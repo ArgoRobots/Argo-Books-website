@@ -67,7 +67,7 @@ function send_license_email($to_email, $license_key)
 
         <div class="license-key">{$license_key}</div>
 
-        <div class="steps">
+        <div class="steps-centered">
             <h2>How to Activate Your License</h2>
             <ol>
                 <li>Open Argo Books on your computer</li>
@@ -103,7 +103,7 @@ function resend_license_email($to_email, $license_key)
 
         <div class="license-key">{$license_key}</div>
 
-        <div class="steps steps-centered">
+        <div class="steps-centered">
             <h2>How to Activate Your License</h2>
             <ol>
                 <li>Open Argo Books on your computer</li>
@@ -144,7 +144,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
 
         <div class="license-key">{$subscription_id}</div>
 
-        <div class="steps steps-centered">
+        <div class="steps-centered">
             <h2>Subscription Details</h2>
             <table style="width: 100%; max-width: 300px; margin: 0 auto; border-collapse: collapse;">
                 <tr>
@@ -1289,7 +1289,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
     $noteSection = '';
     if (!empty($note)) {
         $noteSection = "
-            <div style=\"background: #f0fdf4; border: 1px solid #86efac; padding: 15px; border-radius: 8px; margin: 20px 0;\">
+            <div style=\"background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; margin: 20px 0;\">
                 <p style=\"margin: 0;\"><strong>Note from Argo:</strong> " . htmlspecialchars($note) . "</p>
             </div>";
     }
@@ -1304,7 +1304,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 
         {$noteSection}
 
-        <div class="steps">
+        <div class="steps-centered">
             <h2>How to Activate Your License</h2>
             <ol>
                 <li>Open Argo Books on your computer</li>
@@ -1314,8 +1314,8 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
             </ol>
         </div>
 
-        <h3>What's Included:</h3>
-        <ul style="color: #374151; line-height: 1.8;">
+        <h2>What's Included:</h2>
+        <ul>
             <li>AI-powered receipt scanning</li>
             <li>Predictive sales analysis</li>
             <li>AI business insights</li>

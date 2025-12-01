@@ -216,7 +216,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['generated_sub_key'] = $generated_sub_key;
             $_SESSION['sub_key_duration'] = $duration;
             $_SESSION['sub_key_email'] = $email ?: 'Any user';
-            $_SESSION['message'] = "Free subscription key generated successfully!";
+
+            // Send email notification if email was provided
+            if ($email) {
+                $email_sent = send_free_subscription_key_email($email, $generated_sub_key, $duration, $notes);
+                $_SESSION['message'] = $email_sent
+                    ? "Free subscription key generated and email sent to $email!"
+                    : "Free subscription key generated, but failed to send email to $email.";
+            } else {
+                $_SESSION['message'] = "Free subscription key generated successfully!";
+            }
             $_SESSION['message_type'] = 'success';
         } else {
             $_SESSION['message'] = "Failed to generate subscription key.";

@@ -99,6 +99,7 @@ array_unshift($history, $current_post);
 
     <link rel="stylesheet" href="post-history.css">
     <link rel="stylesheet" href="view-post.css">
+    <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
@@ -111,8 +112,20 @@ array_unshift($history, $current_post);
         <div id="includeHeader"></div>
     </header>
 
-    <div class="community-header">
-        <h2>Post Edit History</h2>
+    <div class="community-hero community-hero-compact">
+        <div class="hero-bg">
+            <div class="hero-gradient-orb hero-orb-1"></div>
+            <div class="hero-gradient-orb hero-orb-2"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                <span>Edit History</span>
+            </div>
+        </div>
     </div>
 
     <div class="community-wrapper">

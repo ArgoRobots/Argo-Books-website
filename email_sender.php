@@ -35,7 +35,6 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
                 </div>
                 <div class="footer">
                     <p>Argo Books &copy; 2025. All rights reserved.</p>
-                    <p>This email was sent to {$to_email}</p>
                 </div>
             </div>
         </body>
@@ -1306,17 +1305,13 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
         {$noteSection}
 
         <div class="steps">
-            <h2>How to Redeem Your Key</h2>
+            <h2>How to Activate Your License</h2>
             <ol>
-                <li>Log in to your Argo Community account (or create one if you don't have one)</li>
-                <li>Go to your <a href="https://argorobots.com/community/users/ai-subscription.php">AI Subscription page</a></li>
-                <li>Click "Redeem Key" and enter the key above</li>
-                <li>Enjoy full access to all AI features!</li>
+                <li>Open Argo Books on your computer</li>
+                <li>Click the blue upgrade button on the top right</li>
+                <li>Enter your license key</li>
+                <li>Enjoy unlimited access to all premium features!</li>
             </ol>
-        </div>
-
-        <div class="button-container">
-            <a href="https://argorobots.com/community/users/ai-subscription.php" class="button" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">Redeem Your Key</a>
         </div>
 
         <h3>What's Included:</h3>

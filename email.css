@@ -22,6 +22,7 @@ body {
 .header {
     padding: 20px;
     text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .header img {
@@ -141,6 +142,178 @@ a:hover {
 
 .footer p {
     margin: 5px 0;
+}
+
+/* Header variations */
+.header-purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+/* header-blue is the default, defined in .header */
+
+/* Tables */
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.details-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.details-table td:last-child {
+    text-align: right;
+}
+
+.details-table tr:last-child td {
+    border-bottom: none;
+}
+
+.details-table .label {
+    color: #6b7280;
+}
+
+.details-table .value {
+    font-weight: bold;
+}
+
+.details-table .monospace {
+    font-size: 12px;
+    font-family: monospace;
+}
+
+/* Info boxes */
+.info-box {
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.info-box p {
+    margin: 0;
+}
+
+.info-box-gray {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.info-box-warning {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+}
+
+.info-box-success {
+    background: #d1fae5;
+    border: 1px solid #6ee7b7;
+}
+
+.info-box-note {
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+}
+
+/* Payment/receipt box */
+.payment-box {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    border: 1px solid #e5e7eb;
+}
+
+.payment-box h3 {
+    margin-top: 0;
+}
+
+/* Credit display */
+.credit-display {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin: 25px 0;
+    text-align: center;
+}
+
+.credit-display .label {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.credit-display .amount {
+    margin: 0;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+/* Button variations */
+.button-purple {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.button-purple:hover {
+    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+/* Status badges */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.status-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* Lists */
+.feature-list {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-list li {
+    padding: 8px 0;
+    padding-left: 24px;
+    position: relative;
+}
+
+.styled-list {
+    color: #374151;
+    line-height: 1.8;
+}
+
+/* Receipt footer */
+.receipt-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+/* Centered text helper */
+.text-center {
+    text-align: center;
+}
+
+/* Text colors */
+.text-muted {
+    color: #6b7280;
+}
+
+/* Margin helpers */
+.mt-0 {
+    margin-top: 0;
+}
+
+.mb-0 {
+    margin-bottom: 0;
 }
 
 /* Mobile responsive */

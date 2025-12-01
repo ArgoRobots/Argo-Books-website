@@ -516,6 +516,7 @@ function handle_password_change()
     <link rel="stylesheet" href="edit-profile.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/header/dark.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
@@ -544,7 +545,7 @@ function handle_password_change()
             <h1>Edit Account</h1>
         </div>
 
-        <a href="profile.php" class="btn btn-outline">
+        <a href="profile.php" class="link-no-underline back-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
             </svg>

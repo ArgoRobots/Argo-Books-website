@@ -206,26 +206,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $duration = intval($_POST['duration_months'] ?? 1);
         $notes = trim($_POST['notes'] ?? '');
 
+        // Require a valid email address
+        if (!$email) {
+            $_SESSION['message'] = "Please enter a valid email address.";
+            $_SESSION['message_type'] = 'error';
+            header('Location: index.php#free-sub-keys');
+            exit;
+        }
+
         // Allow 0 for permanent, otherwise 1-24 months
         if ($duration < 0) $duration = 1;
         if ($duration > 24 && $duration !== 0) $duration = 24;
 
-        $generated_sub_key = generate_ai_subscription_key($email ?: null, $duration, $notes);
+        $generated_sub_key = generate_ai_subscription_key($email, $duration, $notes);
 
         if ($generated_sub_key) {
             $_SESSION['generated_sub_key'] = $generated_sub_key;
             $_SESSION['sub_key_duration'] = $duration;
-            $_SESSION['sub_key_email'] = $email ?: 'Any user';
+            $_SESSION['sub_key_email'] = $email;
 
-            // Send email notification if email was provided
-            if ($email) {
-                $email_sent = send_free_subscription_key_email($email, $generated_sub_key, $duration, $notes);
-                $_SESSION['message'] = $email_sent
-                    ? "Free subscription key generated and email sent to $email!"
-                    : "Free subscription key generated, but failed to send email to $email.";
-            } else {
-                $_SESSION['message'] = "Free subscription key generated successfully!";
-            }
+            // Send email notification
+            $email_sent = send_free_subscription_key_email($email, $generated_sub_key, $duration, $notes);
+            $_SESSION['message'] = $email_sent
+                ? "Free subscription key generated and email sent to $email!"
+                : "Free subscription key generated, but failed to send email to $email.";
             $_SESSION['message_type'] = 'success';
         } else {
             $_SESSION['message'] = "Failed to generate subscription key.";
@@ -832,8 +836,8 @@ include '../admin_header.php';
             <form method="post">
                 <div class="generate-form-grid">
                     <div class="form-group">
-                        <label for="sub_email">Restrict to Email (optional)</label>
-                        <input type="email" id="sub_email" name="sub_email" placeholder="Leave empty for any user">
+                        <label for="sub_email">Recipient Email</label>
+                        <input type="email" id="sub_email" name="sub_email" placeholder="customer@example.com" required>
                     </div>
                     <div class="form-group">
                         <label for="duration_months">Duration</label>

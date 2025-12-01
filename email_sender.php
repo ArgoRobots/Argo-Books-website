@@ -1275,6 +1275,66 @@ function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDat
 }
 
 /**
+ * Send free subscription key notification email
+ *
+ * @param string $email User's email address
+ * @param string $subscriptionKey The subscription key
+ * @param int $durationMonths Duration in months (0 = permanent)
+ * @param string $note Optional note from admin
+ * @return bool Success status
+ */
+function send_free_subscription_key_email($email, $subscriptionKey, $durationMonths = 1, $note = '')
+{
+    $durationText = $durationMonths == 0 ? 'permanent' : $durationMonths . ' month' . ($durationMonths > 1 ? 's' : '');
+
+    $noteSection = '';
+    if (!empty($note)) {
+        $noteSection = "
+            <div style=\"background: #f0fdf4; border: 1px solid #86efac; padding: 15px; border-radius: 8px; margin: 20px 0;\">
+                <p style=\"margin: 0;\"><strong>Note from Argo:</strong> " . htmlspecialchars($note) . "</p>
+            </div>";
+    }
+
+    $body = <<<HTML
+        <h1>You've Received a Free AI Subscription Key!</h1>
+        <p>Great news! You've been given a free Argo AI subscription key.</p>
+
+        <div class="license-key">{$subscriptionKey}</div>
+
+        <p style="text-align: center; color: #6b7280; margin-top: -10px;">Duration: <strong>{$durationText}</strong></p>
+
+        {$noteSection}
+
+        <div class="steps">
+            <h2>How to Redeem Your Key</h2>
+            <ol>
+                <li>Log in to your Argo Community account (or create one if you don't have one)</li>
+                <li>Go to your <a href="https://argorobots.com/community/users/ai-subscription.php">AI Subscription page</a></li>
+                <li>Click "Redeem Key" and enter the key above</li>
+                <li>Enjoy full access to all AI features!</li>
+            </ol>
+        </div>
+
+        <div class="button-container">
+            <a href="https://argorobots.com/community/users/ai-subscription.php" class="button" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">Redeem Your Key</a>
+        </div>
+
+        <h3>What's Included:</h3>
+        <ul style="color: #374151; line-height: 1.8;">
+            <li>AI-powered receipt scanning</li>
+            <li>Predictive sales analysis</li>
+            <li>AI business insights</li>
+            <li>Natural language AI search</li>
+        </ul>
+
+        <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>Thank you for being part of the Argo community!</p>
+        HTML;
+
+    return send_styled_email($email, 'Your Free Argo AI Subscription Key', $body, 'background: linear-gradient(135deg, #8b5cf6, #7c3aed);');
+}
+
+/**
  * Send free credit notification email
  *
  * @param string $email User's email address

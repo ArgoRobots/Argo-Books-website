@@ -16,7 +16,6 @@ require_once 'formatting_functions.php';
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="allowed-domains.css">
-    <link rel="stylesheet" href="../../resources/styles/help.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
@@ -31,7 +30,12 @@ require_once 'formatting_functions.php';
     </header>
 
     <div class="domains-container">
-        <a href="help.php" class="link-no-underline back-link">← Back to Guide</a>
+        <a href="help.php" class="link-no-underline back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Guide
+        </a>
 
         <div class="domains-header">
             <h1>Allowed Domains for Links</h1>

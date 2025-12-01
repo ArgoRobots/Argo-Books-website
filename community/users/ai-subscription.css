@@ -13,21 +13,6 @@
     margin: 30px 0;
 }
 
-.page-header .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--gray-text);
-    text-decoration: none;
-    font-size: 14px;
-    margin-bottom: 16px;
-    transition: color 0.2s;
-}
-
-.page-header .back-link:hover {
-    color: var(--gray-text-dark);
-}
-
 /* Alerts */
 .alert {
     padding: 16px;

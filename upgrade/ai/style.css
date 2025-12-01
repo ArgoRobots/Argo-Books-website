@@ -184,7 +184,7 @@
 
 .license-input-group input:focus {
     outline: none;
-    border-color: var(--amber-500);
+    border-color: var(--blue-500);
 }
 
 .btn-verify {

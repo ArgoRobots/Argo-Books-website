@@ -13,7 +13,6 @@
     <script src="../../resources/scripts/levenshtein.js"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../../resources/styles/help.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
@@ -28,7 +27,12 @@
     </header>
 
     <div class="reference-container">
-        <a href="../#supported-languages" class="link-no-underline back-link">← Back to Documentation</a>
+        <a href="../" class="link-no-underline back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Documentation
+        </a>
 
         <div class="reference-header">
             <h1>Supported Languages</h1>
@@ -70,21 +74,9 @@
                     </div>
                 </div>
                 <div class="language-item">
-                    <h4>Chinese (Traditional)</h4>
-                    <div class="item-info">
-                        <span class="language-region">Taiwan, Hong Kong</span>
-                    </div>
-                </div>
-                <div class="language-item">
                     <h4>Japanese</h4>
                     <div class="item-info">
                         <span class="language-region">Japan</span>
-                    </div>
-                </div>
-                <div class="language-item">
-                    <h4>Arabic</h4>
-                    <div class="item-info">
-                        <span class="language-region">Middle East, North Africa</span>
                     </div>
                 </div>
             </div>
@@ -99,6 +91,12 @@
                         <h5>Albanian</h5>
                         <div class="item-info">
                             <span class="language-region">Albania</span>
+                        </div>
+                    </div>
+                    <div class="item-group-small">
+                        <h5>Arabic</h5>
+                        <div class="item-info">
+                            <span class="language-region">Middle East, North Africa</span>
                         </div>
                     </div>
                 </div>
@@ -143,6 +141,12 @@
                         <h5>Catalan</h5>
                         <div class="item-info">
                             <span class="language-region">Catalonia</span>
+                        </div>
+                    </div>
+                    <div class="item-group-small">
+                        <h5>Chinese (Traditional)</h5>
+                        <div class="item-info">
+                            <span class="language-region">Taiwan, Hong Kong</span>
                         </div>
                     </div>
                     <div class="item-group-small">

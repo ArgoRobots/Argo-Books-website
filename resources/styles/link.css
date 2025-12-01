@@ -10,3 +10,30 @@
 .link-no-underline:hover {
   text-decoration: underline;
 }
+
+/* Back link */
+.back-link {
+  font-weight: 500;
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  width: fit-content;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.back-link svg {
+  transition: transform 0.3s ease;
+}
+
+.back-link:hover svg {
+  transform: translateX(-4px);
+}
+
+@media (max-width: 480px) {
+  .back-link {
+    font-size: 14px;
+  }
+}

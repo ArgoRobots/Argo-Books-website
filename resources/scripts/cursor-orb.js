@@ -24,7 +24,7 @@
             filter: blur(80px);
         }
         .cursor-orb.active {
-            opacity: 0.6;
+            opacity: 0.4;
         }
         @media (max-width: 400px) {
             .cursor-orb {

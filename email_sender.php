@@ -245,6 +245,8 @@ function send_notification_email($type, $data)
         $post_type_text = $data['post_type'] === 'bug' ? 'Bug Report' : 'Feature Request';
         $subject = "[Argo Community] New $post_type_text: " . $data['title'];
         $post_url = "$site_url/community/view_post.php?id=" . $data['id'];
+        $escaped_title = htmlspecialchars($data['title']);
+        $escaped_content = nl2br(htmlspecialchars($data['content'] ?? ''));
 
         $email_template = <<<HTML
         <!DOCTYPE html>
@@ -262,22 +264,26 @@ function send_notification_email($type, $data)
                 <div class="header">
                     <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
-                
+
                 <div class="content">
                     <h2>New {$post_type_text} Posted</h2>
                     <p>A new {$post_type_text} has been posted on the Argo Community:</p>
-                    
-                    <p><strong>Title:</strong> {$data['title']}</p>
+
+                    <p><strong>Title:</strong> {$escaped_title}</p>
                     <p><strong>Posted by:</strong> {$data['user_name']} ({$data['user_email']})</p>
-                    
+
+                    <div style="background-color: #f5f5f5; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                        <p style="margin: 0; color: #374151; font-size: 14px; line-height: 1.6;">{$escaped_content}</p>
+                    </div>
+
                     <div class="button-container">
                         <a href="{$post_url}" class="button">View Post</a>
                     </div>
                 </div>
-                
+
                 <div class="footer">
                     <p>This is an automated notification from the Argo Community system.</p>
-                    <p>You received this message because you're an administrator of the Argo Community. 
+                    <p>You received this message because you're an administrator of the Argo Community.
                     You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
                     <p>Argo Books &copy; 2025. All rights reserved.</p>
                 </div>
@@ -288,6 +294,8 @@ HTML;
     } elseif ($type === 'new_comment') {
         $subject = "[Argo Community] New Comment on: " . $data['post_title'];
         $post_url = "$site_url/community/view_post.php?id=" . $data['post_id'];
+        $escaped_post_title = htmlspecialchars($data['post_title']);
+        $escaped_content = nl2br(htmlspecialchars($data['content'] ?? ''));
 
         $email_template = <<<HTML
         <!DOCTYPE html>
@@ -305,21 +313,25 @@ HTML;
                 <div class="header">
                     <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
-                
+
                 <div class="content">
                     <h2>New Comment Posted</h2>
-                    <p>A new comment has been posted on "{$data['post_title']}":</p>
-                    
+                    <p>A new comment has been posted on "{$escaped_post_title}":</p>
+
                     <p><strong>Posted by:</strong> {$data['user_name']} ({$data['user_email']})</p>
-                    
+
+                    <div style="background-color: #f5f5f5; border-left: 4px solid #2563eb; padding: 15px; margin: 20px 0; border-radius: 4px;">
+                        <p style="margin: 0; color: #374151; font-size: 14px; line-height: 1.6;">{$escaped_content}</p>
+                    </div>
+
                     <div class="button-container">
                         <a href="{$post_url}" class="button">View Comment</a>
                     </div>
                 </div>
-                
+
                 <div class="footer">
                     <p>This is an automated notification from the Argo Community system.</p>
-                    <p>You received this message because you're an administrator of the Argo Community. 
+                    <p>You received this message because you're an administrator of the Argo Community.
                     You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
                     <p>Argo Books &copy; 2025. All rights reserved.</p>
                 </div>

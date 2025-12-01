@@ -18,6 +18,7 @@ require_once '../community_functions.php';
     <link rel="stylesheet" href="reputation-help.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/header/dark.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
@@ -34,10 +35,9 @@ require_once '../community_functions.php';
             <p>Understanding how reputation works and ways to earn it</p>
         </div>
 
-        <a href="profile.php" class="btn btn-blue top-return-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="25" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
+        <a href="profile.php" class="link-no-underline back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             Back to Profile
         </a>
@@ -125,10 +125,9 @@ require_once '../community_functions.php';
             </ul>
         </div>
 
-        <a href="profile.php" class="btn btn-blue">
-            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="25" y1="12" x2="5" y2="12"></line>
-                <polyline points="12 19 5 12 12 5"></polyline>
+        <a href="profile.php" class="link-no-underline back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             Back to Profile
         </a>

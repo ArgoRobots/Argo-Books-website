@@ -13,7 +13,6 @@
     <script src="../../resources/scripts/levenshtein.js"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../../resources/styles/help.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
@@ -71,7 +70,12 @@
     </header>
 
     <div class="reference-container">
-        <a href="../#supported-currencies" class="link-no-underline back-link">← Back to Documentation</a>
+        <a href="../" class="link-no-underline back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Documentation
+        </a>
 
         <div class="reference-header">
             <h1>Supported Currencies</h1>

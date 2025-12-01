@@ -138,7 +138,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
             <h2>Choose Your Plan</h2>
             <p class="pricing-subtitle">Select billing frequency and enter your license key if you're a Premium user</p>
 
-            <div class="license-check-box">
+            <div class="license-discount">
                 <h3>Premium User? Get $20 Off!</h3>
                 <p>If you've purchased the $20 Premium version, enter your license key to receive a $20 discount.</p>
                 <div class="license-input-group">
@@ -205,22 +205,6 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
             <div class="faq-grid">
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Do I need the Premium version to use AI features?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>No, the AI subscription is available to all users. However, Premium users receive a $20 discount on their first year as a thank you for their support.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
                         <h3>How does the $20 discount work?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -230,7 +214,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>If you've purchased the $20 Premium version, enter your license key when subscribing. The $20 discount will be applied to your first yearly subscription ($50 - $20 = $30 for the first year) or as credit toward monthly payments.</p>
+                            <p>If you've purchased the $20 Premium version, the $20 discount will be applied to your first yearly subscription ($50 - $20 = $30 for the first year) or as credit toward monthly payments.</p>
                         </div>
                     </div>
                 </div>
@@ -247,22 +231,6 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes, you can cancel your subscription at any time. Your AI features will remain active until the end of your current billing period.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is there a free trial?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes! New subscribers get a 7-day free trial to experience all AI features before being charged.</p>
                         </div>
                     </div>
                 </div>

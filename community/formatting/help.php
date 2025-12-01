@@ -34,7 +34,7 @@ $combinedExample = "- **Bold list item**\n- _Italic list item_\n- List item with
     <script src="text-formatting.js" defer></script>
 
     <link rel="stylesheet" href="formatted-text.css">
-    <link rel="stylesheet" href="../../resources/styles/help.css">
+    <link rel="stylesheet" href="help.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">

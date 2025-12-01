@@ -51,7 +51,7 @@ function get_pregenerated_license($payment_intent_id) {
  * @param string $payment_method The payment method (Stripe, Square, PayPal)
  * @return bool Success status
  */
-function activate_license_key($license_key, $transaction_id, $order_id, $payment_method) {
+function activate_license_key_with_payment($license_key, $transaction_id, $order_id, $payment_method) {
     $db = get_db_connection();
     $stmt = $db->prepare('UPDATE license_keys SET
         transaction_id = ?,
@@ -163,7 +163,7 @@ function process_payment_completion($params) {
     }
 
     // Activate the license key
-    activate_license_key($license_key, $transaction_id, $order_id, $payment_method);
+    activate_license_key_with_payment($license_key, $transaction_id, $order_id, $payment_method);
 
     // Send license email
     $email_sent = send_license_email($email, $license_key);

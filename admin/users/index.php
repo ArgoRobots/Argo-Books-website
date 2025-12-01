@@ -6,7 +6,7 @@ require_once '../../community/report/ban_check.php';
 
 // Check if user is already logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
+    header('Location: ../login.php');
     exit;
 }
 

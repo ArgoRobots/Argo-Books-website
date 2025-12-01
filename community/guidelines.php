@@ -28,11 +28,14 @@
         <div class="guidelines-header">
             <h1>Community Guidelines</h1>
             <p>Help us keep the community friendly, professional, and productive.</p>
-
-            <div class="back-button-container">
-                <a href="./" class="btn back-button">← Back to Community</a>
-            </div>
         </div>
+
+        <a href="index.php" class="link-no-underline back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Community
+        </a>
 
         <!-- General Rules -->
         <div class="guidelines-section">
@@ -137,10 +140,6 @@
             <strong>Remember:</strong> These guidelines help maintain a productive environment for all Argo Books
             users. When in doubt, ask yourself: "Does this contribute positively to helping others use the
             software effectively?" Thank you for being part of our community!
-        </div>
-
-        <div class="back-button-container">
-            <a href="./" class="btn back-button">← Back to Community</a>
         </div>
     </div>
 

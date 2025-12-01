@@ -67,15 +67,13 @@ function send_license_email($to_email, $license_key)
 
         <div class="license-key">{$license_key}</div>
 
-        <div class="steps-centered">
-            <h2>How to Activate Your License</h2>
-            <ol>
-                <li>Open Argo Books on your computer</li>
-                <li>Click the blue upgrade button on the top right</li>
-                <li>Enter your license key</li>
-                <li>Enjoy unlimited access to all premium features!</li>
-            </ol>
-        </div>
+        <h2>How to Activate Your License</h2>
+        <ol>
+            <li>Open Argo Books on your computer</li>
+            <li>Click the blue upgrade button on the top right</li>
+            <li>Enter your license key</li>
+            <li>Enjoy unlimited access to all premium features!</li>
+        </ol>
 
         <div class="button-container">
             <a href="https://argorobots.com/documentation/" class="button">View Documentation</a>
@@ -103,15 +101,13 @@ function resend_license_email($to_email, $license_key)
 
         <div class="license-key">{$license_key}</div>
 
-        <div class="steps-centered">
-            <h2>How to Activate Your License</h2>
-            <ol>
-                <li>Open Argo Books on your computer</li>
-                <li>Click the blue upgrade button on the top right</li>
-                <li>Enter your license key</li>
-                <li>Enjoy unlimited access to all premium features!</li>
-            </ol>
-        </div>
+        <h2>How to Activate Your License</h2>
+        <ol>
+            <li>Open Argo Books on your computer</li>
+            <li>Click the blue upgrade button on the top right</li>
+            <li>Enter your license key</li>
+            <li>Enjoy unlimited access to all premium features!</li>
+        </ol>
 
         <div class="button-container">
             <a href="https://argorobots.com/documentation/" class="button">View Documentation</a>
@@ -144,19 +140,17 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
 
         <div class="license-key">{$subscription_id}</div>
 
-        <div class="steps-centered">
-            <h2>Subscription Details</h2>
-            <table style="width: 100%; max-width: 300px; margin: 0 auto; border-collapse: collapse;">
-                <tr>
-                    <td style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb;"><strong>Plan</strong></td>
-                    <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">{$billing_text}</td>
-                </tr>
-                <tr>
-                    <td style="padding: 8px; text-align: left;"><strong>Next Billing</strong></td>
-                    <td style="padding: 8px; text-align: right;">{$end_date_text}</td>
-                </tr>
-            </table>
-        </div>
+        <h2>Subscription Details</h2>
+        <table style="width: 100%; max-width: 300px; margin: 0 auto; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb;"><strong>Plan</strong></td>
+                <td style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb;">{$billing_text}</td>
+            </tr>
+            <tr>
+                <td style="padding: 8px; text-align: left;"><strong>Next Billing</strong></td>
+                <td style="padding: 8px; text-align: right;">{$end_date_text}</td>
+            </tr>
+        </table>
 
         <div class="button-container">
             <a href="https://argorobots.com/community/users/ai-subscription.php" class="button" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">Manage Subscription</a>
@@ -1304,15 +1298,13 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 
         {$noteSection}
 
-        <div class="steps-centered">
-            <h2>How to Activate Your License</h2>
-            <ol>
-                <li>Open Argo Books on your computer</li>
-                <li>Click the blue upgrade button on the top right</li>
-                <li>Enter your license key</li>
-                <li>Enjoy unlimited access to all premium features!</li>
-            </ol>
-        </div>
+        <h2>How to Activate Your License</h2>
+        <ol>
+            <li>Open Argo Books on your computer</li>
+            <li>Click the blue upgrade button on the top right</li>
+            <li>Enter your license key</li>
+            <li>Enjoy unlimited access to all premium features!</li>
+        </ol>
 
         <h2>What's Included:</h2>
         <ul>

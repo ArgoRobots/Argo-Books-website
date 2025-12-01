@@ -893,7 +893,6 @@ include '../admin_header.php';
                                     <th>Email</th>
                                     <th>Status</th>
                                     <th>Created</th>
-                                    <th>Redeemed By</th>
                                     <th>Notes</th>
                                 </tr>
                             </thead>
@@ -919,14 +918,6 @@ include '../admin_header.php';
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo date('M j, Y', strtotime($key['created_at'])); ?></td>
-                                        <td>
-                                            <?php if ($key['redeemed_by_username']): ?>
-                                                <?php echo htmlspecialchars($key['redeemed_by_username']); ?>
-                                                <br><small><?php echo date('M j, Y', strtotime($key['redeemed_at'])); ?></small>
-                                            <?php else: ?>
-                                                -
-                                            <?php endif; ?>
-                                        </td>
                                         <td><?php echo $key['notes'] ? htmlspecialchars($key['notes']) : '-'; ?></td>
                                     </tr>
                                 <?php endforeach; ?>

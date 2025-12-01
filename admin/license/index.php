@@ -107,12 +107,7 @@ function get_ai_subscription_keys()
     $keys = [];
 
     try {
-        $stmt = $pdo->query("
-            SELECT k.*, u.username as redeemed_by_username
-            FROM ai_subscription_keys k
-            LEFT JOIN community_users u ON k.redeemed_by_user_id = u.id
-            ORDER BY k.created_at DESC
-        ");
+        $stmt = $pdo->query("SELECT * FROM ai_subscription_keys ORDER BY created_at DESC");
         $keys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching AI subscription keys: " . $e->getMessage());

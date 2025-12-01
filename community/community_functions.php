@@ -94,6 +94,7 @@ function add_post($user_id, $user_name, $user_email, $title, $content, $post_typ
             'user_name' => $user_name,
             'user_email' => $user_email,
             'title' => $title,
+            'content' => $content,
             'post_type' => $post_type
         ]);
 
@@ -245,7 +246,8 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
             'post_id' => $post_id,
             'post_title' => $post['title'],
             'user_name' => $user_name,
-            'user_email' => $user_email
+            'user_email' => $user_email,
+            'content' => $content
         ]);
 
         // Process the comment content for display if needed

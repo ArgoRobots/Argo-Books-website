@@ -3,8 +3,9 @@ $pageTitle = 'Report Generator';
 $pageDescription = 'Learn how to generate professional reports with charts and analytics in Argo Books using the 3-step wizard.';
 $currentPage = 'report-generator';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'features';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -68,4 +69,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

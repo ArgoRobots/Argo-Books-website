@@ -3,8 +3,9 @@ $pageTitle = 'Accepted Countries';
 $pageDescription = 'View the list of accepted country names and variants for importing data into Argo Books.';
 $currentPage = 'accepted-countries';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'reference';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -27,7 +28,7 @@ include 'sidebar.php';
                         names and variants</a></p>
 
                 <div class="page-navigation">
-                    <a href="advanced-search.php" class="nav-button prev">
+                    <a href="../features/advanced-search.php" class="nav-button prev">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M15 18l-6-6 6-6"></path>
                         </svg>
@@ -43,4 +44,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

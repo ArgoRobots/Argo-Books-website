@@ -5,20 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Argo Books supports 54 international languages. Browse the complete list of supported languages and their regions, and learn how to change your language settings.">
-    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
     <title>Supported Languages - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
-    <script src="../../resources/scripts/main.js"></script>
-    <script src="../../resources/scripts/levenshtein.js"></script>
+    <script src="../../../resources/scripts/jquery-3.6.0.js"></script>
+    <script src="../../../resources/scripts/main.js"></script>
+    <script src="../../../resources/scripts/levenshtein.js"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../../resources/styles/button.css">
-    <link rel="stylesheet" href="../../resources/styles/link.css">
-    <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
-    <link rel="stylesheet" href="../../resources/header/style.css">
-    <link rel="stylesheet" href="../../resources/header/dark.css">
-    <link rel="stylesheet" href="../../resources/footer/style.css">
+    <link rel="stylesheet" href="../../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../../resources/styles/link.css">
+    <link rel="stylesheet" href="../../../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../../../resources/header/style.css">
+    <link rel="stylesheet" href="../../../resources/header/dark.css">
+    <link rel="stylesheet" href="../../../resources/footer/style.css">
 </head>
 
 <body>
@@ -27,7 +27,7 @@
     </header>
 
     <div class="reference-container">
-        <a href="../" class="link-no-underline back-link">
+        <a href="../../" class="link-no-underline back-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
             </svg>

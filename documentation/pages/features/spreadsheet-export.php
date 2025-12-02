@@ -3,8 +3,9 @@ $pageTitle = 'Spreadsheet Export';
 $pageDescription = 'Learn how to export your Argo Books data to Excel spreadsheets for backup, analysis, or sharing with accountants.';
 $currentPage = 'spreadsheet-export';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'features';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -35,7 +36,7 @@ include 'sidebar.php';
 
                 <h2>Currency Conversion</h2>
                 <p>When exporting, you can choose any of the <a class="link"
-                        href="supported-currencies.php">supported currencies</a>. The system will:</p>
+                        href="../reference/supported-currencies.php">supported currencies</a>. The system will:</p>
                 <ul>
                     <li>Convert all monetary values to your chosen currency using historical exchange rates</li>
                     <li>Use the exact exchange rate that was valid on each transaction's date</li>
@@ -82,4 +83,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

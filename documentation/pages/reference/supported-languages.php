@@ -3,8 +3,9 @@ $pageTitle = 'Supported Languages';
 $pageDescription = 'View the list of 54 supported languages in Argo Books and learn how to change your application language.';
 $currentPage = 'supported-languages';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'reference';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -32,7 +33,7 @@ include 'sidebar.php';
                         </svg>
                         Previous: Supported Currencies
                     </a>
-                    <a href="encryption.php" class="nav-button next">
+                    <a href="../security/encryption.php" class="nav-button next">
                         Next: Encryption
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 18l6-6-6-6"></path>
@@ -42,4 +43,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

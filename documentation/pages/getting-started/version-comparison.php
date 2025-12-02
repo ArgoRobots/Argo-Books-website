@@ -3,8 +3,9 @@ $pageTitle = 'Free vs. Paid Version';
 $pageDescription = 'Compare Argo Books free and paid versions. Learn about features, limitations, and which version is right for your business.';
 $currentPage = 'version-comparison';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'getting-started';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -97,7 +98,7 @@ include 'sidebar.php';
                         </svg>
                         Previous: Quick Start Tutorial
                     </a>
-                    <a href="product-management.php" class="nav-button next">
+                    <a href="../features/product-management.php" class="nav-button next">
                         Next: Product Management
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 18l6-6-6-6"></path>
@@ -107,4 +108,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

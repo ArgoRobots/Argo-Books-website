@@ -3,8 +3,9 @@ $pageTitle = 'Quick Start Tutorial';
 $pageDescription = 'Get started quickly with Argo Books. Learn the basic steps to set up your business and start tracking products and sales.';
 $currentPage = 'quick-start';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'getting-started';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -43,4 +44,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

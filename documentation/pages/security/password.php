@@ -3,8 +3,9 @@ $pageTitle = 'Password Protection';
 $pageDescription = 'Learn how to set up password protection and Windows Hello in Argo Books to secure your business data.';
 $currentPage = 'password';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'security';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -57,4 +58,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

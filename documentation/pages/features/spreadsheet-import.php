@@ -3,8 +3,9 @@ $pageTitle = 'Spreadsheet Import';
 $pageDescription = 'Learn how to import data from Excel spreadsheets into Argo Books. Supports multiple currencies and automatic data detection.';
 $currentPage = 'spreadsheet-import';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'features';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -42,13 +43,13 @@ include 'sidebar.php';
                             products", "Purchases", "Sales" (case doesn't matter)</li>
                         <li><strong>Date format:</strong> YYYY-MM-DD (e.g., 2025-01-15)</li>
                         <li><strong>Country names:</strong> Must match the <a class="link"
-                                href="accepted-countries.php">accepted country list</a></li>
+                                href="../reference/accepted-countries.php">accepted country list</a></li>
                         <li><strong>Everything else:</strong> Follow the template format exactly</li>
                     </ul>
                 </div>
 
                 <h2>Currency Support</h2>
-                <p>The import system supports <a class="link" href="supported-currencies.php">28 different
+                <p>The import system supports <a class="link" href="../reference/supported-currencies.php">28 different
                         currencies</a>. The system will attempt to automatically detect the currency from your
                     spreadsheet data, but you can also manually select the source currency during import.</p>
 
@@ -104,4 +105,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

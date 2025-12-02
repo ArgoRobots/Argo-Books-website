@@ -3,8 +3,9 @@ $pageTitle = 'Product Management';
 $pageDescription = 'Learn how to manage products and categories in Argo Books. Create categories, add products, and organize your inventory.';
 $currentPage = 'product-management';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'features';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -74,7 +75,7 @@ include 'sidebar.php';
                 </div>
 
                 <div class="page-navigation">
-                    <a href="version-comparison.php" class="nav-button prev">
+                    <a href="../getting-started/version-comparison.php" class="nav-button prev">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M15 18l-6-6 6-6"></path>
                         </svg>
@@ -90,4 +91,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

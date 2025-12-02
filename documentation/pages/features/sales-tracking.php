@@ -3,8 +3,9 @@ $pageTitle = 'Purchase/Sales Tracking';
 $pageDescription = 'Learn how to track purchases and sales in Argo Books. Add transactions, manage orders, and keep accurate records.';
 $currentPage = 'sales-tracking';
 
-include 'docs-header.php';
-include 'sidebar.php';
+include '../../docs-header.php';
+$pageCategory = 'features';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -46,4 +47,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

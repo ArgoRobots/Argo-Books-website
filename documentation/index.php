@@ -45,19 +45,19 @@ include 'sidebar.php';
                 <h2>Getting Started</h2>
                 <p>New to Argo Books? Start here to learn the basics.</p>
                 <div class="section-links">
-                    <a href="system-requirements.php" class="section-link-card">
+                    <a href="pages/getting-started/system-requirements.php" class="section-link-card">
                         <h3>System Requirements</h3>
                         <p>Check if your system meets the requirements for Windows, macOS, or Linux.</p>
                     </a>
-                    <a href="installation.php" class="section-link-card">
+                    <a href="pages/getting-started/installation.php" class="section-link-card">
                         <h3>Installation Guide</h3>
                         <p>Download and install Argo Books on your computer.</p>
                     </a>
-                    <a href="quick-start.php" class="section-link-card">
+                    <a href="pages/getting-started/quick-start.php" class="section-link-card">
                         <h3>Quick Start Tutorial</h3>
                         <p>Get up and running quickly with a step-by-step guide.</p>
                     </a>
-                    <a href="version-comparison.php" class="section-link-card">
+                    <a href="pages/getting-started/version-comparison.php" class="section-link-card">
                         <h3>Free vs. Paid Version</h3>
                         <p>Compare features and choose the right version for you.</p>
                     </a>
@@ -69,31 +69,31 @@ include 'sidebar.php';
                 <h2>Core Features</h2>
                 <p>Learn how to use the main features of Argo Books.</p>
                 <div class="section-links">
-                    <a href="product-management.php" class="section-link-card">
+                    <a href="pages/features/product-management.php" class="section-link-card">
                         <h3>Product Management</h3>
                         <p>Create categories and manage your product inventory.</p>
                     </a>
-                    <a href="sales-tracking.php" class="section-link-card">
+                    <a href="pages/features/sales-tracking.php" class="section-link-card">
                         <h3>Purchase/Sales Tracking</h3>
                         <p>Track all your business transactions.</p>
                     </a>
-                    <a href="receipts.php" class="section-link-card">
+                    <a href="pages/features/receipts.php" class="section-link-card">
                         <h3>Receipt Management</h3>
                         <p>Attach and manage digital receipts for transactions.</p>
                     </a>
-                    <a href="spreadsheet-import.php" class="section-link-card">
+                    <a href="pages/features/spreadsheet-import.php" class="section-link-card">
                         <h3>Spreadsheet Import</h3>
                         <p>Import data from Excel spreadsheets.</p>
                     </a>
-                    <a href="spreadsheet-export.php" class="section-link-card">
+                    <a href="pages/features/spreadsheet-export.php" class="section-link-card">
                         <h3>Spreadsheet Export</h3>
                         <p>Export your data to Excel for backup or analysis.</p>
                     </a>
-                    <a href="report-generator.php" class="section-link-card">
+                    <a href="pages/features/report-generator.php" class="section-link-card">
                         <h3>Report Generator</h3>
                         <p>Create professional reports with charts and analytics.</p>
                     </a>
-                    <a href="advanced-search.php" class="section-link-card">
+                    <a href="pages/features/advanced-search.php" class="section-link-card">
                         <h3>Advanced Search</h3>
                         <p>Use powerful search operators and AI-powered queries.</p>
                     </a>
@@ -105,15 +105,15 @@ include 'sidebar.php';
                 <h2>Reference</h2>
                 <p>Detailed reference information for data import and localization.</p>
                 <div class="section-links">
-                    <a href="accepted-countries.php" class="section-link-card">
+                    <a href="pages/reference/accepted-countries.php" class="section-link-card">
                         <h3>Accepted Countries</h3>
                         <p>View accepted country names and variants for import.</p>
                     </a>
-                    <a href="supported-currencies.php" class="section-link-card">
+                    <a href="pages/reference/supported-currencies.php" class="section-link-card">
                         <h3>Supported Currencies</h3>
                         <p>View the 28 supported currencies.</p>
                     </a>
-                    <a href="supported-languages.php" class="section-link-card">
+                    <a href="pages/reference/supported-languages.php" class="section-link-card">
                         <h3>Supported Languages</h3>
                         <p>View the 54 supported languages.</p>
                     </a>
@@ -125,19 +125,19 @@ include 'sidebar.php';
                 <h2>Security</h2>
                 <p>Learn how to keep your business data safe and secure.</p>
                 <div class="section-links">
-                    <a href="encryption.php" class="section-link-card">
+                    <a href="pages/security/encryption.php" class="section-link-card">
                         <h3>Encryption</h3>
                         <p>Learn about AES-256 encryption for your data.</p>
                     </a>
-                    <a href="password.php" class="section-link-card">
+                    <a href="pages/security/password.php" class="section-link-card">
                         <h3>Password Protection</h3>
                         <p>Set up password protection and Windows Hello.</p>
                     </a>
-                    <a href="backups.php" class="section-link-card">
+                    <a href="pages/security/backups.php" class="section-link-card">
                         <h3>Regular Backups</h3>
                         <p>Create backups to prevent data loss.</p>
                     </a>
-                    <a href="anonymous-data.php" class="section-link-card">
+                    <a href="pages/security/anonymous-data.php" class="section-link-card">
                         <h3>Anonymous Usage Data</h3>
                         <p>Manage privacy settings and data collection.</p>
                     </a>

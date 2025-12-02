@@ -55,7 +55,7 @@ $fullTitle = $pageTitle . ' - Argo Books Documentation';
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
     <title><?php echo htmlspecialchars($fullTitle); ?></title>
 
     <script src="main.js"></script>

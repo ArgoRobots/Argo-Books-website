@@ -37,7 +37,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/about-us/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
     <title>About Us - Argo Books | Calgary Business Software Company</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>
@@ -112,7 +112,7 @@
                     </div>
                 </div>
                 <div class="mission-image animate-on-scroll">
-                    <img src="../images/main.webp" alt="Argo Books Interface">
+                    <img src="../resources/images/main.webp" alt="Argo Books Interface">
                 </div>
             </div>
         </div>
@@ -174,7 +174,7 @@
         <div class="container">
             <div class="story-grid">
                 <div class="story-image animate-on-scroll">
-                    <img src="../images/calgary-skyline.jpg" alt="Calgary Skyline">
+                    <img src="../resources/images/calgary-skyline.jpg" alt="Calgary Skyline">
                     <div class="image-badge">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>

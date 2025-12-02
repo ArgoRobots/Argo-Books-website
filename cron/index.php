@@ -176,7 +176,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
     <title>Subscription Renewal Management - Argo Books</title>
 
     <link rel="stylesheet" href="style.css">

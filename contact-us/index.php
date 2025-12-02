@@ -53,7 +53,7 @@ if (isset($_SESSION['contact_success'])) {
   <!-- Canonical URL -->
   <link rel="canonical" href="https://argorobots.com/contact-us/">
 
-  <link rel="shortcut icon" type="image/x-icon" href="../images/argo-logo/A-logo.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
   <title>Contact Us - Argo Books Support | Calgary Software Company</title>
 
   <script src="../resources/scripts/jquery-3.6.0.js"></script>

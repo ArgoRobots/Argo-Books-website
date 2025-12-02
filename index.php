@@ -92,7 +92,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         }
     </script>
 
-    <link rel="shortcut icon" type="image/x-icon" href="images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/A-logo.ico">
     <title>Argo Books - AI-Powered Business Management Software</title>
 
     <script src="resources/scripts/jquery-3.6.0.js"></script>
@@ -146,7 +146,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="hero-visual animate-fade-in-up delay-2">
                 <div class="hero-device">
                     <div class="device-frame">
-                        <img src="images/main.webp" alt="Argo Books Dashboard" class="device-screen">
+                        <img src="resources/images/main.webp" alt="Argo Books Dashboard" class="device-screen">
                     </div>
                     <div class="floating-card floating-card-1 animate-float">
                         <div class="floating-card-icon">
@@ -922,13 +922,13 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                     <div class="visual-mockup payments-mockup">
                                         <div class="payment-providers">
                                             <div class="provider-card">
-                                                <img src="images/Stripe-logo.svg" alt="Stripe" class="provider-logo">
+                                                <img src="resources/images/Stripe-logo.svg" alt="Stripe" class="provider-logo">
                                             </div>
                                             <div class="provider-card">
-                                                <img src="images/PayPal-logo.svg" alt="PayPal" class="provider-logo">
+                                                <img src="resources/images/PayPal-logo.svg" alt="PayPal" class="provider-logo">
                                             </div>
                                             <div class="provider-card">
-                                                <img src="images/Square-logo.svg" alt="Square" class="provider-logo">
+                                                <img src="resources/images/Square-logo.svg" alt="Square" class="provider-logo">
                                             </div>
                                         </div>
                                         <div class="payment-success">

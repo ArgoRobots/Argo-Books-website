@@ -8,7 +8,7 @@
   <meta name="description" content="">
   <meta name="keywords" content="">
   <meta name="author" content="Argo">
-  <link rel="shortcut icon" type="image/x-icon" href="../../images/argo-logo/A-logo.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
   <title>Argo Books - Message Sent Successfully</title>
 
   <script src="../../resources/scripts/jquery-3.6.0.js"></script>

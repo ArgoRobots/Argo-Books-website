@@ -46,7 +46,7 @@ if (isset($_SESSION['user_id'])) {
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
     <title>Get Premium - Argo Books | $20 CAD Lifetime Access</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
@@ -124,17 +124,17 @@ if (isset($_SESSION['user_id'])) {
 
                     <div class="payment-options">
                         <button class="payment-option" onclick="window.location.href='checkout/?method=paypal'">
-                            <img src="../../images/PayPal-logo.svg" alt="PayPal">
+                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
                             <span class="payment-desc">PayPal balance or linked card</span>
                         </button>
 
                         <button class="payment-option" onclick="window.location.href='checkout/?method=stripe'">
-                            <img src="../../images/Stripe-logo.svg" alt="Stripe">
+                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe">
                             <span class="payment-desc">Visa, Mastercard, Amex via Stripe</span>
                         </button>
 
                         <button class="payment-option" onclick="window.location.href='checkout/?method=square'">
-                            <img src="../../images/Square-logo.svg" alt="Square">
+                            <img src="../../resources/images/Square-logo.svg" alt="Square">
                             <span class="payment-desc">Visa, Mastercard, Amex via Square</span>
                         </button>
                     </div>

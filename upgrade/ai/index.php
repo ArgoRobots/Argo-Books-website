@@ -42,7 +42,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
     <title>AI Subscription - Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
@@ -173,15 +173,15 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                 <h3>Select Payment Method</h3>
                 <div class="payment-grid">
                     <button class="payment-btn" id="pay-paypal">
-                        <img src="../../images/PayPal-logo.svg" alt="PayPal">
+                        <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
                         <span>Pay with PayPal</span>
                     </button>
                     <button class="payment-btn" id="pay-stripe">
-                        <img class="Stripe" src="../../images/Stripe-logo.svg" alt="Stripe">
+                        <img class="Stripe" src="../../resources/images/Stripe-logo.svg" alt="Stripe">
                         <span>Pay with Stripe</span>
                     </button>
                     <button class="payment-btn" id="pay-square">
-                        <img class="Square" src="../../images/Square-logo.svg" alt="Square">
+                        <img class="Square" src="../../resources/images/Square-logo.svg" alt="Square">
                         <span>Pay with Square</span>
                     </button>
                 </div>

@@ -116,7 +116,7 @@ $end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Cancel AI Subscription - Argo Community">
     <meta name="author" content="Argo">
-    <link rel="shortcut icon" type="image/x-icon" href="../../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
     <title>Cancel Subscription - Argo Community</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>

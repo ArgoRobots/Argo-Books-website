@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the website for [Argo Books](https://github.com/ArgoRobots/Sales-Tracker), a WinForms application designed to track the sales and purchases of products. This website serves as a platform for users to download the software, purchase license keys, access documentation, and has an administrative system for managing licenses, user accounts, and analytics.
+This is the website for [Argo Books](https://github.com/ArgoRobots/Argo-Books), AI-powered accounting software with receipt scanning, predictive analytics, inventory management, and more. This website serves as a platform for users to download the software, purchase license keys, access documentation, and has an administrative system for managing licenses, user accounts, and analytics.
 
 You can view the live website here: https://argorobots.com/
 

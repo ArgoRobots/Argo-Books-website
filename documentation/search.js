@@ -3,52 +3,46 @@ class DocumentationSearch {
         this.searchInput = document.getElementById('docSearchInput');
         this.searchButton = document.getElementById('searchButton');
         this.searchResults = document.getElementById('searchResults');
-        this.sections = [];
-        this.searchIndex = [];
-        this.selectedIndex = -1; // Track selected result for keyboard navigation
-        this.currentResults = []; // Store current search results
+        this.selectedIndex = -1;
+        this.currentResults = [];
+
+        // Static index of all documentation pages
+        this.pages = [
+            // Getting Started
+            { id: 'system-requirements', title: 'System Requirements', category: 'Getting Started', keywords: 'windows macos linux requirements specs hardware disk space ram memory' },
+            { id: 'installation', title: 'Installation Guide', category: 'Getting Started', keywords: 'install download setup installer wizard run' },
+            { id: 'quick-start', title: 'Quick Start Tutorial', category: 'Getting Started', keywords: 'tutorial getting started begin first steps currency company accountant category product' },
+            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', keywords: 'free paid premium upgrade features comparison limited unlimited products windows hello ai search' },
+
+            // Core Features
+            { id: 'product-management', title: 'Product Management', category: 'Core Features', keywords: 'products categories inventory add create manage organize' },
+            { id: 'sales-tracking', title: 'Purchase/Sales Tracking', category: 'Core Features', keywords: 'purchase sale transaction order tracking add quantity price shipping tax' },
+            { id: 'receipts', title: 'Receipt Management', category: 'Core Features', keywords: 'receipt digital scan microsoft lens export attach' },
+            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products purchases sales currency' },
+            { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
+            { id: 'report-generator', title: 'Report Generator', category: 'Core Features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
+            { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
+
+            // Reference
+            { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', keywords: 'country countries iso code variant name import us usa uk germany' },
+            { id: 'supported-currencies', title: 'Supported Currencies', category: 'Reference', keywords: 'currency currencies usd eur gbp cad jpy cny exchange rate convert' },
+            { id: 'supported-languages', title: 'Supported Languages', category: 'Reference', keywords: 'language languages english spanish french german chinese arabic localization translation' },
+
+            // Security
+            { id: 'encryption', title: 'Encryption', category: 'Security', keywords: 'encryption aes-256 security protect data' },
+            { id: 'password', title: 'Password Protection', category: 'Security', keywords: 'password protection windows hello fingerprint face login security' },
+            { id: 'backups', title: 'Regular Backups', category: 'Security', keywords: 'backup export save data loss protection cloud' },
+            { id: 'anonymous-data', title: 'Anonymous Usage Data', category: 'Security', keywords: 'anonymous usage data privacy statistics telemetry collection disable' }
+        ];
 
         this.init();
     }
-    
+
     init() {
-        this.buildSearchIndex();
+        if (!this.searchInput || !this.searchResults) return;
         this.setupEventListeners();
     }
-    
-    buildSearchIndex() {
-        // Get all documentation sections
-        const sections = document.querySelectorAll('section[id].article');
-        
-        this.sections = Array.from(sections).map(section => {
-            const id = section.id;
-            const title = section.querySelector('h2')?.textContent || id;
-            const content = this.getSectionContent(section);
-            const navItem = document.querySelector(`[data-scroll-to="${id}"]`);
-            const category = navItem ? navItem.closest('.nav-section').querySelector('h3').textContent : 'Documentation';
-            
-            return {
-                id,
-                title,
-                content,
-                category,
-                element: section
-            };
-        });
-    }
-    
-    getSectionContent(section) {
-        // Remove elements that shouldn't be searched
-        const clone = section.cloneNode(true);
-        
-        // Remove elements we don't want to search
-        const elementsToRemove = clone.querySelectorAll('.info-box, .warning-box, .video-container, .version-cards, table, .steps-list li::before');
-        elementsToRemove.forEach(el => el.remove());
-        
-        // Get clean text content
-        return clone.textContent.replace(/\s+/g, ' ').trim();
-    }
-    
+
     setupEventListeners() {
         // Search on button click
         this.searchButton.addEventListener('click', () => this.performSearch());
@@ -59,7 +53,6 @@ class DocumentationSearch {
             const isResultsVisible = this.searchResults.style.display === 'block';
 
             if (!isResultsVisible || resultItems.length === 0) {
-                // If no results showing, Enter should just perform search
                 if (e.key === 'Enter') {
                     this.performSearch();
                 }
@@ -77,17 +70,14 @@ class DocumentationSearch {
                     break;
                 case 'Tab':
                     e.preventDefault();
-                    // Tab moves forward, Shift+Tab moves backward
                     this.navigateResults(e.shiftKey ? -1 : 1);
                     break;
                 case 'Enter':
                     e.preventDefault();
                     if (this.selectedIndex >= 0 && this.selectedIndex < this.currentResults.length) {
-                        // Navigate to selected result
-                        this.navigateToSection(this.currentResults[this.selectedIndex].id);
+                        this.navigateToPage(this.currentResults[this.selectedIndex].id);
                     } else if (this.currentResults.length > 0) {
-                        // No selection, navigate to first result
-                        this.navigateToSection(this.currentResults[0].id);
+                        this.navigateToPage(this.currentResults[0].id);
                     }
                     break;
                 case 'Escape':
@@ -117,123 +107,107 @@ class DocumentationSearch {
             }
         });
     }
-    
+
     performSearch() {
         const query = this.searchInput.value.trim().toLowerCase();
-        
+
         if (query.length < 2) {
             this.hideResults();
             return;
         }
-        
-        const results = this.searchSections(query);
+
+        const results = this.searchPages(query);
         this.displayResults(results, query);
     }
-    
-    searchSections(query) {
-        const similarityThreshold = 0.6; // 0.0 = no match, 1.0 = perfect match
 
-        return this.sections.filter(section => {
-            // Exact match check first (faster)
-            const titleLower = section.title.toLowerCase();
-            const contentLower = section.content.toLowerCase();
+    searchPages(query) {
+        const similarityThreshold = 0.6;
 
-            if (titleLower.includes(query) || contentLower.includes(query)) {
+        return this.pages.filter(page => {
+            const titleLower = page.title.toLowerCase();
+            const keywordsLower = page.keywords.toLowerCase();
+            const categoryLower = page.category.toLowerCase();
+
+            // Exact match check first
+            if (titleLower.includes(query) || keywordsLower.includes(query) || categoryLower.includes(query)) {
                 return true;
             }
 
-            // Fuzzy matching with Levenshtein distance for title words
+            // Fuzzy matching for title words
             const titleWords = titleLower.split(/\s+/);
             const titleMatch = titleWords.some(word =>
-                getSimilarity(word, query) >= similarityThreshold
+                typeof getSimilarity === 'function' && getSimilarity(word, query) >= similarityThreshold
             );
 
             if (titleMatch) return true;
 
-            // Fuzzy matching for content words (check a sample for performance)
-            const contentWords = contentLower.split(/\s+/).slice(0, 200); // Limit for performance
-            const contentMatch = contentWords.some(word =>
-                getSimilarity(word, query) >= similarityThreshold
+            // Fuzzy matching for keywords
+            const keywordWords = keywordsLower.split(/\s+/);
+            const keywordMatch = keywordWords.some(word =>
+                typeof getSimilarity === 'function' && getSimilarity(word, query) >= similarityThreshold
             );
 
-            return contentMatch;
+            return keywordMatch;
         });
     }
-    
+
     displayResults(results, query) {
-        // Store current results for keyboard navigation
         this.currentResults = results;
-        this.selectedIndex = -1; // Reset selection
+        this.selectedIndex = -1;
 
         if (results.length === 0) {
             this.searchResults.innerHTML = `
                 <div class="no-results">
                     <p>No results found for "<strong>${this.escapeHtml(query)}</strong>"</p>
-                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Try different keywords or check the documentation menu.</p>
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Try different keywords or browse the documentation menu.</p>
                 </div>
             `;
             this.searchResults.style.display = 'block';
             return;
         }
 
-        const resultsHtml = results.map(section => this.createResultItem(section, query)).join('');
+        const resultsHtml = results.map(page => this.createResultItem(page, query)).join('');
         this.searchResults.innerHTML = resultsHtml;
         this.searchResults.style.display = 'block';
 
         // Add click handlers to result items
         this.searchResults.querySelectorAll('.search-result-item').forEach((item, index) => {
             item.addEventListener('click', () => {
-                this.navigateToSection(results[index].id);
+                this.navigateToPage(results[index].id);
             });
         });
     }
-    
-    createResultItem(section, query) {
-        const titleHighlighted = this.highlightText(section.title, query);
-        const preview = this.getContentPreview(section.content, query);
-        const previewHighlighted = this.highlightText(preview, query);
-        
+
+    createResultItem(page, query) {
+        const titleHighlighted = this.highlightText(page.title, query);
+
         return `
-            <div class="search-result-item" data-section="${section.id}">
+            <div class="search-result-item" data-page="${page.id}">
                 <div class="search-result-title">
                     <svg class="search-result-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 12h6m-3-3v6m-9 0V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
                     </svg>
                     ${titleHighlighted}
                 </div>
-                <div class="search-result-section">${section.category}</div>
-                <div class="search-result-preview">${previewHighlighted}</div>
+                <div class="search-result-section">${page.category}</div>
             </div>
         `;
     }
-    
+
     highlightText(text, query) {
         const regex = new RegExp(`(${this.escapeRegex(query)})`, 'gi');
         return text.replace(regex, '<span class="search-highlight">$1</span>');
     }
-    
-    getContentPreview(content, query) {
-        const index = content.toLowerCase().indexOf(query.toLowerCase());
-        if (index === -1) return content.substring(0, 150) + '...';
-        
-        const start = Math.max(0, index - 50);
-        const end = Math.min(content.length, index + query.length + 100);
-        let preview = content.substring(start, end);
-        
-        if (start > 0) preview = '...' + preview;
-        if (end < content.length) preview = preview + '...';
-        
-        return preview;
-    }
-    
+
     navigateResults(direction) {
         const resultItems = this.searchResults.querySelectorAll('.search-result-item');
         if (resultItems.length === 0) return;
 
-        // Update selected index
         this.selectedIndex += direction;
 
-        // Wrap around at boundaries
         if (this.selectedIndex < 0) {
             this.selectedIndex = resultItems.length - 1;
         } else if (this.selectedIndex >= resultItems.length) {
@@ -246,15 +220,12 @@ class DocumentationSearch {
     updateSelection() {
         const resultItems = this.searchResults.querySelectorAll('.search-result-item');
 
-        // Remove previous selection
         resultItems.forEach(item => item.classList.remove('selected'));
 
-        // Add selection to current item
         if (this.selectedIndex >= 0 && this.selectedIndex < resultItems.length) {
             const selectedItem = resultItems[this.selectedIndex];
             selectedItem.classList.add('selected');
 
-            // Scroll selected item into view if needed
             selectedItem.scrollIntoView({
                 block: 'nearest',
                 behavior: 'smooth'
@@ -262,28 +233,21 @@ class DocumentationSearch {
         }
     }
 
-    navigateToSection(sectionId) {
-        // Use your existing navigation system
-        const navItem = document.querySelector(`[data-scroll-to="${sectionId}"]`);
-        if (navItem) {
-            navItem.click();
-        }
-
-        this.hideResults();
-        this.searchInput.value = '';
+    navigateToPage(pageId) {
+        window.location.href = `${pageId}.php`;
     }
-    
+
     hideResults() {
         this.searchResults.style.display = 'none';
-        this.selectedIndex = -1; // Reset selection when hiding
+        this.selectedIndex = -1;
     }
-    
+
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
     escapeRegex(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }

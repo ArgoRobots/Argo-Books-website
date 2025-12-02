@@ -10,7 +10,7 @@ function getBasePath() {
   // If the path doesn't start with common site paths, assume we're in a subfolder
   var sitePaths = ['/upgrade/', '/community/', '/documentation/', '/about-us/',
                    '/contact-us/', '/whats-new/', '/admin/', '/legal/', '/resources/',
-                   '/error-pages/', '/images/', '/older-versions/'];
+                   '/error-pages/', '/images/', '/older-versions/', '/downloads/'];
 
   var isRootPath = sitePaths.some(function(p) { return path.startsWith(p); }) || path === '/' || path === '/index.php';
 

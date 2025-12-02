@@ -243,7 +243,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </svg>
                         </div>
                         <div class="tab-text">
-                            <span class="tab-title">Expense Tracking</span>
+                            <span class="tab-title">Expense & Revenue Tracking</span>
                             <span class="tab-subtitle">Track every dollar</span>
                         </div>
                     </button>
@@ -322,7 +322,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </svg>
                         </div>
                         <div class="tab-text">
-                            <span class="tab-title">Invoice Generation</span>
+                            <span class="tab-title">Invoicing</span>
                             <span class="tab-subtitle">Professional invoices</span>
                         </div>
                     </button>

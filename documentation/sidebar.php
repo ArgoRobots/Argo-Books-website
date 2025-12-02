@@ -55,9 +55,9 @@ $sidebarSections = [
 ];
 
 // Determine base path based on current file location
-// From index.php: need 'pages/' prefix
-// From subpages: need '../' to go up to pages/ folder
-$docBasePath = isset($pageCategory) ? '../' : 'pages/';
+// From index.php: folders already include 'pages/' prefix, so no base needed
+// From subpages: need '../../' to go up from pages/category/ to documentation/
+$docBasePath = isset($pageCategory) ? '../../' : '';
 
 // Function to check if a page is active
 function isActivePage($page, $currentPage) {

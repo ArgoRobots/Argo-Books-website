@@ -2,7 +2,7 @@
 // Load system requirements from JSON
 function getSystemRequirements()
 {
-    $jsonPath = '../resources/data/system-requirements.json';
+    $jsonPath = '../../resources/data/system-requirements.json';
     if (file_exists($jsonPath)) {
         $json = file_get_contents($jsonPath);
         return json_decode($json, true);

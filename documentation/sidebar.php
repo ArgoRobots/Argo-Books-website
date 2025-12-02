@@ -15,7 +15,7 @@ if (!isset($currentPage)) {
 // Define sidebar navigation structure with category folders
 $sidebarSections = [
     'Getting Started' => [
-        'folder' => 'getting-started',
+        'folder' => 'pages/getting-started',
         'pages' => [
             'system-requirements' => 'System Requirements',
             'installation' => 'Installation Guide',
@@ -24,7 +24,7 @@ $sidebarSections = [
         ]
     ],
     'Core Features' => [
-        'folder' => 'features',
+        'folder' => 'pages/features',
         'pages' => [
             'product-management' => 'Product Management',
             'sales-tracking' => 'Purchase/Sales Tracking',
@@ -36,7 +36,7 @@ $sidebarSections = [
         ]
     ],
     'Reference' => [
-        'folder' => 'reference',
+        'folder' => 'pages/reference',
         'pages' => [
             'accepted-countries' => 'Accepted Countries',
             'supported-currencies' => 'Supported Currencies',
@@ -44,7 +44,7 @@ $sidebarSections = [
         ]
     ],
     'Security' => [
-        'folder' => 'security',
+        'folder' => 'pages/security',
         'pages' => [
             'encryption' => 'Encryption',
             'password' => 'Password Protection',

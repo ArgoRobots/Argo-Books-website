@@ -3,8 +3,8 @@ $pageTitle = 'Product Management';
 $pageDescription = 'Learn how to manage products and categories in Argo Books. Create categories, add products, and organize your inventory.';
 $currentPage = 'product-management';
 
-include '../../docs-header.php';
 $pageCategory = 'features';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

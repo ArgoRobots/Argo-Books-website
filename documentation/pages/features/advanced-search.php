@@ -3,8 +3,8 @@ $pageTitle = 'Advanced Search';
 $pageDescription = 'Learn how to use the advanced search features in Argo Books, including search operators and AI-powered search.';
 $currentPage = 'advanced-search';
 
-include '../../docs-header.php';
 $pageCategory = 'features';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

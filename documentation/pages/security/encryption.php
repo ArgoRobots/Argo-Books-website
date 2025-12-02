@@ -3,8 +3,8 @@ $pageTitle = 'Encryption';
 $pageDescription = 'Learn about the AES-256 encryption used in Argo Books to protect your business data.';
 $currentPage = 'encryption';
 
-include '../../docs-header.php';
 $pageCategory = 'security';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

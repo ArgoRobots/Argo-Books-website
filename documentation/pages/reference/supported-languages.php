@@ -3,8 +3,8 @@ $pageTitle = 'Supported Languages';
 $pageDescription = 'View the list of 54 supported languages in Argo Books and learn how to change your application language.';
 $currentPage = 'supported-languages';
 
-include '../../docs-header.php';
 $pageCategory = 'reference';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

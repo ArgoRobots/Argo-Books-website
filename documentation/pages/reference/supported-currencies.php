@@ -3,8 +3,8 @@ $pageTitle = 'Supported Currencies';
 $pageDescription = 'View the list of 28 supported currencies in Argo Books for import, export, and real-time conversion.';
 $currentPage = 'supported-currencies';
 
-include '../../docs-header.php';
 $pageCategory = 'reference';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

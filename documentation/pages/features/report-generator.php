@@ -3,8 +3,8 @@ $pageTitle = 'Report Generator';
 $pageDescription = 'Learn how to generate professional reports with charts and analytics in Argo Books using the 3-step wizard.';
 $currentPage = 'report-generator';
 
-include '../../docs-header.php';
 $pageCategory = 'features';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

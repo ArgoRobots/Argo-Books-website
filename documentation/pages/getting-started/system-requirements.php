@@ -27,8 +27,8 @@ $pageTitle = 'System Requirements';
 $pageDescription = 'View the system requirements for running Argo Books on Windows, macOS, and Linux.';
 $currentPage = 'system-requirements';
 
-include '../../docs-header.php';
 $pageCategory = 'getting-started';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

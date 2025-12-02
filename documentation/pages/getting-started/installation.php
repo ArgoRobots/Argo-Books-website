@@ -3,8 +3,8 @@ $pageTitle = 'Installation Guide';
 $pageDescription = 'Learn how to download and install Argo Books on your Windows, macOS, or Linux computer.';
 $currentPage = 'installation';
 
-include '../../docs-header.php';
 $pageCategory = 'getting-started';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

@@ -3,8 +3,8 @@ $pageTitle = 'Spreadsheet Export';
 $pageDescription = 'Learn how to export your Argo Books data to Excel spreadsheets for backup, analysis, or sharing with accountants.';
 $currentPage = 'spreadsheet-export';
 
-include '../../docs-header.php';
 $pageCategory = 'features';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

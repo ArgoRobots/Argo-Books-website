@@ -3,8 +3,8 @@ $pageTitle = 'Quick Start Tutorial';
 $pageDescription = 'Get started quickly with Argo Books. Learn the basic steps to set up your business and start tracking products and sales.';
 $currentPage = 'quick-start';
 
-include '../../docs-header.php';
 $pageCategory = 'getting-started';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

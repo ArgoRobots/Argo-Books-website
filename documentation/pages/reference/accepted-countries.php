@@ -3,8 +3,8 @@ $pageTitle = 'Accepted Countries';
 $pageDescription = 'View the list of accepted country names and variants for importing data into Argo Books.';
 $currentPage = 'accepted-countries';
 
-include '../../docs-header.php';
 $pageCategory = 'reference';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

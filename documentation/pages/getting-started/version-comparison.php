@@ -3,8 +3,8 @@ $pageTitle = 'Free vs. Paid Version';
 $pageDescription = 'Compare Argo Books free and paid versions. Learn about features, limitations, and which version is right for your business.';
 $currentPage = 'version-comparison';
 
-include '../../docs-header.php';
 $pageCategory = 'getting-started';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

@@ -3,8 +3,8 @@ $pageTitle = 'Spreadsheet Import';
 $pageDescription = 'Learn how to import data from Excel spreadsheets into Argo Books. Supports multiple currencies and automatic data detection.';
 $currentPage = 'spreadsheet-import';
 
-include '../../docs-header.php';
 $pageCategory = 'features';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

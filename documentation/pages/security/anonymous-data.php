@@ -3,8 +3,8 @@ $pageTitle = 'Anonymous Usage Data';
 $pageDescription = 'Learn about the anonymous usage data collected by Argo Books and how to manage your privacy settings.';
 $currentPage = 'anonymous-data';
 
-include '../../docs-header.php';
 $pageCategory = 'security';
+include '../../docs-header.php';
 include '../../sidebar.php';
 ?>
 

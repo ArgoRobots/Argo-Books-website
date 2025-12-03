@@ -170,12 +170,4 @@ php_value error_log error_log.txt
     # Handle general installer downloads (will get latest)
     RewriteRule ^download/([^/]+\.exe)$ get_installer.php?filename=$1 [L,QSA]
     RewriteRule ^download/?$ get_installer.php [L,QSA]
-    
-    # Allow direct access to version-specific installer files via get_installer.php
-    RewriteCond %{REQUEST_FILENAME} \.(exe|msi)$ [NC]
-    RewriteRule ^resources/downloads/versions/([^/]+)/(.+)$ get_installer.php?version=$1&filename=$2 [L,QSA]
-    
-    # Handle /download (redirect to get_installer.php)
-    RewriteCond %{REQUEST_FILENAME} \.(exe|msi)$ [NC]
-    RewriteRule ^resources/downloads/([^/]+\.exe)$ get_installer.php?filename=$1 [L,QSA]
 </IfModule>

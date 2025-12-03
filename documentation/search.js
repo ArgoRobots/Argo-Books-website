@@ -9,30 +9,30 @@ class DocumentationSearch {
         // Static index of all documentation pages
         this.pages = [
             // Getting Started
-            { id: 'system-requirements', title: 'System Requirements', category: 'Getting Started', keywords: 'windows macos linux requirements specs hardware disk space ram memory' },
-            { id: 'installation', title: 'Installation Guide', category: 'Getting Started', keywords: 'install download setup installer wizard run' },
-            { id: 'quick-start', title: 'Quick Start Tutorial', category: 'Getting Started', keywords: 'tutorial getting started begin first steps currency company accountant category product' },
-            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', keywords: 'free paid premium upgrade features comparison limited unlimited products windows hello ai search' },
+            { id: 'system-requirements', title: 'System Requirements', category: 'Getting Started', folder: 'getting-started', keywords: 'windows macos linux requirements specs hardware disk space ram memory' },
+            { id: 'installation', title: 'Installation Guide', category: 'Getting Started', folder: 'getting-started', keywords: 'install download setup installer wizard run' },
+            { id: 'quick-start', title: 'Quick Start Tutorial', category: 'Getting Started', folder: 'getting-started', keywords: 'tutorial getting started begin first steps currency company accountant category product' },
+            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', folder: 'getting-started', keywords: 'free paid premium upgrade features comparison limited unlimited products windows hello ai search' },
 
             // Core Features
-            { id: 'product-management', title: 'Product Management', category: 'Core Features', keywords: 'products categories inventory add create manage organize' },
-            { id: 'sales-tracking', title: 'Purchase/Sales Tracking', category: 'Core Features', keywords: 'purchase sale transaction order tracking add quantity price shipping tax' },
-            { id: 'receipts', title: 'Receipt Management', category: 'Core Features', keywords: 'receipt digital scan microsoft lens export attach' },
-            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products purchases sales currency' },
-            { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
-            { id: 'report-generator', title: 'Report Generator', category: 'Core Features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
-            { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
+            { id: 'product-management', title: 'Product Management', category: 'Core Features', folder: 'features', keywords: 'products categories inventory add create manage organize' },
+            { id: 'sales-tracking', title: 'Purchase/Sales Tracking', category: 'Core Features', folder: 'features', keywords: 'purchase sale transaction order tracking add quantity price shipping tax' },
+            { id: 'receipts', title: 'Receipt Management', category: 'Core Features', folder: 'features', keywords: 'receipt digital scan microsoft lens export attach' },
+            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products purchases sales currency' },
+            { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
+            { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
+            { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', folder: 'features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
 
             // Reference
-            { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', keywords: 'country countries iso code variant name import us usa uk germany' },
-            { id: 'supported-currencies', title: 'Supported Currencies', category: 'Reference', keywords: 'currency currencies usd eur gbp cad jpy cny exchange rate convert' },
-            { id: 'supported-languages', title: 'Supported Languages', category: 'Reference', keywords: 'language languages english spanish french german chinese arabic localization translation' },
+            { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', folder: 'reference', keywords: 'country countries iso code variant name import us usa uk germany' },
+            { id: 'supported-currencies', title: 'Supported Currencies', category: 'Reference', folder: 'reference', keywords: 'currency currencies usd eur gbp cad jpy cny exchange rate convert' },
+            { id: 'supported-languages', title: 'Supported Languages', category: 'Reference', folder: 'reference', keywords: 'language languages english spanish french german chinese arabic localization translation' },
 
             // Security
-            { id: 'encryption', title: 'Encryption', category: 'Security', keywords: 'encryption aes-256 security protect data' },
-            { id: 'password', title: 'Password Protection', category: 'Security', keywords: 'password protection windows hello fingerprint face login security' },
-            { id: 'backups', title: 'Regular Backups', category: 'Security', keywords: 'backup export save data loss protection cloud' },
-            { id: 'anonymous-data', title: 'Anonymous Usage Data', category: 'Security', keywords: 'anonymous usage data privacy statistics telemetry collection disable' }
+            { id: 'encryption', title: 'Encryption', category: 'Security', folder: 'security', keywords: 'encryption aes-256 security protect data' },
+            { id: 'password', title: 'Password Protection', category: 'Security', folder: 'security', keywords: 'password protection windows hello fingerprint face login security' },
+            { id: 'backups', title: 'Regular Backups', category: 'Security', folder: 'security', keywords: 'backup export save data loss protection cloud' },
+            { id: 'anonymous-data', title: 'Anonymous Usage Data', category: 'Security', folder: 'security', keywords: 'anonymous usage data privacy statistics telemetry collection disable' }
         ];
 
         this.init();
@@ -75,9 +75,9 @@ class DocumentationSearch {
                 case 'Enter':
                     e.preventDefault();
                     if (this.selectedIndex >= 0 && this.selectedIndex < this.currentResults.length) {
-                        this.navigateToPage(this.currentResults[this.selectedIndex].id);
+                        this.navigateToPage(this.currentResults[this.selectedIndex]);
                     } else if (this.currentResults.length > 0) {
-                        this.navigateToPage(this.currentResults[0].id);
+                        this.navigateToPage(this.currentResults[0]);
                     }
                     break;
                 case 'Escape':
@@ -173,7 +173,7 @@ class DocumentationSearch {
         // Add click handlers to result items
         this.searchResults.querySelectorAll('.search-result-item').forEach((item, index) => {
             item.addEventListener('click', () => {
-                this.navigateToPage(results[index].id);
+                this.navigateToPage(results[index]);
             });
         });
     }
@@ -233,8 +233,8 @@ class DocumentationSearch {
         }
     }
 
-    navigateToPage(pageId) {
-        window.location.href = `${pageId}.php`;
+    navigateToPage(page) {
+        window.location.href = `pages/${page.folder}/${page.id}.php`;
     }
 
     hideResults() {

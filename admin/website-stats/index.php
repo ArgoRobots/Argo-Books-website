@@ -49,7 +49,7 @@ function get_stats_by_period($table, $period = 'month', $limit = 12, $where_clau
             COUNT(*) as count
         FROM $table
         $where
-        GROUP BY period
+        GROUP BY period, display_period
         ORDER BY period DESC
         LIMIT ?";
 
@@ -128,14 +128,14 @@ function get_page_views_by_period($period = 'month', $limit = 12)
     }
 
     $query = "
-        SELECT 
-            $sql_period as period, 
+        SELECT
+            $sql_period as period,
             $display_format as display_period,
-            COUNT(*) as count 
-        FROM statistics 
-        WHERE event_type = 'page_view' 
-        GROUP BY period 
-        ORDER BY period DESC 
+            COUNT(*) as count
+        FROM statistics
+        WHERE event_type = 'page_view'
+        GROUP BY period, display_period
+        ORDER BY period DESC
         LIMIT ?";
 
     $stmt = $db->prepare($query);

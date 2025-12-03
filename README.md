@@ -47,7 +47,7 @@ You can view the live website here: https://argorobots.com/
 2. Install Laragon (default location: `C:\laragon`)
 3. Open Laragon and click **Start All** to start Apache and MySQL
 
-### Step 2: Install Composer (you can skip this step because we are currently not using any packages)
+### Step 2: Install Composer
 
 1. Download and install Composer from [https://getcomposer.org/](https://getcomposer.org/)
 2. During installation, make sure it detects your `php.exe` from `C:\laragon\bin\php\php-8.3.26-Win32-vs16-x64`

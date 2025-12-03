@@ -2,7 +2,7 @@
 // Load system requirements from JSON
 function getSystemRequirements()
 {
-    $jsonPath = '../resources/data/system-requirements.json';
+    $jsonPath = '../../../resources/data/system-requirements.json';
     if (file_exists($jsonPath)) {
         $json = file_get_contents($jsonPath);
         return json_decode($json, true);
@@ -27,8 +27,9 @@ $pageTitle = 'System Requirements';
 $pageDescription = 'View the system requirements for running Argo Books on Windows, macOS, and Linux.';
 $currentPage = 'system-requirements';
 
-include 'docs-header.php';
-include 'sidebar.php';
+$pageCategory = 'getting-started';
+include '../../docs-header.php';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -66,4 +67,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

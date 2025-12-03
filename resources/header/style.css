@@ -82,7 +82,7 @@ header.sticky .menu-btn:checked~.menu-icon .nav-icon {
 }
 
 header.sticky .header-inner .logo {
-  content: url(../../images/argo-logo/Argo-black.svg);
+  content: url(../../resources/images/argo-logo/Argo-black.svg);
 }
 
 header.sticky .header-inner .menu-container ul li a {

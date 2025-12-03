@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
-require_once '../../community/formatting/formatting_functions.php';
+require_once '../../../db_connect.php';
+require_once '../../../community/formatting/formatting_functions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -10,20 +10,20 @@ require_once '../../community/formatting/formatting_functions.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Complete list of accepted country names and variants for importing data into Argo Books. Find all recognized country codes and alternative names.">
-    <link rel="shortcut icon" type="image/x-icon" href="../../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
     <title>Accepted Country Names - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
-    <script src="../../resources/scripts/main.js"></script>
-    <script src="../../resources/scripts/levenshtein.js"></script>
+    <script src="../../../resources/scripts/jquery-3.6.0.js"></script>
+    <script src="../../../resources/scripts/main.js"></script>
+    <script src="../../../resources/scripts/levenshtein.js"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../../resources/styles/button.css">
-    <link rel="stylesheet" href="../../resources/styles/link.css">
-    <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
-    <link rel="stylesheet" href="../../resources/header/style.css">
-    <link rel="stylesheet" href="../../resources/header/dark.css">
-    <link rel="stylesheet" href="../../resources/footer/style.css">
+    <link rel="stylesheet" href="../../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../../resources/styles/link.css">
+    <link rel="stylesheet" href="../../../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../../../resources/header/style.css">
+    <link rel="stylesheet" href="../../../resources/header/dark.css">
+    <link rel="stylesheet" href="../../../resources/footer/style.css">
 </head>
 
 <body>
@@ -32,7 +32,7 @@ require_once '../../community/formatting/formatting_functions.php';
     </header>
 
     <div class="reference-container">
-        <a href="../" class="link-no-underline back-link">
+        <a href="../../" class="link-no-underline back-link">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
@@ -1827,7 +1827,7 @@ require_once '../../community/formatting/formatting_functions.php';
         <div class="pattern-note">
             <strong>Note:</strong> Country names are case-insensitive, so "United States", "united states", and "UNITED
             STATES" are all accepted. If a country variant is not listed above, you can request it to be added by
-            <a class="link" href="../../community/">posting a feature request</a> or by <a class="link"
+            <a class="link" href="../../../community/">posting a feature request</a> or by <a class="link"
                 href="../../contact-us/">contacting support</a>.
         </div>
     </div>

@@ -3,8 +3,9 @@ $pageTitle = 'Advanced Search';
 $pageDescription = 'Learn how to use the advanced search features in Argo Books, including search operators and AI-powered search.';
 $currentPage = 'advanced-search';
 
-include 'docs-header.php';
-include 'sidebar.php';
+$pageCategory = 'features';
+include '../../docs-header.php';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -89,7 +90,7 @@ include 'sidebar.php';
                         </svg>
                         Previous: Report Generator
                     </a>
-                    <a href="accepted-countries.php" class="nav-button next">
+                    <a href="../reference/accepted-countries.php" class="nav-button next">
                         Next: Accepted Countries
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 18l6-6-6-6"></path>
@@ -99,4 +100,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

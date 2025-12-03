@@ -12,35 +12,52 @@ if (!isset($currentPage)) {
     $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 }
 
-// Define sidebar navigation structure
+// Define sidebar navigation structure with category folders
 $sidebarSections = [
     'Getting Started' => [
-        'system-requirements' => 'System Requirements',
-        'installation' => 'Installation Guide',
-        'quick-start' => 'Quick Start Tutorial',
-        'version-comparison' => 'Free vs. Paid Version'
+        'folder' => 'pages/getting-started',
+        'pages' => [
+            'system-requirements' => 'System Requirements',
+            'installation' => 'Installation Guide',
+            'quick-start' => 'Quick Start Tutorial',
+            'version-comparison' => 'Free vs. Paid Version'
+        ]
     ],
     'Core Features' => [
-        'product-management' => 'Product Management',
-        'sales-tracking' => 'Purchase/Sales Tracking',
-        'receipts' => 'Receipt Management',
-        'spreadsheet-import' => 'Spreadsheet Import',
-        'spreadsheet-export' => 'Spreadsheet Export',
-        'report-generator' => 'Report Generator',
-        'advanced-search' => 'Advanced Search'
+        'folder' => 'pages/features',
+        'pages' => [
+            'product-management' => 'Product Management',
+            'sales-tracking' => 'Purchase/Sales Tracking',
+            'receipts' => 'Receipt Management',
+            'spreadsheet-import' => 'Spreadsheet Import',
+            'spreadsheet-export' => 'Spreadsheet Export',
+            'report-generator' => 'Report Generator',
+            'advanced-search' => 'Advanced Search'
+        ]
     ],
     'Reference' => [
-        'accepted-countries' => 'Accepted Countries',
-        'supported-currencies' => 'Supported Currencies',
-        'supported-languages' => 'Supported Languages'
+        'folder' => 'pages/reference',
+        'pages' => [
+            'accepted-countries' => 'Accepted Countries',
+            'supported-currencies' => 'Supported Currencies',
+            'supported-languages' => 'Supported Languages'
+        ]
     ],
     'Security' => [
-        'encryption' => 'Encryption',
-        'password' => 'Password Protection',
-        'backups' => 'Regular Backups',
-        'anonymous-data' => 'Anonymous Usage Data'
+        'folder' => 'pages/security',
+        'pages' => [
+            'encryption' => 'Encryption',
+            'password' => 'Password Protection',
+            'backups' => 'Regular Backups',
+            'anonymous-data' => 'Anonymous Usage Data'
+        ]
     ]
 ];
+
+// Determine base path based on current file location
+// From index.php: folders already include 'pages/' prefix, so no base needed
+// From subpages: need '../../' to go up from pages/category/ to documentation/
+$docBasePath = isset($pageCategory) ? '../../' : '';
 
 // Function to check if a page is active
 function isActivePage($page, $currentPage) {
@@ -51,13 +68,13 @@ function isActivePage($page, $currentPage) {
 <!-- Sidebar Navigation -->
 <aside class="sidebar">
     <nav class="sidebar-nav">
-        <?php foreach ($sidebarSections as $sectionTitle => $pages): ?>
+        <?php foreach ($sidebarSections as $sectionTitle => $section): ?>
         <div class="nav-section">
             <h3><?php echo htmlspecialchars($sectionTitle); ?></h3>
             <ul class="nav-links">
-                <?php foreach ($pages as $pageSlug => $pageTitle): ?>
+                <?php foreach ($section['pages'] as $pageSlug => $pageTitle): ?>
                 <li>
-                    <a href="<?php echo $pageSlug; ?>.php"
+                    <a href="<?php echo $docBasePath . $section['folder'] . '/' . $pageSlug; ?>.php"
                        class="<?php echo isActivePage($pageSlug, $currentPage) ? 'active' : ''; ?>"
                        title="<?php echo htmlspecialchars($pageTitle); ?>">
                         <?php echo htmlspecialchars($pageTitle); ?>

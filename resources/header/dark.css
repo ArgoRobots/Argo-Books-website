@@ -13,7 +13,7 @@ header .menu-btn:checked~.menu-icon .nav-icon {
 }
 
 header .header-inner .logo {
-  content: url(../../images/argo-logo/Argo-black.svg);
+  content: url(../../resources/images/argo-logo/Argo-black.svg);
 }
 
 header .header-inner .menu-container ul li a {

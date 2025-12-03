@@ -3,8 +3,9 @@ $pageTitle = 'Receipt Management';
 $pageDescription = 'Learn how to manage receipts in Argo Books. Add, digitize, and export receipts for all your transactions.';
 $currentPage = 'receipts';
 
-include 'docs-header.php';
-include 'sidebar.php';
+$pageCategory = 'features';
+include '../../docs-header.php';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -69,4 +70,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

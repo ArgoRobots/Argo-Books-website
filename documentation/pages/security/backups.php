@@ -3,8 +3,9 @@ $pageTitle = 'Regular Backups';
 $pageDescription = 'Learn how to create regular backups of your Argo Books data to prevent data loss.';
 $currentPage = 'backups';
 
-include 'docs-header.php';
-include 'sidebar.php';
+$pageCategory = 'security';
+include '../../docs-header.php';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -45,4 +46,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

@@ -8,7 +8,7 @@
     <meta name="description" content="Checkout - Argo Books">
     <meta name="keywords" content="finance tracker, sales tracker, business software, analytics">
     <meta name="author" content="Argo">
-    <link rel="shortcut icon" type="image/x-icon" href="../../../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
     <title>Checkout - Argo Books</title>
 
     <?php

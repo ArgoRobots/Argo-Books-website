@@ -17,6 +17,11 @@ if (!isset($pageDescription)) {
     $pageDescription = 'Argo Books documentation and user guide.';
 }
 
+// Determine base path for resources based on page location
+// Pages in pages/category/ need to go up 3 levels, index needs to go up 1 level
+$resourcePath = isset($pageCategory) ? '../../../' : '../';
+$docsPath = isset($pageCategory) ? '../../' : '';
+
 $fullTitle = $pageTitle . ' - Argo Books Documentation';
 ?>
 <!DOCTYPE html>
@@ -55,20 +60,20 @@ $fullTitle = $pageTitle . ' - Argo Books Documentation';
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/A-logo.ico">
     <title><?php echo htmlspecialchars($fullTitle); ?></title>
 
-    <script src="main.js"></script>
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
-    <script src="../resources/scripts/main.js"></script>
+    <script src="<?php echo $docsPath; ?>main.js"></script>
+    <script src="<?php echo $resourcePath; ?>resources/scripts/jquery-3.6.0.js"></script>
+    <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../resources/styles/custom-colors.css">
-    <link rel="stylesheet" href="../resources/styles/link.css">
-    <link rel="stylesheet" href="../resources/styles/button.css">
-    <link rel="stylesheet" href="../resources/header/style.css">
-    <link rel="stylesheet" href="../resources/header/dark.css">
-    <link rel="stylesheet" href="../resources/footer/style.css">
+    <link rel="stylesheet" href="<?php echo $docsPath; ?>style.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/link.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/button.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/style.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/dark.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/footer/style.css">
 </head>
 
 <body>

@@ -3,8 +3,9 @@ $pageTitle = 'Encryption';
 $pageDescription = 'Learn about the AES-256 encryption used in Argo Books to protect your business data.';
 $currentPage = 'encryption';
 
-include 'docs-header.php';
-include 'sidebar.php';
+$pageCategory = 'security';
+include '../../docs-header.php';
+include '../../sidebar.php';
 ?>
 
         <!-- Main Content -->
@@ -18,7 +19,7 @@ include 'sidebar.php';
                     default, but can be disabled in the settings under the "Security" menu.</p>
 
                 <div class="page-navigation">
-                    <a href="supported-languages.php" class="nav-button prev">
+                    <a href="../reference/supported-languages.php" class="nav-button prev">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M15 18l-6-6 6-6"></path>
                         </svg>
@@ -34,4 +35,4 @@ include 'sidebar.php';
             </section>
         </main>
 
-<?php include 'docs-footer.php'; ?>
+<?php include '../../docs-footer.php'; ?>

@@ -97,7 +97,7 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Reactivate AI Subscription - Argo Community">
     <meta name="author" content="Argo">
-    <link rel="shortcut icon" type="image/x-icon" href="../../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
     <title>Reactivate Subscription - Argo Community</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
@@ -168,13 +168,13 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
                     <p class="change-payment-label">Payment provider:</p>
                     <div class="payment-provider-options">
                         <div class="payment-provider-btn <?php echo strtolower($ai_subscription['payment_method']) === 'stripe' ? 'current' : ''; ?>" data-method="stripe" data-name="Stripe">
-                            <img src="../../images/Stripe-logo.svg" alt="Stripe">
+                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe">
                         </div>
                         <div class="payment-provider-btn <?php echo strtolower($ai_subscription['payment_method']) === 'paypal' ? 'current' : ''; ?>" data-method="paypal" data-name="PayPal">
-                            <img src="../../images/PayPal-logo.svg" alt="PayPal">
+                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
                         </div>
                         <div class="payment-provider-btn <?php echo strtolower($ai_subscription['payment_method']) === 'square' ? 'current' : ''; ?>" data-method="square" data-name="Square">
-                            <img src="../../images/Square-logo.svg" alt="Square">
+                            <img src="../../resources/images/Square-logo.svg" alt="Square">
                         </div>
                     </div>
                 </div>

@@ -145,26 +145,30 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.disabled = count === 0;
         });
 
-        // Update select-all checkbox state
-        if (count === 0) {
-            selectAllCheckbox.checked = false;
-            selectAllCheckbox.indeterminate = false;
-        } else if (count === rowCheckboxes.length) {
-            selectAllCheckbox.checked = true;
-            selectAllCheckbox.indeterminate = false;
-        } else {
-            selectAllCheckbox.checked = false;
-            selectAllCheckbox.indeterminate = true;
+        // Update select-all checkbox state (only if it exists)
+        if (selectAllCheckbox) {
+            if (count === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (count === rowCheckboxes.length) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
         }
     }
 
-    // Select all functionality
-    selectAllCheckbox.addEventListener('change', function () {
-        rowCheckboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
+    // Select all functionality (only if checkbox exists)
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function () {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateSelectedCount();
         });
-        updateSelectedCount();
-    });
+    }
 
     // Individual checkbox changes
     rowCheckboxes.forEach(checkbox => {

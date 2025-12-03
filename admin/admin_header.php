@@ -14,7 +14,7 @@ $base_path = $in_subdir ? '../' : '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_path; ?>../images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_path; ?>../resources/images/argo-logo/A-logo.ico">
     <title>Admin - Argo Books</title>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -47,7 +47,7 @@ $base_path = $in_subdir ? '../' : '';
                     </a>
 
                     <a href="<?php echo $base_path; ?>index.php" class="logo-section">
-                        <img src="<?php echo $base_path; ?>../images/argo-logo/A-logo.ico" alt="Argo Logo" class="header-logo">
+                        <img src="<?php echo $base_path; ?>../resources/images/argo-logo/A-logo.ico" alt="Argo Logo" class="header-logo">
                         <span class="header-title">Admin Dashboard</span>
                     </a>
                 </div>

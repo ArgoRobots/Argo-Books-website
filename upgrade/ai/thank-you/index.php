@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI Subscription Confirmed - Argo Books">
+    <meta name="description" content="Premium Subscription Confirmed - Argo Books">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
-    <title>AI Subscription Confirmed - Argo Books</title>
+    <title>Premium Subscription Confirmed - Argo Books</title>
 
     <script src="../../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../../resources/scripts/main.js"></script>
@@ -40,7 +40,7 @@
         </div>
 
         <h1>You're All Set!</h1>
-        <p class="subtitle">Your AI subscription is now active. Welcome to the future of sales tracking!</p>
+        <p class="subtitle">Your Premium subscription is now active. Welcome to the future of sales tracking!</p>
 
         <div class="subscription-details">
             <h2>Subscription Details</h2>
@@ -62,6 +62,15 @@
         </div>
 
         <div class="features-list">
+            <div class="feature-item">
+                <svg viewBox="0 0 24 24">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                <span>Invoices & Payments</span>
+            </div>
             <div class="feature-item">
                 <svg viewBox="0 0 24 24">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -92,7 +101,7 @@
         </div>
 
         <div class="activation-steps">
-            <h3>How to Activate AI Features</h3>
+            <h3>How to Activate Premium Features</h3>
             <ol>
                 <li>Open <strong>Argo Books</strong> on your computer</li>
                 <li>Click the blue <strong>Upgrade</strong> button in the top right corner</li>

@@ -34,20 +34,20 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Get Argo Books Premium for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support. Choose your payment method.">
+        content="Get Argo Books Standard for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support. Choose your payment method.">
     <meta name="keywords"
-        content="argo books premium, lifetime access, unlimited products, one time payment, business software">
+        content="argo books standard, lifetime access, unlimited products, one time payment, business software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Get Premium - Argo Books | $20 CAD">
+    <meta property="og:title" content="Get Standard - Argo Books | $20 CAD">
     <meta property="og:description"
-        content="Get Argo Books Premium for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support.">
+        content="Get Argo Books Standard for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support.">
     <meta property="og:url" content="https://argorobots.com/upgrade/premium.php">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
-    <title>Get Premium - Argo Books | $20 CAD Lifetime Access</title>
+    <title>Get Standard - Argo Books | $20 CAD Lifetime Access</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -71,8 +71,8 @@ if (isset($_SESSION['user_id'])) {
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1>Get Premium</h1>
-            <p class="hero-subtitle">Lifetime access to all premium features</p>
+            <h1>Get Standard</h1>
+            <p class="hero-subtitle">Lifetime access to all standard features</p>
         </div>
     </section>
 
@@ -83,7 +83,7 @@ if (isset($_SESSION['user_id'])) {
                     <div class="summary-card">
                         <h2>Order Summary</h2>
                         <div class="summary-item">
-                            <span>Argo Books Premium</span>
+                            <span>Argo Books Standard</span>
                             <span class="item-price">$20.00 CAD</span>
                         </div>
                         <div class="summary-total">

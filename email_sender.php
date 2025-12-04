@@ -83,7 +83,7 @@ function send_license_email($to_email, $license_key)
             <li>Open Argo Books on your computer</li>
             <li>Click the blue upgrade button on the top right</li>
             <li>Enter your license key</li>
-            <li>Enjoy unlimited access to all premium features!</li>
+            <li>Enjoy unlimited access to all standard features!</li>
         </ol>
 
         <div class="button-container">
@@ -117,7 +117,7 @@ function resend_license_email($to_email, $license_key)
             <li>Open Argo Books on your computer</li>
             <li>Click the blue upgrade button on the top right</li>
             <li>Enter your license key</li>
-            <li>Enjoy unlimited access to all premium features!</li>
+            <li>Enjoy unlimited access to all standard features!</li>
         </ol>
 
         <div class="button-container">
@@ -146,8 +146,8 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
     $end_date_text = !empty($end_date) ? date('F j, Y', strtotime($end_date)) : 'N/A';
 
     $body = <<<HTML
-        <h1>Your AI Subscription ID</h1>
-        <p>As requested, here is your Argo AI Subscription ID:</p>
+        <h1>Your Premium Subscription ID</h1>
+        <p>As requested, here is your Argo Premium Subscription ID:</p>
 
         <div class="license-key">{$subscription_id}</div>
 
@@ -171,7 +171,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
         <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
         HTML;
 
-    return send_styled_email($to_email, 'Your Requested Argo AI Subscription ID', $body, 'purple');
+    return send_styled_email($to_email, 'Your Requested Argo Premium Subscription ID', $body, 'purple');
 }
 
 /**
@@ -1031,7 +1031,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
 function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod)
 {
     $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "Payment Receipt - Argo AI Subscription";
+    $subject = "Payment Receipt - Argo Premium Subscription";
 
     $billingText = $billing === 'yearly' ? 'yearly' : 'monthly';
     $renewalDate = date('F j, Y', strtotime($endDate));
@@ -1057,7 +1057,7 @@ function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount
 
                 <div class="content">
                     <h1>Payment Receipt</h1>
-                    <p>Thank you for subscribing to Argo AI!</p>
+                    <p>Thank you for subscribing to Argo Premium!</p>
 
                     <div class="payment-box">
                         <h3>Payment Details</h3>
@@ -1068,7 +1068,7 @@ function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount
                             </tr>
                             <tr>
                                 <td><strong>Description</strong></td>
-                                <td>AI Subscription ({$billingText})</td>
+                                <td>Premium Subscription ({$billingText})</td>
                             </tr>
                             <tr>
                                 <td><strong>Amount</strong></td>
@@ -1091,6 +1091,7 @@ function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount
 
                     <h3>What's Included:</h3>
                     <ul class="feature-list">
+                        <li>✓ Invoices & payments</li>
                         <li>✓ AI-powered receipt scanning</li>
                         <li>✓ Predictive sales analysis</li>
                         <li>✓ AI business insights</li>
@@ -1132,7 +1133,7 @@ function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount
 function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
 {
     $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "Subscription Cancelled - Argo AI";
+    $subject = "Subscription Cancelled - Argo Premium";
 
     $accessUntil = date('F j, Y', strtotime($endDate));
 
@@ -1155,13 +1156,13 @@ function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
 
                 <div class="content">
                     <h1>Subscription Cancelled</h1>
-                    <p>Your Argo AI subscription has been cancelled as requested.</p>
+                    <p>Your Argo Premium subscription has been cancelled as requested.</p>
 
                     <div class="info-box info-box-warning">
-                        <p><strong>Important:</strong> You will continue to have access to AI features until <strong>{$accessUntil}</strong>.</p>
+                        <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
                     </div>
 
-                    <p>After this date, AI features including receipt scanning, predictive analysis, and AI insights will no longer be available.</p>
+                    <p>After this date, Premium features including invoices & payments, receipt scanning, predictive analysis, and AI insights will no longer be available.</p>
 
                     <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
@@ -1173,7 +1174,7 @@ function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
 
                     <div class="receipt-footer">
                         <p>Subscription ID: {$subscriptionId}</p>
-                        <p>Thank you for trying Argo AI!</p>
+                        <p>Thank you for trying Argo Premium!</p>
                         <p><a href="https://argorobots.com">argorobots.com</a></p>
                     </div>
                 </div>
@@ -1204,7 +1205,7 @@ function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
 function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDate, $billingCycle = 'monthly')
 {
     $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "Subscription Reactivated - Argo AI";
+    $subject = "Subscription Reactivated - Argo Premium";
 
     $nextBillingDate = date('F j, Y', strtotime($endDate));
     $billingLabel = ucfirst($billingCycle);
@@ -1228,10 +1229,10 @@ function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDat
 
                 <div class="content">
                     <h1>Welcome Back!</h1>
-                    <p>Your Argo AI subscription has been reactivated.</p>
+                    <p>Your Argo Premium subscription has been reactivated.</p>
 
                     <div class="info-box info-box-success">
-                        <p><strong>Your AI features are now active!</strong> You have full access to all AI-powered features.</p>
+                        <p><strong>Your Premium features are now active!</strong> You have full access to all Premium features.</p>
                     </div>
 
                     <p>Here's a summary of your subscription:</p>
@@ -1257,6 +1258,7 @@ function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDat
 
                     <p>Features now available:</p>
                     <ul class="styled-list">
+                        <li>Invoices & payments</li>
                         <li>AI-powered receipt scanning</li>
                         <li>Predictive sales analysis</li>
                         <li>AI business insights</li>
@@ -1270,7 +1272,7 @@ function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDat
                     <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
                     <div class="receipt-footer">
-                        <p>Thank you for continuing with Argo AI!</p>
+                        <p>Thank you for continuing with Argo Premium!</p>
                         <p><a href="https://argorobots.com">argorobots.com</a></p>
                     </div>
                 </div>
@@ -1312,8 +1314,8 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
     }
 
     $body = <<<HTML
-        <h1>You've Received a Free AI Subscription Key!</h1>
-        <p>Great news! You've been given a free Argo AI subscription key.</p>
+        <h1>You've Received a Free Premium Subscription Key!</h1>
+        <p>Great news! You've been given a free Argo Premium subscription key.</p>
 
         <div class="license-key">{$subscriptionKey}</div>
 
@@ -1326,11 +1328,12 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
             <li>Open Argo Books on your computer</li>
             <li>Click the blue upgrade button on the top right</li>
             <li>Enter your license key</li>
-            <li>Enjoy unlimited access to all premium features!</li>
+            <li>Enjoy unlimited access to all standard features!</li>
         </ol>
 
         <h2>What's Included:</h2>
         <ul>
+            <li>Invoices & payments</li>
             <li>AI-powered receipt scanning</li>
             <li>Predictive sales analysis</li>
             <li>AI business insights</li>
@@ -1341,7 +1344,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
         <p>Thank you for being part of the Argo community!</p>
         HTML;
 
-    return send_styled_email($email, 'Your Free Argo AI Subscription Key', $body, 'purple');
+    return send_styled_email($email, 'Your Free Argo Premium Subscription Key', $body, 'purple');
 }
 
 /**
@@ -1356,7 +1359,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 function send_free_credit_email($email, $creditAmount, $note = '', $subscriptionId = '')
 {
     $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "You've Received Free Credit - Argo AI";
+    $subject = "You've Received Free Credit - Argo Premium";
 
     $formattedAmount = number_format($creditAmount, 2);
     $noteSection = '';
@@ -1386,7 +1389,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
 
                 <div class="content">
                     <h1>You've Received Free Credit!</h1>
-                    <p>Great news! Free credit has been added to your Argo AI subscription.</p>
+                    <p>Great news! Free credit has been added to your Argo Premium subscription.</p>
 
                     <div class="credit-display">
                         <p class="label">Credit Added</p>
@@ -1412,7 +1415,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
                     <p>If you have any questions about your credit or subscription, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
                     <div class="receipt-footer">
-                        <p>Thank you for being an Argo AI subscriber!</p>
+                        <p>Thank you for being an Argo Premium subscriber!</p>
                         <p><a href="https://argorobots.com">argorobots.com</a></p>
                     </div>
                 </div>

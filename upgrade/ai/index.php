@@ -30,20 +30,20 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Subscribe to Argo Books AI features. Get AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year. Premium users save $20!">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year. Standard users save $20!">
     <meta name="keywords"
-        content="argo ai features, ai receipt scanning, predictive sales analysis, ai business insights, finance tracker, sales tracker subscription">
+        content="argo premium features, invoices payments, ai receipt scanning, predictive sales analysis, ai business insights, finance tracker, sales tracker subscription">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="AI Subscription - Argo Books">
+    <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
-        content="Subscribe to Argo Books AI features. Get AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year.">
     <meta property="og:url" content="https://argorobots.com/upgrade/ai-subscription.php">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
-    <title>AI Subscription - Argo Books</title>
+    <title>Premium Subscription - Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -68,9 +68,9 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="ai-badge-large">AI-Powered Features</div>
-            <h1>Unlock AI for Your Business</h1>
-            <p>Transform your sales tracking with artificial intelligence. Get intelligent insights, automated receipt
+            <div class="ai-badge-large">Premium Features</div>
+            <h1>Unlock Premium for Your Business</h1>
+            <p>Transform your sales tracking with invoices & payments and AI-powered features. Get intelligent insights, automated receipt
                 scanning, and predictive analytics.</p>
         </div>
     </section>
@@ -79,6 +79,20 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
         <div class="container">
             <h2>What's Included</h2>
             <div class="ai-features-grid">
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Invoices & Payments</h3>
+                    <p>Create professional invoices and track payments with ease. Streamline your billing workflow and
+                        get paid faster.</p>
+                </div>
                 <div class="ai-feature-card">
                     <div class="ai-feature-icon">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -136,11 +150,11 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <section class="ai-pricing-section">
         <div class="container">
             <h2>Choose Your Plan</h2>
-            <p class="pricing-subtitle">Select billing frequency and enter your license key if you're a Premium user</p>
+            <p class="pricing-subtitle">Select billing frequency and enter your license key if you're a Standard user</p>
 
             <div class="license-discount">
-                <h3>Premium User? Get $20 Off!</h3>
-                <p>If you've purchased the $20 Premium version, enter your license key to receive a $20 discount.</p>
+                <h3>Standard User? Get $20 Off!</h3>
+                <p>If you've purchased the $20 Standard version, enter your license key to receive a $20 discount.</p>
                 <div class="license-input-group">
                     <input type="text" id="license-key" placeholder="Enter your license key">
                     <button type="button" id="verify-license" class="btn-verify">Verify License</button>
@@ -191,7 +205,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                 <p><strong>Subscription Terms:</strong></p>
                 <ul>
                     <li>Cancel anytime - no long-term commitment</li>
-                    <li>Premium discount applies to first year only</li>
+                    <li>Standard discount applies to first year only</li>
                     <li>Automatic renewal unless cancelled</li>
                     <li>7-day free trial for new subscribers</li>
                 </ul>
@@ -214,7 +228,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>If you've purchased the $20 Premium version, the $20 discount will be applied to your first yearly subscription ($50 - $20 = $30 for the first year) or as credit toward monthly payments.</p>
+                            <p>If you've purchased the $20 Standard version, the $20 discount will be applied to your first yearly subscription ($50 - $20 = $30 for the first year) or as credit toward monthly payments.</p>
                         </div>
                     </div>
                 </div>
@@ -230,7 +244,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes, you can cancel your subscription at any time. Your AI features will remain active until the end of your current billing period.</p>
+                            <p>Yes, you can cancel your subscription at any time. Your Premium features will remain active until the end of your current billing period.</p>
                         </div>
                     </div>
                 </div>
@@ -246,7 +260,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Your data remains safe in Argo Books. You'll just lose access to AI-specific features until you resubscribe.</p>
+                            <p>Your data remains safe in Argo Books. You'll just lose access to Premium-specific features until you resubscribe.</p>
                         </div>
                     </div>
                 </div>
@@ -354,7 +368,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     if (data.valid) {
                         hasDiscount = true;
                         verifiedLicenseKey = licenseKey;
-                        statusEl.innerHTML = '<span class="success">License verified! $20 discount applied.</span>';
+                        statusEl.innerHTML = '<span class="success">Standard license verified! $20 discount applied.</span>';
                         updatePriceDisplay();
                         // Reset attempts on success
                         verifyAttempts = 0;
@@ -394,7 +408,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                         originalPrice.style.display = 'block';
                         originalPrice.querySelector('.strikethrough').textContent = '$' + yearlyPrice;
                         discountBadge.style.display = 'block';
-                        discountBadge.textContent = '$20 Premium Discount Applied!';
+                        discountBadge.textContent = '$20 Standard Discount Applied!';
                     } else {
                         priceAmount.textContent = yearlyPrice;
                         originalPrice.style.display = 'none';

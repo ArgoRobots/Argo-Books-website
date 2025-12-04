@@ -1245,11 +1245,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <p class="pricing-note">Free forever</p>
                 </div>
 
-                <!-- Premium Plan -->
+                <!-- Standard Plan -->
                 <div class="pricing-card featured animate-on-scroll">
                     <div class="featured-badge">Most Popular</div>
                     <div class="pricing-header">
-                        <span class="pricing-tag">Premium</span>
+                        <span class="pricing-tag">Standard</span>
                         <div class="pricing-amount">
                             <span class="currency">$</span>
                             <span class="amount">20</span>
@@ -1293,10 +1293,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <p class="pricing-note">30-day money-back guarantee</p>
                 </div>
 
-                <!-- AI Plan -->
+                <!-- Premium Plan -->
                 <div class="pricing-card ai-card animate-on-scroll">
                     <div class="pricing-header">
-                        <span class="pricing-tag ai">AI Features</span>
+                        <span class="pricing-tag ai">Premium</span>
                         <div class="pricing-amount">
                             <span class="currency">$</span>
                             <span class="amount">5</span>
@@ -1310,7 +1310,13 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>Everything in Premium</strong></span>
+                            <span><strong>Everything in Standard</strong></span>
+                        </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            <span><strong>Invoices & payments</strong></span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1337,7 +1343,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span>Natural language search</span>
                         </li>
                     </ul>
-                    <a href="upgrade/ai/" class="btn btn-ai btn-block">Subscribe to AI</a>
+                    <a href="upgrade/ai/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                     <p class="pricing-note">Cancel anytime</p>
                 </div>
             </div>
@@ -1350,7 +1356,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 </div>
                 <div class="guarantee-text">
                     <h4>30-Day Money-Back Guarantee</h4>
-                    <p>Try Premium risk-free. If you're not satisfied, get a full refund. No questions asked.</p>
+                    <p>Try Standard risk-free. If you're not satisfied, get a full refund. No questions asked.</p>
                 </div>
             </div>
         </div>
@@ -1432,7 +1438,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>What's included in the AI subscription?</h3>
+                        <h3>What's included in the Premium subscription?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -1441,7 +1447,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The AI subscription ($5/month or $50/year) includes AI-powered receipt scanning, predictive sales analytics, intelligent business insights, and natural language search. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($5/month or $50/year) includes invoices & payments, AI-powered receipt scanning, predictive sales analytics, intelligent business insights, and natural language search. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
                         </div>
                     </div>
                 </div>

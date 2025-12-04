@@ -76,7 +76,7 @@
         </div>
 
         <h1>You're All Set!</h1>
-        <p class="subtitle">Your purchase is complete. Welcome to Argo Books Premium!</p>
+        <p class="subtitle">Your purchase is complete. Welcome to Argo Books Standard!</p>
 
         <div class="purchase-details">
             <h2>Purchase Details</h2>
@@ -93,7 +93,7 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Product</span>
-                <span class="detail-value">Argo Books Premium</span>
+                <span class="detail-value">Argo Books Standard</span>
             </div>
             <div class="detail-row">
                 <span class="detail-label">License Type</span>
@@ -130,7 +130,7 @@
         </div>
 
         <div class="activation-steps">
-            <h3>How to Activate Premium</h3>
+            <h3>How to Activate Standard</h3>
             <ol>
                 <li>Open <strong>Argo Books</strong> on your computer</li>
                 <li>Click the blue <strong>Upgrade</strong> button in the top right corner</li>

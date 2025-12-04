@@ -49,10 +49,10 @@ if ($ai_subscription) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Manage your AI Subscription - Argo Community">
+    <meta name="description" content="Manage your Premium Subscription - Argo Community">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
-    <title>AI Subscription - Argo Community</title>
+    <title>Premium Subscription - Argo Community</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -74,7 +74,7 @@ if ($ai_subscription) {
     <div class="subscription-page-container">
         <div class="page-header">
             <div class="title-container">
-                <h1>AI Subscription</h1>
+                <h1>Premium Subscription</h1>
             </div>
 
             <div class="button-container">
@@ -103,7 +103,7 @@ if ($ai_subscription) {
                 <div class="subscription-card">
                     <div class="subscription-header">
                         <div class="subscription-plan">
-                            <span class="plan-name">Argo AI Features</span>
+                            <span class="plan-name">Argo Premium</span>
                             <span class="billing-cycle"><?php echo ucfirst($ai_subscription['billing_cycle']); ?> Plan</span>
                         </div>
                         <?php if ($ai_subscription['status'] != 'payment_failed'): ?>
@@ -146,7 +146,7 @@ if ($ai_subscription) {
                             if ($ai_subscription['discount_applied'] && $creditBalance > 0): ?>
                             <div class="detail-item">
                                 <span class="detail-label">Discount</span>
-                                <span class="detail-value discount">$20 Premium Discount Applied</span>
+                                <span class="detail-value discount">$20 Standard Discount Applied</span>
                             </div>
                             <?php endif; ?>
                             <?php if ($creditBalance > 0):
@@ -193,7 +193,7 @@ if ($ai_subscription) {
                             </svg>
                             <div>
                                 <p>Your subscription has been cancelled.</p>
-                                <p class="notice-detail">AI features will remain active until <strong><?php echo date('F j, Y', strtotime($ai_subscription['end_date'])); ?></strong>.</p>
+                                <p class="notice-detail">Premium features will remain active until <strong><?php echo date('F j, Y', strtotime($ai_subscription['end_date'])); ?></strong>.</p>
                             </div>
                         </div>
                         <div class="subscription-actions">
@@ -228,7 +228,7 @@ if ($ai_subscription) {
                             </svg>
                             <div>
                                 <p>Your subscription has expired.</p>
-                                <p class="notice-detail">Renew to continue using AI-powered features.</p>
+                                <p class="notice-detail">Renew to continue using Premium features.</p>
                             </div>
                         </div>
                         <div class="subscription-actions">
@@ -241,6 +241,15 @@ if ($ai_subscription) {
                 <div class="features-section">
                     <h3>Features Included</h3>
                     <div class="features-grid">
+                        <div class="feature-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                            <span>Invoices & Payments</span>
+                        </div>
                         <div class="feature-item">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -279,7 +288,7 @@ if ($ai_subscription) {
                         </svg>
                     </div>
                     <h3>No Active Subscription</h3>
-                    <p>Get access to AI-powered features like receipt scanning, predictive analysis, and natural language search.</p>
+                    <p>Get access to invoices & payments and AI-powered features like receipt scanning, predictive analysis, and natural language search.</p>
                     <div class="pricing-preview">
                         <span class="price">$5</span>
                         <span class="period">CAD/month</span>
@@ -287,7 +296,7 @@ if ($ai_subscription) {
                         <span class="price">$50</span>
                         <span class="period">CAD/year (save $10)</span>
                     </div>
-                    <a href="../../upgrade/ai/" class="btn btn-purple btn-subscribe">Subscribe to AI Features</a>
+                    <a href="../../upgrade/ai/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
                 </div>
             <?php endif; ?>
         </div>

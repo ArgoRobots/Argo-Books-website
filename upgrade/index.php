@@ -9,14 +9,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Upgrade Argo Books. Get Premium for $20 CAD lifetime access or subscribe to AI features for $5/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
+        content="Upgrade Argo Books. Get Standard for $20 CAD lifetime access or subscribe to Premium for $5/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
     <meta name="keywords"
-        content="upgrade argo books, buy full version, lifetime access software, unlimited products, business software pricing, finance tracker, sales tracker premium, AI subscription">
+        content="upgrade argo books, buy full version, lifetime access software, unlimited products, business software pricing, finance tracker, sales tracker standard, premium subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Upgrade - Argo Books">
     <meta property="og:description"
-        content="Upgrade Argo Books. Get Premium for $20 CAD lifetime access or subscribe to AI features for $5/month.">
+        content="Upgrade Argo Books. Get Standard for $20 CAD lifetime access or subscribe to Premium for $5/month.">
     <meta property="og:url" content="https://argorobots.com/upgrade/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -26,7 +26,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Upgrade - Argo Books">
     <meta name="twitter:description"
-        content="Upgrade Argo Books. Get Premium for $20 CAD lifetime access or subscribe to AI features for $5/month.">
+        content="Upgrade Argo Books. Get Standard for $20 CAD lifetime access or subscribe to Premium for $5/month.">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/upgrade/">
@@ -70,11 +70,11 @@
     <section class="pricing-section">
         <div class="container">
             <div class="pricing-cards-wrapper">
-                <!-- Premium Plan Card -->
+                <!-- Standard Plan Card -->
                 <a href="premium/" class="pricing-card-link">
                     <div class="upgrade-pricing-card premium-card">
                         <div class="card-badge">One-Time Payment</div>
-                        <h2>Premium</h2>
+                        <h2>Standard</h2>
                         <div class="card-price">
                             <span class="currency">$</span>
                             <span class="amount">20</span>
@@ -106,16 +106,16 @@
                         </div>
 
                         <div class="card-cta">
-                            <span class="cta-button premium-cta">Get Premium</span>
+                            <span class="cta-button premium-cta">Get Standard</span>
                         </div>
                     </div>
                 </a>
 
-                <!-- AI Subscription Card -->
+                <!-- Premium Subscription Card -->
                 <a href="ai/" class="pricing-card-link">
                     <div class="upgrade-pricing-card ai-card">
                         <div class="card-badge ai-badge">AI-Powered</div>
-                        <h2>AI Subscription</h2>
+                        <h2>Premium</h2>
                         <div class="card-price">
                             <span class="currency">$</span>
                             <span class="amount">5</span>
@@ -126,7 +126,11 @@
                         <ul class="card-features">
                               <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Everything in Premium</strong></span>
+                                <span><strong>Everything in Standard</strong></span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <span><strong>Invoices & payments</strong></span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
@@ -147,11 +151,11 @@
                         </ul>
 
                         <div class="card-highlight ai-highlight">
-                            Premium users get a $20 discount!
+                            Standard users get a $20 discount!
                         </div>
 
                         <div class="card-cta">
-                            <span class="cta-button ai-cta">Subscribe to AI</span>
+                            <span class="cta-button ai-cta">Get Premium</span>
                         </div>
                     </div>
                 </a>
@@ -176,14 +180,14 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need to track more products, consider upgrading to Premium.</p>
+                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need to track more products, consider upgrading to Standard.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What's the difference between Premium and AI Subscription?</h3>
+                        <h3>What's the difference between Standard and Premium?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -192,14 +196,14 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Premium ($20 one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>AI Subscription ($5/month)</strong> adds AI-powered features like receipt scanning, predictive analysis, and natural language search. You can have both for the complete experience!</p>
+                            <p><strong>Standard ($20 one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>Premium ($5/month)</strong> adds invoices & payments, AI-powered features like receipt scanning, predictive analysis, and natural language search. You can have both for the complete experience!</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>How does the $20 discount for Premium users work?</h3>
+                        <h3>How does the $20 discount for Standard users work?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -208,14 +212,14 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>If you've purchased Premium, you get $20 off your first year of AI Subscription. Just enter your license key when subscribing, and the yearly price drops from $50 to $30. You will still have access to your premium license key after you switch to the AI subscription.</p>
+                            <p>If you've purchased Standard, you get $20 off your first year of Premium. Just enter your license key when subscribing, and the yearly price drops from $50 to $30. You will still have access to your standard license key after you switch to the Premium subscription.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Can I cancel the AI Subscription anytime?</h3>
+                        <h3>Can I cancel the Premium subscription anytime?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -224,14 +228,14 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes, you can cancel your AI Subscription at any time. Your AI features will remain active until the end of your current billing period.</p>
+                            <p>Yes, you can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Is Premium a one-time payment?</h3>
+                        <h3>Is Standard a one-time payment?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -240,7 +244,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes, pay once and get lifetime access to all Premium features, including future updates. No recurring charges.</p>
+                            <p>Yes, pay once and get lifetime access to all Standard features, including future updates. No recurring charges.</p>
                         </div>
                     </div>
                 </div>

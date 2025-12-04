@@ -81,7 +81,7 @@
             <div class="order-summary">
                 <h3>Order Summary</h3>
                 <div class="order-item">
-                    <span>Argo Books Premium</span>
+                    <span>Argo Books Standard</span>
                     <span>$20.00 CAD</span>
                 </div>
                 <div class="order-total">

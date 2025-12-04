@@ -53,8 +53,8 @@
                 <li>The license key was revoked due to violation of our <a class="link" href="terms.php">Terms of Service</a>.</li>
             </ol>
 
-            <h2>Argo AI Subscription Refunds</h2>
-            <p>For Argo AI subscriptions:</p>
+            <h2>Argo Premium Subscription Refunds</h2>
+            <p>For Argo Premium subscriptions:</p>
             <ul>
                 <li>Refunds are prorated based on unused time in your billing period.</li>
                 <li>Cancelling your subscription does not automatically trigger a refund - you must request one separately.</li>

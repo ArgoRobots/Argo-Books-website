@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])
                 error_log("Failed to send reactivation email: " . $e->getMessage());
             }
 
-            $successMsg = 'Your subscription has been reactivated! AI features are now available.';
+            $successMsg = 'Your subscription has been reactivated! Premium features are now available.';
             if (!$paypalReactivated) {
                 $successMsg .= ' Note: We could not automatically reactivate your PayPal subscription. You may need to update your payment method if the next renewal fails.';
             }
@@ -95,7 +95,7 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Reactivate AI Subscription - Argo Community">
+    <meta name="description" content="Reactivate Premium Subscription - Argo Community">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
     <title>Reactivate Subscription - Argo Community</title>
@@ -134,13 +134,13 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
             <?php endif; ?>
 
             <p class="confirm-description">
-                You're about to reactivate your Argo AI subscription. Here's what you need to know:
+                You're about to reactivate your Argo Premium subscription. Here's what you need to know:
             </p>
 
             <div class="info-box success-box">
                 <h3>What happens when you reactivate:</h3>
                 <ul>
-                    <li>AI features will be immediately available</li>
+                    <li>Premium features will be immediately available</li>
                     <li>Auto-renewal will be enabled</li>
                     <li>Your next billing date remains <strong><?php echo $end_date; ?></strong></li>
                     <li>No additional charges until your next billing date</li>

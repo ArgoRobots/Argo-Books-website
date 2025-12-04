@@ -5,10 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI Subscription Checkout - Argo Books">
+    <meta name="description" content="Premium Subscription Checkout - Argo Books">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
-    <title>AI Subscription Checkout - Argo Books</title>
+    <title>Premium Subscription Checkout - Argo Books</title>
 
     <?php
     session_start();
@@ -200,7 +200,7 @@
     </header>
 
     <section class="checkout-container">
-        <h1>Complete Your AI Subscription</h1>
+        <h1>Complete Your Premium Subscription</h1>
 
         <div class="checkout-form">
             <h2>Payment Details</h2>
@@ -208,12 +208,12 @@
             <div class="order-summary ai-order-summary">
                 <h3>Order Summary</h3>
                 <div class="order-item">
-                    <span>Argo AI Subscription (<?php echo ucfirst($billing); ?>)</span>
+                    <span>Argo Premium (<?php echo ucfirst($billing); ?>)</span>
                     <span>$<?php echo number_format($basePrice, 2); ?> CAD</span>
                 </div>
                 <?php if ($hasDiscount && $billing === 'yearly'): ?>
                 <div class="order-item discount-item">
-                    <span>Premium User Discount</span>
+                    <span>Standard User Discount</span>
                     <span class="discount-amount">-$<?php echo number_format($discount, 2); ?> CAD</span>
                 </div>
                 <?php endif; ?>

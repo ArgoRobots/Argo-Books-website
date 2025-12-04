@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
             }
         }
 
-        $successMsg = 'Your AI subscription has been cancelled. You will retain access until the end of your billing period.';
+        $successMsg = 'Your Premium subscription has been cancelled. You will retain access until the end of your billing period.';
 
         // Add PayPal warning if cancellation on their side failed
         if ($paypalCancelFailed) {
@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Add discount eligibility notice if credit was used
         $subOriginalCredit = floatval($subscription['original_credit'] ?? 0);
         if ($subOriginalCredit > 0 && $forfeitedCredit < $subOriginalCredit) {
-            $successMsg .= ' Note: The premium user discount cannot be applied again if you resubscribe.';
+            $successMsg .= ' Note: The standard user discount cannot be applied again if you resubscribe.';
         }
 
         $_SESSION['subscription_success'] = $successMsg;
@@ -114,7 +114,7 @@ $end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Cancel AI Subscription - Argo Community">
+    <meta name="description" content="Cancel Premium Subscription - Argo Community">
     <meta name="author" content="Argo">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
     <title>Cancel Subscription - Argo Community</title>
@@ -154,14 +154,14 @@ $end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
             <?php endif; ?>
 
             <p class="confirm-description">
-                You're about to cancel your Argo AI subscription. Please review the following before confirming:
+                You're about to cancel your Argo Premium subscription. Please review the following before confirming:
             </p>
 
             <div class="info-box warning-box">
                 <h3>What happens when you cancel:</h3>
                 <ul>
-                    <li>You will retain access to AI features until <strong><?php echo $end_date; ?></strong></li>
-                    <li>After this date, AI features will be disabled</li>
+                    <li>You will retain access to Premium features until <strong><?php echo $end_date; ?></strong></li>
+                    <li>After this date, Premium features will be disabled</li>
                     <li>Your subscription will not auto-renew</li>
                     <li>You can resubscribe anytime to restore access</li>
                     <?php if ($hasUnusedCredit): ?>
@@ -173,7 +173,7 @@ $end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
             <?php if ($hasUnusedCredit): ?>
             <div class="info-box discount-warning-box">
                 <h3>Credit Will Be Lost</h3>
-                <p>You have $<?php echo number_format($creditBalance, 2); ?> in unused premium user discount credit.</p>
+                <p>You have $<?php echo number_format($creditBalance, 2); ?> in unused standard user discount credit.</p>
                 <p><strong>This credit will be forfeited if you cancel.</strong> If you resubscribe later, the discount will not be available again.</p>
             </div>
             <?php endif; ?>
@@ -181,6 +181,7 @@ $end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
             <div class="info-box features-box">
                 <h3>Features you'll lose access to:</h3>
                 <ul>
+                    <li>Invoices & payments</li>
                     <li>AI-powered receipt scanning</li>
                     <li>Predictive sales analysis</li>
                     <li>AI business insights</li>

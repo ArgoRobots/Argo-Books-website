@@ -47,10 +47,6 @@ include '../../docs-header.php';
                 <strong>Tip:</strong> Biometric login options will only appear if your device has compatible hardware (e.g., fingerprint reader or facial recognition camera) and biometric authentication is properly configured in your operating system settings.
             </div>
 
-            <div class="warning-box">
-                <strong>Important:</strong> Store your password securely in multiple locations. If you forget it, your data cannot be recovered and will be lost forever!
-            </div>
-
             <div class="page-navigation">
                 <a href="encryption.php" class="nav-button prev">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

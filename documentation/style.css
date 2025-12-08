@@ -857,7 +857,6 @@ body.docs-page {
 }
 
 .docs-content h3 {
-  font-size: 1.25rem;
   font-weight: 600;
   color: var(--gray-800);
   margin: 32px 0 12px;

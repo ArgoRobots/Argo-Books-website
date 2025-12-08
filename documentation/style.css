@@ -520,9 +520,9 @@ body.docs-page {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
 
 /* Breadcrumb in Hero */
@@ -549,8 +549,8 @@ body.docs-page {
 /* Sub-page Search */
 .subpage-search {
   position: relative;
-  width: 320px;
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 560px;
   z-index: 100;
 }
 
@@ -943,14 +943,8 @@ body.docs-page {
     padding: 80px 16px 20px;
   }
 
-  .subpage-hero-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-
   .subpage-search {
-    width: 100%;
+    max-width: 100%;
   }
 
   .docs-layout {

@@ -70,6 +70,7 @@ include '../../docs-header.php';
                         </li>
                     </ul>
                     <a href="../../../downloads/" class="btn btn-gray">Get Started Free</a>
+                    <p class="version-note">Free forever</p>
                 </div>
 
                 <!-- Standard Version -->

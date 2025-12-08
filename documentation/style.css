@@ -1047,7 +1047,6 @@ body.docs-page {
 .version-card.featured {
   border: 2px solid var(--primary-blue);
   position: relative;
-  transform: scale(1.02);
 }
 
 .version-card.premium {
@@ -1090,8 +1089,6 @@ body.docs-page {
 
 .version-card .btn {
   width: 100%;
-  margin-top: auto;
-  padding: 12px 20px;
 }
 
 .version-note {

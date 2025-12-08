@@ -975,6 +975,8 @@ body.docs-page {
   background: var(--white);
   border: 1px solid var(--gray-200);
   transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .version-card:hover {
@@ -1000,6 +1002,7 @@ body.docs-page {
 
 .feature-list {
   list-style: none;
+  flex: 1;
 }
 
 .feature-item {
@@ -1093,7 +1096,7 @@ body.docs-page {
   border-radius: 10px;
   font-weight: 600;
   text-decoration: none;
-  margin-top: 24px;
+  margin-top: auto;
   transition: all 0.2s ease;
   background: var(--gray-100);
   color: var(--gray-700);

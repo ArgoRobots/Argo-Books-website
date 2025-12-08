@@ -425,7 +425,6 @@ body.docs-landing {
 @media (max-width: 768px) {
   .docs-hero {
     padding: 80px 20px 60px;
-    margin-top: 60px;
   }
 
   .docs-hero h1 {

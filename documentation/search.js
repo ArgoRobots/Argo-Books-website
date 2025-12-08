@@ -208,16 +208,16 @@ class DocumentationSearch {
 
         return `
             <div class="search-result-item" data-page="${page.id}" data-category="${categorySlug}">
-                <div class="search-result-section">${page.category}</div>
-                <div class="search-result-title">
+                <span class="search-result-section">${page.category}</span>
+                <span class="search-result-title">
                     <svg class="search-result-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
                         <line x1="16" y1="13" x2="8" y2="13"/>
                         <line x1="16" y1="17" x2="8" y2="17"/>
                     </svg>
-                    ${titleHighlighted}
-                </div>
+                    <span>${titleHighlighted}</span>
+                </span>
             </div>
         `;
     }

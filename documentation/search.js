@@ -137,34 +137,55 @@ class DocumentationSearch {
     }
 
     searchPages(query) {
-        const similarityThreshold = 0.6;
+        const similarityThreshold = 0.5;
+        const queryWords = query.split(/\s+/).filter(w => w.length > 0);
 
-        return this.pages.filter(page => {
-            const titleLower = page.title.toLowerCase();
-            const keywordsLower = page.keywords.toLowerCase();
-            const categoryLower = page.category.toLowerCase();
+        return this.pages
+            .map(page => {
+                const titleLower = page.title.toLowerCase();
+                const keywordsLower = page.keywords.toLowerCase();
+                const categoryLower = page.category.toLowerCase();
+                let score = 0;
 
-            // Exact match check first
-            if (titleLower.includes(query) || keywordsLower.includes(query) || categoryLower.includes(query)) {
-                return true;
-            }
+                // Exact substring match (highest priority)
+                if (titleLower.includes(query)) {
+                    score += 100;
+                }
+                if (keywordsLower.includes(query)) {
+                    score += 50;
+                }
+                if (categoryLower.includes(query)) {
+                    score += 30;
+                }
 
-            // Fuzzy matching for title words
-            const titleWords = titleLower.split(/\s+/);
-            const titleMatch = titleWords.some(word =>
-                typeof getSimilarity === 'function' && getSimilarity(word, query) >= similarityThreshold
-            );
+                // Check each query word
+                const titleWords = titleLower.split(/\s+/);
+                const keywordWords = keywordsLower.split(/\s+/);
 
-            if (titleMatch) return true;
+                for (const qWord of queryWords) {
+                    // Prefix matching (e.g., "instal" matches "installation")
+                    if (titleWords.some(w => w.startsWith(qWord))) {
+                        score += 40;
+                    }
+                    if (keywordWords.some(w => w.startsWith(qWord))) {
+                        score += 20;
+                    }
 
-            // Fuzzy matching for keywords
-            const keywordWords = keywordsLower.split(/\s+/);
-            const keywordMatch = keywordWords.some(word =>
-                typeof getSimilarity === 'function' && getSimilarity(word, query) >= similarityThreshold
-            );
+                    // Fuzzy matching using Levenshtein
+                    if (typeof getSimilarity === 'function') {
+                        const titleMatch = titleWords.some(w => getSimilarity(w, qWord) >= similarityThreshold);
+                        const keywordMatch = keywordWords.some(w => getSimilarity(w, qWord) >= similarityThreshold);
 
-            return keywordMatch;
-        });
+                        if (titleMatch) score += 15;
+                        if (keywordMatch) score += 10;
+                    }
+                }
+
+                return { page, score };
+            })
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score)
+            .map(item => item.page);
     }
 
     getCategorySlug(category) {
@@ -208,16 +229,16 @@ class DocumentationSearch {
 
         return `
             <div class="search-result-item" data-page="${page.id}" data-category="${categorySlug}">
-                <div class="search-result-section">${page.category}</div>
-                <div class="search-result-title">
+                <span class="search-result-section">${page.category}</span>
+                <span class="search-result-title">
                     <svg class="search-result-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                         <polyline points="14 2 14 8 20 8"/>
                         <line x1="16" y1="13" x2="8" y2="13"/>
                         <line x1="16" y1="17" x2="8" y2="17"/>
                     </svg>
-                    ${titleHighlighted}
-                </div>
+                    <span>${titleHighlighted}</span>
+                </span>
             </div>
         `;
     }

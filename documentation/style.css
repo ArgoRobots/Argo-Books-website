@@ -26,7 +26,6 @@ body.docs-landing {
   position: relative;
   background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 50%, #1a365d 100%);
   padding: 100px 24px 80px;
-  overflow: hidden;
 }
 
 .hero-content {
@@ -426,7 +425,6 @@ body.docs-landing {
 @media (max-width: 768px) {
   .docs-hero {
     padding: 80px 20px 60px;
-    margin-top: 60px;
   }
 
   .docs-hero h1 {
@@ -520,9 +518,9 @@ body.docs-page {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
 
 /* Breadcrumb in Hero */
@@ -549,8 +547,8 @@ body.docs-page {
 /* Sub-page Search */
 .subpage-search {
   position: relative;
-  width: 320px;
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 560px;
   z-index: 100;
 }
 
@@ -643,6 +641,39 @@ body.docs-page {
   border-radius: 16px;
   border: 1px solid var(--gray-200);
   padding: 20px;
+}
+
+/* Sidebar Home Button */
+.sidebar-home-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  margin-bottom: 20px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  color: var(--gray-700);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.sidebar-home-btn:hover {
+  background: var(--blue-50);
+  border-color: var(--blue-200);
+  color: var(--primary-blue);
+}
+
+.sidebar-home-btn svg {
+  flex-shrink: 0;
+  color: var(--gray-500);
+  transition: color 0.15s ease;
+}
+
+.sidebar-home-btn:hover svg {
+  color: var(--primary-blue);
 }
 
 .nav-section {
@@ -786,7 +817,7 @@ body.docs-page {
 }
 
 .docs-page-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--gray-900);
   margin: 0;
@@ -811,7 +842,7 @@ body.docs-page {
 }
 
 .docs-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--gray-900);
   margin: 40px 0 16px;
@@ -943,14 +974,8 @@ body.docs-page {
     padding: 80px 16px 20px;
   }
 
-  .subpage-hero-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 16px;
-  }
-
   .subpage-search {
-    width: 100%;
+    max-width: 100%;
   }
 
   .docs-layout {

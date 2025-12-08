@@ -3,9 +3,6 @@ $pageTitle = 'Documentation & User Guide';
 $pageDescription = 'Complete Argo Books documentation and user guide. Learn installation, features, tutorials for expense/revenue tracking, product management, analytics, Excel import/export, and security settings.';
 $currentPage = 'index';
 $isDocsLanding = true;
-
-// Determine base path for resources
-$resourcePath = '../';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,22 +33,22 @@ $resourcePath = '../';
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
     <title><?php echo htmlspecialchars($pageTitle); ?> - Argo Books</title>
 
-    <script src="<?php echo $resourcePath; ?>resources/scripts/jquery-3.6.0.js"></script>
-    <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
-    <script src="<?php echo $resourcePath; ?>resources/scripts/ScrollToCenter.js"></script>
-    <script src="<?php echo $resourcePath; ?>resources/scripts/levenshtein.js"></script>
+    <script src="../resources/scripts/jquery-3.6.0.js"></script>
+    <script src="../resources/scripts/main.js"></script>
+    <script src="../resources/scripts/ScrollToCenter.js"></script>
+    <script src="../resources/scripts/levenshtein.js"></script>
     <script src="search.js"></script>
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="search.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/custom-colors.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/link.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/button.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/style.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/footer/style.css">
+    <link rel="stylesheet" href="../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../resources/styles/link.css">
+    <link rel="stylesheet" href="../resources/styles/button.css">
+    <link rel="stylesheet" href="../resources/header/style.css">
+    <link rel="stylesheet" href="../resources/footer/style.css">
 </head>
 
 <body class="docs-landing">

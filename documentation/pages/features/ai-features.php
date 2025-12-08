@@ -17,93 +17,44 @@ include '../../docs-header.php';
             Argo Books Premium includes three AI-powered features that save you time and provide intelligent
             insights to help grow your business.</p>
 
-            <!-- Section 1: Receipt Scanning -->
-            <section class="feature-section">
-                <h2>1. AI Receipt Scanning</h2>
-                <p>Transform paper receipts into digital records instantly with our AI-powered scanner.</p>
+            <div class="feature-cards">
+                <a href="receipt-scanning.php" class="feature-card">
+                    <div class="feature-card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="16" rx="2"/>
+                            <path d="M7 8h10M7 12h6"/>
+                            <circle cx="17" cy="14" r="3"/>
+                        </svg>
+                    </div>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Transform paper receipts into digital records instantly. Take a photo and let the AI extract vendor, date, items, and totals automatically.</p>
+                    <span class="feature-card-link">Learn more →</span>
+                </a>
 
-                <h3>How It Works</h3>
-                <ol class="steps-list">
-                    <li>Take a photo of your receipt with your phone or upload an image</li>
-                    <li>Our AI analyzes the receipt and extracts all relevant information</li>
-                    <li>Review the extracted data and make any corrections</li>
-                    <li>Save to automatically create an expense record</li>
-                </ol>
+                <a href="predictive-analytics.php" class="feature-card">
+                    <div class="feature-card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"/>
+                            <path d="M18 9l-5 5-4-4-3 3"/>
+                        </svg>
+                    </div>
+                    <h3>Predictive Analytics</h3>
+                    <p>See the future of your business with AI-powered forecasting. Get revenue predictions, seasonal pattern detection, and inventory forecasts.</p>
+                    <span class="feature-card-link">Learn more →</span>
+                </a>
 
-                <h3>What Gets Extracted</h3>
-                <ul>
-                    <li><strong>Vendor Name:</strong> The business name from the receipt</li>
-                    <li><strong>Date:</strong> Transaction date</li>
-                    <li><strong>Line Items:</strong> Individual items with quantities and prices</li>
-                    <li><strong>Subtotal, Tax, & Total:</strong> All totals are captured</li>
-                    <li><strong>Payment Method:</strong> If shown on the receipt</li>
-                </ul>
-
-                <div class="info-box">
-                    <p><strong>Tip:</strong> For best results, ensure good lighting and capture the entire receipt
-                    in frame. The AI works with handwritten receipts too, but printed receipts have higher accuracy.</p>
-                </div>
-            </section>
-
-            <!-- Section 2: Predictive Analytics -->
-            <section class="feature-section">
-                <h2>2. Predictive Analytics</h2>
-                <p>See the future of your business with AI-powered forecasting.</p>
-
-                <h3>Revenue Forecasting</h3>
-                <p>Our predictive engine analyzes your historical revenue data to forecast:</p>
-                <ul>
-                    <li>Expected revenue for upcoming weeks and months</li>
-                    <li>Product demand predictions</li>
-                    <li>Best and worst performing periods</li>
-                </ul>
-
-                <h3>Seasonal Pattern Detection</h3>
-                <p>The AI automatically identifies seasonal trends in your business:</p>
-                <ul>
-                    <li>Holiday revenue patterns</li>
-                    <li>Monthly and weekly cycles</li>
-                    <li>Year-over-year comparisons</li>
-                </ul>
-
-                <h3>Inventory Predictions</h3>
-                <p>Get ahead of stockouts with intelligent inventory forecasting:</p>
-                <ul>
-                    <li>Predicted stock depletion dates</li>
-                    <li>Reorder recommendations</li>
-                    <li>Seasonal inventory adjustments</li>
-                </ul>
-            </section>
-
-            <!-- Section 3: Business Insights -->
-            <section class="feature-section">
-                <h2>3. AI Business Insights</h2>
-                <p>Receive intelligent recommendations to optimize your business.</p>
-
-                <h3>Profit Optimization</h3>
-                <ul>
-                    <li>Identify products with the highest profit margins</li>
-                    <li>Spot underperforming items that may need attention</li>
-                    <li>Pricing recommendations based on demand</li>
-                </ul>
-
-                <h3>Smart Alerts</h3>
-                <p>Get proactive notifications about important business events:</p>
-                <ul>
-                    <li><strong>Low Stock Alerts:</strong> Before you run out of best-sellers</li>
-                    <li><strong>Unusual Activity:</strong> Spikes or drops in revenue</li>
-                    <li><strong>Opportunity Alerts:</strong> Products gaining popularity</li>
-                    <li><strong>Trend Notifications:</strong> Seasonal patterns approaching</li>
-                </ul>
-
-                <h3>Growth Opportunities</h3>
-                <p>The AI analyzes your data to suggest ways to grow:</p>
-                <ul>
-                    <li>Cross-selling recommendations</li>
-                    <li>Customer segment insights</li>
-                    <li>Expansion opportunities</li>
-                </ul>
-            </section>
+                <a href="business-insights.php" class="feature-card">
+                    <div class="feature-card-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4M12 8h.01"/>
+                        </svg>
+                    </div>
+                    <h3>AI Business Insights</h3>
+                    <p>Receive intelligent recommendations to optimize your business. Get smart alerts, profit optimization tips, and growth opportunities.</p>
+                    <span class="feature-card-link">Learn more →</span>
+                </a>
+            </div>
 
             <h2>Privacy & Data Security</h2>
             <p>Your data is processed securely:</p>
@@ -121,8 +72,8 @@ include '../../docs-header.php';
                     </svg>
                     Previous: Invoicing & Payments
                 </a>
-                <a href="inventory.php" class="nav-button next">
-                    Next: Inventory Management
+                <a href="receipt-scanning.php" class="nav-button next">
+                    Next: AI Receipt Scanning
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 18l6-6-6-6"></path>
                     </svg>

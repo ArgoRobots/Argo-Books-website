@@ -17,10 +17,10 @@ include '../../docs-header.php';
                 <ul>
                     <li><strong>Accountants</strong> - A simple list with accountant names</li>
                     <li><strong>Companies</strong> - A simple list with company names</li>
-                    <li><strong>Purchase products</strong> - Products for purchasing</li>
-                    <li><strong>Sale products</strong> - Products for selling</li>
-                    <li><strong>Purchases</strong> - Purchase transaction records</li>
-                    <li><strong>Sales</strong> - Sales transaction records</li>
+                    <li><strong>Expense products</strong> - Products for expenses</li>
+                    <li><strong>Revenue products</strong> - Products for revenue</li>
+                    <li><strong>Expenses</strong> - Expense transaction records</li>
+                    <li><strong>Revenue</strong> - Revenue transaction records</li>
                 </ul>
             </div>
 
@@ -30,7 +30,7 @@ include '../../docs-header.php';
 
                 <p>Key points:</p>
                 <ul>
-                    <li><strong>Sheet names:</strong> Use "Accountants", "Companies", "Purchase products", "Sale products", "Purchases", "Sales" (case doesn't matter)</li>
+                    <li><strong>Sheet names:</strong> Use "Accountants", "Companies", "Expense products", "Revenue products", "Expenses", "Revenue" (case doesn't matter)</li>
                     <li><strong>Date format:</strong> YYYY-MM-DD (e.g., 2025-01-15)</li>
                     <li><strong>Country names:</strong> Must match the <a class="link" href="../reference/accepted-countries.php">accepted country list</a></li>
                     <li><strong>Everything else:</strong> Follow the template format exactly</li>

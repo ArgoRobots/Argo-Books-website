@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Documentation & User Guide';
-$pageDescription = 'Complete Argo Books documentation and user guide. Learn installation, features, tutorials for sales tracking, product management, analytics, Excel import/export, and security settings.';
+$pageDescription = 'Complete Argo Books documentation and user guide. Learn installation, features, tutorials for expense/revenue tracking, product management, analytics, Excel import/export, and security settings.';
 $currentPage = 'index';
 $isDocsLanding = true;
 
@@ -213,7 +213,7 @@ $resourcePath = '../';
                             <line x1="6" y1="20" x2="6" y2="16"></line>
                         </svg>
                     </div>
-                    <h3>Sales Tracking</h3>
+                    <h3>Expense/Revenue Tracking</h3>
                     <p>Track all business transactions</p>
                 </a>
                 <a href="pages/features/receipts.php" class="doc-card">
@@ -284,7 +284,7 @@ $resourcePath = '../';
                         </svg>
                     </div>
                     <h3>Customer Management</h3>
-                    <p>Track profiles and purchase history</p>
+                    <p>Track profiles and expense history</p>
                 </a>
                 <a href="pages/features/invoicing.php" class="doc-card">
                     <div class="card-icon">

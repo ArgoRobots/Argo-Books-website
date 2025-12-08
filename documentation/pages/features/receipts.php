@@ -11,7 +11,7 @@ include '../../docs-header.php';
             <p>Keep your records organized by attaching and managing digital receipts for all transactions.</p>
 
             <h2>Adding Receipts</h2>
-            <p>When adding a purchase or sale, click the "Add Receipt" button, then select the receipt file from your computer.</p>
+            <p>When adding an expense or revenue entry, click the "Add Receipt" button, then select the receipt file from your computer.</p>
             <p>To add receipts to existing transactions, right-click the transaction, select "Modify", and click the "Add receipt" button.</p>
 
             <h2>Digitizing Physical Receipts</h2>
@@ -49,7 +49,7 @@ include '../../docs-header.php';
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 18l-6-6 6-6"></path>
                     </svg>
-                    Previous: Purchase/Sales Tracking
+                    Previous: Expense/Revenue Tracking
                 </a>
                 <a href="spreadsheet-import.php" class="nav-button next">
                     Next: Spreadsheet Import

@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Quick Start Tutorial';
-$pageDescription = 'Get started quickly with Argo Books. Learn the basic steps to set up your business and start tracking products and sales.';
+$pageDescription = 'Get started quickly with Argo Books. Learn the basic steps to set up your business and start tracking products and revenue.';
 $currentPage = 'quick-start';
 $pageCategory = 'getting-started';
 
@@ -15,7 +15,7 @@ include '../../docs-header.php';
                 <li>Add accountants and companies you will be working with</li>
                 <li>Set up categories to organize your products</li>
                 <li>Add your initial products</li>
-                <li>Add purchases and sales</li>
+                <li>Add expenses and revenue</li>
             </ol>
 
             <div class="info-box">

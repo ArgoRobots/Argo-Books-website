@@ -13,7 +13,7 @@ include '../../docs-header.php';
             <h2>Creating Categories to organize your products</h2>
             <ol class="steps-list">
                 <li>Go to "Manage Categories" in the top menu</li>
-                <li>Choose whether the category is for purchases or sales</li>
+                <li>Choose whether the category is for expenses or revenue</li>
                 <li>Enter the category name</li>
                 <li>Click "Add Category"</li>
             </ol>
@@ -21,7 +21,7 @@ include '../../docs-header.php';
             <h2>Adding Products</h2>
             <ol class="steps-list">
                 <li>Go to "Manage Products" in the top menu</li>
-                <li>Select whether the product is for purchases or sales</li>
+                <li>Select whether the product is for expenses or revenue</li>
                 <li>Enter the product ID and name</li>
                 <li>Select a category to keep things organized</li>
                 <li>Enter country and company of origin</li>
@@ -75,7 +75,7 @@ include '../../docs-header.php';
                     Previous: Free vs. Paid Version
                 </a>
                 <a href="sales-tracking.php" class="nav-button next">
-                    Next: Purchase/Sales Tracking
+                    Next: Expense/Revenue Tracking
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 18l6-6-6-6"></path>
                     </svg>

@@ -18,13 +18,13 @@ class DocumentationSearch {
 
             // Core Features
             { id: 'product-management', title: 'Product Management', category: 'Core Features', folder: 'features', keywords: 'products categories inventory add create manage organize' },
-            { id: 'sales-tracking', title: 'Purchase/Sales Tracking', category: 'Core Features', folder: 'features', keywords: 'purchase sale transaction order tracking add quantity price shipping tax' },
+            { id: 'sales-tracking', title: 'Expense/Revenue Tracking', category: 'Core Features', folder: 'features', keywords: 'expense revenue transaction order tracking add quantity price shipping tax' },
             { id: 'receipts', title: 'Receipt Management', category: 'Core Features', folder: 'features', keywords: 'receipt digital scan microsoft lens export attach' },
-            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products purchases sales currency' },
+            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products expenses revenue currency' },
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
             { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
             { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', folder: 'features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
-            { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact purchase history notes tags crm relationship' },
+            { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact expense history notes tags crm relationship' },
             { id: 'invoicing', title: 'Invoicing & Payments', category: 'Core Features', folder: 'features', keywords: 'invoice payment billing stripe paypal square online payment processing credit card' },
             { id: 'ai-features', title: 'AI Features', category: 'Core Features', folder: 'features', keywords: 'ai artificial intelligence receipt scanning predictive analytics insights forecast machine learning premium' },
 

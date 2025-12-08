@@ -21,10 +21,10 @@ include '../../docs-header.php';
             <h2>What Gets Exported</h2>
             <p>The exported Excel file contains separate worksheets for each data type:</p>
             <ul>
-                <li><strong>Purchases:</strong> All purchase transactions with complete details</li>
-                <li><strong>Sales:</strong> All sales transactions with complete details</li>
-                <li><strong>Purchase products:</strong> All products available for purchasing</li>
-                <li><strong>Sale products:</strong> All products available for selling</li>
+                <li><strong>Expenses:</strong> All expense transactions with complete details</li>
+                <li><strong>Revenue:</strong> All revenue transactions with complete details</li>
+                <li><strong>Expense products:</strong> All products available for expenses</li>
+                <li><strong>Revenue products:</strong> All products available for revenue</li>
                 <li><strong>Companies:</strong> List of all companies</li>
                 <li><strong>Accountants:</strong> List of all accountants</li>
             </ul>

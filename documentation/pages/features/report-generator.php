@@ -19,8 +19,8 @@ include '../../docs-header.php';
             <h2>Step 1: Data Selection</h2>
             <p>Choose what data to include in your report.</p>
             <ul>
-                <li><strong>Start with Templates:</strong> Use pre-built templates like Monthly Sales, Financial Overview, Performance Analysis, Returns Analysis, Losses Analysis, or Geographic Analysis</li>
-                <li><strong>Select Charts:</strong> Choose from available charts including sales, purchases, profits, distributions, returns, losses, and geographic data</li>
+                <li><strong>Start with Templates:</strong> Use pre-built templates like Monthly Revenue, Financial Overview, Performance Analysis, Returns Analysis, Losses Analysis, or Geographic Analysis</li>
+                <li><strong>Select Charts:</strong> Choose from available charts including revenue, expenses, profits, distributions, returns, losses, and geographic data</li>
                 <li><strong>Set Date Range:</strong> Use quick presets (Last Month, Last 3 Months, etc.) or choose custom dates</li>
                 <li><strong>Apply Filters:</strong> Filter by categories, products, companies, countries, or include/exclude returns and losses</li>
             </ul>

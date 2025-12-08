@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Purchase/Sales Tracking';
-$pageDescription = 'Learn how to track purchases and sales in Argo Books. Add transactions, manage orders, and keep accurate records.';
+$pageTitle = 'Expense/Revenue Tracking';
+$pageDescription = 'Learn how to track expenses and revenue in Argo Books. Add transactions, manage orders, and keep accurate records.';
 $currentPage = 'sales-tracking';
 $pageCategory = 'features';
 
@@ -11,7 +11,7 @@ include '../../docs-header.php';
             <p>Track all your business transactions with Argo Books.</p>
 
             <ol class="steps-list">
-                <li>Click "Add Purchase" or "Add Sale" in the top menu</li>
+                <li>Click "Add Expense" or "Add Revenue" in the top menu</li>
                 <li>Enter the order number and select your name from the accountants list</li>
                 <li>Select the product from the dropdown (must be added in <a class="link" href="product-management.php">Product Management</a> first)</li>
                 <li>Enter the quantity and price per unit</li>
@@ -21,7 +21,7 @@ include '../../docs-header.php';
             </ol>
 
             <div class="info-box">
-                <strong>Tip:</strong> Use the "Multiple items" checkbox when adding multiple products to a single purchase or sale.
+                <strong>Tip:</strong> Use the "Multiple items" checkbox when adding multiple products to a single expense or revenue entry.
             </div>
 
             <div class="page-navigation">

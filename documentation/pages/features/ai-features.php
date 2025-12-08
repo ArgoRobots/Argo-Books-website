@@ -32,7 +32,7 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Vendor Name:</strong> The business name from the receipt</li>
                 <li><strong>Date:</strong> Transaction date</li>
-                <li><strong>Line Items:</strong> Individual items purchased with quantities and prices</li>
+                <li><strong>Line Items:</strong> Individual items with quantities and prices</li>
                 <li><strong>Subtotal, Tax, & Total:</strong> All totals are captured</li>
                 <li><strong>Payment Method:</strong> If shown on the receipt</li>
             </ul>
@@ -45,8 +45,8 @@ include '../../docs-header.php';
             <h2>Predictive Analytics</h2>
             <p>See the future of your business with AI-powered forecasting:</p>
 
-            <h3>Sales Forecasting</h3>
-            <p>Our predictive engine analyzes your historical sales data to forecast:</p>
+            <h3>Revenue Forecasting</h3>
+            <p>Our predictive engine analyzes your historical revenue data to forecast:</p>
             <ul>
                 <li>Expected revenue for upcoming weeks and months</li>
                 <li>Product demand predictions</li>
@@ -56,7 +56,7 @@ include '../../docs-header.php';
             <h3>Seasonal Pattern Detection</h3>
             <p>The AI automatically identifies seasonal trends in your business:</p>
             <ul>
-                <li>Holiday sales patterns</li>
+                <li>Holiday revenue patterns</li>
                 <li>Monthly and weekly cycles</li>
                 <li>Year-over-year comparisons</li>
             </ul>
@@ -83,7 +83,7 @@ include '../../docs-header.php';
             <p>Get proactive notifications about important business events:</p>
             <ul>
                 <li><strong>Low Stock Alerts:</strong> Before you run out of best-sellers</li>
-                <li><strong>Unusual Activity:</strong> Spikes or drops in sales</li>
+                <li><strong>Unusual Activity:</strong> Spikes or drops in revenue</li>
                 <li><strong>Opportunity Alerts:</strong> Products gaining popularity</li>
                 <li><strong>Trend Notifications:</strong> Seasonal patterns approaching</li>
             </ul>
@@ -99,7 +99,7 @@ include '../../docs-header.php';
             <h2>Natural Language Search</h2>
             <p>Search your business data using everyday language:</p>
             <ul>
-                <li>"Show me sales from last month"</li>
+                <li>"Show me revenue from last month"</li>
                 <li>"Which products sold the most in December?"</li>
                 <li>"Find all transactions over $500"</li>
                 <li>"What were my top customers this year?"</li>

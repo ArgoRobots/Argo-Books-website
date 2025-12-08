@@ -54,9 +54,9 @@ include '../../docs-header.php';
             <div class="info-box">
                 <h3>AI Search Examples</h3>
                 <ul>
-                    <li><code>!show me expensive items purchased last month</code></li>
+                    <li><code>!show me expensive items from last month</code></li>
                     <li><code>!orders from germany for ball bearings over $25</code></li>
-                    <li><code>!sales with shipping costs over $10 in april 2025</code></li>
+                    <li><code>!revenue with shipping costs over $10 in april 2025</code></li>
                 </ul>
             </div>
 

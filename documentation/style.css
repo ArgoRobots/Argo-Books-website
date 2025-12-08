@@ -840,7 +840,7 @@ body.docs-page {
 
 .docs-content ul,
 .docs-content ol {
-  margin: 16px 0 16px 24px;
+  margin: 16px 0 16px 16px;
   color: var(--gray-700);
 }
 

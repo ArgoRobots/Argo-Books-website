@@ -43,14 +43,12 @@ include '../../docs-header.php';
             </ul>
 
             <h2>Tips for Best Results</h2>
-            <div class="info-box">
-                <ul>
-                    <li><strong>Good Lighting:</strong> Ensure the receipt is well-lit without shadows</li>
-                    <li><strong>Full Frame:</strong> Capture the entire receipt in the photo</li>
-                    <li><strong>Flat Surface:</strong> Place the receipt on a flat surface to avoid distortion</li>
-                    <li><strong>Clear Focus:</strong> Make sure the text is sharp and readable</li>
-                </ul>
-            </div>
+            <ul>
+                <li><strong>Good Lighting:</strong> Ensure the receipt is well-lit without shadows</li>
+                <li><strong>Full Frame:</strong> Capture the entire receipt in the photo</li>
+                <li><strong>Flat Surface:</strong> Place the receipt on a flat surface to avoid distortion</li>
+                <li><strong>Clear Focus:</strong> Make sure the text is sharp and readable</li>
+            </ul>
 
             <h2>Scanning from Mobile</h2>
             <p>Use the Argo Books mobile app for the fastest scanning experience:</p>

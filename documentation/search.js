@@ -24,6 +24,9 @@ class DocumentationSearch {
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
             { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
             { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', folder: 'features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
+            { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact purchase history notes tags crm relationship' },
+            { id: 'invoicing', title: 'Invoicing & Payments', category: 'Core Features', folder: 'features', keywords: 'invoice payment billing stripe paypal square online payment processing credit card' },
+            { id: 'ai-features', title: 'AI Features', category: 'Core Features', folder: 'features', keywords: 'ai artificial intelligence receipt scanning predictive analytics insights forecast machine learning premium' },
 
             // Reference
             { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', folder: 'reference', keywords: 'country countries iso code variant name import us usa uk germany' },

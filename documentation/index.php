@@ -274,6 +274,41 @@ $resourcePath = '../';
                     <h3>Advanced Search</h3>
                     <p>Powerful operators and AI queries</p>
                 </a>
+                <a href="pages/features/customers.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>Customer Management</h3>
+                    <p>Track profiles and purchase history</p>
+                </a>
+                <a href="pages/features/invoicing.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h3>Invoicing & Payments</h3>
+                    <p>Create invoices, accept payments</p>
+                </a>
+                <a href="pages/features/ai-features.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
+                            <circle cx="7.5" cy="14.5" r="1.5"></circle>
+                            <circle cx="16.5" cy="14.5" r="1.5"></circle>
+                        </svg>
+                    </div>
+                    <h3>AI Features</h3>
+                    <p>Receipt scanning, analytics, insights</p>
+                </a>
             </div>
         </section>
 

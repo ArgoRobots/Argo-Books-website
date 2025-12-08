@@ -1163,7 +1163,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 </svg>
                             </div>
                             <div class="security-detail">
-                                <h4>Windows Hello</h4>
+                                <h4>Biometric Login</h4>
                                 <p>Fingerprint and face unlock for quick, secure access</p>
                             </div>
                         </div>
@@ -1274,7 +1274,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span>Windows Hello security</span>
+                            <span>Biometric login security</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

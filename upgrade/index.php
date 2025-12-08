@@ -89,7 +89,7 @@
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Windows Hello security</span>
+                                <span>Biometric login security</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>

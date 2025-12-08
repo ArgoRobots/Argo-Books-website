@@ -14,7 +14,7 @@ class DocumentationSearch {
             { id: 'system-requirements', title: 'System Requirements', category: 'Getting Started', folder: 'getting-started', keywords: 'windows macos linux requirements specs hardware disk space ram memory' },
             { id: 'installation', title: 'Installation Guide', category: 'Getting Started', folder: 'getting-started', keywords: 'install download setup installer wizard run' },
             { id: 'quick-start', title: 'Quick Start Tutorial', category: 'Getting Started', folder: 'getting-started', keywords: 'tutorial getting started begin first steps currency company accountant category product' },
-            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', folder: 'getting-started', keywords: 'free paid premium upgrade features comparison limited unlimited products windows hello ai search standard' },
+            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', folder: 'getting-started', keywords: 'free paid premium upgrade features comparison limited unlimited products biometric login touch id fingerprint ai search standard' },
 
             // Core Features
             { id: 'product-management', title: 'Product Management', category: 'Core Features', folder: 'features', keywords: 'products categories inventory add create manage organize' },
@@ -41,7 +41,7 @@ class DocumentationSearch {
 
             // Security
             { id: 'encryption', title: 'Encryption', category: 'Security', folder: 'security', keywords: 'encryption aes-256 security protect data' },
-            { id: 'password', title: 'Password Protection', category: 'Security', folder: 'security', keywords: 'password protection windows hello fingerprint face login security' },
+            { id: 'password', title: 'Password Protection', category: 'Security', folder: 'security', keywords: 'password protection biometric login fingerprint face touch id windows hello macos linux security' },
             { id: 'backups', title: 'Regular Backups', category: 'Security', folder: 'security', keywords: 'backup export save data loss protection cloud' },
             { id: 'anonymous-data', title: 'Anonymous Usage Data', category: 'Security', folder: 'security', keywords: 'anonymous usage data privacy statistics telemetry collection disable' }
         ];

@@ -549,7 +549,7 @@ body.docs-page {
   position: relative;
   width: 100%;
   max-width: 560px;
-  z-index: 100;
+  z-index: 1;
 }
 
 .subpage-search .search-input-wrapper {
@@ -857,7 +857,6 @@ body.docs-page {
 }
 
 .docs-content h3 {
-  font-size: 1.25rem;
   font-weight: 600;
   color: var(--gray-800);
   margin: 32px 0 12px;

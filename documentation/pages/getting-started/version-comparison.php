@@ -101,7 +101,7 @@ include '../../docs-header.php';
                                 stroke="currentColor" stroke-width="2">
                                 <path d="M20 6L9 17l-5-5"></path>
                             </svg>
-                            <span class="feature-text">Windows Hello security</span>
+                            <span class="feature-text">Biometric login security</span>
                         </li>
                         <li class="feature-item">
                             <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -228,7 +228,7 @@ include '../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
-                            <td>Windows Hello</td>
+                            <td>Biometric Login</td>
                             <td>—</td>
                             <td>✓</td>
                             <td>✓</td>

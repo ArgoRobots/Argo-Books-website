@@ -1,10 +1,12 @@
 class DocumentationSearch {
     constructor() {
         this.searchInput = document.getElementById('docSearchInput');
-        this.searchButton = document.getElementById('searchButton');
         this.searchResults = document.getElementById('searchResults');
         this.selectedIndex = -1;
         this.currentResults = [];
+
+        // Get base path from data attribute (for sub-pages)
+        this.basePath = this.searchInput ? (this.searchInput.dataset.basePath || '') : '';
 
         // Static index of all documentation pages
         this.pages = [
@@ -12,16 +14,25 @@ class DocumentationSearch {
             { id: 'system-requirements', title: 'System Requirements', category: 'Getting Started', folder: 'getting-started', keywords: 'windows macos linux requirements specs hardware disk space ram memory' },
             { id: 'installation', title: 'Installation Guide', category: 'Getting Started', folder: 'getting-started', keywords: 'install download setup installer wizard run' },
             { id: 'quick-start', title: 'Quick Start Tutorial', category: 'Getting Started', folder: 'getting-started', keywords: 'tutorial getting started begin first steps currency company accountant category product' },
-            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', folder: 'getting-started', keywords: 'free paid premium upgrade features comparison limited unlimited products windows hello ai search' },
+            { id: 'version-comparison', title: 'Free vs. Paid Version', category: 'Getting Started', folder: 'getting-started', keywords: 'free paid premium upgrade features comparison limited unlimited products windows hello ai search standard' },
 
             // Core Features
             { id: 'product-management', title: 'Product Management', category: 'Core Features', folder: 'features', keywords: 'products categories inventory add create manage organize' },
-            { id: 'sales-tracking', title: 'Purchase/Sales Tracking', category: 'Core Features', folder: 'features', keywords: 'purchase sale transaction order tracking add quantity price shipping tax' },
+            { id: 'sales-tracking', title: 'Expense/Revenue Tracking', category: 'Core Features', folder: 'features', keywords: 'expense revenue transaction order tracking add quantity price shipping tax' },
             { id: 'receipts', title: 'Receipt Management', category: 'Core Features', folder: 'features', keywords: 'receipt digital scan microsoft lens export attach' },
-            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products purchases sales currency' },
+            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products expenses revenue currency' },
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
             { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
             { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', folder: 'features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
+            { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact expense history notes tags crm relationship' },
+            { id: 'invoicing', title: 'Invoicing & Payments', category: 'Core Features', folder: 'features', keywords: 'invoice payment billing stripe paypal square online payment processing credit card' },
+            { id: 'ai-features', title: 'AI Features', category: 'Core Features', folder: 'features', keywords: 'ai artificial intelligence premium machine learning' },
+            { id: 'receipt-scanning', title: 'AI Receipt Scanning', category: 'Core Features', folder: 'features', keywords: 'ai receipt scanning ocr photo image extract vendor date items totals premium' },
+            { id: 'predictive-analytics', title: 'Predictive Analytics', category: 'Core Features', folder: 'features', keywords: 'ai predictive analytics forecast revenue seasonal patterns inventory predictions premium' },
+            { id: 'business-insights', title: 'AI Business Insights', category: 'Core Features', folder: 'features', keywords: 'ai business insights profit optimization smart alerts growth opportunities premium' },
+            { id: 'inventory', title: 'Inventory Management', category: 'Core Features', folder: 'features', keywords: 'inventory stock tracking reorder point low stock alert quantity warehouse location batch' },
+            { id: 'rental', title: 'Rental Management', category: 'Core Features', folder: 'features', keywords: 'rental booking calendar availability equipment return deposit late fee reservation' },
+            { id: 'payments', title: 'Payment System', category: 'Core Features', folder: 'features', keywords: 'payment stripe paypal square online credit card debit bank transfer processing' },
 
             // Reference
             { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', folder: 'reference', keywords: 'country countries iso code variant name import us usa uk germany' },
@@ -44,13 +55,10 @@ class DocumentationSearch {
     }
 
     setupEventListeners() {
-        // Search on button click
-        this.searchButton.addEventListener('click', () => this.performSearch());
-
         // Keyboard navigation for search input
         this.searchInput.addEventListener('keydown', (e) => {
             const resultItems = this.searchResults.querySelectorAll('.search-result-item');
-            const isResultsVisible = this.searchResults.style.display === 'block';
+            const isResultsVisible = this.searchResults.classList.contains('active');
 
             if (!isResultsVisible || resultItems.length === 0) {
                 if (e.key === 'Enter') {
@@ -97,12 +105,20 @@ class DocumentationSearch {
                 } else {
                     this.hideResults();
                 }
-            }, 300);
+            }, 200);
+        });
+
+        // Show results on focus if there's a query
+        this.searchInput.addEventListener('focus', () => {
+            if (this.searchInput.value.length >= 2) {
+                this.performSearch();
+            }
         });
 
         // Close results when clicking outside
         document.addEventListener('click', (e) => {
-            if (!this.searchInput.contains(e.target) && !this.searchResults.contains(e.target)) {
+            const searchContainer = this.searchInput.closest('.hero-search') || this.searchInput.closest('.subpage-search') || this.searchInput.closest('.search-container');
+            if (searchContainer && !searchContainer.contains(e.target)) {
                 this.hideResults();
             }
         });
@@ -151,6 +167,10 @@ class DocumentationSearch {
         });
     }
 
+    getCategorySlug(category) {
+        return category.toLowerCase().replace(/\s+/g, '-');
+    }
+
     displayResults(results, query) {
         this.currentResults = results;
         this.selectedIndex = -1;
@@ -158,17 +178,21 @@ class DocumentationSearch {
         if (results.length === 0) {
             this.searchResults.innerHTML = `
                 <div class="no-results">
-                    <p>No results found for "<strong>${this.escapeHtml(query)}</strong>"</p>
-                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Try different keywords or browse the documentation menu.</p>
+                    <svg class="no-results-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    <div class="no-results-title">No results found</div>
+                    <div class="no-results-text">Try searching for something else</div>
                 </div>
             `;
-            this.searchResults.style.display = 'block';
+            this.showResults();
             return;
         }
 
         const resultsHtml = results.map(page => this.createResultItem(page, query)).join('');
         this.searchResults.innerHTML = resultsHtml;
-        this.searchResults.style.display = 'block';
+        this.showResults();
 
         // Add click handlers to result items
         this.searchResults.querySelectorAll('.search-result-item').forEach((item, index) => {
@@ -180,9 +204,11 @@ class DocumentationSearch {
 
     createResultItem(page, query) {
         const titleHighlighted = this.highlightText(page.title, query);
+        const categorySlug = this.getCategorySlug(page.category);
 
         return `
-            <div class="search-result-item" data-page="${page.id}">
+            <div class="search-result-item" data-page="${page.id}" data-category="${categorySlug}">
+                <div class="search-result-section">${page.category}</div>
                 <div class="search-result-title">
                     <svg class="search-result-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -192,7 +218,6 @@ class DocumentationSearch {
                     </svg>
                     ${titleHighlighted}
                 </div>
-                <div class="search-result-section">${page.category}</div>
             </div>
         `;
     }
@@ -234,11 +259,15 @@ class DocumentationSearch {
     }
 
     navigateToPage(page) {
-        window.location.href = `pages/${page.folder}/${page.id}.php`;
+        window.location.href = `${this.basePath}pages/${page.folder}/${page.id}.php`;
+    }
+
+    showResults() {
+        this.searchResults.classList.add('active');
     }
 
     hideResults() {
-        this.searchResults.style.display = 'none';
+        this.searchResults.classList.remove('active');
         this.selectedIndex = -1;
     }
 

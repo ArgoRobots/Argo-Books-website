@@ -2,14 +2,10 @@
 /**
  * Documentation Page Header Component
  *
- * Usage: Set $pageTitle and $pageDescription before including this file
- * Example:
- *   $pageTitle = 'Installation Guide';
- *   $pageDescription = 'Learn how to install Argo Books on your computer.';
- *   include 'docs-header.php';
+ * Usage: Set $pageTitle, $pageDescription, $currentPage, and $pageCategory before including
  */
 
-// Default values if not set
+// Default values
 if (!isset($pageTitle)) {
     $pageTitle = 'Documentation';
 }
@@ -18,11 +14,20 @@ if (!isset($pageDescription)) {
 }
 
 // Determine base path for resources based on page location
-// Pages in pages/category/ need to go up 3 levels, index needs to go up 1 level
 $resourcePath = isset($pageCategory) ? '../../../' : '../';
 $docsPath = isset($pageCategory) ? '../../' : '';
 
 $fullTitle = $pageTitle . ' - Argo Books Documentation';
+
+// Category display names and colors
+$categoryInfo = [
+    'getting-started' => ['name' => 'Getting Started', 'color' => 'emerald'],
+    'features' => ['name' => 'Core Features', 'color' => 'blue'],
+    'reference' => ['name' => 'Reference', 'color' => 'amber'],
+    'security' => ['name' => 'Security', 'color' => 'purple']
+];
+
+$currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', 'color' => 'blue'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -51,42 +56,71 @@ $fullTitle = $pageTitle . ' - Argo Books Documentation';
     <meta name="twitter:title" content="<?php echo htmlspecialchars($fullTitle); ?>">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($pageDescription); ?>">
 
-    <!-- Additional SEO Meta Tags -->
-    <meta name="geo.region" content="CA-AB">
-    <meta name="geo.placename" content="Calgary">
-    <meta name="geo.position" content="51.0447;-114.0719">
-    <meta name="ICBM" content="51.0447, -114.0719">
-
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
 
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/A-logo.ico">
     <title><?php echo htmlspecialchars($fullTitle); ?></title>
 
-    <script src="<?php echo $docsPath; ?>main.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/jquery-3.6.0.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
+    <script src="<?php echo $resourcePath; ?>resources/scripts/levenshtein.js"></script>
+    <script src="<?php echo $docsPath; ?>search.js"></script>
 
     <link rel="stylesheet" href="<?php echo $docsPath; ?>style.css">
+    <link rel="stylesheet" href="<?php echo $docsPath; ?>search.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/custom-colors.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/link.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/button.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/style.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/dark.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/footer/style.css">
 </head>
 
-<body>
-    <button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle documentation menu">
-        <span class="toggle-text">Docs Menu</span>
-        <svg class="menu-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 4h12M2 8h16M2 12h12M2 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-    </button>
-
+<body class="docs-page">
     <header>
         <div id="includeHeader"></div>
     </header>
 
-    <div class="docs-container">
+    <!-- Sub-page Hero with Search -->
+    <div class="docs-subpage-hero">
+        <div class="subpage-hero-content">
+            <!-- Breadcrumb -->
+            <nav class="docs-breadcrumb">
+                <a href="<?php echo $docsPath; ?>">Documentation</a>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+                <a href="<?php echo $docsPath; ?>#<?php echo $pageCategory; ?>"><?php echo $currentCategory['name']; ?></a>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"></path>
+                </svg>
+                <span><?php echo htmlspecialchars($pageTitle); ?></span>
+            </nav>
+
+            <!-- Search Bar -->
+            <div class="subpage-search">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.3-4.3"></path>
+                    </svg>
+                    <input type="text" id="docSearchInput" placeholder="Search documentation..." aria-label="Search documentation" data-base-path="<?php echo $docsPath; ?>">
+                    <kbd class="search-shortcut">Ctrl+K</kbd>
+                </div>
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="docs-layout">
+        <!-- Sidebar -->
+        <?php include $docsPath . 'sidebar.php'; ?>
+
+        <!-- Main Content -->
+        <main class="docs-main-content">
+            <!-- Page Header -->
+            <div class="docs-page-header">
+                <span class="docs-category-badge <?php echo $currentCategory['color']; ?>"><?php echo $currentCategory['name']; ?></span>
+                <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
+            </div>
+

@@ -26,45 +26,40 @@ $systemRequirements = getSystemRequirements();
 $pageTitle = 'System Requirements';
 $pageDescription = 'View the system requirements for running Argo Books on Windows, macOS, and Linux.';
 $currentPage = 'system-requirements';
-
 $pageCategory = 'getting-started';
+
 include '../../docs-header.php';
-include '../../sidebar.php';
 ?>
 
-        <!-- Main Content -->
-        <main class="content">
-            <section class="article">
-                <h1>System Requirements</h1>
-                <p>Make sure your system meets these requirements before installing Argo Books.</p>
+        <div class="docs-content">
+            <p>Make sure your system meets these requirements before installing Argo Books.</p>
 
-                <div class="requirements-grid">
-                    <?php foreach ($systemRequirements as $platform => $data): ?>
-                    <div class="requirement-card">
-                        <h3>
-                            <svg viewBox="0 0 24 24" fill="currentColor" class="req-icon">
-                                <path d="<?php echo getPlatformIconPath($platform); ?>"/>
-                            </svg>
-                            <?php echo htmlspecialchars($data['name']); ?>
-                        </h3>
-                        <ul>
-                            <?php foreach ($data['requirements'] as $req): ?>
-                            <li><?php echo htmlspecialchars($req); ?></li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-
-                <div class="page-navigation">
-                    <a href="installation.php" class="nav-button next">
-                        Next: Installation Guide
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 18l6-6-6-6"></path>
+            <div class="requirements-grid">
+                <?php foreach ($systemRequirements as $platform => $data): ?>
+                <div class="requirement-card">
+                    <h3>
+                        <svg viewBox="0 0 24 24" fill="currentColor" class="req-icon">
+                            <path d="<?php echo getPlatformIconPath($platform); ?>"/>
                         </svg>
-                    </a>
+                        <?php echo htmlspecialchars($data['name']); ?>
+                    </h3>
+                    <ul>
+                        <?php foreach ($data['requirements'] as $req): ?>
+                        <li><?php echo htmlspecialchars($req); ?></li>
+                        <?php endforeach; ?>
+                    </ul>
                 </div>
-            </section>
-        </main>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="page-navigation">
+                <a href="installation.php" class="nav-button next">
+                    Next: Installation Guide
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
 
 <?php include '../../docs-footer.php'; ?>

@@ -51,7 +51,6 @@ $resourcePath = '../';
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/link.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/button.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/style.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/dark.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/footer/style.css">
 </head>
 
@@ -155,7 +154,7 @@ $resourcePath = '../';
                     <h3>Installation Guide</h3>
                     <p>Download and install on your computer</p>
                 </a>
-                <a href="pages/getting-started/quick-start.php" class="doc-card featured">
+                <a href="pages/getting-started/quick-start.php" class="doc-card">
                     <div class="card-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -163,7 +162,6 @@ $resourcePath = '../';
                     </div>
                     <h3>Quick Start Tutorial</h3>
                     <p>Get up and running in minutes</p>
-                    <span class="card-badge">Popular</span>
                 </a>
                 <a href="pages/getting-started/version-comparison.php" class="doc-card">
                     <div class="card-icon">
@@ -264,7 +262,7 @@ $resourcePath = '../';
                     <h3>Report Generator</h3>
                     <p>Create charts and analytics</p>
                 </a>
-                <a href="pages/features/advanced-search.php" class="doc-card featured">
+                <a href="pages/features/advanced-search.php" class="doc-card">
                     <div class="card-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
@@ -275,7 +273,6 @@ $resourcePath = '../';
                     </div>
                     <h3>Advanced Search</h3>
                     <p>Powerful operators and AI queries</p>
-                    <span class="card-badge">AI Powered</span>
                 </a>
             </div>
         </section>

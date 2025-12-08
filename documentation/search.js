@@ -27,6 +27,9 @@ class DocumentationSearch {
             { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact expense history notes tags crm relationship' },
             { id: 'invoicing', title: 'Invoicing & Payments', category: 'Core Features', folder: 'features', keywords: 'invoice payment billing stripe paypal square online payment processing credit card' },
             { id: 'ai-features', title: 'AI Features', category: 'Core Features', folder: 'features', keywords: 'ai artificial intelligence receipt scanning predictive analytics insights forecast machine learning premium' },
+            { id: 'inventory', title: 'Inventory Management', category: 'Core Features', folder: 'features', keywords: 'inventory stock tracking reorder point low stock alert quantity warehouse location batch' },
+            { id: 'rental', title: 'Rental Management', category: 'Core Features', folder: 'features', keywords: 'rental booking calendar availability equipment return deposit late fee reservation' },
+            { id: 'payments', title: 'Payment System', category: 'Core Features', folder: 'features', keywords: 'payment stripe paypal square online credit card debit bank transfer processing' },
 
             // Reference
             { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', folder: 'reference', keywords: 'country countries iso code variant name import us usa uk germany' },

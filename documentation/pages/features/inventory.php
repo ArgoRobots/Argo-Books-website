@@ -1,0 +1,93 @@
+<?php
+$pageTitle = 'Inventory Management';
+$pageDescription = 'Learn how to track stock levels, set reorder points, and manage inventory with Argo Books inventory management features.';
+$currentPage = 'inventory';
+$pageCategory = 'features';
+
+include '../../docs-header.php';
+?>
+
+        <div class="docs-content">
+            <p>Keep complete control over your inventory with real-time stock tracking, automatic alerts, and intelligent reorder recommendations.</p>
+
+            <h2>Stock Tracking</h2>
+            <p>Monitor your inventory levels in real-time:</p>
+            <ul>
+                <li><strong>Current Stock:</strong> See how many units of each product you have on hand</li>
+                <li><strong>Stock History:</strong> Track inventory changes over time</li>
+                <li><strong>Batch Tracking:</strong> Monitor different batches or lots of the same product</li>
+                <li><strong>Location Management:</strong> Track stock across multiple storage locations</li>
+            </ul>
+
+            <h2>Setting Up Inventory</h2>
+            <ol class="steps-list">
+                <li>Navigate to "Products" in the main menu</li>
+                <li>Select a product or create a new one</li>
+                <li>Enable inventory tracking in the product settings</li>
+                <li>Enter your current stock quantity</li>
+                <li>Set your minimum stock level (reorder point)</li>
+            </ol>
+
+            <h2>Reorder Points</h2>
+            <p>Set minimum stock thresholds to avoid running out of popular items:</p>
+            <ul>
+                <li><strong>Minimum Level:</strong> Get alerted when stock falls below this quantity</li>
+                <li><strong>Reorder Quantity:</strong> Suggested amount to order when restocking</li>
+                <li><strong>Lead Time:</strong> Account for supplier delivery times</li>
+            </ul>
+
+            <div class="info-box">
+                <p><strong>Tip:</strong> Set your reorder point higher than your minimum level to give yourself time to restock before running out completely.</p>
+            </div>
+
+            <h2>Low Stock Alerts</h2>
+            <p>Argo Books automatically monitors your inventory and notifies you when action is needed:</p>
+            <ul>
+                <li><strong>Dashboard Alerts:</strong> Low stock items appear on your main dashboard</li>
+                <li><strong>Notification Center:</strong> View all inventory alerts in one place</li>
+                <li><strong>Mobile Notifications:</strong> Get push notifications on your phone (with mobile app)</li>
+            </ul>
+
+            <h2>Inventory Adjustments</h2>
+            <p>Make manual adjustments when needed:</p>
+            <ul>
+                <li><strong>Stock Count:</strong> Update quantities after physical inventory counts</li>
+                <li><strong>Damage/Loss:</strong> Record items lost to damage, theft, or expiration</li>
+                <li><strong>Transfers:</strong> Move stock between locations</li>
+                <li><strong>Adjustments:</strong> Correct discrepancies with notes for audit trail</li>
+            </ul>
+
+            <h2>Automatic Stock Updates</h2>
+            <p>Inventory is automatically adjusted when you:</p>
+            <ul>
+                <li>Record a revenue transaction (stock decreases)</li>
+                <li>Record an expense/purchase transaction (stock increases)</li>
+                <li>Process a return (stock adjusts accordingly)</li>
+            </ul>
+
+            <h2>Inventory Reports</h2>
+            <p>Generate reports to understand your inventory performance:</p>
+            <ul>
+                <li><strong>Stock Valuation:</strong> Total value of current inventory</li>
+                <li><strong>Movement Report:</strong> Items sold, purchased, and adjusted over time</li>
+                <li><strong>Low Stock Report:</strong> All items below reorder point</li>
+                <li><strong>Dead Stock:</strong> Items that haven't sold in a specified period</li>
+            </ul>
+
+            <div class="page-navigation">
+                <a href="ai-features.php" class="nav-button prev">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"></path>
+                    </svg>
+                    Previous: AI Features
+                </a>
+                <a href="rental.php" class="nav-button next">
+                    Next: Rental Management
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+<?php include '../../docs-footer.php'; ?>

@@ -429,7 +429,7 @@ $isDocsLanding = true;
                         </svg>
                     </div>
                     <h3>Password Protection</h3>
-                    <p>Setup password and Windows Hello</p>
+                    <p>Setup password and biometric login</p>
                 </a>
                 <a href="pages/security/backups.php" class="doc-card">
                     <div class="card-icon">

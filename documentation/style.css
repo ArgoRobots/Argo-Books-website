@@ -26,7 +26,6 @@ body.docs-landing {
   position: relative;
   background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 50%, #1a365d 100%);
   padding: 100px 24px 80px;
-  overflow: hidden;
 }
 
 .hero-content {

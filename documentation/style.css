@@ -621,7 +621,7 @@ body.docs-page {
 /* Layout Container */
 .docs-layout {
   display: flex;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 32px 24px 60px;
   gap: 40px;
@@ -842,11 +842,6 @@ body.docs-page {
 .docs-content ol {
   margin: 16px 0 16px 24px;
   color: var(--gray-700);
-}
-
-.docs-content li {
-  margin-bottom: 8px;
-  line-height: 1.6;
 }
 
 .docs-content img {
@@ -1210,14 +1205,12 @@ body.docs-page {
 .steps-list {
   list-style: none;
   counter-reset: step;
-  padding-left: 0;
 }
 
 .steps-list li {
   position: relative;
-  padding-left: 3rem;
+  padding-left: 2.5rem;
   margin-bottom: 1.25rem;
-  color: var(--gray-700);
 }
 
 .steps-list li::before {
@@ -1228,8 +1221,8 @@ body.docs-page {
   top: 0;
   background: var(--primary-blue);
   color: var(--white);
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
   border-radius: 50%;
   display: flex;
   align-items: center;

@@ -61,7 +61,7 @@ include '../../docs-header.php';
             </div>
 
             <div class="warning-box">
-                <strong>Internet Connection Required:</strong> AI search requires an internet connection and is only available in the paid version. <a class="link" href="../../../../upgrade/">Upgrade here</a> to access this feature.
+                <strong>Internet Connection Required:</strong> AI search requires an internet connection and is only available in the paid version. <a class="link" href="../../../upgrade/">Upgrade here</a> to access this feature.
             </div>
 
             <div class="page-navigation">

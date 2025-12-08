@@ -64,7 +64,7 @@ include '../../docs-header.php';
             </div>
 
             <div class="warning-box">
-                <strong>Important:</strong> Free version users are limited to 10 products. <a class="link" href="../../../../upgrade/">Upgrade to the paid version</a> for unlimited products.
+                <strong>Important:</strong> Free version users are limited to 10 products. <a class="link" href="../../../upgrade/">Upgrade to the paid version</a> for unlimited products.
             </div>
 
             <div class="page-navigation">

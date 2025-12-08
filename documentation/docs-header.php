@@ -73,7 +73,6 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/link.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/button.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/style.css">
-    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/header/dark.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/footer/style.css">
 </head>
 

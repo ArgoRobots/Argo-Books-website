@@ -11,7 +11,7 @@ include '../../docs-header.php';
             <p>Import your existing business data from Excel spreadsheets into Argo Books. The import system supports multiple currencies and can automatically detect the currency used in your data.</p>
 
             <h2>Preparing Your Spreadsheet</h2>
-            <p>Download our <a class="link" href="../../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> to see the exact format required. Your Excel file can include any combination of the following sheets (not all are required):</p>
+            <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> to see the exact format required. Your Excel file can include any combination of the following sheets (not all are required):</p>
 
             <div class="info-box">
                 <ul>
@@ -26,7 +26,7 @@ include '../../docs-header.php';
 
             <h2>Formatting Requirements</h2>
             <div class="info-box">
-                <p>Download our <a class="link" href="../../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> and follow the exact format shown. This is much easier than trying to remember formatting rules!</p>
+                <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> and follow the exact format shown. This is much easier than trying to remember formatting rules!</p>
 
                 <p>Key points:</p>
                 <ul>

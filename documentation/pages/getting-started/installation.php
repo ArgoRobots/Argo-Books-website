@@ -11,7 +11,7 @@ include '../../docs-header.php';
             <p>Follow these steps to install Argo Books on your computer.</p>
 
             <ol class="steps-list">
-                <li>Download the installer <a class="link" href="../../../../downloads/">here</a></li>
+                <li>Download the installer <a class="link" href="../../../downloads/">here</a></li>
                 <li>Run the installer file (Argo Books Installer.exe)</li>
                 <li>Follow the installation wizard</li>
                 <li>Launch Argo Books from your desktop or start menu</li>

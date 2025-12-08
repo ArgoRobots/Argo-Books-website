@@ -1088,45 +1088,10 @@ body.docs-page {
   margin-top: 4px;
 }
 
-.version-btn {
-  display: block;
+.version-card .btn {
   width: 100%;
-  padding: 12px 20px;
-  text-align: center;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
   margin-top: auto;
-  transition: all 0.2s ease;
-  background: var(--gray-100);
-  color: var(--gray-700);
-  border: 1px solid var(--gray-200);
-}
-
-.version-btn:hover {
-  background: var(--gray-200);
-  color: var(--gray-900);
-}
-
-.version-btn.primary {
-  background: var(--primary-blue);
-  color: var(--white);
-  border-color: var(--primary-blue);
-}
-
-.version-btn.primary:hover {
-  background: var(--blue-700);
-  border-color: var(--blue-700);
-}
-
-.version-btn.premium-btn {
-  background: linear-gradient(135deg, var(--purple-600) 0%, var(--purple-700) 100%);
-  color: var(--white);
-  border-color: var(--purple-600);
-}
-
-.version-btn.premium-btn:hover {
-  background: linear-gradient(135deg, var(--purple-700) 0%, var(--purple-800) 100%);
+  padding: 12px 20px;
 }
 
 .version-note {

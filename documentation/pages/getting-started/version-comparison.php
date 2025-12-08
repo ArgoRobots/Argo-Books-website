@@ -69,7 +69,7 @@ include '../../docs-header.php';
                             <span class="feature-text">Email support</span>
                         </li>
                     </ul>
-                    <a href="../../../downloads/" class="version-btn">Get Started Free</a>
+                    <a href="../../../downloads/" class="btn btn-gray">Get Started Free</a>
                 </div>
 
                 <!-- Standard Version -->
@@ -117,7 +117,7 @@ include '../../docs-header.php';
                             <span class="feature-text">Lifetime updates</span>
                         </li>
                     </ul>
-                    <a href="../../../upgrade/" class="version-btn primary">Upgrade Now</a>
+                    <a href="../../../upgrade/" class="btn btn-blue">Upgrade Now</a>
                     <p class="version-note">30-day money-back guarantee</p>
                 </div>
 
@@ -173,7 +173,7 @@ include '../../docs-header.php';
                             <span class="feature-text">Natural language search</span>
                         </li>
                     </ul>
-                    <a href="../../../upgrade/ai/" class="version-btn premium-btn">Subscribe to Premium</a>
+                    <a href="../../../upgrade/ai/" class="btn btn-purple">Subscribe to Premium</a>
                     <p class="version-note">Cancel anytime</p>
                 </div>
             </div>

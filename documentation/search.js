@@ -5,6 +5,9 @@ class DocumentationSearch {
         this.selectedIndex = -1;
         this.currentResults = [];
 
+        // Get base path from data attribute (for sub-pages)
+        this.basePath = this.searchInput ? (this.searchInput.dataset.basePath || '') : '';
+
         // Static index of all documentation pages
         this.pages = [
             // Getting Started
@@ -105,7 +108,7 @@ class DocumentationSearch {
 
         // Close results when clicking outside
         document.addEventListener('click', (e) => {
-            const searchContainer = this.searchInput.closest('.hero-search') || this.searchInput.closest('.search-container');
+            const searchContainer = this.searchInput.closest('.hero-search') || this.searchInput.closest('.subpage-search') || this.searchInput.closest('.search-container');
             if (searchContainer && !searchContainer.contains(e.target)) {
                 this.hideResults();
             }
@@ -247,7 +250,7 @@ class DocumentationSearch {
     }
 
     navigateToPage(page) {
-        window.location.href = `pages/${page.folder}/${page.id}.php`;
+        window.location.href = `${this.basePath}pages/${page.folder}/${page.id}.php`;
     }
 
     showResults() {

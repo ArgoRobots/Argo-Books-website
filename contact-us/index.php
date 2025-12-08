@@ -71,7 +71,7 @@ if (isset($_SESSION['contact_success'])) {
   </header>
 
   <!-- Hero Section -->
-  <section class="contact-hero">
+  <section class="hero">
     <div class="hero-bg">
       <div class="hero-gradient-orb hero-orb-1"></div>
       <div class="hero-gradient-orb hero-orb-2"></div>

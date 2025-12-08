@@ -57,7 +57,7 @@ $isDocsLanding = true;
     </header>
 
     <!-- Hero Section -->
-    <section class="docs-hero">
+    <section class="hero">
         <div class="hero-content">
             <div class="hero-badge">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

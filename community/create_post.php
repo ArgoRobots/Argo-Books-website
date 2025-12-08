@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="includeHeader"></div>
     </header>
 
-    <div class="community-hero">
+    <div class="hero">
         <div class="hero-bg">
             <div class="hero-gradient-orb hero-orb-1"></div>
             <div class="hero-gradient-orb hero-orb-2"></div>

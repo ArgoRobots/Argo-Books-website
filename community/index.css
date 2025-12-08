@@ -6,7 +6,7 @@ header .header-inner .menu-container .menu .community:after {
 /* ========================================
    Hero Section
    ======================================== */
-.community-hero {
+.hero {
   position: relative;
   padding: 100px 0 60px;
   background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
@@ -14,19 +14,19 @@ header .header-inner .menu-container .menu .community:after {
   overflow: hidden;
 }
 
-.community-hero .hero-bg {
+.hero .hero-bg {
   position: absolute;
   inset: 0;
 }
 
-.community-hero .hero-gradient-orb {
+.hero .hero-gradient-orb {
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.5;
 }
 
-.community-hero .hero-orb-1 {
+.hero .hero-orb-1 {
   width: 400px;
   height: 400px;
   background: linear-gradient(135deg, var(--emerald-500), var(--cyan-500));
@@ -34,7 +34,7 @@ header .header-inner .menu-container .menu .community:after {
   left: -100px;
 }
 
-.community-hero .hero-orb-2 {
+.hero .hero-orb-2 {
   width: 300px;
   height: 300px;
   background: linear-gradient(135deg, var(--primary-blue), var(--purple-500));
@@ -42,7 +42,7 @@ header .header-inner .menu-container .menu .community:after {
   right: -50px;
 }
 
-.community-hero .hero-content {
+.hero .hero-content {
   position: relative;
   z-index: 2;
   max-width: 700px;
@@ -50,7 +50,7 @@ header .header-inner .menu-container .menu .community:after {
   padding: 0 24px;
 }
 
-.community-hero .hero-badge {
+.hero .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -63,11 +63,11 @@ header .header-inner .menu-container .menu .community:after {
   margin-bottom: 24px;
 }
 
-.community-hero .hero-badge svg {
+.hero .hero-badge svg {
   color: var(--emerald-500);
 }
 
-.community-hero h1 {
+.hero h1 {
   font-size: 3rem;
   font-weight: 700;
   color: var(--white);
@@ -75,13 +75,13 @@ header .header-inner .menu-container .menu .community:after {
   letter-spacing: -0.02em;
 }
 
-.community-hero p {
+.hero p {
   font-size: 1.25rem;
   color: var(--hero-text-muted);
   margin-bottom: 24px;
 }
 
-.community-hero .guidelines-btn {
+.hero .guidelines-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -95,7 +95,7 @@ header .header-inner .menu-container .menu .community:after {
   transition: all 0.2s ease;
 }
 
-.community-hero .guidelines-btn:hover {
+.hero .guidelines-btn:hover {
   background: var(--hero-badge-border);
   transform: translateY(-2px);
 }
@@ -554,15 +554,15 @@ header .header-inner .menu-container .menu .community:after {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .community-hero {
+  .hero {
     padding: 120px 0 60px;
   }
 
-  .community-hero h1 {
+  .hero h1 {
     font-size: 2.25rem;
   }
 
-  .community-hero p {
+  .hero p {
     font-size: 1.1rem;
   }
 

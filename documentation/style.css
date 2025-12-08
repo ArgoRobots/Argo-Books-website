@@ -22,7 +22,7 @@ body.docs-landing {
 /* ==========================================
    HERO SECTION - Landing Page Only
    ========================================== */
-.docs-hero {
+.hero {
   position: relative;
   background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 50%, #1a365d 100%);
   padding: 100px 24px 80px;
@@ -55,7 +55,7 @@ body.docs-landing {
   opacity: 0.8;
 }
 
-.docs-hero h1 {
+.hero h1 {
   font-size: 3rem;
   font-weight: 700;
   color: var(--white);
@@ -423,11 +423,11 @@ body.docs-landing {
 }
 
 @media (max-width: 768px) {
-  .docs-hero {
+  .hero {
     padding: 80px 20px 60px;
   }
 
-  .docs-hero h1 {
+  .hero h1 {
     font-size: 2rem;
   }
 
@@ -486,7 +486,7 @@ body.docs-landing {
 }
 
 @media (max-width: 480px) {
-  .docs-hero h1 {
+  .hero h1 {
     font-size: 1.75rem;
   }
 

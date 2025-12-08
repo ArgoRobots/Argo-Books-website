@@ -41,7 +41,7 @@
     function initCursorOrbs() {
         // Find all sections that should have cursor orbs
         // Include various hero variants used across different pages
-        const sections = document.querySelectorAll('.hero, .community-hero, .contact-hero, .cta-section, .contact-section, .footer');
+        const sections = document.querySelectorAll('.hero, .cta-section, .contact-section, .footer');
 
         sections.forEach(section => {
             // Check if section already has a cursor orb

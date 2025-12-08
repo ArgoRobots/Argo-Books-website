@@ -143,7 +143,7 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
         <div id="includeHeader"></div>
     </header>
 
-    <div class="community-hero community-hero-compact">
+    <div class="hero hero-compact">
         <div class="hero-bg">
             <div class="hero-gradient-orb hero-orb-1"></div>
             <div class="hero-gradient-orb hero-orb-2"></div>

@@ -265,7 +265,7 @@ include '../../docs-header.php';
                         </tr>
                         <tr>
                             <td>Support</td>
-                            <td>Email</td>
+                            <td>Standard</td>
                             <td>Priority</td>
                             <td>Priority</td>
                         </tr>

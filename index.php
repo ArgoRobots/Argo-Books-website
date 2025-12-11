@@ -120,10 +120,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         </div>
         <div class="container">
             <div class="hero-content">
-                <div class="hero-badge animate-fade-in">
-                    <span class="badge-dot"></span>
-                    <span>Introducing AI-Powered Business Management</span>
-                </div>
+                <div class="hero-app-title animate-fade-in">Argo Books</div>
                 <h1 class="hero-title animate-fade-in-up">
                     The smarter way to<br>
                     <span class="text-gradient">run your business</span>

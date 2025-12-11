@@ -374,25 +374,15 @@ a {
     color: white;
 }
 
-.hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 10px 20px;
-    border-radius: 50px;
+.hero-app-title {
+    font-size: 4.5rem;
+    font-weight: 800;
     margin-bottom: 24px;
-    font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.badge-dot {
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .hero-title {
@@ -2543,6 +2533,10 @@ a {
         padding: 100px 0 60px;
     }
 
+    .hero-app-title {
+        font-size: 3rem;
+    }
+
     .hero-title {
         font-size: 2.5rem;
     }
@@ -2652,6 +2646,10 @@ a {
         padding: 0 16px;
     }
 
+    .hero-app-title {
+        font-size: 2.5rem;
+    }
+
     .hero-title {
         font-size: 2rem;
     }
@@ -2732,18 +2730,5 @@ a {
     .cursor-orb {
         width: 250px;
         height: 250px;
-    }
-
-    .hero-badge {
-        font-size: 0.75rem;
-        padding: 8px 14px;
-        gap: 6px;
-    }
-
-    .hero-badge span:last-child {
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
     }
 }

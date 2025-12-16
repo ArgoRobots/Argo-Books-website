@@ -102,12 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Remove temporary user ID
                         unset($_SESSION['temp_user_id']);
 
-                        // Generate and send license key
-                        if (function_exists('generate_license_key') && function_exists('send_license_email')) {
-                            $license_key = generate_license_key($verified_user['email']);
-                            send_license_email($verified_user['email'], $license_key);
-                        }
-
                         $success = true;
                     }
                 } else {

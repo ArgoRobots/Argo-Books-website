@@ -18,7 +18,7 @@ include '../../docs-header.php';
                 <li><strong>Germany:</strong> DE, Deutschland</li>
             </ul>
 
-            <p><a class="link" href="references/accepted_countries.php">View complete list of all accepted country names and variants</a></p>
+            <p><a class="link" href="accepted_countries.php">View complete list of all accepted country names and variants</a></p>
 
             <div class="page-navigation">
                 <a href="../features/advanced-search.php" class="nav-button prev">

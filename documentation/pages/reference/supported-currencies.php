@@ -10,7 +10,7 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>Argo Books supports 28 international currencies including USD, EUR, GBP, CAD, JPY, CNY, and others. The system uses real-time exchange rates to convert between currencies accurately for import, export, and display.</p>
 
-            <p><a class="link" href="references/supported_currencies.php">View complete list of all 28 supported currencies</a></p>
+            <p><a class="link" href="/supported_currencies.php">View complete list of all 28 supported currencies</a></p>
 
             <div class="warning-box">
                 <strong>Internet Connection Required:</strong> Currency conversion requires an internet connection to fetch current and historical exchange rates. The rates are cached locally to minimize future requests.

@@ -17,7 +17,7 @@ include '../../docs-header.php';
                 <li>Select your preferred language from the list</li>
             </ol>
 
-            <p><a class="link" href="references/supported_languages.php">View complete list of all 54 supported languages</a></p>
+            <p><a class="link" href="/supported_languages.php">View complete list of all 54 supported languages</a></p>
 
             <div class="page-navigation">
                 <a href="supported-currencies.php" class="nav-button prev">

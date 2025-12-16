@@ -77,25 +77,6 @@ function create_license_key($email, $user_id = null)
 }
 
 /**
- * Verify if a standard license key exists
- *
- * @param string $key The license key to verify
- * @return bool True if the key exists, false otherwise
- */
-function verify_standard_license_key($key)
-{
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT * FROM license_keys WHERE license_key = ?');
-    $stmt->bind_param('s', $key);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $stmt->close();
-
-    return $row !== null;
-}
-
-/**
  * Validate a standard license key and return structured response
  * @param string $key The license key to validate
  * @param string $ip_address The IP address for activation

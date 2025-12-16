@@ -12,7 +12,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 // Set page variables for the header
 $page_title = "License & Subscription Administration";
-$page_description = "Manage license keys, AI subscriptions, and free subscription keys";
+$page_description = "Manage license keys, Premium subscriptions, and free subscription keys";
 
 // Function to get all license keys with optional filters
 function get_license_keys($search_filter = '', $date_from = '', $date_to = '')
@@ -66,8 +66,8 @@ function get_license_keys($search_filter = '', $date_from = '', $date_to = '')
     return $licenses;
 }
 
-// Function to get AI subscriptions
-function get_ai_subscriptions($search_filter = '')
+// Function to get Premium subscriptions
+function get_premium_subscriptions($search_filter = '')
 {
     global $pdo;
     $subscriptions = [];
@@ -95,14 +95,14 @@ function get_ai_subscriptions($search_filter = '')
         $stmt->execute($params);
         $subscriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        error_log("Error fetching AI subscriptions: " . $e->getMessage());
+        error_log("Error fetching Premium subscriptions: " . $e->getMessage());
     }
 
     return $subscriptions;
 }
 
-// Function to get AI subscription keys (free/promo)
-function get_ai_subscription_keys()
+// Function to get Premium subscription keys (free/promo)
+function get_premium_subscription_keys()
 {
     global $pdo;
     $keys = [];
@@ -111,14 +111,14 @@ function get_ai_subscription_keys()
         $stmt = $pdo->query("SELECT * FROM ai_subscription_keys ORDER BY created_at DESC");
         $keys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
-        error_log("Error fetching AI subscription keys: " . $e->getMessage());
+        error_log("Error fetching Premium subscription keys: " . $e->getMessage());
     }
 
     return $keys;
 }
 
-// Function to generate AI subscription key
-function generate_ai_subscription_key($email = null, $duration_months = 1, $notes = '')
+// Function to generate Premium subscription key
+function generate_premium_subscription_key($email = null, $duration_months = 1, $notes = '')
 {
     global $pdo;
 
@@ -133,7 +133,7 @@ function generate_ai_subscription_key($email = null, $duration_months = 1, $note
         $stmt->execute([$key, $email ?: null, $duration_months, $notes ?: null]);
         return $key;
     } catch (PDOException $e) {
-        error_log("Error generating AI subscription key: " . $e->getMessage());
+        error_log("Error generating Premium subscription key: " . $e->getMessage());
         return false;
     }
 }
@@ -155,7 +155,7 @@ function get_chart_data()
     return $data;
 }
 
-// Get chart data - AI subscriptions by date
+// Get chart data - Premium subscriptions by date
 function get_subscription_chart_data()
 {
     global $pdo;
@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($duration < 0) $duration = 1;
         if ($duration > 24 && $duration !== 0) $duration = 24;
 
-        $generated_sub_key = generate_ai_subscription_key($email, $duration, $notes);
+        $generated_sub_key = generate_premium_subscription_key($email, $duration, $notes);
 
         if ($generated_sub_key) {
             $_SESSION['generated_sub_key'] = $generated_sub_key;
@@ -310,7 +310,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     } elseif (isset($_POST['bulk_subscription_action'])) {
-        // Handle bulk actions for AI subscriptions (Give Credit)
+        // Handle bulk actions for Premium subscriptions (Give Credit)
         $action = $_POST['bulk_subscription_action'];
         $subscription_ids = $_POST['selected_subscriptions'] ?? [];
         $credit_amount = floatval($_POST['credit_amount'] ?? 0);
@@ -429,8 +429,8 @@ if (!empty($date_preset) && $date_preset !== 'custom') {
 
 // Get data
 $licenses = get_license_keys($search, $date_from, $date_to);
-$ai_subscriptions = get_ai_subscriptions($sub_search);
-$ai_subscription_keys = get_ai_subscription_keys();
+$premium_subscriptions = get_premium_subscriptions($sub_search);
+$premium_subscription_keys = get_premium_subscription_keys();
 $chart_data = get_chart_data();
 $subscription_chart_data = get_subscription_chart_data();
 
@@ -441,12 +441,12 @@ $row = $result->fetch_assoc();
 $user_count = $row['count'] ?? 0;
 
 $active_ai_subs = 0;
-foreach ($ai_subscriptions as $sub) {
+foreach ($premium_subscriptions as $sub) {
     if ($sub['status'] === 'active') $active_ai_subs++;
 }
 
 $unredeemed_keys = 0;
-foreach ($ai_subscription_keys as $key) {
+foreach ($premium_subscription_keys as $key) {
     if ($key['redeemed_at'] === null) $unredeemed_keys++;
 }
 
@@ -659,7 +659,7 @@ include '../admin_header.php';
         </div>
     </div>
 
-    <!-- AI Subscriptions Tab -->
+    <!-- Premium Subscriptions Tab -->
     <div id="ai-subscriptions" class="tab-content">
         <div class="stats-grid">
             <div class="stat-card active">
@@ -668,7 +668,7 @@ include '../admin_header.php';
             </div>
             <div class="stat-card">
                 <h3>Total Subscriptions</h3>
-                <div class="value"><?php echo count($ai_subscriptions); ?></div>
+                <div class="value"><?php echo count($premium_subscriptions); ?></div>
             </div>
             <div class="stat-card free">
                 <h3>Free Keys Available</h3>
@@ -692,7 +692,7 @@ include '../admin_header.php';
                 </div>
             </form>
 
-            <!-- Bulk Actions for AI Subscriptions -->
+            <!-- Bulk Actions for Premium Subscriptions -->
             <div class="bulk-actions-container" id="subscription-bulk-actions">
                 <div class="selection-info">
                     <span id="subscription-selected-count">0</span> selected
@@ -704,8 +704,8 @@ include '../admin_header.php';
                 </div>
             </div>
 
-            <?php if (empty($ai_subscriptions)): ?>
-                <p>No AI subscriptions found.</p>
+            <?php if (empty($premium_subscriptions)): ?>
+                <p>No Premium subscriptions found.</p>
             <?php else: ?>
                 <form id="subscription-bulk-form" method="post">
                     <input type="hidden" name="bulk_subscription_action" id="bulk_subscription_action_input" value="give_credit">
@@ -733,7 +733,7 @@ include '../admin_header.php';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($ai_subscriptions as $sub): ?>
+                                <?php foreach ($premium_subscriptions as $sub): ?>
                                     <tr>
                                         <td class="checkbox-column">
                                             <div class="checkbox">
@@ -808,11 +808,11 @@ include '../admin_header.php';
             </div>
             <div class="stat-card pending">
                 <h3>Redeemed Keys</h3>
-                <div class="value"><?php echo count($ai_subscription_keys) - $unredeemed_keys; ?></div>
+                <div class="value"><?php echo count($premium_subscription_keys) - $unredeemed_keys; ?></div>
             </div>
             <div class="stat-card">
                 <h3>Total Generated</h3>
-                <div class="value"><?php echo count($ai_subscription_keys); ?></div>
+                <div class="value"><?php echo count($premium_subscription_keys); ?></div>
             </div>
         </div>
 
@@ -868,7 +868,7 @@ include '../admin_header.php';
                 </div>
             </div>
 
-            <?php if (empty($ai_subscription_keys)): ?>
+            <?php if (empty($premium_subscription_keys)): ?>
                 <p>No free subscription keys generated yet.</p>
             <?php else: ?>
                 <form id="sub-key-bulk-form" method="post">
@@ -892,7 +892,7 @@ include '../admin_header.php';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($ai_subscription_keys as $key): ?>
+                                <?php foreach ($premium_subscription_keys as $key): ?>
                                     <tr class="<?php echo $key['redeemed_at'] ? 'redeemed-row' : ''; ?>">
                                         <td class="checkbox-column">
                                             <?php if (!$key['redeemed_at']): ?>
@@ -1004,7 +1004,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // AI Subscription Bulk Selection
+    // Premium Subscription Bulk Selection
     const subscriptionSelectAll = document.getElementById('subscription-select-all');
     const subscriptionCheckboxes = document.querySelectorAll('.subscription-checkbox');
     const subscriptionSelectedCount = document.getElementById('subscription-selected-count');

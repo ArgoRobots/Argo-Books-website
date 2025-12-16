@@ -2,14 +2,14 @@
 session_start();
 require_once '../../community/users/user_functions.php';
 
-// Require login to access AI subscription page
+// Require login to access Premium subscription page
 require_login('upgrade/premium/');
 
 $user_id = $_SESSION['user_id'];
 $user = get_user($user_id);
 
 // Check if user already has an active subscription
-$existing_subscription = get_user_ai_subscription($user_id);
+$existing_subscription = get_user_premium_subscription($user_id);
 if ($existing_subscription && in_array($existing_subscription['status'], ['active', 'cancelled'])) {
     // User already has a subscription (active or cancelled but not expired)
     if ($existing_subscription['status'] === 'active' ||

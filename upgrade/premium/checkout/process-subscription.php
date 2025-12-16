@@ -1,6 +1,6 @@
 <?php
 /**
- * AI Subscription Payment Processor
+ * Premium Subscription Payment Processor
  * Handles subscription creation for AI features with recurring billing support
  */
 
@@ -208,7 +208,7 @@ try {
                         'payment_method' => $paymentMethodId,
                         'off_session' => true,
                         'confirm' => true,
-                        'description' => "AI Subscription - Initial Payment ($billing)",
+                        'description' => "Premium Subscription - Initial Payment ($billing)",
                         'receipt_email' => $email,
                         'metadata' => [
                             'subscription_id' => $subscriptionId,
@@ -337,7 +337,7 @@ try {
                         ],
                         'location_id' => $squareLocationId,
                         'customer_id' => $customerId,
-                        'note' => "AI Subscription - Initial Payment ($billing)",
+                        'note' => "Premium Subscription - Initial Payment ($billing)",
                         'autocomplete' => true
                     ];
                     $paymentResult = $squareApiCall('payments', 'POST', $paymentData);
@@ -510,10 +510,10 @@ try {
         // Send receipt email (skip for monthly with credit - no charge was made)
         if (!$isMonthlyWithCredit) {
             try {
-                send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod);
+                send_premium_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod);
             } catch (Exception $e) {
                 // Log email error but don't fail the transaction
-                error_log("Failed to send AI subscription email: " . $e->getMessage());
+                error_log("Failed to send Premium subscription email: " . $e->getMessage());
             }
         }
 
@@ -531,7 +531,7 @@ try {
 
 } catch (PDOException $e) {
     $pdo->rollBack();
-    error_log("AI Subscription Error: " . $e->getMessage());
+    error_log("Premium Subscription Error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,

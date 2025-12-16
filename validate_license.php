@@ -16,17 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the license key from the request
     $data = json_decode(file_get_contents('php://input'), true);
 
-    // Check for AI subscription key validation
+    // Check for Premium subscription key validation
     if (isset($data['subscription_id'])) {
         $subscription_id = trim($data['subscription_id']);
-        $response = validate_ai_subscription_key($subscription_id);
+        $response = validate_premium_subscription_key($subscription_id);
     }
     // Check for mremium license key validation
     elseif (isset($data['license_key'])) {
         $license_key = trim($data['license_key']);
 
         // Verify the license key
-        if (verify_premium_license_key($license_key)) {
+        if (verify_standard_license_key($license_key)) {
             // Get license details to check if it's already activated
             $license_details = get_license_details($license_key);
 

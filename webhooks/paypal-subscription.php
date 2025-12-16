@@ -203,7 +203,7 @@ function handleSubscriptionCancelled($resource) {
 
         // Send cancellation email
         try {
-            send_ai_subscription_cancelled_email(
+            send_premium_subscription_cancelled_email(
                 $subscription['email'],
                 $subscription['subscription_id'],
                 $subscription['end_date']
@@ -389,7 +389,7 @@ function handlePaymentCompleted($resource) {
 
         // Send renewal receipt email
         try {
-            send_ai_subscription_receipt(
+            send_premium_subscription_receipt(
                 $subscription['email'],
                 $subscription['subscription_id'],
                 $billing,

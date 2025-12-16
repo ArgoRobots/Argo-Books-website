@@ -232,7 +232,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
         <div class="cron-header">
             <div>
                 <h1>Subscription Renewal Management</h1>
-                <p>Monitor and manage AI subscription renewals</p>
+                <p>Monitor and manage Premium subscription renewals</p>
             </div>
             <div class="header-actions">
                 <a href="?logout=1" class="btn btn-small btn-red">Logout</a>

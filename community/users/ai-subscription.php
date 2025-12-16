@@ -24,18 +24,18 @@ if (isset($_SESSION['subscription_error'])) {
 }
 
 // Get subscription info
-$ai_subscription = get_user_ai_subscription($user_id);
+$premium_subscription = get_user_premium_subscription($user_id);
 
 // Get payment history
 $payment_history = [];
-if ($ai_subscription) {
+if ($premium_subscription) {
     try {
         $stmt = $pdo->prepare("
             SELECT * FROM ai_subscription_payments
             WHERE subscription_id = ?
             ORDER BY created_at DESC
         ");
-        $stmt->execute([$ai_subscription['subscription_id']]);
+        $stmt->execute([$premium_subscription['subscription_id']]);
         $payment_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         // Silently fail - payment history not critical
@@ -99,16 +99,16 @@ if ($ai_subscription) {
         <div class="subscription-section">
             <h2>Subscription Status</h2>
 
-            <?php if ($ai_subscription): ?>
+            <?php if ($premium_subscription): ?>
                 <div class="subscription-card">
                     <div class="subscription-header">
                         <div class="subscription-plan">
                             <span class="plan-name">Argo Premium</span>
-                            <span class="billing-cycle"><?php echo ucfirst($ai_subscription['billing_cycle']); ?> Plan</span>
+                            <span class="billing-cycle"><?php echo ucfirst($premium_subscription['billing_cycle']); ?> Plan</span>
                         </div>
-                        <?php if ($ai_subscription['status'] != 'payment_failed'): ?>
-                            <div class="subscription-status <?php echo $ai_subscription['status']; ?>">
-                                <span class="status-badge"><?php echo ucfirst($ai_subscription['status']); ?></span>
+                        <?php if ($premium_subscription['status'] != 'payment_failed'): ?>
+                            <div class="subscription-status <?php echo $premium_subscription['status']; ?>">
+                                <span class="status-badge"><?php echo ucfirst($premium_subscription['status']); ?></span>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -129,21 +129,21 @@ if ($ai_subscription) {
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Price</span>
-                                <span class="detail-value">$<?php echo number_format($ai_subscription['amount'], 2); ?> <?php echo $ai_subscription['currency']; ?>/<?php echo $ai_subscription['billing_cycle'] === 'yearly' ? 'year' : 'month'; ?></span>
+                                <span class="detail-value">$<?php echo number_format($premium_subscription['amount'], 2); ?> <?php echo $premium_subscription['currency']; ?>/<?php echo $premium_subscription['billing_cycle'] === 'yearly' ? 'year' : 'month'; ?></span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">Started</span>
-                                <span class="detail-value"><?php echo date('F j, Y', strtotime($ai_subscription['start_date'])); ?></span>
+                                <span class="detail-value"><?php echo date('F j, Y', strtotime($premium_subscription['start_date'])); ?></span>
                             </div>
                             <div class="detail-item">
-                                <span class="detail-label"><?php echo $ai_subscription['status'] === 'active' ? 'Next Billing Date' : 'Access Until'; ?></span>
-                                <span class="detail-value"><?php echo date('F j, Y', strtotime($ai_subscription['end_date'])); ?></span>
+                                <span class="detail-label"><?php echo $premium_subscription['status'] === 'active' ? 'Next Billing Date' : 'Access Until'; ?></span>
+                                <span class="detail-value"><?php echo date('F j, Y', strtotime($premium_subscription['end_date'])); ?></span>
                             </div>
                             <?php
-                            $creditBalance = floatval($ai_subscription['credit_balance'] ?? 0);
-                            $originalCredit = floatval($ai_subscription['original_credit'] ?? 0);
+                            $creditBalance = floatval($premium_subscription['credit_balance'] ?? 0);
+                            $originalCredit = floatval($premium_subscription['original_credit'] ?? 0);
                             // Only show discount if there's still credit remaining
-                            if ($ai_subscription['discount_applied'] && $creditBalance > 0): ?>
+                            if ($premium_subscription['discount_applied'] && $creditBalance > 0): ?>
                             <div class="detail-item">
                                 <span class="detail-label">Discount</span>
                                 <span class="detail-value discount">$20 Standard Discount Applied</span>
@@ -163,12 +163,12 @@ if ($ai_subscription) {
                             <?php endif; ?>
                             <div class="detail-item">
                                 <span class="detail-label">Payment Method</span>
-                                <span class="detail-value"><?php echo ucfirst($ai_subscription['payment_method']); ?></span>
+                                <span class="detail-value"><?php echo ucfirst($premium_subscription['payment_method']); ?></span>
                             </div>
                         </div>
                     </div>
 
-                    <?php if ($creditBalance > 0 && $ai_subscription['status'] === 'active'): ?>
+                    <?php if ($creditBalance > 0 && $premium_subscription['status'] === 'active'): ?>
                         <div class="subscription-notice credit-notice">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke-width="2">
                                 <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -180,11 +180,11 @@ if ($ai_subscription) {
                         </div>
                     <?php endif; ?>
 
-                    <?php if ($ai_subscription['status'] === 'active'): ?>
+                    <?php if ($premium_subscription['status'] === 'active'): ?>
                         <div class="subscription-actions">
                             <a href="cancel-subscription.php" class="btn btn-outline-red btn-cancel">Cancel Subscription</a>
                         </div>
-                    <?php elseif ($ai_subscription['status'] === 'cancelled'): ?>
+                    <?php elseif ($premium_subscription['status'] === 'cancelled'): ?>
                         <div class="subscription-notice cancelled">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -193,17 +193,17 @@ if ($ai_subscription) {
                             </svg>
                             <div>
                                 <p>Your subscription has been cancelled.</p>
-                                <p class="notice-detail">Premium features will remain active until <strong><?php echo date('F j, Y', strtotime($ai_subscription['end_date'])); ?></strong>.</p>
+                                <p class="notice-detail">Premium features will remain active until <strong><?php echo date('F j, Y', strtotime($premium_subscription['end_date'])); ?></strong>.</p>
                             </div>
                         </div>
                         <div class="subscription-actions">
-                            <?php if (strtotime($ai_subscription['end_date']) > time()): ?>
+                            <?php if (strtotime($premium_subscription['end_date']) > time()): ?>
                                 <a href="reactivate-subscription.php" class="btn btn-purple btn-reactivate">Reactivate Subscription</a>
                             <?php else: ?>
                                 <a href="reactivate-subscription.php" class="btn btn-purple">Resubscribe</a>
                             <?php endif; ?>
                         </div>
-                    <?php elseif ($ai_subscription['status'] === 'payment_failed'): ?>
+                    <?php elseif ($premium_subscription['status'] === 'payment_failed'): ?>
                         <div class="subscription-notice payment-failed">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -219,7 +219,7 @@ if ($ai_subscription) {
                             <a href="reactivate-subscription.php" class="btn btn-purple">Update Payment Method</a>
                             <button type="button" class="btn btn-outline" id="retry-payment-btn">Retry with Existing Method</button>
                         </div>
-                    <?php elseif ($ai_subscription['status'] === 'expired'): ?>
+                    <?php elseif ($premium_subscription['status'] === 'expired'): ?>
                         <div class="subscription-notice expired">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"></circle>
@@ -371,7 +371,7 @@ if ($ai_subscription) {
     </footer>
 
     <!-- Retry Payment Modal -->
-    <?php if ($ai_subscription && $ai_subscription['status'] === 'payment_failed'): ?>
+    <?php if ($premium_subscription && $premium_subscription['status'] === 'payment_failed'): ?>
     <div class="modal-overlay" id="retry-payment-modal">
         <div class="modal-container">
             <button class="modal-close" id="modal-close-btn" aria-label="Close modal">
@@ -396,8 +396,8 @@ if ($ai_subscription) {
                 <div class="modal-payment-info">
                     <div class="payment-method-badge">
                         <?php
-                        $paymentMethodLower = strtolower($ai_subscription['payment_method'] ?? 'unknown');
-                        $paymentMethodDisplay = ucfirst($ai_subscription['payment_method'] ?? 'Unknown');
+                        $paymentMethodLower = strtolower($premium_subscription['payment_method'] ?? 'unknown');
+                        $paymentMethodDisplay = ucfirst($premium_subscription['payment_method'] ?? 'Unknown');
                         ?>
                         <?php if ($paymentMethodLower === 'stripe'): ?>
                             <img src="../../resources/images/Stripe-logo.svg" alt="Stripe" class="payment-logo">
@@ -409,7 +409,7 @@ if ($ai_subscription) {
                             <span class="payment-text"><?php echo $paymentMethodDisplay; ?></span>
                         <?php endif; ?>
                     </div>
-                    <span class="billing-info"><?php echo ucfirst($ai_subscription['billing_cycle'] ?? 'Monthly'); ?> billing</span>
+                    <span class="billing-info"><?php echo ucfirst($premium_subscription['billing_cycle'] ?? 'Monthly'); ?> billing</span>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-purple" id="confirm-retry-btn">

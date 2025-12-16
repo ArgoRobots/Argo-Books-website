@@ -77,12 +77,12 @@ function create_license_key($email, $user_id = null)
 }
 
 /**
- * Verify if a license key is valid
+ * Verify if a standard license key is valid
  *
  * @param string $key The license key to verify
  * @return bool True if the key is valid, false otherwise
  */
-function verify_premium_license_key($key)
+function verify_standard_license_key($key)
 {
     $db = get_db_connection();
     $stmt = $db->prepare('SELECT * FROM license_keys WHERE license_key = ?');
@@ -96,11 +96,11 @@ function verify_premium_license_key($key)
 }
 
 /**
- * Verify if an AI subscription key is valid
+ * Verify if a premium subscription is valid
  * @param string $subscription_id The subscription ID to validate
  * @return array Response array with validation result
  */
-function validate_ai_subscription_key($subscription_id) {
+function validate_premium_subscription_key($subscription_id) {
     global $pdo;
 
     try {
@@ -127,9 +127,9 @@ function validate_ai_subscription_key($subscription_id) {
         if ($subscription['status'] === 'active' && $end_date > $now) {
             return [
                 'success' => true,
-                'type' => 'ai_subscription',
+                'type' => 'premium_subscription',
                 'status' => 'active',
-                'message' => 'AI subscription is valid and active.',
+                'message' => 'Premium subscription is valid and active.',
                 'subscription_id' => $subscription['subscription_id'],
                 'billing_cycle' => $subscription['billing_cycle'],
                 'end_date' => $subscription['end_date'],
@@ -138,9 +138,9 @@ function validate_ai_subscription_key($subscription_id) {
         } elseif ($subscription['status'] === 'cancelled' && $end_date > $now) {
             return [
                 'success' => true,
-                'type' => 'ai_subscription',
+                'type' => 'premium_subscription',
                 'status' => 'cancelled',
-                'message' => 'AI subscription is cancelled but still active until end of billing period.',
+                'message' => 'Premium subscription is cancelled but still active until end of billing period.',
                 'subscription_id' => $subscription['subscription_id'],
                 'billing_cycle' => $subscription['billing_cycle'],
                 'end_date' => $subscription['end_date'],
@@ -155,15 +155,15 @@ function validate_ai_subscription_key($subscription_id) {
 
             return [
                 'success' => false,
-                'type' => 'ai_subscription',
+                'type' => 'premium_subscription',
                 'status' => 'expired',
-                'message' => 'AI subscription has expired.',
+                'message' => 'Premium subscription has expired.',
                 'subscription_id' => $subscription['subscription_id'],
                 'end_date' => $subscription['end_date']
             ];
         }
     } catch (PDOException $e) {
-        error_log("AI Subscription validation error: " . $e->getMessage());
+        error_log("Premium subscription validation error: " . $e->getMessage());
         return [
             'success' => false,
             'message' => 'Error validating subscription. Please try again.'

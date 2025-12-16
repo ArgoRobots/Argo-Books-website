@@ -12,13 +12,13 @@ require_login();
 $user_id = $_SESSION['user_id'];
 
 // Get subscription info
-$ai_subscription = get_user_ai_subscription($user_id);
+$premium_subscription = get_user_premium_subscription($user_id);
 
 // Check if this is a PayPal subscription that was cancelled
 // PayPal subscriptions cannot be reactivated via API once cancelled - user must create a new subscription
-$is_cancelled_paypal = ($ai_subscription['payment_method'] === 'paypal'
-    && !empty($ai_subscription['paypal_subscription_id'])
-    && $ai_subscription['status'] === 'cancelled');
+$is_cancelled_paypal = ($premium_subscription['payment_method'] === 'paypal'
+    && !empty($premium_subscription['paypal_subscription_id'])
+    && $premium_subscription['status'] === 'cancelled');
 
 $error_message = '';
 
@@ -26,19 +26,19 @@ $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])) {
     // For cancelled PayPal subscriptions, redirect to checkout to create a new subscription
     if ($is_cancelled_paypal) {
-        header('Location: ../../upgrade/premium/checkout/?method=paypal&billing=' . ($ai_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
+        header('Location: ../../upgrade/premium/checkout/?method=paypal&billing=' . ($premium_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
         exit;
     }
 
     try {
         // For PayPal subscriptions that are suspended (payment_failed), try to reactivate on PayPal's side
         $paypalReactivated = true;
-        if ($ai_subscription['payment_method'] === 'paypal'
-            && !empty($ai_subscription['paypal_subscription_id'])
-            && $ai_subscription['status'] === 'payment_failed') {
+        if ($premium_subscription['payment_method'] === 'paypal'
+            && !empty($premium_subscription['paypal_subscription_id'])
+            && $premium_subscription['status'] === 'payment_failed') {
             try {
                 $paypalReactivated = activatePayPalSubscription(
-                    $ai_subscription['paypal_subscription_id'],
+                    $premium_subscription['paypal_subscription_id'],
                     'Reactivated by user from account settings'
                 );
             } catch (Exception $e) {
@@ -58,11 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])
         if ($stmt->rowCount() > 0) {
             // Send reactivation email
             try {
-                send_ai_subscription_reactivated_email(
-                    $ai_subscription['email'],
-                    $ai_subscription['subscription_id'],
-                    $ai_subscription['end_date'],
-                    $ai_subscription['billing_cycle'] ?? 'monthly'
+                send_premium_subscription_reactivated_email(
+                    $premium_subscription['email'],
+                    $premium_subscription['subscription_id'],
+                    $premium_subscription['end_date'],
+                    $premium_subscription['billing_cycle'] ?? 'monthly'
                 );
             } catch (Exception $e) {
                 error_log("Failed to send reactivation email: " . $e->getMessage());
@@ -83,10 +83,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])
     }
 }
 
-$end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
-$status = $ai_subscription['status'];
-$payment_method = ucfirst($ai_subscription['payment_method'] ?? 'Unknown');
-$billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
+$end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
+$status = $premium_subscription['status'];
+$payment_method = ucfirst($premium_subscription['payment_method'] ?? 'Unknown');
+$billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -167,13 +167,13 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
                 <div class="change-payment-section">
                     <p class="change-payment-label">Payment provider:</p>
                     <div class="payment-provider-options">
-                        <div class="payment-provider-btn <?php echo strtolower($ai_subscription['payment_method']) === 'stripe' ? 'current' : ''; ?>" data-method="stripe" data-name="Stripe">
+                        <div class="payment-provider-btn <?php echo strtolower($premium_subscription['payment_method']) === 'stripe' ? 'current' : ''; ?>" data-method="stripe" data-name="Stripe">
                             <img src="../../resources/images/Stripe-logo.svg" alt="Stripe">
                         </div>
-                        <div class="payment-provider-btn <?php echo strtolower($ai_subscription['payment_method']) === 'paypal' ? 'current' : ''; ?>" data-method="paypal" data-name="PayPal">
+                        <div class="payment-provider-btn <?php echo strtolower($premium_subscription['payment_method']) === 'paypal' ? 'current' : ''; ?>" data-method="paypal" data-name="PayPal">
                             <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
                         </div>
-                        <div class="payment-provider-btn <?php echo strtolower($ai_subscription['payment_method']) === 'square' ? 'current' : ''; ?>" data-method="square" data-name="Square">
+                        <div class="payment-provider-btn <?php echo strtolower($premium_subscription['payment_method']) === 'square' ? 'current' : ''; ?>" data-method="square" data-name="Square">
                             <img src="../../resources/images/Square-logo.svg" alt="Square">
                         </div>
                     </div>
@@ -190,7 +190,7 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
 
             <script>
             (function() {
-                const originalMethod = '<?php echo strtolower($ai_subscription['payment_method']); ?>';
+                const originalMethod = '<?php echo strtolower($premium_subscription['payment_method']); ?>';
                 const originalBilling = '<?php echo $billing_cycle; ?>';
                 let selectedMethod = originalMethod;
                 let selectedBilling = originalBilling;

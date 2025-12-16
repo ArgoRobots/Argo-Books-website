@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This script handles retrieving and resending AI subscription IDs to users
+ * This script handles retrieving and resending Premium subscription IDs to users
  */
 session_start();
 require_once '../../db_connect.php';
@@ -22,14 +22,14 @@ $user_id = $_SESSION['user_id'];
 $email = $_SESSION['email'] ?? '';
 
 // Get subscription info
-$ai_subscription = get_user_ai_subscription($user_id);
+$premium_subscription = get_user_premium_subscription($user_id);
 
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ai_subscription) {
-    $subscription_id = $ai_subscription['subscription_id'];
-    $billing_cycle = $ai_subscription['billing_cycle'];
-    $end_date = $ai_subscription['end_date'];
-    $subscription_email = $ai_subscription['email'] ?? $email;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
+    $subscription_id = $premium_subscription['subscription_id'];
+    $billing_cycle = $premium_subscription['billing_cycle'];
+    $end_date = $premium_subscription['end_date'];
+    $subscription_email = $premium_subscription['email'] ?? $email;
 
     // Send the subscription ID via email
     $send_to = !empty($subscription_email) ? $subscription_email : $email;
@@ -98,19 +98,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ai_subscription) {
                 <div class="centered">
                     <a href="ai-subscription.php" class="btn btn-purple">Back to Subscription</a>
                 </div>
-            <?php elseif (!$ai_subscription): ?>
+            <?php elseif (!$premium_subscription): ?>
                 <div class="error-message">
-                    You don't have an active AI subscription.
+                    You don't have an active Premium subscription.
                 </div>
                 <div class="centered">
-                    <a href="../../upgrade/premium/" class="btn btn-purple">Subscribe to AI Features</a>
+                    <a href="../../upgrade/premium/" class="btn btn-purple">Subscribe to Premium Features</a>
                 </div>
             <?php else: ?>
-                <p class="auth-subtitle">We'll send your AI subscription ID to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
+                <p class="auth-subtitle">We'll send your Premium subscription ID to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
 
                 <div class="subscription-info">
                     <h3>Subscription ID Information</h3>
-                    <p>Your subscription ID is a unique identifier for your AI subscription. Keep it safe for your records.</p>
+                    <p>Your subscription ID is a unique identifier for your Premium subscription. Keep it safe for your records.</p>
                     <p>You may need this ID when contacting support about billing or subscription issues.</p>
                 </div>
 

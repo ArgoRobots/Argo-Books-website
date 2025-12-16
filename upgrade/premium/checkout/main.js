@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return actions.order.create({
             purchase_units: [
               {
-                description: `Argo AI Subscription (${subscription.billing})`,
+                description: `Argo Premium Subscription (${subscription.billing})`,
                 amount: {
                   value: subscription.finalPrice.toFixed(2),
                   currency_code: "CAD",

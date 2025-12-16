@@ -30,22 +30,22 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $user_id = $_SESSION['user_id'];
 
 // Get subscription info
-$ai_subscription = get_user_ai_subscription($user_id);
+$premium_subscription = get_user_premium_subscription($user_id);
 
 // Validate subscription state
-if (!$ai_subscription) {
+if (!$premium_subscription) {
     echo json_encode(['success' => false, 'error' => 'No subscription found']);
     exit;
 }
 
-if ($ai_subscription['status'] !== 'payment_failed') {
+if ($premium_subscription['status'] !== 'payment_failed') {
     echo json_encode(['success' => false, 'error' => 'Subscription is not in a failed payment state']);
     exit;
 }
 
-$payment_method = strtolower($ai_subscription['payment_method'] ?? '');
-$billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
-$subscription_id = $ai_subscription['subscription_id'];
+$payment_method = strtolower($premium_subscription['payment_method'] ?? '');
+$billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
+$subscription_id = $premium_subscription['subscription_id'];
 
 // Calculate amount based on billing cycle
 $amount = ($billing_cycle === 'yearly') ? 50.00 : 5.00;
@@ -60,11 +60,11 @@ try {
 
     // Handle PayPal subscriptions
     if ($payment_method === 'paypal') {
-        if (!empty($ai_subscription['paypal_subscription_id'])) {
+        if (!empty($premium_subscription['paypal_subscription_id'])) {
             // Try to reactivate the suspended PayPal subscription
             try {
                 $reactivated = activatePayPalSubscription(
-                    $ai_subscription['paypal_subscription_id'],
+                    $premium_subscription['paypal_subscription_id'],
                     'Reactivated by user - retry payment'
                 );
 
@@ -101,8 +101,8 @@ try {
     }
     // Handle Stripe subscriptions
     else if ($payment_method === 'stripe') {
-        $paymentToken = $ai_subscription['payment_token'] ?? null;
-        $stripeCustomerId = $ai_subscription['stripe_customer_id'] ?? null;
+        $paymentToken = $premium_subscription['payment_token'] ?? null;
+        $stripeCustomerId = $premium_subscription['stripe_customer_id'] ?? null;
 
         if (empty($paymentToken)) {
             echo json_encode([
@@ -128,8 +128,8 @@ try {
                 'payment_method' => $paymentToken,
                 'confirm' => true,
                 'off_session' => true,
-                'description' => "AI Subscription Retry Payment - $subscription_id",
-                'receipt_email' => $ai_subscription['email'],
+                'description' => "Premium Subscription Retry Payment - $subscription_id",
+                'receipt_email' => $premium_subscription['email'],
                 'metadata' => [
                     'subscription_id' => $subscription_id,
                     'type' => 'retry_payment'
@@ -179,7 +179,7 @@ try {
     }
     // Handle Square subscriptions
     else if ($payment_method === 'square') {
-        $paymentToken = $ai_subscription['payment_token'] ?? null;
+        $paymentToken = $premium_subscription['payment_token'] ?? null;
 
         if (empty($paymentToken)) {
             echo json_encode([
@@ -219,7 +219,7 @@ try {
             );
             $createPaymentRequest->setAmountMoney($amountMoney);
             $createPaymentRequest->setLocationId($squareLocationId);
-            $createPaymentRequest->setNote("AI Subscription Retry Payment - $subscription_id");
+            $createPaymentRequest->setNote("Premium Subscription Retry Payment - $subscription_id");
 
             $response = $paymentsApi->createPayment($createPaymentRequest);
 
@@ -293,8 +293,8 @@ try {
 
             // Send reactivation email with new end date
             try {
-                send_ai_subscription_reactivated_email(
-                    $ai_subscription['email'],
+                send_premium_subscription_reactivated_email(
+                    $premium_subscription['email'],
                     $subscription_id,
                     $new_end_date,
                     $billing_cycle

@@ -10,7 +10,7 @@
  *   Web: setup-paypal-plans.php?key=YOUR_CRON_SECRET
  *
  * This will create:
- *   1. A Product (Argo AI Subscription)
+ *   1. A Product (Argo Premium Subscription)
  *   2. A Monthly Plan ($5 CAD/month)
  *   3. A Yearly Plan ($50 CAD/year)
  */
@@ -151,7 +151,7 @@ function getAccessToken($baseUrl, $clientId, $clientSecret) {
 
 function createProduct($baseUrl, $accessToken) {
     $productData = [
-        'name' => 'Argo AI Subscription',
+        'name' => 'Argo Premium Subscription',
         'description' => 'Access to AI-powered features including receipt scanning, predictive analysis, and natural language search.',
         'type' => 'SERVICE',
         'category' => 'SOFTWARE',
@@ -188,7 +188,7 @@ function createPlan($baseUrl, $accessToken, $productId, $interval, $price) {
     $planData = [
         'product_id' => $productId,
         'name' => "Argo AI - $planName",
-        'description' => "Argo AI Subscription - $planName billing",
+        'description' => "Argo Premium Subscription - $planName billing",
         'status' => 'ACTIVE',
         'billing_cycles' => [
             [

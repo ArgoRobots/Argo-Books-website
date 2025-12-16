@@ -1,6 +1,6 @@
 <?php
 /**
- * AI Subscription Renewal Cron Job
+ * Premium Subscription Renewal Cron Job
  *
  * This script should be run daily via cron to check for and process subscription renewals.
  *
@@ -340,7 +340,7 @@ function processStripeRenewal($paymentMethodId, $amount, $subscriptionId, $email
             'payment_method' => $paymentMethodId,
             'confirm' => true,
             'off_session' => true,
-            'description' => "AI Subscription Renewal - $subscriptionId",
+            'description' => "Premium Subscription Renewal - $subscriptionId",
             'receipt_email' => $email,
             'metadata' => [
                 'subscription_id' => $subscriptionId,
@@ -424,7 +424,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
                 'currency' => 'CAD'
             ],
             'location_id' => $locationId,
-            'note' => "AI Subscription Renewal - $subscriptionId",
+            'note' => "Premium Subscription Renewal - $subscriptionId",
             'autocomplete' => true
         ];
 
@@ -502,7 +502,7 @@ function getRecentFailureCount($pdo, $subscriptionId) {
  */
 function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $nextRenewal, $transactionId, $paymentMethod) {
     $css = file_get_contents(__DIR__ . '/../email.css');
-    $subject = "Payment Receipt - Argo AI Subscription";
+    $subject = "Payment Receipt - Argo Premium Subscription";
 
     $billingText = $billing === 'yearly' ? 'yearly' : 'monthly';
     $renewalDate = date('F j, Y', strtotime($nextRenewal));
@@ -539,7 +539,7 @@ function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $ne
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Description</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">AI Subscription ({$billingText})</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">Premium Subscription ({$billingText})</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Amount</strong></td>
@@ -591,7 +591,7 @@ HTML;
  */
 function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
     $css = file_get_contents(__DIR__ . '/../email.css');
-    $subject = "Payment Failed - Argo AI Subscription";
+    $subject = "Payment Failed - Argo Premium Subscription";
 
     $email_html = <<<HTML
 <!DOCTYPE html>

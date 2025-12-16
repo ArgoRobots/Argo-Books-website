@@ -132,10 +132,10 @@ function resend_license_email($to_email, $license_key)
 }
 
 /**
- * Resend AI subscription ID email
+ * Resend Premium subscription ID email
  *
  * @param string $to_email User's email address
- * @param string $subscription_id AI subscription ID
+ * @param string $subscription_id Premium subscription ID
  * @param string $billing_cycle Billing cycle (monthly/yearly)
  * @param string $end_date Subscription end date
  * @return bool Success status
@@ -1017,7 +1017,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
 }
 
 /**
- * Send AI subscription confirmation/receipt email
+ * Send Premium subscription confirmation/receipt email
  *
  * @param string $email User's email address
  * @param string $subscriptionId Subscription ID
@@ -1028,7 +1028,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
  * @param string $paymentMethod Payment method used
  * @return bool Success status
  */
-function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod)
+function send_premium_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod)
 {
     $css = file_get_contents(__DIR__ . '/email.css');
     $subject = "Payment Receipt - Argo Premium Subscription";
@@ -1123,14 +1123,14 @@ function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount
 }
 
 /**
- * Send AI subscription cancellation confirmation email
+ * Send Premium subscription cancellation confirmation email
  *
  * @param string $email User's email address
  * @param string $subscriptionId Subscription ID
  * @param string $endDate Date when access ends
  * @return bool Success status
  */
-function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
+function send_premium_subscription_cancelled_email($email, $subscriptionId, $endDate)
 {
     $css = file_get_contents(__DIR__ . '/email.css');
     $subject = "Subscription Cancelled - Argo Premium";
@@ -1195,14 +1195,14 @@ function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
 }
 
 /**
- * Send AI subscription reactivated email
+ * Send Premium subscription reactivated email
  * @param string $email User's email address
  * @param string $subscriptionId Subscription ID
  * @param string $endDate Next billing date
  * @param string $billingCycle Monthly or yearly
  * @return bool Success status
  */
-function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDate, $billingCycle = 'monthly')
+function send_premium_subscription_reactivated_email($email, $subscriptionId, $endDate, $billingCycle = 'monthly')
 {
     $css = file_get_contents(__DIR__ . '/email.css');
     $subject = "Subscription Reactivated - Argo Premium";

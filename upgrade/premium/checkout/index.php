@@ -78,7 +78,7 @@
         $alreadyUsedDiscount = false;
         try {
             $stmt = $pdo->prepare("
-                SELECT id FROM ai_subscriptions
+                SELECT id FROM premium_subscriptions
                 WHERE user_id = ? AND (discount_applied = 1 OR original_credit > 0)
                 LIMIT 1
             ");

@@ -101,7 +101,7 @@ if (is_cron_authenticated()) {
                 u.username,
                 u.email as user_email,
                 DATEDIFF(s.end_date, NOW()) as days_until_renewal
-            FROM ai_subscriptions s
+            FROM premium_subscriptions s
             JOIN community_users u ON s.user_id = u.id
             WHERE s.status = 'active'
             AND s.end_date <= DATE_ADD(NOW(), INTERVAL 7 DAY)
@@ -117,8 +117,8 @@ if (is_cron_authenticated()) {
                 p.*,
                 s.email,
                 u.username
-            FROM ai_subscription_payments p
-            JOIN ai_subscriptions s ON p.subscription_id = s.subscription_id
+            FROM premium_subscription_payments p
+            JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
             JOIN community_users u ON s.user_id = u.id
             ORDER BY p.created_at DESC
             LIMIT 20
@@ -127,18 +127,18 @@ if (is_cron_authenticated()) {
         $recentPayments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Get stats
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM ai_subscriptions WHERE status = 'active'");
+        $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
         $stats['active_subscriptions'] = $stmt->fetch()['count'];
 
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM ai_subscriptions WHERE status = 'active' AND end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) AND auto_renew = 1");
+        $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active' AND end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) AND auto_renew = 1");
         $stats['due_today'] = $stmt->fetch()['count'];
 
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM ai_subscription_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+        $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscription_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
         $stats['successful_30d'] = $stmt->fetch()['count'];
 
         $stmt = $pdo->query("
             SELECT COUNT(DISTINCT subscription_id) AS count
-            FROM ai_subscription_payments
+            FROM premium_subscription_payments
             WHERE status = 'failed'
             AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         ");

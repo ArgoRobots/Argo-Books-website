@@ -95,7 +95,7 @@ try {
             s.*,
             u.username,
             u.email as user_email
-        FROM ai_subscriptions s
+        FROM premium_subscriptions s
         JOIN community_users u ON s.user_id = u.id
         WHERE s.status = 'active'
         AND s.end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY)
@@ -160,7 +160,7 @@ foreach ($subscriptions as $subscription) {
             $newCreditBalance = $creditBalance - $creditUsed;
 
             $stmt = $pdo->prepare("
-                UPDATE ai_subscriptions
+                UPDATE premium_subscriptions
                 SET end_date = ?,
                     credit_balance = ?,
                     updated_at = NOW()
@@ -170,7 +170,7 @@ foreach ($subscriptions as $subscription) {
 
             // Log the credit-based payment (no actual charge)
             $stmt = $pdo->prepare("
-                INSERT INTO ai_subscription_payments (
+                INSERT INTO premium_subscription_payments (
                     subscription_id, amount, currency, payment_method,
                     transaction_id, status, payment_type, created_at
                 ) VALUES (?, 0, 'CAD', ?, ?, 'completed', 'credit', NOW())
@@ -236,7 +236,7 @@ foreach ($subscriptions as $subscription) {
             $newCreditBalance = $creditBalance - $creditUsed; // Deduct any used credit
 
             $stmt = $pdo->prepare("
-                UPDATE ai_subscriptions
+                UPDATE premium_subscriptions
                 SET end_date = ?,
                     credit_balance = ?,
                     updated_at = NOW()
@@ -246,7 +246,7 @@ foreach ($subscriptions as $subscription) {
 
             // Log payment (log the actual amount charged, not the full renewal amount)
             $stmt = $pdo->prepare("
-                INSERT INTO ai_subscription_payments (
+                INSERT INTO premium_subscription_payments (
                     subscription_id, amount, currency, payment_method,
                     transaction_id, status, payment_type, created_at
                 ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'renewal', NOW())
@@ -279,7 +279,7 @@ foreach ($subscriptions as $subscription) {
 
         // Log failed attempt
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_payments (
+            INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, error_message, created_at
             ) VALUES (?, ?, 'CAD', ?, NULL, 'failed', 'renewal', ?, NOW())
@@ -293,7 +293,7 @@ foreach ($subscriptions as $subscription) {
         $failureCount = getRecentFailureCount($pdo, $subscriptionId);
         if ($failureCount >= 3) {
             $stmt = $pdo->prepare("
-                UPDATE ai_subscriptions
+                UPDATE premium_subscriptions
                 SET status = 'payment_failed',
                     updated_at = NOW()
                 WHERE subscription_id = ?
@@ -311,7 +311,7 @@ logMessage("Renewal processing complete. Success: $successCount, Failed: $failed
 // Also check for subscriptions that should be marked as expired
 try {
     $stmt = $pdo->prepare("
-        UPDATE ai_subscriptions
+        UPDATE premium_subscriptions
         SET status = 'expired',
             updated_at = NOW()
         WHERE status = 'active'
@@ -487,7 +487,7 @@ function calculateNewEndDate($currentEndDate, $billing) {
 function getRecentFailureCount($pdo, $subscriptionId) {
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as count
-        FROM ai_subscription_payments
+        FROM premium_subscription_payments
         WHERE subscription_id = ?
         AND status = 'failed'
         AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)

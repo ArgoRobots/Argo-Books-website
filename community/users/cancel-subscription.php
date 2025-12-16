@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Get subscription details before cancelling
         $stmt = $pdo->prepare("
             SELECT subscription_id, email, end_date, credit_balance, original_credit, payment_method, paypal_subscription_id
-            FROM ai_subscriptions
+            FROM premium_subscriptions
             WHERE user_id = ? AND status = 'active'
         ");
         $stmt->execute([$user_id]);
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Cancel the subscription and invalidate any remaining credit
         // Credit is forfeited upon cancellation
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'cancelled', auto_renew = 0, credit_balance = 0, cancelled_at = NOW(), updated_at = NOW()
             WHERE user_id = ? AND status = 'active'
         ");

@@ -75,7 +75,7 @@ function get_premium_subscriptions($search_filter = '')
     try {
         $query = "
             SELECT s.*, u.username
-            FROM ai_subscriptions s
+            FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
             WHERE 1=1
         ";
@@ -108,7 +108,7 @@ function get_premium_subscription_keys()
     $keys = [];
 
     try {
-        $stmt = $pdo->query("SELECT * FROM ai_subscription_keys ORDER BY created_at DESC");
+        $stmt = $pdo->query("SELECT * FROM premium_subscription_keys ORDER BY created_at DESC");
         $keys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching Premium subscription keys: " . $e->getMessage());
@@ -127,7 +127,7 @@ function generate_premium_subscription_key($email = null, $duration_months = 1, 
 
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_keys (subscription_key, email, duration_months, notes)
+            INSERT INTO premium_subscription_keys (subscription_key, email, duration_months, notes)
             VALUES (?, ?, ?, ?)
         ");
         $stmt->execute([$key, $email ?: null, $duration_months, $notes ?: null]);
@@ -166,7 +166,7 @@ function get_subscription_chart_data()
             SELECT DATE(created_at) as date,
                    COUNT(*) as total,
                    SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active
-            FROM ai_subscriptions
+            FROM premium_subscriptions
             GROUP BY DATE(created_at)
             ORDER BY date
         ");
@@ -290,7 +290,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($action === 'delete') {
                 try {
-                    $stmt = $pdo->prepare("DELETE FROM ai_subscription_keys WHERE id IN ($placeholders) AND redeemed_at IS NULL");
+                    $stmt = $pdo->prepare("DELETE FROM premium_subscription_keys WHERE id IN ($placeholders) AND redeemed_at IS NULL");
                     $stmt->execute($key_ids);
                     $deleted = $stmt->rowCount();
                     if ($deleted > 0) {
@@ -325,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Update credit_balance for selected subscriptions
                 $stmt = $pdo->prepare("
-                    UPDATE ai_subscriptions
+                    UPDATE premium_subscriptions
                     SET credit_balance = credit_balance + ?
                     WHERE id IN ($placeholders)
                 ");
@@ -339,7 +339,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Send emails to affected users and verify credit was saved
                 $stmt = $pdo->prepare("
                     SELECT id, email, subscription_id, credit_balance
-                    FROM ai_subscriptions
+                    FROM premium_subscriptions
                     WHERE id IN ($placeholders)
                 ");
                 $stmt->execute($subscription_ids);

@@ -680,7 +680,7 @@ namespace {
 
         try {
             $stmt = $pdo->prepare("
-                SELECT * FROM ai_subscriptions
+                SELECT * FROM premium_subscriptions
                 WHERE user_id = ?
                 ORDER BY created_at DESC
                 LIMIT 1

@@ -107,7 +107,7 @@ function validate_premium_subscription_key($subscription_id) {
         $stmt = $pdo->prepare("
             SELECT subscription_id, user_id, email, billing_cycle, status,
                 start_date, end_date, created_at
-            FROM ai_subscriptions
+            FROM premium_subscriptions
             WHERE subscription_id = ?
         ");
         $stmt->execute([$subscription_id]);
@@ -149,7 +149,7 @@ function validate_premium_subscription_key($subscription_id) {
         } else {
             // Subscription expired - update status if needed
             if ($subscription['status'] !== 'expired') {
-                $stmt = $pdo->prepare("UPDATE ai_subscriptions SET status = 'expired' WHERE subscription_id = ?");
+                $stmt = $pdo->prepare("UPDATE premium_subscriptions SET status = 'expired' WHERE subscription_id = ?");
                 $stmt->execute([$subscription_id]);
             }
 

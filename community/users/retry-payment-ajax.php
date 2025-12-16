@@ -269,18 +269,18 @@ try {
 
         // Update the subscription status in database and extend the end date
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'active', auto_renew = 1, end_date = ?, updated_at = NOW()
             WHERE user_id = ? AND status = 'payment_failed'
         ");
         $stmt->execute([$new_end_date, $user_id]);
 
         if ($stmt->rowCount() > 0) {
-            // Record the payment in ai_subscription_payments (for Stripe/Square)
+            // Record the payment in premium_subscription_payments (for Stripe/Square)
             if ($transaction_id && in_array($payment_method, ['stripe', 'square'])) {
                 try {
                     $stmt = $pdo->prepare("
-                        INSERT INTO ai_subscription_payments (
+                        INSERT INTO premium_subscription_payments (
                             subscription_id, amount, currency, payment_method,
                             transaction_id, status, payment_type, created_at
                         ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'retry', NOW())

@@ -101,7 +101,7 @@ $subscriptionStillValid = false;
 
 try {
     $stmt = $pdo->prepare("
-        SELECT * FROM ai_subscriptions
+        SELECT * FROM premium_subscriptions
         WHERE user_id = ? AND status IN ('active', 'cancelled', 'payment_failed')
         AND end_date > NOW()
         ORDER BY created_at DESC LIMIT 1
@@ -383,7 +383,7 @@ try {
         }
 
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET payment_method = ?,
                 payment_token = ?,
                 stripe_customer_id = ?,
@@ -411,7 +411,7 @@ try {
         // Update with PayPal subscription ID if applicable
         if ($paypalSubscriptionId) {
             try {
-                $stmt = $pdo->prepare("UPDATE ai_subscriptions SET paypal_subscription_id = ? WHERE subscription_id = ?");
+                $stmt = $pdo->prepare("UPDATE premium_subscriptions SET paypal_subscription_id = ? WHERE subscription_id = ?");
                 $stmt->execute([$paypalSubscriptionId, $subscriptionId]);
             } catch (PDOException $e) {
                 error_log("Could not set paypal_subscription_id: " . $e->getMessage());
@@ -438,10 +438,10 @@ try {
     } else {
         // Create new subscription
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscriptions (
+            INSERT INTO premium_subscriptions (
                 subscription_id, user_id, email, billing_cycle, amount, currency,
                 start_date, end_date, status, payment_method, transaction_id,
-                premium_license_key, discount_applied, credit_balance, original_credit,
+                standard_license_key, discount_applied, credit_balance, original_credit,
                 payment_token, stripe_customer_id, auto_renew, created_at
             ) VALUES (
                 ?, ?, ?, ?, ?, ?,
@@ -476,7 +476,7 @@ try {
         // Update with PayPal subscription ID if applicable (column may not exist in older schema)
         if ($paypalSubscriptionId) {
             try {
-                $stmt = $pdo->prepare("UPDATE ai_subscriptions SET paypal_subscription_id = ? WHERE subscription_id = ?");
+                $stmt = $pdo->prepare("UPDATE premium_subscriptions SET paypal_subscription_id = ? WHERE subscription_id = ?");
                 $stmt->execute([$paypalSubscriptionId, $subscriptionId]);
             } catch (PDOException $e) {
                 // Column may not exist yet - log but don't fail
@@ -490,7 +490,7 @@ try {
         $paymentType = $isMonthlyWithCredit ? 'credit' : 'initial';
 
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_payments (
+            INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, created_at
             ) VALUES (?, ?, ?, ?, ?, 'completed', ?, NOW())

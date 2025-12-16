@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])
         }
 
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'active', auto_renew = 1, cancelled_at = NULL, updated_at = NOW()
             WHERE user_id = ? AND status IN ('cancelled', 'payment_failed')
             AND end_date > NOW()

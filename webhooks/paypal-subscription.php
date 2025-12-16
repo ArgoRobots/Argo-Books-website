@@ -150,14 +150,14 @@ function handleSubscriptionActivated($resource) {
     }
 
     // Check if we already have this subscription in our database
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscriptions WHERE paypal_subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$paypalSubscriptionId]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
         // Subscription exists, update status to active
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'active', auto_renew = 1, updated_at = NOW()
             WHERE paypal_subscription_id = ?
         ");
@@ -184,14 +184,14 @@ function handleSubscriptionCancelled($resource) {
     }
 
     // Find subscription in our database
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscriptions WHERE paypal_subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$paypalSubscriptionId]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
         // Update subscription status to cancelled
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'cancelled',
                 auto_renew = 0,
                 credit_balance = 0,
@@ -232,7 +232,7 @@ function handleSubscriptionExpired($resource) {
 
     // Update subscription status
     $stmt = $pdo->prepare("
-        UPDATE ai_subscriptions
+        UPDATE premium_subscriptions
         SET status = 'expired', auto_renew = 0, updated_at = NOW()
         WHERE paypal_subscription_id = ?
     ");
@@ -254,14 +254,14 @@ function handleSubscriptionSuspended($resource) {
     }
 
     // Find subscription
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscriptions WHERE paypal_subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$paypalSubscriptionId]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
         // Update subscription status to payment_failed
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'payment_failed', updated_at = NOW()
             WHERE paypal_subscription_id = ?
         ");
@@ -296,14 +296,14 @@ function handlePaymentFailed($resource) {
     }
 
     // Find subscription
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscriptions WHERE paypal_subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$billingAgreementId]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
         // Log the failed payment
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_payments (
+            INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, error_message, created_at
             ) VALUES (?, 0, 'CAD', 'paypal', NULL, 'failed', 'renewal', 'PayPal payment failed', NOW())
@@ -332,7 +332,7 @@ function handlePaymentCompleted($resource) {
     }
 
     // Find subscription
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscriptions WHERE paypal_subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$billingAgreementId]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -342,7 +342,7 @@ function handlePaymentCompleted($resource) {
     }
 
     // Check if this is the initial payment (transaction already exists) or a renewal
-    $stmt = $pdo->prepare("SELECT id FROM ai_subscription_payments WHERE transaction_id = ?");
+    $stmt = $pdo->prepare("SELECT id FROM premium_subscription_payments WHERE transaction_id = ?");
     $stmt->execute([$transactionId]);
 
     if ($stmt->fetch()) {
@@ -352,7 +352,7 @@ function handlePaymentCompleted($resource) {
     }
 
     // Determine if this is a renewal (subscription already has payments)
-    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM ai_subscription_payments WHERE subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM premium_subscription_payments WHERE subscription_id = ?");
     $stmt->execute([$subscription['subscription_id']]);
     $paymentCount = $stmt->fetch()['count'] ?? 0;
 
@@ -360,7 +360,7 @@ function handlePaymentCompleted($resource) {
 
     // Log the payment
     $stmt = $pdo->prepare("
-        INSERT INTO ai_subscription_payments (
+        INSERT INTO premium_subscription_payments (
             subscription_id, amount, currency, payment_method,
             transaction_id, status, payment_type, created_at
         ) VALUES (?, ?, ?, 'paypal', ?, 'completed', ?, NOW())
@@ -379,7 +379,7 @@ function handlePaymentCompleted($resource) {
         $newEndDate = calculateNewEndDate($subscription['end_date'], $billing);
 
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET end_date = ?,
                 status = 'active',
                 updated_at = NOW()
@@ -422,14 +422,14 @@ function handlePaymentDenied($resource) {
     }
 
     // Find subscription
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscriptions WHERE paypal_subscription_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$billingAgreementId]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
         // Log the failed payment
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_payments (
+            INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, error_message, created_at
             ) VALUES (?, 0, 'CAD', 'paypal', ?, 'failed', 'renewal', 'Payment denied by PayPal', NOW())
@@ -466,14 +466,14 @@ function handlePaymentRefunded($resource) {
     }
 
     // Find the original payment
-    $stmt = $pdo->prepare("SELECT * FROM ai_subscription_payments WHERE transaction_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM premium_subscription_payments WHERE transaction_id = ?");
     $stmt->execute([$saleId]);
     $payment = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($payment) {
         // Log the refund
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_payments (
+            INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, created_at
             ) VALUES (?, ?, 'CAD', 'paypal', ?, 'refunded', 'renewal', NOW())

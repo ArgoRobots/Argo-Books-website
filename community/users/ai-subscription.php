@@ -31,7 +31,7 @@ $payment_history = [];
 if ($premium_subscription) {
     try {
         $stmt = $pdo->prepare("
-            SELECT * FROM ai_subscription_payments
+            SELECT * FROM premium_subscription_payments
             WHERE subscription_id = ?
             ORDER BY created_at DESC
         ");

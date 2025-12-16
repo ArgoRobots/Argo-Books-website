@@ -2,6 +2,7 @@
 session_start();
 require_once '../../db_connect.php';
 require_once '../../email_sender.php';
+require_once '../../license_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -121,15 +122,8 @@ function generate_ai_subscription_key($email = null, $duration_months = 1, $note
 {
     global $pdo;
 
-    // Generate key in format XXXX-XXXX-XXXX-XXXX (alphanumeric)
-    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $key = '';
-    for ($i = 0; $i < 16; $i++) {
-        if ($i > 0 && $i % 4 == 0) {
-            $key .= '-';
-        }
-        $key .= $chars[random_int(0, strlen($chars) - 1)];
-    }
+    // Reuse the shared license key generator for consistent format
+    $key = generate_license_key();
 
     try {
         $stmt = $pdo->prepare("
@@ -191,8 +185,6 @@ $email_status = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['generate_key'])) {
-        require_once '../license_functions.php';
-
         $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
         if ($email) {
             $generated_key = create_license_key($email);

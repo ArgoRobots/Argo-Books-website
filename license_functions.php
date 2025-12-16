@@ -77,10 +77,10 @@ function create_license_key($email, $user_id = null)
 }
 
 /**
- * Verify if a standard license key is valid
+ * Verify if a standard license key exists
  *
  * @param string $key The license key to verify
- * @return bool True if the key is valid, false otherwise
+ * @return bool True if the key exists, false otherwise
  */
 function verify_standard_license_key($key)
 {
@@ -93,6 +93,67 @@ function verify_standard_license_key($key)
     $stmt->close();
 
     return $row !== null;
+}
+
+/**
+ * Validate a standard license key and return structured response
+ * @param string $key The license key to validate
+ * @param string $ip_address The IP address for activation
+ * @return array Response array with validation result
+ */
+function validate_standard_license_key($key, $ip_address) {
+    $db = get_db_connection();
+
+    try {
+        $stmt = $db->prepare('SELECT * FROM license_keys WHERE license_key = ?');
+        $stmt->bind_param('s', $key);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $license = $result->fetch_assoc();
+        $stmt->close();
+
+        if (!$license) {
+            return [
+                'success' => false,
+                'message' => 'Invalid license key.'
+            ];
+        }
+
+        // Check if already activated
+        if ($license['activated']) {
+            return [
+                'success' => true,
+                'type' => 'standard',
+                'status' => 'activated',
+                'message' => 'License key is valid and already activated.',
+                'key' => $license['license_key'],
+                'activation_date' => $license['activation_date']
+            ];
+        }
+
+        // Activate the license
+        if (activate_license_key($key, $ip_address)) {
+            return [
+                'success' => true,
+                'type' => 'standard',
+                'status' => 'activated',
+                'message' => 'License key activated successfully.',
+                'key' => $license['license_key'],
+                'activation_date' => date('Y-m-d H:i:s')
+            ];
+        } else {
+            return [
+                'success' => false,
+                'message' => 'Failed to activate license key.'
+            ];
+        }
+    } catch (Exception $e) {
+        error_log("Standard license validation error: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Error validating license key. Please try again.'
+        ];
+    }
 }
 
 /**

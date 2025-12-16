@@ -26,7 +26,7 @@ $error_message = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])) {
     // For cancelled PayPal subscriptions, redirect to checkout to create a new subscription
     if ($is_cancelled_paypal) {
-        header('Location: ../../upgrade/ai/checkout/?method=paypal&billing=' . ($ai_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
+        header('Location: ../../upgrade/premium/checkout/?method=paypal&billing=' . ($ai_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
         exit;
     }
 
@@ -208,7 +208,7 @@ $billing_cycle = $ai_subscription['billing_cycle'] ?? 'monthly';
                         reactivateBtn.textContent = `Reactivate with ${methodName} (${billingName})`;
                         reactivateBtn.type = 'button';
                         reactivateBtn.onclick = function() {
-                            window.location.href = `../../upgrade/ai/checkout/?method=${selectedMethod}&billing=${selectedBilling}&change_method=1`;
+                            window.location.href = `../../upgrade/premium/checkout/?method=${selectedMethod}&billing=${selectedBilling}&change_method=1`;
                         };
                     } else {
                         reactivateBtn.textContent = `Reactivate with ${methodName} (${billingName})`;

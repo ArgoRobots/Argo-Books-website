@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ai_subscription) {
                     You don't have an active AI subscription.
                 </div>
                 <div class="centered">
-                    <a href="../../upgrade/ai/" class="btn btn-purple">Subscribe to AI Features</a>
+                    <a href="../../upgrade/premium/" class="btn btn-purple">Subscribe to AI Features</a>
                 </div>
             <?php else: ?>
                 <p class="auth-subtitle">We'll send your AI subscription ID to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>

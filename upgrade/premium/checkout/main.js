@@ -3,6 +3,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const urlParams = new URLSearchParams(window.location.search);
   const paymentMethod = urlParams.get("method");
 
+  // Get subscription details from PHP
+  const subscription = window.AI_SUBSCRIPTION;
+
   // Update the form based on payment method
   const formTitle = document.querySelector(".checkout-form h2");
 
@@ -34,6 +37,15 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelector(".checkout-form").appendChild(paypalContainer);
     }
 
+    // Get the appropriate PayPal plan ID based on billing cycle
+    const paypalConfig = window.PAYMENT_CONFIG.paypal;
+    const planId = subscription.billing === "yearly"
+      ? paypalConfig.yearlyPlanId
+      : paypalConfig.monthlyPlanId;
+
+    // Determine if we should use subscription mode (requires plan IDs)
+    const useSubscriptionMode = planId && planId.length > 0;
+
     // Check if PayPal is defined
     if (typeof paypal === "undefined") {
       // Show loading message
@@ -44,9 +56,13 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     `;
 
-      // Load PayPal SDK dynamically if not available
+      // Load PayPal SDK dynamically with appropriate intent
       const paypalScript = document.createElement("script");
-      paypalScript.src = `https://www.paypal.com/sdk/js?client-id=${window.PAYMENT_CONFIG.paypal.clientId}&currency=CAD`;
+      if (useSubscriptionMode) {
+        paypalScript.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=CAD&vault=true&intent=subscription`;
+      } else {
+        paypalScript.src = `https://www.paypal.com/sdk/js?client-id=${paypalConfig.clientId}&currency=CAD`;
+      }
       paypalScript.onload = initializePayPal;
       paypalScript.onerror = () => {
         paypalContainer.innerHTML = `
@@ -64,156 +80,168 @@ document.addEventListener("DOMContentLoaded", function () {
       // Clear loading message
       paypalContainer.innerHTML = "";
 
-      // Initialize PayPal buttons
-      paypal
-        .Buttons({
-          createOrder: function (data, actions) {
-            return actions.order.create({
-              purchase_units: [
-                {
-                  amount: {
-                    value: "20.00",
-                    currency_code: "CAD",
-                  },
-                },
-              ],
+      // Configure buttons based on mode
+      const buttonConfig = {
+        style: {
+          shape: "rect",
+          color: "blue",
+          layout: "vertical",
+          label: useSubscriptionMode ? "subscribe" : "pay",
+        },
+        onError: function (err) {
+          console.error("PayPal error:", err);
+          paypalContainer.innerHTML = `
+            <div style="text-align: center; padding: 40px 0; color: #b91c1c;">
+              <p>Payment failed. Please try again or choose a different payment method.</p>
+              <button onclick="location.reload()" style="margin-top: 15px; padding: 10px 20px; cursor: pointer;">Retry</button>
+            </div>
+          `;
+        },
+      };
+
+      if (useSubscriptionMode) {
+        // Use PayPal Subscriptions API for true recurring billing
+        buttonConfig.createSubscription = function (data, actions) {
+          return actions.subscription.create({
+            plan_id: planId,
+            custom_id: `user_${subscription.userId}`,
+            application_context: {
+              shipping_preference: "NO_SHIPPING",
+            },
+          });
+        };
+
+        buttonConfig.onApprove = function (data, actions) {
+          // Process the successful subscription on our server
+          return fetch("process-subscription.php", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              subscriptionID: data.subscriptionID,
+              orderID: data.orderID,
+              paypal_subscription_id: data.subscriptionID,
+              amount: subscription.finalPrice.toFixed(2),
+              currency: "CAD",
+              billing: subscription.billing,
+              hasDiscount: subscription.hasDiscount,
+              premiumLicenseKey: subscription.licenseKey,
+              status: "completed",
+              email: subscription.userEmail,
+              payment_method: "paypal",
+              user_id: subscription.userId,
+              is_paypal_subscription: true,
+              update_payment_method: subscription.isUpdatingPaymentMethod || false,
+            }),
+          })
+            .then((response) => response.json())
+            .then((result) => {
+              if (result.success) {
+                window.location.href =
+                  "../thank-you/?subscription_id=" +
+                  result.subscription_id +
+                  "&email=" +
+                  encodeURIComponent(subscription.userEmail);
+              } else {
+                alert(
+                  result.error || "Payment was successful but there was an error setting up your subscription. Please contact support."
+                );
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("An error occurred. Please contact support.");
             });
-          },
-          onApprove: function (data, actions) {
-            return actions.order.capture().then(function (details) {
-              // Process the successful payment on our server
-              return fetch("process-paypal-payment.php", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
+        };
+      } else {
+        // Use one-time payment (fallback when no plan IDs configured)
+        buttonConfig.createOrder = function (data, actions) {
+          return actions.order.create({
+            purchase_units: [
+              {
+                description: `Argo AI Subscription (${subscription.billing})`,
+                amount: {
+                  value: subscription.finalPrice.toFixed(2),
+                  currency_code: "CAD",
                 },
-                body: JSON.stringify({
-                  orderID: data.orderID,
-                  payerID: data.payerID,
-                  amount: "20.00",
-                  currency: "CAD",
-                  status: "completed",
-                  payer_email: details.payer.email_address,
-                  payer_name:
-                    details.payer.name.given_name +
-                    " " +
-                    details.payer.name.surname,
-                }),
+              },
+            ],
+          });
+        };
+
+        buttonConfig.onApprove = function (data, actions) {
+          return actions.order.capture().then(function (details) {
+            // Process the successful payment on our server
+            return fetch("process-subscription.php", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                orderID: data.orderID,
+                payerID: data.payerID,
+                amount: subscription.finalPrice.toFixed(2),
+                currency: "CAD",
+                billing: subscription.billing,
+                hasDiscount: subscription.hasDiscount,
+                premiumLicenseKey: subscription.licenseKey,
+                status: "completed",
+                payer_email: details.payer.email_address,
+                payer_name:
+                  details.payer.name.given_name +
+                  " " +
+                  details.payer.name.surname,
+                payment_method: "paypal",
+                user_id: subscription.userId,
+                update_payment_method: subscription.isUpdatingPaymentMethod || false,
+              }),
+            })
+              .then((response) => response.json())
+              .then((result) => {
+                if (result.success) {
+                  window.location.href =
+                    "../thank-you/?subscription_id=" +
+                    result.subscription_id +
+                    "&email=" +
+                    encodeURIComponent(details.payer.email_address);
+                } else {
+                  alert(
+                    "Payment was successful but there was an error setting up your subscription. Please contact support."
+                  );
+                }
               })
-                .then((response) => response.json())
-                .then((data) => {
-                  if (data.success) {
-                    // Redirect to thank you page with license key and other details
-                    window.location.href =
-                      "../thank-you/?order_id=" +
-                      encodeURIComponent(data.order_id || "") +
-                      "&transaction_id=" +
-                      encodeURIComponent(data.transaction_id || "") +
-                      "&license=" +
-                      encodeURIComponent(data.license_key) +
-                      "&email=" +
-                      encodeURIComponent(details.payer.email_address) +
-                      "&method=paypal";
-                  } else {
-                    throw new Error(
-                      data.message || "Failed to generate license key"
-                    );
-                  }
-                });
-            });
-          },
-          onError: function (err) {
-            console.error("PayPal payment error:", err);
-            alert(
-              "There was an error processing your payment. Please try again."
-            );
-          },
-        })
-        .render("#paypal-button-container");
+              .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred. Please contact support.");
+              });
+          });
+        };
+      }
+
+      paypal.Buttons(buttonConfig).render("#paypal-button-container");
     }
   }
 
   function setupStripeCheckout() {
-    // Find the stripe container
     const stripeContainer = document.getElementById("stripe-container");
-    if (!stripeContainer) {
-      console.error("Stripe container not found");
-      return;
-    }
-
-    // Show the stripe container
     stripeContainer.style.display = "block";
 
-    // Check if Stripe is already loaded
-    if (typeof Stripe === "undefined") {
-      // Show loading message in the stripe container
-      stripeContainer.innerHTML = `
-      <div style="text-align: center; padding: 40px 0;">
-        <p>Loading Stripe payment form...</p>
-        <div class="loading-spinner"></div>
-      </div>
-    `;
-
-      // Load Stripe script dynamically
-      const stripeScript = document.createElement("script");
-      stripeScript.src = "https://js.stripe.com/v3/";
-      stripeScript.onload = () => {
-        // Once Stripe loads, initialize it
-        initializeStripe();
-      };
-      stripeScript.onerror = () => {
-        stripeContainer.innerHTML = `
-        <div style="text-align: center; padding: 40px 0; color: #b91c1c;">
-          <p>Failed to load Stripe. Please refresh the page or try another payment method.</p>
-        </div>
-      `;
-      };
-      document.head.appendChild(stripeScript);
-    } else {
-      // Stripe is already loaded, initialize immediately
-      initializeStripe();
-    }
+    // Load Stripe
+    const stripeScript = document.createElement("script");
+    stripeScript.src = "https://js.stripe.com/v3/";
+    stripeScript.onload = initializeStripe;
+    document.head.appendChild(stripeScript);
 
     function initializeStripe() {
-      // Create the complete Stripe form
-      stripeContainer.innerHTML = `
-      <form id="stripe-payment-form">
-        <div class="form-group">
-          <label for="stripe-card-holder">Cardholder Name</label>
-          <input type="text" id="stripe-card-holder" name="stripe-card-holder" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label for="stripe-card-element">Card Details</label>
-          <div id="stripe-card-element" class="form-control">
-            <!-- Stripe Elements will be inserted here -->
-          </div>
-          <div id="stripe-card-errors" role="alert" class="stripe-error"></div>
-        </div>
-
-        <div class="form-group">
-          <label for="stripe-email">Email Address</label>
-          <input type="email" id="stripe-email" name="stripe-email" class="form-control" required>
-        </div>
-
-        <button type="submit" id="stripe-submit-btn" class="checkout-btn">
-          Pay $20.00 CAD
-        </button>
-      </form>
-    `;
-
-      // Initialize Stripe
       const stripe = Stripe(window.PAYMENT_CONFIG.stripe.publishableKey);
       const elements = stripe.elements();
-
-      // Create card element
       const cardElement = elements.create("card", {
         style: {
           base: {
+            fontSize: "16px",
             color: "#32325d",
             fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
-            fontSmoothing: "antialiased",
-            fontSize: "16px",
             "::placeholder": {
               color: "#aab7c4",
             },
@@ -225,307 +253,195 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
 
-      // Mount the card element
-      const cardElementContainer = document.getElementById(
-        "stripe-card-element"
-      );
-      if (!cardElementContainer) {
-        console.error("Stripe card element container not found");
-        return;
-      }
-
-      cardElement.mount("#stripe-card-element");
-
-      // Handle real-time validation errors
-      cardElement.on("change", function (event) {
-        const displayError = document.getElementById("stripe-card-errors");
-        if (displayError) {
-          displayError.textContent = event.error ? event.error.message : "";
-        }
-      });
+      cardElement.mount("#card-element");
 
       // Handle form submission
       const form = document.getElementById("stripe-payment-form");
-      if (!form) {
-        console.error("Stripe payment form not found");
-        return;
-      }
-
-      form.addEventListener("submit", async function (event) {
+      form.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        // Get form inputs
-        const emailInput = document.getElementById("stripe-email");
-        const cardHolderInput = document.getElementById("stripe-card-holder");
-        const errorElement = document.getElementById("stripe-card-errors");
-
-        // Validate inputs
-        if (!emailInput || !emailInput.value.trim()) {
-          if (errorElement)
-            errorElement.textContent = "Please enter your email address.";
-          return;
-        }
-
-        if (!cardHolderInput || !cardHolderInput.value.trim()) {
-          if (errorElement)
-            errorElement.textContent = "Please enter the cardholder name.";
-          return;
-        }
-
-        // Clear any previous errors
-        if (errorElement) errorElement.textContent = "";
+        const submitButton = document.getElementById("stripe-submit-btn");
+        submitButton.disabled = true;
+        submitButton.textContent = "Processing...";
 
         // Show processing overlay
         const processingOverlay = document.createElement("div");
         processingOverlay.className = "processing-overlay";
         processingOverlay.innerHTML = `
-        <div class="spinner"></div>
-        <h2>Processing Your Payment</h2>
-        <p>Please do not close this window or refresh the page.</p>
-      `;
+          <div class="spinner"></div>
+          <h2>Processing Your Payment</h2>
+          <p>Please do not close this window or refresh the page.</p>
+        `;
         document.body.appendChild(processingOverlay);
 
-        // Disable submit button
-        const submitButton = document.getElementById("stripe-submit-btn");
-        if (submitButton) {
-          submitButton.disabled = true;
-          submitButton.textContent = "Processing...";
-        }
+        const cardHolder = document.getElementById("card-holder").value;
+        const email = document.getElementById("email").value;
 
         try {
-          // Create payment intent
-          const paymentIntentResponse = await fetch(
-            "stripe-payment-intent.php",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                amount: 2000, // $20.00 in cents
-                currency: "CAD",
-                email: emailInput.value.trim(),
-              }),
-            }
-          );
+          // Create payment method
+          const { paymentMethod, error } = await stripe.createPaymentMethod({
+            type: "card",
+            card: cardElement,
+            billing_details: {
+              name: cardHolder,
+              email: email,
+            },
+          });
 
-          const paymentIntentText = await paymentIntentResponse.text();
-          let paymentIntent;
-
-          try {
-            paymentIntent = JSON.parse(paymentIntentText);
-          } catch (e) {
-            throw new Error(
-              `Server returned invalid JSON: ${paymentIntentText.substring(
-                0,
-                100
-              )}...`
-            );
+          if (error) {
+            document.getElementById("card-errors").textContent = error.message;
+            const overlay = document.querySelector(".processing-overlay");
+            if (overlay) overlay.remove();
+            submitButton.disabled = false;
+            submitButton.textContent = subscription.isMonthlyWithCredit
+              ? "Subscribe - $0.00 Today (Credit Applied)"
+              : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+            return;
           }
 
-          if (paymentIntent.error) {
-            throw new Error(paymentIntent.error);
-          }
-
-          // Confirm payment with Stripe
-          const result = await stripe.confirmCardPayment(
-            paymentIntent.client_secret,
-            {
-              payment_method: {
-                card: cardElement,
-                billing_details: {
-                  name: cardHolderInput.value.trim(),
-                  email: emailInput.value.trim(),
-                },
-              },
-            }
-          );
-
-          if (result.error) {
-            throw new Error(result.error.message);
-          }
-
-          // Process successful payment
-          const processResponse = await fetch("process-stripe-payment.php", {
+          // Send to server
+          const response = await fetch("process-subscription.php", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({
-              payment_intent_id: result.paymentIntent.id,
-              payment_method_id: result.paymentIntent.payment_method,
-              email: emailInput.value.trim(),
-              amount: "20.00",
+              payment_method_id: paymentMethod.id,
+              email: email,
+              name: cardHolder,
+              amount: subscription.finalPrice.toFixed(2),
               currency: "CAD",
-              status: result.paymentIntent.status,
+              billing: subscription.billing,
+              hasDiscount: subscription.hasDiscount,
+              premiumLicenseKey: subscription.licenseKey,
+              payment_method: "stripe",
+              user_id: subscription.userId,
+              update_payment_method: subscription.isUpdatingPaymentMethod || false,
             }),
           });
 
-          const processData = await processResponse.json();
+          const result = await response.json();
 
-          if (!processData.success) {
-            throw new Error(
-              processData.message || "Failed to generate license key"
+          if (result.success) {
+            window.location.href =
+              "../thank-you/?subscription_id=" +
+              result.subscription_id +
+              "&email=" +
+              encodeURIComponent(email);
+          } else if (result.requires_action) {
+            // Handle 3D Secure
+            const { error: confirmError } = await stripe.confirmCardPayment(
+              result.client_secret
             );
+            if (confirmError) {
+              document.getElementById("card-errors").textContent =
+                confirmError.message;
+              const overlay = document.querySelector(".processing-overlay");
+              if (overlay) overlay.remove();
+              submitButton.disabled = false;
+              submitButton.textContent = subscription.isMonthlyWithCredit
+                ? "Subscribe - $0.00 Today (Credit Applied)"
+                : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+            } else {
+              window.location.href =
+                "../thank-you/?subscription_id=" +
+                result.subscription_id +
+                "&email=" +
+                encodeURIComponent(email);
+            }
+          } else {
+            document.getElementById("card-errors").textContent =
+              result.error || "Payment failed. Please try again.";
+            const overlay = document.querySelector(".processing-overlay");
+            if (overlay) overlay.remove();
+            submitButton.disabled = false;
+            submitButton.textContent = subscription.isMonthlyWithCredit
+              ? "Subscribe - $0.00 Today (Credit Applied)"
+              : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
           }
-
-          // Redirect to success page
-          const params = new URLSearchParams({
-            order_id: processData.order_id || "",
-            transaction_id: processData.transaction_id || "",
-            license: processData.license_key,
-            email: emailInput.value.trim(),
-            method: "stripe",
-          });
-
-          window.location.href = `../thank-you/?${params.toString()}`;
-        } catch (error) {
-          console.error("Stripe payment error:", error);
-
-          // Remove processing overlay
+        } catch (err) {
+          console.error("Error:", err);
+          document.getElementById("card-errors").textContent =
+            "An error occurred. Please try again.";
           const overlay = document.querySelector(".processing-overlay");
           if (overlay) overlay.remove();
-
-          // Show error message
-          if (errorElement) {
-            errorElement.innerHTML = `
-            <div style="background-color: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 6px; margin-top: 15px;">
-              <strong>Error:</strong> ${
-                error.message ||
-                "An error occurred while processing your payment."
-              }
-              <p style="margin-top: 8px; margin-bottom: 0;">Please try again or contact support if the problem persists.</p>
-            </div>
-          `;
-          }
-
-          // Re-enable submit button
-          if (submitButton) {
-            submitButton.disabled = false;
-            submitButton.textContent = "Pay $20.00 CAD";
-          }
+          submitButton.disabled = false;
+          submitButton.textContent = subscription.isMonthlyWithCredit
+            ? "Subscribe - $0.00 Today (Credit Applied)"
+            : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
         }
       });
     }
   }
 
   function setupSquareCheckout() {
-    // Create Square container if it doesn't exist or clear existing content
-    let squareContainer = document.getElementById("square-container");
-    if (!squareContainer) {
-      squareContainer = document.createElement("div");
-      squareContainer.id = "square-container";
-      document.querySelector(".checkout-form").appendChild(squareContainer);
-    } else {
-      squareContainer.innerHTML = "";
-      squareContainer.style.display = "block";
-    }
+    const squareContainer = document.getElementById("square-container");
+    squareContainer.style.display = "block";
 
-    // Create the Square payment form HTML structure
+    // Show loading state
     squareContainer.innerHTML = `
-      <form id="square-payment-form">
-        <div class="form-group">
-          <label for="square-card-holder">Cardholder Name</label>
-          <input type="text" id="square-card-holder" name="square-card-holder" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label for="square-email">Email Address</label>
-          <input type="email" id="square-email" name="square-email" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-          <label for="square-card">Card Details</label>
-          <div id="card-container" class="form-control square-field"></div>
-          <div id="square-errors" role="alert" class="payment-error"></div>
-        </div>
-
-        <button type="submit" id="square-submit-btn" class="checkout-btn">
-          Pay $20.00 CAD
-        </button>
-      </form>
+      <div class="loading-square">
+        <div class="spinner"></div>
+        <p>Loading Square payment form...</p>
+      </div>
     `;
 
-    // Show loading indicator while we load the Square JS SDK
-    const cardContainer = document.getElementById("card-container");
-    if (cardContainer) {
-      cardContainer.innerHTML =
-        '<div class="loading-square"><div class="spinner"></div><p>Loading payment form...</p></div>';
-    }
+    // Load Square SDK
+    const squareScript = document.createElement("script");
+    squareScript.src = "https://sandbox.web.squarecdn.com/v1/square.js";
+    squareScript.onload = initializeSquare;
+    squareScript.onerror = () => {
+      squareContainer.innerHTML = `
+        <div style="text-align: center; padding: 40px 0; color: #b91c1c;">
+          <p>Failed to load Square. Please refresh the page or try another payment method.</p>
+        </div>
+      `;
+    };
+    document.head.appendChild(squareScript);
 
-    // Load Square SDK if not already loaded
-    function loadSquareSDK() {
-      return new Promise((resolve, reject) => {
-        if (window.Square) {
-          resolve(window.Square);
-          return;
-        }
+    async function initializeSquare() {
+      try {
+        const payments = Square.payments(
+          window.PAYMENT_CONFIG.square.appId,
+          window.PAYMENT_CONFIG.square.locationId
+        );
 
-        const script = document.createElement("script");
-        // Use sandbox SDK if app ID starts with 'sandbox-'
-        const isSandbox =
-          window.PAYMENT_CONFIG?.square?.appId?.startsWith("sandbox-");
-        script.src = isSandbox
-          ? "https://sandbox.web.squarecdn.com/v1/square.js" // Sandbox SDK
-          : "https://web.squarecdn.com/v1/square.js"; // Production SDK
-        script.onload = () => {
-          if (window.Square) {
-            resolve(window.Square);
-          } else {
-            reject(new Error("Failed to load Square SDK"));
-          }
-        };
-        script.onerror = () => reject(new Error("Failed to load Square SDK"));
-        document.head.appendChild(script);
-      });
-    }
+        const card = await payments.card();
 
-    // Initialize Square payment form
-    loadSquareSDK()
-      .then((Square) => {
-        const appId = window.PAYMENT_CONFIG.square.appId;
-        const locationId = window.PAYMENT_CONFIG.square.locationId;
+        // Create form HTML
+        const buttonText = subscription.isMonthlyWithCredit
+          ? "Subscribe - $0.00 Today (Credit Applied)"
+          : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
 
-        // Initialize payments
-        const payments = Square.payments(appId, locationId);
+        squareContainer.innerHTML = `
+          <form id="square-payment-form">
+            <div class="form-group">
+              <label for="square-email">Email Address</label>
+              <input type="email" id="square-email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>Card Details</label>
+              <div id="card-container"></div>
+            </div>
+            <div id="payment-error" class="payment-error"></div>
+            <button type="submit" id="square-submit-btn" class="checkout-btn ai-checkout-btn">
+              ${buttonText}
+            </button>
+          </form>
+        `;
 
-        // Create and attach the card payment method
-        return payments.card().then((card) => {
-          const cardContainer = document.getElementById("card-container");
-          if (cardContainer) {
-            // Clear loading indicator
-            cardContainer.innerHTML = "";
+        await card.attach("#card-container");
 
-            // Mount the card
-            card.attach("#card-container");
-
-            // Return the card instance for use in the form submit handler
-            return card;
-          } else {
-            throw new Error("Card container element not found");
-          }
-        });
-      })
-      .then((card) => {
-        // Setup the form submit handler
+        // Handle form submission
         const form = document.getElementById("square-payment-form");
-        if (!form) {
-          throw new Error("Payment form not found");
-        }
-
         form.addEventListener("submit", async (event) => {
           event.preventDefault();
 
-          // Validate form fields
-          const emailInput = document.getElementById("square-email");
-          const cardHolderInput = document.getElementById("square-card-holder");
-          const errorContainer = document.getElementById("square-errors");
-
-          if (!emailInput || !emailInput.value) {
-            errorContainer.textContent = "Please enter your email address.";
-            return;
-          }
-
-          if (!cardHolderInput || !cardHolderInput.value) {
-            errorContainer.textContent = "Please enter the cardholder name.";
-            return;
-          }
+          const submitButton = document.getElementById("square-submit-btn");
+          const errorDiv = document.getElementById("payment-error");
+          submitButton.disabled = true;
+          submitButton.textContent = "Processing...";
+          errorDiv.textContent = "";
 
           // Show processing overlay
           const processingOverlay = document.createElement("div");
@@ -537,101 +453,70 @@ document.addEventListener("DOMContentLoaded", function () {
           `;
           document.body.appendChild(processingOverlay);
 
-          // Disable form submission while processing
-          const submitButton = document.getElementById("square-submit-btn");
-          if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.textContent = "Processing...";
-          }
-
           try {
-            // Generate a unique ID for this payment
-            const idempotencyKey =
-              Date.now().toString() + Math.random().toString(36).substring(2);
+            const result = await card.tokenize();
+            if (result.status === "OK") {
+              const email = document.getElementById("square-email").value;
 
-            // Tokenize the card
-            const tokenResult = await card.tokenize();
-
-            if (tokenResult.status === "OK") {
-              // Send payment token to server
-              const response = await fetch("process-square-payment.php", {
+              const response = await fetch("process-subscription.php", {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  source_id: tokenResult.token,
-                  idempotency_key: idempotencyKey,
-                  email: emailInput.value,
-                  reference_id: `ARGO-${Date.now()}`,
-                  customer_name: cardHolderInput.value,
+                  source_id: result.token,
+                  email: email,
+                  amount: subscription.finalPrice.toFixed(2),
+                  currency: "CAD",
+                  billing: subscription.billing,
+                  hasDiscount: subscription.hasDiscount,
+                  premiumLicenseKey: subscription.licenseKey,
+                  payment_method: "square",
+                  user_id: subscription.userId,
+                  update_payment_method: subscription.isUpdatingPaymentMethod || false,
                 }),
               });
 
               const data = await response.json();
 
               if (data.success) {
-                // Redirect to thank you page
-                window.location.href = `../thank-you/?order_id=${encodeURIComponent(
-                  data.order_id || ""
-                )}&transaction_id=${encodeURIComponent(
-                  data.transaction_id || ""
-                )}&license=${encodeURIComponent(
-                  data.license_key
-                )}&email=${encodeURIComponent(emailInput.value)}&method=square`;
+                window.location.href =
+                  "../thank-you/?subscription_id=" +
+                  data.subscription_id +
+                  "&email=" +
+                  encodeURIComponent(email);
               } else {
-                throw new Error(data.message || "Payment processing failed");
+                errorDiv.textContent =
+                  data.error || "Payment failed. Please try again.";
+                const overlay = document.querySelector(".processing-overlay");
+                if (overlay) overlay.remove();
+                submitButton.disabled = false;
+                submitButton.textContent = buttonText;
               }
             } else {
-              throw new Error(
-                tokenResult.errors[0]?.message || "Card tokenization failed"
-              );
-            }
-          } catch (error) {
-            console.error("Payment error:", error);
-
-            // Remove processing overlay
-            const overlay = document.querySelector(".processing-overlay");
-            if (overlay) {
-              overlay.remove();
-            }
-
-            // Show error message
-            if (errorContainer) {
-              errorContainer.innerHTML = `
-                <div style="background-color: #fee2e2; color: #b91c1c; padding: 12px; border-radius: 6px; margin-top: 15px;">
-                  <strong>Error:</strong> ${
-                    error.message ||
-                    "An error occurred while processing your payment."
-                  }
-                  <p>Please try again or contact support if the problem persists.</p>
-                </div>
-              `;
-            }
-
-            // Re-enable submit button
-            if (submitButton) {
+              errorDiv.textContent = "Card validation failed. Please try again.";
+              const overlay = document.querySelector(".processing-overlay");
+              if (overlay) overlay.remove();
               submitButton.disabled = false;
-              submitButton.textContent = "Pay $20.00 CAD";
+              submitButton.textContent = buttonText;
             }
+          } catch (err) {
+            console.error("Error:", err);
+            errorDiv.textContent = "An error occurred. Please try again.";
+            const overlay = document.querySelector(".processing-overlay");
+            if (overlay) overlay.remove();
+            submitButton.disabled = false;
+            submitButton.textContent = buttonText;
           }
         });
-      })
-      .catch((error) => {
-        console.error("Square initialization error:", error);
-
-        // Show initialization error
-        const errorMessage = `
-          <div class="payment-error" style="background-color: #fee2e2; color: #b91c1c; padding: 15px; border-radius: 6px; margin: 20px 0;">
-            <strong>Error initializing payment form:</strong> ${error.message}
-            <p>Please refresh the page or try a different payment method.</p>
+      } catch (err) {
+        console.error("Square initialization error:", err);
+        squareContainer.innerHTML = `
+          <div style="text-align: center; padding: 40px 0; color: #b91c1c;">
+            <p>Failed to initialize Square payment. Please try another payment method.</p>
           </div>
         `;
-
-        const squareContainer = document.getElementById("square-container");
-        if (squareContainer) {
-          squareContainer.innerHTML = errorMessage;
-        }
-      });
+      }
+    }
   }
 });

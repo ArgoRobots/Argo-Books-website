@@ -232,7 +232,7 @@ if ($ai_subscription) {
                             </div>
                         </div>
                         <div class="subscription-actions">
-                            <a href="../../upgrade/ai/" class="btn btn-blue">Renew Subscription</a>
+                            <a href="../../upgrade/premium/" class="btn btn-blue">Renew Subscription</a>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -296,7 +296,7 @@ if ($ai_subscription) {
                         <span class="price">$50</span>
                         <span class="period">CAD/year (save $10)</span>
                     </div>
-                    <a href="../../upgrade/ai/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
+                    <a href="../../upgrade/premium/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
                 </div>
             <?php endif; ?>
         </div>

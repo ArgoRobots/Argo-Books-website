@@ -4,23 +4,27 @@ require_once 'db_connect.php';
 if (!function_exists('generate_license_key')) {
     /**
      * Generate a random license key
-     * 
-     * @return string A 20-character alphanumeric license key
+     *
+     * @param string $type The type of license: 'standard' or 'premium'
+     * @return string A 20-character alphanumeric license key in format XXXX-XXXX-XXXX-XXXX-XXXX
      */
-    function generate_license_key()
+    function generate_license_key($type = 'standard')
     {
         $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $key_length = 20;
-        $key = '';
 
-        // Format: XXXXX-XXXXX-XXXXX-XXXXX
-        for ($i = 0; $i < $key_length; $i++) {
-            if ($i > 0 && $i % 5 == 0) {
+        // First 4 characters indicate the license type
+        $prefix = ($type === 'premium') ? 'PREM' : 'STND';
+
+        // Generate remaining 16 random characters
+        $key = $prefix;
+        for ($i = 0; $i < 16; $i++) {
+            if ($i % 4 == 0) {
                 $key .= '-';
             }
             $key .= $chars[random_int(0, strlen($chars) - 1)];
         }
 
+        // Format: XXXX-XXXX-XXXX-XXXX-XXXX
         return $key;
     }
 

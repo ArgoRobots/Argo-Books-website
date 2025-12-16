@@ -1,3 +1,8 @@
+/* Underline current page */
+header .header-inner .menu-container .menu .upgrade-now:after {
+    transform: translateX(-50%) scaleX(1);
+}
+
 .thank-you-container {
     max-width: 700px;
     margin: 0 auto;
@@ -9,7 +14,7 @@
 .success-icon {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -37,17 +42,17 @@ h1 {
     margin-bottom: 40px;
 }
 
-.subscription-details {
+.purchase-details {
     background: var(--white);
-    border: 2px solid var(--purple-500);
+    border: 2px solid var(--primary-blue);
     border-radius: 16px;
     padding: 30px;
     margin-bottom: 30px;
     text-align: left;
 }
 
-.subscription-details h2 {
-    color: var(--purple-500);
+.purchase-details h2 {
+    color: var(--primary-blue);
     font-size: 20px;
     margin-bottom: 20px;
     text-align: center;
@@ -73,32 +78,32 @@ h1 {
     font-weight: 600;
 }
 
-.subscription-id-box {
-    background: var(--purple-100);
-    border: 1px solid var(--purple-300);
+.license-box {
+    background: var(--blue-50);
+    border: 1px solid var(--blue-200);
     border-radius: 8px;
     padding: 16px;
     margin: 20px 0;
     text-align: center;
 }
 
-.subscription-id-box label {
+.license-box label {
     display: block;
     color: var(--gray-text);
     font-size: 14px;
     margin-bottom: 8px;
 }
 
-.subscription-id {
+.license-key {
     font-family: monospace;
     font-size: 20px;
-    color: var(--purple-600);
+    color: var(--blueHover);
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 .copy-btn {
-    background: var(--purple-500);
+    background: var(--primary-blue);
     color: var(--white);
     border: none;
     padding: 8px 16px;
@@ -110,7 +115,7 @@ h1 {
 }
 
 .copy-btn:hover {
-    background: var(--purple-600);
+    background: var(--blueHover);
 }
 
 .copy-btn.copied {
@@ -167,7 +172,7 @@ h1 {
 .feature-item svg {
     width: 24px;
     height: 24px;
-    stroke: var(--purple-500);
+    stroke: var(--primary-blue);
     stroke-width: 2;
     fill: none;
     flex-shrink: 0;
@@ -185,8 +190,32 @@ h1 {
     flex-wrap: wrap;
 }
 
-.btn-purple,
-.btn-outline-purple {
-    padding: 12px 20px;
-    width: auto;
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+    color: var(--white);
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background: var(--white);
+    color: var(--primary-blue);
+    padding: 14px 28px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 2px solid var(--primary-blue);
+    transition: background 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--blue-50);
 }

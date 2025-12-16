@@ -1,25 +1,21 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
+require_once '../../community/users/user_functions.php';
 
-// Check if logged-in user already has a license key
-if (isset($_SESSION['user_id'])) {
-    $user_id = $_SESSION['user_id'];
-    $user_email = $_SESSION['email'] ?? '';
+// Require login to access AI subscription page
+require_login('upgrade/premium/');
 
-    if ($pdo !== null) {
-        try {
-            // Check by user_id or email
-            $stmt = $pdo->prepare("SELECT license_key FROM license_keys WHERE user_id = ? OR LOWER(email) = LOWER(?) LIMIT 1");
-            $stmt->execute([$user_id, $user_email]);
-            if ($stmt->fetch()) {
-                // User already has a license, redirect to profile
-                header('Location: ../../community/users/profile.php');
-                exit;
-            }
-        } catch (PDOException $e) {
-            // Silently continue to premium page
-        }
+$user_id = $_SESSION['user_id'];
+$user = get_user($user_id);
+
+// Check if user already has an active subscription
+$existing_subscription = get_user_ai_subscription($user_id);
+if ($existing_subscription && in_array($existing_subscription['status'], ['active', 'cancelled'])) {
+    // User already has a subscription (active or cancelled but not expired)
+    if ($existing_subscription['status'] === 'active' ||
+        ($existing_subscription['status'] === 'cancelled' && strtotime($existing_subscription['end_date']) > time())) {
+        header('Location: ../../community/users/ai-subscription.php');
+        exit;
     }
 }
 ?>
@@ -34,20 +30,20 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Get Argo Books Standard for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support. Choose your payment method.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year. Standard users save $20!">
     <meta name="keywords"
-        content="argo books standard, lifetime access, unlimited products, one time payment, business software">
+        content="argo premium features, invoices payments, ai receipt scanning, predictive sales analysis, ai business insights, finance tracker, sales tracker subscription">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Get Standard - Argo Books | $20 CAD">
+    <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
-        content="Get Argo Books Standard for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support.">
-    <meta property="og:url" content="https://argorobots.com/upgrade/premium.php">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year.">
+    <meta property="og:url" content="https://argorobots.com/upgrade/premium/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
-    <title>Get Standard - Argo Books | $20 CAD Lifetime Access</title>
+    <title>Premium Subscription - Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -56,6 +52,7 @@ if (isset($_SESSION['user_id'])) {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
+    <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
 </head>
@@ -65,108 +62,386 @@ if (isset($_SESSION['user_id'])) {
         <div id="includeHeader"></div>
     </header>
 
-    <section class="hero premium-hero">
+    <section class="hero ai-hero">
         <div class="hero-bg">
             <div class="hero-gradient-orb hero-orb-1"></div>
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1>Get Standard</h1>
-            <p class="hero-subtitle">Lifetime access to all standard features</p>
+            <div class="ai-badge-large">Premium Features</div>
+            <h1>Unlock Premium for Your Business</h1>
+            <p>Transform your finance tracking with invoices & payments and AI-powered features. Get intelligent insights, automated receipt
+                scanning, and predictive analytics.</p>
         </div>
     </section>
 
-    <section class="premium-content">
+    <section class="ai-features-showcase">
         <div class="container">
-            <div class="premium-layout">
-                <div class="premium-summary">
-                    <div class="summary-card">
-                        <h2>Order Summary</h2>
-                        <div class="summary-item">
-                            <span>Argo Books Standard</span>
-                            <span class="item-price">$20.00 CAD</span>
-                        </div>
-                        <div class="summary-total">
-                            <span>Total</span>
-                            <span>$20.00 CAD</span>
-                        </div>
-                        <div class="summary-note">
-                            One-time payment. No recurring charges.
-                        </div>
-                    </div>
-
-                    <div class="features-included">
-                        <h3>What's Included</h3>
-                        <ul>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Unlimited products</strong> - No restrictions</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Windows Hello security</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Lifetime updates included</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Priority customer support</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="payment-selection">
-                    <h2>Select Payment Method</h2>
-                    <p>Choose how you'd like to pay</p>
-
-                    <div class="payment-options">
-                        <button class="payment-option" onclick="window.location.href='checkout/?method=paypal'">
-                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
-                            <span class="payment-desc">PayPal balance or linked card</span>
-                        </button>
-
-                        <button class="payment-option" onclick="window.location.href='checkout/?method=stripe'">
-                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe">
-                            <span class="payment-desc">Visa, Mastercard, Amex via Stripe</span>
-                        </button>
-
-                        <button class="payment-option" onclick="window.location.href='checkout/?method=square'">
-                            <img src="../../resources/images/Square-logo.svg" alt="Square">
-                            <span class="payment-desc">Visa, Mastercard, Amex via Square</span>
-                        </button>
-                    </div>
-
-                    <div class="security-note">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0110 0v4"></path>
+            <h2>What's Included</h2>
+            <div class="ai-features-grid">
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
                         </svg>
-                        <span>Secure payment processing. We never store your payment details.</span>
+                    </div>
+                    <h3>Invoices & Payments</h3>
+                    <p>Create professional invoices and track payments with ease. Streamline your billing workflow and
+                        get paid faster.</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
+                        </svg>
+                    </div>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Automatically extract data from receipts using advanced image recognition. Save hours of manual
+                        data entry.</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                            <polyline points="7.5 4.21 12 6.81 16.5 4.21"></polyline>
+                            <polyline points="7.5 19.79 7.5 14.6 3 12"></polyline>
+                            <polyline points="21 12 16.5 14.6 16.5 19.79"></polyline>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <h3>Predictive Sales Analysis</h3>
+                    <p>Forecast future trends based on your historical data. Make informed decisions with AI-powered
+                        predictions.</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <h3>AI Business Insights</h3>
+                    <p>Receive intelligent recommendations and insights tailored to your business patterns and goals.</p>
+                </div>
+                <div class="ai-feature-card">
+                    <div class="ai-feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            <path d="M11 8v6M8 11h6"></path>
+                        </svg>
+                    </div>
+                    <h3>Natural Language AI Search</h3>
+                    <p>Ask questions in plain English like "Show me my best selling products last quarter" and get
+                        instant answers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="ai-pricing-section">
+        <div class="container">
+            <h2>Choose Your Plan</h2>
+            <p class="pricing-subtitle">Select billing frequency and enter your license key if you're a Standard user</p>
+
+            <div class="license-discount">
+                <h3>Standard User? Get $20 Off!</h3>
+                <p>If you've purchased the $20 Standard version, enter your license key to receive a $20 discount.</p>
+                <div class="license-input-group">
+                    <input type="text" id="license-key" placeholder="Enter your license key">
+                    <button type="button" id="verify-license" class="btn-verify">Verify License</button>
+                </div>
+                <div id="license-status" class="license-status"></div>
+            </div>
+
+            <div class="billing-toggle">
+                <button type="button" class="billing-option active" data-billing="monthly">Monthly</button>
+                <button type="button" class="billing-option" data-billing="yearly">Yearly (Save $10)</button>
+            </div>
+
+            <div class="pricing-display">
+                <div class="price-box" id="price-display">
+                    <div class="original-price" id="original-price" style="display: none;">
+                        <span class="strikethrough">$50</span>
+                    </div>
+                    <div class="current-price">
+                        <span class="currency">$</span>
+                        <span class="amount" id="price-amount">5</span>
+                        <span class="period" id="price-period">CAD/month</span>
+                    </div>
+                    <div class="discount-badge" id="discount-badge" style="display: none;">
+                        $20 Premium Discount Applied!
                     </div>
                 </div>
             </div>
 
-            <div class="guarantee-section">
-                <div class="guarantee-badge">
-                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                        <path d="M9 12l2 2 4-4"></path>
-                    </svg>
-                    <div>
-                        <strong>30-Day Money Back Guarantee</strong>
-                        <p>Not satisfied? Get a full refund within 30 days, no questions asked.</p>
+            <div class="payment-methods">
+                <h3>Select Payment Method</h3>
+                <div class="payment-grid">
+                    <button class="payment-btn" id="pay-paypal">
+                        <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
+                        <span>Pay with PayPal</span>
+                    </button>
+                    <button class="payment-btn" id="pay-stripe">
+                        <img class="Stripe" src="../../resources/images/Stripe-logo.svg" alt="Stripe">
+                        <span>Pay with Stripe</span>
+                    </button>
+                    <button class="payment-btn" id="pay-square">
+                        <img class="Square" src="../../resources/images/Square-logo.svg" alt="Square">
+                        <span>Pay with Square</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="subscription-info">
+                <p><strong>Subscription Terms:</strong></p>
+                <ul>
+                    <li>Cancel anytime - no long-term commitment</li>
+                    <li>Standard discount applies to first year only</li>
+                    <li>Automatic renewal unless cancelled</li>
+                    <li>7-day free trial for new subscribers</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="ai-faq">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>How does the $20 discount work?</h3>
+                        <div class="faq-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>If you've purchased the $20 Standard version, the $20 discount will be applied to your first yearly subscription ($50 - $20 = $30 for the first year) or as credit toward monthly payments.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Can I cancel my subscription?</h3>
+                        <div class="faq-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Yes, you can cancel your subscription at any time. Your Premium features will remain active until the end of your current billing period.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What happens to my data if I cancel?</h3>
+                        <div class="faq-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6,9 12,15 18,9"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Your data remains safe in Argo Books. You'll just lose access to Premium-specific features until you resubscribe.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const faqItems = document.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                faqItems.forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                });
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    });
+    </script>
 
     <footer class="footer">
         <div id="includeFooter"></div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentBilling = 'monthly';
+            let hasDiscount = false;
+            let verifiedLicenseKey = null;
+
+            const monthlyPrice = 5;
+            const yearlyPrice = 50;
+            const discount = 20;
+
+            // Billing toggle
+            document.querySelectorAll('.billing-option').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.billing-option').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentBilling = this.dataset.billing;
+                    updatePriceDisplay();
+                });
+            });
+
+            // License verification with rate limiting
+            let lastVerifyAttempt = 0;
+            let verifyAttempts = 0;
+            const RATE_LIMIT_WINDOW = 60000; // 1 minute
+            const MAX_ATTEMPTS = 5;
+            const COOLDOWN_TIME = 3000; // 3 seconds between attempts
+
+            document.getElementById('verify-license').addEventListener('click', async function() {
+                const licenseKey = document.getElementById('license-key').value.trim();
+                const statusEl = document.getElementById('license-status');
+                const verifyBtn = this;
+                const now = Date.now();
+
+                // Reset attempt counter if window has passed
+                if (now - lastVerifyAttempt > RATE_LIMIT_WINDOW) {
+                    verifyAttempts = 0;
+                }
+
+                // Check rate limit
+                if (verifyAttempts >= MAX_ATTEMPTS) {
+                    const waitTime = Math.ceil((RATE_LIMIT_WINDOW - (now - lastVerifyAttempt)) / 1000);
+                    statusEl.innerHTML = `<span class="error">Too many attempts. Please wait ${waitTime} seconds.</span>`;
+                    return;
+                }
+
+                // Cooldown between attempts
+                if (now - lastVerifyAttempt < COOLDOWN_TIME && lastVerifyAttempt > 0) {
+                    statusEl.innerHTML = '<span class="error">Please wait a moment before trying again.</span>';
+                    return;
+                }
+
+                if (!licenseKey) {
+                    statusEl.innerHTML = '<span class="error">Please enter a license key</span>';
+                    return;
+                }
+
+                // Update rate limit tracking
+                lastVerifyAttempt = now;
+                verifyAttempts++;
+
+                // Disable button during verification
+                verifyBtn.disabled = true;
+                statusEl.innerHTML = '<span class="loading">Verifying...</span>';
+
+                try {
+                    const response = await fetch('../../check_license.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ license_key: licenseKey })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.valid) {
+                        hasDiscount = true;
+                        verifiedLicenseKey = licenseKey;
+                        statusEl.innerHTML = '<span class="success">Standard license verified! $20 discount applied.</span>';
+                        updatePriceDisplay();
+                        // Reset attempts on success
+                        verifyAttempts = 0;
+                    } else {
+                        hasDiscount = false;
+                        verifiedLicenseKey = null;
+                        statusEl.innerHTML = '<span class="error">Invalid or unactivated license key</span>';
+                        updatePriceDisplay();
+                    }
+                } catch (error) {
+                    statusEl.innerHTML = '<span class="error">Error verifying license. Please try again.</span>';
+                } finally {
+                    verifyBtn.disabled = false;
+                }
+            });
+
+            function updatePriceDisplay() {
+                const priceAmount = document.getElementById('price-amount');
+                const pricePeriod = document.getElementById('price-period');
+                const originalPrice = document.getElementById('original-price');
+                const discountBadge = document.getElementById('discount-badge');
+
+                if (currentBilling === 'monthly') {
+                    priceAmount.textContent = monthlyPrice;
+                    pricePeriod.textContent = 'CAD/month';
+                    originalPrice.style.display = 'none';
+
+                    if (hasDiscount) {
+                        discountBadge.style.display = 'block';
+                        discountBadge.textContent = '$20 credit will be applied to your account!';
+                    } else {
+                        discountBadge.style.display = 'none';
+                    }
+                } else {
+                    if (hasDiscount) {
+                        priceAmount.textContent = yearlyPrice - discount;
+                        originalPrice.style.display = 'block';
+                        originalPrice.querySelector('.strikethrough').textContent = '$' + yearlyPrice;
+                        discountBadge.style.display = 'block';
+                        discountBadge.textContent = '$20 Standard Discount Applied!';
+                    } else {
+                        priceAmount.textContent = yearlyPrice;
+                        originalPrice.style.display = 'none';
+                        discountBadge.style.display = 'none';
+                    }
+                    pricePeriod.textContent = 'CAD/year';
+                }
+            }
+
+            // Payment button handlers
+            function getCheckoutUrl(method) {
+                const params = new URLSearchParams({
+                    method: method,
+                    billing: currentBilling
+                });
+
+                // License/discount auto-detected on checkout page from database
+                return 'checkout/?' + params.toString();
+            }
+
+            document.getElementById('pay-paypal').addEventListener('click', function() {
+                window.location.href = getCheckoutUrl('paypal');
+            });
+
+            document.getElementById('pay-stripe').addEventListener('click', function() {
+                window.location.href = getCheckoutUrl('stripe');
+            });
+
+            document.getElementById('pay-square').addEventListener('click', function() {
+                window.location.href = getCheckoutUrl('square');
+            });
+        });
+    </script>
 </body>
 
 </html>

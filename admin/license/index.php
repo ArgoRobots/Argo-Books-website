@@ -2,6 +2,7 @@
 session_start();
 require_once '../../db_connect.php';
 require_once '../../email_sender.php';
+require_once '../../license_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -121,7 +122,8 @@ function generate_ai_subscription_key($email = null, $duration_months = 1, $note
 {
     global $pdo;
 
-    $key = 'AISUB-' . strtoupper(bin2hex(random_bytes(4))) . '-' . strtoupper(bin2hex(random_bytes(4)));
+    // Reuse the shared license key generator with 'premium' type prefix
+    $key = generate_license_key('premium');
 
     try {
         $stmt = $pdo->prepare("
@@ -183,8 +185,6 @@ $email_status = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['generate_key'])) {
-        require_once '../license_functions.php';
-
         $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
         if ($email) {
             $generated_key = create_license_key($email);
@@ -476,9 +476,9 @@ include '../admin_header.php';
 <div class="container">
     <!-- Section Tabs -->
     <div class="section-tabs">
-        <button class="section-tab active" data-tab="premium-keys">Premium Licenses</button>
-        <button class="section-tab" data-tab="ai-subscriptions">AI Subscriptions</button>
-        <button class="section-tab" data-tab="free-sub-keys">Free AI Subscription Keys</button>
+        <button class="section-tab active" data-tab="premium-keys">Standard Licenses</button>
+        <button class="section-tab" data-tab="ai-subscriptions">Premium Subscriptions</button>
+        <button class="section-tab" data-tab="free-sub-keys">Free Premium Subscription Keys</button>
     </div>
 
     <?php if (!empty($message)): ?>
@@ -678,12 +678,12 @@ include '../admin_header.php';
 
         <!-- Subscription Chart -->
         <div class="chart-container">
-            <h2>AI Subscriptions Over Time</h2>
+            <h2>Premium Subscriptions Over Time</h2>
             <canvas id="subscriptionsChart"></canvas>
         </div>
 
         <div class="table-container">
-            <h2>AI Subscriptions</h2>
+            <h2>Premium Subscriptions</h2>
 
             <form method="get" action="index.php" style="margin-bottom: 20px;">
                 <div class="input-button-wrapper">
@@ -818,7 +818,7 @@ include '../admin_header.php';
 
         <div class="table-container">
             <h2>Generate Free Subscription Key</h2>
-            <p style="color: #6b7280; margin-bottom: 20px;">Create keys that can be redeemed for free AI subscription access without payment.</p>
+            <p style="color: #6b7280; margin-bottom: 20px;">Create keys that can be redeemed for free Premium subscription access without payment.</p>
 
             <?php if ($generated_sub_key): ?>
                 <div class="key-display">

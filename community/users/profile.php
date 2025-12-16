@@ -615,7 +615,7 @@ if ($is_own_profile) {
                                 </p>
                             </div>
 
-                            <?php if (!empty(trim($user['bio']))): ?>
+                            <?php if (!empty(trim($user['bio'] ?? ''))): ?>
                                 <h3 class="profile-bio-title">BIO</h3>
                                 <div class="profile-bio">
                                     <?php echo nl2br(htmlspecialchars($user['bio'])); ?>

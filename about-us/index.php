@@ -9,14 +9,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Learn about Argo, the Calgary-based startup creating affordable sales tracking software for small businesses. Our mission: Better tools, no subscriptions, built by entrepreneurs who understand your challenges.">
+        content="Learn about Argo, the Calgary-based startup creating affordable finance tracking software for small businesses. Our mission: Better tools, no subscriptions, built by entrepreneurs who understand your challenges.">
     <meta name="keywords"
-        content="about argo books, calgary startup, small business software company, affordable business tools, sales tracking developers, canadian software company, calgary business, alberta tech company">
+        content="about argo books, calgary startup, small business software company, affordable business tools, finance tracking developers, canadian software company, calgary business, alberta tech company">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="About Us - Argo Books | Calgary Business Software Company">
     <meta property="og:description"
-        content="Learn about Argo, the Calgary-based startup creating affordable sales tracking software for small businesses. Our mission: Better tools, no subscriptions, built by entrepreneurs who understand your challenges.">
+        content="Learn about Argo, the Calgary-based startup creating affordable finance tracking software for small businesses. Our mission: Better tools, no subscriptions, built by entrepreneurs who understand your challenges.">
     <meta property="og:url" content="https://argorobots.com/about-us/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -26,7 +26,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="About Us - Argo Books | Calgary Business Software Company">
     <meta name="twitter:description"
-        content="Learn about Argo, the Calgary-based startup creating affordable sales tracking software for small businesses. Our mission: Better tools, no subscriptions, built by entrepreneurs who understand your challenges.">
+        content="Learn about Argo, the Calgary-based startup creating affordable finance tracking software for small businesses. Our mission: Better tools, no subscriptions, built by entrepreneurs who understand your challenges.">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-AB">
@@ -186,7 +186,7 @@
                 <div class="story-content animate-on-scroll">
                     <span class="section-label">Our Story</span>
                     <h2>Built by entrepreneurs, for entrepreneurs</h2>
-                    <p>From humble beginnings with a simple goal: Create the sales tracking tool we
+                    <p>From humble beginnings with a simple goal: Create the finance tracking tool we
                         wished existed for our own small businesses.</p>
                     <p>What sets us apart is our first-hand experience with the challenges small businesses face. We're
                         not a large corporation with venture capital funding — we're a small, self-funded business that

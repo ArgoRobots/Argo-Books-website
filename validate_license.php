@@ -16,12 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Get the license key from the request
     $data = json_decode(file_get_contents('php://input'), true);
 
-    // Check for Premium subscription key validation
+    // Check for Premium subscription key validation (active subscriptions)
     if (isset($data['subscription_id'])) {
         $subscription_id = trim($data['subscription_id']);
         $response = validate_premium_subscription_key($subscription_id);
     }
-    // Check for mremium license key validation
+    // Check for free/promo premium key validation
+    elseif (isset($data['premium_key'])) {
+        $premium_key = trim($data['premium_key']);
+        $response = validate_premium_key($premium_key);
+    }
+    // Check for standard license key validation
     elseif (isset($data['license_key'])) {
         $license_key = trim($data['license_key']);
 
@@ -65,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $response = [
             'success' => false,
-            'message' => 'License key or subscription ID is required.'
+            'message' => 'License key, subscription ID, or premium key is required.'
         ];
     }
 }

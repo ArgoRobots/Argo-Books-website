@@ -208,3 +208,60 @@ function get_license_details($key)
 
     return $row;
 }
+
+/**
+ * Validate a free/promo premium subscription key
+ * @param string $key The premium subscription key to validate
+ * @return array Response array with validation result
+ */
+function validate_premium_key($key) {
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT subscription_key, email, duration_months, created_at,
+                redeemed_at, redeemed_by_user_id, subscription_id, notes
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$key]);
+        $premium_key = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$premium_key) {
+            return [
+                'success' => false,
+                'message' => 'Invalid premium key.'
+            ];
+        }
+
+        // Check if already redeemed
+        if ($premium_key['redeemed_at'] !== null) {
+            return [
+                'success' => true,
+                'type' => 'premium_key',
+                'status' => 'redeemed',
+                'message' => 'Premium key has already been redeemed.',
+                'key' => $premium_key['subscription_key'],
+                'redeemed_at' => $premium_key['redeemed_at'],
+                'subscription_id' => $premium_key['subscription_id']
+            ];
+        }
+
+        // Key is valid and not yet redeemed
+        return [
+            'success' => true,
+            'type' => 'premium_key',
+            'status' => 'valid',
+            'message' => 'Premium key is valid and can be redeemed.',
+            'key' => $premium_key['subscription_key'],
+            'duration_months' => $premium_key['duration_months'],
+            'restricted_email' => $premium_key['email']
+        ];
+    } catch (PDOException $e) {
+        error_log("Premium key validation error: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Error validating premium key. Please try again.'
+        ];
+    }
+}

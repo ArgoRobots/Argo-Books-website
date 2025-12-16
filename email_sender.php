@@ -39,7 +39,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
         <body>
             <div class="container">
                 <div class="header {$header_class}" style="{$header_inline}">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
                 <div class="content">
                     {$body_content}
@@ -262,7 +262,7 @@ function send_notification_email($type, $data)
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -311,7 +311,7 @@ HTML;
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -438,7 +438,7 @@ function send_account_deletion_scheduled_email($email, $username, $scheduled_dat
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
                 
                 <div class="content">
@@ -513,7 +513,7 @@ function send_account_deletion_cancelled_email($email, $username)
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -631,7 +631,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -707,7 +707,7 @@ function send_unban_notification_email($email, $username)
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -792,7 +792,7 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -882,7 +882,7 @@ function send_bio_cleared_email($email, $username, $violation_type, $additional_
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -967,7 +967,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
         <body>
             <div class="container">
                 <div class="header">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -1052,7 +1052,7 @@ function send_ai_subscription_receipt($email, $subscriptionId, $billing, $amount
         <body>
             <div class="container">
                 <div class="header header-purple">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -1151,7 +1151,7 @@ function send_ai_subscription_cancelled_email($email, $subscriptionId, $endDate)
         <body>
             <div class="container">
                 <div class="header header-purple">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -1224,7 +1224,7 @@ function send_ai_subscription_reactivated_email($email, $subscriptionId, $endDat
         <body>
             <div class="container">
                 <div class="header header-purple">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">
@@ -1384,7 +1384,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
         <body>
             <div class="container">
                 <div class="header header-purple">
-                    <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+                    <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
                 </div>
 
                 <div class="content">

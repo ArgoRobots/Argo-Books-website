@@ -70,7 +70,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
         <div class="container">
             <div class="ai-badge-large">Premium Features</div>
             <h1>Unlock Premium for Your Business</h1>
-            <p>Transform your sales tracking with invoices & payments and AI-powered features. Get intelligent insights, automated receipt
+            <p>Transform your finance tracking with invoices & payments and AI-powered features. Get intelligent insights, automated receipt
                 scanning, and predictive analytics.</p>
         </div>
     </section>

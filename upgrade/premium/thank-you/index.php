@@ -40,7 +40,7 @@
         </div>
 
         <h1>You're All Set!</h1>
-        <p class="subtitle">Your Premium subscription is now active. Welcome to the future of sales tracking!</p>
+        <p class="subtitle">Your Premium subscription is now active. Welcome to the future of finance tracking!</p>
 
         <div class="subscription-details">
             <h2>Subscription Details</h2>

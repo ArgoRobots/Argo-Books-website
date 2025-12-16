@@ -71,7 +71,7 @@ if (isset($_SESSION['user_id'])) {
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1>Get Standard</h1>
+            <h1>Unlock Standard for Your Business</h1>
             <p class="hero-subtitle">Lifetime access to all standard features</p>
         </div>
     </section>

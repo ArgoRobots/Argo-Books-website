@@ -122,8 +122,8 @@ function generate_ai_subscription_key($email = null, $duration_months = 1, $note
 {
     global $pdo;
 
-    // Reuse the shared license key generator for consistent format
-    $key = generate_license_key();
+    // Reuse the shared license key generator with 'premium' type prefix
+    $key = generate_license_key('premium');
 
     try {
         $stmt = $pdo->prepare("

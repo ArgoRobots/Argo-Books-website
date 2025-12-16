@@ -1340,7 +1340,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span>Natural language search</span>
                         </li>
                     </ul>
-                    <a href="upgrade/ai/" class="btn btn-ai btn-block">Subscribe to Premium</a>
+                    <a href="upgrade/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                     <p class="pricing-note">Cancel anytime</p>
                 </div>
             </div>

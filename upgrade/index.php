@@ -71,7 +71,7 @@
         <div class="container">
             <div class="pricing-cards-wrapper">
                 <!-- Standard Plan Card -->
-                <a href="premium/" class="pricing-card-link">
+                <a href="standard/" class="pricing-card-link">
                     <div class="upgrade-pricing-card premium-card">
                         <div class="card-badge">One-Time Payment</div>
                         <h2>Standard</h2>
@@ -112,7 +112,7 @@
                 </a>
 
                 <!-- Premium Subscription Card -->
-                <a href="ai/" class="pricing-card-link">
+                <a href="premium/" class="pricing-card-link">
                     <div class="upgrade-pricing-card ai-card">
                         <div class="card-badge ai-badge">AI-Powered</div>
                         <h2>Premium</h2>

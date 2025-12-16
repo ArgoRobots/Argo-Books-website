@@ -1,8 +1,3 @@
-/* Underline current page */
-header .header-inner .menu-container .menu .upgrade-now:after {
-    transform: translateX(-50%) scaleX(1);
-}
-
 .thank-you-container {
     max-width: 700px;
     margin: 0 auto;
@@ -14,7 +9,7 @@ header .header-inner .menu-container .menu .upgrade-now:after {
 .success-icon {
     width: 100px;
     height: 100px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -42,17 +37,17 @@ h1 {
     margin-bottom: 40px;
 }
 
-.purchase-details {
+.subscription-details {
     background: var(--white);
-    border: 2px solid var(--primary-blue);
+    border: 2px solid var(--purple-500);
     border-radius: 16px;
     padding: 30px;
     margin-bottom: 30px;
     text-align: left;
 }
 
-.purchase-details h2 {
-    color: var(--primary-blue);
+.subscription-details h2 {
+    color: var(--purple-500);
     font-size: 20px;
     margin-bottom: 20px;
     text-align: center;
@@ -78,32 +73,32 @@ h1 {
     font-weight: 600;
 }
 
-.license-box {
-    background: var(--blue-50);
-    border: 1px solid var(--blue-200);
+.subscription-id-box {
+    background: var(--purple-100);
+    border: 1px solid var(--purple-300);
     border-radius: 8px;
     padding: 16px;
     margin: 20px 0;
     text-align: center;
 }
 
-.license-box label {
+.subscription-id-box label {
     display: block;
     color: var(--gray-text);
     font-size: 14px;
     margin-bottom: 8px;
 }
 
-.license-key {
+.subscription-id {
     font-family: monospace;
     font-size: 20px;
-    color: var(--blueHover);
+    color: var(--purple-600);
     font-weight: 700;
     letter-spacing: 1px;
 }
 
 .copy-btn {
-    background: var(--primary-blue);
+    background: var(--purple-500);
     color: var(--white);
     border: none;
     padding: 8px 16px;
@@ -115,7 +110,7 @@ h1 {
 }
 
 .copy-btn:hover {
-    background: var(--blueHover);
+    background: var(--purple-600);
 }
 
 .copy-btn.copied {
@@ -172,7 +167,7 @@ h1 {
 .feature-item svg {
     width: 24px;
     height: 24px;
-    stroke: var(--primary-blue);
+    stroke: var(--purple-500);
     stroke-width: 2;
     fill: none;
     flex-shrink: 0;
@@ -190,32 +185,8 @@ h1 {
     flex-wrap: wrap;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
-    color: var(--white);
-    padding: 14px 28px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.btn-secondary {
-    background: var(--white);
-    color: var(--primary-blue);
-    padding: 14px 28px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    border: 2px solid var(--primary-blue);
-    transition: background 0.3s ease;
-}
-
-.btn-secondary:hover {
-    background: var(--blue-50);
+.btn-purple,
+.btn-outline-purple {
+    padding: 12px 20px;
+    width: auto;
 }

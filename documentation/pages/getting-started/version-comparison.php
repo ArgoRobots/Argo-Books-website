@@ -174,7 +174,7 @@ include '../../docs-header.php';
                             <span class="feature-text">Natural language search</span>
                         </li>
                     </ul>
-                    <a href="../../../upgrade/ai/" class="btn btn-purple">Subscribe to Premium</a>
+                    <a href="../../../upgrade/premium/" class="btn btn-purple">Subscribe to Premium</a>
                     <p class="version-note">Cancel anytime</p>
                 </div>
             </div>

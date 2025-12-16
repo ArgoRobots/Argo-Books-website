@@ -26,11 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $premium_key = trim($data['premium_key']);
         $response = validate_premium_key($premium_key);
     }
-    // Check for standard license key validation
+    // Check for license key validation (auto-detect type by prefix)
     elseif (isset($data['license_key'])) {
         $license_key = trim($data['license_key']);
         $ip_address = $_SERVER['REMOTE_ADDR'];
-        $response = validate_standard_license_key($license_key, $ip_address);
+
+        // Auto-detect key type based on prefix
+        if (str_starts_with($license_key, 'PREM-')) {
+            $response = validate_premium_key($license_key);
+        } else {
+            $response = validate_standard_license_key($license_key, $ip_address);
+        }
     } else {
         $response = [
             'success' => false,

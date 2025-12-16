@@ -4,18 +4,18 @@ require_once 'db_connect.php';
 if (!function_exists('generate_license_key')) {
     /**
      * Generate a random license key
-     * 
-     * @return string A 20-character alphanumeric license key
+     *
+     * @return string A 16-character alphanumeric license key in format XXXX-XXXX-XXXX-XXXX
      */
     function generate_license_key()
     {
         $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $key_length = 20;
+        $key_length = 16;
         $key = '';
 
-        // Format: XXXXX-XXXXX-XXXXX-XXXXX
+        // Format: XXXX-XXXX-XXXX-XXXX
         for ($i = 0; $i < $key_length; $i++) {
-            if ($i > 0 && $i % 5 == 0) {
+            if ($i > 0 && $i % 4 == 0) {
                 $key .= '-';
             }
             $key .= $chars[random_int(0, strlen($chars) - 1)];

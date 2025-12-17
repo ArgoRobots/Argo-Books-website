@@ -131,18 +131,6 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     <h3>AI Business Insights</h3>
                     <p>Receive intelligent recommendations and insights tailored to your business patterns and goals.</p>
                 </div>
-                <div class="ai-feature-card">
-                    <div class="ai-feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            <path d="M11 8v6M8 11h6"></path>
-                        </svg>
-                    </div>
-                    <h3>Natural Language AI Search</h3>
-                    <p>Ask questions in plain English like "Show me my best selling products last quarter" and get
-                        instant answers.</p>
-                </div>
             </div>
         </div>
     </section>

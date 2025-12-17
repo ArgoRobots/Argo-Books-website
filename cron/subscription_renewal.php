@@ -1,6 +1,6 @@
 <?php
 /**
- * AI Subscription Renewal Cron Job
+ * Premium Subscription Renewal Cron Job
  *
  * This script should be run daily via cron to check for and process subscription renewals.
  *
@@ -95,7 +95,7 @@ try {
             s.*,
             u.username,
             u.email as user_email
-        FROM ai_subscriptions s
+        FROM premium_subscriptions s
         JOIN community_users u ON s.user_id = u.id
         WHERE s.status = 'active'
         AND s.end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY)
@@ -160,7 +160,7 @@ foreach ($subscriptions as $subscription) {
             $newCreditBalance = $creditBalance - $creditUsed;
 
             $stmt = $pdo->prepare("
-                UPDATE ai_subscriptions
+                UPDATE premium_subscriptions
                 SET end_date = ?,
                     credit_balance = ?,
                     updated_at = NOW()
@@ -170,7 +170,7 @@ foreach ($subscriptions as $subscription) {
 
             // Log the credit-based payment (no actual charge)
             $stmt = $pdo->prepare("
-                INSERT INTO ai_subscription_payments (
+                INSERT INTO premium_subscription_payments (
                     subscription_id, amount, currency, payment_method,
                     transaction_id, status, payment_type, created_at
                 ) VALUES (?, 0, 'CAD', ?, ?, 'completed', 'credit', NOW())
@@ -236,7 +236,7 @@ foreach ($subscriptions as $subscription) {
             $newCreditBalance = $creditBalance - $creditUsed; // Deduct any used credit
 
             $stmt = $pdo->prepare("
-                UPDATE ai_subscriptions
+                UPDATE premium_subscriptions
                 SET end_date = ?,
                     credit_balance = ?,
                     updated_at = NOW()
@@ -246,7 +246,7 @@ foreach ($subscriptions as $subscription) {
 
             // Log payment (log the actual amount charged, not the full renewal amount)
             $stmt = $pdo->prepare("
-                INSERT INTO ai_subscription_payments (
+                INSERT INTO premium_subscription_payments (
                     subscription_id, amount, currency, payment_method,
                     transaction_id, status, payment_type, created_at
                 ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'renewal', NOW())
@@ -279,7 +279,7 @@ foreach ($subscriptions as $subscription) {
 
         // Log failed attempt
         $stmt = $pdo->prepare("
-            INSERT INTO ai_subscription_payments (
+            INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, error_message, created_at
             ) VALUES (?, ?, 'CAD', ?, NULL, 'failed', 'renewal', ?, NOW())
@@ -293,7 +293,7 @@ foreach ($subscriptions as $subscription) {
         $failureCount = getRecentFailureCount($pdo, $subscriptionId);
         if ($failureCount >= 3) {
             $stmt = $pdo->prepare("
-                UPDATE ai_subscriptions
+                UPDATE premium_subscriptions
                 SET status = 'payment_failed',
                     updated_at = NOW()
                 WHERE subscription_id = ?
@@ -311,7 +311,7 @@ logMessage("Renewal processing complete. Success: $successCount, Failed: $failed
 // Also check for subscriptions that should be marked as expired
 try {
     $stmt = $pdo->prepare("
-        UPDATE ai_subscriptions
+        UPDATE premium_subscriptions
         SET status = 'expired',
             updated_at = NOW()
         WHERE status = 'active'
@@ -340,7 +340,7 @@ function processStripeRenewal($paymentMethodId, $amount, $subscriptionId, $email
             'payment_method' => $paymentMethodId,
             'confirm' => true,
             'off_session' => true,
-            'description' => "AI Subscription Renewal - $subscriptionId",
+            'description' => "Premium Subscription Renewal - $subscriptionId",
             'receipt_email' => $email,
             'metadata' => [
                 'subscription_id' => $subscriptionId,
@@ -424,7 +424,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
                 'currency' => 'CAD'
             ],
             'location_id' => $locationId,
-            'note' => "AI Subscription Renewal - $subscriptionId",
+            'note' => "Premium Subscription Renewal - $subscriptionId",
             'autocomplete' => true
         ];
 
@@ -487,7 +487,7 @@ function calculateNewEndDate($currentEndDate, $billing) {
 function getRecentFailureCount($pdo, $subscriptionId) {
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as count
-        FROM ai_subscription_payments
+        FROM premium_subscription_payments
         WHERE subscription_id = ?
         AND status = 'failed'
         AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
@@ -502,7 +502,7 @@ function getRecentFailureCount($pdo, $subscriptionId) {
  */
 function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $nextRenewal, $transactionId, $paymentMethod) {
     $css = file_get_contents(__DIR__ . '/../email.css');
-    $subject = "Payment Receipt - Argo AI Subscription";
+    $subject = "Payment Receipt - Argo Premium Subscription";
 
     $billingText = $billing === 'yearly' ? 'yearly' : 'monthly';
     $renewalDate = date('F j, Y', strtotime($nextRenewal));
@@ -539,7 +539,7 @@ function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $ne
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Description</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">AI Subscription ({$billingText})</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">Premium Subscription ({$billingText})</td>
                     </tr>
                     <tr>
                         <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Amount</strong></td>
@@ -591,7 +591,7 @@ HTML;
  */
 function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
     $css = file_get_contents(__DIR__ . '/../email.css');
-    $subject = "Payment Failed - Argo AI Subscription";
+    $subject = "Payment Failed - Argo Premium Subscription";
 
     $email_html = <<<HTML
 <!DOCTYPE html>

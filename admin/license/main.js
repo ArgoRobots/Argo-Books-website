@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // AI Subscriptions Chart initialization
+    // Premium Subscriptions Chart initialization
     const subLabels = subscriptionChartData.map(item => item.date);
     const subTotals = subscriptionChartData.map(item => parseInt(item.total));
     const subActive = subscriptionChartData.map(item => parseInt(item.active));

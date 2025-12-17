@@ -22,7 +22,7 @@
     $user_email = $_SESSION['email'] ?? '';
 
     // Check if user already has an active subscription
-    $existing_subscription = get_user_ai_subscription($user_id);
+    $existing_subscription = get_user_premium_subscription($user_id);
     $is_changing_method = isset($_GET['change_method']) && $_GET['change_method'] === '1';
 
     if ($existing_subscription && in_array($existing_subscription['status'], ['active', 'cancelled', 'payment_failed'])) {
@@ -78,7 +78,7 @@
         $alreadyUsedDiscount = false;
         try {
             $stmt = $pdo->prepare("
-                SELECT id FROM ai_subscriptions
+                SELECT id FROM premium_subscriptions
                 WHERE user_id = ? AND (discount_applied = 1 OR original_credit > 0)
                 LIMIT 1
             ");

@@ -473,8 +473,8 @@ if ($user) {
 }
 
 // Check if user has a premium license key (by user_id or case-insensitive email match)
-$has_premium_license = false;
-$has_ai_subscription = false;
+$has_standard_license = false;
+$has_premium_subscription = false;
 if ($is_own_profile) {
     $db = get_db_connection();
     // Check for premium license key (must have a non-empty license_key value)
@@ -484,12 +484,12 @@ if ($is_own_profile) {
     $stmt->bind_param('is', $user_id_check, $email_check);
     $stmt->execute();
     $result = $stmt->get_result();
-    $has_premium_license = ($result->num_rows > 0);
+    $has_standard_license = ($result->num_rows > 0);
     $stmt->close();
 
-    // Check for AI subscription
-    $ai_subscription = get_user_ai_subscription($user['id']);
-    $has_ai_subscription = ($ai_subscription !== null);
+    // Check for Premium subscription
+    $premium_subscription = get_user_premium_subscription($user['id']);
+    $has_premium_subscription = ($premium_subscription !== null);
 }
 
 ?>
@@ -645,15 +645,15 @@ if ($is_own_profile) {
 
                         <div class="profile-actions">
                             <?php if ($is_own_profile): ?>
-                                <?php if ($has_premium_license || $has_ai_subscription): ?>
+                                <?php if ($has_standard_license || $has_premium_subscription): ?>
                                     <a href="resend_license.php" class="btn btn-blue">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                                         </svg>
-                                        <?php if ($has_premium_license && $has_ai_subscription): ?>
+                                        <?php if ($has_standard_license && $has_premium_subscription): ?>
                                             Resend License/Subscription
-                                        <?php elseif ($has_premium_license): ?>
+                                        <?php elseif ($has_standard_license): ?>
                                             Resend License Key
                                         <?php else: ?>
                                             Resend Subscription ID

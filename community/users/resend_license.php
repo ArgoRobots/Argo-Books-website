@@ -29,18 +29,18 @@ $stmt = $db->prepare('SELECT license_key, email FROM license_keys WHERE (user_id
 $stmt->bind_param('is', $user_id, $email);
 $stmt->execute();
 $result = $stmt->get_result();
-$premium_license = $result->fetch_assoc();
-$has_premium_license = ($premium_license !== null);
+$standard_license = $result->fetch_assoc();
+$has_standard_license = ($standard_license !== null);
 $stmt->close();
 
-// Check if user has AI subscription
-$ai_subscription = get_user_ai_subscription($user_id);
-$has_ai_subscription = ($ai_subscription !== null);
+// Check if user has Premium subscription
+$premium_subscription = get_user_premium_subscription($user_id);
+$has_premium_subscription = ($premium_subscription !== null);
 
 // Handle form submission for premium license
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_license']) && $has_premium_license) {
-    $license_key = $premium_license['license_key'];
-    $license_email = $premium_license['email'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_license']) && $has_standard_license) {
+    $license_key = $standard_license['license_key'];
+    $license_email = $standard_license['email'];
 
     // Send the existing license key via email (use license email, fallback to session email)
     $send_to = !empty($license_email) ? $license_email : $email;
@@ -54,11 +54,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_license']) && 
 }
 
 // Handle form submission for subscription ID
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_subscription']) && $has_ai_subscription) {
-    $subscription_id = $ai_subscription['subscription_id'];
-    $billing_cycle = $ai_subscription['billing_cycle'];
-    $end_date = $ai_subscription['end_date'];
-    $subscription_email = $ai_subscription['email'] ?? $email;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_subscription']) && $has_premium_subscription) {
+    $subscription_id = $premium_subscription['subscription_id'];
+    $billing_cycle = $premium_subscription['billing_cycle'];
+    $end_date = $premium_subscription['end_date'];
+    $subscription_email = $premium_subscription['email'] ?? $email;
 
     // Send the subscription ID via email
     $send_to = !empty($subscription_email) ? $subscription_email : $email;
@@ -72,16 +72,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_subscription']
 }
 
 // If user has neither, redirect to profile
-if (!$has_premium_license && !$has_ai_subscription) {
+if (!$has_standard_license && !$has_premium_subscription) {
     header('Location: profile.php');
     exit;
 }
 
 // Determine page title based on what user has
 $page_title = 'Resend ';
-if ($has_premium_license && $has_ai_subscription) {
+if ($has_standard_license && $has_premium_subscription) {
     $page_title .= 'License Key / Subscription ID';
-} elseif ($has_premium_license) {
+} elseif ($has_standard_license) {
     $page_title .= 'License Key';
 } else {
     $page_title .= 'Subscription ID';
@@ -190,7 +190,7 @@ if ($has_premium_license && $has_ai_subscription) {
 
             <p class="auth-subtitle">We'll send your information to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
 
-            <?php if ($has_premium_license): ?>
+            <?php if ($has_standard_license): ?>
                 <div class="resend-section premium">
                     <h3>Premium License Key</h3>
 
@@ -212,15 +212,15 @@ if ($has_premium_license && $has_ai_subscription) {
                 </div>
             <?php endif; ?>
 
-            <?php if ($has_premium_license && $has_ai_subscription): ?>
+            <?php if ($has_standard_license && $has_premium_subscription): ?>
                 <div class="section-divider">
                     <span>AND</span>
                 </div>
             <?php endif; ?>
 
-            <?php if ($has_ai_subscription): ?>
+            <?php if ($has_premium_subscription): ?>
                 <div class="resend-section subscription">
-                    <h3>AI Subscription ID</h3>
+                    <h3>Premium Subscription ID</h3>
 
                     <?php if ($subscription_success): ?>
                         <div class="success-message">
@@ -231,7 +231,7 @@ if ($has_premium_license && $has_ai_subscription) {
                             <?php echo $subscription_error; ?>
                         </div>
                     <?php else: ?>
-                        <p>Your AI subscription ID is a unique identifier for your subscription. You may need it when contacting support.</p>
+                        <p>Your Premium subscription ID is a unique identifier for your subscription. You may need it when contacting support.</p>
                         <form method="post">
                             <input type="hidden" name="resend_subscription" value="1">
                             <button type="submit" class="btn btn-purple">Send Subscription ID</button>

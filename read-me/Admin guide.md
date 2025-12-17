@@ -122,7 +122,7 @@ Creates admin users for the community system
 
 ## Subscription Renewal Cron Job
 
-The subscription renewal process checks for AI subscriptions due for renewal and processes payments automatically.
+The subscription renewal process checks for Premium subscriptions due for renewal and processes payments automatically.
 
 ### Automatic Scheduling
 

@@ -291,7 +291,7 @@ CREATE TABLE IF NOT EXISTS user_bans (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- AI Subscriptions table
-CREATE TABLE IF NOT EXISTS ai_subscriptions (
+CREATE TABLE IF NOT EXISTS premium_subscriptions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_id VARCHAR(50) NOT NULL UNIQUE,
     user_id INT NOT NULL,
@@ -308,7 +308,7 @@ CREATE TABLE IF NOT EXISTS ai_subscriptions (
     stripe_customer_id VARCHAR(255) COMMENT 'Stripe customer ID for recurring billing',
     auto_renew TINYINT(1) DEFAULT 1 COMMENT 'Whether to auto-renew the subscription',
     paypal_subscription_id VARCHAR(100) COMMENT 'PayPal subscription ID for recurring billing',
-    premium_license_key VARCHAR(255),
+    standard_license_key VARCHAR(255),
     discount_applied TINYINT(1) DEFAULT 0,
     credit_balance DECIMAL(10,2) DEFAULT 0 COMMENT 'Remaining credit balance from premium discount',
     original_credit DECIMAL(10,2) DEFAULT 0 COMMENT 'Original credit amount (to track if credit was used)',
@@ -320,13 +320,13 @@ CREATE TABLE IF NOT EXISTS ai_subscriptions (
     INDEX idx_email (email),
     INDEX idx_status (status),
     INDEX idx_end_date (end_date),
-    INDEX idx_premium_license (premium_license_key),
+    INDEX idx_premium_license (standard_license_key),
     INDEX idx_renewal (status, end_date, auto_renew),
     FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- AI Subscription Payments table
-CREATE TABLE IF NOT EXISTS ai_subscription_payments (
+CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_id VARCHAR(50) NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
@@ -344,7 +344,7 @@ CREATE TABLE IF NOT EXISTS ai_subscription_payments (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- AI Subscription Keys table (free/promo keys)
-CREATE TABLE IF NOT EXISTS ai_subscription_keys (
+CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_key VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) DEFAULT NULL COMMENT 'Optional: restrict to specific email',

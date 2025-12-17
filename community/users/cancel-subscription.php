@@ -12,10 +12,10 @@ require_login();
 $user_id = $_SESSION['user_id'];
 
 // Get subscription info
-$ai_subscription = get_user_ai_subscription($user_id);
+$premium_subscription = get_user_premium_subscription($user_id);
 
 // Redirect if no active subscription
-if (!$ai_subscription || $ai_subscription['status'] !== 'active') {
+if (!$premium_subscription || $premium_subscription['status'] !== 'active') {
     header('Location: ai-subscription.php');
     exit;
 }
@@ -23,8 +23,8 @@ if (!$ai_subscription || $ai_subscription['status'] !== 'active') {
 $error_message = '';
 
 // Check credit status for warning messages
-$originalCredit = floatval($ai_subscription['original_credit'] ?? 0);
-$creditBalance = floatval($ai_subscription['credit_balance'] ?? 0);
+$originalCredit = floatval($premium_subscription['original_credit'] ?? 0);
+$creditBalance = floatval($premium_subscription['credit_balance'] ?? 0);
 $hasUnusedCredit = ($originalCredit > 0 && $creditBalance > 0);
 $hasUsedCredit = ($originalCredit > 0 && $creditBalance < $originalCredit);
 $creditUsed = $originalCredit - $creditBalance;
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Get subscription details before cancelling
         $stmt = $pdo->prepare("
             SELECT subscription_id, email, end_date, credit_balance, original_credit, payment_method, paypal_subscription_id
-            FROM ai_subscriptions
+            FROM premium_subscriptions
             WHERE user_id = ? AND status = 'active'
         ");
         $stmt->execute([$user_id]);
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Cancel the subscription and invalidate any remaining credit
         // Credit is forfeited upon cancellation
         $stmt = $pdo->prepare("
-            UPDATE ai_subscriptions
+            UPDATE premium_subscriptions
             SET status = 'cancelled', auto_renew = 0, credit_balance = 0, cancelled_at = NOW(), updated_at = NOW()
             WHERE user_id = ? AND status = 'active'
         ");
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Send cancellation email
         if ($subscription) {
             try {
-                send_ai_subscription_cancelled_email(
+                send_premium_subscription_cancelled_email(
                     $subscription['email'],
                     $subscription['subscription_id'],
                     $subscription['end_date']
@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
     }
 }
 
-$end_date = date('F j, Y', strtotime($ai_subscription['end_date']));
+$end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
 ?>
 <!DOCTYPE html>
 <html lang="en">

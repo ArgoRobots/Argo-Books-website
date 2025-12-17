@@ -1,7 +1,7 @@
 <?php
 /**
  * License Check Endpoint
- * Validates if a license key exists and is activated for AI subscription discount
+ * Validates if a license key exists and is activated for Premium subscription discount
  */
 
 session_start();

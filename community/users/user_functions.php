@@ -665,12 +665,12 @@ namespace {
     }
 
     /**
-     * Get user's AI subscription information
+     * Get user's Premium subscription information
      *
      * @param int $user_id User ID
      * @return array|null Subscription data or null if no subscription
      */
-    function get_user_ai_subscription($user_id)
+    function get_user_premium_subscription($user_id)
     {
         global $pdo;
 
@@ -680,7 +680,7 @@ namespace {
 
         try {
             $stmt = $pdo->prepare("
-                SELECT * FROM ai_subscriptions
+                SELECT * FROM premium_subscriptions
                 WHERE user_id = ?
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -690,7 +690,7 @@ namespace {
 
             return $subscription ?: null;
         } catch (PDOException $e) {
-            error_log('Error fetching AI subscription: ' . $e->getMessage());
+            error_log('Error fetching Premium subscription: ' . $e->getMessage());
             return null;
         }
     }

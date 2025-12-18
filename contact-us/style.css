@@ -400,7 +400,6 @@ header .header-inner .menu-container .menu .contact-us:after {
 /* ========================================
    Messages
    ======================================== */
-.success-message,
 .error-message {
   display: flex;
   align-items: center;
@@ -409,20 +408,6 @@ header .header-inner .menu-container .menu .contact-us:after {
   border-radius: 12px;
   margin-bottom: 24px;
   font-size: 0.95rem;
-}
-
-.success-message {
-  background: var(--green-50);
-  border: 1px solid var(--green-200);
-  color: var(--green-800);
-}
-
-.success-message svg {
-  color: var(--emerald-500);
-  flex-shrink: 0;
-}
-
-.error-message {
   background: var(--red-50);
   border: 1px solid var(--red-200);
   color: var(--red-800);

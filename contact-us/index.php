@@ -1,17 +1,17 @@
 <?php
-// Start session to handle error messages if they exist
-session_start();
+require_once 'contact_process.php';
 
-// Get error/success messages if exists
 $error_message = '';
-$success_message = '';
-if (isset($_SESSION['contact_error'])) {
-  $error_message = $_SESSION['contact_error'];
-  unset($_SESSION['contact_error']);
-}
-if (isset($_SESSION['contact_success'])) {
-  $success_message = $_SESSION['contact_success'];
-  unset($_SESSION['contact_success']);
+$form_data = ['firstName' => '', 'lastName' => '', 'email' => '', 'subject' => 'general', 'message' => ''];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $result = process_contact_form();
+  if ($result['success']) {
+    header('Location: message-sent-successfully/index.php');
+    exit;
+  }
+  $error_message = $result['message'];
+  $form_data = $result['form_data'];
 }
 ?>
 <!DOCTYPE html>
@@ -168,16 +168,6 @@ if (isset($_SESSION['contact_success'])) {
           <p>Fill out the form below and we'll get back to you as soon as possible.</p>
         </div>
 
-        <?php if (!empty($success_message)): ?>
-        <div class="success-message">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
-            <polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-          <?php echo htmlspecialchars($success_message); ?>
-        </div>
-        <?php endif; ?>
-
         <?php if (!empty($error_message)): ?>
         <div class="error-message">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -189,38 +179,38 @@ if (isset($_SESSION['contact_success'])) {
         </div>
         <?php endif; ?>
 
-        <form action="contact_process.php" method="POST" id="contact-form">
+        <form action="" method="POST" id="contact-form" autocomplete="off">
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">First Name</label>
-              <input type="text" id="firstName" name="firstName" maxlength="35" placeholder="John" required>
+              <input type="text" id="firstName" name="firstName" maxlength="35" placeholder="John" value="<?php echo htmlspecialchars($form_data['firstName']); ?>" required>
             </div>
             <div class="form-group">
               <label for="lastName">Last Name</label>
-              <input type="text" id="lastName" name="lastName" maxlength="35" placeholder="Doe" required>
+              <input type="text" id="lastName" name="lastName" maxlength="35" placeholder="Doe" value="<?php echo htmlspecialchars($form_data['lastName']); ?>" required>
             </div>
           </div>
 
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" placeholder="john@example.com" required>
+            <input type="text" id="email" name="email" placeholder="john@example.com" value="<?php echo htmlspecialchars($form_data['email']); ?>" pattern=".+@.+\..+" title="Please enter a valid email address (e.g. john@example.com)" required>
           </div>
 
           <div class="form-group">
             <label for="subject">Subject</label>
             <select id="subject" name="subject">
-              <option value="general">General Inquiry</option>
-              <option value="support">Technical Support</option>
-              <option value="billing">Billing Question</option>
-              <option value="feature">Feature Request</option>
-              <option value="bug">Bug Report</option>
-              <option value="other">Other</option>
+              <option value="general" <?php echo $form_data['subject'] === 'general' ? 'selected' : ''; ?>>General Inquiry</option>
+              <option value="support" <?php echo $form_data['subject'] === 'support' ? 'selected' : ''; ?>>Technical Support</option>
+              <option value="billing" <?php echo $form_data['subject'] === 'billing' ? 'selected' : ''; ?>>Billing Question</option>
+              <option value="feature" <?php echo $form_data['subject'] === 'feature' ? 'selected' : ''; ?>>Feature Request</option>
+              <option value="bug" <?php echo $form_data['subject'] === 'bug' ? 'selected' : ''; ?>>Bug Report</option>
+              <option value="other" <?php echo $form_data['subject'] === 'other' ? 'selected' : ''; ?>>Other</option>
             </select>
           </div>
 
           <div class="form-group">
             <label for="message">Message</label>
-            <textarea id="message" name="message" maxlength="3000" rows="6" placeholder="How can we help you?" required></textarea>
+            <textarea id="message" name="message" maxlength="3000" rows="6" placeholder="How can we help you?" required><?php echo htmlspecialchars($form_data['message']); ?></textarea>
           </div>
 
           <button type="submit" class="submit-btn">

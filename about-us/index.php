@@ -107,7 +107,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
-                            <p>Flexible pricing — affordable one-time purchase or subscription options</p>
+                            <p>Flexible pricing — Use it free, or unlock more with a one-time purchase</p>
                         </div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
         <div class="container">
             <div class="story-grid">
                 <div class="story-image animate-on-scroll">
-                    <img src="../resources/images/calgary-skyline.jpg" alt="Saskatoon Skyline">
+                    <img src="../resources/images/saskatoon.jpg" alt="Saskatoon Skyline">
                     <div class="image-badge">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>

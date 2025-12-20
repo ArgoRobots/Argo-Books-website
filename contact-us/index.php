@@ -25,14 +25,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- SEO Meta Tags -->
   <meta name="description"
-    content="Contact Argo Books support team in Calgary, Canada. Get help with finance tracking software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
+    content="Contact Argo Books support team in Saskatoon, Canada. Get help with finance management software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
   <meta name="keywords"
-    content="contact argo books, customer support calgary, business software help, finance tracker, sales tracker support, contact form, technical support, calgary software company contact, customer service">
+    content="contact argo books, customer support saskatoon, business software help, finance management, sales tracker support, contact form, technical support, saskatoon software company contact, customer service">
 
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="Contact Us - Argo Books Support">
   <meta property="og:description"
-    content="Contact Argo Books support team in Calgary, Canada. Get help with finance tracking software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
+    content="Contact Argo Books support team in Saskatoon, Canada. Get help with finance management software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
   <meta property="og:url" content="https://argorobots.com/contact-us/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Argo Books">
@@ -42,19 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Contact Us - Argo Books Support">
   <meta name="twitter:description"
-    content="Contact Argo Books support team in Calgary, Canada. Get help with finance tracking software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
+    content="Contact Argo Books support team in Saskatoon, Canada. Get help with finance management software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
 
   <!-- Additional SEO Meta Tags -->
-  <meta name="geo.region" content="CA-AB">
-  <meta name="geo.placename" content="Calgary">
-  <meta name="geo.position" content="51.0447;-114.0719">
-  <meta name="ICBM" content="51.0447, -114.0719">
+  <meta name="geo.region" content="CA-SK">
+  <meta name="geo.placename" content="Saskatoon">
+  <meta name="geo.position" content="52.1579;-106.6702">
+  <meta name="ICBM" content="52.1579, -106.6702">
 
   <!-- Canonical URL -->
   <link rel="canonical" href="https://argorobots.com/contact-us/">
 
   <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
-  <title>Contact Us - Argo Books Support | Calgary Software Company</title>
+  <title>Contact Us - Argo Books Support | Saskatoon Software Company</title>
 
   <script src="../resources/scripts/jquery-3.6.0.js"></script>
   <script src="../resources/scripts/main.js"></script>
@@ -244,14 +244,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <circle cx="12" cy="10" r="3"/>
             </svg>
           </div>
-          <h4>Based in Calgary</h4>
+          <h4>Based in Saskatoon</h4>
           <p>We're a Canadian company proudly serving businesses worldwide.</p>
           <span class="location-badge">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
-            Calgary, Alberta, Canada
+            Saskatoon, SK, Canada
           </span>
         </div>
       </div>

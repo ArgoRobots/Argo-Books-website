@@ -166,13 +166,6 @@ include '../../docs-header.php';
                             </svg>
                             <span class="feature-text"><strong>AI business insights</strong></span>
                         </li>
-                        <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
-                            <span class="feature-text">Natural language search</span>
-                        </li>
                     </ul>
                     <a href="../../../upgrade/premium/" class="btn btn-purple">Subscribe to Premium</a>
                     <p class="version-note">Cancel anytime</p>
@@ -253,12 +246,6 @@ include '../../docs-header.php';
                         </tr>
                         <tr>
                             <td>AI Business Insights</td>
-                            <td>—</td>
-                            <td>—</td>
-                            <td>✓</td>
-                        </tr>
-                        <tr>
-                            <td>Natural Language Search</td>
                             <td>—</td>
                             <td>—</td>
                             <td>✓</td>

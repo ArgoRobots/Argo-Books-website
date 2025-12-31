@@ -42,10 +42,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         content="Transform your business with AI receipt scanning, predictive analytics, and automated business management.">
 
     <!-- Additional SEO Meta Tags -->
-    <meta name="geo.region" content="CA-AB">
-    <meta name="geo.placename" content="Calgary">
-    <meta name="geo.position" content="51.0447;-114.0719">
-    <meta name="ICBM" content="51.0447, -114.0719">
+    <meta name="geo.region" content="CA-SK">
+    <meta name="geo.placename" content="Saskatoon">
+    <meta name="geo.position" content="52.1579;-106.6702">
+    <meta name="ICBM" content="52.1579, -106.6702">
 
      <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/">
@@ -80,8 +80,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 "url": "https://argorobots.com/",
                 "address": {
                     "@type": "PostalAddress",
-                    "addressLocality": "Calgary",
-                    "addressRegion": "AB",
+                    "addressLocality": "Saskatoon",
+                    "addressRegion": "SK",
                     "addressCountry": "CA"
                 }
             },
@@ -1259,13 +1259,13 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>Everything in Free</strong></span>
+                            <span>Everything in Free</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>Unlimited products</strong></span>
+                            <span>Unlimited products</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1307,37 +1307,31 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>Everything in Standard</strong></span>
+                            <span>Everything in Standard</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>Invoices & payments</strong></span>
+                            <span>Invoices & payments</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>AI receipt scanning</strong></span>
+                            <span>AI receipt scanning</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>Predictive analytics</strong></span>
+                            <span>Predictive analytics</span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span><strong>AI business insights</strong></span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
-                            <span>Natural language search</span>
+                            <span>AI business insights</span>
                         </li>
                     </ul>
                     <a href="upgrade/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
@@ -1428,7 +1422,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes! Argo Books has a free tier that includes up to 10 products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade to Premium or add AI features whenever you're ready.</p>
+                            <p>Yes! Argo Books has a free tier that includes up to 10 products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready.</p>
                         </div>
                     </div>
                 </div>
@@ -1444,7 +1438,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($5/month or $50/year) includes invoices & payments, AI-powered receipt scanning, predictive sales analytics, intelligent business insights, and natural language search. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($5/month or $50/year) includes invoices & payments, AI-powered receipt scanning, predictive sales analytics, and intelligent business insights. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
                         </div>
                     </div>
                 </div>

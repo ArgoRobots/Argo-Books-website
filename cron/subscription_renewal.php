@@ -562,7 +562,7 @@ function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $ne
 
             <p>Your subscription has been renewed and will continue until {$renewalDate}.</p>
 
-            <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/ai-subscription.php">account settings</a>.</p>
+            <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
 
             <div class="footer" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
                 <p>Subscription ID: {$subscriptionId}</p>
@@ -628,7 +628,7 @@ function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
             <p>If the payment continues to fail, your subscription may be suspended. Please update your payment method to avoid interruption of service.</p>
 
             <div style="text-align: center; margin: 30px 0;">
-                <a href="https://argorobots.com/community/users/ai-subscription.php" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Update Payment Method</a>
+                <a href="https://argorobots.com/community/users/subscription.php" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Update Payment Method</a>
             </div>
 
             <p>If you need assistance, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>

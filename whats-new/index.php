@@ -29,10 +29,10 @@
         content="Latest updates and new features in Argo Books. Download the latest release.">
 
     <!-- Additional SEO Meta Tags -->
-    <meta name="geo.region" content="CA-AB">
-    <meta name="geo.placename" content="Calgary">
-    <meta name="geo.position" content="51.0447;-114.0719">
-    <meta name="ICBM" content="51.0447, -114.0719">
+    <meta name="geo.region" content="CA-SK">
+    <meta name="geo.placename" content="Saskatoon">
+    <meta name="geo.position" content="52.1579;-106.6702">
+    <meta name="ICBM" content="52.1579, -106.6702">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/whats-new/">

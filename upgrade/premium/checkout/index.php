@@ -32,7 +32,7 @@
 
         if ($has_valid_subscription && !$is_changing_method) {
             // Redirect to subscription page unless they're changing payment method
-            header('Location: ../../../community/users/ai-subscription.php');
+            header('Location: ../../../community/users/subscription.php');
             exit;
         }
     }

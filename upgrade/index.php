@@ -85,7 +85,7 @@
                         <ul class="card-features">
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Unlimited products</strong></span>
+                                <span>Unlimited products</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
@@ -126,27 +126,23 @@
                         <ul class="card-features">
                               <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Everything in Standard</strong></span>
+                                <span>Everything in Standard</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Invoices & payments</strong></span>
+                                <span>Invoices & payments</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>AI receipt scanning</strong></span>
+                                <span>AI receipt scanning</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>Predictive sales analysis</strong></span>
+                                <span>Predictive sales analysis</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span><strong>AI business insights</strong></span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Natural language AI search</span>
+                                <span>AI business insights</span>
                             </li>
                         </ul>
 
@@ -196,7 +192,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Standard ($20 one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>Premium ($5/month)</strong> adds invoices & payments, AI-powered features like receipt scanning, predictive analysis, and natural language search. You can have both for the complete experience!</p>
+                            <p><strong>Standard ($20 one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>Premium ($5/month)</strong> adds invoices & payments, AI-powered features like receipt scanning, and predictive analysis.</p>
                         </div>
                     </div>
                 </div>
@@ -277,22 +273,6 @@
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Immediately after your payment is confirmed, your license key will be sent to the email you provided during checkout. This process usually only takes a few seconds.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Is my payment information secure?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes, all transactions are processed through trusted payment platforms like PayPal, Stripe, and Square. We do not store any of your payment details.</p>
                         </div>
                     </div>
                 </div>

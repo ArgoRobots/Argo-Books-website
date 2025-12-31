@@ -16,7 +16,7 @@ $premium_subscription = get_user_premium_subscription($user_id);
 
 // Redirect if no active subscription
 if (!$premium_subscription || $premium_subscription['status'] !== 'active') {
-    header('Location: ai-subscription.php');
+    header('Location: subscription.php');
     exit;
 }
 
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         }
 
         $_SESSION['subscription_success'] = $successMsg;
-        header('Location: ai-subscription.php');
+        header('Location: subscription.php');
         exit;
     } catch (PDOException $e) {
         $error_message = 'Failed to cancel subscription. Please contact support.';
@@ -122,7 +122,7 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="ai-subscription.css">
+    <link rel="stylesheet" href="subscription.css">
     <link rel="stylesheet" href="subscription-confirm.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
@@ -185,7 +185,6 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
                     <li>AI-powered receipt scanning</li>
                     <li>Predictive sales analysis</li>
                     <li>AI business insights</li>
-                    <li>Natural language search</li>
                 </ul>
             </div>
 
@@ -194,7 +193,7 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
                     <input type="hidden" name="confirm_cancel" value="1">
                     <button type="submit" class="btn btn-red">Yes, Cancel My Subscription</button>
                 </form>
-                <a href="ai-subscription.php" class="btn btn-outline">No, Keep My Subscription</a>
+                <a href="subscription.php" class="btn btn-outline">No, Keep My Subscription</a>
             </div>
         </div>
     </div>

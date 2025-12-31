@@ -57,7 +57,7 @@ if ($premium_subscription) {
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="ai-subscription.css">
+    <link rel="stylesheet" href="subscription.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
@@ -270,13 +270,6 @@ if ($premium_subscription) {
                             </svg>
                             <span>AI Business Insights</span>
                         </div>
-                        <div class="feature-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                            <span>Natural Language Search</span>
-                        </div>
                     </div>
                 </div>
 
@@ -288,7 +281,7 @@ if ($premium_subscription) {
                         </svg>
                     </div>
                     <h3>No Active Subscription</h3>
-                    <p>Get access to invoices & payments and AI-powered features like receipt scanning, predictive analysis, and natural language search.</p>
+                    <p>Get access to invoices & payments and AI-powered features like receipt scanning, and predictive analysis.</p>
                     <div class="pricing-preview">
                         <span class="price">$5</span>
                         <span class="period">CAD/month</span>

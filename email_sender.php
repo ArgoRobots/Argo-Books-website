@@ -164,7 +164,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
         </table>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/ai-subscription.php" class="button button-purple">Manage Subscription</a>
+            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">Manage Subscription</a>
         </div>
 
         <p>Keep this ID safe. You may need it when contacting support about your subscription.</p>
@@ -1098,7 +1098,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
                         <li>✓ Natural language AI search</li>
                     </ul>
 
-                    <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/ai-subscription.php">account settings</a>.</p>
+                    <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
 
                     <div class="receipt-footer">
                         <p>Subscription ID: {$subscriptionId}</p>
@@ -1262,11 +1262,10 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
                         <li>AI-powered receipt scanning</li>
                         <li>Predictive sales analysis</li>
                         <li>AI business insights</li>
-                        <li>Natural language search</li>
                     </ul>
 
                     <div class="button-container">
-                        <a href="https://argorobots.com/community/users/ai-subscription.php" class="button button-purple">View Subscription</a>
+                        <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Subscription</a>
                     </div>
 
                     <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
@@ -1409,7 +1408,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
                     </ul>
 
                     <div class="button-container">
-                        <a href="https://argorobots.com/community/users/ai-subscription.php" class="button button-purple">View Your Subscription</a>
+                        <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Your Subscription</a>
                     </div>
 
                     <p>If you have any questions about your credit or subscription, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>

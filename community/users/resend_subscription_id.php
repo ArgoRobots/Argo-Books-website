@@ -89,14 +89,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
                     <?php echo htmlspecialchars($success_message); ?>
                 </div>
                 <div class="centered">
-                    <a href="ai-subscription.php" class="btn btn-purple">Back to Subscription</a>
+                    <a href="subscription.php" class="btn btn-purple">Back to Subscription</a>
                 </div>
             <?php elseif ($error_message): ?>
                 <div class="error-message">
                     <?php echo $error_message; ?>
                 </div>
                 <div class="centered">
-                    <a href="ai-subscription.php" class="btn btn-purple">Back to Subscription</a>
+                    <a href="subscription.php" class="btn btn-purple">Back to Subscription</a>
                 </div>
             <?php elseif (!$premium_subscription): ?>
                 <div class="error-message">
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
                 <form method="post" class="auth-form">
                     <div class="form-actions centered">
                         <button type="submit" class="btn btn-purple">Send Subscription ID</button>
-                        <a href="ai-subscription.php" class="btn btn-black">Cancel</a>
+                        <a href="subscription.php" class="btn btn-black">Cancel</a>
                     </div>
                 </form>
             <?php endif; ?>

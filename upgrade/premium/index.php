@@ -14,7 +14,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     // User already has a subscription (active or cancelled but not expired)
     if ($existing_subscription['status'] === 'active' ||
         ($existing_subscription['status'] === 'cancelled' && strtotime($existing_subscription['end_date']) > time())) {
-        header('Location: ../../community/users/ai-subscription.php');
+        header('Location: ../../community/users/subscription.php');
         exit;
     }
 }
@@ -30,14 +30,14 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year. Standard users save $20!">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $5/month or $50/year. Standard users save $20!">
     <meta name="keywords"
         content="argo premium features, invoices payments, ai receipt scanning, predictive sales analysis, ai business insights, finance tracker, sales tracker subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, predictive sales analysis, and natural language search. $5/month or $50/year.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $5/month or $50/year.">
     <meta property="og:url" content="https://argorobots.com/upgrade/premium/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">

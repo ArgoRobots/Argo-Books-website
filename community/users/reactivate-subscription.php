@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])
         } else {
             $_SESSION['subscription_error'] = 'Could not reactivate subscription. It may have expired.';
         }
-        header('Location: ai-subscription.php');
+        header('Location: subscription.php');
         exit;
     } catch (PDOException $e) {
         $error_message = 'Failed to reactivate subscription. Please contact support.';
@@ -103,7 +103,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="ai-subscription.css">
+    <link rel="stylesheet" href="subscription.css">
     <link rel="stylesheet" href="subscription-confirm.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
@@ -185,7 +185,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
                     <input type="hidden" name="confirm_reactivate" value="1">
                     <button type="submit" id="reactivate-btn" class="btn btn-purple">Reactivate with <?php echo $payment_method; ?> (<?php echo ucfirst($billing_cycle); ?>)</button>
                 </form>
-                <a href="ai-subscription.php" class="btn btn-outline">Go Back</a>
+                <a href="subscription.php" class="btn btn-outline">Go Back</a>
             </div>
 
             <script>

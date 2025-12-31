@@ -152,7 +152,7 @@ function getAccessToken($baseUrl, $clientId, $clientSecret) {
 function createProduct($baseUrl, $accessToken) {
     $productData = [
         'name' => 'Argo Premium Subscription',
-        'description' => 'Access to AI-powered features including receipt scanning, predictive analysis, and natural language search.',
+        'description' => 'Access to AI-powered features including receipt scanning, and predictive analysis.',
         'type' => 'SERVICE',
         'category' => 'SOFTWARE',
         'home_url' => 'https://argorobots.com/upgrade/premium/'

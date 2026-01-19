@@ -66,6 +66,15 @@ if (!isset($input['license_key']) || empty($input['license_key'])) {
 
 $license_key = trim($input['license_key']);
 
+// Validate license key format (must start with STND- prefix)
+if (!str_starts_with($license_key, 'STND-')) {
+    echo json_encode([
+        'valid' => false,
+        'message' => 'Invalid license key format'
+    ]);
+    exit();
+}
+
 // Load database connection
 require_once 'db_connect.php';
 

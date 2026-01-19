@@ -85,14 +85,6 @@ function validateAndGetTier($pdo, $license_key) {
         if ($stmt->fetch()) {
             return ['tier' => 'standard', 'limit' => 0];
         }
-        return null;
-    }
-
-    // Legacy keys without prefix - treat as standard (no receipt scanning)
-    $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
-    $stmt->execute([$license_key]);
-    if ($stmt->fetch()) {
-        return ['tier' => 'standard', 'limit' => 0];
     }
 
     return null;

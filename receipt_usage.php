@@ -1,7 +1,8 @@
 <?php
 /**
  * Receipt Scan Usage Tracking API
- * Tracks and enforces monthly scan limits for Standard and Premium tiers
+ * Tracks and enforces monthly scan limits for Premium tier subscribers.
+ * AI Receipt Scanning is only available on the Premium plan ($5/month) with 500 scans/month.
  */
 
 header('Content-Type: application/json');
@@ -47,7 +48,9 @@ require_once 'db_connect.php';
  * Determine tier and validate license key
  * @param PDO $pdo
  * @param string $license_key
- * @return array|null Returns ['tier' => 'standard'|'premium', 'limit' => int] or null if invalid
+ * @return array|null Returns ['tier' => 'premium', 'limit' => 500] for valid premium keys,
+ *                    ['tier' => 'standard', 'limit' => 0] for standard keys (feature not available),
+ *                    or null if invalid
  */
 function validateAndGetTier($pdo, $license_key) {
     // Check if it's a Premium key (starts with PREM-)
@@ -56,11 +59,10 @@ function validateAndGetTier($pdo, $license_key) {
         $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            return ['tier' => 'premium', 'limit' => 10000];
+            return ['tier' => 'premium', 'limit' => 500];
         }
 
         // Check premium_subscriptions table for active subscriptions
-        // Look for subscriptions where the subscription_id matches the license key pattern
         $stmt = $pdo->prepare("
             SELECT id FROM premium_subscriptions
             WHERE subscription_id = ?
@@ -69,27 +71,28 @@ function validateAndGetTier($pdo, $license_key) {
         ");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            return ['tier' => 'premium', 'limit' => 10000];
+            return ['tier' => 'premium', 'limit' => 500];
         }
 
         return null;
     }
 
     // Check if it's a Standard key (starts with STND-)
+    // AI Receipt Scanning is NOT available on Standard plan
     if (strpos($license_key, 'STND-') === 0) {
         $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            return ['tier' => 'standard', 'limit' => 500];
+            return ['tier' => 'standard', 'limit' => 0];
         }
         return null;
     }
 
-    // Legacy keys without prefix - check in license_keys table (treat as standard)
+    // Legacy keys without prefix - treat as standard (no receipt scanning)
     $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
     $stmt->execute([$license_key]);
     if ($stmt->fetch()) {
-        return ['tier' => 'standard', 'limit' => 500];
+        return ['tier' => 'standard', 'limit' => 0];
     }
 
     return null;
@@ -173,6 +176,19 @@ try {
 
     $tier = $tierInfo['tier'];
     $monthly_limit = $tierInfo['limit'];
+
+    // Standard tier does not have access to AI Receipt Scanning
+    if ($tier === 'standard') {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error' => 'AI Receipt Scanning is only available on the Premium plan',
+            'tier' => 'standard',
+            'can_scan' => false,
+            'upgrade_required' => true
+        ]);
+        exit();
+    }
 
     // Get or create usage record
     $usage = getOrCreateUsageRecord($pdo, $license_key, $monthly_limit);

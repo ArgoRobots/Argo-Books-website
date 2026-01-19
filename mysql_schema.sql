@@ -393,7 +393,7 @@ CREATE INDEX idx_remember_tokens_token ON remember_tokens(token);
 CREATE INDEX idx_remember_tokens_user_id ON remember_tokens(user_id);
 CREATE INDEX idx_notification_settings_user_id ON admin_notification_settings(user_id);
 
--- Receipt scan usage tracking table (for rate limiting)
+-- Receipt scan usage tracking table (for rate limiting Premium tier: 500 scans/month)
 CREATE TABLE IF NOT EXISTS receipt_scan_usage (
     id INT PRIMARY KEY AUTO_INCREMENT,
     license_key VARCHAR(255) NOT NULL,

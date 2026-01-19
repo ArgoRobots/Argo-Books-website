@@ -45,7 +45,7 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Dashboard Alerts:</strong> Low stock items appear on your main dashboard</li>
                 <li><strong>Notification Center:</strong> View all inventory alerts in one place</li>
-                <li><strong>Mobile Notifications:</strong> Get push notifications on your phone (with mobile app)</li>
+                <!-- <li><strong>Mobile Notifications:</strong> Get push notifications on your phone (with mobile app)</li> -->
             </ul>
 
             <h2>Inventory Adjustments</h2>

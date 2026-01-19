@@ -150,7 +150,7 @@ include '../../docs-header.php';
                                 stroke="currentColor" stroke-width="2">
                                 <path d="M20 6L9 17l-5-5"></path>
                             </svg>
-                            <span class="feature-text"><strong>AI receipt scanning</strong></span>
+                            <span class="feature-text"><strong>AI receipt scanning</strong> <span style="font-size: 0.85em; opacity: 0.8;">(500/month)</span></span>
                         </li>
                         <li class="feature-item">
                             <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -233,7 +233,7 @@ include '../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
-                            <td>AI Receipt Scanning</td>
+                            <td>AI Receipt Scanning <span style="font-size: 0.85em; opacity: 0.7;">(500/month)</span></td>
                             <td>—</td>
                             <td>—</td>
                             <td>✓</td>

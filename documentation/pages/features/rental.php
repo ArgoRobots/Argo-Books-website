@@ -94,12 +94,14 @@ include '../../docs-header.php';
                     </svg>
                     Previous: Inventory Management
                 </a>
+                <!-- Payment System nav - TEMPORARILY DISABLED
                 <a href="payments.php" class="nav-button next">
                     Next: Payment System
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 18l6-6-6-6"></path>
                     </svg>
                 </a>
+                -->
             </div>
         </div>
 

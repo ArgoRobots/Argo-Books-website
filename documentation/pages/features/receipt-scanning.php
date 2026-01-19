@@ -50,6 +50,7 @@ include '../../docs-header.php';
                 <li><strong>Clear Focus:</strong> Make sure the text is sharp and readable</li>
             </ul>
 
+            <!-- Mobile scanning section - TEMPORARILY DISABLED
             <h2>Scanning from Mobile</h2>
             <p>Use the Argo Books mobile app for the fastest scanning experience:</p>
             <ol class="steps-list">
@@ -58,6 +59,7 @@ include '../../docs-header.php';
                 <li>The app automatically detects and captures the receipt</li>
                 <li>Review and save - it syncs to your desktop automatically</li>
             </ol>
+            -->
 
             <h2>Uploading from Desktop</h2>
             <p>You can also scan receipts from your computer:</p>

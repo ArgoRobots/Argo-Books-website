@@ -31,11 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $license_key = trim($data['license_key']);
         $ip_address = $_SERVER['REMOTE_ADDR'];
 
-        // Auto-detect key type based on prefix
+        // Validate key type based on prefix
         if (str_starts_with($license_key, 'PREM-')) {
             $response = validate_premium_key($license_key);
-        } else {
+        } elseif (str_starts_with($license_key, 'STND-')) {
             $response = validate_standard_license_key($license_key, $ip_address);
+        } else {
+            $response = [
+                'success' => false,
+                'message' => 'Invalid license key format.'
+            ];
         }
     } else {
         $response = [

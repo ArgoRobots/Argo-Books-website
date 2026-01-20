@@ -323,6 +323,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span class="tab-subtitle">Professional invoices</span>
                         </div>
                     </button>
+                    <!-- Payment System tab - TEMPORARILY DISABLED
                     <button class="tab-btn" data-tab="payments">
                         <div class="tab-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -335,6 +336,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span class="tab-subtitle">Get paid faster</span>
                         </div>
                     </button>
+                    -->
                 </div>
 
                 <div class="features-tabs-content">
@@ -887,7 +889,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                     </div>
 
-                    <!-- Payment System -->
+                    <!-- Payment System - TEMPORARILY DISABLED
                     <div class="tab-content" id="tab-payments">
                         <div class="tab-content-inner">
                             <div class="tab-content-text">
@@ -943,6 +945,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </div>
                         </div>
                     </div>
+                    -->
                 </div>
             </div>
         </div>
@@ -998,7 +1001,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         </div>
     </section>
 
-    <!-- Mobile Experience Section -->
+    <!-- Mobile Experience Section - TEMPORARILY DISABLED
     <section class="mobile-section">
         <div class="container">
             <div class="mobile-content">
@@ -1118,6 +1121,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             </div>
         </div>
     </section>
+    -->
 
     <!-- Security Section -->
     <section class="security-section">
@@ -1319,7 +1323,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span>AI receipt scanning</span>
+                            <span>AI receipt scanning <span style="font-size: 0.85em; opacity: 0.8;">(500/month)</span></span>
                         </li>
                         <li>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1374,7 +1378,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available for Windows, macOS, and Linux. A mobile app for Android and iOS allows you to scan receipts and view your business data on the go.</p>
+                            <p>Argo Books is available for Windows, macOS, and Linux.</p>
                         </div>
                     </div>
                 </div>

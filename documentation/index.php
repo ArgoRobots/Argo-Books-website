@@ -329,6 +329,7 @@ $isDocsLanding = true;
                     <h3>Rental Management</h3>
                     <p>Bookings and availability calendar</p>
                 </a>
+                <!-- Payment System - TEMPORARILY DISABLED
                 <a href="pages/features/payments.php" class="doc-card">
                     <div class="card-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -339,6 +340,7 @@ $isDocsLanding = true;
                     <h3>Payment System</h3>
                     <p>Stripe, PayPal, Square integration</p>
                 </a>
+                -->
             </div>
         </section>
 

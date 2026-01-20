@@ -392,3 +392,17 @@ CREATE INDEX idx_rate_limits_user_action ON rate_limits(user_id, action_type);
 CREATE INDEX idx_remember_tokens_token ON remember_tokens(token);
 CREATE INDEX idx_remember_tokens_user_id ON remember_tokens(user_id);
 CREATE INDEX idx_notification_settings_user_id ON admin_notification_settings(user_id);
+
+-- Receipt scan usage tracking table (for rate limiting Premium tier: 500 scans/month)
+CREATE TABLE IF NOT EXISTS receipt_scan_usage (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    license_key VARCHAR(255) NOT NULL,
+    usage_month DATE NOT NULL COMMENT 'First day of the month (e.g., 2025-01-01)',
+    scan_count INT NOT NULL DEFAULT 0,
+    monthly_limit INT NOT NULL DEFAULT 500,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_license_month (license_key, usage_month),
+    INDEX idx_license_key (license_key),
+    INDEX idx_usage_month (usage_month)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

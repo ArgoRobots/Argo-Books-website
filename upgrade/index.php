@@ -134,7 +134,7 @@
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>AI receipt scanning</span>
+                                <span>AI receipt scanning <span style="font-size: 0.85em; opacity: 0.8;">(500/month)</span></span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>

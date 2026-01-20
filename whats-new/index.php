@@ -146,20 +146,6 @@
                         <p>
                             Create professional invoices with customizable templates that match your brand. Set payment terms, track invoice status, and keep all your billing organized in one place.
                         </p>
-
-                        <h3>Online Payment Integration</h3>
-                        <p>
-                            Accept payments directly through Argo Books with built-in support for <strong>Stripe</strong>, <strong>PayPal</strong>, and <strong>Square</strong>. Your customers can pay invoices online, and the payments are automatically recorded in your books.
-                        </p>
-
-                        <h3>Enterprise-Grade Security</h3>
-                        <p>
-                            Your data security is our priority. All data is protected with <strong>AES-256 encryption</strong> and stored locally on your machine &mdash; not in the cloud. We've also added support for <strong>Windows Hello</strong> biometric authentication, so you can unlock Argo Books with your fingerprint or face.
-                        </p>
-
-                        <div class="upgrade-note">
-                            <strong>Upgrading from 1.x?</strong> Your existing company files are fully compatible with version 2.0. Simply open them in the new version and all your data will be preserved.
-                        </div>
                     </div>
                 </div>
             </div>

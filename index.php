@@ -1239,7 +1239,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span>Email support</span>
+                            <span>Core features</span>
                         </li>
                     </ul>
                     <a href="downloads" class="btn btn-secondary btn-block">Get Started Free</a>

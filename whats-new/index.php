@@ -89,12 +89,12 @@
     <div class="container">
         <div class="version-grid">
 
-            <!-- Version 1.0.8 -->
+            <!-- Version 2.0.0 -->
             <div class="version-card">
                 <div class="version-header">
                     <div class="version-info">
-                        <span class="version-tag">Version 1.0.8</span>
-                        <span class="date-tag">October 18 2025</span>
+                        <span class="version-tag">Version 2.0.0</span>
+                        <span class="date-tag">January 2026</span>
                     </div>
                     <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polyline points="6 9 12 15 18 9"></polyline>
@@ -102,115 +102,50 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Cross platform<span class="type-tag feature">New Feature</span></h3>
-                                <p>We migrated our codebase to a new platform, meaning you can now use Argo Books
-                                    on Windows, macOS, and Linux. We also overhauled the user interface to be
-                                    more modern and intuitve.</p>
-                            </div>
-                        </div>
+                    <div class="release-post">
+                        <p class="intro">
+                            We're excited to announce Argo Books 2.0 &mdash; a complete rebuild from the ground up. This isn't just an update; it's an entirely new application built with modern technology to give you more power, more flexibility, and a dramatically better experience.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Report Generator<span class="type-tag feature">New Feature</span></h3>
-                                <p>Create professional, customizable reports with our new Report Generator. Include
-                                    sales summaries, inventory analysis, financial overviews, and performance metrics.
-                                    Export reports in multiple formats (PDF, PNG, JPEG) with your company branding,
-                                    custom date ranges, and flexible filtering options.</p>
-                            </div>
-                        </div>
+                        <h3>A New Foundation: Cross-Platform and Modern</h3>
+                        <p>
+                            We've rebuilt Argo Books using Avalonia UI and .NET 10, replacing the old Windows-only WinForms architecture. This means you can now run Argo Books natively on <strong>Windows, macOS, and Linux</strong>. The interface has been completely redesigned with a fresh, modern look that's more intuitive and responsive than ever before.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Service Tracking<span class="type-tag feature">New Feature</span></h3>
-                                <p>You can now track services alongside products with the same comprehensive functionality.
-                                    Manage service transactions, analytics, and reporting with the same powerful tools you
-                                    use for physical products.</p>
-                            </div>
-                        </div>
+                        <h3>AI-Powered Receipt Scanning</h3>
+                        <p>
+                            Say goodbye to manual data entry. Take a photo of any receipt with your phone or upload an image from your computer, and our AI automatically extracts the vendor, date, amount, and individual line items with 99% accuracy. It's the fastest way to log expenses and keep your books up to date.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced AI Search<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Improved AI search capabilities to better understand natural language queries.
-                                    It now understands what 'high' and 'low' means for numerical values by calculating
-                                    percentile-based thresholds. The AI does not have access to your financial information.</p>
-                            </div>
-                        </div>
+                        <h3>Predictive Analytics</h3>
+                        <p>
+                            Argo Books now examines your historical business data to forecast future sales patterns and identify seasonal trends. See where your business is heading, not just where it's been. This helps you make smarter decisions about inventory, staffing, and cash flow planning.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Customizable Table Columns<span class="type-tag feature">New Feature</span></h3>
-                                <p>Right-click on table headers to access a new panel that lets you show or hide specific
-                                    columns.</p>
-                            </div>
-                        </div>
+                        <h3>AI Business Insights</h3>
+                        <p>
+                            Beyond predictions, our new AI engine continuously analyzes your data to surface actionable insights. It spots opportunities you might have missed and flags potential issues before they become problems &mdash; like unusual spending patterns or declining product performance.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Smart Spreadsheet Import<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Data is now automatically detected based on column header names rather than column order,
-                                    making imports more flexible and reliable even if your spreadsheet columns are
-                                    rearranged. It also no longer requires certain columns. We updated the documentation to
-                                    include a list of required columns
-                                    <a class="link-no-underline" href="../documentation/#spreadsheet-import">here</a>.
-                                </p>
-                            </div>
-                        </div>
+                        <h3>Inventory Management</h3>
+                        <p>
+                            Track your stock levels in real time with the new inventory management system. Set reorder points to get alerts when stock runs low, monitor product movement, and maintain complete visibility over your entire inventory. No more spreadsheets or guesswork.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Lost and Damaged Product Tracking<span class="type-tag feature">New Feature</span></h3>
-                                <p>Beyond returns, you can now mark products as lost or damaged, providing complete
-                                    inventory management. Includes a dedicated analytics tab for tracking lost and damaged
-                                    products, with full Excel import/export support.</p>
-                            </div>
-                        </div>
+                        <h3>Rental Management</h3>
+                        <p>
+                            For businesses that rent equipment or products, we've added a dedicated rental management module. Track availability, manage bookings, and handle the logistics of your rental operations all in one place.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Flexible Transaction Entry<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Streamlined transaction entry with fewer mandatory fields, allowing for quicker data
-                                    input.</p>
-                            </div>
-                        </div>
+                        <h3>Customer Management</h3>
+                        <p>
+                            Build stronger relationships with your customers by keeping track of their purchase history, preferences, and contact information. Use this data to provide better service and identify your most valuable customers.
+                        </p>
 
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Transaction Deletion Confirmation<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added a confirmation dialog when deleting transactions to prevent accidental deletions
-                                    and ensure data safety.</p>
-                            </div>
-                        </div>
+                        <h3>Professional Invoicing</h3>
+                        <p>
+                            Create professional invoices with customizable templates that match your brand. Set payment terms, track invoice status, and keep all your billing organized in one place.
+                        </p>
                     </div>
                 </div>
             </div>

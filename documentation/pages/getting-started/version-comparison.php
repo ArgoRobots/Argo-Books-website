@@ -66,7 +66,7 @@ include '../../docs-header.php';
                                 stroke="currentColor" stroke-width="2">
                                 <path d="M20 6L9 17l-5-5"></path>
                             </svg>
-                            <span class="feature-text">Email support</span>
+                            <span class="feature-text">Core features</span>
                         </li>
                     </ul>
                     <a href="../../../downloads/" class="btn btn-gray">Get Started Free</a>

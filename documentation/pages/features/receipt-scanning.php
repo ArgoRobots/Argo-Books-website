@@ -9,7 +9,7 @@ include '../../docs-header.php';
 
         <div class="docs-content">
             <div class="info-box">
-                <p><strong>Premium Feature:</strong> AI Receipt Scanning is available with the Premium subscription.
+                <p><strong>Premium Feature:</strong> AI Receipt Scanning is available with the Premium plan.
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 

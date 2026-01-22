@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Predictive Analytics';
-$pageDescription = 'See the future of your business with AI-powered forecasting, seasonal pattern detection, and inventory predictions.';
+$pageDescription = 'See the future of your business with machine learning forecasting, seasonal pattern detection, and inventory predictions.';
 $currentPage = 'predictive-analytics';
 $pageCategory = 'features';
 
@@ -9,11 +9,15 @@ include '../../docs-header.php';
 
         <div class="docs-content">
             <div class="info-box">
-                <p><strong>Premium Feature:</strong> Predictive Analytics is available with the Premium subscription.
+                <p><strong>Premium Feature:</strong> Predictive Analytics is available with the Premium plan.
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
-            <p>See the future of your business with AI-powered forecasting. Our predictive engine analyzes your historical data to help you make smarter decisions.</p>
+            <p>See the future of your business with machine learning forecasting. Our predictive engine analyzes your historical data to help you make smarter decisions.</p>
+
+            <div class="info-box">
+                <p><strong>Privacy First:</strong> All analysis happens locally on your device. Your data is never uploaded to the cloud - the ML models run entirely on your computer.</p>
+            </div>
 
             <h2>Revenue Forecasting</h2>
             <p>Our predictive engine analyzes your historical revenue data to forecast:</p>
@@ -26,9 +30,9 @@ include '../../docs-header.php';
 
             <h2>How Forecasting Works</h2>
             <ol class="steps-list">
-                <li>The AI analyzes your historical transaction data</li>
-                <li>It identifies patterns, trends, and seasonality</li>
-                <li>Machine learning models generate predictions</li>
+                <li>The system analyzes your historical transaction data</li>
+                <li>Statistical algorithms identify patterns, trends, and seasonality</li>
+                <li>Machine learning models combined with mathematical analysis generate predictions</li>
                 <li>Forecasts are updated as new data comes in</li>
             </ol>
 
@@ -37,7 +41,7 @@ include '../../docs-header.php';
             </div>
 
             <h2>Seasonal Pattern Detection</h2>
-            <p>The AI automatically identifies seasonal trends in your business:</p>
+            <p>The system automatically identifies seasonal trends in your business:</p>
             <ul>
                 <li><strong>Holiday Patterns:</strong> Revenue spikes around holidays</li>
                 <li><strong>Weekly Cycles:</strong> Which days perform best</li>
@@ -62,15 +66,6 @@ include '../../docs-header.php';
                 <li><strong>Quantity Suggestions:</strong> How much to order</li>
                 <li><strong>Seasonal Adjustments:</strong> Stock up before busy periods</li>
             </ul>
-
-            <h2>Viewing Predictions</h2>
-            <p>Access your predictions from the Analytics dashboard:</p>
-            <ol class="steps-list">
-                <li>Go to "Analytics" in the main menu</li>
-                <li>Select "Predictions" tab</li>
-                <li>Choose the forecast type (Revenue, Demand, Inventory)</li>
-                <li>Adjust the time range as needed</li>
-            </ol>
 
             <h2>Prediction Accuracy</h2>
             <p>The system shows confidence levels for each prediction:</p>

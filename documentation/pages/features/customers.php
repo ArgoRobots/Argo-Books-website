@@ -15,19 +15,18 @@ include '../../docs-header.php';
             <h2>Customer Profiles</h2>
             <p>Create detailed customer profiles that store all the information you need:</p>
             <ul>
-                <li><strong>Contact Information:</strong> Name, email, phone number, and address</li>
-                <li><strong>Company Details:</strong> Business name and billing information</li>
+                <li><strong>Contact Information:</strong> First name, last name, email, and phone number</li>
+                <li><strong>Address:</strong> Street, city, state, ZIP code, and country</li>
+                <li><strong>Status:</strong> Track whether customers are Active, Inactive, or Banned</li>
                 <li><strong>Notes:</strong> Add personal notes about preferences or special requirements</li>
-                <li><strong>Tags:</strong> Categorize customers with custom tags for easy filtering</li>
             </ul>
 
             <h2>Transaction History</h2>
             <p>View a complete history of all transactions with each customer:</p>
             <ul>
-                <li>All past expenses and revenue</li>
-                <li>Total amount spent over time</li>
-                <li>Most frequently ordered items</li>
-                <li>Average order value</li>
+                <li>All past purchases and sales linked to the customer</li>
+                <li>Last rental date for rental customers</li>
+                <li>Complete transaction records with dates and amounts</li>
             </ul>
 
             <div class="info-box">
@@ -38,10 +37,10 @@ include '../../docs-header.php';
             <h2>Quick Customer Lookup</h2>
             <p>Find customers instantly using the search feature. Search by:</p>
             <ul>
-                <li>Name or company name</li>
+                <li>First or last name</li>
                 <li>Email address</li>
                 <li>Phone number</li>
-                <li>Custom tags</li>
+                <li>Customer ID</li>
             </ul>
 
             <h2>Linking Transactions</h2>
@@ -54,12 +53,11 @@ include '../../docs-header.php';
             </ol>
 
             <h2>Customer Statistics</h2>
-            <p>Get insights into customer behavior with built-in statistics:</p>
+            <p>Get insights into your customer base with built-in statistics:</p>
             <ul>
                 <li><strong>Total Customers:</strong> Track your growing customer base</li>
-                <li><strong>New vs Returning:</strong> See how many customers are repeat buyers</li>
-                <li><strong>Top Customers:</strong> Identify your highest-value customers</li>
-                <li><strong>Transaction Frequency:</strong> Understand buying patterns</li>
+                <li><strong>Active Customers:</strong> See how many customers are currently active</li>
+                <li><strong>Banned Customers:</strong> Track customers who have been banned</li>
             </ul>
 
             <h2>Exporting Customer Data</h2>
@@ -71,7 +69,7 @@ include '../../docs-header.php';
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 18l-6-6 6-6"></path>
                     </svg>
-                    Previous: Advanced Search
+                    Previous: Quick Actions
                 </a>
                 <a href="invoicing.php" class="nav-button next">
                     Next: Invoicing & Payments

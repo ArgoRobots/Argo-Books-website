@@ -268,8 +268,8 @@ $isDocsLanding = true;
                             <line x1="8" y1="11" x2="14" y2="11"></line>
                         </svg>
                     </div>
-                    <h3>Advanced Search</h3>
-                    <p>Powerful operators and AI queries</p>
+                    <h3>Quick Actions</h3>
+                    <p>Fast navigation with Ctrl+K</p>
                 </a>
                 <a href="pages/features/customers.php" class="doc-card">
                     <div class="card-icon">

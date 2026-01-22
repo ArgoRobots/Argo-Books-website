@@ -23,7 +23,7 @@ class DocumentationSearch {
             { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products expenses revenue currency' },
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
             { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
-            { id: 'advanced-search', title: 'Advanced Search', category: 'Core Features', folder: 'features', keywords: 'search find filter operators quotes exact phrase plus minus exclude ai natural language' },
+            { id: 'advanced-search', title: 'Quick Actions', category: 'Core Features', folder: 'features', keywords: 'quick actions command palette ctrl k search navigate create keyboard shortcut' },
             { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact expense history notes tags crm relationship' },
             { id: 'invoicing', title: 'Invoicing & Payments', category: 'Core Features', folder: 'features', keywords: 'invoice payment billing stripe paypal square online payment processing credit card' },
             { id: 'receipt-scanning', title: 'AI Receipt Scanning', category: 'Core Features', folder: 'features', keywords: 'ai receipt scanning ocr photo image extract vendor date items totals premium' },

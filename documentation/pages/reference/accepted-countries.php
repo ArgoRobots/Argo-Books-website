@@ -25,7 +25,7 @@ include '../../docs-header.php';
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 18l-6-6 6-6"></path>
                     </svg>
-                    Previous: Advanced Search
+                    Previous: Quick Actions
                 </a>
                 <a href="supported-currencies.php" class="nav-button next">
                     Next: Supported Currencies

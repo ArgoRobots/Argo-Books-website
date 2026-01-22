@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Advanced Search';
-$pageDescription = 'Learn how to use the advanced search features in Argo Books, including search operators and AI-powered search.';
+$pageTitle = 'Quick Actions';
+$pageDescription = 'Learn how to use Quick Actions in Argo Books to quickly navigate, create records, and access features with keyboard shortcuts.';
 $currentPage = 'advanced-search';
 $pageCategory = 'features';
 
@@ -8,61 +8,56 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Argo Books includes a powerful search system with advanced operators to help you find exactly what you need. The search bar works across all your transactions, making it easy to filter and locate specific data.</p>
+            <p>Quick Actions is a command palette that lets you quickly navigate the app, create new records, and access features without using menus. Press <strong>Ctrl+K</strong> to open it anytime.</p>
 
-            <h2>Basic Search</h2>
-            <p>Simply type a word or phrase to search across all fields in your transactions:</p>
+            <h2>Opening Quick Actions</h2>
             <ul>
-                <li><code>shirt</code> - Finds all transactions containing "shirt" in any field</li>
-                <li><code>cotton mills</code> - Finds transactions containing both "cotton" and "mills"</li>
+                <li>Press <strong>Ctrl+K</strong> on your keyboard</li>
+                <li>Or click the search icon in the header</li>
             </ul>
 
-            <p>Basic search tolerates small spelling errors and variations. This helps you find records even if there are minor typos in your data.</p>
+            <h2>How It Works</h2>
+            <p>Start typing to search through available actions. The search uses fuzzy matching, so you don't need to type exact names:</p>
+            <ul>
+                <li>Type <code>inv</code> to find "Create Invoice" or "View Invoices"</li>
+                <li>Type <code>cust</code> to find customer-related actions</li>
+                <li>Type <code>settings</code> to access application settings</li>
+            </ul>
 
-            <h2>Search Operators</h2>
+            <p>Results are organized into categories:</p>
+            <ul>
+                <li><strong>Top Results:</strong> Best matches for your search</li>
+                <li><strong>Quick Actions:</strong> Create new records (invoices, expenses, customers, etc.)</li>
+                <li><strong>Navigation:</strong> Go to different pages in the app</li>
+                <li><strong>Tools & Settings:</strong> Access settings and configuration options</li>
+            </ul>
+
+            <h2>Common Actions</h2>
             <div class="info-box">
-                <h3>Exact Phrase Matching with Double Quotes (" ")</h3>
-                <p>Double quotes search for an <strong>exact sequence of words in that precise order</strong>:</p>
+                <h3>Creating Records</h3>
                 <ul>
-                    <li><code>"black t-shirt"</code> - Finds only transactions containing these exact words together in this exact order</li>
-                    <li>Will NOT match "t-shirt black" or "black cotton t-shirt"</li>
+                    <li>Create new expense</li>
+                    <li>Create new invoice</li>
+                    <li>Add customer</li>
+                    <li>Add product</li>
                 </ul>
 
-                <h3>Required Terms with Plus Sign (+)</h3>
-                <p>The plus sign marks words that <strong>must be present somewhere</strong> in the transaction, but not necessarily together or in any specific order:</p>
+                <h3>Navigation</h3>
                 <ul>
-                    <li><code>+shirt +cotton</code> - Finds transactions that contain both "shirt" AND "cotton" anywhere in the record</li>
-                    <li>Would match "cotton shirt," "shirt made of cotton," or even records where "shirt" appears in one field and "cotton" in another</li>
-                </ul>
-
-                <h3>Exclusion Terms with Minus Sign (-)</h3>
-                <p>Use the minus sign to exclude words from your search:</p>
-                <ul>
-                    <li><code>shirt -white</code> - Finds transactions containing "shirt" but NOT "white"</li>
-                    <li><code>"t-shirt" -black -white</code> - Finds t-shirts that are neither black nor white</li>
+                    <li>Go to Dashboard</li>
+                    <li>Go to Analytics</li>
+                    <li>View Inventory</li>
+                    <li>Open Settings</li>
                 </ul>
             </div>
 
-            <h2>AI-Powered Search (Paid Version)</h2>
-            <p>The paid version includes AI-powered search capabilities that understand natural language queries.</p>
-            <ol class="steps-list">
-                <li>Start your search with an exclamation mark (!)</li>
-                <li>Type your query in natural language</li>
-                <li>Press Enter to execute the search</li>
-            </ol>
-
-            <div class="info-box">
-                <h3>AI Search Examples</h3>
-                <ul>
-                    <li><code>!show me expensive items from last month</code></li>
-                    <li><code>!orders from germany for ball bearings over $25</code></li>
-                    <li><code>!revenue with shipping costs over $10 in april 2025</code></li>
-                </ul>
-            </div>
-
-            <div class="warning-box">
-                <strong>Internet Connection Required:</strong> AI search requires an internet connection and is only available in the paid version. <a class="link" href="../../../upgrade/">Upgrade here</a> to access this feature.
-            </div>
+            <h2>Page Search</h2>
+            <p>Each page in the app has its own search box for filtering records on that specific page. Use the search box at the top of any list view to filter by:</p>
+            <ul>
+                <li>Names and descriptions</li>
+                <li>IDs and reference numbers</li>
+                <li>Other relevant fields for that data type</li>
+            </ul>
 
             <div class="page-navigation">
                 <a href="report-generator.php" class="nav-button prev">

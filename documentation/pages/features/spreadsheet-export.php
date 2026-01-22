@@ -13,21 +13,34 @@ include '../../docs-header.php';
             <h2>Exporting Your Data</h2>
             <ol class="steps-list">
                 <li>Click "File > Export"</li>
-                <li>Select "Excel spreadsheet (.xlsx)" from the dropdown menu</li>
+                <li>Select the "Spreadsheet" tab</li>
+                <li>Choose your export format: Excel (.xlsx), CSV, or PDF</li>
+                <li>Set your date range to filter which records to include</li>
+                <li>Select which data categories to export using the checkboxes (or use "Select All")</li>
                 <li>Choose your preferred currency for the export</li>
-                <li>Select a location to save your export file</li>
+                <li>Click "Export" and select a location to save your file</li>
             </ol>
 
-            <h2>What Gets Exported</h2>
-            <p>The exported Excel file contains separate worksheets for each data type:</p>
+            <h2>Export Formats</h2>
             <ul>
-                <li><strong>Expenses:</strong> All expense transactions with complete details</li>
-                <li><strong>Revenue:</strong> All revenue transactions with complete details</li>
-                <li><strong>Expense products:</strong> All products available for expenses</li>
-                <li><strong>Revenue products:</strong> All products available for revenue</li>
-                <li><strong>Companies:</strong> List of all companies</li>
-                <li><strong>Accountants:</strong> List of all accountants</li>
+                <li><strong>Excel (.xlsx):</strong> Full spreadsheet with separate worksheets for each data type</li>
+                <li><strong>CSV:</strong> Comma-separated values, compatible with any spreadsheet application</li>
+                <li><strong>PDF:</strong> Formatted tables for printing or sharing (limited to 500 rows)</li>
             </ul>
+
+            <h2>What You Can Export</h2>
+            <p>Select any combination of these data categories:</p>
+            <ul>
+                <li><strong>Transactions:</strong> Expenses, Revenue, Invoices, Payments</li>
+                <li><strong>Products:</strong> Products, Categories, Inventory, Stock Adjustments</li>
+                <li><strong>People:</strong> Customers, Suppliers, Employees, Departments</li>
+                <li><strong>Rentals:</strong> Rental Inventory, Rental Records</li>
+                <li><strong>Other:</strong> Locations, Recurring Invoices, Purchase Orders</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>Record Counts:</strong> The export dialog shows how many records exist in each category, so you know exactly what you're exporting.
+            </div>
 
             <h2>Currency Conversion</h2>
             <p>When exporting, you can choose any of the <a class="link" href="../reference/supported-currencies.php">supported currencies</a>. The system will:</p>

@@ -33,10 +33,6 @@ include '../../docs-header.php';
                 <li><strong>Overstock Threshold:</strong> Get notified when stock exceeds this level</li>
             </ul>
 
-            <div class="info-box">
-                <p><strong>Tip:</strong> Set your reorder point higher than your minimum level to give yourself time to restock before running out completely.</p>
-            </div>
-
             <h2>Low Stock Alerts</h2>
             <p>Argo Books automatically monitors your inventory and notifies you when action is needed:</p>
             <ul>

@@ -295,16 +295,16 @@ $isDocsLanding = true;
                     <h3>Invoicing & Payments</h3>
                     <p>Create invoices, accept payments</p>
                 </a>
-                <a href="pages/features/ai-features.php" class="doc-card">
+                <a href="pages/features/receipt-scanning.php" class="doc-card">
                     <div class="card-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"></path>
-                            <circle cx="7.5" cy="14.5" r="1.5"></circle>
-                            <circle cx="16.5" cy="14.5" r="1.5"></circle>
+                            <rect x="3" y="4" width="18" height="16" rx="2"/>
+                            <path d="M7 8h10M7 12h6"/>
+                            <circle cx="17" cy="14" r="3"/>
                         </svg>
                     </div>
-                    <h3>AI Features</h3>
-                    <p>Receipt scanning, analytics, insights</p>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Extract data from receipts with AI</p>
                 </a>
                 <a href="pages/features/inventory.php" class="doc-card">
                     <div class="card-icon">

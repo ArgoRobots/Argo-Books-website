@@ -122,11 +122,6 @@
                             Argo Books now examines your historical business data to forecast future sales patterns and identify seasonal trends. See where your business is heading, not just where it's been. This helps you make smarter decisions about inventory, staffing, and cash flow planning.
                         </p>
 
-                        <h3>AI Business Insights</h3>
-                        <p>
-                            Beyond predictions, our new AI engine continuously analyzes your data to surface actionable insights. It spots opportunities you might have missed and flags potential issues before they become problems &mdash; like unusual spending patterns or declining product performance.
-                        </p>
-
                         <h3>Inventory Management</h3>
                         <p>
                             Track your stock levels in real time with the new inventory management system. Set reorder points to get alerts when stock runs low, monitor product movement, and maintain complete visibility over your entire inventory. No more spreadsheets or guesswork.

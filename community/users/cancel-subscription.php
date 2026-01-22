@@ -184,7 +184,6 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
                     <li>Invoices & payments</li>
                     <li>AI-powered receipt scanning</li>
                     <li>Predictive sales analysis</li>
-                    <li>AI business insights</li>
                 </ul>
             </div>
 

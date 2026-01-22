@@ -21,11 +21,11 @@ include '../../docs-header.php';
             <p><a class="link" href="accepted_countries.php">View complete list of all accepted country names and variants</a></p>
 
             <div class="page-navigation">
-                <a href="../features/advanced-search.php" class="nav-button prev">
+                <a href="../features/rental.php" class="nav-button prev">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 18l-6-6 6-6"></path>
                     </svg>
-                    Previous: Quick Actions
+                    Previous: Rental Management
                 </a>
                 <a href="supported-currencies.php" class="nav-button next">
                     Next: Supported Currencies

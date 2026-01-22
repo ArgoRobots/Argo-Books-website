@@ -166,7 +166,7 @@ include '../../docs-header.php';
 
             <h2>Feature Comparison</h2>
             <div class="comparison-table-wrapper">
-                <table class="comparison-table">
+                <table class="comparison-table" style="text-align: left;">
                     <thead>
                         <tr>
                             <th style="text-align: left;">Feature</th>

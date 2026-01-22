@@ -1094,7 +1094,6 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
                         <li>✓ Invoices & payments</li>
                         <li>✓ AI-powered receipt scanning</li>
                         <li>✓ Predictive sales analysis</li>
-                        <li>✓ AI business insights</li>
                         <li>✓ Natural language AI search</li>
                     </ul>
 
@@ -1261,7 +1260,6 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
                         <li>Invoices & payments</li>
                         <li>AI-powered receipt scanning</li>
                         <li>Predictive sales analysis</li>
-                        <li>AI business insights</li>
                     </ul>
 
                     <div class="button-container">
@@ -1335,7 +1333,6 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
             <li>Invoices & payments</li>
             <li>AI-powered receipt scanning</li>
             <li>Predictive sales analysis</li>
-            <li>AI business insights</li>
             <li>Natural language AI search</li>
         </ul>
 

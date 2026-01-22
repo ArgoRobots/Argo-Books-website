@@ -256,17 +256,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span class="tab-subtitle">Forecast your future</span>
                         </div>
                     </button>
-                    <button class="tab-btn" data-tab="insights">
-                        <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/>
-                            </svg>
-                        </div>
-                        <div class="tab-text">
-                            <span class="tab-title">AI Business Insights</span>
-                            <span class="tab-subtitle">Smart recommendations</span>
-                        </div>
-                    </button>
                     <button class="tab-btn" data-tab="inventory">
                         <div class="tab-icon">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -556,79 +545,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                     </div>
 
-                    <!-- AI Business Insights -->
-                    <div class="tab-content" id="tab-insights">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>AI-powered recommendations</h3>
-                                <p>Get intelligent suggestions to optimize your business. Our AI analyzes your data to identify opportunities, flag concerns, and recommend actions.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
-                                        <span>Profit margin optimization</span>
-                                    </li>
-                                    <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
-                                        <span>Inventory alerts</span>
-                                    </li>
-                                    <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
-                                        <span>Growth opportunities</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup insights-mockup">
-                                        <div class="insight-card-stack">
-                                            <div class="insight-item priority-high">
-                                                <div class="insight-icon">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                                                        <line x1="12" y1="9" x2="12" y2="13"/>
-                                                        <line x1="12" y1="17" x2="12.01" y2="17"/>
-                                                    </svg>
-                                                </div>
-                                                <div class="insight-text">
-                                                    <strong>Low Stock Alert</strong>
-                                                    <span>Widget Pro inventory below threshold</span>
-                                                </div>
-                                            </div>
-                                            <div class="insight-item priority-success">
-                                                <div class="insight-icon">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
-                                                    </svg>
-                                                </div>
-                                                <div class="insight-text">
-                                                    <strong>Opportunity Found</strong>
-                                                    <span>Service packages have 45% margins</span>
-                                                </div>
-                                            </div>
-                                            <div class="insight-item priority-info">
-                                                <div class="insight-icon">
-                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                        <path d="M12 16v-4M12 8h.01"/>
-                                                    </svg>
-                                                </div>
-                                                <div class="insight-text">
-                                                    <strong>Seasonal Trend</strong>
-                                                    <span>Holiday sales peak in 3 weeks</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Inventory Management -->
                     <div class="tab-content" id="tab-inventory">
@@ -1330,12 +1246,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </svg>
                             <span>Predictive analytics</span>
                         </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
-                            <span>AI business insights</span>
-                        </li>
                     </ul>
                     <a href="upgrade/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                     <p class="pricing-note">Cancel anytime</p>
@@ -1441,7 +1351,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($5/month or $50/year) includes invoices & payments, AI-powered receipt scanning, predictive sales analytics, and intelligent business insights. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($5/month or $50/year) includes invoices & payments, AI-powered receipt scanning, and predictive sales analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
                         </div>
                     </div>
                 </div>

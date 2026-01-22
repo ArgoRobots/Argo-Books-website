@@ -87,8 +87,8 @@ include '../../docs-header.php';
                     </svg>
                     Previous: AI Receipt Scanning
                 </a>
-                <a href="business-insights.php" class="nav-button next">
-                    Next: AI Business Insights
+                <a href="inventory.php" class="nav-button next">
+                    Next: Inventory Management
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 18l6-6-6-6"></path>
                     </svg>

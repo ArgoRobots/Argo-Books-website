@@ -140,10 +140,6 @@
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
                                 <span>Predictive sales analysis</span>
                             </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>AI business insights</span>
-                            </li>
                         </ul>
 
                         <div class="card-highlight ai-highlight">

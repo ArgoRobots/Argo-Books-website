@@ -28,7 +28,7 @@ include '../../docs-header.php';
             <h2>Exporting Receipts from the Receipts page</h2>
             <ol class="steps-list">
                 <li>Go to "Receipts" in the sidebar (at the very bottom)</li>
-                <li>Optionally filter the receipts you want to export</li>
+                <li>Filter the receipts you want to export (optional)</li>
                 <li>Select the receipts you want to export."</li>
                 <li>Click the "Export Selected" button and choose the destination</li>
             </ol>

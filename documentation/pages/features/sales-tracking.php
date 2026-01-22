@@ -15,7 +15,7 @@ include '../../docs-header.php';
                 <li>Go to "Expenses" or "Revenue" in the sidebar (under Transactions)</li>
                 <li>Click the "Add Expense" or "Add Revenue" button</li>
                 <li>Enter the amount, category, and date</li>
-                <li>Optionally attach a receipt</li>
+                <li>Attach a receipt (optional)</li>
                 <li>Click "Save" to add the transaction</li>
             </ol>
 

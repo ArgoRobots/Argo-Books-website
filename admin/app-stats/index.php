@@ -20,8 +20,10 @@ $aggregatedData = [
         'OpenAI' => [],
         'OpenExchangeRates' => [],
         'GoogleSheets' => [],
+        'ReceiptScanning' => [],
         'Session' => [],
-        'Error' => []
+        'Error' => [],
+        'FeatureUsage' => []
     ],
     'geoLocationEnabled' => false,
     'privacySettings' => [
@@ -32,6 +34,104 @@ $aggregatedData = [
     ]
 ];
 $fileInfo = [];
+
+// Helper function to normalize event data from the new format
+function normalizeEvent($event) {
+    $normalized = [
+        'timestamp' => $event['Timestamp'] ?? date('Y-m-d H:i:s'),
+        'appVersion' => $event['AppVersion'] ?? 'Unknown',
+        'platform' => $event['Platform'] ?? 'Unknown',
+        'userAgent' => $event['UserAgent'] ?? '',
+        'dataType' => $event['DataType'] ?? 'Unknown'
+    ];
+
+    // Extract geo-location data
+    if (isset($event['GeoLocation']) && is_array($event['GeoLocation'])) {
+        $geo = $event['GeoLocation'];
+        $normalized['country'] = $geo['Country'] ?? 'Unknown';
+        $normalized['region'] = $geo['Region'] ?? '';
+        $normalized['city'] = $geo['City'] ?? '';
+        $normalized['timezone'] = $geo['Timezone'] ?? '';
+        $normalized['hashedIP'] = $geo['IpHash'] ?? '';
+    }
+
+    return $normalized;
+}
+
+// Helper function to categorize and transform events
+function processEvent($event, $sourceFile) {
+    $dataType = $event['DataType'] ?? null;
+    if (!$dataType) {
+        return null;
+    }
+
+    $normalized = normalizeEvent($event);
+    $normalized['source_file'] = $sourceFile;
+
+    switch ($dataType) {
+        case 'Session':
+            $normalized['sessionId'] = $event['SessionId'] ?? '';
+            $normalized['action'] = $event['EventType'] === 'Start' ? 'SessionStart' : 'SessionEnd';
+            $normalized['duration'] = $event['DurationSeconds'] ?? 0;
+            $normalized['companyCount'] = $event['CompanyCount'] ?? 0;
+            return ['category' => 'Session', 'data' => $normalized];
+
+        case 'Export':
+            $normalized['ExportType'] = $event['ExportType'] ?? 'Unknown';
+            $normalized['DurationMS'] = $event['DurationMs'] ?? 0;
+            $normalized['FileSize'] = $event['FileSizeBytes'] ?? null;
+            $normalized['RecordCount'] = $event['RecordCount'] ?? 0;
+            return ['category' => 'Export', 'data' => $normalized];
+
+        case 'ApiUsage':
+            $serviceName = $event['ServiceName'] ?? 'Unknown';
+            $normalized['DurationMS'] = $event['DurationMs'] ?? 0;
+            $normalized['Success'] = $event['Success'] ?? true;
+            $normalized['Endpoint'] = $event['Endpoint'] ?? '';
+            $normalized['ErrorMessage'] = $event['ErrorMessage'] ?? null;
+
+            switch ($serviceName) {
+                case 'OpenAI':
+                    $normalized['TokensUsed'] = $event['TokensUsed'] ?? 0;
+                    $normalized['Model'] = $event['Model'] ?? 'Unknown';
+                    return ['category' => 'OpenAI', 'data' => $normalized];
+
+                case 'ExchangeRate':
+                    return ['category' => 'OpenExchangeRates', 'data' => $normalized];
+
+                case 'GoogleSheets':
+                    return ['category' => 'GoogleSheets', 'data' => $normalized];
+
+                case 'AzureReceipt':
+                    $normalized['ServiceName'] = 'AzureReceipt';
+                    return ['category' => 'ReceiptScanning', 'data' => $normalized];
+
+                default:
+                    return null;
+            }
+
+        case 'Error':
+            $normalized['Category'] = $event['Category'] ?? 'Unknown';
+            $normalized['Severity'] = $event['Severity'] ?? 'Error';
+            $normalized['Message'] = $event['Message'] ?? '';
+            $normalized['StackTrace'] = $event['StackTrace'] ?? '';
+            $normalized['Context'] = $event['Context'] ?? '';
+            // Legacy field mapping for existing charts
+            $normalized['ErrorCategory'] = $event['Category'] ?? 'Unknown';
+            $normalized['ErrorCode'] = $event['Category'] ?? 'Unknown';
+            return ['category' => 'Error', 'data' => $normalized];
+
+        case 'FeatureUsage':
+            $normalized['FeatureName'] = $event['FeatureName'] ?? 'Unknown';
+            $normalized['Context'] = $event['Context'] ?? '';
+            $normalized['DurationMs'] = $event['DurationMs'] ?? 0;
+            $normalized['Metadata'] = $event['Metadata'] ?? [];
+            return ['category' => 'FeatureUsage', 'data' => $normalized];
+
+        default:
+            return null;
+    }
+}
 
 if (!is_dir($dataDir)) {
     $errorMessage = "Directory 'data-logs/' does not exist.";
@@ -58,38 +158,56 @@ if (!is_dir($dataDir)) {
             }
 
             $fileData = json_decode($jsonDataRaw, true);
-            if ($fileData === null || !isset($fileData['dataPoints'])) {
+            if ($fileData === null) {
                 $failedFiles++;
                 continue;
             }
 
-            // Check if geo-location is enabled in this file
-            if (isset($fileData['geoLocationEnabled']) && $fileData['geoLocationEnabled']) {
-                $aggregatedData['geoLocationEnabled'] = true;
-            }
+            $sourceFile = basename($file);
 
-            // Update privacy settings from latest file
-            if (isset($fileData['privacySettings'])) {
-                $aggregatedData['privacySettings'] = array_merge(
-                    $aggregatedData['privacySettings'],
-                    $fileData['privacySettings']
-                );
-            }
+            // New Avalonia format: array of events with DataType field
+            if (is_array($fileData) && isset($fileData[0]['DataType'])) {
+                foreach ($fileData as $event) {
+                    $result = processEvent($event, $sourceFile);
+                    if ($result !== null) {
+                        $category = $result['category'];
+                        $data = $result['data'];
 
-            // Merge data from this file into the aggregated data
-            foreach ($fileData['dataPoints'] as $category => $dataPoints) {
-                if (!isset($aggregatedData['dataPoints'][$category])) {
-                    $aggregatedData['dataPoints'][$category] = [];
+                        if (!isset($aggregatedData['dataPoints'][$category])) {
+                            $aggregatedData['dataPoints'][$category] = [];
+                        }
+                        $aggregatedData['dataPoints'][$category][] = $data;
+
+                        // Enable geo-location if any event has it
+                        if (!empty($data['country']) && $data['country'] !== 'Unknown') {
+                            $aggregatedData['geoLocationEnabled'] = true;
+                        }
+                    }
                 }
-
-                // Add data points with file source information
-                foreach ($dataPoints as $dataPoint) {
-                    $dataPoint['source_file'] = basename($file);
-                    $aggregatedData['dataPoints'][$category][] = $dataPoint;
-                }
+                $processedFiles++;
             }
+            // Single event object with DataType
+            elseif (isset($fileData['DataType'])) {
+                $result = processEvent($fileData, $sourceFile);
+                if ($result !== null) {
+                    $category = $result['category'];
+                    $data = $result['data'];
 
-            $processedFiles++;
+                    if (!isset($aggregatedData['dataPoints'][$category])) {
+                        $aggregatedData['dataPoints'][$category] = [];
+                    }
+                    $aggregatedData['dataPoints'][$category][] = $data;
+
+                    if (!empty($data['country']) && $data['country'] !== 'Unknown') {
+                        $aggregatedData['geoLocationEnabled'] = true;
+                    }
+                }
+                $processedFiles++;
+            }
+            // Unknown format
+            else {
+                $failedFiles++;
+            }
         }
 
         // Store file processing information
@@ -260,8 +378,10 @@ include '../admin_header.php';
             count($aggregatedData['dataPoints']['OpenAI']) == 0 &&
             count($aggregatedData['dataPoints']['OpenExchangeRates']) == 0 &&
             count($aggregatedData['dataPoints']['GoogleSheets']) == 0 &&
+            count($aggregatedData['dataPoints']['ReceiptScanning']) == 0 &&
             count($aggregatedData['dataPoints']['Session']) == 0 &&
-            count($aggregatedData['dataPoints']['Error']) == 0)
+            count($aggregatedData['dataPoints']['Error']) == 0 &&
+            count($aggregatedData['dataPoints']['FeatureUsage']) == 0)
     ): ?>
         <div class="no-data">
             <h3>No Data Available</h3>
@@ -290,6 +410,7 @@ include '../admin_header.php';
                 <div class="tab-button" onclick="switchTab('geographic')">Geographic</div>
                 <?php endif; ?>
                 <div class="tab-button" onclick="switchTab('versions')">Versions</div>
+                <div class="tab-button" onclick="switchTab('features')">Features</div>
                 <div class="tab-button" onclick="switchTab('errors')">Errors</div>
                 <div class="tab-button" onclick="switchTab('usage')">Usage</div>
                 <div class="tab-button" onclick="switchTab('api')">API Usage</div>
@@ -388,6 +509,44 @@ include '../admin_header.php';
                 </div>
             </div>
 
+            <!-- Features Tab -->
+            <div id="features-tab" class="tab-content">
+                <h2 class="section-title">Feature Usage Analytics</h2>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Most Used Features</h2>
+                        <canvas id="featureUsageChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Page Views Distribution</h2>
+                        <canvas id="pageViewsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Feature Usage Over Time</h2>
+                        <canvas id="featureTimelineChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Average Feature Duration</h2>
+                        <canvas id="featureDurationChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Import Operations</h2>
+                        <canvas id="importStatsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Context Usage</h2>
+                        <canvas id="contextUsageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- Errors Tab -->
             <div id="errors-tab" class="tab-content">
                 <h2 class="section-title">Error Analysis</h2>
@@ -398,8 +557,8 @@ include '../admin_header.php';
                         <canvas id="errorCategoryChart"></canvas>
                     </div>
                     <div class="chart-container">
-                        <h2>Most Common Error Codes</h2>
-                        <canvas id="errorCodeChart"></canvas>
+                        <h2>Error Severity Distribution</h2>
+                        <canvas id="errorSeverityChart"></canvas>
                     </div>
                 </div>
 
@@ -409,8 +568,19 @@ include '../admin_header.php';
                         <canvas id="errorTimeChart"></canvas>
                     </div>
                     <div class="chart-container">
+                        <h2>Errors by Category Over Time</h2>
+                        <canvas id="errorCategoryTimelineChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
                         <h2>Application Stability Overview</h2>
                         <canvas id="stabilityChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Error Context Analysis</h2>
+                        <canvas id="errorContextChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -465,6 +635,30 @@ include '../admin_header.php';
                     <div class="chart-container">
                         <h2>Exchange Rates API Usage</h2>
                         <canvas id="exchangeRatesChart"></canvas>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 2rem;">Receipt Scanning (Azure AI)</h2>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Receipt Scans Overview</h2>
+                        <canvas id="receiptScanOverviewChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Receipt Scan Success Rate</h2>
+                        <canvas id="receiptScanSuccessChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Receipt Scan Duration</h2>
+                        <canvas id="receiptScanDurationChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Scans Per Day Trend</h2>
+                        <canvas id="receiptScanTrendChart"></canvas>
                     </div>
                 </div>
             </div>

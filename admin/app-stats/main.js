@@ -33,8 +33,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const openaiData = rawData.dataPoints.OpenAI || [];
   const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
   const googleSheetsData = rawData.dataPoints.GoogleSheets || [];
+  const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
+  const featureUsageData = rawData.dataPoints.FeatureUsage || [];
 
   // Initialize all charts
   generateStatistics(
@@ -42,8 +44,10 @@ document.addEventListener("DOMContentLoaded", function () {
     openaiData,
     exchangeRatesData,
     googleSheetsData,
+    receiptScanningData,
     sessionData,
-    errorData
+    errorData,
+    featureUsageData
   );
 
   if (isGeoEnabled) {
@@ -125,8 +129,10 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   generateErrorCategoryChart(errorData);
-  generateErrorCodeChart(errorData);
+  generateErrorSeverityChart(errorData);
   generateErrorTimeChart(errorData);
+  generateErrorCategoryTimelineChart(errorData);
+  generateErrorContextChart(errorData);
   generateStabilityChart(
     exportData,
     openaiData,
@@ -134,6 +140,20 @@ document.addEventListener("DOMContentLoaded", function () {
     sessionData,
     errorData
   );
+
+  // Feature Usage Charts
+  generateFeatureUsageChart(featureUsageData);
+  generatePageViewsChart(featureUsageData);
+  generateFeatureTimelineChart(featureUsageData);
+  generateFeatureDurationChart(featureUsageData);
+  generateImportStatsChart(featureUsageData);
+  generateContextUsageChart(featureUsageData);
+
+  // Receipt Scanning Charts
+  generateReceiptScanOverviewChart(receiptScanningData);
+  generateReceiptScanSuccessChart(receiptScanningData);
+  generateReceiptScanDurationChart(receiptScanningData);
+  generateReceiptScanTrendChart(receiptScanningData);
 
   generateSessionDurationChart(sessionData);
   generateExportTypesBreakdown(exportData);
@@ -161,8 +181,10 @@ document.addEventListener("DOMContentLoaded", function () {
     openaiData,
     exchangeRatesData,
     googleSheetsData,
+    receiptScanningData,
     sessionData,
-    errorData
+    errorData,
+    featureUsageData
   ) {
     const statsGrid = document.getElementById("statsGrid");
 
@@ -170,15 +192,19 @@ document.addEventListener("DOMContentLoaded", function () {
       exportData.length +
       openaiData.length +
       exchangeRatesData.length +
-      googleSheetsData.length;
+      googleSheetsData.length +
+      receiptScanningData.length;
     const totalErrors = errorData.length;
     const totalSessions = sessionData.length;
+    const totalFeatureUsage = featureUsageData.length;
+    const totalReceiptScans = receiptScanningData.length;
 
     // Calculate Performance Score (0-100 based on average response times)
     const allDurations = [
       ...exportData.map((d) => parseFloat(d.DurationMS || 0)),
       ...openaiData.map((d) => parseFloat(d.DurationMS || 0)),
       ...exchangeRatesData.map((d) => parseFloat(d.DurationMS || 0)),
+      ...receiptScanningData.map((d) => parseFloat(d.DurationMS || 0)),
     ].filter((d) => d > 0);
 
     const avgDuration =
@@ -201,15 +227,37 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     // Find Most Popular Feature
-    const featureUsage = {
+    const featureUsageCounts = {
       Export: exportData.length,
       "AI Assistant": openaiData.length,
       "Currency Rates": exchangeRatesData.length,
       "Google Sheets": googleSheetsData.length,
+      "Receipt Scan": receiptScanningData.length,
     };
-    const mostUsedFeature = Object.entries(featureUsage).sort(
+    const mostUsedFeature = Object.entries(featureUsageCounts).sort(
       ([, a], [, b]) => b - a
     )[0];
+
+    // Calculate page views from FeatureUsage data
+    const pageViews = featureUsageData.filter(
+      (f) => f.FeatureName === "PageView"
+    ).length;
+
+    // Calculate receipt scan success rate
+    const successfulScans = receiptScanningData.filter(
+      (r) => r.Success === true
+    ).length;
+    const scanSuccessRate =
+      totalReceiptScans > 0
+        ? ((successfulScans / totalReceiptScans) * 100).toFixed(1)
+        : "N/A";
+
+    // Calculate error rate per session
+    const sessionsEnded = sessionData.filter(
+      (s) => s.action === "SessionEnd"
+    ).length;
+    const errorRatePerSession =
+      sessionsEnded > 0 ? (totalErrors / sessionsEnded).toFixed(2) : "0";
 
     // Calculate Peak Usage Hour
     const allData = [
@@ -217,7 +265,9 @@ document.addEventListener("DOMContentLoaded", function () {
       ...openaiData,
       ...exchangeRatesData,
       ...googleSheetsData,
+      ...receiptScanningData,
       ...sessionData,
+      ...featureUsageData,
     ];
     const hourCounts = {};
     allData.forEach((item) => {
@@ -294,8 +344,10 @@ document.addEventListener("DOMContentLoaded", function () {
       ...openaiData,
       ...exchangeRatesData,
       ...googleSheetsData,
+      ...receiptScanningData,
       ...sessionData,
       ...errorData,
+      ...featureUsageData,
     ];
     const versionCounts = {};
     allDataWithVersion.forEach((item) => {
@@ -333,9 +385,9 @@ document.addEventListener("DOMContentLoaded", function () {
         subtext: `${Math.round(avgDuration)}ms avg response`,
       },
       {
-        title: "Data Quality",
-        value: `${dataQualityScore}%`,
-        subtext: "Completeness & accuracy",
+        title: "Total Page Views",
+        value: pageViews.toLocaleString(),
+        subtext: "From feature tracking",
       },
       {
         title: "Active Users Today",
@@ -346,6 +398,14 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Most Used Feature",
         value: mostUsedFeature ? mostUsedFeature[0] : "N/A",
         subtext: mostUsedFeature ? `${mostUsedFeature[1]} uses` : "No data",
+      },
+      {
+        title: "Receipt Scans",
+        value: totalReceiptScans.toLocaleString(),
+        subtext:
+          scanSuccessRate !== "N/A"
+            ? `${scanSuccessRate}% success rate`
+            : "No scans yet",
       },
       {
         title: "Peak Usage Time",
@@ -361,14 +421,14 @@ document.addEventListener("DOMContentLoaded", function () {
             : "No data",
       },
       {
+        title: "Errors Per Session",
+        value: errorRatePerSession,
+        subtext: `${totalErrors} total errors`,
+      },
+      {
         title: "Unique Countries",
         value: uniqueCountries.toString(),
         subtext: uniqueCountries > 0 ? "geo-distribution" : "No data",
-      },
-      {
-        title: "User Retention",
-        value: userRetentionRate + "%",
-        subtext: `${uniqueUsers} unique users`,
       },
       {
         title: "Version Adoption",
@@ -379,11 +439,6 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "Total Operations",
         value: totalOperations.toLocaleString(),
         subtext: "All user actions",
-      },
-      {
-        title: "Error Rate",
-        value: `${errorRate.toFixed(2)}%`,
-        subtext: totalErrors > 0 ? `${totalErrors} incidents` : "No errors",
       },
     ];
 
@@ -2363,6 +2418,10 @@ document.addEventListener("DOMContentLoaded", function () {
         ...d,
         type: "Google Sheets",
       })),
+      ...(rawData.dataPoints.ReceiptScanning || []).map((d) => ({
+        ...d,
+        type: "Receipt Scan",
+      })),
       ...sessionData.map((d) => ({
         ...d,
         type: "Session",
@@ -2370,6 +2429,10 @@ document.addEventListener("DOMContentLoaded", function () {
       ...errorData.map((d) => ({
         ...d,
         type: "Error",
+      })),
+      ...(rawData.dataPoints.FeatureUsage || []).map((d) => ({
+        ...d,
+        type: "Feature",
       })),
     ];
 
@@ -2388,8 +2451,10 @@ document.addEventListener("DOMContentLoaded", function () {
           OpenAI: 0,
           "Exchange Rates": 0,
           "Google Sheets": 0,
+          "Receipt Scan": 0,
           Session: 0,
           Error: 0,
+          Feature: 0,
         };
       }
       dailyCounts[date][item.type]++;
@@ -2420,9 +2485,19 @@ document.addEventListener("DOMContentLoaded", function () {
         backgroundColor: "#10b981",
       },
       {
+        label: "Receipt Scans",
+        data: recent30Dates.map((date) => dailyCounts[date]["Receipt Scan"]),
+        backgroundColor: "#ec4899",
+      },
+      {
         label: "Sessions",
         data: recent30Dates.map((date) => dailyCounts[date].Session),
         backgroundColor: "#06b6d4",
+      },
+      {
+        label: "Features",
+        data: recent30Dates.map((date) => dailyCounts[date].Feature),
+        backgroundColor: "#84cc16",
       },
       {
         label: "Errors",
@@ -2462,6 +2537,849 @@ document.addEventListener("DOMContentLoaded", function () {
             position: "bottom",
           },
         }
+      },
+    });
+  }
+
+  // =====================
+  // Error Severity Chart
+  // =====================
+  function generateErrorSeverityChart(errorData) {
+    if (errorData.length === 0) {
+      document.getElementById("errorSeverityChart").parentElement.innerHTML =
+        '<div class="chart-no-data"><h3>No Errors!</h3><p>All systems running smoothly</p></div>';
+      return;
+    }
+
+    const severityCounts = {};
+    errorData.forEach((error) => {
+      const severity = error.Severity || "Unknown";
+      severityCounts[severity] = (severityCounts[severity] || 0) + 1;
+    });
+
+    const severityColors = {
+      Critical: "#dc2626",
+      Error: "#ef4444",
+      Warning: "#f59e0b",
+      Unknown: "#9ca3af",
+    };
+
+    const labels = Object.keys(severityCounts);
+    const data = Object.values(severityCounts);
+    const colors = labels.map((s) => severityColors[s] || "#9ca3af");
+
+    new Chart(document.getElementById("errorSeverityChart"), {
+      type: "doughnut",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            data: data,
+            backgroundColor: colors,
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // =====================
+  // Error Category Timeline Chart
+  // =====================
+  function generateErrorCategoryTimelineChart(errorData) {
+    if (errorData.length === 0) {
+      document.getElementById(
+        "errorCategoryTimelineChart"
+      ).parentElement.innerHTML =
+        '<div class="chart-no-data">No error timeline data available</div>';
+      return;
+    }
+
+    const categoryByDate = {};
+    const categories = new Set();
+
+    errorData.forEach((error) => {
+      const date = new Date(error.timestamp).toLocaleDateString();
+      const category = error.Category || error.ErrorCategory || "Unknown";
+      categories.add(category);
+
+      if (!categoryByDate[date]) {
+        categoryByDate[date] = {};
+      }
+      categoryByDate[date][category] =
+        (categoryByDate[date][category] || 0) + 1;
+    });
+
+    const dates = Object.keys(categoryByDate).sort().slice(-30);
+    const categoryArray = Array.from(categories).slice(0, 6);
+    const categoryColors = [
+      "#ef4444",
+      "#f59e0b",
+      "#3b82f6",
+      "#10b981",
+      "#8b5cf6",
+      "#ec4899",
+    ];
+
+    const datasets = categoryArray.map((category, index) => ({
+      label: category,
+      data: dates.map((date) => categoryByDate[date]?.[category] || 0),
+      borderColor: categoryColors[index],
+      backgroundColor: categoryColors[index] + "20",
+      fill: true,
+      tension: 0.4,
+    }));
+
+    new Chart(document.getElementById("errorCategoryTimelineChart"), {
+      type: "line",
+      data: {
+        labels: dates,
+        datasets: datasets,
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            stacked: true,
+            title: {
+              display: true,
+              text: "Error Count",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // =====================
+  // Error Context Chart
+  // =====================
+  function generateErrorContextChart(errorData) {
+    if (errorData.length === 0) {
+      document.getElementById("errorContextChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No error context data available</div>';
+      return;
+    }
+
+    const contextCounts = {};
+    errorData.forEach((error) => {
+      const context = error.Context || "Unknown";
+      contextCounts[context] = (contextCounts[context] || 0) + 1;
+    });
+
+    const sortedContexts = Object.entries(contextCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10);
+
+    new Chart(document.getElementById("errorContextChart"), {
+      type: "bar",
+      data: {
+        labels: sortedContexts.map(([ctx]) => ctx),
+        datasets: [
+          {
+            label: "Errors",
+            data: sortedContexts.map(([, count]) => count),
+            backgroundColor: "#ef4444",
+            borderColor: "#dc2626",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "y",
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Error Count",
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // =====================
+  // Feature Usage Charts
+  // =====================
+  function generateFeatureUsageChart(featureUsageData) {
+    if (featureUsageData.length === 0) {
+      document.getElementById("featureUsageChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No feature usage data available</div>';
+      return;
+    }
+
+    const featureCounts = {};
+    featureUsageData.forEach((item) => {
+      const feature = item.FeatureName || "Unknown";
+      featureCounts[feature] = (featureCounts[feature] || 0) + 1;
+    });
+
+    const sortedFeatures = Object.entries(featureCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10);
+
+    const colors = [
+      "#3b82f6",
+      "#10b981",
+      "#f59e0b",
+      "#ef4444",
+      "#8b5cf6",
+      "#06b6d4",
+      "#84cc16",
+      "#f97316",
+      "#ec4899",
+      "#6366f1",
+    ];
+
+    new Chart(document.getElementById("featureUsageChart"), {
+      type: "bar",
+      data: {
+        labels: sortedFeatures.map(([feature]) => feature),
+        datasets: [
+          {
+            label: "Usage Count",
+            data: sortedFeatures.map(([, count]) => count),
+            backgroundColor: colors,
+            borderColor: colors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: "y",
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Usage Count",
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generatePageViewsChart(featureUsageData) {
+    const pageViews = featureUsageData.filter(
+      (f) => f.FeatureName === "PageView"
+    );
+
+    if (pageViews.length === 0) {
+      document.getElementById("pageViewsChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No page view data available</div>';
+      return;
+    }
+
+    const pageCounts = {};
+    pageViews.forEach((item) => {
+      const page = item.Context || "Unknown";
+      pageCounts[page] = (pageCounts[page] || 0) + 1;
+    });
+
+    const sortedPages = Object.entries(pageCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10);
+
+    const colors = [
+      "#3b82f6",
+      "#10b981",
+      "#f59e0b",
+      "#ef4444",
+      "#8b5cf6",
+      "#06b6d4",
+      "#84cc16",
+      "#f97316",
+      "#ec4899",
+      "#6366f1",
+    ];
+
+    new Chart(document.getElementById("pageViewsChart"), {
+      type: "pie",
+      data: {
+        labels: sortedPages.map(([page]) => page),
+        datasets: [
+          {
+            data: sortedPages.map(([, count]) => count),
+            backgroundColor: colors,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} views (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateFeatureTimelineChart(featureUsageData) {
+    if (featureUsageData.length === 0) {
+      document.getElementById("featureTimelineChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No feature timeline data available</div>';
+      return;
+    }
+
+    const dailyCounts = {};
+    featureUsageData.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      dailyCounts[date] = (dailyCounts[date] || 0) + 1;
+    });
+
+    const dates = Object.keys(dailyCounts).sort().slice(-30);
+    const counts = dates.map((date) => dailyCounts[date]);
+
+    new Chart(document.getElementById("featureTimelineChart"), {
+      type: "line",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "Feature Usage",
+            data: counts,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Usage Count",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateFeatureDurationChart(featureUsageData) {
+    const dataWithDuration = featureUsageData.filter(
+      (f) => f.DurationMs && f.DurationMs > 0
+    );
+
+    if (dataWithDuration.length === 0) {
+      document.getElementById("featureDurationChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No feature duration data available</div>';
+      return;
+    }
+
+    const featureDurations = {};
+    const featureCounts = {};
+
+    dataWithDuration.forEach((item) => {
+      const feature = item.FeatureName || "Unknown";
+      if (!featureDurations[feature]) {
+        featureDurations[feature] = 0;
+        featureCounts[feature] = 0;
+      }
+      featureDurations[feature] += item.DurationMs;
+      featureCounts[feature]++;
+    });
+
+    const avgDurations = Object.entries(featureDurations)
+      .map(([feature, total]) => ({
+        feature,
+        avg: Math.round(total / featureCounts[feature]),
+      }))
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 10);
+
+    new Chart(document.getElementById("featureDurationChart"), {
+      type: "bar",
+      data: {
+        labels: avgDurations.map((d) => d.feature),
+        datasets: [
+          {
+            label: "Average Duration (ms)",
+            data: avgDurations.map((d) => d.avg),
+            backgroundColor: "#10b981",
+            borderColor: "#059669",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Duration (ms)",
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateImportStatsChart(featureUsageData) {
+    const importData = featureUsageData.filter(
+      (f) => f.FeatureName === "Import"
+    );
+
+    if (importData.length === 0) {
+      document.getElementById("importStatsChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No import data available</div>';
+      return;
+    }
+
+    const dailyImports = {};
+    importData.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      dailyImports[date] = (dailyImports[date] || 0) + 1;
+    });
+
+    const dates = Object.keys(dailyImports).sort().slice(-30);
+    const counts = dates.map((date) => dailyImports[date]);
+
+    new Chart(document.getElementById("importStatsChart"), {
+      type: "bar",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "Imports",
+            data: counts,
+            backgroundColor: "#8b5cf6",
+            borderColor: "#7c3aed",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Import Count",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateContextUsageChart(featureUsageData) {
+    if (featureUsageData.length === 0) {
+      document.getElementById("contextUsageChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No context data available</div>';
+      return;
+    }
+
+    const contextCounts = {};
+    featureUsageData.forEach((item) => {
+      const context = item.Context || "Unknown";
+      if (context !== "Unknown" && context !== "") {
+        contextCounts[context] = (contextCounts[context] || 0) + 1;
+      }
+    });
+
+    if (Object.keys(contextCounts).length === 0) {
+      document.getElementById("contextUsageChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No context data available</div>';
+      return;
+    }
+
+    const sortedContexts = Object.entries(contextCounts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10);
+
+    const colors = [
+      "#3b82f6",
+      "#10b981",
+      "#f59e0b",
+      "#ef4444",
+      "#8b5cf6",
+      "#06b6d4",
+      "#84cc16",
+      "#f97316",
+      "#ec4899",
+      "#6366f1",
+    ];
+
+    new Chart(document.getElementById("contextUsageChart"), {
+      type: "doughnut",
+      data: {
+        labels: sortedContexts.map(([ctx]) => ctx),
+        datasets: [
+          {
+            data: sortedContexts.map(([, count]) => count),
+            backgroundColor: colors,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // =====================
+  // Receipt Scanning Charts
+  // =====================
+  function generateReceiptScanOverviewChart(receiptScanningData) {
+    if (receiptScanningData.length === 0) {
+      document.getElementById(
+        "receiptScanOverviewChart"
+      ).parentElement.innerHTML =
+        '<div class="chart-no-data">No receipt scanning data available</div>';
+      return;
+    }
+
+    const successful = receiptScanningData.filter(
+      (r) => r.Success === true
+    ).length;
+    const failed = receiptScanningData.filter(
+      (r) => r.Success === false
+    ).length;
+    const unknown = receiptScanningData.length - successful - failed;
+
+    new Chart(document.getElementById("receiptScanOverviewChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["Successful", "Failed", "Unknown"],
+        datasets: [
+          {
+            data: [successful, failed, unknown],
+            backgroundColor: ["#10b981", "#ef4444", "#9ca3af"],
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} scans (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateReceiptScanSuccessChart(receiptScanningData) {
+    if (receiptScanningData.length === 0) {
+      document.getElementById(
+        "receiptScanSuccessChart"
+      ).parentElement.innerHTML =
+        '<div class="chart-no-data">No receipt scanning data available</div>';
+      return;
+    }
+
+    const dailyStats = {};
+    receiptScanningData.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      if (!dailyStats[date]) {
+        dailyStats[date] = { success: 0, total: 0 };
+      }
+      dailyStats[date].total++;
+      if (item.Success === true) {
+        dailyStats[date].success++;
+      }
+    });
+
+    const dates = Object.keys(dailyStats).sort().slice(-30);
+    const successRates = dates.map((date) =>
+      dailyStats[date].total > 0
+        ? Math.round((dailyStats[date].success / dailyStats[date].total) * 100)
+        : 0
+    );
+
+    new Chart(document.getElementById("receiptScanSuccessChart"), {
+      type: "line",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "Success Rate (%)",
+            data: successRates,
+            borderColor: "#10b981",
+            backgroundColor: "rgba(16, 185, 129, 0.1)",
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: "Success Rate (%)",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateReceiptScanDurationChart(receiptScanningData) {
+    const dataWithDuration = receiptScanningData.filter(
+      (r) => r.DurationMS && r.DurationMS > 0
+    );
+
+    if (dataWithDuration.length === 0) {
+      document.getElementById(
+        "receiptScanDurationChart"
+      ).parentElement.innerHTML =
+        '<div class="chart-no-data">No duration data available</div>';
+      return;
+    }
+
+    const recentData = dataWithDuration.slice(-50);
+    const durations = recentData.map((r) => parseInt(r.DurationMS) || 0);
+    const avgDuration = Math.round(
+      durations.reduce((a, b) => a + b, 0) / durations.length
+    );
+
+    // Create histogram buckets
+    const buckets = {
+      "0-1s": 0,
+      "1-2s": 0,
+      "2-3s": 0,
+      "3-5s": 0,
+      "5-10s": 0,
+      "10s+": 0,
+    };
+
+    dataWithDuration.forEach((item) => {
+      const seconds = (item.DurationMS || 0) / 1000;
+      if (seconds < 1) buckets["0-1s"]++;
+      else if (seconds < 2) buckets["1-2s"]++;
+      else if (seconds < 3) buckets["2-3s"]++;
+      else if (seconds < 5) buckets["3-5s"]++;
+      else if (seconds < 10) buckets["5-10s"]++;
+      else buckets["10s+"]++;
+    });
+
+    new Chart(document.getElementById("receiptScanDurationChart"), {
+      type: "bar",
+      data: {
+        labels: Object.keys(buckets),
+        datasets: [
+          {
+            label: "Scans",
+            data: Object.values(buckets),
+            backgroundColor: "#06b6d4",
+            borderColor: "#0891b2",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: `Average: ${avgDuration}ms`,
+            position: "bottom",
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Number of Scans",
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateReceiptScanTrendChart(receiptScanningData) {
+    if (receiptScanningData.length === 0) {
+      document.getElementById("receiptScanTrendChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No trend data available</div>';
+      return;
+    }
+
+    const dailyCounts = {};
+    receiptScanningData.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      dailyCounts[date] = (dailyCounts[date] || 0) + 1;
+    });
+
+    const dates = Object.keys(dailyCounts).sort().slice(-30);
+    const counts = dates.map((date) => dailyCounts[date]);
+
+    new Chart(document.getElementById("receiptScanTrendChart"), {
+      type: "bar",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "Scans",
+            data: counts,
+            backgroundColor: "#f59e0b",
+            borderColor: "#d97706",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Scans per Day",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
       },
     });
   }

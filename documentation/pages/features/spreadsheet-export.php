@@ -12,28 +12,18 @@ include '../../docs-header.php';
 
             <h2>Exporting Your Data</h2>
             <ol class="steps-list">
-                <li>Click "File > Export"</li>
-                <li>Select "Excel spreadsheet (.xlsx)" from the dropdown menu</li>
+                <li>Click "File > Export as"</li>
+                <li>Select the "Spreadsheet" tab</li>
+                <li>Set a date range to filter which records to include</li>
+                <li>Select which data categories to export</li>
                 <li>Choose your preferred currency for the export</li>
-                <li>Select a location to save your export file</li>
+                <li>Click "Export" and select a location to save your file</li>
             </ol>
-
-            <h2>What Gets Exported</h2>
-            <p>The exported Excel file contains separate worksheets for each data type:</p>
-            <ul>
-                <li><strong>Expenses:</strong> All expense transactions with complete details</li>
-                <li><strong>Revenue:</strong> All revenue transactions with complete details</li>
-                <li><strong>Expense products:</strong> All products available for expenses</li>
-                <li><strong>Revenue products:</strong> All products available for revenue</li>
-                <li><strong>Companies:</strong> List of all companies</li>
-                <li><strong>Accountants:</strong> List of all accountants</li>
-            </ul>
 
             <h2>Currency Conversion</h2>
             <p>When exporting, you can choose any of the <a class="link" href="../reference/supported-currencies.php">supported currencies</a>. The system will:</p>
             <ul>
                 <li>Convert all monetary values to your chosen currency using historical exchange rates</li>
-                <li>Use the exact exchange rate that was valid on each transaction's date</li>
                 <li>Display values with proper currency formatting</li>
                 <li>Add a note at the top indicating which currency is being used</li>
             </ul>

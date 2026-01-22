@@ -10,7 +10,7 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>Argo Books uses AES-256 encryption to protect your business data, the same standard used by banks and military organizations.</p>
 
-            <p>Encryption is automatic and requires no additional setup from users. It's enabled by default, but can be disabled in the settings under the "Security" menu.</p>
+            <p>Encryption is automatic and requires no additional setup from users. It's enabled by default, but can be disabled in the settings under the "Security" tab.</p>
 
             <div class="page-navigation">
                 <a href="../reference/supported-languages.php" class="nav-button prev">

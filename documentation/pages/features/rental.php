@@ -12,79 +12,68 @@ include '../../docs-header.php';
 
             <h2>Setting Up Rental Items</h2>
             <ol class="steps-list">
-                <li>Create a product and mark it as a rental item</li>
-                <li>Set the rental price (daily, weekly, or custom period)</li>
-                <li>Define the rental deposit amount (optional)</li>
-                <li>Add any rental terms or conditions</li>
+                <li>Go to Rental Inventory in the sidebar</li>
+                <li>Click "Add Item" to create a new rental item</li>
+                <li>Set pricing: daily rate, weekly rate, and monthly rate</li>
+                <li>Define the security deposit amount (optional)</li>
+                <li>Set the total quantity available</li>
+                <li>Link to a supplier if applicable</li>
             </ol>
 
-            <h2>Availability Calendar</h2>
-            <p>View and manage item availability at a glance:</p>
+            <h2>Tracking Availability</h2>
+            <p>Monitor your rental inventory status:</p>
             <ul>
-                <li><strong>Visual Calendar:</strong> See which items are booked and when</li>
-                <li><strong>Multiple Views:</strong> Switch between day, week, and month views</li>
-                <li><strong>Color Coding:</strong> Quickly identify booked, available, and maintenance periods</li>
-                <li><strong>Conflict Prevention:</strong> System prevents double-booking automatically</li>
+                <li><strong>Total Quantity:</strong> How many units you own</li>
+                <li><strong>Available:</strong> Units ready to rent</li>
+                <li><strong>Rented:</strong> Units currently out with customers</li>
+                <li><strong>In Maintenance:</strong> Units temporarily unavailable for service</li>
             </ul>
 
-            <h2>Creating a Booking</h2>
+            <h2>Creating a Rental Record</h2>
             <ol class="steps-list">
-                <li>Select the item to rent from your product list</li>
-                <li>Choose the start and end dates on the calendar</li>
-                <li>Select or create a customer profile</li>
-                <li>Review pricing (automatically calculated based on duration)</li>
-                <li>Collect deposit if required</li>
-                <li>Confirm the booking</li>
+                <li>Go to Rental Records in the sidebar</li>
+                <li>Click "Add Rental" to create a new record</li>
+                <li>Select the customer and rental item</li>
+                <li>Enter the quantity and rental dates</li>
+                <li>Review the pricing and total</li>
+                <li>Save the rental record</li>
             </ol>
 
             <div class="info-box">
-                <p><strong>Tip:</strong> Link bookings to customer profiles to track rental history and preferences for each customer.</p>
+                <p><strong>Tip:</strong> Link rentals to customer profiles to track rental history for each customer.</p>
             </div>
 
-            <h2>Booking Status</h2>
-            <p>Track each booking through its lifecycle:</p>
+            <h2>Rental Status</h2>
+            <p>Track each rental through its lifecycle:</p>
             <ul>
-                <li><strong>Reserved:</strong> Booking confirmed, awaiting pickup</li>
-                <li><strong>Active:</strong> Item has been picked up and is currently rented</li>
-                <li><strong>Returned:</strong> Item returned and booking completed</li>
+                <li><strong>Active:</strong> Item is currently rented out</li>
+                <li><strong>Returned:</strong> Item has been returned and rental is complete</li>
                 <li><strong>Overdue:</strong> Return date has passed</li>
-                <li><strong>Cancelled:</strong> Booking was cancelled</li>
+                <li><strong>Cancelled:</strong> Rental was cancelled</li>
             </ul>
 
             <h2>Processing Returns</h2>
             <ol class="steps-list">
-                <li>Find the booking in your active rentals list</li>
-                <li>Inspect the item for any damage</li>
-                <li>Record the return condition</li>
-                <li>Calculate any additional charges (late fees, damage)</li>
-                <li>Process the deposit refund or apply to charges</li>
-                <li>Mark as returned</li>
+                <li>Find the rental in your active rentals list</li>
+                <li>Click "Return" to mark the item as returned</li>
+                <li>The rental status will update to "Returned"</li>
+                <li>Available quantity for the item will increase automatically</li>
             </ol>
 
-            <h2>Late Fees and Damage Charges</h2>
-            <p>Handle additional charges when items are returned late or damaged:</p>
+            <h2>Maintenance Mode</h2>
+            <p>Mark items as unavailable when they need service:</p>
             <ul>
-                <li><strong>Late Fee Calculation:</strong> Automatic calculation based on days overdue</li>
-                <li><strong>Damage Assessment:</strong> Document damage with notes and photos</li>
-                <li><strong>Deposit Application:</strong> Apply deposit to cover charges</li>
-                <li><strong>Additional Billing:</strong> Generate invoice for amounts exceeding deposit</li>
+                <li>Set an item's status to "In Maintenance" to remove it from available inventory</li>
+                <li>Return it to "Active" status when service is complete</li>
             </ul>
 
-            <h2>Maintenance Periods</h2>
-            <p>Block out time for equipment maintenance:</p>
+            <h2>Rental Dashboard</h2>
+            <p>Monitor your rental operations with key metrics:</p>
             <ul>
-                <li>Schedule regular maintenance windows</li>
-                <li>Mark items as unavailable during service</li>
-                <li>Track maintenance history for each item</li>
-            </ul>
-
-            <h2>Rental Reports</h2>
-            <p>Analyze your rental business performance:</p>
-            <ul>
-                <li><strong>Utilization Rate:</strong> How often each item is rented</li>
-                <li><strong>Revenue by Item:</strong> Which items generate the most income</li>
-                <li><strong>Customer Analysis:</strong> Frequent renters and rental patterns</li>
-                <li><strong>Upcoming Returns:</strong> Items due back soon</li>
+                <li><strong>Total Rentals:</strong> All rental records</li>
+                <li><strong>Active Rentals:</strong> Currently rented out</li>
+                <li><strong>Overdue:</strong> Rentals past their return date</li>
+                <li><strong>Revenue:</strong> Total revenue from returned rentals</li>
             </ul>
 
             <div class="page-navigation">

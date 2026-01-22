@@ -333,7 +333,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="tab-content-inner">
                             <div class="tab-content-text">
                                 <h3>Scan receipts with AI</h3>
-                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts vendor, date, amount, and line items with 99% accuracy.</p>
+                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts vendor, date, amount, and line items with 98% accuracy.</p>
                                 <ul class="feature-list">
                                     <li>
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1319,7 +1319,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the vendor name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 99% accuracy.</p>
+                            <p>Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the vendor name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy.</p>
                         </div>
                     </div>
                 </div>

@@ -8,50 +8,23 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Import your existing business data from Excel spreadsheets into Argo Books. The import system supports multiple currencies and can automatically detect the currency used in your data.</p>
+            <p>Import your existing business data from Excel spreadsheets into Argo Books. The import system supports multiple currencies.</p>
 
             <h2>Preparing Your Spreadsheet</h2>
-            <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> to see the exact format required. Your Excel file can include any combination of the following sheets (not all are required):</p>
-
-            <div class="info-box">
-                <ul>
-                    <li><strong>Accountants</strong> - A simple list with accountant names</li>
-                    <li><strong>Companies</strong> - A simple list with company names</li>
-                    <li><strong>Expense products</strong> - Products for expenses</li>
-                    <li><strong>Revenue products</strong> - Products for revenue</li>
-                    <li><strong>Expenses</strong> - Expense transaction records</li>
-                    <li><strong>Revenue</strong> - Revenue transaction records</li>
-                </ul>
-            </div>
+            <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> to see the exact format required.</p>
 
             <h2>Formatting Requirements</h2>
-            <div class="info-box">
-                <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> and follow the exact format shown. This is much easier than trying to remember formatting rules!</p>
-
-                <p>Key points:</p>
-                <ul>
-                    <li><strong>Sheet names:</strong> Use "Accountants", "Companies", "Expense products", "Revenue products", "Expenses", "Revenue" (case doesn't matter)</li>
-                    <li><strong>Date format:</strong> YYYY-MM-DD (e.g., 2025-01-15)</li>
-                    <li><strong>Country names:</strong> Must match the <a class="link" href="../reference/accepted-countries.php">accepted country list</a></li>
-                    <li><strong>Everything else:</strong> Follow the template format exactly</li>
-                </ul>
-            </div>
-
-            <h2>Currency Support</h2>
-            <p>The import system supports <a class="link" href="../reference/supported-currencies.php">28 different currencies</a>. The system will attempt to automatically detect the currency from your spreadsheet data, but you can also manually select the source currency during import.</p>
-
-            <div class="info-box">
-                <strong>Multi-Currency Support:</strong> If your spreadsheet contains data in a different currency than your default, the system will automatically convert all values using real-time exchange rates for the transaction dates.
-            </div>
+            <ul>
+                <li><strong>Date format:</strong> YYYY-MM-DD (e.g., 2025-01-15)</li>
+                <li><strong>Country names:</strong> Must match the <a class="link" href="../reference/accepted-countries.php">accepted country list</a></li>
+                <li><strong>Everything else:</strong> Follow the template format exactly</li>
+            </ul>
 
             <h2>How to Import</h2>
             <ol class="steps-list">
-                <li>Click "File > Import spreadsheet"</li>
+                <li>Click "File > Import", then click the "Excel (XLSX)" button</li>
                 <li>Select your Excel file</li>
-                <li>The system will detect which data sheets are available and show a preview</li>
-                <li>Review the detected currency (or select manually if needed)</li>
-                <li>Select which data sections you want to import using the checkboxes</li>
-                <li>Optionally select a receipts folder if you have receipt files to import</li>
+                <li>Select the currency</li>
                 <li>Click "Import" to begin the process</li>
             </ol>
 

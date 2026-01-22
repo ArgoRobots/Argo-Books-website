@@ -12,56 +12,21 @@ include '../../docs-header.php';
 
             <h2>Creating Categories to organize your products</h2>
             <ol class="steps-list">
-                <li>Go to "Manage Categories" in the top menu</li>
-                <li>Choose whether the category is for expenses or revenue</li>
-                <li>Enter the category name</li>
+                <li>Go to "Categories" in the sidebar (under Management)</li>
                 <li>Click "Add Category"</li>
+                <li>Enter the category name</li>
+                <li>Save the category</li>
             </ol>
 
             <h2>Adding Products</h2>
             <ol class="steps-list">
-                <li>Go to "Manage Products" in the top menu</li>
-                <li>Select whether the product is for expenses or revenue</li>
-                <li>Enter the product ID and name</li>
-                <li>Select a category to keep things organized</li>
-                <li>Enter country and company of origin</li>
+                <li>Go to "Products/Services" in the sidebar (under Management)</li>
                 <li>Click "Add Product"</li>
+                <li>Enter the product name</li>
+                <li>Select a category to keep things organized</li>
+                <li>Set pricing and other optional fields</li>
+                <li>Save the product</li>
             </ol>
-
-            <div class="info-box">
-                <p>Let's say you run a t-shirt store. Here's how you might set up three products within 2 categories:</p>
-
-                <table class="comparison-table">
-                    <tr>
-                        <th>Category</th>
-                        <th>Product ID</th>
-                        <th>Product Name</th>
-                        <th>Country</th>
-                        <th>Company</th>
-                    </tr>
-                    <tr>
-                        <td>Men's T-Shirts</td>
-                        <td>TS001</td>
-                        <td>Black T-Shirt</td>
-                        <td>United States</td>
-                        <td>Cotton Mills Ltd</td>
-                    </tr>
-                    <tr>
-                        <td>Men's T-Shirts</td>
-                        <td>TS002</td>
-                        <td>White Linen T-Shirt</td>
-                        <td>Italy</td>
-                        <td>FabricCo</td>
-                    </tr>
-                    <tr>
-                        <td>Women's T-Shirts</td>
-                        <td>TS003</td>
-                        <td>White T-Shirt</td>
-                        <td>Germany</td>
-                        <td>TextileCo</td>
-                    </tr>
-                </table>
-            </div>
 
             <div class="warning-box">
                 <strong>Important:</strong> Free version users are limited to 10 products. <a class="link" href="../../../upgrade/">Upgrade to the paid version</a> for unlimited products.

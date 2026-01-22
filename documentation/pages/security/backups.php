@@ -13,7 +13,7 @@ include '../../docs-header.php';
             <h2>Creating a Backup</h2>
             <ol class="steps-list">
                 <li>Click "File > Export as..."</li>
-                <li>Select "ArgoSales (.zip)" from the drop-down menu</li>
+                <li>Make sure you're in the "Backup" tab</li>
                 <li>Choose a location for your backup</li>
                 <li>Store backups in a secure location, preferably on a different device or in the cloud</li>
             </ol>

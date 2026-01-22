@@ -12,35 +12,18 @@ include '../../docs-header.php';
 
             <h2>Setting Up Password Protection</h2>
             <ol class="steps-list">
-                <li>Go to "Account > Settings > Security"</li>
-                <li>Click "Enable Password Protection"</li>
+                <li>Go to "Settings > Security"</li>
+                <li>Click "Add Password"</li>
                 <li>Create a strong password</li>
             </ol>
 
             <h2>Setting Up Biometric Login (Paid Version)</h2>
-            <p>Argo Books supports biometric authentication on all major operating systems, allowing you to use fingerprint or facial recognition for quick, secure access.</p>
+            <p>Argo Books supports biometric authentication on Windows, Linux, and macOS, allowing you to use fingerprint or facial recognition for quick, secure access.</p>
 
-            <h3>Windows (Windows Hello)</h3>
             <ol class="steps-list">
-                <li>After setting up password protection, an "Enable Biometric Login" button will appear in the Security settings</li>
-                <li>Click the button and Windows Hello will prompt you to verify your identity</li>
-                <li>Once configured, you can use fingerprint, facial recognition, or PIN instead of your password</li>
-            </ol>
-
-            <h3>macOS (Touch ID)</h3>
-            <ol class="steps-list">
-                <li>Ensure Touch ID is set up in System Preferences > Touch ID</li>
-                <li>After setting up password protection, click "Enable Biometric Login" in Security settings</li>
-                <li>Authenticate with Touch ID when prompted</li>
-                <li>You can now use your fingerprint to unlock Argo Books</li>
-            </ol>
-
-            <h3>Linux (Fingerprint Authentication)</h3>
-            <ol class="steps-list">
-                <li>Ensure fingerprint authentication is configured in your system settings (fprintd)</li>
-                <li>After setting up password protection, click "Enable Biometric Login" in Security settings</li>
-                <li>Scan your fingerprint when prompted</li>
-                <li>You can now use your fingerprint to unlock Argo Books</li>
+                <li>After setting up a password, a toggle button will appear below</li>
+                <li>Click the toggle button and your computer will prompt you to verify your identity</li>
+                <li>Once configured, you can use fingerprint, facial recognition, or a PIN instead of your password</li>
             </ol>
 
             <div class="info-box">

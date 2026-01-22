@@ -9,7 +9,7 @@ include '../../docs-header.php';
 
         <div class="docs-content">
             <div class="info-box">
-                <p><strong>Premium Feature:</strong> Online payment processing is available with the Premium subscription.
+                <p><strong>Premium Feature:</strong> Online payment processing is available with the Premium plan.
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
@@ -36,13 +36,12 @@ include '../../docs-header.php';
                 <p><strong>Note:</strong> You'll need an existing account with Stripe, PayPal, or Square. Argo Books connects to your account - we never store your payment credentials.</p>
             </div>
 
-            <h2>Payment Links</h2>
-            <p>Generate payment links for easy online collection:</p>
+            <h2>Payment Portal</h2>
+            <p>When you connect a payment provider, customers can pay invoices online:</p>
             <ul>
-                <li><strong>Invoice Links:</strong> Attach payment links directly to invoices</li>
-                <li><strong>Standalone Links:</strong> Create payment links for any amount</li>
-                <li><strong>QR Codes:</strong> Generate scannable codes for in-person payments</li>
-                <li><strong>Email Integration:</strong> Send payment requests via email</li>
+                <li>Customers receive invoices with a link to your payment portal</li>
+                <li>They can pay securely using their preferred payment method</li>
+                <li>Payments sync automatically with your Argo Books account</li>
             </ul>
 
             <h2>Accepting a Payment</h2>
@@ -76,13 +75,13 @@ include '../../docs-header.php';
                 <p><strong>Tip:</strong> Fee rates may vary based on your account type, location, and transaction volume. Check with your payment provider for exact rates.</p>
             </div>
 
-            <h2>Payment Reports</h2>
-            <p>Track your payment activity:</p>
+            <h2>Payment Dashboard</h2>
+            <p>Monitor your payments at a glance:</p>
             <ul>
-                <li><strong>Transaction History:</strong> All payments received with details</li>
-                <li><strong>Outstanding Payments:</strong> Invoices awaiting payment</li>
-                <li><strong>Fee Summary:</strong> Total processing fees paid</li>
-                <li><strong>Provider Breakdown:</strong> Payments by provider</li>
+                <li><strong>Received This Month:</strong> Total payments collected</li>
+                <li><strong>Transactions:</strong> Number of payment transactions</li>
+                <li><strong>Pending:</strong> Payments awaiting processing</li>
+                <li><strong>Refunds:</strong> Refunded payments</li>
             </ul>
 
             <h2>Security</h2>

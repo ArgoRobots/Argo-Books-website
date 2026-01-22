@@ -15,8 +15,6 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Current Stock:</strong> See how many units of each product you have on hand</li>
                 <li><strong>Stock History:</strong> Track inventory changes over time</li>
-                <li><strong>Batch Tracking:</strong> Monitor different batches or lots of the same product</li>
-                <li><strong>Location Management:</strong> Track stock across multiple storage locations</li>
             </ul>
 
             <h2>Setting Up Inventory</h2>
@@ -29,16 +27,11 @@ include '../../docs-header.php';
             </ol>
 
             <h2>Reorder Points</h2>
-            <p>Set minimum stock thresholds to avoid running out of popular items:</p>
+            <p>Set stock thresholds to stay on top of your inventory:</p>
             <ul>
-                <li><strong>Minimum Level:</strong> Get alerted when stock falls below this quantity</li>
-                <li><strong>Reorder Quantity:</strong> Suggested amount to order when restocking</li>
-                <li><strong>Lead Time:</strong> Account for supplier delivery times</li>
+                <li><strong>Reorder Point:</strong> Get alerted when stock falls below this quantity</li>
+                <li><strong>Overstock Threshold:</strong> Get notified when stock exceeds this level</li>
             </ul>
-
-            <div class="info-box">
-                <p><strong>Tip:</strong> Set your reorder point higher than your minimum level to give yourself time to restock before running out completely.</p>
-            </div>
 
             <h2>Low Stock Alerts</h2>
             <p>Argo Books automatically monitors your inventory and notifies you when action is needed:</p>
@@ -53,7 +46,6 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Stock Count:</strong> Update quantities after physical inventory counts</li>
                 <li><strong>Damage/Loss:</strong> Record items lost to damage, theft, or expiration</li>
-                <li><strong>Transfers:</strong> Move stock between locations</li>
                 <li><strong>Adjustments:</strong> Correct discrepancies with notes for audit trail</li>
             </ul>
 
@@ -65,13 +57,14 @@ include '../../docs-header.php';
                 <li>Process a return (stock adjusts accordingly)</li>
             </ul>
 
-            <h2>Inventory Reports</h2>
-            <p>Generate reports to understand your inventory performance:</p>
+            <h2>Inventory Dashboard</h2>
+            <p>Monitor your inventory at a glance with key metrics:</p>
             <ul>
-                <li><strong>Stock Valuation:</strong> Total value of current inventory</li>
-                <li><strong>Movement Report:</strong> Items sold, purchased, and adjusted over time</li>
-                <li><strong>Low Stock Report:</strong> All items below reorder point</li>
-                <li><strong>Dead Stock:</strong> Items that haven't sold in a specified period</li>
+                <li><strong>Total Units:</strong> Total inventory across all products</li>
+                <li><strong>In Stock:</strong> Products with healthy stock levels</li>
+                <li><strong>Low Stock:</strong> Products below their reorder point</li>
+                <li><strong>Out of Stock:</strong> Products with zero inventory</li>
+                <li><strong>Overstock:</strong> Products above their overstock threshold</li>
             </ul>
 
             <div class="page-navigation">

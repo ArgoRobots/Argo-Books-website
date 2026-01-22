@@ -9,7 +9,7 @@ include '../../docs-header.php';
 
         <div class="docs-content">
             <div class="info-box">
-                <p><strong>Premium Feature:</strong> Invoicing & Payments is available with the Premium subscription.
+                <p><strong>Premium Feature:</strong> Invoicing & Payments is available with the Premium plan.
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
@@ -30,18 +30,18 @@ include '../../docs-header.php';
             <h2>Invoice Features</h2>
             <ul>
                 <li><strong>Automatic Numbering:</strong> Sequential invoice numbers are generated automatically</li>
-                <li><strong>Custom Templates:</strong> Add your logo and customize the invoice layout</li>
                 <li><strong>Tax Calculations:</strong> Automatic tax calculations based on your settings</li>
                 <li><strong>Multiple Currencies:</strong> Create invoices in any supported currency</li>
                 <li><strong>Notes & Terms:</strong> Add custom notes and payment terms</li>
+                <li><strong>Recurring Invoices:</strong> Set up invoices that repeat on a schedule</li>
             </ul>
 
             <h2>Sending Invoices</h2>
-            <p>Multiple ways to deliver invoices to your customers:</p>
+            <p>After creating an invoice, you can:</p>
             <ul>
-                <li><strong>Email:</strong> Send directly from Argo Books with a professional template</li>
-                <li><strong>PDF Download:</strong> Generate a PDF to send manually or print</li>
-                <li><strong>Payment Link:</strong> Include a link for online payment</li>
+                <li><strong>Preview:</strong> Review the invoice before sending</li>
+                <li><strong>Create & Send:</strong> Send the invoice to your customer</li>
+                <li><strong>Save as Draft:</strong> Save and send later</li>
             </ul>
 
             <h2>Payment Processing</h2>
@@ -76,13 +76,13 @@ include '../../docs-header.php';
                 <li>Reflected in your reports and analytics</li>
             </ul>
 
-            <h2>Invoice Reports</h2>
-            <p>Generate reports to track your invoicing performance:</p>
+            <h2>Invoice Dashboard</h2>
+            <p>Monitor your invoicing at a glance with key metrics:</p>
             <ul>
-                <li>Outstanding invoices by age</li>
-                <li>Payment collection rate</li>
-                <li>Revenue by customer</li>
-                <li>Tax collected</li>
+                <li><strong>Total Outstanding:</strong> Total amount owed across all unpaid invoices</li>
+                <li><strong>Paid This Month:</strong> Payments received in the current month</li>
+                <li><strong>Overdue:</strong> Amount past due date</li>
+                <li><strong>Due This Week:</strong> Invoices coming due soon</li>
             </ul>
 
             <div class="page-navigation">

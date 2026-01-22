@@ -114,7 +114,7 @@
 
                         <h3>AI-Powered Receipt Scanning</h3>
                         <p>
-                            Say goodbye to manual data entry. Take a photo of any receipt with your phone or upload an image from your computer, and our AI automatically extracts the vendor, date, amount, and individual line items with 99% accuracy. It's the fastest way to log expenses and keep your books up to date.
+                            Say goodbye to manual data entry. Take a photo of any receipt with your phone or upload an image from your computer, and our AI automatically extracts the vendor, date, amount, and individual line items with 98% accuracy. It's the fastest way to log expenses and keep your books up to date.
                         </p>
 
                         <h3>Predictive Analytics</h3>

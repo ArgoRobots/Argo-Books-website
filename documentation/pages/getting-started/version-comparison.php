@@ -166,13 +166,13 @@ include '../../docs-header.php';
 
             <h2>Feature Comparison</h2>
             <div class="comparison-table-wrapper">
-                <table class="comparison-table" style="text-align: left;">
+                <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th style="text-align: left;">Feature</th>
-                            <th style="text-align: left;">Free</th>
-                            <th style="text-align: left;">Standard</th>
-                            <th style="text-align: left;">Premium</th>
+                            <th>Feature</th>
+                            <th>Free</th>
+                            <th>Standard</th>
+                            <th>Premium</th>
                         </tr>
                     </thead>
                     <tbody>

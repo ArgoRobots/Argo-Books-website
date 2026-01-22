@@ -1216,7 +1216,7 @@ body.docs-page {
 .comparison-table th,
 .comparison-table td {
   padding: 14px 16px;
-  text-align: center;
+  text-align: left;
   border-bottom: 1px solid var(--gray-100);
 }
 

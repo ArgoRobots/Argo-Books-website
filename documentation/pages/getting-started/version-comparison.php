@@ -26,10 +26,9 @@ include '../../docs-header.php';
                     </div>
                     <ul class="feature-list">
                         <li class="feature-item">
-                            <svg class="limit-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M8 12h8"></path>
+                                <path d="M20 6L9 17l-5-5"></path>
                             </svg>
                             <span class="feature-text">Up to 10 products</span>
                         </li>
@@ -69,7 +68,7 @@ include '../../docs-header.php';
                             <span class="feature-text">Core features</span>
                         </li>
                     </ul>
-                    <a href="../../../downloads/" class="btn btn-gray">Get Started Free</a>
+                    <a href="../../../downloads/" class="btn btn-gray">Get Started for Free</a>
                     <p class="version-note">Free forever</p>
                 </div>
 
@@ -126,7 +125,7 @@ include '../../docs-header.php';
                 <div class="version-card premium">
                     <div class="card-header">
                         <h3 class="version-title">Premium</h3>
-                        <p class="version-subtitle">AI-powered features</p>
+                        <p class="version-subtitle">Includes AI-powered features</p>
                         <div class="version-price">$5 <span class="price-period">CAD/month</span></div>
                         <p class="price-alt">or $50 CAD/year (save $10)</p>
                     </div>
@@ -150,7 +149,7 @@ include '../../docs-header.php';
                                 stroke="currentColor" stroke-width="2">
                                 <path d="M20 6L9 17l-5-5"></path>
                             </svg>
-                            <span class="feature-text"><strong>AI receipt scanning</strong> <span style="font-size: 0.85em; opacity: 0.8;">(500/month)</span></span>
+                            <span class="feature-text"><strong>AI receipt scanning</strong> <span style="font-size: 0.85em; opacity: 0.8;">(500 receipts / month)</span></span>
                         </li>
                         <li class="feature-item">
                             <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -170,10 +169,10 @@ include '../../docs-header.php';
                 <table class="comparison-table">
                     <thead>
                         <tr>
-                            <th>Feature</th>
-                            <th>Free</th>
-                            <th>Standard</th>
-                            <th>Premium</th>
+                            <th style="text-align: left;">Feature</th>
+                            <th style="text-align: left;">Free</th>
+                            <th style="text-align: left;">Standard</th>
+                            <th style="text-align: left;">Premium</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -226,7 +225,7 @@ include '../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
-                            <td>AI Receipt Scanning <span style="font-size: 0.85em; opacity: 0.7;">(500/month)</span></td>
+                            <td>AI Receipt Scanning <span style="font-size: 0.85em; opacity: 0.7;">(500 receipts / month)</span></td>
                             <td>—</td>
                             <td>—</td>
                             <td>✓</td>

@@ -1,0 +1,127 @@
+[
+  {
+    "dataType": "Session",
+    "event": {
+      "dataType": "Session",
+      "action": "SessionStart",
+      "dataId": "51463620a9a647c3",
+      "timestamp": "2026-01-22T06:53:46.256499Z",
+      "appVersion": "2.0.0",
+      "platform": "Windows",
+      "userAgent": "Microsoft Windows 10.0.26200 (X64)",
+      "geoLocation": {
+        "country": "Canada",
+        "countryCode": "CA",
+        "region": "SK",
+        "city": "Saskatoon",
+        "timezone": "America/Regina",
+        "hashedIp": "e7bf5f0919897ff0"
+      }
+    }
+  },
+  {
+    "dataType": "FeatureUsage",
+    "event": {
+      "dataType": "FeatureUsage",
+      "featureName": "PageView",
+      "context": "Dashboard",
+      "dataId": "6ec695f393734baf",
+      "timestamp": "2026-01-22T06:55:42.0677706Z",
+      "appVersion": "2.0.0",
+      "platform": "Windows",
+      "userAgent": "Microsoft Windows 10.0.26200 (X64)",
+      "geoLocation": {
+        "country": "Canada",
+        "countryCode": "CA",
+        "region": "SK",
+        "city": "Saskatoon",
+        "timezone": "America/Regina",
+        "hashedIp": "e7bf5f0919897ff0"
+      }
+    }
+  },
+  {
+    "dataType": "FeatureUsage",
+    "event": {
+      "dataType": "FeatureUsage",
+      "featureName": "PageView",
+      "context": "Expenses",
+      "dataId": "b933d449830b4b33",
+      "timestamp": "2026-01-22T06:55:43.144228Z",
+      "appVersion": "2.0.0",
+      "platform": "Windows",
+      "userAgent": "Microsoft Windows 10.0.26200 (X64)",
+      "geoLocation": {
+        "country": "Canada",
+        "countryCode": "CA",
+        "region": "SK",
+        "city": "Saskatoon",
+        "timezone": "America/Regina",
+        "hashedIp": "e7bf5f0919897ff0"
+      }
+    }
+  },
+  {
+    "dataType": "FeatureUsage",
+    "event": {
+      "dataType": "FeatureUsage",
+      "featureName": "PageView",
+      "context": "Revenue",
+      "dataId": "87ef43215ef9437d",
+      "timestamp": "2026-01-22T06:55:43.5084309Z",
+      "appVersion": "2.0.0",
+      "platform": "Windows",
+      "userAgent": "Microsoft Windows 10.0.26200 (X64)",
+      "geoLocation": {
+        "country": "Canada",
+        "countryCode": "CA",
+        "region": "SK",
+        "city": "Saskatoon",
+        "timezone": "America/Regina",
+        "hashedIp": "e7bf5f0919897ff0"
+      }
+    }
+  },
+  {
+    "dataType": "FeatureUsage",
+    "event": {
+      "dataType": "FeatureUsage",
+      "featureName": "PageView",
+      "context": "Invoices",
+      "dataId": "23ee4c1c145944e2",
+      "timestamp": "2026-01-22T06:55:43.8236265Z",
+      "appVersion": "2.0.0",
+      "platform": "Windows",
+      "userAgent": "Microsoft Windows 10.0.26200 (X64)",
+      "geoLocation": {
+        "country": "Canada",
+        "countryCode": "CA",
+        "region": "SK",
+        "city": "Saskatoon",
+        "timezone": "America/Regina",
+        "hashedIp": "e7bf5f0919897ff0"
+      }
+    }
+  },
+  {
+    "dataType": "Session",
+    "event": {
+      "dataType": "Session",
+      "action": "SessionEnd",
+      "durationSeconds": 135,
+      "dataId": "b78da087e6564181",
+      "timestamp": "2026-01-22T06:56:01.4739208Z",
+      "appVersion": "2.0.0",
+      "platform": "Windows",
+      "userAgent": "Microsoft Windows 10.0.26200 (X64)",
+      "geoLocation": {
+        "country": "Canada",
+        "countryCode": "CA",
+        "region": "SK",
+        "city": "Saskatoon",
+        "timezone": "America/Regina",
+        "hashedIp": "e7bf5f0919897ff0"
+      }
+    }
+  }
+]

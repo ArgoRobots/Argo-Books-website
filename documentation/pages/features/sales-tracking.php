@@ -10,14 +10,15 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>Track all your business transactions with Argo Books.</p>
 
+            <h2>Adding Transactions</h2>
             <ol class="steps-list">
-                <li>Click "Add Expense" or "Add Revenue" in the top menu</li>
-                <li>Enter the order number and select your name from the accountants list</li>
-                <li>Select the product from the dropdown (must be added in <a class="link" href="product-management.php">Product Management</a> first)</li>
-                <li>Enter the quantity and price per unit</li>
-                <li>Add shipping costs, taxes, and any other fees</li>
+                <li>Go to "Expenses" or "Revenue" in the sidebar (under Transactions)</li>
+                <li>Click the "Add Expense" or "Add Revenue" button</li>
+                <li>Select a customer (optional)</li>
+                <li>Enter the amount, category, and date</li>
+                <li>Add a description</li>
                 <li>Optionally attach a receipt</li>
-                <li>Click "Add" to save</li>
+                <li>Click "Save" to add the transaction</li>
             </ol>
 
             <div class="info-box">

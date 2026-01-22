@@ -12,20 +12,20 @@ include '../../docs-header.php';
 
             <h2>Creating Categories to organize your products</h2>
             <ol class="steps-list">
-                <li>Go to "Manage Categories" in the top menu</li>
-                <li>Choose whether the category is for expenses or revenue</li>
-                <li>Enter the category name</li>
+                <li>Go to "Categories" in the sidebar (under Management)</li>
                 <li>Click "Add Category"</li>
+                <li>Enter the category name</li>
+                <li>Save the category</li>
             </ol>
 
             <h2>Adding Products</h2>
             <ol class="steps-list">
-                <li>Go to "Manage Products" in the top menu</li>
-                <li>Select whether the product is for expenses or revenue</li>
-                <li>Enter the product ID and name</li>
-                <li>Select a category to keep things organized</li>
-                <li>Enter country and company of origin</li>
+                <li>Go to "Products/Services" in the sidebar (under Management)</li>
                 <li>Click "Add Product"</li>
+                <li>Enter the product name and details</li>
+                <li>Select a category to keep things organized</li>
+                <li>Set pricing and other optional fields</li>
+                <li>Save the product</li>
             </ol>
 
             <div class="info-box">

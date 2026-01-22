@@ -13,17 +13,12 @@ include '../../docs-header.php';
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
-            <p>See the future of your business with machine learning forecasting. Our predictive engine analyzes your historical data to help you make smarter decisions.</p>
-
-            <div class="info-box">
-                <p><strong>Privacy First:</strong> All analysis happens locally on your device. Your data is never uploaded to the cloud - the ML models run entirely on your computer.</p>
-            </div>
+            <p>See the future of your business with machine learning (ML) forecasting. Our predictive engine analyzes your historical data to help you make smarter decisions. All analysis happens locally on your device. Your data is never uploaded to the cloud - the ML models run entirely on your computer.</p>
 
             <h2>Revenue Forecasting</h2>
-            <p>Our predictive engine analyzes your historical revenue data to forecast:</p>
+            <p>Our predictive engine analyzes your historical data to forecast:</p>
             <ul>
-                <li><strong>Weekly Projections:</strong> Expected revenue for the coming weeks</li>
-                <li><strong>Monthly Forecasts:</strong> Longer-term revenue predictions</li>
+                <li><strong>Growth</strong> Expected revenue, expenses, and profits for the selected time frame</li>
                 <li><strong>Product Demand:</strong> Which products will sell best</li>
                 <li><strong>Peak Periods:</strong> Your best and worst performing times</li>
             </ul>

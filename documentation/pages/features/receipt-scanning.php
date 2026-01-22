@@ -71,11 +71,10 @@ include '../../docs-header.php';
             </ol>
 
             <h2>Accuracy and Corrections</h2>
-            <p>Our AI achieves 99% accuracy on printed receipts. After scanning:</p>
+            <p>Our AI achieves 98% accuracy on printed receipts. After scanning:</p>
             <ul>
                 <li>Review all extracted fields before saving</li>
                 <li>Make corrections directly in the review screen</li>
-                <li>The AI learns from your corrections to improve future scans</li>
             </ul>
 
             <div class="page-navigation">

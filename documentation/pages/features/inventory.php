@@ -15,8 +15,6 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Current Stock:</strong> See how many units of each product you have on hand</li>
                 <li><strong>Stock History:</strong> Track inventory changes over time</li>
-                <li><strong>Batch Tracking:</strong> Monitor different batches or lots of the same product</li>
-                <li><strong>Location Management:</strong> Track stock across multiple storage locations</li>
             </ul>
 
             <h2>Setting Up Inventory</h2>
@@ -53,7 +51,6 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Stock Count:</strong> Update quantities after physical inventory counts</li>
                 <li><strong>Damage/Loss:</strong> Record items lost to damage, theft, or expiration</li>
-                <li><strong>Transfers:</strong> Move stock between locations</li>
                 <li><strong>Adjustments:</strong> Correct discrepancies with notes for audit trail</li>
             </ul>
 

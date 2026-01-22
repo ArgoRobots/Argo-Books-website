@@ -116,7 +116,8 @@ document.addEventListener("DOMContentLoaded", function () {
     exchangeRatesData,
     googleSheetsData,
     sessionData,
-    errorData
+    errorData,
+    featureUsageData
   );
   generateVersionPerformanceChart(exportData, openaiData, exchangeRatesData);
   generateVersionSessionChart(sessionData);
@@ -799,7 +800,7 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById(
         "errorRatesByCountryChart"
       ).parentElement.innerHTML =
-        '<div class="chart-no-data"><h3>🎉 No Errors by Country!</h3><p>All regions running smoothly</p></div>';
+        '<div class="chart-no-data">No error data by country available</div>';
       return;
     }
 
@@ -1074,7 +1075,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ];
 
     new Chart(document.getElementById("versionDistributionChart"), {
-      type: "doughnut",
+      type: "pie",
       data: {
         labels: labels,
         datasets: [
@@ -1207,7 +1208,8 @@ document.addEventListener("DOMContentLoaded", function () {
     exchangeRatesData,
     googleSheetsData,
     sessionData,
-    errorData
+    errorData,
+    featureUsageData
   ) {
     const allData = [
       ...exportData,
@@ -1216,6 +1218,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ...googleSheetsData,
       ...sessionData,
       ...errorData,
+      ...featureUsageData,
     ];
     const versionStats = {};
 
@@ -1229,6 +1232,7 @@ document.addEventListener("DOMContentLoaded", function () {
             openai: 0,
             exchangeRates: 0,
             sessions: 0,
+            features: 0,
             errors: 0,
           };
         }
@@ -1247,6 +1251,9 @@ document.addEventListener("DOMContentLoaded", function () {
             break;
           case "Session":
             versionStats[version].sessions++;
+            break;
+          case "FeatureUsage":
+            versionStats[version].features++;
             break;
           case "Error":
             versionStats[version].errors++;
@@ -1272,33 +1279,47 @@ document.addEventListener("DOMContentLoaded", function () {
       ([, stats]) => stats.exchangeRates
     );
     const chartSessionData = sortedVersions.map(([, stats]) => stats.sessions);
+    const chartFeatureData = sortedVersions.map(([, stats]) => stats.features || 0);
+
+    // Only include datasets that have data
+    const allDatasets = [
+      {
+        label: "Exports",
+        data: chartExportData,
+        backgroundColor: "#3b82f6",
+      },
+      {
+        label: "OpenAI",
+        data: chartOpenaiData,
+        backgroundColor: "#8b5cf6",
+      },
+      {
+        label: "Exchange Rates",
+        data: chartExchangeData,
+        backgroundColor: "#f59e0b",
+      },
+      {
+        label: "Sessions",
+        data: chartSessionData,
+        backgroundColor: "#10b981",
+      },
+      {
+        label: "Features",
+        data: chartFeatureData,
+        backgroundColor: "#06b6d4",
+      },
+    ];
+
+    // Filter to only show datasets with at least some data
+    const activeDatasets = allDatasets.filter((ds) =>
+      ds.data.some((val) => val > 0)
+    );
 
     new Chart(document.getElementById("topVersionsChart"), {
       type: "bar",
       data: {
         labels: labels,
-        datasets: [
-          {
-            label: "Exports",
-            data: chartExportData,
-            backgroundColor: "#3b82f6",
-          },
-          {
-            label: "OpenAI",
-            data: chartOpenaiData,
-            backgroundColor: "#8b5cf6",
-          },
-          {
-            label: "Exchange Rates",
-            data: chartExchangeData,
-            backgroundColor: "#f59e0b",
-          },
-          {
-            label: "Sessions",
-            data: chartSessionData,
-            backgroundColor: "#10b981",
-          },
-        ],
+        datasets: activeDatasets,
       },
       options: {
         responsive: true,
@@ -1513,7 +1534,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ) {
     if (errorData.length === 0) {
       document.getElementById("versionErrorChart").parentElement.innerHTML =
-        '<div class="chart-no-data"><h3>🎉 No Errors by Version!</h3><p>All versions running smoothly</p></div>';
+        '<div class="chart-no-data">No error data by version available</div>';
       return;
     }
 
@@ -1604,7 +1625,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateErrorCategoryChart(errorData) {
     if (errorData.length === 0) {
       document.getElementById("errorCategoryChart").parentElement.innerHTML =
-        '<div class="chart-no-data"><h3>🎉 No Errors Detected!</h3><p>Your application is running smoothly</p></div>';
+        '<div class="chart-no-data">No error data available</div>';
       return;
     }
 
@@ -1666,7 +1687,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateErrorCodeChart(errorData) {
     if (errorData.length === 0) {
       document.getElementById("errorCodeChart").parentElement.innerHTML =
-        '<div class="chart-no-data"><h3>🎉 No Error Codes!</h3><p>Clean codebase detected</p></div>';
+        '<div class="chart-no-data">No error code data available</div>';
       return;
     }
 
@@ -2547,7 +2568,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateErrorSeverityChart(errorData) {
     if (errorData.length === 0) {
       document.getElementById("errorSeverityChart").parentElement.innerHTML =
-        '<div class="chart-no-data"><h3>No Errors!</h3><p>All systems running smoothly</p></div>';
+        '<div class="chart-no-data">No error severity data available</div>';
       return;
     }
 

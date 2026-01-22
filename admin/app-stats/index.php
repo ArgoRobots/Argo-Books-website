@@ -36,23 +36,24 @@ $aggregatedData = [
 $fileInfo = [];
 
 // Helper function to normalize event data from the new format
+// Handles both PascalCase and camelCase field names
 function normalizeEvent($event) {
     $normalized = [
-        'timestamp' => $event['Timestamp'] ?? date('Y-m-d H:i:s'),
-        'appVersion' => $event['AppVersion'] ?? 'Unknown',
-        'platform' => $event['Platform'] ?? 'Unknown',
-        'userAgent' => $event['UserAgent'] ?? '',
-        'dataType' => $event['DataType'] ?? 'Unknown'
+        'timestamp' => $event['timestamp'] ?? $event['Timestamp'] ?? date('Y-m-d H:i:s'),
+        'appVersion' => $event['appVersion'] ?? $event['AppVersion'] ?? 'Unknown',
+        'platform' => $event['platform'] ?? $event['Platform'] ?? 'Unknown',
+        'userAgent' => $event['userAgent'] ?? $event['UserAgent'] ?? '',
+        'dataType' => $event['dataType'] ?? $event['DataType'] ?? 'Unknown'
     ];
 
-    // Extract geo-location data
-    if (isset($event['GeoLocation']) && is_array($event['GeoLocation'])) {
-        $geo = $event['GeoLocation'];
-        $normalized['country'] = $geo['Country'] ?? 'Unknown';
-        $normalized['region'] = $geo['Region'] ?? '';
-        $normalized['city'] = $geo['City'] ?? '';
-        $normalized['timezone'] = $geo['Timezone'] ?? '';
-        $normalized['hashedIP'] = $geo['IpHash'] ?? '';
+    // Extract geo-location data (handle both camelCase and PascalCase)
+    $geo = $event['geoLocation'] ?? $event['GeoLocation'] ?? null;
+    if (isset($geo) && is_array($geo)) {
+        $normalized['country'] = $geo['country'] ?? $geo['Country'] ?? 'Unknown';
+        $normalized['region'] = $geo['region'] ?? $geo['Region'] ?? '';
+        $normalized['city'] = $geo['city'] ?? $geo['City'] ?? '';
+        $normalized['timezone'] = $geo['timezone'] ?? $geo['Timezone'] ?? '';
+        $normalized['hashedIP'] = $geo['hashedIp'] ?? $geo['IpHash'] ?? '';
     }
 
     return $normalized;
@@ -60,7 +61,12 @@ function normalizeEvent($event) {
 
 // Helper function to categorize and transform events
 function processEvent($event, $sourceFile) {
-    $dataType = $event['DataType'] ?? null;
+    // Handle nested event structure (wrapper has dataType, actual data is in event property)
+    if (isset($event['event']) && is_array($event['event'])) {
+        $event = $event['event'];
+    }
+
+    $dataType = $event['dataType'] ?? $event['DataType'] ?? null;
     if (!$dataType) {
         return null;
     }
@@ -70,30 +76,39 @@ function processEvent($event, $sourceFile) {
 
     switch ($dataType) {
         case 'Session':
-            $normalized['sessionId'] = $event['SessionId'] ?? '';
-            $normalized['action'] = $event['EventType'] === 'Start' ? 'SessionStart' : 'SessionEnd';
-            $normalized['duration'] = $event['DurationSeconds'] ?? 0;
-            $normalized['companyCount'] = $event['CompanyCount'] ?? 0;
+            $normalized['sessionId'] = $event['sessionId'] ?? $event['SessionId'] ?? '';
+            // Handle both 'action' field (SessionStart/SessionEnd) and 'EventType' field (Start/End)
+            $action = $event['action'] ?? null;
+            $eventType = $event['eventType'] ?? $event['EventType'] ?? null;
+            if ($action) {
+                $normalized['action'] = $action;
+            } elseif ($eventType) {
+                $normalized['action'] = $eventType === 'Start' ? 'SessionStart' : 'SessionEnd';
+            } else {
+                $normalized['action'] = 'Unknown';
+            }
+            $normalized['duration'] = $event['durationSeconds'] ?? $event['DurationSeconds'] ?? 0;
+            $normalized['companyCount'] = $event['companyCount'] ?? $event['CompanyCount'] ?? 0;
             return ['category' => 'Session', 'data' => $normalized];
 
         case 'Export':
-            $normalized['ExportType'] = $event['ExportType'] ?? 'Unknown';
-            $normalized['DurationMS'] = $event['DurationMs'] ?? 0;
-            $normalized['FileSize'] = $event['FileSizeBytes'] ?? null;
-            $normalized['RecordCount'] = $event['RecordCount'] ?? 0;
+            $normalized['ExportType'] = $event['exportType'] ?? $event['ExportType'] ?? 'Unknown';
+            $normalized['DurationMS'] = $event['durationMs'] ?? $event['DurationMs'] ?? 0;
+            $normalized['FileSize'] = $event['fileSizeBytes'] ?? $event['FileSizeBytes'] ?? null;
+            $normalized['RecordCount'] = $event['recordCount'] ?? $event['RecordCount'] ?? 0;
             return ['category' => 'Export', 'data' => $normalized];
 
         case 'ApiUsage':
-            $serviceName = $event['ServiceName'] ?? 'Unknown';
-            $normalized['DurationMS'] = $event['DurationMs'] ?? 0;
-            $normalized['Success'] = $event['Success'] ?? true;
-            $normalized['Endpoint'] = $event['Endpoint'] ?? '';
-            $normalized['ErrorMessage'] = $event['ErrorMessage'] ?? null;
+            $serviceName = $event['serviceName'] ?? $event['ServiceName'] ?? 'Unknown';
+            $normalized['DurationMS'] = $event['durationMs'] ?? $event['DurationMs'] ?? 0;
+            $normalized['Success'] = $event['success'] ?? $event['Success'] ?? true;
+            $normalized['Endpoint'] = $event['endpoint'] ?? $event['Endpoint'] ?? '';
+            $normalized['ErrorMessage'] = $event['errorMessage'] ?? $event['ErrorMessage'] ?? null;
 
             switch ($serviceName) {
                 case 'OpenAI':
-                    $normalized['TokensUsed'] = $event['TokensUsed'] ?? 0;
-                    $normalized['Model'] = $event['Model'] ?? 'Unknown';
+                    $normalized['TokensUsed'] = $event['tokensUsed'] ?? $event['TokensUsed'] ?? 0;
+                    $normalized['Model'] = $event['model'] ?? $event['Model'] ?? 'Unknown';
                     return ['category' => 'OpenAI', 'data' => $normalized];
 
                 case 'ExchangeRate':
@@ -111,21 +126,21 @@ function processEvent($event, $sourceFile) {
             }
 
         case 'Error':
-            $normalized['Category'] = $event['Category'] ?? 'Unknown';
-            $normalized['Severity'] = $event['Severity'] ?? 'Error';
-            $normalized['Message'] = $event['Message'] ?? '';
-            $normalized['StackTrace'] = $event['StackTrace'] ?? '';
-            $normalized['Context'] = $event['Context'] ?? '';
+            $normalized['Category'] = $event['category'] ?? $event['Category'] ?? 'Unknown';
+            $normalized['Severity'] = $event['severity'] ?? $event['Severity'] ?? 'Error';
+            $normalized['Message'] = $event['message'] ?? $event['Message'] ?? '';
+            $normalized['StackTrace'] = $event['stackTrace'] ?? $event['StackTrace'] ?? '';
+            $normalized['Context'] = $event['context'] ?? $event['Context'] ?? '';
             // Legacy field mapping for existing charts
-            $normalized['ErrorCategory'] = $event['Category'] ?? 'Unknown';
-            $normalized['ErrorCode'] = $event['Category'] ?? 'Unknown';
+            $normalized['ErrorCategory'] = $normalized['Category'];
+            $normalized['ErrorCode'] = $normalized['Category'];
             return ['category' => 'Error', 'data' => $normalized];
 
         case 'FeatureUsage':
-            $normalized['FeatureName'] = $event['FeatureName'] ?? 'Unknown';
-            $normalized['Context'] = $event['Context'] ?? '';
-            $normalized['DurationMs'] = $event['DurationMs'] ?? 0;
-            $normalized['Metadata'] = $event['Metadata'] ?? [];
+            $normalized['FeatureName'] = $event['featureName'] ?? $event['FeatureName'] ?? 'Unknown';
+            $normalized['Context'] = $event['context'] ?? $event['Context'] ?? '';
+            $normalized['DurationMs'] = $event['durationMs'] ?? $event['DurationMs'] ?? 0;
+            $normalized['Metadata'] = $event['metadata'] ?? $event['Metadata'] ?? [];
             return ['category' => 'FeatureUsage', 'data' => $normalized];
 
         default:
@@ -165,8 +180,12 @@ if (!is_dir($dataDir)) {
 
             $sourceFile = basename($file);
 
-            // New Avalonia format: array of events with DataType field
-            if (is_array($fileData) && isset($fileData[0]['DataType'])) {
+            // New Avalonia format: array of events with dataType/DataType field
+            // Check for both camelCase (dataType) and PascalCase (DataType)
+            $isEventArray = is_array($fileData) && isset($fileData[0]) &&
+                (isset($fileData[0]['dataType']) || isset($fileData[0]['DataType']));
+
+            if ($isEventArray) {
                 foreach ($fileData as $event) {
                     $result = processEvent($event, $sourceFile);
                     if ($result !== null) {
@@ -186,8 +205,8 @@ if (!is_dir($dataDir)) {
                 }
                 $processedFiles++;
             }
-            // Single event object with DataType
-            elseif (isset($fileData['DataType'])) {
+            // Single event object with dataType/DataType
+            elseif (isset($fileData['dataType']) || isset($fileData['DataType'])) {
                 $result = processEvent($fileData, $sourceFile);
                 if ($result !== null) {
                     $category = $result['category'];

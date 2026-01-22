@@ -12,16 +12,11 @@ include '../../docs-header.php';
 
             <ol class="steps-list">
                 <li>Choose your default currency and create your first company</li>
-                <li>Add accountants and companies you will be working with</li>
+                <li>Add your suppliers</li>
                 <li>Set up categories to organize your products</li>
                 <li>Add your initial products</li>
                 <li>Add expenses and revenue</li>
             </ol>
-
-            <div class="info-box">
-                <strong>Note:</strong> A video tutorial is coming soon to help you visualize these steps. Check back
-                later for a comprehensive walkthrough.
-            </div>
 
             <div class="page-navigation">
                 <a href="installation.php" class="nav-button prev">

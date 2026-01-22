@@ -14,15 +14,13 @@ include '../../docs-header.php';
             <ol class="steps-list">
                 <li>Go to "Expenses" or "Revenue" in the sidebar (under Transactions)</li>
                 <li>Click the "Add Expense" or "Add Revenue" button</li>
-                <li>Select a customer (optional)</li>
                 <li>Enter the amount, category, and date</li>
-                <li>Add a description</li>
                 <li>Optionally attach a receipt</li>
                 <li>Click "Save" to add the transaction</li>
             </ol>
 
             <div class="info-box">
-                <strong>Tip:</strong> Use the "Multiple items" checkbox when adding multiple products to a single expense or revenue entry.
+                <strong>Tip:</strong> You can add multiple products to a transaction by clicking the "Add item" button.
             </div>
 
             <div class="page-navigation">

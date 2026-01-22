@@ -11,8 +11,8 @@ include '../../docs-header.php';
             <p>Keep your records organized by attaching and managing digital receipts for all transactions.</p>
 
             <h2>Adding Receipts</h2>
-            <p>When adding an expense or revenue entry, click the "Add Receipt" button, then select the receipt file from your computer.</p>
-            <p>To add receipts to existing transactions, right-click the transaction, select "Modify", and click the "Add receipt" button.</p>
+            <p>When adding an expense or revenue entry, click the "Attach" button, then select the receipt from your computer.</p>
+            <p>To add receipts to existing transactions, click the edit button in the actions column, and click the "Attach" button.</p>
 
             <h2>Digitizing Physical Receipts</h2>
             <p>You can quickly digitize paper receipts by taking a photo with your smartphone:</p>
@@ -22,27 +22,16 @@ include '../../docs-header.php';
                 <li>Position your phone's camera over the receipt</li>
                 <li>The app will automatically detect the receipt's edges and optimize the image</li>
                 <li>Save the digitized receipt as a PDF or image file</li>
-                <li>Upload the digital copy to your computer or sync with your cloud storage</li>
+                <li>Upload the digital copy to your computer</li>
             </ol>
 
-            <h2>Exporting Receipts from the main screen</h2>
+            <h2>Exporting Receipts from the Receipts page</h2>
             <ol class="steps-list">
-                <li>Select the transactions you want to export receipts for. You can hold down the Ctrl key or use the Shift key</li>
-                <li>Right-click on any of the selected transaction and click "Export receipts"</li>
-                <li>Choose a destination folder</li>
-            </ol>
-
-            <h2>Exporting Receipts from the Receipt Manager</h2>
-            <ol class="steps-list">
-                <li>Click the file button on the top left, then click "Export Receipts"</li>
+                <li>Go to "Receipts" in the sidebar (at the very bottom)</li>
                 <li>Optionally filter the receipts you want to export</li>
-                <li>Select the receipts you want to export. You can click the "Select all" button or press "Ctrl+A"</li>
-                <li>Click the "Export" button and choose the destination</li>
+                <li>Select the receipts you want to export."</li>
+                <li>Click the "Export Selected" button and choose the destination</li>
             </ol>
-
-            <div class="info-box">
-                <strong>Tip:</strong> When exporting multiple receipts, they will be organized in a dated folder.
-            </div>
 
             <div class="page-navigation">
                 <a href="sales-tracking.php" class="nav-button prev">

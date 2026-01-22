@@ -180,12 +180,31 @@ if (!is_dir($dataDir)) {
 
             $sourceFile = basename($file);
 
-            // New Avalonia format: array of events with dataType/DataType field
-            // Check for both camelCase (dataType) and PascalCase (DataType)
-            $isEventArray = is_array($fileData) && isset($fileData[0]) &&
-                (isset($fileData[0]['dataType']) || isset($fileData[0]['DataType']));
+            // Avalonia upload format: wrapper object with events array
+            // Format: { "uploadTime": "...", "eventCount": N, "events": [...] }
+            if (isset($fileData['events']) && is_array($fileData['events'])) {
+                foreach ($fileData['events'] as $event) {
+                    $result = processEvent($event, $sourceFile);
+                    if ($result !== null) {
+                        $category = $result['category'];
+                        $data = $result['data'];
 
-            if ($isEventArray) {
+                        if (!isset($aggregatedData['dataPoints'][$category])) {
+                            $aggregatedData['dataPoints'][$category] = [];
+                        }
+                        $aggregatedData['dataPoints'][$category][] = $data;
+
+                        // Enable geo-location if any event has it
+                        if (!empty($data['country']) && $data['country'] !== 'Unknown') {
+                            $aggregatedData['geoLocationEnabled'] = true;
+                        }
+                    }
+                }
+                $processedFiles++;
+            }
+            // Alternative: direct array of events with dataType/DataType field
+            elseif (is_array($fileData) && isset($fileData[0]) &&
+                (isset($fileData[0]['dataType']) || isset($fileData[0]['DataType']))) {
                 foreach ($fileData as $event) {
                     $result = processEvent($event, $sourceFile);
                     if ($result !== null) {

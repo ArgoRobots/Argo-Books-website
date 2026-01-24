@@ -27,7 +27,7 @@ include '../../docs-header.php';
             <h2>Step 2: Layout Designer</h2>
             <p>Design your report using drag-and-drop functionality.</p>
             <ul>
-                <li><strong>Add Charts:</strong> Choose from 40+ chart types across categories like Revenue, Expenses, Financial, Geographic, Customers, Returns, and more</li>
+                <li><strong>Add Charts:</strong> Choose from 30+ chart types across categories like Revenue, Expenses, Financial, Geographic, Customers, Returns, and more</li>
                 <li><strong>Add Elements:</strong> Include text labels, images, date ranges, summary statistics, and tables</li>
                 <li><strong>Drag and Drop:</strong> Click and drag elements to position them on the canvas</li>
                 <li><strong>Resize:</strong> Select an element and drag the corner handles to resize</li>

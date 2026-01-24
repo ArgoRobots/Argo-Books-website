@@ -20,7 +20,7 @@ class DocumentationSearch {
             { id: 'product-management', title: 'Product Management', category: 'Core Features', folder: 'features', keywords: 'products categories inventory add create manage organize' },
             { id: 'sales-tracking', title: 'Expense/Revenue Tracking', category: 'Core Features', folder: 'features', keywords: 'expense revenue transaction order tracking add quantity price shipping tax' },
             { id: 'receipts', title: 'Receipt Management', category: 'Core Features', folder: 'features', keywords: 'receipt digital scan microsoft lens export attach' },
-            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data accountants companies products expenses revenue currency' },
+            { id: 'spreadsheet-import', title: 'Spreadsheet Import', category: 'Core Features', folder: 'features', keywords: 'import excel spreadsheet xlsx csv data suppliers products expenses revenue currency' },
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
             { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
             { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact expense history notes tags crm relationship' },

@@ -29,7 +29,7 @@ include '../../docs-header.php';
             <ol class="steps-list">
                 <li>Go to "Receipts" in the sidebar (at the very bottom)</li>
                 <li>Filter the receipts you want to export (optional)</li>
-                <li>Select the receipts you want to export."</li>
+                <li>Select the receipts you want to export</li>
                 <li>Click the "Export Selected" button and choose the destination</li>
             </ol>
 

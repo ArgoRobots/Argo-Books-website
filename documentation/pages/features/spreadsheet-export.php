@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Spreadsheet Export';
-$pageDescription = 'Learn how to export your Argo Books data to Excel spreadsheets for backup, analysis, or sharing with accountants.';
+$pageDescription = 'Learn how to export your Argo Books data to Excel spreadsheets for backup, analysis, or sharing with others.';
 $currentPage = 'spreadsheet-export';
 $pageCategory = 'features';
 
@@ -8,7 +8,7 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Export your data to Excel spreadsheets for backup, analysis, or sharing with accountants and business partners.</p>
+            <p>Export your data to Excel spreadsheets for backup, analysis, or sharing with business partners.</p>
 
             <h2>Exporting Your Data</h2>
             <ol class="steps-list">
@@ -33,7 +33,7 @@ include '../../docs-header.php';
             </div>
 
             <h2>Receipt Export</h2>
-            <p>Receipt filenames are included in the exported spreadsheet. If you need the actual receipt files:</p>
+            <p>Receipt file names are included in the exported spreadsheet. If you need the actual receipt files:</p>
             <ol class="steps-list">
                 <li>Select the transactions you want to export receipts for in the main view</li>
                 <li>Right-click and select "Export receipts"</li>

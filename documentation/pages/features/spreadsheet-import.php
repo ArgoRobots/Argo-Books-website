@@ -11,7 +11,7 @@ include '../../docs-header.php';
             <p>Import your existing business data from Excel spreadsheets into Argo Books. The import system supports multiple currencies.</p>
 
             <h2>Preparing Your Spreadsheet</h2>
-            <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">template spreadsheet</a> to see the exact format required.</p>
+            <p>Download our <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">spreadsheet template</a> to see the exact format required.</p>
 
             <h2>Formatting Requirements</h2>
             <ul>
@@ -29,7 +29,7 @@ include '../../docs-header.php';
             </ol>
 
             <h2>What Gets Created Automatically</h2>
-            <p>The import system automatically creates any missing companies, categories, or accountants referenced in your transaction data.</p>
+            <p>The import system automatically creates any missing categories, customers, or suppliers referenced in your transaction data.</p>
 
             <h2>Receipt Import</h2>
             <p>If you have receipt files to import alongside your data:</p>

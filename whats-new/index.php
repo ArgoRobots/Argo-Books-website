@@ -750,7 +750,7 @@
                             <div class="feature-content">
                                 <h3>Import and Export Spreadsheets<span class="type-tag feature">New Feature</span></h3>
                                 <p>Seamlessly manage your business data with our powerful spreadsheet tools. Export complete
-                                    datasets including companies, accountants, products, and transaction records in
+                                    datasets including suppliers, customers, products, and transaction records in
                                     organized worksheets using the standard .xlsx format. Compatible with Microsoft Excel,
                                     Google Sheets, and LibreOffice. Keep sales and purchase records organized in separate
                                     worksheets for better clarity.</p>

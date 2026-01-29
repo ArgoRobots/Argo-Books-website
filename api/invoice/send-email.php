@@ -176,20 +176,6 @@ if (!empty($data['bcc']) && !filter_var($data['bcc'], FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-// Check SMTP configuration before proceeding
-$smtpHost = $_ENV['SMTP_HOST'] ?? getenv('SMTP_HOST') ?? '';
-if (empty($smtpHost)) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Server configuration error: SMTP_HOST not configured.',
-        'messageId' => null,
-        'errorCode' => 'CONFIG_ERROR',
-        'timestamp' => date('c')
-    ]);
-    exit;
-}
-
 // Include the email sender
 require_once __DIR__ . '/InvoiceEmailSender.php';
 

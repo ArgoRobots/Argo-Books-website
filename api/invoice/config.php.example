@@ -1,0 +1,35 @@
+<?php
+/**
+ * Invoice Email API Configuration
+ *
+ * IMPORTANT: Copy this file to config.php and update with your actual credentials!
+ * Never commit config.php with real credentials to version control!
+ */
+
+// API Authentication
+define('INVOICE_API_KEY', 'your-secure-api-key-here');
+
+// Email Settings
+define('SMTP_HOST', 'smtp.yourserver.com');
+define('SMTP_PORT', 587);
+define('SMTP_SECURE', 'tls'); // 'tls', 'ssl', or '' for none
+define('SMTP_AUTH', true);
+define('SMTP_USERNAME', 'your-smtp-username');
+define('SMTP_PASSWORD', 'your-smtp-password');
+
+// Default sender (can be overridden in request)
+define('DEFAULT_FROM_EMAIL', 'noreply@yourcompany.com');
+define('DEFAULT_FROM_NAME', 'Your Company');
+
+// Rate limiting (optional)
+define('RATE_LIMIT_ENABLED', true);
+define('RATE_LIMIT_MAX_REQUESTS', 100); // Max requests per time window
+define('RATE_LIMIT_TIME_WINDOW', 3600); // Time window in seconds (1 hour)
+
+// Logging
+define('LOG_ENABLED', true);
+define('LOG_FILE', __DIR__ . '/logs/email.log');
+
+// Security
+define('MAX_ATTACHMENT_SIZE', 10 * 1024 * 1024); // 10MB max per attachment
+define('ALLOWED_ATTACHMENT_TYPES', ['application/pdf', 'image/png', 'image/jpeg']);

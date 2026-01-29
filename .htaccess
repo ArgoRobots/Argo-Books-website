@@ -10,6 +10,22 @@ Order allow,deny
 Deny from all
 </Files>
 
+# Protect Invoice Email API configuration and logs
+<Files "config.php">
+Order allow,deny
+Deny from all
+</Files>
+
+<Files ~ "\.log$">
+Order allow,deny
+Deny from all
+</Files>
+
+<Files "rate_limits.json">
+Order allow,deny
+Deny from all
+</Files>
+
 # Protect database directory
 <IfModule mod_rewrite.c>
     RewriteEngine On

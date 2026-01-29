@@ -1056,7 +1056,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </div>
                             <div class="security-detail">
                                 <h4>AES-256 Encryption</h4>
-                                <p>Military-grade encryption protects all your data</p>
+                                <p>Bank-grade encryption protects all your data</p>
                             </div>
                         </div>
                         <div class="security-item">

@@ -90,8 +90,23 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit;
 }
 
+// Get default from email (makes 'from' field optional)
+$defaultFromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?? '';
+$defaultFromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?? 'Argo Books';
+
+// Use defaults if not provided in request
+if (empty($data['from']) && !empty($defaultFromEmail)) {
+    $data['from'] = $defaultFromEmail;
+}
+if (empty($data['fromName']) && !empty($defaultFromName)) {
+    $data['fromName'] = $defaultFromName;
+}
+
 // Validate required fields (matching Argo Books client field names)
-$requiredFields = ['to', 'from', 'subject', 'html'];
+$requiredFields = ['to', 'subject', 'html'];
+if (empty($defaultFromEmail)) {
+    $requiredFields[] = 'from'; // Only required if no default configured
+}
 $missingFields = [];
 foreach ($requiredFields as $field) {
     if (empty($data[$field])) {
@@ -124,7 +139,7 @@ if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
-if (!filter_var($data['from'], FILTER_VALIDATE_EMAIL)) {
+if (!empty($data['from']) && !filter_var($data['from'], FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
     echo json_encode([
         'success' => false,

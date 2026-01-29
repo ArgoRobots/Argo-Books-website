@@ -334,7 +334,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                 statusEl.innerHTML = '<span class="loading">Verifying...</span>';
 
                 try {
-                    const response = await fetch('../../check_license.php', {
+                    const response = await fetch('../../api/license/check.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

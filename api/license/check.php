@@ -76,7 +76,7 @@ if (!str_starts_with($license_key, 'STND-')) {
 }
 
 // Load database connection
-require_once 'db_connect.php';
+require_once __DIR__ . '/../../db_connect.php';
 
 try {
     // Check if license key exists and is activated

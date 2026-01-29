@@ -139,6 +139,20 @@ if (!filter_var($data['to'], FILTER_VALIDATE_EMAIL)) {
     exit;
 }
 
+// Validate domain has MX records (mail servers)
+$domain = substr(strrchr($data['to'], '@'), 1);
+if (!checkdnsrr($domain, 'MX')) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Invalid email domain - no mail servers found for ' . $domain,
+        'messageId' => null,
+        'errorCode' => 'INVALID_DOMAIN',
+        'timestamp' => date('c')
+    ]);
+    exit;
+}
+
 if (!empty($data['from']) && !filter_var($data['from'], FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
     echo json_encode([

@@ -2,49 +2,92 @@
 /**
  * Invoice Email Sender
  *
- * Handles the actual sending of invoice emails using PHPMailer.
+ * Handles sending invoice emails using PHPMailer.
+ * Configuration is loaded from environment variables.
  */
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-// Include PHPMailer (install via Composer: composer require phpmailer/phpmailer)
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 class InvoiceEmailSender
 {
-    private $mailer;
-    private $rateLimiter;
+    private PHPMailer $mailer;
+    private ?RateLimiter $rateLimiter = null;
+
+    // Configuration from environment
+    private string $smtpHost;
+    private int $smtpPort;
+    private bool $smtpAuth;
+    private string $smtpUsername;
+    private string $smtpPassword;
+    private string $smtpSecure;
+    private string $defaultFromEmail;
+    private string $defaultFromName;
+    private bool $rateLimitEnabled;
+    private int $rateLimitMaxRequests;
+    private int $rateLimitTimeWindow;
+    private bool $logEnabled;
+    private string $logFile;
+    private int $maxAttachmentSize;
 
     public function __construct()
     {
+        $this->loadConfig();
         $this->mailer = new PHPMailer(true);
         $this->setupMailer();
 
-        if (defined('RATE_LIMIT_ENABLED') && RATE_LIMIT_ENABLED) {
-            $this->rateLimiter = new RateLimiter();
+        if ($this->rateLimitEnabled) {
+            $this->rateLimiter = new RateLimiter(
+                $this->rateLimitMaxRequests,
+                $this->rateLimitTimeWindow
+            );
         }
     }
 
-    private function setupMailer()
+    private function loadConfig(): void
     {
-        // Server settings
+        // SMTP settings
+        $this->smtpHost = $_ENV['SMTP_HOST'] ?? getenv('SMTP_HOST') ?: 'localhost';
+        $this->smtpPort = (int)($_ENV['SMTP_PORT'] ?? getenv('SMTP_PORT') ?: 587);
+        $this->smtpAuth = filter_var($_ENV['SMTP_AUTH'] ?? getenv('SMTP_AUTH') ?? true, FILTER_VALIDATE_BOOLEAN);
+        $this->smtpUsername = $_ENV['SMTP_USERNAME'] ?? getenv('SMTP_USERNAME') ?: '';
+        $this->smtpPassword = $_ENV['SMTP_PASSWORD'] ?? getenv('SMTP_PASSWORD') ?: '';
+        $this->smtpSecure = $_ENV['SMTP_SECURE'] ?? getenv('SMTP_SECURE') ?: 'tls';
+
+        // Default sender
+        $this->defaultFromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
+        $this->defaultFromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
+
+        // Rate limiting
+        $this->rateLimitEnabled = filter_var($_ENV['INVOICE_RATE_LIMIT_ENABLED'] ?? getenv('INVOICE_RATE_LIMIT_ENABLED') ?? false, FILTER_VALIDATE_BOOLEAN);
+        $this->rateLimitMaxRequests = (int)($_ENV['INVOICE_RATE_LIMIT_MAX'] ?? getenv('INVOICE_RATE_LIMIT_MAX') ?: 100);
+        $this->rateLimitTimeWindow = (int)($_ENV['INVOICE_RATE_LIMIT_WINDOW'] ?? getenv('INVOICE_RATE_LIMIT_WINDOW') ?: 3600);
+
+        // Logging
+        $this->logEnabled = filter_var($_ENV['INVOICE_LOG_ENABLED'] ?? getenv('INVOICE_LOG_ENABLED') ?? true, FILTER_VALIDATE_BOOLEAN);
+        $this->logFile = $_ENV['INVOICE_LOG_FILE'] ?? getenv('INVOICE_LOG_FILE') ?: __DIR__ . '/logs/invoice_emails.log';
+
+        // Attachments
+        $this->maxAttachmentSize = (int)($_ENV['INVOICE_MAX_ATTACHMENT_SIZE'] ?? getenv('INVOICE_MAX_ATTACHMENT_SIZE') ?: 10485760); // 10MB
+    }
+
+    private function setupMailer(): void
+    {
         $this->mailer->isSMTP();
-        $this->mailer->Host = SMTP_HOST;
-        $this->mailer->Port = SMTP_PORT;
+        $this->mailer->Host = $this->smtpHost;
+        $this->mailer->Port = $this->smtpPort;
 
-        if (SMTP_AUTH) {
+        if ($this->smtpAuth) {
             $this->mailer->SMTPAuth = true;
-            $this->mailer->Username = SMTP_USERNAME;
-            $this->mailer->Password = SMTP_PASSWORD;
+            $this->mailer->Username = $this->smtpUsername;
+            $this->mailer->Password = $this->smtpPassword;
         }
 
-        if (!empty(SMTP_SECURE)) {
-            $this->mailer->SMTPSecure = SMTP_SECURE;
+        if (!empty($this->smtpSecure)) {
+            $this->mailer->SMTPSecure = $this->smtpSecure === 'tls' ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
         }
 
-        // Content settings
         $this->mailer->isHTML(true);
         $this->mailer->CharSet = 'UTF-8';
     }
@@ -53,28 +96,33 @@ class InvoiceEmailSender
      * Send an invoice email
      *
      * @param array $data Email data from API request
-     * @return array Result with success, message, and messageId
+     * @return array Result with success, message, messageId, and timestamp
      */
     public function send(array $data): array
     {
+        $timestamp = date('c');
+
         // Check rate limit
         if ($this->rateLimiter && !$this->rateLimiter->check($data['from'])) {
             return [
                 'success' => false,
                 'message' => 'Rate limit exceeded. Please try again later.',
-                'messageId' => null
+                'messageId' => null,
+                'errorCode' => 'RATE_LIMITED',
+                'timestamp' => $timestamp
             ];
         }
 
         try {
-            // Clear any previous recipients
+            // Clear previous state
             $this->mailer->clearAddresses();
             $this->mailer->clearReplyTos();
             $this->mailer->clearAttachments();
+            $this->mailer->clearBCCs();
 
             // Set sender
-            $fromEmail = $data['from'] ?? DEFAULT_FROM_EMAIL;
-            $fromName = $data['fromName'] ?? DEFAULT_FROM_NAME;
+            $fromEmail = $data['from'] ?? $this->defaultFromEmail;
+            $fromName = $data['fromName'] ?? $this->defaultFromName;
             $this->mailer->setFrom($fromEmail, $fromName);
 
             // Set recipient
@@ -86,30 +134,32 @@ class InvoiceEmailSender
                 $this->mailer->addReplyTo($data['replyTo']);
             }
 
+            // Set BCC if provided
+            if (!empty($data['bcc'])) {
+                $this->mailer->addBCC($data['bcc']);
+            }
+
             // Set subject
             $this->mailer->Subject = $data['subject'];
 
-            // Set body
-            $this->mailer->Body = $data['htmlBody'];
+            // Set body (field is 'html' from Argo Books client)
+            $this->mailer->Body = $data['html'];
 
-            // Set plain text alternative if provided
-            if (!empty($data['plainTextBody'])) {
-                $this->mailer->AltBody = $data['plainTextBody'];
+            // Set plain text alternative (field is 'text' from Argo Books client)
+            if (!empty($data['text'])) {
+                $this->mailer->AltBody = $data['text'];
             } else {
-                // Generate plain text from HTML as fallback
                 $this->mailer->AltBody = strip_tags(
-                    str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $data['htmlBody'])
+                    str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $data['html'])
                 );
             }
 
-            // Handle attachments
-            if (!empty($data['attachments']) && is_array($data['attachments'])) {
-                foreach ($data['attachments'] as $attachment) {
-                    $this->addAttachment($attachment);
-                }
+            // Handle PDF attachment (from Argo Books client)
+            if (!empty($data['pdfAttachment'])) {
+                $this->addPdfAttachment($data['pdfAttachment'], $data['pdfFilename'] ?? 'invoice.pdf');
             }
 
-            // Generate a unique message ID
+            // Generate unique message ID
             $messageId = $this->generateMessageId($data['invoiceId'] ?? 'invoice');
             $this->mailer->MessageID = $messageId;
 
@@ -127,11 +177,11 @@ class InvoiceEmailSender
             return [
                 'success' => true,
                 'message' => 'Email sent successfully.',
-                'messageId' => $messageId
+                'messageId' => $messageId,
+                'timestamp' => $timestamp
             ];
 
         } catch (Exception $e) {
-            // Log error
             $this->log('Email sending failed', [
                 'to' => $data['to'] ?? 'unknown',
                 'error' => $e->getMessage()
@@ -140,53 +190,37 @@ class InvoiceEmailSender
             return [
                 'success' => false,
                 'message' => 'Failed to send email: ' . $e->getMessage(),
-                'messageId' => null
+                'messageId' => null,
+                'errorCode' => 'SEND_FAILED',
+                'timestamp' => $timestamp
             ];
         }
     }
 
     /**
-     * Add an attachment to the email
-     *
-     * @param array $attachment Attachment data
+     * Add PDF attachment from base64 content
      */
-    private function addAttachment(array $attachment): void
+    private function addPdfAttachment(string $base64Content, string $filename): void
     {
-        if (empty($attachment['contentBase64']) || empty($attachment['filename'])) {
-            return;
-        }
-
-        // Validate MIME type
-        $mimeType = $attachment['mimeType'] ?? 'application/octet-stream';
-        if (!in_array($mimeType, ALLOWED_ATTACHMENT_TYPES)) {
-            throw new Exception("Attachment type not allowed: {$mimeType}");
-        }
-
-        // Decode base64 content
-        $content = base64_decode($attachment['contentBase64']);
+        $content = base64_decode($base64Content);
         if ($content === false) {
-            throw new Exception("Invalid base64 content for attachment: {$attachment['filename']}");
+            throw new Exception("Invalid base64 content for PDF attachment");
         }
 
-        // Check size
-        if (strlen($content) > MAX_ATTACHMENT_SIZE) {
-            throw new Exception("Attachment too large: {$attachment['filename']}");
+        if (strlen($content) > $this->maxAttachmentSize) {
+            throw new Exception("PDF attachment too large (max " . round($this->maxAttachmentSize / 1048576, 1) . "MB)");
         }
 
-        // Add as string attachment
         $this->mailer->addStringAttachment(
             $content,
-            $attachment['filename'],
+            $filename,
             PHPMailer::ENCODING_BASE64,
-            $mimeType
+            'application/pdf'
         );
     }
 
     /**
      * Generate a unique message ID
-     *
-     * @param string $invoiceId Invoice ID for reference
-     * @return string Message ID
      */
     private function generateMessageId(string $invoiceId): string
     {
@@ -198,18 +232,14 @@ class InvoiceEmailSender
 
     /**
      * Log email activity
-     *
-     * @param string $message Log message
-     * @param array $context Additional context
-     * @param string $level Log level
      */
     private function log(string $message, array $context = [], string $level = 'INFO'): void
     {
-        if (!defined('LOG_ENABLED') || !LOG_ENABLED) {
+        if (!$this->logEnabled) {
             return;
         }
 
-        $logDir = dirname(LOG_FILE);
+        $logDir = dirname($this->logFile);
         if (!is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
@@ -218,58 +248,42 @@ class InvoiceEmailSender
         $contextStr = !empty($context) ? json_encode($context) : '';
         $logLine = "[{$timestamp}] [{$level}] {$message} {$contextStr}\n";
 
-        file_put_contents(LOG_FILE, $logLine, FILE_APPEND | LOCK_EX);
+        file_put_contents($this->logFile, $logLine, FILE_APPEND | LOCK_EX);
     }
 }
 
 /**
- * Simple rate limiter using file-based storage
+ * Rate limiter using file-based storage
  */
 class RateLimiter
 {
-    private $storageFile;
+    private string $storageFile;
+    private int $maxRequests;
+    private int $timeWindow;
 
-    public function __construct()
+    public function __construct(int $maxRequests, int $timeWindow)
     {
         $this->storageFile = __DIR__ . '/logs/rate_limits.json';
+        $this->maxRequests = $maxRequests;
+        $this->timeWindow = $timeWindow;
     }
 
-    /**
-     * Check if request is within rate limits
-     *
-     * @param string $identifier Unique identifier (e.g., email or IP)
-     * @return bool True if request is allowed
-     */
     public function check(string $identifier): bool
     {
         $data = $this->loadData();
         $now = time();
-        $window = RATE_LIMIT_TIME_WINDOW;
-        $maxRequests = RATE_LIMIT_MAX_REQUESTS;
 
         // Clean up old entries
-        $data = array_filter($data, function($entry) use ($now, $window) {
-            return ($now - $entry['timestamp']) < $window;
-        });
+        $data = array_filter($data, fn($entry) => ($now - $entry['timestamp']) < $this->timeWindow);
 
         // Count requests for this identifier
-        $count = 0;
-        foreach ($data as $entry) {
-            if ($entry['identifier'] === $identifier) {
-                $count++;
-            }
-        }
+        $count = count(array_filter($data, fn($entry) => $entry['identifier'] === $identifier));
 
-        if ($count >= $maxRequests) {
+        if ($count >= $this->maxRequests) {
             return false;
         }
 
-        // Add this request
-        $data[] = [
-            'identifier' => $identifier,
-            'timestamp' => $now
-        ];
-
+        $data[] = ['identifier' => $identifier, 'timestamp' => $now];
         $this->saveData($data);
         return true;
     }
@@ -279,7 +293,6 @@ class RateLimiter
         if (!file_exists($this->storageFile)) {
             return [];
         }
-
         $content = file_get_contents($this->storageFile);
         return json_decode($content, true) ?? [];
     }
@@ -290,7 +303,6 @@ class RateLimiter
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
-
         file_put_contents($this->storageFile, json_encode($data), LOCK_EX);
     }
 }

@@ -2,9 +2,9 @@
 session_start();
 
 // Load environment variables from .env file
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
 
 // Security headers
@@ -16,12 +16,12 @@ header('Content-Type: application/json');
 // Configuration
 define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB max
 define('ALLOWED_MIME_TYPES', ['application/json', 'text/plain']);
-define('DATA_DIR', 'admin/data-logs');
+define('DATA_DIR', __DIR__ . '/../../admin/data-logs');
 define('MAX_UPLOADS_PER_HOUR', 100); // Rate limiting
 define('MAX_FILENAME_LENGTH', 255);
 
 // Authentication configuration
-define('API_KEY', $_ENV['UPLOAD_API_KEY']); 
+define('API_KEY', $_ENV['UPLOAD_API_KEY']);
 define('ALLOWED_USER_AGENT', 'ArgoSalesTracker'); // Expected User-Agent prefix
 
 // Authenticate request

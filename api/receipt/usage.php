@@ -42,7 +42,7 @@ $license_key = trim($input['license_key']);
 $action = $input['action'];
 
 // Load database connection
-require_once 'db_connect.php';
+require_once __DIR__ . '/../../db_connect.php';
 
 /**
  * Determine tier and validate license key

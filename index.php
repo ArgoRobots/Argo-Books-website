@@ -126,7 +126,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <span class="text-gradient">run your business</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
-                    AI-powered accounting software with receipt scanning, predictive analytics, and inventory management. Everything you need to run your business.
+                    Simple, modern accounting software built for small businesses — with automation that saves time and keeps your finances organized
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">
@@ -213,7 +213,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Features</span>
                 <h2 class="section-title">Everything you need to grow</h2>
-                <p class="section-description">Powerful features that help you manage every aspect of your business, from AI-powered receipt scanning to predictive sales analytics.</p>
+                <p class="section-description">Easy-to-use accounting software with AI-powered receipt scanning, predictive analytics, and inventory management. Everything you need to run your business.</p>
             </div>
 
             <div class="features-tabs">

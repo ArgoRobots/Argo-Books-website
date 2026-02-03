@@ -35,7 +35,7 @@ include '../../docs-header.php';
             <p>If you have receipt files to import alongside your data:</p>
             <ol class="steps-list">
                 <li>Organize your receipt files in a folder on your computer</li>
-                <li>In your spreadsheet, include the receipt filename in the "Receipt" column</li>
+                <li>In your spreadsheet, include the receipt file name in the "Receipt" column</li>
                 <li>During import, select the folder containing your receipt files</li>
                 <li>The system will automatically link receipts to their corresponding transactions</li>
             </ol>

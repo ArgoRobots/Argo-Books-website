@@ -32,14 +32,6 @@ include '../../docs-header.php';
                 <strong>Multi-Item Transactions:</strong> Transactions with multiple items are exported with the main transaction details on the first row, and additional items on subsequent rows with empty transaction ID cells.
             </div>
 
-            <h2>Receipt Export</h2>
-            <p>Receipt file names are included in the exported spreadsheet. If you need the actual receipt files:</p>
-            <ol class="steps-list">
-                <li>Select the transactions you want to export receipts for in the main view</li>
-                <li>Right-click and select "Export receipts"</li>
-                <li>Choose a save location</li>
-            </ol>
-
             <h2>Chart Export</h2>
             <p>Charts from the Analytics Dashboard can also be exported to Excel with full data:</p>
             <ol class="steps-list">

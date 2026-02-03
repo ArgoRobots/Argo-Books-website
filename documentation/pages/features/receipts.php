@@ -15,9 +15,9 @@ include '../../docs-header.php';
             <p>To add receipts to existing transactions, click the edit button in the actions column, and click the "Attach" button.</p>
 
             <h2>Digitizing Physical Receipts</h2>
-            <p>You can quickly digitize paper receipts by taking a photo with your smartphone:</p>
+            <p>You can quickly digitize paper receipts by taking a photo with your phone:</p>
             <ol class="steps-list">
-                <li>Install Microsoft Lens on your smartphone - it's free and available for both iOS and Android</li>
+                <li>Install Microsoft Lens on your phone - it's free and available for both iOS and Android</li>
                 <li>Open Microsoft Lens and select "Document" mode</li>
                 <li>Position your phone's camera over the receipt</li>
                 <li>The app will automatically detect the receipt's edges and optimize the image</li>

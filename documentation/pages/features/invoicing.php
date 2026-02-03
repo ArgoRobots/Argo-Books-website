@@ -22,18 +22,17 @@ include '../../docs-header.php';
                 <li>Navigate to the Invoices section</li>
                 <li>Click "New Invoice"</li>
                 <li>Select a customer or create a new one</li>
-                <li>Add line items from your product catalog or enter custom items</li>
+                <li>Add line items from your product catalog</li>
                 <li>Set payment terms and due date</li>
                 <li>Preview and send</li>
             </ol>
 
             <h2>Invoice Features</h2>
             <ul>
-                <li><strong>Automatic Numbering:</strong> Sequential invoice numbers are generated automatically</li>
                 <li><strong>Tax Calculations:</strong> Automatic tax calculations based on your settings</li>
                 <li><strong>Multiple Currencies:</strong> Create invoices in any supported currency</li>
                 <li><strong>Notes & Terms:</strong> Add custom notes and payment terms</li>
-                <li><strong>Recurring Invoices:</strong> Set up invoices that repeat on a schedule</li>
+                <!-- <li><strong>Recurring Invoices:</strong> Set up invoices that repeat on a schedule</li> -->
             </ul>
 
             <h2>Sending Invoices</h2>
@@ -44,45 +43,22 @@ include '../../docs-header.php';
                 <li><strong>Save as Draft:</strong> Save and send later</li>
             </ul>
 
-            <h2>Payment Processing</h2>
+            <!-- <h2>Payment Processing</h2>
             <p>Accept payments online with integrated payment providers:</p>
             <ul>
                 <li><strong>Stripe:</strong> Accept credit cards, debit cards, and bank transfers</li>
                 <li><strong>PayPal:</strong> Let customers pay with their PayPal account</li>
                 <li><strong>Square:</strong> Process payments through Square</li>
-            </ul>
-
-            <div class="info-box">
-                <p><strong>Note:</strong> You'll need to connect your payment provider account in Settings
-                before customers can pay online. Each provider has their own fees and processing times.</p>
-            </div>
+            </ul> -->
 
             <h2>Payment Tracking</h2>
             <p>Keep track of all your invoices and their payment status:</p>
             <ul>
                 <li><strong>Draft:</strong> Invoice created but not yet sent</li>
                 <li><strong>Sent:</strong> Invoice delivered to customer</li>
-                <li><strong>Viewed:</strong> Customer has opened the invoice</li>
                 <li><strong>Partial:</strong> Customer has made a partial payment</li>
                 <li><strong>Paid:</strong> Invoice fully paid</li>
                 <li><strong>Overdue:</strong> Payment is past the due date</li>
-            </ul>
-
-            <h2>Automatic Reconciliation</h2>
-            <p>When customers pay online, payments are automatically:</p>
-            <ul>
-                <li>Matched to the correct invoice</li>
-                <li>Recorded in your transaction history</li>
-                <li>Reflected in your reports and analytics</li>
-            </ul>
-
-            <h2>Invoice Dashboard</h2>
-            <p>Monitor your invoicing at a glance with key metrics:</p>
-            <ul>
-                <li><strong>Total Outstanding:</strong> Total amount owed across all unpaid invoices</li>
-                <li><strong>Paid This Month:</strong> Payments received in the current month</li>
-                <li><strong>Overdue:</strong> Amount past due date</li>
-                <li><strong>Due This Week:</strong> Invoices coming due soon</li>
             </ul>
 
             <div class="page-navigation">

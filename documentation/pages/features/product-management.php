@@ -12,7 +12,7 @@ include '../../docs-header.php';
 
             <h2>Creating Categories to organize your products</h2>
             <ol class="steps-list">
-                <li>Go to "Categories" in the sidebar (under Management)</li>
+                <li>Go to "Categories" in the navigation menu (under Management)</li>
                 <li>Click "Add Category"</li>
                 <li>Enter the category name</li>
                 <li>Save the category</li>
@@ -20,7 +20,7 @@ include '../../docs-header.php';
 
             <h2>Adding Products</h2>
             <ol class="steps-list">
-                <li>Go to "Products/Services" in the sidebar (under Management)</li>
+                <li>Go to "Products/Services" in the navigation menu (under Management)</li>
                 <li>Click "Add Product"</li>
                 <li>Enter the product name</li>
                 <li>Select a category to keep things organized</li>

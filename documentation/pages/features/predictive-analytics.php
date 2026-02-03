@@ -15,6 +15,8 @@ include '../../docs-header.php';
 
             <p>See the future of your business with machine learning (ML) forecasting. Our predictive engine analyzes your historical data to help you make smarter decisions. All analysis happens locally on your device. Your data is never uploaded to the cloud - the ML models run entirely on your computer.</p>
 
+            <img src="../../../resources/images/insights.webp" alt="Predictive Analytics Insights" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+
             <h2>Revenue Forecasting</h2>
             <p>Our predictive engine analyzes your historical data to forecast:</p>
             <ul>

@@ -12,7 +12,7 @@ include '../../docs-header.php';
 
             <h2>Adding Transactions</h2>
             <ol class="steps-list">
-                <li>Go to "Expenses" or "Revenue" in the sidebar (under Transactions)</li>
+                <li>Go to "Expenses" or "Revenue" in the navigation menu (under Transactions)</li>
                 <li>Click the "Add Expense" or "Add Revenue" button</li>
                 <li>Enter the amount, category, and date</li>
                 <li>Attach a receipt (optional)</li>

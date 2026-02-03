@@ -12,7 +12,7 @@ include '../../docs-header.php';
 
             <h2>How to Generate a Report</h2>
             <ol class="steps-list">
-                <li>Go to "Reports" in the sidebar (under Main)</li>
+                <li>Go to "Reports" in the navigation menu (under Main)</li>
                 <li>Follow the 3-step wizard to create your custom report</li>
             </ol>
 

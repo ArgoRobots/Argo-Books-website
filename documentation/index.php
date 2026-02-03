@@ -294,6 +294,16 @@ $isDocsLanding = true;
                     <h3>AI Receipt Scanning</h3>
                     <p>Extract data from receipts with AI</p>
                 </a>
+                <a href="pages/features/predictive-analytics.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3v18h18"></path>
+                            <path d="M18 9l-5 5-4-4-3 3"></path>
+                        </svg>
+                    </div>
+                    <h3>Predictive Analytics</h3>
+                    <p>ML-powered forecasting and insights</p>
+                </a>
                 <a href="pages/features/inventory.php" class="doc-card">
                     <div class="card-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

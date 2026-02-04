@@ -144,6 +144,13 @@ function isActivePage($page, $currentPage) {
 }
 ?>
 
+<!-- Mobile Sidebar Toggle Button -->
+<button id="sidebarToggle" class="sidebar-toggle" aria-label="Toggle navigation menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+</button>
+
 <!-- Sidebar Navigation -->
 <aside class="sidebar">
     <nav class="sidebar-nav">

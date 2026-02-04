@@ -2490,6 +2490,7 @@ a {
     .security-item {
         text-align: left;
         max-width: 400px;
+        width: 100%;
     }
 
     .pricing-grid {

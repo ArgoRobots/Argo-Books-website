@@ -66,6 +66,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/levenshtein.js"></script>
     <script src="<?php echo $docsPath; ?>search.js"></script>
+    <script src="<?php echo $docsPath; ?>main.js"></script>
 
     <link rel="stylesheet" href="<?php echo $docsPath; ?>style.css">
     <link rel="stylesheet" href="<?php echo $docsPath; ?>search.css">

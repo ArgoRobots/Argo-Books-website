@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebarToggle = document.getElementById("sidebarToggle");
   const sidebar = document.querySelector(".sidebar");
 
-  const isMobile = () => window.innerWidth <= 768;
+  const isMobile = () => window.innerWidth <= 1024;
 
   const toggleSidebar = () => {
     sidebar.classList.toggle("active");
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Handle resize events
   let lastWidth = window.innerWidth;
   window.addEventListener("resize", () => {
-    if (lastWidth <= 768 && window.innerWidth > 768) {
+    if (lastWidth <= 1024 && window.innerWidth > 1024) {
       // Switching to desktop
       if (sidebar) {
         sidebar.classList.remove("active");
@@ -56,18 +56,4 @@ document.addEventListener("DOMContentLoaded", function () {
       closeSidebar();
     });
   });
-
-  // Collapsible sections (if any)
-  var coll = document.getElementsByClassName("collapsible");
-  for (var i = 0; i < coll.length; i++) {
-    coll[i].addEventListener("click", function () {
-      this.classList.toggle("active");
-      var content = this.nextElementSibling;
-      if (content.style.maxHeight) {
-        content.style.maxHeight = null;
-      } else {
-        content.style.maxHeight = content.scrollHeight + "px";
-      }
-    });
-  }
 });

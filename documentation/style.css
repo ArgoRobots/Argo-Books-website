@@ -962,10 +962,6 @@ body.docs-page {
   .docs-layout {
     gap: 24px;
   }
-
-  .sidebar {
-    width: 220px;
-  }
 }
 
 @media (max-width: 900px) {
@@ -981,16 +977,6 @@ body.docs-page {
     flex-direction: column;
     padding: 24px 16px 40px;
     gap: 24px;
-  }
-
-  .sidebar {
-    width: 100%;
-    position: static;
-    max-height: none;
-  }
-
-  .sidebar-nav {
-    padding: 16px;
   }
 
   .nav-section {

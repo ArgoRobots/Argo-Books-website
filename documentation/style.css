@@ -1578,7 +1578,7 @@ body.docs-page {
 }
 
 /* Mobile sidebar behavior */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar-toggle {
     display: flex;
   }
@@ -1609,7 +1609,7 @@ body.docs-page {
 }
 
 /* Sidebar overlay for mobile */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .sidebar::before {
     content: '';
     position: fixed;

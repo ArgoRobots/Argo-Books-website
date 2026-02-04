@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const sidebarToggle = document.getElementById("sidebarToggle");
   const sidebar = document.querySelector(".sidebar");
 
-  const isMobile = () => window.innerWidth <= 768;
+  const isMobile = () => window.innerWidth <= 1024;
 
   const toggleSidebar = () => {
     sidebar.classList.toggle("active");
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Handle resize events
   let lastWidth = window.innerWidth;
   window.addEventListener("resize", () => {
-    if (lastWidth <= 768 && window.innerWidth > 768) {
+    if (lastWidth <= 1024 && window.innerWidth > 1024) {
       // Switching to desktop
       if (sidebar) {
         sidebar.classList.remove("active");

@@ -167,7 +167,7 @@ $systemRequirements = getSystemRequirements();
                     <p class="platform-desc">For Windows 10 and later</p>
                     <?php if ($latestVersion): ?>
                         <div class="version-details">
-                            <span class="version-tag">v<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
                             <span class="file-size"><?php echo formatFileSize($latestVersion['filesize']); ?></span>
                         </div>
                     <?php endif; ?>
@@ -182,7 +182,7 @@ $systemRequirements = getSystemRequirements();
                         Download for Windows
                     </a>
                     <?php if ($latestVersion): ?>
-                        <span class="platform-badge available">v<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                        <span class="platform-badge available">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
                     <?php endif; ?>
                 </div>
             </div>

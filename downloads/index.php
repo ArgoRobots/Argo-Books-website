@@ -21,51 +21,58 @@ function getPlatformIconPath($platform)
     return $icons[$platform] ?? '';
 }
 
+// Platform file patterns for Avalonia builds
+$avaloniaPatterns = [
+    'windows' => 'Argo Books Installer V.{version}.exe',
+    'macos'   => 'ArgoBooks-{version}-osx-arm64.zip',
+    'linux'   => 'ArgoBooks-{version}-linux-x64.AppImage',
+];
+
 // Get latest version information from filesystem
 function getLatestVersion()
 {
-    $versionsPath = '../resources/downloads/versions/';
-    $latestVersion = null;
+    $basePath = '../resources/downloads/versions/';
 
-    if (!is_dir($versionsPath)) {
+    if (!is_dir($basePath)) {
         return null;
     }
 
-    $versionFolders = scandir($versionsPath);
-
-    foreach ($versionFolders as $folder) {
+    $versions = [];
+    foreach (scandir($basePath) as $folder) {
         if ($folder === '.' || $folder === '..') continue;
+        if (!is_dir($basePath . $folder)) continue;
+        if (!preg_match('/^\d+\.\d+\.\d+/', $folder)) continue;
+        $versions[] = $folder;
+    }
 
-        $versionPath = $versionsPath . $folder . '/';
+    if (empty($versions)) {
+        return null;
+    }
 
-        if (!is_dir($versionPath)) continue;
+    usort($versions, function ($a, $b) {
+        return version_compare($b, $a);
+    });
 
-        $files = scandir($versionPath);
+    $latest = $versions[0];
 
-        foreach ($files as $file) {
-            if (preg_match('/^Argo Books Installer V\.(.+)\.exe$/i', $file, $matches)) {
-                $version = $matches[1];
-                $filepath = $versionPath . $file;
-
-                if (file_exists($filepath)) {
-                    $versionData = [
-                        'version' => $version,
-                        'filename' => $file,
-                        'filepath' => $filepath,
-                        'filesize' => filesize($filepath),
-                        'modified' => filemtime($filepath)
-                    ];
-
-                    if ($latestVersion === null || version_compare($version, $latestVersion['version']) > 0) {
-                        $latestVersion = $versionData;
-                    }
-                }
-                break;
-            }
+    // Gather per-platform file sizes
+    global $avaloniaPatterns;
+    $platforms = [];
+    foreach ($avaloniaPatterns as $platform => $pattern) {
+        $filename = str_replace('{version}', $latest, $pattern);
+        $filepath = $basePath . $latest . '/' . $filename;
+        if (file_exists($filepath)) {
+            $platforms[$platform] = [
+                'filename' => $filename,
+                'filesize' => filesize($filepath),
+            ];
         }
     }
 
-    return $latestVersion;
+    return [
+        'version'   => $latest,
+        'platforms' => $platforms,
+    ];
 }
 
 function formatFileSize($bytes)
@@ -165,15 +172,15 @@ $systemRequirements = getSystemRequirements();
                 <div class="platform-info">
                     <h2>Windows</h2>
                     <p class="platform-desc">For Windows 10 and later</p>
-                    <?php if ($latestVersion): ?>
+                    <?php if ($latestVersion && isset($latestVersion['platforms']['windows'])): ?>
                         <div class="version-details">
-                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
-                            <span class="file-size"><?php echo formatFileSize($latestVersion['filesize']); ?></span>
+                            <span class="version-tag">v<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                            <span class="file-size"><?php echo formatFileSize($latestVersion['platforms']['windows']['filesize']); ?></span>
                         </div>
                     <?php endif; ?>
                 </div>
                 <div class="platform-actions">
-                    <a href="../download" class="btn btn-blue download-btn" data-platform="windows">
+                    <a href="../download/avalonia/win" class="btn btn-blue download-btn" data-platform="windows">
                         <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="7 10 12 15 17 10"/>
@@ -209,7 +216,7 @@ $systemRequirements = getSystemRequirements();
             <div class="platform-card platform-linux">
                 <div class="platform-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12.504 0c-.155 0-.315.008-.48.021-4.226.333-3.105 4.807-3.17 6.298-.076 1.092-.3 1.953-1.05 3.02-.885 1.051-2.127 2.75-2.716 4.521-.278.832-.41 1.684-.287 2.489a.424.424 0 00-.11.135c-.26.268-.45.6-.663.839-.199.199-.485.267-.797.4-.313.136-.658.269-.864.68-.09.189-.136.394-.132.602 0 .199.027.4.055.536.058.399.116.728.04.97-.249.68-.28 1.145-.106 1.484.174.334.535.47.94.601.81.2 1.91.135 2.774.6.926.466 1.866.67 2.616.47.526-.116.97-.464 1.208-.946.587-.003 1.23-.269 2.26-.334.699-.058 1.574.267 2.577.2.025.134.063.198.114.333l.003.003c.391.778 1.113 1.132 1.884 1.071.771-.06 1.592-.536 2.257-1.306.631-.765 1.683-1.084 2.378-1.503.348-.199.629-.469.649-.853.023-.4-.2-.811-.714-1.376v-.097l-.003-.003c-.17-.2-.25-.535-.338-.926-.085-.401-.182-.786-.492-1.046h-.003c-.059-.054-.123-.067-.188-.135a.357.357 0 00-.19-.064c.431-1.278.264-2.55-.173-3.694-.533-1.41-1.465-2.638-2.175-3.483-.796-1.005-1.576-1.957-1.56-3.368.026-2.152.236-6.133-3.544-6.139zm.529 3.405h.013c.213 0 .396.062.584.198.19.135.33.332.438.533.105.259.158.459.166.724 0-.02.006-.04.006-.06v.105a.086.086 0 01-.004-.021l-.004-.024a1.807 1.807 0 01-.15.706.953.953 0 01-.213.335.71.71 0 00-.088-.042c-.104-.045-.198-.064-.284-.133a1.312 1.312 0 00-.22-.066c.05-.06.146-.133.183-.198.053-.128.082-.264.088-.402v-.02a1.21 1.21 0 00-.061-.4c-.045-.134-.101-.2-.183-.333-.084-.066-.167-.132-.267-.132h-.016c-.093 0-.176.03-.262.132a.8.8 0 00-.205.334 1.18 1.18 0 00-.09.4v.019c.002.089.008.179.02.267-.193-.067-.438-.135-.607-.202a1.635 1.635 0 01-.018-.2v-.02a1.772 1.772 0 01.15-.768c.082-.22.232-.406.43-.534a.985.985 0 01.594-.2zm-2.962.059h.036c.142 0 .27.048.399.135.146.129.264.288.344.465.09.199.14.4.153.667l.002.021.003.021v.02c0 .133-.012.267-.03.397-.106-.065-.25-.133-.393-.133h-.027c-.26.002-.491.135-.665.334a1.063 1.063 0 00-.198.467c-.013.066-.018.135-.018.2v.02c.002.133.018.267.058.398a.09.09 0 01-.016-.003l-.021-.007a1.966 1.966 0 01-.282-.065c-.058-.2-.09-.387-.09-.6a1.784 1.784 0 01.142-.656c.088-.2.214-.397.388-.535.205-.156.428-.2.65-.2zm1.956 1.609c.36.001.686.132.918.331.265.2.437.468.522.8.053.2.066.401.066.602 0 .135-.012.267-.03.4l-.018.129a.077.077 0 01-.002.01 2.05 2.05 0 01-.106.401c-.06.132-.164.265-.184.333-.022.065-.03.132-.03.199 0 .066.007.133.016.2l.012.066c-.066.043-.132.132-.199.132h-.003c-.073 0-.15-.035-.22-.133-.067-.066-.135-.2-.185-.467-.039-.2-.058-.401-.058-.602v-.066a1.27 1.27 0 01.036-.333c.043-.132.043-.2.043-.265a.563.563 0 00-.09-.334 1.157 1.157 0 00-.203-.264c-.113-.066-.24-.132-.393-.132h-.006c-.143 0-.268.066-.379.199a.758.758 0 00-.17.332c-.02.066-.03.132-.03.199 0 .066.006.133.015.2.02.133.04.266.04.4 0 .134-.013.266-.058.398a.93.93 0 01-.137.267c-.06.065-.116.132-.174.199-.055.066-.11.133-.146.2-.053.133-.082.267-.082.4v.067c0 .135.028.267.082.4.053.135.142.266.248.4.053.066.113.133.172.2.059.066.114.133.164.2.16.2.279.399.359.6.116.199.176.398.212.598a3.23 3.23 0 01.024.333c0 .333-.049.667-.144 1-.096.334-.234.667-.416.934a2.385 2.385 0 01-.624.663c-.148.092-.293.148-.44.198.072-.333.112-.668.112-1 0-.333-.049-.667-.146-1-.096-.334-.235-.667-.416-.934a2.305 2.305 0 00-.626-.663c-.085-.067-.173-.12-.263-.174-.113-.135-.243-.267-.373-.4-.13-.133-.26-.267-.386-.4-.212-.2-.388-.4-.535-.602-.146-.2-.262-.398-.336-.598-.083-.2-.127-.4-.127-.6 0-.135.012-.267.041-.4a1.5 1.5 0 01.137-.4c.06-.132.137-.265.23-.398.095-.135.206-.267.335-.4.06-.067.121-.133.177-.2.054-.067.097-.133.123-.2.03-.066.041-.132.041-.199 0-.066-.006-.132-.018-.199a1.05 1.05 0 00-.124-.334 1.02 1.02 0 00-.222-.267.637.637 0 00-.328-.132h-.003c-.145 0-.277.041-.396.132-.117.09-.217.201-.299.334-.082.133-.147.266-.195.4-.047.132-.077.265-.087.397v.135c0 .066.006.133.017.2.011.065.023.132.04.199.006.031.01.067.014.1a1.84 1.84 0 01-.413-.201 1.81 1.81 0 01-.348-.267 1.96 1.96 0 01-.097-.135c-.045-.067-.077-.135-.097-.2a.682.682 0 01-.043-.199v-.066c0-.334.09-.668.274-1 .089-.168.204-.332.345-.465.14-.135.304-.2.493-.2h.07c.177.012.332.066.463.132.13.068.245.135.346.2.076.068.136.135.176.2.04.066.06.135.06.2v.066c0 .133-.006.266-.006.4 0 .133.012.265.035.398.024.135.06.267.106.4z"/>
+                        <path d="<?php echo getPlatformIconPath('linux'); ?>"/>
                     </svg>
                 </div>
                 <div class="platform-info">

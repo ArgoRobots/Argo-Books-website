@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Argo Books Avalonia Updates</title>
+        <link>https://argorobots.com</link>
+        <description>Updates for Argo Books (cross-platform)</description>
+        <language>en</language>
+        <item>
+            <title>Version 2.0.0</title>
+            <sparkle:version>2.0.0</sparkle:version>
+            <sparkle:releaseNotesLink>https://argorobots.com/whats-new/</sparkle:releaseNotesLink>
+            <pubDate>Thu, 01 Jan 2026 10:00:00 +0000</pubDate>
+
+            <!-- Windows -->
+            <enclosure url="https://argorobots.com/download/avalonia/win"
+                       sparkle:version="2.0.0"
+                       sparkle:os="windows"
+                       type="application/octet-stream"
+                       length="0" />
+
+            <!-- macOS -->
+            <enclosure url="https://argorobots.com/download/avalonia/mac"
+                       sparkle:version="2.0.0"
+                       sparkle:os="macos"
+                       type="application/octet-stream"
+                       length="0" />
+
+            <!-- Linux -->
+            <enclosure url="https://argorobots.com/download/avalonia/linux"
+                       sparkle:version="2.0.0"
+                       sparkle:os="linux"
+                       type="application/octet-stream"
+                       length="0" />
+        </item>
+    </channel>
+</rss>

@@ -157,6 +157,12 @@ AddDefaultCharset UTF-8
         Header set Content-Type "application/octet-stream"
         Header set Content-Disposition "attachment"
     </FilesMatch>
+
+    # Force download for cross-platform installer files
+    <FilesMatch "\.(AppImage|dmg|pkg)$">
+        Header set Content-Type "application/octet-stream"
+        Header set Content-Disposition "attachment"
+    </FilesMatch>
 </IfModule>
 
 # Redirect to error pages
@@ -179,11 +185,11 @@ php_value error_log error_log.txt
     # Protect database directory
     RewriteRule ^database/ - [F,L]
     
-    # Download handling rules with filename in URL for new structure
-    # Handle versioned installer downloads: /download/1.0.5/filename.exe
-    RewriteRule ^download/([0-9]+\.[0-9]+\.[0-9]+)/([^/]+\.exe)$ get_installer.php?version=$1&filename=$2 [L,QSA]
-    
-    # Handle general installer downloads (will get latest)
-    RewriteRule ^download/([^/]+\.exe)$ get_installer.php?filename=$1 [L,QSA]
-    RewriteRule ^download/?$ get_installer.php [L,QSA]
+    # --- Avalonia (cross-platform) download routes ---
+
+    # Versioned: /download/avalonia/2.1.0/win
+    RewriteRule ^download/avalonia/([0-9]+\.[0-9]+\.[0-9]+)/(win|mac|linux)/?$ get_avalonia_installer.php?version=$1&platform=$2 [L,QSA]
+
+    # Latest: /download/avalonia/win
+    RewriteRule ^download/avalonia/(win|mac|linux)/?$ get_avalonia_installer.php?platform=$1 [L,QSA]
 </IfModule>

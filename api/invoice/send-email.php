@@ -191,7 +191,7 @@ if (!empty($data['bcc']) && !filter_var($data['bcc'], FILTER_VALIDATE_EMAIL)) {
 }
 
 // Include the email sender
-require_once __DIR__ . '/InvoiceEmailSender.php';
+require_once __DIR__ . '/invoice_email_sender.php';
 
 try {
     $sender = new InvoiceEmailSender();

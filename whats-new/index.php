@@ -158,70 +158,22 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Language Switching Label Alignment<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed an issue causing some labels not to be aligned correctly after changing the
-                                    application language.</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Security improvements</strong> &mdash; Strengthened security across the application.</li>
+                                <li><strong>Faster startup</strong> &mdash; Optimized the startup sequence so the app opens quicker.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>SearchBox Positioning Fix<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed the SearchBox size and location not being set correctly when renaming companies on
-                                    the Get Started Form.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Font Scaling in Recent Companies Panel<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed the font size not scaling correctly in the 'recently opened companies' panel,
-                                    ensuring text remains readable and properly proportioned across different display
-                                    settings and screen resolutions.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Date Range Panel Translation<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed an issue causing the date range panel not to translate languages in some cases.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Security<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Improved security measures throughout the application to better protect your
-                                    business data.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Faster Startup Performance<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Optimized application startup sequence, allowing the program to open faster.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Label alignment after language switch</strong> &mdash; Some labels weren't aligning correctly after changing the app language.</li>
+                                <li><strong>SearchBox positioning</strong> &mdash; The SearchBox size and position weren't updating correctly when renaming companies on the Get Started Form.</li>
+                                <li><strong>Font scaling in Recent Companies panel</strong> &mdash; Font sizes now scale properly across different display settings.</li>
+                                <li><strong>Date range panel translation</strong> &mdash; The date range panel wasn't translating in some cases.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -240,53 +192,20 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Improved Application Scaling<span class="type-tag fix">Fix</span></h3>
-                                <p>The application now scales properly on most devices, providing a better user experience
-                                    across different screen sizes and resolutions. Whether you're using a high-DPI display
-                                    or a standard monitor, the interface will look crisp and properly sized.</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>More languages</strong> &mdash; Added support for additional languages.</li>
+                                <li><strong>Bulk import controls</strong> &mdash; Added "Yes to all" and "No to all" buttons in import dialogs so you don't have to respond to each duplicate prompt individually.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Additional Language Support<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Added more languages to make the application accessible to a broader international
-                                    audience.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Import Dialog Controls<span class="type-tag enhancement">Enhancement</span>
-                                </h3>
-                                <p>Added "Yes to all" and "No to all" buttons to import dialog boxes, allowing you to apply
-                                    your choice to all similar prompts during the import process. This eliminates the need
-                                    to respond to each individual prompt when importing large datasets with duplicate items,
-                                    making bulk imports much more efficient.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Bug Fixes and Improvements<span class="type-tag fix">Fix</span></h3>
-                                <p>Various bug fixes and general improvements throughout the application for enhanced
-                                    stability and performance.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Application scaling</strong> &mdash; Fixed scaling issues on high-DPI displays and different screen resolutions.</li>
+                                <li>Various bug fixes and stability improvements.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -305,85 +224,28 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Automatic Updates<span class="type-tag feature">New Feature</span></h3>
-                                <p>Stay up-to-date effortlessly! The application now automatically checks for new versions
-                                    when connected to the internet and prompts you to update. No more manual checking of the
-                                    website for the latest releases. Note: You may need to download this version manually to
-                                    enable automatic updates for future releases.</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Automatic updates</strong> &mdash; The app now checks for new versions on startup and prompts you to install them. You may need to download this version manually to enable auto-updates going forward.</li>
+                                <li><strong>Company logo</strong> &mdash; You can now set a custom company logo that appears in the main interface. Click it or right-click to change it.</li>
+                                <li><strong>Version compatibility check</strong> &mdash; The app now warns you if you try to open a file saved with a newer version.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Accountant Management<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Users now select an accountant when opening companies (skipped if only one exists). Your
-                                    selection is remembered so you no longer have to select the accountant every time you
-                                    create transactions.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Accountant selection</strong> &mdash; Your accountant choice is now remembered when opening companies, so you don't have to pick one every time.</li>
+                                <li><strong>Return tracking</strong> &mdash; Returned products now show which accountant processed the return.</li>
+                                <li><strong>Translated logs</strong> &mdash; Application logs can now be viewed in other languages.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Company Logo Display<span class="type-tag feature">New Feature</span></h3>
-                                <p>Add a personalized touch to your application with custom company logos.The logo appears
-                                    in the main interface and can be easily changed by clicking on it or using the
-                                    right-click menu. Perfect for branding and making the application feel truly yours.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Return Tracking<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Returned products now display which accountant processed the return, providing better
-                                    tracking for your return management processes.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Multilingual Log Support<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Application logs can now be translated to other languages, making debugging and support
-                                    more accessible.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Version Compatibility Check<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added version validation to prevent opening files that were saved with newer versions of
-                                    the application, ensuring data integrity and preventing compatibility issues.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Bug Fixes<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed several bugs throughout the application for improved stability and performance.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Several bug fixes for improved stability.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -402,76 +264,27 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Product Returns Management<span class="type-tag feature">New Feature</span></h3>
-                                <p>Users can now right-click on any transaction to return the product. We also added
-                                    dedicated analytics charts to track return patterns, refund amounts, and return rates to
-                                    help you better understand your business performance</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Product returns</strong> &mdash; Right-click any transaction to process a return. New analytics charts track return patterns and refund amounts.</li>
+                                <li><strong>Geographic analytics map</strong> &mdash; A world map view showing your business data broken down by country.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Charts render significantly faster<span class="type-tag enhancement">Enhancement</span>
-                                </h3>
-                                <p>Completely rebuilt the chart system, delivering lightning-fast performance,
-                                    buttery-smooth animations, and enhanced visual clarity. Charts now load instantly
-                                    instead of taking several seconds, and feature beautiful, fluid animations that make
-                                    data analysis more engaging. For users who prefer a more static experience, a new
-                                    setting allows you to disable chart animations.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Faster charts</strong> &mdash; Rebuilt the chart system for much better performance. Charts now load instantly and have smooth animations (which you can turn off in settings).</li>
+                                <li><strong>Organized analytics</strong> &mdash; Charts are now grouped into tabs for easier navigation.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Organized Analytics Charts<span class="type-tag enhancement">Enhancement</span>
-                                </h3>
-                                <p>Analytics charts are now grouped into different tabs, making it easier to find specific
-                                    analytical insights and navigate through your business data more efficiently.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Geographic Analytics Map<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added a world map that visualizes your business data by country. Includes the ability to
-                                    switch between different geographic data sources for deeper insights.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Translation Coverage<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed an issue where some interface controls were not being translated when using a
-                                    language other than English.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Bug Fixes<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed several bugs throughout the application for improved stability.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Translation gaps</strong> &mdash; Some UI controls weren't being translated in non-English languages.</li>
+                                <li>General bug fixes.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -490,69 +303,32 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Bug Fixes and Optimizations<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed several bugs and made optimizations throughout the application for improved
-                                    stability and performance.</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Receipt import/export</strong> &mdash; Receipts are now included when importing or exporting spreadsheet data.</li>
+                                <li><strong>Export currency selection</strong> &mdash; Choose which currency to use when exporting spreadsheets.</li>
+                                <li><strong>Currency detection</strong> &mdash; Imported spreadsheets are automatically detected for their currency and converted to your default. You can also set it manually if needed.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Receipt Import/Export with Spreadsheets<span class="type-tag feature">New Feature</span>
-                                </h3>
-                                <p>Added the ability to import and export receipts along with your spreadsheet data for
-                                    complete data portability and easier migration.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Better import error handling</strong> &mdash; When importing a spreadsheet with bad data, you can now skip the row, retry it, or cancel the whole import.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Import Error Handling<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Improved error handling for importing spreadsheets that are not in the correct format or
-                                    are missing required data. When encountering invalid values, you can now choose to skip
-                                    the problematic row, retry with corrected data, or cancel the entire import process.</p>
-                            </div>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Currency Selection for Exports<span class="type-tag feature">New Feature</span></h3>
-                                <p>Choose your preferred currency when exporting spreadsheets, allowing you to present
-                                    financial data in the currency that best suits your needs.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Currency Detection and Conversion<span class="type-tag feature">New Feature</span>
-                                </h3>
-                                <p>The application now automatically detects the currency used in imported spreadsheets and
-                                    converts all monetary values to your default currency. If auto-detection fails, you can
-                                    manually select the source currency for accurate conversion.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Bug fixes and performance optimizations.</li>
+                            </ul>
                         </div>
                     </div>
 
                     <div class="documentation-link">
                         <p>
-                            <strong>For more information about the updated spreadsheet import/export process,
+                            <strong>For more information about spreadsheet import/export,
                                 <a class="link-no-underline" href="../documentation/#spreadsheet-import">visit our
                                     documentation</a></strong>
                         </p>
@@ -573,38 +349,24 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-check"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Network Check Fix<span class="type-tag fix">Fix</span></h3>
-                                <p>Fixed a bug where the internet connection check failed on certain public or restricted
-                                    networks.</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Currency change loading indicator</strong> &mdash; Changing your default currency now shows a loading panel, and the currency symbol updates everywhere automatically.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Live Language Update<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Switching languages now updates all open forms instantly. No need to close and reopen
-                                    them manually.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Live language switching</strong> &mdash; Changing languages now updates all open forms instantly &mdash; no need to close and reopen them.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Loading Panel For Currency Changes<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added a loading panel for changing the default currency. The currency symbol is also
-                                    updated everywhere automatically.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Network check</strong> &mdash; Fixed the internet connection check failing on some public/restricted networks.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -623,74 +385,22 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Major Performance Boost<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Upgraded to .NET 9, delivering 15-25% performance improvements across the entire
-                                    application for faster data processing and smoother user interactions. It also uses
-                                    20-30% less memory.</p>
-                            </div>
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Chart zoom reset</strong> &mdash; You can now reset the zoom level on charts, plus improved zooming in general.</li>
+                                <li><strong>Offline detection</strong> &mdash; The app now shows a clear message when you lose internet instead of confusing error dialogs.</li>
+                                <li><strong>Cancel button on loading screens</strong> &mdash; You can now cancel out of long-running operations.</li>
+                            </ul>
                         </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Optimized Chart Management<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Separated Totals_Chart and Distribution_Chart for purchases and sales, eliminating
-                                    unnecessary refreshes when switching between screens and significantly boosting
-                                    performance.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-lightning"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Improved Language Translation<span class="type-tag enhancement">Enhancement</span></h3>
-                                <p>Enhanced language switching with a new loading screen and optimized the translation
-                                    system. It downloads all translations at once instead of using multiple API calls,
-                                    making language conversion much faster and more reliable.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Chart Interactivity<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added an option to reset the zoom of charts and improved chart zooming capabilities for a
-                                    better user experience when analyzing data visualizations.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Connectivity Management<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added internet connection monitoring that displays user-friendly messages when
-                                    connectivity is unavailable, replacing confusing error messages.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Enhanced Loading Controls<span class="type-tag feature">New Feature</span></h3>
-                                <p>Added a Cancel button to some loading screens, giving users more control and the ability
-                                    to interrupt long-running operations when needed.</p>
-                            </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>.NET 9 upgrade</strong> &mdash; Migrated to .NET 9, which brings roughly 15&ndash;25% faster performance and 20&ndash;30% lower memory usage across the board.</li>
+                                <li><strong>Chart performance</strong> &mdash; Separated chart instances for purchases and sales so they don't refresh unnecessarily when switching screens.</li>
+                                <li><strong>Faster language switching</strong> &mdash; Translations are now downloaded in a single batch instead of multiple API calls.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -709,63 +419,15 @@
                 </div>
 
                 <div class="version-content">
-                    <div class="feature-list">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Initial Release<span class="type-tag feature">New Feature</span></h3>
-                                <p>First stable release of Argo Books, including core functionality for tracking
-                                    sales, managing products, and analyzing business performance.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Analytics Dashboard<span class="type-tag feature">New Feature</span></h3>
-                                <p>Comprehensive analytics dashboard with interactive charts showing expenses and revenue
-                                    growth rates, total transactions, average transaction values, and much more.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Receipt Manager<span class="type-tag feature">New Feature</span></h3>
-                                <p>Receipt management system featuring flexible date range filtering, bulk
-                                    selection capabilities, and separate tracking for purchases and sales.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Import and Export Spreadsheets<span class="type-tag feature">New Feature</span></h3>
-                                <p>Seamlessly manage your business data with our powerful spreadsheet tools. Export complete
-                                    datasets including suppliers, customers, products, and transaction records in
-                                    organized worksheets using the standard .xlsx format. Compatible with Microsoft Excel,
-                                    Google Sheets, and LibreOffice. Keep sales and purchase records organized in separate
-                                    worksheets for better clarity.</p>
-                            </div>
-                        </div>
-
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <div class="icon icon-plus"></div>
-                            </div>
-                            <div class="feature-content">
-                                <h3>Multi-language Support<span class="type-tag feature">New Feature</span></h3>
-                                <p>Support for multiple languages with easy switching.</p>
-                            </div>
-                        </div>
+                    <div class="changelog">
+                        <p class="changelog-intro">First stable release of Argo Books.</p>
+                        <ul class="changelog-list">
+                            <li>Core sales tracking and product management</li>
+                            <li>Analytics dashboard with interactive charts for revenue, expenses, and transaction data</li>
+                            <li>Receipt manager with date range filtering and bulk selection</li>
+                            <li>Spreadsheet import and export (.xlsx) &mdash; compatible with Excel, Google Sheets, and LibreOffice</li>
+                            <li>Multi-language support</li>
+                        </ul>
                     </div>
                 </div>
             </div>

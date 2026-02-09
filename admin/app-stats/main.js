@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
   const googleSheetsData = rawData.dataPoints.GoogleSheets || [];
   const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
+  const translatorData = rawData.dataPoints.MicrosoftTranslator || [];
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
   const featureUsageData = rawData.dataPoints.FeatureUsage || [];
@@ -45,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
     exchangeRatesData,
     googleSheetsData,
     receiptScanningData,
+    translatorData,
     sessionData,
     errorData,
     featureUsageData
@@ -66,11 +68,6 @@ document.addEventListener("DOMContentLoaded", function () {
       googleSheetsData,
       sessionData,
       errorData
-    );
-    generateFeatureUsageByRegionChart(
-      exportData,
-      openaiData,
-      exchangeRatesData
     );
     generatePerformanceByCountryChart(
       exportData,
@@ -110,15 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
     sessionData,
     errorData
   );
-  generateTopVersionsChart(
-    exportData,
-    openaiData,
-    exchangeRatesData,
-    googleSheetsData,
-    sessionData,
-    errorData,
-    featureUsageData
-  );
   generateVersionPerformanceChart(exportData, openaiData, exchangeRatesData);
   generateVersionSessionChart(sessionData);
   generateVersionErrorChart(
@@ -130,24 +118,13 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   generateErrorCategoryChart(errorData);
-  generateErrorSeverityChart(errorData);
   generateErrorTimeChart(errorData);
   generateErrorCategoryTimelineChart(errorData);
-  generateErrorContextChart(errorData);
-  generateStabilityChart(
-    exportData,
-    openaiData,
-    exchangeRatesData,
-    sessionData,
-    errorData
-  );
 
   // Feature Usage Charts
   generateFeatureUsageChart(featureUsageData);
   generatePageViewsChart(featureUsageData);
   generateFeatureTimelineChart(featureUsageData);
-  generateFeatureDurationChart(featureUsageData);
-  generateImportStatsChart(featureUsageData);
   generateContextUsageChart(featureUsageData);
 
   // Receipt Scanning Charts
@@ -161,17 +138,16 @@ document.addEventListener("DOMContentLoaded", function () {
   generateExportDurationByTypeChart(exportData);
   generateExportFileSizeByTypeChart(exportData);
 
-  generateExportDurationChart(exportData);
   generateOpenAIChart(openaiData);
   generateOpenAITokenChart(openaiData);
   generateExchangeRatesChart(exchangeRatesData);
 
-  generateExportFileSizeChart(exportData);
   generateOverallActivityChart(
     exportData,
     openaiData,
     exchangeRatesData,
     googleSheetsData,
+    translatorData,
     sessionData,
     errorData
   );
@@ -183,6 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
     exchangeRatesData,
     googleSheetsData,
     receiptScanningData,
+    translatorData,
     sessionData,
     errorData,
     featureUsageData
@@ -194,7 +171,8 @@ document.addEventListener("DOMContentLoaded", function () {
       openaiData.length +
       exchangeRatesData.length +
       googleSheetsData.length +
-      receiptScanningData.length;
+      receiptScanningData.length +
+      translatorData.length;
     const totalErrors = errorData.length;
     const totalSessions = sessionData.length;
     const totalFeatureUsage = featureUsageData.length;
@@ -206,6 +184,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ...openaiData.map((d) => parseFloat(d.DurationMS || 0)),
       ...exchangeRatesData.map((d) => parseFloat(d.DurationMS || 0)),
       ...receiptScanningData.map((d) => parseFloat(d.DurationMS || 0)),
+      ...translatorData.map((d) => parseFloat(d.DurationMS || 0)),
     ].filter((d) => d > 0);
 
     const avgDuration =
@@ -234,6 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
       "Currency Rates": exchangeRatesData.length,
       "Google Sheets": googleSheetsData.length,
       "Receipt Scan": receiptScanningData.length,
+      Translator: translatorData.length,
     };
     const mostUsedFeature = Object.entries(featureUsageCounts).sort(
       ([, a], [, b]) => b - a
@@ -267,6 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exchangeRatesData,
       ...googleSheetsData,
       ...receiptScanningData,
+      ...translatorData,
       ...sessionData,
       ...featureUsageData,
     ];
@@ -346,6 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exchangeRatesData,
       ...googleSheetsData,
       ...receiptScanningData,
+      ...translatorData,
       ...sessionData,
       ...errorData,
       ...featureUsageData,
@@ -627,84 +609,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return `${context.label}: ${context.raw} (${percentage}%)`;
               },
             },
-          },
-        }
-      },
-    });
-  }
-
-  function generateFeatureUsageByRegionChart(
-    exportData,
-    openaiData,
-    exchangeRatesData
-  ) {
-    const regionData = {};
-
-    const addToRegion = (item, type) => {
-      const country = item.country || "Unknown";
-      if (country !== "Unknown") {
-        if (!regionData[country]) {
-          regionData[country] = {
-            exports: 0,
-            openai: 0,
-            exchangeRates: 0,
-          };
-        }
-        regionData[country][type]++;
-      }
-    };
-
-    exportData.forEach((item) => addToRegion(item, "exports"));
-    openaiData.forEach((item) => addToRegion(item, "openai"));
-    exchangeRatesData.forEach((item) => addToRegion(item, "exchangeRates"));
-
-    if (Object.keys(regionData).length === 0) {
-      document.getElementById(
-        "featureUsageByRegionChart"
-      ).parentElement.innerHTML =
-        '<div class="chart-no-data">No regional feature usage data available</div>';
-      return;
-    }
-
-    const countries = Object.keys(regionData).slice(0, 10);
-
-    new Chart(document.getElementById("featureUsageByRegionChart"), {
-      type: "bar",
-      data: {
-        labels: countries,
-        datasets: [
-          {
-            label: "Exports",
-            data: countries.map((country) => regionData[country].exports),
-            backgroundColor: "#3b82f6",
-          },
-          {
-            label: "OpenAI",
-            data: countries.map((country) => regionData[country].openai),
-            backgroundColor: "#8b5cf6",
-          },
-          {
-            label: "Exchange Rates",
-            data: countries.map((country) => regionData[country].exchangeRates),
-            backgroundColor: "#f59e0b",
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            stacked: true,
-          },
-          y: {
-            stacked: true,
-            beginAtZero: true,
-          },
-        },
-        plugins: {
-          legend: {
-            position: "bottom",
           },
         }
       },
@@ -1202,150 +1106,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateTopVersionsChart(
-    exportData,
-    openaiData,
-    exchangeRatesData,
-    googleSheetsData,
-    sessionData,
-    errorData,
-    featureUsageData
-  ) {
-    const allData = [
-      ...exportData,
-      ...openaiData,
-      ...exchangeRatesData,
-      ...googleSheetsData,
-      ...sessionData,
-      ...errorData,
-      ...featureUsageData,
-    ];
-    const versionStats = {};
-
-    allData.forEach((item) => {
-      const version = item.appVersion || "Unknown";
-      if (version !== "Unknown") {
-        if (!versionStats[version]) {
-          versionStats[version] = {
-            totalOps: 0,
-            exports: 0,
-            openai: 0,
-            exchangeRates: 0,
-            sessions: 0,
-            features: 0,
-            errors: 0,
-          };
-        }
-        versionStats[version].totalOps++;
-
-        const dataType = item.dataType;
-        switch (dataType) {
-          case "Export":
-            versionStats[version].exports++;
-            break;
-          case "OpenAI":
-            versionStats[version].openai++;
-            break;
-          case "OpenExchangeRates":
-            versionStats[version].exchangeRates++;
-            break;
-          case "Session":
-            versionStats[version].sessions++;
-            break;
-          case "FeatureUsage":
-            versionStats[version].features++;
-            break;
-          case "Error":
-            versionStats[version].errors++;
-            break;
-        }
-      }
-    });
-
-    if (Object.keys(versionStats).length === 0) {
-      document.getElementById("topVersionsChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No version activity data available</div>';
-      return;
-    }
-
-    const sortedVersions = Object.entries(versionStats)
-      .sort(([, a], [, b]) => b.totalOps - a.totalOps)
-      .slice(0, 8);
-
-    const labels = sortedVersions.map(([version]) => `v${version}`);
-    const chartExportData = sortedVersions.map(([, stats]) => stats.exports);
-    const chartOpenaiData = sortedVersions.map(([, stats]) => stats.openai);
-    const chartExchangeData = sortedVersions.map(
-      ([, stats]) => stats.exchangeRates
-    );
-    const chartSessionData = sortedVersions.map(([, stats]) => stats.sessions);
-    const chartFeatureData = sortedVersions.map(([, stats]) => stats.features || 0);
-
-    // Only include datasets that have data
-    const allDatasets = [
-      {
-        label: "Exports",
-        data: chartExportData,
-        backgroundColor: "#3b82f6",
-      },
-      {
-        label: "OpenAI",
-        data: chartOpenaiData,
-        backgroundColor: "#8b5cf6",
-      },
-      {
-        label: "Exchange Rates",
-        data: chartExchangeData,
-        backgroundColor: "#f59e0b",
-      },
-      {
-        label: "Sessions",
-        data: chartSessionData,
-        backgroundColor: "#10b981",
-      },
-      {
-        label: "Features",
-        data: chartFeatureData,
-        backgroundColor: "#06b6d4",
-      },
-    ];
-
-    // Filter to only show datasets with at least some data
-    const activeDatasets = allDatasets.filter((ds) =>
-      ds.data.some((val) => val > 0)
-    );
-
-    new Chart(document.getElementById("topVersionsChart"), {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: activeDatasets,
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: {
-            stacked: true,
-          },
-          y: {
-            stacked: true,
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Operations Count",
-            },
-          },
-        },
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-        }
-      },
-    });
-  }
-
   function generateVersionPerformanceChart(
     exportData,
     openaiData,
@@ -1740,13 +1500,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateErrorTimeChart(errorData) {
     if (errorData.length === 0) {
       document.getElementById("errorTimeChart").parentElement.innerHTML =
-        '<div class="chart-no-data"><h3>📈 Stable Performance</h3><p>No error trends to display</p></div>';
+        '<div class="chart-no-data">No error trends to display</div>';
       return;
     }
 
     const dailyErrors = {};
     errorData.forEach((error) => {
-      const date = error.timestamp.split(" ")[0];
+      const date = error.timestamp.slice(0, 10);
       dailyErrors[date] = (dailyErrors[date] || 0) + 1;
     });
 
@@ -1795,62 +1555,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateStabilityChart(
-    exportData,
-    openaiData,
-    exchangeRatesData,
-    sessionData,
-    errorData
-  ) {
-    const totalOperations =
-      exportData.length +
-      openaiData.length +
-      exchangeRatesData.length +
-      sessionData.length;
-    const totalErrors = errorData.length;
-    const successfulOperations = totalOperations - totalErrors;
-
-    if (totalOperations === 0) {
-      document.getElementById("stabilityChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No operations data available</div>';
-      return;
-    }
-
-    new Chart(document.getElementById("stabilityChart"), {
-      type: "doughnut",
-      data: {
-        labels: ["Successful Operations", "Errors"],
-        datasets: [
-          {
-            data: [successfulOperations, totalErrors],
-            backgroundColor: ["#10b981", "#ef4444"],
-            borderColor: ["#059669", "#dc2626"],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                return `${context.label
-                  }: ${context.raw.toLocaleString()} (${percentage}%)`;
-              },
-            },
-          },
-        }
-      },
-    });
-  }
-
   // Usage Charts
   function generateSessionDurationChart(sessionData) {
     const sessionEndData = sessionData.filter(
@@ -1865,7 +1569,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const dailyStats = {};
     sessionEndData.forEach((session) => {
-      const date = session.timestamp.split(" ")[0];
+      const date = session.timestamp.slice(0, 10);
       if (!dailyStats[date]) {
         dailyStats[date] = {
           totalDuration: 0,
@@ -2134,75 +1838,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // API Usage Charts
-  function generateExportDurationChart(exportData) {
-    if (exportData.length === 0) {
-      document.getElementById("exportDurationChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No export data available</div>';
-      return;
-    }
-
-    const recentData = exportData.slice(-100);
-    const labels = recentData.map((d, index) => {
-      const date = new Date(d.timestamp);
-      return recentData.length > 50
-        ? index % Math.ceil(recentData.length / 20) === 0
-          ? date.toLocaleDateString()
-          : ""
-        : date.toLocaleString();
-    });
-
-    const durations = recentData.map((d) => {
-      const duration = d.DurationMS;
-      return typeof duration === "string"
-        ? parseFloat(duration.replace(/[^\d.]/g, ""))
-        : parseInt(duration) || 0;
-    });
-
-    new Chart(document.getElementById("exportDurationChart"), {
-      type: "line",
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: "Duration (ms)",
-            data: durations,
-            borderColor: "#3b82f6",
-            backgroundColor: "rgba(59, 130, 246, 0.1)",
-            fill: true,
-            tension: 0.4,
-            pointRadius: exportData.length > 50 ? 1 : 3,
-            pointHoverRadius: 6,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        scales: {
-          x: {
-            display: true,
-            ticks: {
-              maxTicksLimit: 15,
-              maxRotation: 45,
-            },
-          },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Duration (milliseconds)",
-            },
-          },
-        }
-      },
-    });
-  }
-
   function generateOpenAIChart(openaiData) {
     if (openaiData.length === 0) {
       document.getElementById("openaiChart").parentElement.innerHTML =
@@ -2212,7 +1847,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const modelCounts = {};
     openaiData.forEach((item) => {
-      const model = item.Model || "Unknown";
+      const model = item.Model || "Unspecified";
       modelCounts[model] = (modelCounts[model] || 0) + 1;
     });
 
@@ -2342,83 +1977,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Overall Activity Charts
-  function generateExportFileSizeChart(exportData) {
-    const fileSizes = exportData
-      .filter((d) => d.FileSize && d.FileSize !== "null" && d.FileSize !== null)
-      .map((d) => ({
-        size: parseInt(d.FileSize) || 0,
-        type: d.ExportType || "Unknown",
-      }))
-      .filter((item) => item.size > 0);
-
-    if (fileSizes.length === 0) {
-      document.getElementById("exportFileSizeChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No file size data available</div>';
-      return;
-    }
-
-    const datasets = [];
-    const types = [...new Set(fileSizes.map((item) => item.type))];
-
-    types.forEach((type) => {
-      const typeData = fileSizes.filter((item) => item.type === type);
-      datasets.push({
-        label: type,
-        data: typeData.map((item, index) => ({
-          x: index + 1,
-          y: item.size,
-        })),
-        backgroundColor: typeColors[type] || "#9ca3af",
-        borderColor: typeColors[type] || "#9ca3af",
-        pointRadius: 4,
-      });
-    });
-
-    new Chart(document.getElementById("exportFileSizeChart"), {
-      type: "scatter",
-      data: {
-        datasets: datasets,
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-        },
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: "Export Number",
-            },
-          },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "File Size (bytes)",
-            },
-            ticks: {
-              callback: function (value) {
-                if (value >= 1048576)
-                  return (value / 1048576).toFixed(1) + "MB";
-                if (value >= 1024) return (value / 1024).toFixed(1) + "KB";
-                return value + "B";
-              },
-            },
-          },
-        }
-      },
-    });
-  }
-
   function generateOverallActivityChart(
     exportData,
     openaiData,
     exchangeRatesData,
     googleSheetsData,
+    translatorData,
     sessionData,
     errorData
   ) {
@@ -2442,6 +2006,10 @@ document.addEventListener("DOMContentLoaded", function () {
       ...(rawData.dataPoints.ReceiptScanning || []).map((d) => ({
         ...d,
         type: "Receipt Scan",
+      })),
+      ...translatorData.map((d) => ({
+        ...d,
+        type: "Translator",
       })),
       ...sessionData.map((d) => ({
         ...d,
@@ -2563,66 +2131,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // =====================
-  // Error Severity Chart
-  // =====================
-  function generateErrorSeverityChart(errorData) {
-    if (errorData.length === 0) {
-      document.getElementById("errorSeverityChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No error severity data available</div>';
-      return;
-    }
-
-    const severityCounts = {};
-    errorData.forEach((error) => {
-      const severity = error.Severity || "Unknown";
-      severityCounts[severity] = (severityCounts[severity] || 0) + 1;
-    });
-
-    const severityColors = {
-      Critical: "#dc2626",
-      Error: "#ef4444",
-      Warning: "#f59e0b",
-      Unknown: "#9ca3af",
-    };
-
-    const labels = Object.keys(severityCounts);
-    const data = Object.values(severityCounts);
-    const colors = labels.map((s) => severityColors[s] || "#9ca3af");
-
-    new Chart(document.getElementById("errorSeverityChart"), {
-      type: "doughnut",
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            data: data,
-            backgroundColor: colors,
-            borderWidth: 2,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                return `${context.label}: ${context.raw} (${percentage}%)`;
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  // =====================
   // Error Category Timeline Chart
   // =====================
   function generateErrorCategoryTimelineChart(errorData) {
@@ -2695,62 +2203,6 @@ document.addEventListener("DOMContentLoaded", function () {
           x: {
             ticks: {
               maxRotation: 45,
-            },
-          },
-        },
-      },
-    });
-  }
-
-  // =====================
-  // Error Context Chart
-  // =====================
-  function generateErrorContextChart(errorData) {
-    if (errorData.length === 0) {
-      document.getElementById("errorContextChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No error context data available</div>';
-      return;
-    }
-
-    const contextCounts = {};
-    errorData.forEach((error) => {
-      const context = error.Context || "Unknown";
-      contextCounts[context] = (contextCounts[context] || 0) + 1;
-    });
-
-    const sortedContexts = Object.entries(contextCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10);
-
-    new Chart(document.getElementById("errorContextChart"), {
-      type: "bar",
-      data: {
-        labels: sortedContexts.map(([ctx]) => ctx),
-        datasets: [
-          {
-            label: "Errors",
-            data: sortedContexts.map(([, count]) => count),
-            backgroundColor: "#ef4444",
-            borderColor: "#dc2626",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        indexAxis: "y",
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Error Count",
             },
           },
         },
@@ -2938,133 +2390,6 @@ document.addEventListener("DOMContentLoaded", function () {
             title: {
               display: true,
               text: "Usage Count",
-            },
-          },
-          x: {
-            ticks: {
-              maxRotation: 45,
-            },
-          },
-        },
-      },
-    });
-  }
-
-  function generateFeatureDurationChart(featureUsageData) {
-    const dataWithDuration = featureUsageData.filter(
-      (f) => f.DurationMs && f.DurationMs > 0
-    );
-
-    if (dataWithDuration.length === 0) {
-      document.getElementById("featureDurationChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No feature duration data available</div>';
-      return;
-    }
-
-    const featureDurations = {};
-    const featureCounts = {};
-
-    dataWithDuration.forEach((item) => {
-      const feature = item.FeatureName || "Unknown";
-      if (!featureDurations[feature]) {
-        featureDurations[feature] = 0;
-        featureCounts[feature] = 0;
-      }
-      featureDurations[feature] += item.DurationMs;
-      featureCounts[feature]++;
-    });
-
-    const avgDurations = Object.entries(featureDurations)
-      .map(([feature, total]) => ({
-        feature,
-        avg: Math.round(total / featureCounts[feature]),
-      }))
-      .sort((a, b) => b.avg - a.avg)
-      .slice(0, 10);
-
-    new Chart(document.getElementById("featureDurationChart"), {
-      type: "bar",
-      data: {
-        labels: avgDurations.map((d) => d.feature),
-        datasets: [
-          {
-            label: "Average Duration (ms)",
-            data: avgDurations.map((d) => d.avg),
-            backgroundColor: "#10b981",
-            borderColor: "#059669",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Duration (ms)",
-            },
-          },
-        },
-      },
-    });
-  }
-
-  function generateImportStatsChart(featureUsageData) {
-    const importData = featureUsageData.filter(
-      (f) => f.FeatureName === "Import"
-    );
-
-    if (importData.length === 0) {
-      document.getElementById("importStatsChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No import data available</div>';
-      return;
-    }
-
-    const dailyImports = {};
-    importData.forEach((item) => {
-      const date = new Date(item.timestamp).toLocaleDateString();
-      dailyImports[date] = (dailyImports[date] || 0) + 1;
-    });
-
-    const dates = Object.keys(dailyImports).sort().slice(-30);
-    const counts = dates.map((date) => dailyImports[date]);
-
-    new Chart(document.getElementById("importStatsChart"), {
-      type: "bar",
-      data: {
-        labels: dates,
-        datasets: [
-          {
-            label: "Imports",
-            data: counts,
-            backgroundColor: "#8b5cf6",
-            borderColor: "#7c3aed",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Import Count",
             },
           },
           x: {

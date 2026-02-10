@@ -89,6 +89,56 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.1 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.1</span>
+                        <span class="date-tag">February 2026</span>
+                    </div>
+                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Backup &amp; restore</strong> &mdash; Create <code>.argobk</code> backup files of your company data with optional attachments, and restore from them at any time.</li>
+                                <li><strong>Version history &amp; audit trail</strong> &mdash; Every change to your data is now recorded with timestamps and field-level details. Browse, search, and undo/redo past changes from the new version history panel.</li>
+                                <li><strong>Ribbon invoice template</strong> &mdash; A new modern invoice design featuring decorative wave accents and gradient fills.</li>
+                                <li><strong>Update notification banner</strong> &mdash; A new banner appears when an update is available, letting you download directly without interrupting your workflow.</li>
+                                <li><strong>Receipt grid/table toggle</strong> &mdash; Switch between grid and table views on the Receipts page for flexible data browsing.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Responsive dashboard</strong> &mdash; Stat cards and quick actions now adapt to smaller screens with minimal and compact display modes.</li>
+                                <li><strong>Invoice template color controls</strong> &mdash; Added separate header and text color settings with per-template labels, replacing hardcoded colors.</li>
+                                <li><strong>Template designer undo/redo</strong> &mdash; Rapid property changes are coalesced into single undo entries, and you'll be prompted to save unsaved changes when closing.</li>
+                                <li><strong>Searchable template dropdown</strong> &mdash; Replaced the standard dropdown with a searchable one for easier template selection.</li>
+                                <li><strong>Receipt scanner zoom &amp; pan</strong> &mdash; Added zoom and pan controls to the receipt scanner preview for easier reviewing.</li>
+                                <li><strong>Sidebar auto-shrink</strong> &mdash; Long company names in the sidebar now automatically shrink to fit.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Tutorial display</strong> &mdash; Fixed page tutorials appearing outside of tutorial mode.</li>
+                                <li><strong>Reports layout state</strong> &mdash; Fixed unsaved layout changes incorrectly persisting after choosing &ldquo;Don't Save&rdquo;.</li>
+                                <li><strong>Version history buttons</strong> &mdash; Fixed undo/redo buttons not appearing for previously saved changes.</li>
+                                <li><strong>Transaction editing</strong> &mdash; Fixed PO number and product dropdown behavior when editing transactions.</li>
+                                <li><strong>Product import mismatch</strong> &mdash; Corrected product matching during imports with receipt reference decoupling.</li>
+                                <li>Memory leak fixes and event handler cleanup across several pages.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.0 -->
             <div class="version-card">
                 <div class="version-header">

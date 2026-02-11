@@ -106,9 +106,9 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Backup &amp; restore</strong> &mdash; Create <code>.argobk</code> backup files of your company data with optional attachments, and restore from them at any time.</li>
-                                <li><strong>Version history &amp; audit trail</strong> &mdash; Every change to your data is now recorded with timestamps and field-level details. Browse, search, and undo/redo past changes from the new version history panel.</li>
-                                <li><strong>New invoice template</strong> &mdash; A new modern invoice design featuring decorative wave accents and gradient fills.</li>
+                                <li><strong>Backup &amp; restore</strong> &mdash; Create <code>.argobk</code> backup files of your company data, and restore from them at any time.</li>
+                                <li><strong>Version history &amp; audit trail</strong> &mdash; Every change to your data is now recorded with timestamps and details. Browse, search, and undo/redo past changes from the new version history panel.</li>
+                                <li><strong>New invoice template</strong> &mdash; A new modern invoice featuring decorative wave accents.</li>
                                 <li><strong>Receipt grid/table toggle</strong> &mdash; Switch between grid and table views on the Receipts page for flexible data browsing.</li>
                             </ul>
                         </div>
@@ -116,9 +116,15 @@
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
                                 <li><strong>Improved responsiveness</strong> &mdash; The interface now adapts more smoothly across different screen sizes.</li>
-                                <li><strong>Invoice template color controls</strong> &mdash; Added separate header and text color settings with per-template labels, replacing hardcoded colors.</li>
-                                <li><strong>Improved undo/redo</strong> &mdash; Rapid property changes are coalesced into single undo entries.</li>
+                                <li><strong>Invoice template color controls</strong> &mdash; Added per-template color settings.</li>
+                                <li><strong>Improved undo/redo</strong> &mdash; Rapid property changes are combined into single entries.</li>
                                 <li><strong>Receipt scanner zoom &amp; pan</strong> &mdash; Added zoom and pan controls to the receipt scanner preview for easier reviewing.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Several bug fixes for improved stability.</li>
                             </ul>
                         </div>
                     </div>

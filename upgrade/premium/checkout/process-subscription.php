@@ -9,6 +9,7 @@ header('Content-Type: application/json');
 require_once '../../../db_connect.php';
 require_once '../../../email_sender.php';
 require_once '../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../config/pricing.php';
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -36,12 +37,25 @@ $premiumLicenseKey = $input['premiumLicenseKey'] ?? '';
 $paymentMethod = $input['payment_method'] ?? 'unknown';
 $userId = intval($input['user_id'] ?? 0);
 
-// Credit configuration for monthly subscriptions with discount
-$discountAmount = 20.00;
-$monthlyPrice = 5.00;
+// Credit configuration for monthly subscriptions with discount (from centralized config)
+$pricingConfig = get_pricing_config();
+$discountAmount = $pricingConfig['premium_discount'];
+$monthlyPrice = $pricingConfig['premium_monthly_price'];
+$yearlyPrice = $pricingConfig['premium_yearly_price'];
 $isMonthlyWithCredit = ($billing === 'monthly' && $hasDiscount);
 $creditBalance = 0;
 $originalCredit = 0;
+
+// Compute server-side total (base price + processing fee) — never trust client amount
+if (!$isMonthlyWithCredit) {
+    if ($billing === 'yearly') {
+        $baseCharge = $hasDiscount ? ($yearlyPrice - $discountAmount) : $yearlyPrice;
+    } else {
+        $baseCharge = $monthlyPrice;
+    }
+    $processingFee = calculate_processing_fee($baseCharge);
+    $amount = $baseCharge + $processingFee;
+}
 
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';
@@ -268,6 +282,7 @@ try {
                 }
                 $response = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
                 return ['response' => json_decode($response, true), 'http_code' => $httpCode];
             };
 
@@ -366,8 +381,8 @@ try {
         // Update existing subscription with new payment method and billing cycle
         $subscriptionId = $existingSubscription['subscription_id'];
 
-        // Calculate new amount based on billing cycle
-        $newAmount = ($billing === 'yearly') ? 50.00 : 5.00;
+        // Calculate new amount based on billing cycle (from centralized config)
+        $newAmount = ($billing === 'yearly') ? $pricingConfig['premium_yearly_price'] : $pricingConfig['premium_monthly_price'];
 
         // Determine the new end date:
         // - If subscription still valid (end_date > now) AND not charged: keep existing end_date

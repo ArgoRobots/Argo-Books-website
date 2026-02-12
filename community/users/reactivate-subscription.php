@@ -5,6 +5,7 @@ require_once '../../email_sender.php';
 require_once '../community_functions.php';
 require_once 'user_functions.php';
 require_once '../../webhooks/paypal-helper.php';
+require_once '../../config/pricing.php';
 
 // Ensure user is logged in
 require_login();
@@ -155,11 +156,11 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
                     <div class="billing-cycle-options">
                         <div class="billing-cycle-btn <?php echo $billing_cycle === 'monthly' ? 'current' : ''; ?>" data-billing="monthly">
                             <span class="billing-cycle-name">Monthly</span>
-                            <span class="billing-cycle-price">$5/month</span>
+                            <span class="billing-cycle-price">$<?php echo number_format(get_pricing_config()['premium_monthly_price'], 0); ?>/month</span>
                         </div>
                         <div class="billing-cycle-btn <?php echo $billing_cycle === 'yearly' ? 'current' : ''; ?>" data-billing="yearly">
                             <span class="billing-cycle-name">Yearly</span>
-                            <span class="billing-cycle-price">$50/year</span>
+                            <span class="billing-cycle-price">$<?php echo number_format(get_pricing_config()['premium_yearly_price'], 0); ?>/year</span>
                         </div>
                     </div>
                 </div>

@@ -4,6 +4,12 @@ $pageDescription = 'Compare Argo Books free, standard, and premium versions. Lea
 $currentPage = 'version-comparison';
 $pageCategory = 'getting-started';
 
+require_once __DIR__ . '/../../../config/pricing.php';
+$pricing = get_pricing_config();
+$monthlyPrice = $pricing['premium_monthly_price'];
+$yearlyPrice = $pricing['premium_yearly_price'];
+$yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
+
 include '../../docs-header.php';
 ?>
 
@@ -126,8 +132,8 @@ include '../../docs-header.php';
                     <div class="card-header">
                         <h3 class="version-title">Premium</h3>
                         <p class="version-subtitle">Includes AI-powered features</p>
-                        <div class="version-price">$5 <span class="price-period">CAD/month</span></div>
-                        <p class="price-alt">or $50 CAD/year (save $10)</p>
+                        <div class="version-price">$<?php echo number_format($monthlyPrice, 0); ?> <span class="price-period">CAD/month</span></div>
+                        <p class="price-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
                     </div>
                     <ul class="feature-list">
                         <li class="feature-item">

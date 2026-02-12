@@ -1,3 +1,13 @@
+<?php
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/../config/pricing.php';
+$pricing = get_pricing_config();
+$standardPrice = $pricing['standard_price'];
+$monthlyPrice = $pricing['premium_monthly_price'];
+$yearlyPrice = $pricing['premium_yearly_price'];
+$discount = $pricing['premium_discount'];
+$yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,14 +19,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Upgrade Argo Books. Get Standard for $20 CAD lifetime access or subscribe to Premium for $5/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
+        content="Upgrade Argo Books. Get Standard for $<?php echo number_format($standardPrice, 0); ?> CAD lifetime access or subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
     <meta name="keywords"
         content="upgrade argo books, buy full version, lifetime access software, unlimited products, business software pricing, finance tracker, sales tracker standard, premium subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Upgrade - Argo Books">
     <meta property="og:description"
-        content="Upgrade Argo Books. Get Standard for $20 CAD lifetime access or subscribe to Premium for $5/month.">
+        content="Upgrade Argo Books. Get Standard for $<?php echo number_format($standardPrice, 0); ?> CAD lifetime access or subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month.">
     <meta property="og:url" content="https://argorobots.com/upgrade/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -26,7 +36,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Upgrade - Argo Books">
     <meta name="twitter:description"
-        content="Upgrade Argo Books. Get Standard for $20 CAD lifetime access or subscribe to Premium for $5/month.">
+        content="Upgrade Argo Books. Get Standard for $<?php echo number_format($standardPrice, 0); ?> CAD lifetime access or subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month.">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/upgrade/">
@@ -77,7 +87,7 @@
                         <h2>Standard</h2>
                         <div class="card-price">
                             <span class="currency">$</span>
-                            <span class="amount">20</span>
+                            <span class="amount"><?php echo number_format($standardPrice, 0); ?></span>
                             <span class="period">CAD</span>
                         </div>
                         <p class="price-note">Lifetime access</p>
@@ -118,10 +128,10 @@
                         <h2>Premium</h2>
                         <div class="card-price">
                             <span class="currency">$</span>
-                            <span class="amount">5</span>
+                            <span class="amount"><?php echo number_format($monthlyPrice, 0); ?></span>
                             <span class="period">CAD/month</span>
                         </div>
-                        <p class="price-note">or $50 CAD/year (save $10)</p>
+                        <p class="price-note">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
 
                         <ul class="card-features">
                               <li>
@@ -143,7 +153,7 @@
                         </ul>
 
                         <div class="card-highlight ai-highlight">
-                            Standard users get a $20 discount!
+                            Standard users get a $<?php echo number_format($discount, 0); ?> discount!
                         </div>
 
                         <div class="card-cta">
@@ -188,14 +198,14 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Standard ($20 one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>Premium ($5/month)</strong> adds invoices & payments, AI-powered features like receipt scanning, and predictive analysis.</p>
+                            <p><strong>Standard ($<?php echo number_format($standardPrice, 0); ?> one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month)</strong> adds invoices & payments, AI-powered features like receipt scanning, and predictive analysis.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>How does the $20 discount for Standard users work?</h3>
+                        <h3>How does the $<?php echo number_format($discount, 0); ?> discount for Standard users work?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -204,7 +214,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>If you've purchased Standard, you get $20 off your first year of Premium. Just enter your license key when subscribing, and the yearly price drops from $50 to $30. You will still have access to your standard license key after you switch to the Premium subscription.</p>
+                            <p>If you've purchased Standard, you get $<?php echo number_format($discount, 0); ?> off your first year of Premium. Your first year drops from $<?php echo number_format($yearlyPrice, 0); ?> to $<?php echo number_format($yearlyPrice - $discount, 0); ?>. After that, it renews at the regular $<?php echo number_format($yearlyPrice, 0); ?>/year price. You will still have access to your standard license key after you switch to the Premium subscription.</p>
                         </div>
                     </div>
                 </div>

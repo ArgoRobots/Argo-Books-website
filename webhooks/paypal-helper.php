@@ -56,6 +56,7 @@ function getPayPalAccessToken() {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     if ($httpCode !== 200) {
         error_log("Failed to get PayPal access token. HTTP Code: $httpCode, Response: $response");
@@ -125,6 +126,7 @@ function verifyPayPalWebhookSignature($headers, $body, $webhookId) {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     if ($httpCode !== 200) {
         error_log("PayPal webhook verification failed. HTTP Code: $httpCode, Response: $response");
@@ -162,6 +164,7 @@ function getPayPalSubscriptionDetails($subscriptionId) {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     if ($httpCode !== 200) {
         error_log("Failed to get PayPal subscription details. HTTP Code: $httpCode");
@@ -200,6 +203,7 @@ function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user'
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     // PayPal returns 204 No Content on successful cancellation
     if ($httpCode !== 204) {
@@ -236,7 +240,9 @@ function suspendPayPalSubscription($subscriptionId, $reason = 'Payment failed') 
         ]
     ]);
 
+    curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     return $httpCode === 204;
 }
@@ -267,7 +273,9 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
         ]
     ]);
 
+    curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     return $httpCode === 204;
 }
@@ -297,6 +305,7 @@ function getPayPalCaptureDetails($captureId) {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
     if ($httpCode !== 200) {
         return false;

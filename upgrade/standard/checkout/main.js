@@ -1,4 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Get pricing from server-injected config (see index.php)
+  const pricing = window.PRICING;
+  const priceFormatted = pricing.formatted;
+  const priceValue = pricing.standardPrice.toFixed(2);
+  const priceCents = pricing.standardPriceCents;
+  const currency = pricing.currency;
+
   // Get payment method from URL
   const urlParams = new URLSearchParams(window.location.search);
   const paymentMethod = urlParams.get("method");
@@ -72,8 +79,8 @@ document.addEventListener("DOMContentLoaded", function () {
               purchase_units: [
                 {
                   amount: {
-                    value: "20.00",
-                    currency_code: "CAD",
+                    value: priceValue,
+                    currency_code: currency,
                   },
                 },
               ],
@@ -90,8 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify({
                   orderID: data.orderID,
                   payerID: data.payerID,
-                  amount: "20.00",
-                  currency: "CAD",
+                  amount: priceValue,
+                  currency: currency,
                   status: "completed",
                   payer_email: details.payer.email_address,
                   payer_name:
@@ -197,7 +204,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
         <button type="submit" id="stripe-submit-btn" class="checkout-btn">
-          Pay $20.00 CAD
+          Pay ${priceFormatted}
         </button>
       </form>
     `;
@@ -300,8 +307,8 @@ document.addEventListener("DOMContentLoaded", function () {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
-                amount: 2000, // $20.00 in cents
-                currency: "CAD",
+                amount: priceCents,
+                currency: currency,
                 email: emailInput.value.trim(),
               }),
             }
@@ -351,8 +358,8 @@ document.addEventListener("DOMContentLoaded", function () {
               payment_intent_id: result.paymentIntent.id,
               payment_method_id: result.paymentIntent.payment_method,
               email: emailInput.value.trim(),
-              amount: "20.00",
-              currency: "CAD",
+              amount: priceValue,
+              currency: currency,
               status: result.paymentIntent.status,
             }),
           });
@@ -398,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
           // Re-enable submit button
           if (submitButton) {
             submitButton.disabled = false;
-            submitButton.textContent = "Pay $20.00 CAD";
+            submitButton.textContent = `Pay ${priceFormatted}`;
           }
         }
       });
@@ -437,7 +444,7 @@ document.addEventListener("DOMContentLoaded", function () {
         </div>
 
         <button type="submit" id="square-submit-btn" class="checkout-btn">
-          Pay $20.00 CAD
+          Pay ${priceFormatted}
         </button>
       </form>
     `;
@@ -612,7 +619,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Re-enable submit button
             if (submitButton) {
               submitButton.disabled = false;
-              submitButton.textContent = "Pay $20.00 CAD";
+              submitButton.textContent = `Pay ${priceFormatted}`;
             }
           }
         });

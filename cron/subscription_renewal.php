@@ -39,6 +39,7 @@ set_time_limit(300);
 require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
+require_once __DIR__ . '/../config/pricing.php';
 
 // Only allow CLI or authenticated web requests
 $isCli = php_sapi_name() === 'cli';
@@ -127,9 +128,10 @@ foreach ($subscriptions as $subscription) {
 
     logMessage("Processing renewal for subscription: $subscriptionId (User: $userId, Method: $paymentMethod, Credit: $$creditBalance)");
 
-    // Calculate renewal amount
-    $baseMonthly = 5.00;
-    $baseYearly = 50.00;
+    // Calculate renewal amount from centralized config
+    $pricingConfig = get_pricing_config();
+    $baseMonthly = $pricingConfig['premium_monthly_price'];
+    $baseYearly = $pricingConfig['premium_yearly_price'];
     $amount = ($billing === 'yearly') ? $baseYearly : $baseMonthly;
 
     // Check if renewal can be covered by credit
@@ -150,6 +152,12 @@ foreach ($subscriptions as $subscription) {
             $amountToCharge = $amount - $creditBalance;
             logMessage("Partial credit ($$creditBalance) applied for $subscriptionId, charging $$amountToCharge");
         }
+    }
+
+    // Add processing fee on the amount actually charged to the card
+    if ($amountToCharge > 0) {
+        $processingFee = calculate_processing_fee($amountToCharge);
+        $amountToCharge += $processingFee;
     }
 
     // Skip payment processing if fully covered by credit
@@ -405,6 +413,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
         ]);
         $cardResponse = curl_exec($ch);
         $cardHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
         $cardResult = json_decode($cardResponse, true);
         if ($cardHttpCode < 200 || $cardHttpCode >= 300 || !isset($cardResult['card'])) {
@@ -443,6 +452,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
         $result = json_decode($response, true);
 

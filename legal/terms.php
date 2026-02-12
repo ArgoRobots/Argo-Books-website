@@ -88,7 +88,11 @@
             <h2>Argo Premium Subscription</h2>
             <p>Argo Premium is an optional subscription service that provides invoices and AI-powered features. By subscribing, you agree to the following:</p>
             <ul>
-                <li><strong>Billing</strong>: Subscriptions are billed monthly ($5 CAD) or yearly ($50 CAD). Standard license holders receive a $20 discount.</li>
+<?php
+                    require_once __DIR__ . '/../config/pricing.php';
+                    $pricing = get_pricing_config();
+                ?>
+                <li><strong>Billing</strong>: Subscriptions are billed monthly ($<?php echo number_format($pricing['premium_monthly_price'], 0); ?> CAD) or yearly ($<?php echo number_format($pricing['premium_yearly_price'], 0); ?> CAD). Standard license holders receive a $<?php echo number_format($pricing['premium_discount'], 0); ?> discount.</li>
                 <li><strong>Auto-Renewal</strong>: Subscriptions automatically renew unless cancelled before the billing date.</li>
                 <li><strong>Cancellation</strong>: You may cancel at any time. Access continues until the end of your billing period.</li>
                 <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square.</li>

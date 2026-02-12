@@ -4,8 +4,9 @@ session_start();
 // Set headers for JSON response
 header('Content-Type: application/json');
 
-// Load payment helper
+// Load payment helper and pricing config
 require_once 'payment-helper.php';
+require_once __DIR__ . '/../../../config/pricing.php';
 
 // Get user_id if logged in
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
@@ -55,14 +56,17 @@ try {
         }
     }
 
-    // Create payment request for Square
+    // Create payment request for Square (price + processing fee)
+    $pricing = get_pricing_config();
+    $fee = calculate_processing_fee($pricing['standard_price']);
+    $totalAmount = $pricing['standard_price'] + $fee;
     $idempotency_key = $data['idempotency_key'] ?? uniqid();
     $payment_data = [
         'source_id' => $data['source_id'],
         'idempotency_key' => $idempotency_key,
         'amount_money' => [
-            'amount' => 2000, // $20.00 in cents
-            'currency' => 'CAD'
+            'amount' => price_to_cents($totalAmount),
+            'currency' => $pricing['currency']
         ],
         'autocomplete' => true,
         'location_id' => $square_location_id,
@@ -86,6 +90,7 @@ try {
     $response_data = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curl_error = curl_error($ch);
+    curl_close($ch);
 
     if ($http_code >= 200 && $http_code < 300) {
         $payment_result = json_decode($response_data, true);

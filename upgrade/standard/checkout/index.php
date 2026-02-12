@@ -14,6 +14,12 @@
     <?php
     // Load environment variables
     require_once '../../../db_connect.php';
+    require_once '../../../config/pricing.php';
+
+    $pricing = get_pricing_config();
+    $standardPrice = $pricing['standard_price'];
+    $fee = calculate_processing_fee($standardPrice);
+    $totalPrice = $standardPrice + $fee;
 
     // Get environment-based keys
     $is_production = $_ENV['APP_ENV'] === 'production';
@@ -51,6 +57,13 @@
                 locationId: '<?php echo $square_location_id; ?>'
             }
         };
+
+        window.PRICING = {
+            standardPrice: <?php echo $totalPrice; ?>,
+            standardPriceCents: <?php echo price_to_cents($totalPrice); ?>,
+            currency: '<?php echo $pricing['currency']; ?>',
+            formatted: '$<?php echo number_format($totalPrice, 2); ?> <?php echo $pricing['currency']; ?>'
+        };
     </script>
 
     <script src="main.js"></script>
@@ -82,11 +95,15 @@
                 <h3>Order Summary</h3>
                 <div class="order-item">
                     <span>Argo Books Standard</span>
-                    <span>$20.00 CAD</span>
+                    <span>$<?php echo number_format($standardPrice, 2); ?> <?php echo $pricing['currency']; ?></span>
+                </div>
+                <div class="order-item">
+                    <span>Processing Fee</span>
+                    <span>$<?php echo number_format($fee, 2); ?> <?php echo $pricing['currency']; ?></span>
                 </div>
                 <div class="order-total">
                     <span>Total</span>
-                    <span>$20.00 CAD</span>
+                    <span>$<?php echo number_format($totalPrice, 2); ?> <?php echo $pricing['currency']; ?></span>
                 </div>
             </div>
 
@@ -100,8 +117,7 @@
                     <div class="form-group">
                         <label for="card-element">Card Details</label>
                         <div id="card-element" class="form-control">
-                            <!-- Stripe Elements Placeholder -->
-                            <div id="card-element"></div>
+                            <!-- Stripe Elements will mount here -->
                         </div>
                         <div id="card-errors" role="alert" class="stripe-error"></div>
                     </div>
@@ -112,7 +128,7 @@
                     </div>
 
                     <button type="submit" id="stripe-submit-btn" class="checkout-btn">
-                        Pay $20.00 CAD
+                        Pay $<?php echo number_format($totalPrice, 2); ?> <?php echo $pricing['currency']; ?>
                     </button>
                 </form>
             </div>

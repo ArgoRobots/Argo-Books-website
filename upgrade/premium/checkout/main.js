@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
               subscriptionID: data.subscriptionID,
               orderID: data.orderID,
               paypal_subscription_id: data.subscriptionID,
-              amount: subscription.finalPrice.toFixed(2),
+              amount: subscription.totalCharge.toFixed(2),
               currency: "CAD",
               billing: subscription.billing,
               hasDiscount: subscription.hasDiscount,
@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
               {
                 description: `Argo Premium Subscription (${subscription.billing})`,
                 amount: {
-                  value: subscription.finalPrice.toFixed(2),
+                  value: subscription.totalCharge.toFixed(2),
                   currency_code: "CAD",
                 },
               },
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
               body: JSON.stringify({
                 orderID: data.orderID,
                 payerID: data.payerID,
-                amount: subscription.finalPrice.toFixed(2),
+                amount: subscription.totalCharge.toFixed(2),
                 currency: "CAD",
                 billing: subscription.billing,
                 hasDiscount: subscription.hasDiscount,
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
             submitButton.disabled = false;
             submitButton.textContent = subscription.isMonthlyWithCredit
               ? "Subscribe - $0.00 Today (Credit Applied)"
-              : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+              : `Subscribe - $${subscription.totalCharge.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
             return;
           }
 
@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", function () {
               payment_method_id: paymentMethod.id,
               email: email,
               name: cardHolder,
-              amount: subscription.finalPrice.toFixed(2),
+              amount: subscription.totalCharge.toFixed(2),
               currency: "CAD",
               billing: subscription.billing,
               hasDiscount: subscription.hasDiscount,
@@ -341,7 +341,7 @@ document.addEventListener("DOMContentLoaded", function () {
               submitButton.disabled = false;
               submitButton.textContent = subscription.isMonthlyWithCredit
                 ? "Subscribe - $0.00 Today (Credit Applied)"
-                : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+                : `Subscribe - $${subscription.totalCharge.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
             } else {
               window.location.href =
                 "../thank-you/?subscription_id=" +
@@ -357,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
             submitButton.disabled = false;
             submitButton.textContent = subscription.isMonthlyWithCredit
               ? "Subscribe - $0.00 Today (Credit Applied)"
-              : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+              : `Subscribe - $${subscription.totalCharge.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
           }
         } catch (err) {
           console.error("Error:", err);
@@ -368,7 +368,7 @@ document.addEventListener("DOMContentLoaded", function () {
           submitButton.disabled = false;
           submitButton.textContent = subscription.isMonthlyWithCredit
             ? "Subscribe - $0.00 Today (Credit Applied)"
-            : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+            : `Subscribe - $${subscription.totalCharge.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
         }
       });
     }
@@ -388,7 +388,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Load Square SDK
     const squareScript = document.createElement("script");
-    squareScript.src = "https://sandbox.web.squarecdn.com/v1/square.js";
+    const isSandbox = window.PAYMENT_CONFIG?.square?.appId?.startsWith("sandbox-");
+    squareScript.src = isSandbox
+      ? "https://sandbox.web.squarecdn.com/v1/square.js"
+      : "https://web.squarecdn.com/v1/square.js";
     squareScript.onload = initializeSquare;
     squareScript.onerror = () => {
       squareContainer.innerHTML = `
@@ -411,7 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Create form HTML
         const buttonText = subscription.isMonthlyWithCredit
           ? "Subscribe - $0.00 Today (Credit Applied)"
-          : `Subscribe - $${subscription.finalPrice.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
+          : `Subscribe - $${subscription.totalCharge.toFixed(2)} CAD/${subscription.billing === "yearly" ? "year" : "month"}`;
 
         squareContainer.innerHTML = `
           <form id="square-payment-form">
@@ -466,7 +469,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: JSON.stringify({
                   source_id: result.token,
                   email: email,
-                  amount: subscription.finalPrice.toFixed(2),
+                  amount: subscription.totalCharge.toFixed(2),
                   currency: "CAD",
                   billing: subscription.billing,
                   hasDiscount: subscription.hasDiscount,

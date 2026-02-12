@@ -4,6 +4,8 @@ require_once '../../db_connect.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $pricing = get_pricing_config();
 $standardPrice = $pricing['standard_price'];
+$fee = calculate_processing_fee($standardPrice);
+$totalPrice = $standardPrice + $fee;
 
 // Check if logged-in user already has a license key
 if (isset($_SESSION['user_id'])) {
@@ -89,9 +91,13 @@ if (isset($_SESSION['user_id'])) {
                             <span>Argo Books Standard</span>
                             <span class="item-price">$<?php echo number_format($standardPrice, 2); ?> CAD</span>
                         </div>
+                        <div class="summary-item">
+                            <span>Processing Fee</span>
+                            <span class="item-price">$<?php echo number_format($fee, 2); ?> CAD</span>
+                        </div>
                         <div class="summary-total">
                             <span>Total</span>
-                            <span>$<?php echo number_format($standardPrice, 2); ?> CAD</span>
+                            <span>$<?php echo number_format($totalPrice, 2); ?> CAD</span>
                         </div>
                         <div class="summary-note">
                             One-time payment. No recurring charges.

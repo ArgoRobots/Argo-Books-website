@@ -74,12 +74,12 @@ try {
         'currency' => strtolower($pricing['currency']),
         'payment_method_types' => ['card'],
         'metadata' => [
-            'product' => 'Argo Books - Premium License',
+            'product' => 'Argo Books - Standard License',
             'email' => $data['email'] ?? '',
             'license_key' => $license_key ?? ''
         ],
         'receipt_email' => $data['email'] ?? null,
-        'description' => 'Argo Books - Premium License'
+        'description' => 'Argo Books - Standard License'
     ]);
 
     // Store the payment intent ID in our database

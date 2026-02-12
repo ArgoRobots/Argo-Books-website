@@ -117,8 +117,7 @@
                     <div class="form-group">
                         <label for="card-element">Card Details</label>
                         <div id="card-element" class="form-control">
-                            <!-- Stripe Elements Placeholder -->
-                            <div id="card-element"></div>
+                            <!-- Stripe Elements will mount here -->
                         </div>
                         <div id="card-errors" role="alert" class="stripe-error"></div>
                     </div>

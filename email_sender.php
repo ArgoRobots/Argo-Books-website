@@ -1352,6 +1352,43 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
  * @param string $subscriptionId Subscription ID
  * @return bool Success status
  */
+/**
+ * Send payment failed notification email
+ *
+ * @param string $email User's email address
+ * @param string $subscriptionId Subscription ID
+ * @param string $errorMessage Description of the failure
+ * @return bool Success status
+ */
+function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
+{
+    $body = <<<HTML
+        <h1>Payment Failed</h1>
+        <p>We were unable to process your subscription renewal payment.</p>
+
+        <div class="info-box info-box-warning">
+            <p><strong>Subscription ID:</strong> {$subscriptionId}</p>
+        </div>
+
+        <p><strong>What to do next:</strong></p>
+        <ul>
+            <li>Check that your payment method is up to date</li>
+            <li>Ensure there are sufficient funds available</li>
+            <li>Update your payment information in your account settings</li>
+        </ul>
+
+        <p>If the payment continues to fail, your subscription may be suspended. Please update your payment method to avoid interruption of service.</p>
+
+        <div class="button-container">
+            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">Update Payment Method</a>
+        </div>
+
+        <p>If you need assistance, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        HTML;
+
+    return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'purple');
+}
+
 function send_free_credit_email($email, $creditAmount, $note = '', $subscriptionId = '')
 {
     $css = file_get_contents(__DIR__ . '/email.css');

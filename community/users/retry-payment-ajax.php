@@ -12,6 +12,7 @@ require_once '../../vendor/autoload.php';
 require_once '../community_functions.php';
 require_once 'user_functions.php';
 require_once '../../webhooks/paypal-helper.php';
+require_once '../../config/pricing.php';
 
 // Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -47,8 +48,11 @@ $payment_method = strtolower($premium_subscription['payment_method'] ?? '');
 $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
 $subscription_id = $premium_subscription['subscription_id'];
 
-// Calculate amount based on billing cycle
-$amount = ($billing_cycle === 'yearly') ? 50.00 : 5.00;
+// Calculate amount based on billing cycle using centralized pricing
+$pricing = get_pricing_config();
+$base_amount = ($billing_cycle === 'yearly') ? $pricing['premium_yearly_price'] : $pricing['premium_monthly_price'];
+$fee = calculate_processing_fee($base_amount);
+$amount = $base_amount + $fee;
 
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';

@@ -29,8 +29,18 @@ $hasUnusedCredit = ($originalCredit > 0 && $creditBalance > 0);
 $hasUsedCredit = ($originalCredit > 0 && $creditBalance < $originalCredit);
 $creditUsed = $originalCredit - $creditBalance;
 
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle cancellation confirmation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_message = 'Invalid request. Please try again.';
+        // Skip cancellation processing
+    } else {
     try {
         // Get subscription details before cancelling
         $stmt = $pdo->prepare("
@@ -103,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
     } catch (PDOException $e) {
         $error_message = 'Failed to cancel subscription. Please contact support.';
     }
+    } // end CSRF else
 }
 
 $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
@@ -189,6 +200,7 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
 
             <div class="confirm-actions">
                 <form method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="confirm_cancel" value="1">
                     <button type="submit" class="btn btn-red">Yes, Cancel My Subscription</button>
                 </form>

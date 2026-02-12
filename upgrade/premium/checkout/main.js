@@ -388,7 +388,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Load Square SDK
     const squareScript = document.createElement("script");
-    squareScript.src = "https://sandbox.web.squarecdn.com/v1/square.js";
+    const isSandbox = window.PAYMENT_CONFIG?.square?.appId?.startsWith("sandbox-");
+    squareScript.src = isSandbox
+      ? "https://sandbox.web.squarecdn.com/v1/square.js"
+      : "https://web.squarecdn.com/v1/square.js";
     squareScript.onload = initializeSquare;
     squareScript.onerror = () => {
       squareContainer.innerHTML = `

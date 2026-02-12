@@ -4,6 +4,7 @@ session_start();
 require_once '../../../vendor/autoload.php';
 require_once '../../../db_connect.php';
 require_once '../../../license_functions.php';
+require_once __DIR__ . '/../../../config/pricing.php';
 
 // Set headers for JSON response
 header('Content-Type: application/json');
@@ -64,10 +65,11 @@ try {
         $stmt->close();
     }
 
-    // Create a PaymentIntent
+    // Create a PaymentIntent using server-side configured price
+    $pricing = get_pricing_config();
     $payment_intent = \Stripe\PaymentIntent::create([
-        'amount' => $data['amount'],
-        'currency' => strtolower($data['currency']),
+        'amount' => price_to_cents($pricing['standard_price']),
+        'currency' => strtolower($pricing['currency']),
         'payment_method_types' => ['card'],
         'metadata' => [
             'product' => 'Argo Books - Premium License',

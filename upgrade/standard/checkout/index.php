@@ -14,6 +14,9 @@
     <?php
     // Load environment variables
     require_once '../../../db_connect.php';
+    require_once '../../../config/pricing.php';
+
+    $pricing = get_pricing_config();
 
     // Get environment-based keys
     $is_production = $_ENV['APP_ENV'] === 'production';
@@ -51,6 +54,13 @@
                 locationId: '<?php echo $square_location_id; ?>'
             }
         };
+
+        window.PRICING = {
+            standardPrice: <?php echo $pricing['standard_price']; ?>,
+            standardPriceCents: <?php echo price_to_cents($pricing['standard_price']); ?>,
+            currency: '<?php echo $pricing['currency']; ?>',
+            formatted: '$<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?>'
+        };
     </script>
 
     <script src="main.js"></script>
@@ -82,11 +92,11 @@
                 <h3>Order Summary</h3>
                 <div class="order-item">
                     <span>Argo Books Standard</span>
-                    <span>$20.00 CAD</span>
+                    <span>$<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?></span>
                 </div>
                 <div class="order-total">
                     <span>Total</span>
-                    <span>$20.00 CAD</span>
+                    <span>$<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?></span>
                 </div>
             </div>
 
@@ -112,7 +122,7 @@
                     </div>
 
                     <button type="submit" id="stripe-submit-btn" class="checkout-btn">
-                        Pay $20.00 CAD
+                        Pay $<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?>
                     </button>
                 </form>
             </div>

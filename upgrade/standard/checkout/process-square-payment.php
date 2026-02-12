@@ -4,8 +4,9 @@ session_start();
 // Set headers for JSON response
 header('Content-Type: application/json');
 
-// Load payment helper
+// Load payment helper and pricing config
 require_once 'payment-helper.php';
+require_once __DIR__ . '/../../../config/pricing.php';
 
 // Get user_id if logged in
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
@@ -56,13 +57,14 @@ try {
     }
 
     // Create payment request for Square
+    $pricing = get_pricing_config();
     $idempotency_key = $data['idempotency_key'] ?? uniqid();
     $payment_data = [
         'source_id' => $data['source_id'],
         'idempotency_key' => $idempotency_key,
         'amount_money' => [
-            'amount' => 2000, // $20.00 in cents
-            'currency' => 'CAD'
+            'amount' => price_to_cents($pricing['standard_price']),
+            'currency' => $pricing['currency']
         ],
         'autocomplete' => true,
         'location_id' => $square_location_id,

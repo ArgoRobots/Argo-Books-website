@@ -39,6 +39,7 @@ set_time_limit(300);
 require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
+require_once __DIR__ . '/../config/pricing.php';
 
 // Only allow CLI or authenticated web requests
 $isCli = php_sapi_name() === 'cli';
@@ -127,9 +128,10 @@ foreach ($subscriptions as $subscription) {
 
     logMessage("Processing renewal for subscription: $subscriptionId (User: $userId, Method: $paymentMethod, Credit: $$creditBalance)");
 
-    // Calculate renewal amount
-    $baseMonthly = 5.00;
-    $baseYearly = 50.00;
+    // Calculate renewal amount from centralized config
+    $pricingConfig = get_pricing_config();
+    $baseMonthly = $pricingConfig['premium_monthly_price'];
+    $baseYearly = $pricingConfig['premium_yearly_price'];
     $amount = ($billing === 'yearly') ? $baseYearly : $baseMonthly;
 
     // Check if renewal can be covered by credit

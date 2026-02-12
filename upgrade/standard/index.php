@@ -1,6 +1,9 @@
 <?php
 session_start();
 require_once '../../db_connect.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$pricing = get_pricing_config();
+$standardPrice = $pricing['standard_price'];
 
 // Check if logged-in user already has a license key
 if (isset($_SESSION['user_id'])) {
@@ -34,20 +37,20 @@ if (isset($_SESSION['user_id'])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Get Argo Books Standard for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support. Choose your payment method.">
+        content="Get Argo Books Standard for $<?php echo number_format($standardPrice, 0); ?> CAD. Lifetime access to unlimited products, Windows Hello security, and priority support. Choose your payment method.">
     <meta name="keywords"
         content="argo books standard, lifetime access, unlimited products, one time payment, business software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Get Standard - Argo Books | $20 CAD">
+    <meta property="og:title" content="Get Standard - Argo Books | $<?php echo number_format($standardPrice, 0); ?> CAD">
     <meta property="og:description"
-        content="Get Argo Books Standard for $20 CAD. Lifetime access to unlimited products, Windows Hello security, and priority support.">
+        content="Get Argo Books Standard for $<?php echo number_format($standardPrice, 0); ?> CAD. Lifetime access to unlimited products, Windows Hello security, and priority support.">
     <meta property="og:url" content="https://argorobots.com/upgrade/standard/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
-    <title>Get Standard - Argo Books | $20 CAD Lifetime Access</title>
+    <title>Get Standard - Argo Books | $<?php echo number_format($standardPrice, 0); ?> CAD Lifetime Access</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -84,11 +87,11 @@ if (isset($_SESSION['user_id'])) {
                         <h2>Order Summary</h2>
                         <div class="summary-item">
                             <span>Argo Books Standard</span>
-                            <span class="item-price">$20.00 CAD</span>
+                            <span class="item-price">$<?php echo number_format($standardPrice, 2); ?> CAD</span>
                         </div>
                         <div class="summary-total">
                             <span>Total</span>
-                            <span>$20.00 CAD</span>
+                            <span>$<?php echo number_format($standardPrice, 2); ?> CAD</span>
                         </div>
                         <div class="summary-note">
                             One-time payment. No recurring charges.

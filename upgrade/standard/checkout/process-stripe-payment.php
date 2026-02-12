@@ -4,8 +4,9 @@ session_start();
 // Set headers for JSON response
 header('Content-Type: application/json');
 
-// Load payment helper
+// Load payment helper and pricing config
 require_once 'payment-helper.php';
+require_once __DIR__ . '/../../../config/pricing.php';
 
 // Get user_id if logged in
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
@@ -30,6 +31,8 @@ $response = [
 ];
 
 try {
+    $pricing = get_pricing_config();
+
     // Validate payment status
     if (!isset($data['status']) || $data['status'] !== 'succeeded') {
         $response = [
@@ -37,8 +40,8 @@ try {
             'message' => 'Payment status is not completed'
         ];
     }
-    // Validate payment amount
-    else if (!isset($data['amount']) || floatval($data['amount']) < 20.00) {
+    // Validate payment amount against configured price
+    else if (!isset($data['amount']) || floatval($data['amount']) < $pricing['standard_price']) {
         $response = [
             'success' => false,
             'message' => 'Invalid payment amount'

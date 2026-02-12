@@ -4,8 +4,9 @@ session_start();
 // Set headers for JSON response
 header('Content-Type: application/json');
 
-// Load payment helper
+// Load payment helper and pricing config
 require_once 'payment-helper.php';
+require_once __DIR__ . '/../../../config/pricing.php';
 
 // Get user_id if logged in
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
@@ -69,9 +70,10 @@ try {
     }
 
     // Step 4: Extract transaction details
+    $pricing = get_pricing_config();
     $transaction_id = $order_id;
-    $amount = $data['amount'] ?? '20.00';
-    $currency = $data['currency'] ?? 'CAD';
+    $amount = $data['amount'] ?? number_format($pricing['standard_price'], 2, '.', '');
+    $currency = $data['currency'] ?? $pricing['currency'];
 
     // Get more specific transaction ID from capture details if available
     if (isset($order_details['purchase_units'][0]['payments']['captures'][0])) {

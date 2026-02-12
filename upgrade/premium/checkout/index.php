@@ -14,6 +14,9 @@
     session_start();
     require_once '../../../db_connect.php';
     require_once '../../../community/users/user_functions.php';
+    require_once '../../../config/pricing.php';
+
+    $pricing = get_pricing_config();
 
     // Require login to checkout
     require_login('upgrade/premium/');
@@ -115,10 +118,10 @@
         }
     }
 
-    // Calculate prices
-    $monthlyPrice = 5.00;
-    $yearlyPrice = 50.00;
-    $discount = 20.00;
+    // Calculate prices from centralized config
+    $monthlyPrice = $pricing['premium_monthly_price'];
+    $yearlyPrice = $pricing['premium_yearly_price'];
+    $discount = $pricing['premium_discount'];
 
     if ($billing === 'yearly') {
         $basePrice = $yearlyPrice;
@@ -223,15 +226,16 @@
                 </div>
                 <?php if ($hasDiscount && $billing === 'monthly'): ?>
                 <div class="credit-notice">
-                    <p><strong>$20 Credit Applied!</strong></p>
-                    <p>Your first 4 months are covered by this credit. You won't be charged today - your card will be saved for when the credit is depleted.</p>
+                    <p><strong>$<?php echo number_format($discount, 2); ?> Credit Applied!</strong></p>
+                    <p>Your first <?php echo floor($discount / $monthlyPrice); ?> months are covered by this credit. You won't be charged today - your card will be saved for when the credit is depleted.</p>
                 </div>
                 <?php endif; ?>
             </div>
 
             <div class="subscription-notice">
                 <?php if ($hasDiscount && $billing === 'monthly'): ?>
-                <p>This is a recurring subscription. Your $20 credit covers your first 4 months. You will be charged $<?php echo number_format($monthlyPrice, 2); ?> CAD/month starting month 5.</p>
+                <?php $creditMonths = floor($discount / $monthlyPrice); ?>
+                <p>This is a recurring subscription. Your $<?php echo number_format($discount, 2); ?> credit covers your first <?php echo $creditMonths; ?> months. You will be charged $<?php echo number_format($monthlyPrice, 2); ?> CAD/month starting month <?php echo $creditMonths + 1; ?>.</p>
                 <?php elseif ($hasDiscount && $billing === 'yearly'): ?>
                 <p>You will be charged $<?php echo number_format($finalPrice, 2); ?> CAD today (discounted), then $<?php echo number_format($yearlyPrice, 2); ?> CAD/year on each renewal.</p>
                 <?php else: ?>

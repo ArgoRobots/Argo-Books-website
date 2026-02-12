@@ -1,6 +1,13 @@
 <?php
 session_start();
 require_once '../../community/users/user_functions.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$pricing = get_pricing_config();
+$monthlyPrice = $pricing['premium_monthly_price'];
+$yearlyPrice = $pricing['premium_yearly_price'];
+$premiumDiscount = $pricing['premium_discount'];
+$standardPrice = $pricing['standard_price'];
+$yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
 // Require login to access Premium subscription page
 require_login('upgrade/premium/');
@@ -30,14 +37,14 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $5/month or $50/year. Standard users save $20!">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year. Standard users save $<?php echo number_format($premiumDiscount, 0); ?>!">
     <meta name="keywords"
         content="argo premium features, invoices payments, ai receipt scanning, predictive sales analysis, finance tracker, sales tracker subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $5/month or $50/year.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
     <meta property="og:url" content="https://argorobots.com/upgrade/premium/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -132,8 +139,8 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
             <p class="pricing-subtitle">Select billing frequency and enter your license key if you're a Standard user</p>
 
             <div class="license-discount">
-                <h3>Standard User? Get $20 Off!</h3>
-                <p>If you've purchased the $20 Standard version, enter your license key to receive a $20 discount.</p>
+                <h3>Standard User? Get $<?php echo number_format($premiumDiscount, 0); ?> Off!</h3>
+                <p>If you've purchased the $<?php echo number_format($standardPrice, 0); ?> Standard version, enter your license key to receive a $<?php echo number_format($premiumDiscount, 0); ?> discount.</p>
                 <div class="license-input-group">
                     <input type="text" id="license-key" placeholder="Enter your license key">
                     <button type="button" id="verify-license" class="btn-verify">Verify License</button>
@@ -143,21 +150,21 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
             <div class="billing-toggle">
                 <button type="button" class="billing-option active" data-billing="monthly">Monthly</button>
-                <button type="button" class="billing-option" data-billing="yearly">Yearly (Save $10)</button>
+                <button type="button" class="billing-option" data-billing="yearly">Yearly (Save $<?php echo number_format($yearlySavings, 0); ?>)</button>
             </div>
 
             <div class="pricing-display">
                 <div class="price-box" id="price-display">
                     <div class="original-price" id="original-price" style="display: none;">
-                        <span class="strikethrough">$50</span>
+                        <span class="strikethrough">$<?php echo number_format($yearlyPrice, 0); ?></span>
                     </div>
                     <div class="current-price">
                         <span class="currency">$</span>
-                        <span class="amount" id="price-amount">5</span>
+                        <span class="amount" id="price-amount"><?php echo number_format($monthlyPrice, 0); ?></span>
                         <span class="period" id="price-period">CAD/month</span>
                     </div>
                     <div class="discount-badge" id="discount-badge" style="display: none;">
-                        $20 Premium Discount Applied!
+                        $<?php echo number_format($premiumDiscount, 0); ?> Premium Discount Applied!
                     </div>
                 </div>
             </div>
@@ -198,7 +205,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
             <div class="faq-grid">
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>How does the $20 discount work?</h3>
+                        <h3>How does the $<?php echo number_format($premiumDiscount, 0); ?> discount work?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -207,7 +214,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>If you've purchased the $20 Standard version, the $20 discount will be applied to your first yearly subscription ($50 - $20 = $30 for the first year) or as credit toward monthly payments.</p>
+                            <p>If you've purchased the $<?php echo number_format($standardPrice, 0); ?> Standard version, the $<?php echo number_format($premiumDiscount, 0); ?> discount will be applied to your first yearly subscription ($<?php echo number_format($yearlyPrice, 0); ?> - $<?php echo number_format($premiumDiscount, 0); ?> = $<?php echo number_format($yearlyPrice - $premiumDiscount, 0); ?> for the first year) or as credit toward monthly payments.</p>
                         </div>
                     </div>
                 </div>
@@ -275,9 +282,9 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
             let hasDiscount = false;
             let verifiedLicenseKey = null;
 
-            const monthlyPrice = 5;
-            const yearlyPrice = 50;
-            const discount = 20;
+            const monthlyPrice = <?php echo $monthlyPrice; ?>;
+            const yearlyPrice = <?php echo $yearlyPrice; ?>;
+            const discount = <?php echo $premiumDiscount; ?>;
 
             // Billing toggle
             document.querySelectorAll('.billing-option').forEach(btn => {
@@ -347,7 +354,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     if (data.valid) {
                         hasDiscount = true;
                         verifiedLicenseKey = licenseKey;
-                        statusEl.innerHTML = '<span class="success">Standard license verified! $20 discount applied.</span>';
+                        statusEl.innerHTML = '<span class="success">Standard license verified! $' + discount + ' discount applied.</span>';
                         updatePriceDisplay();
                         // Reset attempts on success
                         verifyAttempts = 0;
@@ -377,7 +384,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
                     if (hasDiscount) {
                         discountBadge.style.display = 'block';
-                        discountBadge.textContent = '$20 credit will be applied to your account!';
+                        discountBadge.textContent = '$' + discount + ' credit will be applied to your account!';
                     } else {
                         discountBadge.style.display = 'none';
                     }
@@ -387,7 +394,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                         originalPrice.style.display = 'block';
                         originalPrice.querySelector('.strikethrough').textContent = '$' + yearlyPrice;
                         discountBadge.style.display = 'block';
-                        discountBadge.textContent = '$20 Standard Discount Applied!';
+                        discountBadge.textContent = '$' + discount + ' Standard Discount Applied!';
                     } else {
                         priceAmount.textContent = yearlyPrice;
                         originalPrice.style.display = 'none';

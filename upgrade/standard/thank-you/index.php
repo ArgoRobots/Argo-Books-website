@@ -30,7 +30,7 @@
             if (transactionID && !sessionStorage.getItem(trackingKey)) {
                 gtag('event', 'conversion', {
                     'send_to': 'AW-17210317271/u-kiCL2u0_oaENezwo5A',
-                    'value': 20.00,
+                    'value': 25.00,
                     'currency': 'CAD',
                     'transaction_id': transactionID
                 });

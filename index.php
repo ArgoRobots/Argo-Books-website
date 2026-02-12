@@ -1173,7 +1173,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <span class="pricing-tag">Standard</span>
                         <div class="pricing-amount">
                             <span class="currency">$</span>
-                            <span class="amount">20</span>
+                            <span class="amount"><?php echo number_format($pricing['standard_price'], 0); ?></span>
                             <span class="period">CAD one-time</span>
                         </div>
                         <p class="pricing-description">Everything you need to scale</p>

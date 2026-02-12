@@ -11,6 +11,8 @@
  *   PREMIUM_MONTHLY_PRICE       - Premium monthly subscription (default: 5.00)
  *   PREMIUM_YEARLY_PRICE        - Premium yearly subscription (default: 50.00)
  *   PREMIUM_STANDARD_DISCOUNT   - Discount for Standard users upgrading to Premium (default: 20.00)
+ *   PROCESSING_FEE_PERCENT      - Payment processing fee percentage (default: 2.90)
+ *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
  */
 
 /**
@@ -22,6 +24,8 @@
  *   - premium_monthly_price (float)
  *   - premium_yearly_price (float)
  *   - premium_discount (float)
+ *   - processing_fee_percent (float)
+ *   - processing_fee_fixed (float)
  *   - currency (string)
  */
 function get_pricing_config() {
@@ -36,6 +40,8 @@ function get_pricing_config() {
         'premium_monthly_price' => _pricing_parse_env('PREMIUM_MONTHLY_PRICE', 5.00),
         'premium_yearly_price'  => _pricing_parse_env('PREMIUM_YEARLY_PRICE', 50.00),
         'premium_discount'      => _pricing_parse_env('PREMIUM_STANDARD_DISCOUNT', 20.00),
+        'processing_fee_percent' => _pricing_parse_env('PROCESSING_FEE_PERCENT', 2.90),
+        'processing_fee_fixed'   => _pricing_parse_env('PROCESSING_FEE_FIXED', 0.30),
         'currency'              => 'CAD',
     ];
 
@@ -62,6 +68,21 @@ function _pricing_parse_env($key, $default) {
     }
 
     return $value;
+}
+
+/**
+ * Calculate the processing fee for a given subtotal.
+ * Returns 0 if subtotal is zero or negative (e.g. credit-covered payments).
+ *
+ * @param float $subtotal The pre-fee charge amount
+ * @return float Fee amount rounded to 2 decimal places
+ */
+function calculate_processing_fee($subtotal) {
+    if ($subtotal <= 0) {
+        return 0.00;
+    }
+    $config = get_pricing_config();
+    return round(($subtotal * $config['processing_fee_percent'] / 100) + $config['processing_fee_fixed'], 2);
 }
 
 /**

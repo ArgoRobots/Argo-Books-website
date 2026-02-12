@@ -32,6 +32,7 @@ $response = [
 
 try {
     $pricing = get_pricing_config();
+    $expectedTotal = $pricing['standard_price'] + calculate_processing_fee($pricing['standard_price']);
 
     // Validate payment status
     if (!isset($data['status']) || $data['status'] !== 'succeeded') {
@@ -40,8 +41,8 @@ try {
             'message' => 'Payment status is not completed'
         ];
     }
-    // Validate payment amount against configured price
-    else if (!isset($data['amount']) || floatval($data['amount']) < $pricing['standard_price']) {
+    // Validate payment amount against configured price + processing fee
+    else if (!isset($data['amount']) || floatval($data['amount']) < $expectedTotal) {
         $response = [
             'success' => false,
             'message' => 'Invalid payment amount'

@@ -56,14 +56,16 @@ try {
         }
     }
 
-    // Create payment request for Square
+    // Create payment request for Square (price + processing fee)
     $pricing = get_pricing_config();
+    $fee = calculate_processing_fee($pricing['standard_price']);
+    $totalAmount = $pricing['standard_price'] + $fee;
     $idempotency_key = $data['idempotency_key'] ?? uniqid();
     $payment_data = [
         'source_id' => $data['source_id'],
         'idempotency_key' => $idempotency_key,
         'amount_money' => [
-            'amount' => price_to_cents($pricing['standard_price']),
+            'amount' => price_to_cents($totalAmount),
             'currency' => $pricing['currency']
         ],
         'autocomplete' => true,

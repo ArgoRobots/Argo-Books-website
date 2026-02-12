@@ -65,10 +65,12 @@ try {
         $stmt->close();
     }
 
-    // Create a PaymentIntent using server-side configured price
+    // Create a PaymentIntent using server-side configured price + processing fee
     $pricing = get_pricing_config();
+    $fee = calculate_processing_fee($pricing['standard_price']);
+    $totalAmount = $pricing['standard_price'] + $fee;
     $payment_intent = \Stripe\PaymentIntent::create([
-        'amount' => price_to_cents($pricing['standard_price']),
+        'amount' => price_to_cents($totalAmount),
         'currency' => strtolower($pricing['currency']),
         'payment_method_types' => ['card'],
         'metadata' => [

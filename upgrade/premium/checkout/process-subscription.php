@@ -41,9 +41,21 @@ $userId = intval($input['user_id'] ?? 0);
 $pricingConfig = get_pricing_config();
 $discountAmount = $pricingConfig['premium_discount'];
 $monthlyPrice = $pricingConfig['premium_monthly_price'];
+$yearlyPrice = $pricingConfig['premium_yearly_price'];
 $isMonthlyWithCredit = ($billing === 'monthly' && $hasDiscount);
 $creditBalance = 0;
 $originalCredit = 0;
+
+// Compute server-side total (base price + processing fee) — never trust client amount
+if (!$isMonthlyWithCredit) {
+    if ($billing === 'yearly') {
+        $baseCharge = $hasDiscount ? ($yearlyPrice - $discountAmount) : $yearlyPrice;
+    } else {
+        $baseCharge = $monthlyPrice;
+    }
+    $processingFee = calculate_processing_fee($baseCharge);
+    $amount = $baseCharge + $processingFee;
+}
 
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';

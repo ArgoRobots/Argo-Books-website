@@ -154,6 +154,12 @@ foreach ($subscriptions as $subscription) {
         }
     }
 
+    // Add processing fee on the amount actually charged to the card
+    if ($amountToCharge > 0) {
+        $processingFee = calculate_processing_fee($amountToCharge);
+        $amountToCharge += $processingFee;
+    }
+
     // Skip payment processing if fully covered by credit
     if ($amountToCharge <= 0 && $useCredit) {
         try {

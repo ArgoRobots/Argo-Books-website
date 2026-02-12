@@ -17,6 +17,9 @@
     require_once '../../../config/pricing.php';
 
     $pricing = get_pricing_config();
+    $standardPrice = $pricing['standard_price'];
+    $fee = calculate_processing_fee($standardPrice);
+    $totalPrice = $standardPrice + $fee;
 
     // Get environment-based keys
     $is_production = $_ENV['APP_ENV'] === 'production';
@@ -56,10 +59,10 @@
         };
 
         window.PRICING = {
-            standardPrice: <?php echo $pricing['standard_price']; ?>,
-            standardPriceCents: <?php echo price_to_cents($pricing['standard_price']); ?>,
+            standardPrice: <?php echo $totalPrice; ?>,
+            standardPriceCents: <?php echo price_to_cents($totalPrice); ?>,
             currency: '<?php echo $pricing['currency']; ?>',
-            formatted: '$<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?>'
+            formatted: '$<?php echo number_format($totalPrice, 2); ?> <?php echo $pricing['currency']; ?>'
         };
     </script>
 
@@ -92,11 +95,15 @@
                 <h3>Order Summary</h3>
                 <div class="order-item">
                     <span>Argo Books Standard</span>
-                    <span>$<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?></span>
+                    <span>$<?php echo number_format($standardPrice, 2); ?> <?php echo $pricing['currency']; ?></span>
+                </div>
+                <div class="order-item">
+                    <span>Processing Fee</span>
+                    <span>$<?php echo number_format($fee, 2); ?> <?php echo $pricing['currency']; ?></span>
                 </div>
                 <div class="order-total">
                     <span>Total</span>
-                    <span>$<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?></span>
+                    <span>$<?php echo number_format($totalPrice, 2); ?> <?php echo $pricing['currency']; ?></span>
                 </div>
             </div>
 
@@ -122,7 +129,7 @@
                     </div>
 
                     <button type="submit" id="stripe-submit-btn" class="checkout-btn">
-                        Pay $<?php echo number_format($pricing['standard_price'], 2); ?> <?php echo $pricing['currency']; ?>
+                        Pay $<?php echo number_format($totalPrice, 2); ?> <?php echo $pricing['currency']; ?>
                     </button>
                 </form>
             </div>

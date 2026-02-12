@@ -214,7 +214,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>If you've purchased Standard, you get $<?php echo number_format($discount, 0); ?> off your first year of Premium. Just enter your license key when subscribing, and the yearly price drops from $<?php echo number_format($yearlyPrice, 0); ?> to $<?php echo number_format($yearlyPrice - $discount, 0); ?>. You will still have access to your standard license key after you switch to the Premium subscription.</p>
+                            <p>If you've purchased Standard, you get $<?php echo number_format($discount, 0); ?> off your first year of Premium. Just enter your license key when subscribing, and your first year drops from $<?php echo number_format($yearlyPrice, 0); ?> to $<?php echo number_format($yearlyPrice - $discount, 0); ?>. After that, it renews at the regular $<?php echo number_format($yearlyPrice, 0); ?>/year price. You will still have access to your standard license key after you switch to the Premium subscription.</p>
                         </div>
                     </div>
                 </div>

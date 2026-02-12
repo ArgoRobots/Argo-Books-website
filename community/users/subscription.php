@@ -3,6 +3,12 @@ session_start();
 require_once '../../db_connect.php';
 require_once '../community_functions.php';
 require_once 'user_functions.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$pricing = get_pricing_config();
+$monthlyPrice = $pricing['premium_monthly_price'];
+$yearlyPrice = $pricing['premium_yearly_price'];
+$premiumDiscount = $pricing['premium_discount'];
+$yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
 // Ensure user is logged in
 require_login();
@@ -146,11 +152,11 @@ if ($premium_subscription) {
                             if ($premium_subscription['discount_applied'] && $creditBalance > 0): ?>
                             <div class="detail-item">
                                 <span class="detail-label">Discount</span>
-                                <span class="detail-value discount">$20 Standard Discount Applied</span>
+                                <span class="detail-value discount">$<?php echo number_format($premiumDiscount, 0); ?> Standard Discount Applied</span>
                             </div>
                             <?php endif; ?>
                             <?php if ($creditBalance > 0):
-                                $monthsRemaining = floor($creditBalance / 5); // $5/month
+                                $monthsRemaining = floor($creditBalance / $monthlyPrice);
                             ?>
                             <div class="detail-item">
                                 <span class="detail-label">Credit Balance</span>
@@ -277,11 +283,11 @@ if ($premium_subscription) {
                     <h3>No Active Subscription</h3>
                     <p>Get access to invoices & payments and AI-powered features like receipt scanning, and predictive analysis.</p>
                     <div class="pricing-preview">
-                        <span class="price">$5</span>
+                        <span class="price">$<?php echo number_format($monthlyPrice, 0); ?></span>
                         <span class="period">CAD/month</span>
                         <span class="divider">or</span>
-                        <span class="price">$50</span>
-                        <span class="period">CAD/year (save $10)</span>
+                        <span class="price">$<?php echo number_format($yearlyPrice, 0); ?></span>
+                        <span class="period">CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</span>
                     </div>
                     <a href="../../upgrade/premium/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
                 </div>

@@ -3,6 +3,11 @@ session_start();
 require_once 'community/users/user_functions.php';
 require_once 'track_referral.php';
 require_once 'statistics.php';
+require_once __DIR__ . '/config/pricing.php';
+$pricing = get_pricing_config();
+$monthlyPrice = $pricing['premium_monthly_price'];
+$yearlyPrice = $pricing['premium_yearly_price'];
+$yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
 track_page_view($_SERVER['REQUEST_URI']);
 
@@ -1215,10 +1220,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <span class="pricing-tag ai">Premium</span>
                         <div class="pricing-amount">
                             <span class="currency">$</span>
-                            <span class="amount">5</span>
+                            <span class="amount"><?php echo number_format($monthlyPrice, 0); ?></span>
                             <span class="period">CAD/month</span>
                         </div>
-                        <p class="pricing-alt">or $50 CAD/year (save $10)</p>
+                        <p class="pricing-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
                         <p class="pricing-description">Unlock AI-powered features</p>
                     </div>
                     <ul class="pricing-features">

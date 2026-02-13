@@ -125,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
   generateFeatureUsageChart(featureUsageData);
   generatePageViewsChart(featureUsageData);
   generateFeatureTimelineChart(featureUsageData);
-  generateContextUsageChart(featureUsageData);
 
   // Receipt Scanning Charts
   generateReceiptScanOverviewChart(receiptScanningData);
@@ -2402,75 +2401,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateContextUsageChart(featureUsageData) {
-    if (featureUsageData.length === 0) {
-      document.getElementById("contextUsageChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No context data available</div>';
-      return;
-    }
-
-    const contextCounts = {};
-    featureUsageData.forEach((item) => {
-      const context = item.Context || "Unknown";
-      if (context !== "Unknown" && context !== "") {
-        contextCounts[context] = (contextCounts[context] || 0) + 1;
-      }
-    });
-
-    if (Object.keys(contextCounts).length === 0) {
-      document.getElementById("contextUsageChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No context data available</div>';
-      return;
-    }
-
-    const sortedContexts = Object.entries(contextCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10);
-
-    const colors = [
-      "#3b82f6",
-      "#10b981",
-      "#f59e0b",
-      "#ef4444",
-      "#8b5cf6",
-      "#06b6d4",
-      "#84cc16",
-      "#f97316",
-      "#ec4899",
-      "#6366f1",
-    ];
-
-    new Chart(document.getElementById("contextUsageChart"), {
-      type: "doughnut",
-      data: {
-        labels: sortedContexts.map(([ctx]) => ctx),
-        datasets: [
-          {
-            data: sortedContexts.map(([, count]) => count),
-            backgroundColor: colors,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                return `${context.label}: ${context.raw} (${percentage}%)`;
-              },
-            },
-          },
-        },
-      },
-    });
-  }
 
   // =====================
   // Receipt Scanning Charts

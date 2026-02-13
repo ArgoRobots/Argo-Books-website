@@ -509,10 +509,6 @@ include '../admin_header.php';
                         <h2>Feature Usage Over Time</h2>
                         <canvas id="featureTimelineChart"></canvas>
                     </div>
-                    <div class="chart-container">
-                        <h2>Context Usage</h2>
-                        <canvas id="contextUsageChart"></canvas>
-                    </div>
                 </div>
             </div>
 

@@ -70,6 +70,7 @@ $paymentMethods = get_available_payment_methods($company);
 send_json_response(200, [
     'success' => true,
     'connected' => true,
+    'portalUrl' => 'https://argorobots.com/portal/',
     'company' => [
         'name' => $company['company_name'],
         'logo_url' => $company['company_logo_url'],

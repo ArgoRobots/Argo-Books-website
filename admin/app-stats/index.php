@@ -522,13 +522,6 @@ include '../admin_header.php';
                         <canvas id="errorCategoryChart"></canvas>
                     </div>
                     <div class="chart-container">
-                        <h2>Error Frequency Over Time</h2>
-                        <canvas id="errorTimeChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-row">
-                    <div class="chart-container">
                         <h2>Errors by Category Over Time</h2>
                         <canvas id="errorCategoryTimelineChart"></canvas>
                     </div>

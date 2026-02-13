@@ -84,7 +84,7 @@ include '../../docs-header.php';
                     <div class="card-header">
                         <h3 class="version-title">Standard</h3>
                         <p class="version-subtitle">Everything you need to scale</p>
-                        <div class="version-price">$20 <span class="price-period">CAD one-time</span></div>
+                        <div class="version-price">$<?php echo number_format($pricing['standard_price'], 0); ?> <span class="price-period">CAD one-time</span></div>
                     </div>
                     <ul class="feature-list">
                         <li class="feature-item">

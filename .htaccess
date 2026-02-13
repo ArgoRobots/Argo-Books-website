@@ -185,6 +185,14 @@ php_value error_log error_log.txt
     # Protect database directory
     RewriteRule ^database/ - [F,L]
     
+    # --- Customer Payment Portal routes ---
+
+    # Invoice view: /invoice/{48-char-hex-token}
+    RewriteRule ^invoice/([a-fA-F0-9]{48})/?$ portal/invoice.php?token=$1 [L,QSA]
+
+    # Customer portal: /portal/{48-char-hex-token}
+    RewriteRule ^portal/([a-fA-F0-9]{48})/?$ portal/index.php?token=$1 [L,QSA]
+
     # --- Avalonia (cross-platform) download routes ---
 
     # Versioned: /download/avalonia/2.1.0/win

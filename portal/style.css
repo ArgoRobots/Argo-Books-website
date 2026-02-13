@@ -1,0 +1,1193 @@
+/* ============================================
+   Payment Portal Styles
+   Matches the existing Argo Books site design
+   ============================================ */
+
+/* Base Reset */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--light-page-bg);
+    color: var(--gray-800);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   Page Layout
+   ============================================ */
+
+.portal-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.portal-main {
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+    flex: 1;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+
+.portal-header {
+    background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end));
+    color: white;
+    padding: 24px 20px;
+}
+
+.portal-header-inner {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.company-logo {
+    max-height: 48px;
+    max-width: 120px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.company-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.company-name {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.portal-subtitle {
+    font-size: 13px;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+
+.portal-footer {
+    text-align: center;
+    padding: 24px 20px;
+    color: var(--gray-400);
+    font-size: 13px;
+    border-top: 1px solid var(--gray-200);
+    background: var(--white);
+}
+
+.portal-footer a {
+    color: var(--primary-blue);
+    text-decoration: none;
+}
+
+.portal-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   Invoice View - Header Section
+   ============================================ */
+
+.invoice-header-section {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.invoice-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.invoice-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-sent, .status-pending, .status-viewed {
+    background: var(--blue-50);
+    color: var(--blue-700);
+}
+
+.status-partial {
+    background: var(--amber-50);
+    color: var(--amber-700);
+}
+
+.status-overdue {
+    background: var(--red-50);
+    color: var(--red-700);
+}
+
+.status-paid, .status-completed {
+    background: var(--green-50);
+    color: var(--green-700);
+}
+
+.status-cancelled {
+    background: var(--gray-100);
+    color: var(--gray-500);
+}
+
+.status-refunded {
+    background: var(--red-50);
+    color: var(--red-600);
+}
+
+/* Party Info (From / To) */
+.invoice-parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.party-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.party-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-400);
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.party-info strong {
+    font-size: 15px;
+    color: var(--gray-800);
+}
+
+.party-detail {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+/* Dates */
+.invoice-dates {
+    display: flex;
+    gap: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-100);
+}
+
+.date-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.date-item.overdue .date-value {
+    color: var(--red-600);
+    font-weight: 600;
+}
+
+.date-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-400);
+    font-weight: 600;
+}
+
+.date-value {
+    font-size: 14px;
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+/* ============================================
+   Invoice Line Items Table
+   ============================================ */
+
+.invoice-items-section {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.invoice-table thead th {
+    background: var(--gray-50);
+    padding: 12px 20px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.invoice-table tbody td {
+    padding: 14px 20px;
+    font-size: 14px;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.invoice-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.col-qty, .col-price, .col-total {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.col-description {
+    width: 50%;
+}
+
+.no-items {
+    text-align: center;
+    color: var(--gray-400);
+    padding: 24px;
+}
+
+/* Invoice Totals */
+.invoice-totals {
+    padding: 16px 20px;
+    border-top: 2px solid var(--gray-200);
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.total-row-main {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--gray-800);
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 6px;
+}
+
+.total-row-paid {
+    color: var(--green-700);
+}
+
+.total-row-balance {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--gray-900);
+    padding-top: 10px;
+    border-top: 1px solid var(--gray-200);
+    margin-top: 6px;
+}
+
+.total-row-balance.overdue {
+    color: var(--red-600);
+}
+
+.total-row-balance.paid {
+    color: var(--green-700);
+}
+
+/* Invoice Notes */
+.invoice-notes {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.invoice-notes h3 {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.invoice-notes p {
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+/* ============================================
+   Payment Section
+   ============================================ */
+
+.payment-section {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.payment-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: 20px;
+}
+
+/* Payment Amount Selection */
+.payment-amount-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.amount-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.amount-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.amount-option input[type="radio"] {
+    accent-color: var(--primary-blue);
+    width: 16px;
+    height: 16px;
+}
+
+.amount-option strong {
+    color: var(--gray-900);
+}
+
+.partial-amount-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    margin-left: 26px;
+}
+
+.currency-prefix, .currency-suffix {
+    font-size: 14px;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
+.partial-amount-input .form-control {
+    max-width: 160px;
+}
+
+/* Payment Method Buttons */
+.payment-methods {
+    margin-bottom: 24px;
+}
+
+.method-label {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.method-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.method-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: 2px solid var(--gray-200);
+    border-radius: 8px;
+    background: var(--white);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
+}
+
+.method-btn:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    background: var(--blue-50);
+}
+
+.method-btn.active {
+    border-color: var(--primary-blue);
+    background: var(--blue-50);
+    color: var(--primary-blue);
+}
+
+.method-btn svg {
+    flex-shrink: 0;
+}
+
+/* Payment Form */
+#payment-form-container {
+    margin-top: 20px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.form-group .optional {
+    font-weight: 400;
+    color: var(--gray-400);
+    font-size: 12px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-input-border);
+    border-radius: 6px;
+    font-size: 15px;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.card-element-container {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+
+.field-error {
+    font-size: 13px;
+    color: var(--red-600);
+    margin-top: 6px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px 20px;
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 8px;
+}
+
+.btn-submit:hover {
+    background: var(--blueHover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Payment Error Box */
+.payment-error-box {
+    background: var(--red-50);
+    color: var(--red-700);
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 12px;
+    border: 1px solid var(--red-200);
+}
+
+.payment-error-box strong {
+    color: var(--red-800);
+}
+
+.payment-error-box p {
+    margin-top: 6px;
+    margin-bottom: 0;
+    font-size: 13px;
+    color: var(--red-600);
+}
+
+/* Loading State */
+.loading-payment {
+    text-align: center;
+    padding: 32px 0;
+}
+
+.loading-payment p {
+    margin-top: 12px;
+    color: var(--gray-500);
+    font-size: 14px;
+}
+
+/* ============================================
+   Invoice Paid Banner
+   ============================================ */
+
+.invoice-paid-banner {
+    background: var(--green-50);
+    border: 1px solid var(--green-200);
+    border-radius: 12px;
+    padding: 40px 28px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.invoice-paid-banner svg {
+    color: var(--green-600);
+    margin-bottom: 16px;
+}
+
+.invoice-paid-banner h3 {
+    font-size: 20px;
+    color: var(--green-800);
+    margin-bottom: 8px;
+}
+
+.invoice-paid-banner p {
+    color: var(--green-700);
+    font-size: 14px;
+}
+
+.invoice-no-methods {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    color: var(--gray-600);
+    font-size: 14px;
+}
+
+/* ============================================
+   Payment Confirmation
+   ============================================ */
+
+.payment-confirmation {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 40px 28px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.4s ease;
+}
+
+.confirmation-icon {
+    color: var(--green-600);
+    margin-bottom: 16px;
+}
+
+.payment-confirmation h3 {
+    font-size: 24px;
+    color: var(--green-800);
+    margin-bottom: 24px;
+}
+
+.confirmation-details {
+    max-width: 400px;
+    margin: 0 auto 24px;
+    text-align: left;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 14px;
+}
+
+.detail-row span:first-child {
+    color: var(--gray-500);
+}
+
+.detail-row span:last-child {
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+.confirmation-note {
+    color: var(--gray-500);
+    font-size: 13px;
+    margin-top: 16px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   Customer Portal - Welcome
+   ============================================ */
+
+.portal-welcome {
+    margin-bottom: 24px;
+}
+
+.portal-welcome h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 12px;
+}
+
+.outstanding-summary {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    background: var(--amber-50);
+    border: 1px solid var(--amber-300);
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.outstanding-label {
+    font-size: 14px;
+    color: var(--amber-700);
+    font-weight: 500;
+}
+
+.outstanding-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--amber-800);
+}
+
+/* ============================================
+   Tabs
+   ============================================ */
+
+.portal-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid var(--gray-200);
+    margin-bottom: 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-btn {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-500);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-btn:hover {
+    color: var(--gray-700);
+}
+
+.tab-btn.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+.tab-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--gray-100);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+.tab-btn.active .tab-count {
+    background: var(--blue-100);
+    color: var(--primary-blue);
+}
+
+/* ============================================
+   Invoice Cards (Active Invoices Tab)
+   ============================================ */
+
+.invoice-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.invoice-card {
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.invoice-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.invoice-card.overdue {
+    border-left-color: var(--red-500);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 0;
+}
+
+.card-id {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--gray-800);
+}
+
+.card-body {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.card-dates {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.card-amounts {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.card-total-label {
+    font-size: 12px;
+    color: var(--gray-400);
+}
+
+.card-balance {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.card-balance-label {
+    font-size: 11px;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-footer {
+    padding: 12px 20px 16px;
+}
+
+.btn-pay {
+    display: block;
+    text-align: center;
+    padding: 10px 16px;
+    background: var(--primary-blue);
+    color: var(--white);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-pay:hover {
+    background: var(--blueHover);
+    transform: translateY(-1px);
+}
+
+.btn-view {
+    display: inline-block;
+    padding: 6px 14px;
+    background: var(--gray-50);
+    color: var(--primary-blue);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-view:hover {
+    background: var(--blue-50);
+    border-color: var(--primary-blue);
+}
+
+/* ============================================
+   Tables (Payment History, All Invoices)
+   ============================================ */
+
+.payment-history-table-wrapper,
+.all-invoices-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.payment-history-table,
+.all-invoices-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.payment-history-table thead th,
+.all-invoices-table thead th {
+    background: var(--gray-50);
+    padding: 12px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.payment-history-table tbody td,
+.all-invoices-table tbody td {
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-100);
+    white-space: nowrap;
+}
+
+.payment-history-table tbody tr:last-child td,
+.all-invoices-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.payment-history-table code,
+.all-invoices-table code {
+    font-size: 12px;
+    background: var(--gray-50);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--gray-600);
+}
+
+.amount-cell.refunded {
+    color: var(--red-600);
+}
+
+.text-danger {
+    color: var(--red-600) !important;
+}
+
+/* ============================================
+   Empty State
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.empty-state svg {
+    margin-bottom: 16px;
+    color: var(--gray-300);
+}
+
+.empty-state p {
+    color: var(--gray-500);
+    font-size: 15px;
+}
+
+/* ============================================
+   Processing Overlay
+   ============================================ */
+
+.processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.96);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+}
+
+.processing-overlay h2 {
+    color: var(--blueText);
+    margin-bottom: 12px;
+    font-size: 24px;
+}
+
+.processing-overlay p {
+    color: var(--gray-text-light);
+    font-size: 15px;
+}
+
+.spinner {
+    display: inline-block;
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 24px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+@media (max-width: 640px) {
+    .portal-main {
+        padding: 20px 16px 48px;
+    }
+
+    .invoice-header-section {
+        padding: 20px;
+    }
+
+    .invoice-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .invoice-title {
+        font-size: 18px;
+    }
+
+    .invoice-parties {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .invoice-dates {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Responsive table: stack on mobile */
+    .invoice-table thead {
+        display: none;
+    }
+
+    .invoice-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 20px;
+    }
+
+    .invoice-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--gray-500);
+        font-size: 12px;
+        text-transform: uppercase;
+    }
+
+    .invoice-table tbody tr {
+        border-bottom: 1px solid var(--gray-200);
+        padding: 8px 0;
+    }
+
+    .invoice-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .col-qty, .col-price, .col-total {
+        text-align: right;
+    }
+
+    /* Method buttons stack vertically */
+    .method-buttons {
+        flex-direction: column;
+    }
+
+    .method-btn {
+        min-width: unset;
+    }
+
+    /* Payment section */
+    .payment-section {
+        padding: 20px;
+    }
+
+    /* Card body on invoice cards */
+    .card-body {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .card-amounts {
+        text-align: left;
+    }
+
+    /* Tables scroll horizontally */
+    .payment-history-table,
+    .all-invoices-table {
+        min-width: 600px;
+    }
+
+    /* Outstanding summary */
+    .outstanding-summary {
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+    }
+
+    .outstanding-amount {
+        font-size: 28px;
+    }
+
+    /* Portal welcome */
+    .portal-welcome h2 {
+        font-size: 20px;
+    }
+
+    /* Tabs scrollable */
+    .portal-tabs {
+        gap: 0;
+    }
+
+    .tab-btn {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+
+    /* Confirmation */
+    .payment-confirmation {
+        padding: 28px 20px;
+    }
+
+    .payment-confirmation h3 {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .portal-header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .company-name {
+        font-size: 18px;
+    }
+
+    .btn-submit {
+        font-size: 14px;
+        padding: 12px 16px;
+    }
+}
+
+/* PayPal button container */
+#portal-paypal-container {
+    min-height: 150px;
+    margin-top: 8px;
+}

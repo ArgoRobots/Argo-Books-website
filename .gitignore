@@ -14,3 +14,4 @@ reset_admin_password.php
 /api/invoice/config.php
 /api/invoice/logs/*.log
 /api/invoice/logs/*.json
+/api/portal/rate_limits.json

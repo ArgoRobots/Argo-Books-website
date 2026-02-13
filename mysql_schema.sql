@@ -406,3 +406,81 @@ CREATE TABLE IF NOT EXISTS receipt_scan_usage (
     INDEX idx_license_key (license_key),
     INDEX idx_usage_month (usage_month)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Customer Payment Portal Tables
+-- ============================================
+
+-- Companies (Argo Books businesses) registered for the payment portal
+CREATE TABLE IF NOT EXISTS portal_companies (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    api_key VARCHAR(128) NOT NULL UNIQUE COMMENT 'API key for Argo Books app to authenticate with portal',
+    company_name VARCHAR(255) NOT NULL,
+    company_logo_url VARCHAR(500) DEFAULT NULL,
+    -- Connected payment provider accounts (money goes to these, not to ArgoRobots)
+    stripe_account_id VARCHAR(255) DEFAULT NULL COMMENT 'Stripe Connect account ID',
+    paypal_merchant_id VARCHAR(255) DEFAULT NULL COMMENT 'PayPal merchant ID for marketplace',
+    square_merchant_id VARCHAR(255) DEFAULT NULL COMMENT 'Square merchant ID',
+    square_access_token VARCHAR(500) DEFAULT NULL COMMENT 'Square OAuth access token (encrypted at rest)',
+    square_location_id VARCHAR(255) DEFAULT NULL COMMENT 'Square location ID',
+    -- Metadata
+    owner_email VARCHAR(100) DEFAULT NULL,
+    is_active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_api_key (api_key),
+    INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Invoices published to the portal by Argo Books businesses
+CREATE TABLE IF NOT EXISTS portal_invoices (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    invoice_id VARCHAR(100) NOT NULL COMMENT 'Invoice number/ID from Argo Books (e.g., INV-0001)',
+    invoice_token VARCHAR(48) NOT NULL UNIQUE COMMENT '48-char hex token for direct invoice access',
+    customer_token VARCHAR(48) NOT NULL COMMENT '48-char hex token for customer portal access',
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255) DEFAULT NULL,
+    invoice_data JSON COMMENT 'Full invoice data (line items, addresses, tax, notes)',
+    status ENUM('draft', 'sent', 'viewed', 'pending', 'partial', 'paid', 'overdue', 'cancelled') NOT NULL DEFAULT 'sent',
+    total_amount DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    balance_due DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+    due_date DATE DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_company_invoice (company_id, invoice_id),
+    INDEX idx_invoice_token (invoice_token),
+    INDEX idx_customer_token (customer_token),
+    INDEX idx_company_id (company_id),
+    INDEX idx_status (status),
+    INDEX idx_customer_email (customer_email),
+    INDEX idx_due_date (due_date),
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Payments received through the portal
+CREATE TABLE IF NOT EXISTS portal_payments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    invoice_id VARCHAR(100) NOT NULL COMMENT 'Invoice number/ID that was paid',
+    customer_name VARCHAR(255) DEFAULT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    processing_fee DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+    currency VARCHAR(3) NOT NULL DEFAULT 'USD',
+    payment_method VARCHAR(50) NOT NULL COMMENT 'stripe, paypal, or square',
+    provider_payment_id VARCHAR(255) DEFAULT NULL COMMENT 'Payment ID from the payment provider',
+    provider_transaction_id VARCHAR(255) DEFAULT NULL COMMENT 'Transaction/charge ID from the provider',
+    reference_number VARCHAR(50) NOT NULL COMMENT 'Human-readable reference (PAY-YYYYMMDD-XXXXXX)',
+    status ENUM('pending', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
+    synced_to_argo TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Whether Argo Books has pulled this payment',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_company_id (company_id),
+    INDEX idx_invoice_id (invoice_id),
+    INDEX idx_reference_number (reference_number),
+    INDEX idx_provider_payment_id (provider_payment_id),
+    INDEX idx_status (status),
+    INDEX idx_synced (synced_to_argo),
+    INDEX idx_created_at (created_at),
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

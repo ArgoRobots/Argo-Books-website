@@ -818,7 +818,7 @@ include '../admin_header.php';
 
         <div class="table-container">
             <h2>Generate Free Subscription Key</h2>
-            <p style="color: #6b7280; margin-bottom: 20px;">Create keys that can be redeemed for free Premium subscription access without payment.</p>
+            <p style="color: #6b7280; margin-bottom: 20px;">Create keys that can be redeemed for free Premium subscription access without payment. The note is added to the email that is sent.</p>
 
             <?php if ($generated_sub_key): ?>
                 <div class="key-display">

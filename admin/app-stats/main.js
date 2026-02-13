@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Find Most Popular Feature
     const featureUsageCounts = {
       Export: exportData.length,
-      "AI Assistant": openaiData.length,
+      "Supplier Matching": openaiData.length,
       "Currency Rates": exchangeRatesData.length,
       "Google Sheets": googleSheetsData.length,
       "Receipt Scan": receiptScanningData.length,

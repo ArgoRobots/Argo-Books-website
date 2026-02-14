@@ -475,7 +475,7 @@ function require_method($allowed): void
 function set_portal_headers(): void
 {
     header('Access-Control-Allow-Origin: *');
-    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
     header('X-Content-Type-Options: nosniff');
 }

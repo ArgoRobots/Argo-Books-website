@@ -419,10 +419,13 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     company_logo_url VARCHAR(500) DEFAULT NULL,
     -- Connected payment provider accounts (money goes to these, not to ArgoRobots)
     stripe_account_id VARCHAR(255) DEFAULT NULL COMMENT 'Stripe Connect account ID',
+    stripe_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected Stripe account',
     paypal_merchant_id VARCHAR(255) DEFAULT NULL COMMENT 'PayPal merchant ID for marketplace',
+    paypal_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected PayPal account',
     square_merchant_id VARCHAR(255) DEFAULT NULL COMMENT 'Square merchant ID',
     square_access_token VARCHAR(500) DEFAULT NULL COMMENT 'Square OAuth access token (encrypted at rest)',
     square_location_id VARCHAR(255) DEFAULT NULL COMMENT 'Square location ID',
+    square_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected Square account',
     -- Metadata
     owner_email VARCHAR(100) DEFAULT NULL,
     is_active TINYINT(1) DEFAULT 1,
@@ -430,6 +433,19 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_api_key (api_key),
     INDEX idx_is_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- OAuth state tokens for CSRF protection during provider connect flows
+CREATE TABLE IF NOT EXISTS portal_oauth_states (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    provider VARCHAR(20) NOT NULL COMMENT 'stripe, paypal, or square',
+    state_token VARCHAR(64) NOT NULL UNIQUE COMMENT 'CSRF state parameter',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL COMMENT 'State tokens expire after 10 minutes',
+    INDEX idx_state_token (state_token),
+    INDEX idx_expires_at (expires_at),
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Invoices published to the portal by Argo Books businesses

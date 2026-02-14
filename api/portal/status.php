@@ -76,6 +76,14 @@ send_json_response(200, [
         'logo_url' => $company['company_logo_url'],
     ],
     'payment_methods' => $paymentMethods,
+    'connectedProviders' => [
+        'stripeConnected' => !empty($company['stripe_account_id']),
+        'stripeEmail' => $company['stripe_email'] ?? null,
+        'paypalConnected' => !empty($company['paypal_merchant_id']),
+        'paypalEmail' => $company['paypal_email'] ?? null,
+        'squareConnected' => !empty($company['square_merchant_id']),
+        'squareEmail' => $company['square_email'] ?? null,
+    ],
     'statistics' => [
         'total_invoices' => (int) $invoiceStats['total_invoices'],
         'active_invoices' => (int) $invoiceStats['active_invoices'],

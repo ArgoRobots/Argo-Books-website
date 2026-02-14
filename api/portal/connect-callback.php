@@ -153,8 +153,8 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
         ? $_ENV['PAYPAL_LIVE_CLIENT_ID']
         : $_ENV['PAYPAL_SANDBOX_CLIENT_ID'];
     $clientSecret = $is_production
-        ? $_ENV['PAYPAL_LIVE_SECRET']
-        : $_ENV['PAYPAL_SANDBOX_SECRET'];
+        ? $_ENV['PAYPAL_LIVE_CLIENT_SECRET']
+        : $_ENV['PAYPAL_SANDBOX_CLIENT_SECRET'];
     $apiBase = $is_production
         ? 'https://api-m.paypal.com'
         : 'https://api-m.sandbox.paypal.com';

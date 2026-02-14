@@ -193,6 +193,19 @@ php_value error_log error_log.txt
     # Customer portal: /portal/{48-char-hex-token}
     RewriteRule ^portal/([a-fA-F0-9]{48})/?$ portal/index.php?token=$1 [L,QSA]
 
+    # Portal API: registration
+    RewriteRule ^api/portal/register/?$ api/portal/register.php [L,QSA]
+
+    # Portal API: status check
+    RewriteRule ^api/portal/status/?$ api/portal/status.php [L,QSA]
+
+    # Portal API: invoice publishing
+    RewriteRule ^api/portal/invoices/?$ api/portal/invoices.php [L,QSA]
+
+    # Portal API: payment sync (GET = pull, POST = confirm; confirm path also routes here)
+    RewriteRule ^api/portal/payments/sync/confirm/?$ api/portal/payments-sync.php [L,QSA]
+    RewriteRule ^api/portal/payments/sync/?$ api/portal/payments-sync.php [L,QSA]
+
     # Provider OAuth callback: /api/portal/connect/callback/{provider}
     RewriteRule ^api/portal/connect/callback/(stripe|paypal|square)/?$ api/portal/connect-callback.php?provider=$1 [L,QSA]
 

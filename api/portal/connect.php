@@ -91,8 +91,10 @@ function initiate_connect(array $company, string $provider): void
                     // Verify the stored account exists and matches the current mode (live vs test)
                     try {
                         $existingAccount = \Stripe\Account::retrieve($row['stripe_account_id']);
-                        // Clear if mode mismatch (e.g. live account but using test keys, or vice versa)
-                        if ($existingAccount->livemode === $is_production) {
+                        // Verify the account was created in the same mode (live vs test)
+                        $acctData = $existingAccount->toArray();
+                        $acctLivemode = isset($acctData['livemode']) ? $acctData['livemode'] : null;
+                        if ($acctLivemode === $is_production) {
                             $stripeAccountId = $row['stripe_account_id'];
                         }
                     } catch (\Stripe\Exception\ApiErrorException $e) {

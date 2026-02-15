@@ -88,8 +88,25 @@ function initiate_connect(array $company, string $provider): void
                 $dbCheck->close();
 
                 if (!empty($row['stripe_account_id'])) {
-                    $stripeAccountId = $row['stripe_account_id'];
-                } else {
+                    // Verify the stored account exists in the current environment
+                    try {
+                        \Stripe\Account::retrieve($row['stripe_account_id']);
+                        $stripeAccountId = $row['stripe_account_id'];
+                    } catch (\Stripe\Exception\InvalidRequestException $e) {
+                        // Account doesn't exist (e.g. switched between live/sandbox) — clear it
+                        $stripeAccountId = null;
+                        $dbClear = get_db_connection();
+                        $stmtClear = $dbClear->prepare(
+                            'UPDATE portal_companies SET stripe_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
+                        );
+                        $stmtClear->bind_param('i', $company['id']);
+                        $stmtClear->execute();
+                        $stmtClear->close();
+                        $dbClear->close();
+                    }
+                }
+
+                if (!$stripeAccountId) {
                     // Create a new Express connected account
                     $account = \Stripe\Account::create([
                         'type' => 'express',

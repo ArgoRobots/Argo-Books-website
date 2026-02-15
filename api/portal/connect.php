@@ -91,13 +91,8 @@ function initiate_connect(array $company, string $provider): void
                     $stripeAccountId = $row['stripe_account_id'];
                 } else {
                     // Create a new Express connected account
-                    // Use controller param to explicitly set Stripe as loss handler
                     $account = \Stripe\Account::create([
-                        'controller' => [
-                            'losses' => ['payments' => 'stripe'],
-                            'fees' => ['payer' => 'application'],
-                            'stripe_dashboard' => ['type' => 'express'],
-                        ],
+                        'type' => 'express',
                         'capabilities' => [
                             'card_payments' => ['requested' => true],
                             'transfers' => ['requested' => true],

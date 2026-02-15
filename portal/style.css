@@ -518,8 +518,12 @@ body {
 
 .card-element-container {
     min-height: 44px;
-    display: flex;
-    align-items: center;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.card-element-container > div {
+    width: 100%;
 }
 
 .field-error {

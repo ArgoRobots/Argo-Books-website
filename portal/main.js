@@ -121,6 +121,19 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function initializeStripeForm() {
+    // Validate config before rendering the form
+    if (!config.stripe.publishableKey) {
+      formContainer.innerHTML =
+        '<div class="payment-error-box">Stripe is not configured. Please contact the business for payment instructions.</div>';
+      return;
+    }
+
+    if (!config.stripe.accountId) {
+      formContainer.innerHTML =
+        '<div class="payment-error-box">This business has not connected their Stripe account yet. Please contact them or try another payment method.</div>';
+      return;
+    }
+
     formContainer.innerHTML =
       '<form id="portal-stripe-form">' +
       '<div class="form-group">' +
@@ -146,25 +159,37 @@ document.addEventListener("DOMContentLoaded", function () {
       "</form>";
 
     // Initialize Stripe with the connected account
-    var stripe = Stripe(config.stripe.publishableKey, {
-      stripeAccount: config.stripe.accountId,
-    });
-    var elements = stripe.elements();
+    var stripe, elements, cardElement;
+    try {
+      stripe = Stripe(config.stripe.publishableKey, {
+        stripeAccount: config.stripe.accountId,
+      });
+      elements = stripe.elements();
 
-    var cardElement = elements.create("card", {
-      style: {
-        base: {
-          color: "#32325d",
-          fontFamily:
-            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          fontSmoothing: "antialiased",
-          fontSize: "16px",
-          "::placeholder": { color: "#aab7c4" },
+      cardElement = elements.create("card", {
+        style: {
+          base: {
+            color: "#32325d",
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            fontSmoothing: "antialiased",
+            fontSize: "16px",
+            "::placeholder": { color: "#aab7c4" },
+          },
+          invalid: { color: "#fa755a", iconColor: "#fa755a" },
         },
-        invalid: { color: "#fa755a", iconColor: "#fa755a" },
-      },
-    });
-    cardElement.mount("#portal-card-element");
+      });
+      cardElement.mount("#portal-card-element");
+    } catch (err) {
+      var errorEl = document.getElementById("portal-card-errors");
+      if (errorEl) {
+        errorEl.innerHTML =
+          '<div class="payment-error-box">Failed to load card form: ' +
+          escapeHtml(err.message) +
+          ". Please refresh or try another payment method.</div>";
+      }
+      return;
+    }
 
     cardElement.on("change", function (event) {
       var errorEl = document.getElementById("portal-card-errors");

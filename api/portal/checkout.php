@@ -147,16 +147,21 @@ function handle_stripe_checkout(array $invoice, int $amountCents, string $curren
 function handle_paypal_checkout(array $invoice, float $amount, string $currency, array $data): void
 {
     $paypalMerchantId = $invoice['paypal_merchant_id'] ?? '';
-    if (empty($paypalMerchantId)) {
+    $paypalEmail = $invoice['paypal_email'] ?? '';
+    if (empty($paypalMerchantId) && empty($paypalEmail)) {
         send_error_response(400, 'PayPal is not configured for this business.', 'PAYPAL_NOT_CONNECTED');
     }
+
+    // Determine if merchant_id is a real PayPal account ID or an email
+    $isEmailBased = empty($paypalMerchantId) || filter_var($paypalMerchantId, FILTER_VALIDATE_EMAIL);
 
     // For PayPal, the order is created client-side using the PayPal SDK.
     // We return the merchant info so the frontend can create the order with the correct payee.
     send_json_response(200, [
         'success' => true,
         'method' => 'paypal',
-        'merchant_id' => $paypalMerchantId,
+        'merchant_id' => $isEmailBased ? null : $paypalMerchantId,
+        'paypal_email' => $isEmailBased ? ($paypalEmail ?: $paypalMerchantId) : $paypalEmail,
         'invoice_id' => $invoice['invoice_id'],
         'amount' => number_format($amount, 2, '.', ''),
         'currency' => strtoupper($currency),

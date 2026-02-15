@@ -21,6 +21,13 @@ if (!in_array($provider, ['stripe', 'paypal', 'square'])) {
     exit;
 }
 
+// PayPal uses direct email entry instead of OAuth
+$mode = $_GET['mode'] ?? '';
+if ($provider === 'paypal' && $mode === 'email_entry') {
+    handle_paypal_email_entry();
+    exit;
+}
+
 // Check for errors from the provider (user denied, etc.)
 $error = $_GET['error'] ?? $_GET['error_description'] ?? '';
 if (!empty($error)) {
@@ -107,6 +114,179 @@ try {
     $db->close();
     error_log("OAuth callback error ($provider): " . $e->getMessage());
     show_result_page(false, 'Failed to complete connection: ' . $e->getMessage());
+}
+
+/**
+ * Handle PayPal email entry flow.
+ * Shows a form for the user to enter their PayPal email, validates the state token,
+ * and saves the email directly (no OAuth needed).
+ */
+function handle_paypal_email_entry(): void
+{
+    $state = $_GET['state'] ?? '';
+    if (empty($state)) {
+        show_result_page(false, 'Missing state parameter.');
+        return;
+    }
+
+    // On POST, process the submitted email
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $email = trim($_POST['paypal_email'] ?? '');
+        $submittedState = $_POST['state'] ?? '';
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            show_paypal_email_form($state, 'Please enter a valid email address.');
+            return;
+        }
+
+        if ($submittedState !== $state) {
+            show_result_page(false, 'Invalid state token. Please try connecting again from Argo Books.');
+            return;
+        }
+
+        // Verify the CSRF state token and look up the company
+        $db = get_db_connection();
+        $stmt = $db->prepare(
+            'SELECT os.id AS state_id, os.company_id, pc.company_name
+             FROM portal_oauth_states os
+             JOIN portal_companies pc ON os.company_id = pc.id
+             WHERE os.state_token = ? AND os.provider = ? AND os.expires_at > NOW()
+             LIMIT 1'
+        );
+        $provider = 'paypal';
+        $stmt->bind_param('ss', $submittedState, $provider);
+        $stmt->execute();
+        $oauthState = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        if (!$oauthState) {
+            $db->close();
+            show_result_page(false, 'Invalid or expired state. Please try connecting again from Argo Books.');
+            return;
+        }
+
+        $companyId = $oauthState['company_id'];
+        $companyName = $oauthState['company_name'];
+        $stateId = $oauthState['state_id'];
+
+        // Save the PayPal email (use email as merchant_id since we don't have a payer_id)
+        $stmt = $db->prepare(
+            'UPDATE portal_companies
+             SET paypal_merchant_id = ?, paypal_email = ?, updated_at = NOW()
+             WHERE id = ?'
+        );
+        $stmt->bind_param('ssi', $email, $email, $companyId);
+        $stmt->execute();
+        $stmt->close();
+
+        // Delete the used state token
+        $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
+        $stmt->bind_param('i', $stateId);
+        $stmt->execute();
+        $stmt->close();
+        $db->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
+        $db->close();
+
+        show_result_page(true, 'PayPal has been connected successfully!', $companyName);
+        return;
+    }
+
+    // On GET, verify the state is valid before showing the form
+    $db = get_db_connection();
+    $stmt = $db->prepare(
+        'SELECT os.id FROM portal_oauth_states os
+         WHERE os.state_token = ? AND os.provider = ? AND os.expires_at > NOW()
+         LIMIT 1'
+    );
+    $provider = 'paypal';
+    $stmt->bind_param('ss', $state, $provider);
+    $stmt->execute();
+    $valid = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    $db->close();
+
+    if (!$valid) {
+        show_result_page(false, 'Invalid or expired link. Please try connecting again from Argo Books.');
+        return;
+    }
+
+    show_paypal_email_form($state);
+}
+
+/**
+ * Show the PayPal email entry form.
+ */
+function show_paypal_email_form(string $state, string $error = ''): void
+{
+    $stateHtml = htmlspecialchars($state);
+    $errorHtml = $error ? '<p class="form-error">' . htmlspecialchars($error) . '</p>' : '';
+    ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Connect PayPal - Argo Books</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/A-logo.ico">
+    <link rel="stylesheet" href="/resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="/portal/style.css">
+    <style>
+        .paypal-form-container { text-align: center; padding: 40px 20px; max-width: 480px; margin: 0 auto; }
+        .paypal-form-container h2 { font-size: 22px; font-weight: 600; color: var(--gray-900, #111); margin: 0 0 8px; }
+        .paypal-form-container p.subtitle { color: var(--gray-600, #555); font-size: 14px; margin: 0 0 24px; line-height: 1.5; }
+        .paypal-form-container form { text-align: left; }
+        .paypal-form-container label { display: block; font-size: 14px; font-weight: 500; color: var(--gray-700, #333); margin-bottom: 6px; }
+        .paypal-form-container input[type="email"] {
+            width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid var(--gray-300, #ccc);
+            border-radius: 6px; box-sizing: border-box; outline: none; transition: border-color 0.2s;
+        }
+        .paypal-form-container input[type="email"]:focus { border-color: var(--primary, #003087); box-shadow: 0 0 0 3px rgba(0, 48, 135, 0.1); }
+        .paypal-form-container button {
+            width: 100%; padding: 12px; font-size: 15px; font-weight: 600; color: #fff;
+            background: #0070ba; border: none; border-radius: 6px; cursor: pointer;
+            margin-top: 16px; transition: background 0.2s;
+        }
+        .paypal-form-container button:hover { background: #003087; }
+        .form-error { color: #ef4444; font-size: 13px; margin: 8px 0 0; }
+        .paypal-icon { margin-bottom: 16px; }
+        .form-hint { color: var(--gray-400, #999); font-size: 12px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="portal-page">
+        <header class="portal-header">
+            <div class="portal-header-inner">
+                <div class="company-info">
+                    <h1 class="company-name">Payment Portal</h1>
+                    <span class="portal-subtitle">Powered by Argo Books</span>
+                </div>
+            </div>
+        </header>
+        <main class="portal-main">
+            <div class="paypal-form-container">
+                <div class="paypal-icon">
+                    <svg width="56" height="56" viewBox="0 0 56 56" fill="none"><circle cx="28" cy="28" r="28" fill="#0070ba" opacity="0.1"/><circle cx="28" cy="28" r="20" fill="#0070ba" opacity="0.15"/><text x="28" y="34" text-anchor="middle" font-size="20" font-weight="bold" fill="#003087">P</text></svg>
+                </div>
+                <h2>Connect PayPal</h2>
+                <p class="subtitle">Enter the PayPal email address where you'd like to receive payments.</p>
+                <?= $errorHtml ?>
+                <form method="POST">
+                    <input type="hidden" name="state" value="<?= $stateHtml ?>">
+                    <label for="paypal_email">PayPal Email Address</label>
+                    <input type="email" id="paypal_email" name="paypal_email" required placeholder="you@example.com" autofocus>
+                    <p class="form-hint">This should be the email associated with your PayPal Business or Personal account.</p>
+                    <button type="submit">Connect PayPal</button>
+                </form>
+            </div>
+        </main>
+        <footer class="portal-footer">
+            <p>Secure payments powered by <a href="https://argorobots.com" target="_blank" rel="noopener">Argo Books</a></p>
+        </footer>
+    </div>
+</body>
+</html>
+    <?php
 }
 
 /**

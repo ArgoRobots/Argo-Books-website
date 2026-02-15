@@ -132,9 +132,15 @@ function initiate_connect(array $company, string $provider): void
             if (empty($clientId)) {
                 send_error_response(500, 'PayPal is not configured on the server.', 'PROVIDER_NOT_CONFIGURED');
             }
-            // PayPal uses direct email entry instead of OAuth
-            $authUrl = "$callbackUrl?" . http_build_query([
-                'mode' => 'email_entry',
+            $paypalBase = $is_production
+                ? 'https://www.paypal.com'
+                : 'https://www.sandbox.paypal.com';
+            $authUrl = "$paypalBase/signin/authorize?" . http_build_query([
+                'flowEntry' => 'static',
+                'client_id' => $clientId,
+                'response_type' => 'code',
+                'scope' => 'openid profile email',
+                'redirect_uri' => $callbackUrl,
                 'state' => $state,
             ]);
             break;

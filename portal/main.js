@@ -286,17 +286,15 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!data.success) throw new Error(data.message);
 
           var script = document.createElement("script");
-          var sdkUrl =
+          script.src =
             "https://www.paypal.com/sdk/js?client-id=" +
             config.paypal.clientId +
             "&currency=" +
-            currency;
-          if (data.merchant_id) {
-            sdkUrl += "&merchant-id=" + data.merchant_id;
-          }
-          script.src = sdkUrl;
+            currency +
+            "&merchant-id=" +
+            data.merchant_id;
           script.onload = function () {
-            initializePayPalButtons(data.merchant_id, data.paypal_email);
+            initializePayPalButtons(data.merchant_id);
           };
           script.onerror = function () {
             document.getElementById("portal-paypal-container").innerHTML =
@@ -323,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(function (data) {
           if (!data.success) throw new Error(data.message);
-          initializePayPalButtons(data.merchant_id, data.paypal_email);
+          initializePayPalButtons(data.merchant_id);
         })
         .catch(function (err) {
           document.getElementById("portal-paypal-container").innerHTML =
@@ -332,7 +330,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function initializePayPalButtons(merchantId, paypalEmail) {
+  function initializePayPalButtons(merchantId) {
     var container = document.getElementById("portal-paypal-container");
     container.innerHTML = "";
 
@@ -342,10 +340,6 @@ document.addEventListener("DOMContentLoaded", function () {
           var amount = getPaymentAmount();
           if (amount === null) return;
 
-          var payee = merchantId
-            ? { merchant_id: merchantId }
-            : { email_address: paypalEmail };
-
           return actions.order.create({
             purchase_units: [
               {
@@ -353,7 +347,9 @@ document.addEventListener("DOMContentLoaded", function () {
                   value: amount.toFixed(2),
                   currency_code: currency,
                 },
-                payee: payee,
+                payee: {
+                  merchant_id: merchantId,
+                },
                 description: "Invoice " + config.invoiceId,
               },
             ],

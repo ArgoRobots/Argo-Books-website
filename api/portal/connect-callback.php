@@ -31,8 +31,13 @@ if (!empty($error)) {
 $code = $_GET['code'] ?? '';
 $state = $_GET['state'] ?? '';
 
-if (empty($code) || empty($state)) {
+// Stripe Account Links flow only returns state (no code). Other providers require both.
+if ($provider !== 'stripe' && (empty($code) || empty($state))) {
     show_result_page(false, 'Missing authorization code or state parameter.');
+    exit;
+}
+if (empty($state)) {
+    show_result_page(false, 'Missing state parameter.');
     exit;
 }
 
@@ -56,22 +61,24 @@ if (!$oauthState) {
     exit;
 }
 
-// Delete the used state token (and clean up expired ones)
-$stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
-$stmt->bind_param('i', $oauthState['state_id']);
-$stmt->execute();
-$stmt->close();
-$db->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
-
 $companyId = $oauthState['company_id'];
 $companyName = $oauthState['company_name'];
+$stateId = $oauthState['state_id'];
 $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 $callbackBase = rtrim($_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com', '/');
+
+$isRefresh = isset($_GET['refresh']);
 
 try {
     switch ($provider) {
         case 'stripe':
-            handle_stripe_callback($db, $companyId, $code, $is_production);
+            $callbackUrl = "$callbackBase/api/portal/connect/callback/stripe";
+            $result = handle_stripe_callback($db, $companyId, $is_production, $isRefresh, $callbackUrl, $state);
+            if ($result === 'redirect') {
+                // Onboarding incomplete — keep the state token alive for the next callback
+                $db->close();
+                exit;
+            }
             break;
         case 'paypal':
             handle_paypal_callback($db, $companyId, $code, $is_production);
@@ -81,66 +88,78 @@ try {
             break;
     }
 
+    // Delete the used state token (and clean up expired ones)
+    $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
+    $stmt->bind_param('i', $stateId);
+    $stmt->execute();
+    $stmt->close();
+    $db->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
+
     $db->close();
     show_result_page(true, ucfirst($provider) . ' has been connected successfully!', $companyName);
 } catch (Exception $e) {
+    // Clean up state token even on failure
+    $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
+    $stmt->bind_param('i', $stateId);
+    $stmt->execute();
+    $stmt->close();
+
     $db->close();
     error_log("OAuth callback error ($provider): " . $e->getMessage());
     show_result_page(false, 'Failed to complete connection: ' . $e->getMessage());
 }
 
 /**
- * Handle Stripe Connect OAuth callback.
- * Exchanges the authorization code for a Stripe account ID and email.
+ * Handle Stripe Account Links callback.
+ * Retrieves the Express account, checks onboarding status, and saves email if complete.
+ * Returns 'redirect' if onboarding is incomplete and the user was redirected back to Stripe.
  */
-function handle_stripe_callback(mysqli $db, int $companyId, string $code, bool $is_production): void
+function handle_stripe_callback(mysqli $db, int $companyId, bool $is_production, bool $isRefresh, string $callbackUrl, string $state): ?string
 {
     $secretKey = $is_production
-        ? $_ENV['STRIPE_LIVE_SECRET_KEY']
-        : $_ENV['STRIPE_SANDBOX_SECRET_KEY'];
-
-    // Exchange authorization code for access token / account ID
-    $ch = curl_init('https://connect.stripe.com/oauth/token');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => http_build_query([
-            'grant_type' => 'authorization_code',
-            'code' => $code,
-            'client_secret' => $secretKey,
-        ]),
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode !== 200) {
-        $error = json_decode($response, true);
-        throw new Exception($error['error_description'] ?? 'Stripe token exchange failed.');
-    }
-
-    $data = json_decode($response, true);
-    $stripeAccountId = $data['stripe_user_id'] ?? '';
-
-    if (empty($stripeAccountId)) {
-        throw new Exception('No Stripe account ID received.');
-    }
-
-    // Retrieve account email via Stripe API
+        ? ($_ENV['STRIPE_LIVE_SECRET_KEY'] ?? '')
+        : ($_ENV['STRIPE_SANDBOX_SECRET_KEY'] ?? '');
     \Stripe\Stripe::setApiKey($secretKey);
-    $account = \Stripe\Account::retrieve($stripeAccountId);
-    $email = $account->email ?? null;
 
-    // Store credentials
+    // Look up the stored Stripe account ID for this company
+    $stmt = $db->prepare('SELECT stripe_account_id FROM portal_companies WHERE id = ?');
+    $stmt->bind_param('i', $companyId);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    $stripeAccountId = $row['stripe_account_id'] ?? '';
+    if (empty($stripeAccountId)) {
+        throw new Exception('No Stripe account found. Please initiate the connection again from Argo Books.');
+    }
+
+    // Retrieve the Express account to check onboarding status
+    $account = \Stripe\Account::retrieve($stripeAccountId);
+
+    if (!$account->details_submitted || $isRefresh) {
+        // Onboarding incomplete or user requested refresh — send them back to Stripe
+        $accountLink = \Stripe\AccountLink::create([
+            'account' => $stripeAccountId,
+            'return_url' => $callbackUrl . '?state=' . $state,
+            'refresh_url' => $callbackUrl . '?state=' . $state . '&refresh=1',
+            'type' => 'account_onboarding',
+        ]);
+        header('Location: ' . $accountLink->url);
+        return 'redirect';
+    }
+
+    // Onboarding complete — save the account email
+    $email = $account->email ?? null;
     $stmt = $db->prepare(
         'UPDATE portal_companies
-         SET stripe_account_id = ?, stripe_email = ?, updated_at = NOW()
+         SET stripe_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->bind_param('ssi', $stripeAccountId, $email, $companyId);
+    $stmt->bind_param('si', $email, $companyId);
     $stmt->execute();
     $stmt->close();
+
+    return null;
 }
 
 /**

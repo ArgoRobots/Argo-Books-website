@@ -10,6 +10,7 @@
  */
 
 require_once __DIR__ . '/portal-helper.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 set_portal_headers();
 require_method(['POST', 'DELETE']);
@@ -64,17 +65,58 @@ function initiate_connect(array $company, string $provider): void
 
     switch ($provider) {
         case 'stripe':
-            $clientId = $_ENV['STRIPE_CONNECT_CLIENT_ID'] ?? '';
-            if (empty($clientId)) {
+            $secretKey = $is_production
+                ? ($_ENV['STRIPE_LIVE_SECRET_KEY'] ?? '')
+                : ($_ENV['STRIPE_SANDBOX_SECRET_KEY'] ?? '');
+            if (empty($secretKey)) {
                 send_error_response(500, 'Stripe Connect is not configured on the server.', 'PROVIDER_NOT_CONFIGURED');
             }
-            $authUrl = 'https://connect.stripe.com/oauth/authorize?' . http_build_query([
-                'response_type' => 'code',
-                'client_id' => $clientId,
-                'scope' => 'read_write',
-                'state' => $state,
-                'redirect_uri' => $callbackUrl,
+            \Stripe\Stripe::setApiKey($secretKey);
+
+            // Check if this company already has a Stripe Express account
+            $stripeAccountId = null;
+            $dbCheck = get_db_connection();
+            $stmtCheck = $dbCheck->prepare(
+                'SELECT stripe_account_id FROM portal_companies WHERE id = ?'
+            );
+            $stmtCheck->bind_param('i', $company['id']);
+            $stmtCheck->execute();
+            $row = $stmtCheck->get_result()->fetch_assoc();
+            $stmtCheck->close();
+            $dbCheck->close();
+
+            if (!empty($row['stripe_account_id'])) {
+                $stripeAccountId = $row['stripe_account_id'];
+            } else {
+                // Create a new Express connected account
+                $account = \Stripe\Account::create([
+                    'type' => 'express',
+                    'capabilities' => [
+                        'card_payments' => ['requested' => true],
+                        'transfers' => ['requested' => true],
+                    ],
+                ]);
+                $stripeAccountId = $account->id;
+
+                // Store the account ID immediately
+                $dbStore = get_db_connection();
+                $stmtStore = $dbStore->prepare(
+                    'UPDATE portal_companies SET stripe_account_id = ?, updated_at = NOW() WHERE id = ?'
+                );
+                $stmtStore->bind_param('si', $stripeAccountId, $company['id']);
+                $stmtStore->execute();
+                $stmtStore->close();
+                $dbStore->close();
+            }
+
+            // Create an Account Link for Express onboarding
+            $accountLink = \Stripe\AccountLink::create([
+                'account' => $stripeAccountId,
+                'return_url' => $callbackUrl . '?state=' . $state,
+                'refresh_url' => $callbackUrl . '?state=' . $state . '&refresh=1',
+                'type' => 'account_onboarding',
             ]);
+            $authUrl = $accountLink->url;
             break;
 
         case 'paypal':

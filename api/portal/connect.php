@@ -88,13 +88,18 @@ function initiate_connect(array $company, string $provider): void
                 $dbCheck->close();
 
                 if (!empty($row['stripe_account_id'])) {
-                    // Verify the stored account exists in the current environment
+                    // Verify the stored account exists and matches the current mode (live vs test)
                     try {
-                        \Stripe\Account::retrieve($row['stripe_account_id']);
-                        $stripeAccountId = $row['stripe_account_id'];
-                    } catch (\Stripe\Exception\InvalidRequestException $e) {
-                        // Account doesn't exist (e.g. switched between live/sandbox) — clear it
-                        $stripeAccountId = null;
+                        $existingAccount = \Stripe\Account::retrieve($row['stripe_account_id']);
+                        // Clear if mode mismatch (e.g. live account but using test keys, or vice versa)
+                        if ($existingAccount->livemode === $is_production) {
+                            $stripeAccountId = $row['stripe_account_id'];
+                        }
+                    } catch (\Stripe\Exception\ApiErrorException $e) {
+                        // Account doesn't exist or can't be accessed — will create a new one below
+                    }
+
+                    if (!$stripeAccountId) {
                         $dbClear = get_db_connection();
                         $stmtClear = $dbClear->prepare(
                             'UPDATE portal_companies SET stripe_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'

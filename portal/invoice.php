@@ -152,6 +152,12 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     <h1 class="company-name"><?php echo htmlspecialchars($companyName); ?></h1>
                     <span class="portal-subtitle">Invoice Portal</span>
                 </div>
+                <?php if (!empty($invoice['customer_token'])): ?>
+                    <a href="/portal/<?php echo htmlspecialchars($invoice['customer_token']); ?>" class="portal-all-invoices-link">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        View all invoices
+                    </a>
+                <?php endif; ?>
             </div>
         </header>
 

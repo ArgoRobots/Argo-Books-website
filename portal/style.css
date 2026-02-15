@@ -78,6 +78,32 @@ body {
     font-weight: 400;
 }
 
+.portal-all-invoices-link {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.portal-all-invoices-link:hover {
+    background: rgba(255, 255, 255, 0.22);
+    color: #ffffff;
+}
+
+.portal-all-invoices-link svg {
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
 /* ============================================
    Footer
    ============================================ */
@@ -1178,6 +1204,11 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+
+    .portal-all-invoices-link {
+        margin-left: 0;
+        align-self: flex-start;
     }
 
     .company-name {

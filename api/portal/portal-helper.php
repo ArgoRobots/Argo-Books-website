@@ -493,3 +493,202 @@ function get_client_ip(): string
     }
     return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 }
+
+/**
+ * Send a generic invoice notification email to a customer.
+ * Uses PHPMailer with SMTP settings from environment variables.
+ *
+ * @param array $params Email parameters:
+ *   - customerEmail: Recipient email
+ *   - customerName: Recipient name
+ *   - companyName: Sender business name
+ *   - invoiceId: Invoice number for display
+ *   - totalAmount: Invoice total
+ *   - balanceDue: Current balance due
+ *   - currency: Currency code (USD, CAD, etc.)
+ *   - dueDate: Due date string (Y-m-d or similar)
+ *   - invoiceUrl: Full URL to view/pay the invoice
+ *   - portalUrl: Full URL to the customer's portal (optional)
+ * @return array Result with 'success' and 'message'
+ */
+function send_invoice_notification(array $params): array
+{
+    require_once __DIR__ . '/../../vendor/autoload.php';
+
+    $customerEmail = $params['customerEmail'] ?? '';
+    $customerName = $params['customerName'] ?? '';
+    $companyName = $params['companyName'] ?? '';
+    $invoiceId = $params['invoiceId'] ?? '';
+    $balanceDue = $params['balanceDue'] ?? 0;
+    $currency = $params['currency'] ?? 'USD';
+    $dueDate = $params['dueDate'] ?? '';
+    $invoiceUrl = $params['invoiceUrl'] ?? '';
+
+    if (empty($customerEmail) || empty($invoiceUrl)) {
+        return ['success' => false, 'message' => 'Missing customer email or invoice URL'];
+    }
+
+    $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+    $formattedAmount = $currencySymbol . number_format(floatval($balanceDue), 2) . ' ' . $currency;
+    $formattedDueDate = $dueDate ? date('F j, Y', strtotime($dueDate)) : '';
+    $subject = "Invoice {$invoiceId} from {$companyName}";
+
+    $html = build_invoice_email_html([
+        'customerName' => $customerName,
+        'companyName' => $companyName,
+        'invoiceId' => $invoiceId,
+        'formattedAmount' => $formattedAmount,
+        'formattedDueDate' => $formattedDueDate,
+        'invoiceUrl' => $invoiceUrl,
+    ]);
+
+    $plainText = "Hi {$customerName},\n\n"
+        . "You have a new invoice from {$companyName}.\n\n"
+        . "Invoice: {$invoiceId}\n"
+        . "Amount Due: {$formattedAmount}\n"
+        . ($formattedDueDate ? "Due Date: {$formattedDueDate}\n" : '')
+        . "\nView and pay your invoice:\n{$invoiceUrl}\n\n"
+        . "If you have any questions, please contact {$companyName} directly.\n";
+
+    try {
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+        // SMTP config from environment
+        $smtpHost = $_ENV['SMTP_HOST'] ?? getenv('SMTP_HOST') ?? '';
+        $smtpPort = $_ENV['SMTP_PORT'] ?? getenv('SMTP_PORT') ?? 587;
+        $smtpUsername = $_ENV['SMTP_USERNAME'] ?? getenv('SMTP_USERNAME') ?? '';
+        $smtpPassword = $_ENV['SMTP_PASSWORD'] ?? getenv('SMTP_PASSWORD') ?? '';
+        $smtpSecure = $_ENV['SMTP_SECURE'] ?? getenv('SMTP_SECURE') ?? 'tls';
+        $smtpAuth = filter_var($_ENV['SMTP_AUTH'] ?? getenv('SMTP_AUTH') ?? true, FILTER_VALIDATE_BOOLEAN);
+        $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?? 'noreply@argorobots.com';
+        $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?? 'Argo Books';
+
+        if (empty($smtpHost)) {
+            return ['success' => false, 'message' => 'SMTP not configured'];
+        }
+
+        $mail->isSMTP();
+        $mail->Host = $smtpHost;
+        $mail->Port = (int) $smtpPort;
+        $mail->SMTPAuth = $smtpAuth;
+        $mail->Username = $smtpUsername;
+        $mail->Password = $smtpPassword;
+        $mail->SMTPSecure = $smtpSecure === 'ssl'
+            ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
+            : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+
+        $mail->setFrom($fromEmail, $fromName);
+        $mail->addAddress($customerEmail, $customerName);
+        $mail->isHTML(true);
+        $mail->CharSet = 'UTF-8';
+        $mail->Subject = $subject;
+        $mail->Body = $html;
+        $mail->AltBody = $plainText;
+
+        $mail->send();
+
+        return ['success' => true, 'message' => 'Email sent'];
+    } catch (\Exception $e) {
+        error_log('Portal invoice notification email failed: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Build the HTML for a generic invoice notification email.
+ * Uses table-based layout with inline styles for maximum email client compatibility.
+ */
+function build_invoice_email_html(array $params): string
+{
+    $customerName = htmlspecialchars($params['customerName'] ?? '');
+    $companyName = htmlspecialchars($params['companyName'] ?? '');
+    $invoiceId = htmlspecialchars($params['invoiceId'] ?? '');
+    $formattedAmount = htmlspecialchars($params['formattedAmount'] ?? '');
+    $formattedDueDate = htmlspecialchars($params['formattedDueDate'] ?? '');
+    $invoiceUrl = htmlspecialchars($params['invoiceUrl'] ?? '');
+
+    $dueDateRow = '';
+    if (!empty($formattedDueDate)) {
+        $dueDateRow = '
+                        <tr>
+                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Due Date</td>
+                            <td style="padding: 8px 0; text-align: right; font-size: 14px; color: #111827;">' . $formattedDueDate . '</td>
+                        </tr>';
+    }
+
+    return '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <!-- Header bar -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 28px 32px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 700;">' . $companyName . '</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 20px; font-size: 16px; color: #374151; line-height: 1.5;">
+                                Hi' . ($customerName ? ' ' . $customerName : '') . ',
+                            </p>
+                            <p style="margin: 0 0 24px; font-size: 16px; color: #374151; line-height: 1.5;">
+                                You have a new invoice from <strong>' . $companyName . '</strong>.
+                            </p>
+
+                            <!-- Invoice summary card -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 28px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Invoice</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;">' . $invoiceId . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Amount Due</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">' . $formattedAmount . '</td>
+                                            </tr>' . $dueDateRow . '
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- CTA Button -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="' . $invoiceUrl . '" style="display: inline-block; padding: 14px 40px; background-color: #2563eb; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px;">
+                                            View &amp; Pay Invoice
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 28px 0 0; font-size: 13px; color: #9ca3af; line-height: 1.5; text-align: center;">
+                                If you have any questions about this invoice, please contact ' . $companyName . ' directly.
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px 32px; border-top: 1px solid #e5e7eb; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                Powered by <a href="https://argorobots.com" style="color: #2563eb; text-decoration: none;">Argo Books</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+}

@@ -191,12 +191,36 @@ function handle_publish_invoice(): void
     $stmt->close();
     $db->close();
 
+    $portalBaseUrl = $_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com';
+    $invoiceUrl = $portalBaseUrl . '/invoice/' . $invoiceToken;
+    $portalUrl = $portalBaseUrl . '/portal/' . $customerToken;
+
+    // Send notification email if requested
+    $emailSent = false;
+    $sendEmail = filter_var($data['sendEmail'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    if ($sendEmail && !empty($customerEmail)) {
+        $emailResult = send_invoice_notification([
+            'customerEmail' => $customerEmail,
+            'customerName' => $customerName,
+            'companyName' => $company['company_name'],
+            'invoiceId' => $invoiceId,
+            'totalAmount' => $totalAmount,
+            'balanceDue' => $balanceDue,
+            'currency' => $currency,
+            'dueDate' => $dueDate,
+            'invoiceUrl' => $invoiceUrl,
+            'portalUrl' => $portalUrl,
+        ]);
+        $emailSent = $emailResult['success'];
+    }
+
     send_json_response(200, [
         'success' => true,
         'invoiceToken' => $invoiceToken,
         'customerToken' => $customerToken,
-        'invoiceUrl' => 'https://argorobots.com/invoice/' . $invoiceToken,
-        'portalUrl' => 'https://argorobots.com/portal/' . $customerToken,
+        'invoiceUrl' => $invoiceUrl,
+        'portalUrl' => $portalUrl,
+        'emailSent' => $emailSent,
         'message' => $existing ? 'Invoice updated' : 'Invoice published',
         'timestamp' => date('c')
     ]);

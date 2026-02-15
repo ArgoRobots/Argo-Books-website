@@ -148,8 +148,12 @@ function handle_stripe_callback(mysqli $db, int $companyId, bool $is_production,
         return 'redirect';
     }
 
-    // Onboarding complete — save the account email
-    $email = $account->email ?? null;
+    // Onboarding complete — save the account email (try multiple fields for Express accounts)
+    $acctData = $account->toArray();
+    $email = $acctData['email']
+        ?? $acctData['business_profile']['support_email']
+        ?? $acctData['individual']['email']
+        ?? null;
     $stmt = $db->prepare(
         'UPDATE portal_companies
          SET stripe_email = ?, updated_at = NOW()

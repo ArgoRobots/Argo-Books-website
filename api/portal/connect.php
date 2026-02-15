@@ -139,7 +139,7 @@ function initiate_connect(array $company, string $provider): void
                 'flowEntry' => 'static',
                 'client_id' => $clientId,
                 'response_type' => 'code',
-                'scope' => 'openid profile email',
+                'scope' => 'openid profile email https://uri.paypal.com/services/paypalattributes',
                 'redirect_uri' => $callbackUrl,
                 'state' => $state,
             ]);

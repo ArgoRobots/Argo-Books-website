@@ -588,7 +588,7 @@ function send_invoice_notification(array $params): array
         $mail->send();
 
         return ['success' => true, 'message' => 'Email sent'];
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         error_log('Portal invoice notification email failed: ' . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
     }

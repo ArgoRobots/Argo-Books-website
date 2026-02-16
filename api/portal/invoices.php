@@ -195,23 +195,28 @@ function handle_publish_invoice(): void
     $invoiceUrl = $portalBaseUrl . '/invoice/' . $invoiceToken;
     $portalUrl = $portalBaseUrl . '/portal/' . $customerToken;
 
-    // Send notification email if requested
+    // Send notification email if requested (never let email failure block the publish)
     $emailSent = false;
     $sendEmail = filter_var($data['sendEmail'] ?? false, FILTER_VALIDATE_BOOLEAN);
     if ($sendEmail && !empty($customerEmail)) {
-        $emailResult = send_invoice_notification([
-            'customerEmail' => $customerEmail,
-            'customerName' => $customerName,
-            'companyName' => $company['company_name'],
-            'invoiceId' => $invoiceId,
-            'totalAmount' => $totalAmount,
-            'balanceDue' => $balanceDue,
-            'currency' => $currency,
-            'dueDate' => $dueDate,
-            'invoiceUrl' => $invoiceUrl,
-            'portalUrl' => $portalUrl,
-        ]);
-        $emailSent = $emailResult['success'];
+        try {
+            $emailResult = send_invoice_notification([
+                'customerEmail' => $customerEmail,
+                'customerName' => $customerName,
+                'companyName' => $company['company_name'],
+                'invoiceId' => $invoiceId,
+                'totalAmount' => $totalAmount,
+                'balanceDue' => $balanceDue,
+                'currency' => $currency,
+                'dueDate' => $dueDate,
+                'invoiceUrl' => $invoiceUrl,
+                'portalUrl' => $portalUrl,
+            ]);
+            $emailSent = $emailResult['success'];
+        } catch (\Throwable $e) {
+            error_log('Invoice publish email failed: ' . $e->getMessage());
+            $emailSent = false;
+        }
     }
 
     send_json_response(200, [

@@ -513,8 +513,6 @@ function get_client_ip(): string
  */
 function send_invoice_notification(array $params): array
 {
-    require_once __DIR__ . '/../../vendor/autoload.php';
-
     $customerEmail = $params['customerEmail'] ?? '';
     $customerName = $params['customerName'] ?? '';
     $companyName = $params['companyName'] ?? '';
@@ -542,52 +540,27 @@ function send_invoice_notification(array $params): array
         'invoiceUrl' => $invoiceUrl,
     ]);
 
-    $plainText = "Hi {$customerName},\n\n"
-        . "You have a new invoice from {$companyName}.\n\n"
-        . "Invoice: {$invoiceId}\n"
-        . "Amount Due: {$formattedAmount}\n"
-        . ($formattedDueDate ? "Due Date: {$formattedDueDate}\n" : '')
-        . "\nView and pay your invoice:\n{$invoiceUrl}\n\n"
-        . "If you have any questions, please contact {$companyName} directly.\n";
-
     try {
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
+        $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
 
-        // SMTP config from environment
-        $smtpHost = $_ENV['SMTP_HOST'] ?? getenv('SMTP_HOST') ?? '';
-        $smtpPort = $_ENV['SMTP_PORT'] ?? getenv('SMTP_PORT') ?? 587;
-        $smtpUsername = $_ENV['SMTP_USERNAME'] ?? getenv('SMTP_USERNAME') ?? '';
-        $smtpPassword = $_ENV['SMTP_PASSWORD'] ?? getenv('SMTP_PASSWORD') ?? '';
-        $smtpSecure = $_ENV['SMTP_SECURE'] ?? getenv('SMTP_SECURE') ?? 'tls';
-        $smtpAuth = filter_var($_ENV['SMTP_AUTH'] ?? getenv('SMTP_AUTH') ?? true, FILTER_VALIDATE_BOOLEAN);
-        $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?? 'noreply@argorobots.com';
-        $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?? 'Argo Books';
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $fromName . ' <' . $fromEmail . '>',
+            'Reply-To: ' . $fromEmail,
+            'X-Mailer: ArgoBooks/1.0'
+        ];
 
-        if (empty($smtpHost)) {
-            return ['success' => false, 'message' => 'SMTP not configured'];
+        $to = $customerName ? "{$customerName} <{$customerEmail}>" : $customerEmail;
+        $result = mail($to, $subject, $html, implode("\r\n", $headers));
+
+        if ($result) {
+            return ['success' => true, 'message' => 'Email sent'];
+        } else {
+            error_log('Portal invoice notification: mail() returned false for ' . $customerEmail);
+            return ['success' => false, 'message' => 'mail() returned false'];
         }
-
-        $mail->isSMTP();
-        $mail->Host = $smtpHost;
-        $mail->Port = (int) $smtpPort;
-        $mail->SMTPAuth = $smtpAuth;
-        $mail->Username = $smtpUsername;
-        $mail->Password = $smtpPassword;
-        $mail->SMTPSecure = $smtpSecure === 'ssl'
-            ? \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS
-            : \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-
-        $mail->setFrom($fromEmail, $fromName);
-        $mail->addAddress($customerEmail, $customerName);
-        $mail->isHTML(true);
-        $mail->CharSet = 'UTF-8';
-        $mail->Subject = $subject;
-        $mail->Body = $html;
-        $mail->AltBody = $plainText;
-
-        $mail->send();
-
-        return ['success' => true, 'message' => 'Email sent'];
     } catch (\Throwable $e) {
         error_log('Portal invoice notification email failed: ' . $e->getMessage());
         return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];

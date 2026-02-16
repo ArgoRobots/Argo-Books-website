@@ -195,14 +195,30 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                 <script>
                 (function() {
                     var iframe = document.getElementById('custom-invoice-frame');
-                    function resize() {
+                    iframe.addEventListener('load', function() {
                         try {
-                            var h = iframe.contentDocument.documentElement.scrollHeight;
-                            iframe.style.height = h + 'px';
+                            var doc = iframe.contentDocument;
+
+                            // Strip email wrapper styling so the invoice fills the container
+                            var style = doc.createElement('style');
+                            style.textContent =
+                                'html, body { margin: 0 !important; padding: 0 !important; background: transparent !important; overflow: hidden !important; }' +
+                                'body > table { background: transparent !important; }' +
+                                'body > table > tbody > tr > td { padding: 0 !important; }' +
+                                'body > table > tbody > tr > td > table { max-width: 100% !important; width: 100% !important; box-shadow: none !important; border-radius: 0 !important; }';
+                            doc.head.appendChild(style);
+
+                            // Auto-resize height to content
+                            iframe.style.height = doc.documentElement.scrollHeight + 'px';
                         } catch(e) {}
-                    }
-                    iframe.addEventListener('load', resize);
-                    window.addEventListener('resize', function() { setTimeout(resize, 100); });
+                    });
+                    window.addEventListener('resize', function() {
+                        setTimeout(function() {
+                            try {
+                                iframe.style.height = iframe.contentDocument.documentElement.scrollHeight + 'px';
+                            } catch(e) {}
+                        }, 100);
+                    });
                 })();
                 </script>
             <?php else: ?>

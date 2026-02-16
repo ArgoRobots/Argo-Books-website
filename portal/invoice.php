@@ -85,6 +85,9 @@ $taxAmount = $invoiceData['taxAmount'] ?? $invoiceData['TaxAmount'] ?? 0;
 $taxRate = $invoiceData['taxRate'] ?? $invoiceData['TaxRate'] ?? '';
 $amountPaid = $totalAmount - $balanceDue;
 
+// Custom invoice HTML (rendered by Argo Books desktop app)
+$customInvoiceHtml = $invoiceData['customInvoiceHtml'] ?? '';
+
 // Company address info
 $companyAddress = $invoiceData['companyAddress'] ?? $invoiceData['CompanyAddress'] ?? '';
 $companyEmail = $invoiceData['companyEmail'] ?? $invoiceData['CompanyEmail'] ?? '';
@@ -162,126 +165,167 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
         </header>
 
         <main class="portal-main">
-            <!-- Invoice Header -->
-            <div class="invoice-header-section">
-                <div class="invoice-title-row">
-                    <h2 class="invoice-title">Invoice <?php echo htmlspecialchars($invoiceId); ?></h2>
-                    <span class="status-badge status-<?php echo htmlspecialchars($status); ?>">
-                        <?php echo ucfirst(htmlspecialchars($status)); ?>
-                    </span>
-                </div>
-
-                <div class="invoice-parties">
-                    <div class="party-info">
-                        <span class="party-label">From</span>
-                        <strong><?php echo htmlspecialchars($companyName); ?></strong>
-                        <?php if ($companyAddress): ?>
-                            <span class="party-detail"><?php echo nl2br(htmlspecialchars($companyAddress)); ?></span>
-                        <?php endif; ?>
-                        <?php if ($companyEmail): ?>
-                            <span class="party-detail"><?php echo htmlspecialchars($companyEmail); ?></span>
-                        <?php endif; ?>
-                        <?php if ($companyPhone): ?>
-                            <span class="party-detail"><?php echo htmlspecialchars($companyPhone); ?></span>
+            <?php if (!empty($customInvoiceHtml)): ?>
+                <!-- Custom Invoice rendered by Argo Books -->
+                <?php if ($amountPaid > 0 || $isPaid): ?>
+                    <div class="invoice-status-bar">
+                        <span class="status-badge status-<?php echo htmlspecialchars($status); ?>">
+                            <?php echo ucfirst(htmlspecialchars($status)); ?>
+                        </span>
+                        <?php if ($amountPaid > 0 && !$isPaid): ?>
+                            <span class="status-bar-detail">
+                                Paid: <?php echo $currencySymbol . number_format($amountPaid, 2); ?>
+                            </span>
+                            <span class="status-bar-detail">
+                                Balance Due: <strong><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></strong>
+                            </span>
                         <?php endif; ?>
                     </div>
-                    <div class="party-info">
-                        <span class="party-label">To</span>
-                        <strong><?php echo htmlspecialchars($customerName); ?></strong>
-                        <?php if ($customerAddress): ?>
-                            <span class="party-detail"><?php echo nl2br(htmlspecialchars($customerAddress)); ?></span>
+                <?php endif; ?>
+                <div class="custom-invoice-container">
+                    <iframe
+                        id="custom-invoice-frame"
+                        srcdoc="<?php echo htmlspecialchars($customInvoiceHtml); ?>"
+                        sandbox="allow-same-origin"
+                        class="custom-invoice-iframe"
+                        scrolling="no"
+                        frameborder="0">
+                    </iframe>
+                </div>
+                <script>
+                (function() {
+                    var iframe = document.getElementById('custom-invoice-frame');
+                    function resize() {
+                        try {
+                            var h = iframe.contentDocument.documentElement.scrollHeight;
+                            iframe.style.height = h + 'px';
+                        } catch(e) {}
+                    }
+                    iframe.addEventListener('load', resize);
+                    window.addEventListener('resize', function() { setTimeout(resize, 100); });
+                })();
+                </script>
+            <?php else: ?>
+                <!-- Standard invoice template -->
+                <div class="invoice-header-section">
+                    <div class="invoice-title-row">
+                        <h2 class="invoice-title">Invoice <?php echo htmlspecialchars($invoiceId); ?></h2>
+                        <span class="status-badge status-<?php echo htmlspecialchars($status); ?>">
+                            <?php echo ucfirst(htmlspecialchars($status)); ?>
+                        </span>
+                    </div>
+
+                    <div class="invoice-parties">
+                        <div class="party-info">
+                            <span class="party-label">From</span>
+                            <strong><?php echo htmlspecialchars($companyName); ?></strong>
+                            <?php if ($companyAddress): ?>
+                                <span class="party-detail"><?php echo nl2br(htmlspecialchars($companyAddress)); ?></span>
+                            <?php endif; ?>
+                            <?php if ($companyEmail): ?>
+                                <span class="party-detail"><?php echo htmlspecialchars($companyEmail); ?></span>
+                            <?php endif; ?>
+                            <?php if ($companyPhone): ?>
+                                <span class="party-detail"><?php echo htmlspecialchars($companyPhone); ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <div class="party-info">
+                            <span class="party-label">To</span>
+                            <strong><?php echo htmlspecialchars($customerName); ?></strong>
+                            <?php if ($customerAddress): ?>
+                                <span class="party-detail"><?php echo nl2br(htmlspecialchars($customerAddress)); ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="invoice-dates">
+                        <?php if ($issueDate): ?>
+                            <div class="date-item">
+                                <span class="date-label">Issue Date</span>
+                                <span class="date-value"><?php echo date('M j, Y', strtotime($issueDate)); ?></span>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($dueDate): ?>
+                            <div class="date-item <?php echo $isOverdue ? 'overdue' : ''; ?>">
+                                <span class="date-label">Due Date</span>
+                                <span class="date-value"><?php echo date('M j, Y', strtotime($dueDate)); ?></span>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
 
-                <div class="invoice-dates">
-                    <?php if ($issueDate): ?>
-                        <div class="date-item">
-                            <span class="date-label">Issue Date</span>
-                            <span class="date-value"><?php echo date('M j, Y', strtotime($issueDate)); ?></span>
-                        </div>
-                    <?php endif; ?>
-                    <?php if ($dueDate): ?>
-                        <div class="date-item <?php echo $isOverdue ? 'overdue' : ''; ?>">
-                            <span class="date-label">Due Date</span>
-                            <span class="date-value"><?php echo date('M j, Y', strtotime($dueDate)); ?></span>
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-
-            <!-- Line Items -->
-            <div class="invoice-items-section">
-                <table class="invoice-table">
-                    <thead>
-                        <tr>
-                            <th class="col-description">Description</th>
-                            <th class="col-qty">Qty</th>
-                            <th class="col-price">Price</th>
-                            <th class="col-total">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if (!empty($lineItems)): ?>
-                            <?php foreach ($lineItems as $item): ?>
-                                <tr>
-                                    <td class="col-description">
-                                        <?php echo htmlspecialchars($item['description'] ?? $item['Description'] ?? ''); ?>
-                                    </td>
-                                    <td class="col-qty">
-                                        <?php echo htmlspecialchars($item['quantity'] ?? $item['Quantity'] ?? 1); ?>
-                                    </td>
-                                    <td class="col-price">
-                                        <?php echo $currencySymbol . number_format(floatval($item['unitPrice'] ?? $item['UnitPrice'] ?? $item['price'] ?? $item['Price'] ?? 0), 2); ?>
-                                    </td>
-                                    <td class="col-total">
-                                        <?php echo $currencySymbol . number_format(floatval($item['total'] ?? $item['Total'] ?? $item['amount'] ?? $item['Amount'] ?? 0), 2); ?>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
+                <div class="invoice-items-section">
+                    <table class="invoice-table">
+                        <thead>
                             <tr>
-                                <td colspan="4" class="no-items">Invoice details</td>
+                                <th class="col-description">Description</th>
+                                <th class="col-qty">Qty</th>
+                                <th class="col-price">Price</th>
+                                <th class="col-total">Total</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($lineItems)): ?>
+                                <?php foreach ($lineItems as $item): ?>
+                                    <tr>
+                                        <td class="col-description">
+                                            <?php echo htmlspecialchars($item['description'] ?? $item['Description'] ?? ''); ?>
+                                        </td>
+                                        <td class="col-qty">
+                                            <?php echo htmlspecialchars($item['quantity'] ?? $item['Quantity'] ?? 1); ?>
+                                        </td>
+                                        <td class="col-price">
+                                            <?php echo $currencySymbol . number_format(floatval($item['unitPrice'] ?? $item['UnitPrice'] ?? $item['price'] ?? $item['Price'] ?? 0), 2); ?>
+                                        </td>
+                                        <td class="col-total">
+                                            <?php echo $currencySymbol . number_format(floatval($item['total'] ?? $item['Total'] ?? $item['amount'] ?? $item['Amount'] ?? 0), 2); ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="4" class="no-items">Invoice details</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+
+                    <div class="invoice-totals">
+                        <?php if ($subtotal != $totalAmount): ?>
+                            <div class="total-row">
+                                <span>Subtotal</span>
+                                <span><?php echo $currencySymbol . number_format(floatval($subtotal), 2); ?></span>
+                            </div>
                         <?php endif; ?>
-                    </tbody>
-                </table>
-
-                <div class="invoice-totals">
-                    <?php if ($subtotal != $totalAmount): ?>
-                        <div class="total-row">
-                            <span>Subtotal</span>
-                            <span><?php echo $currencySymbol . number_format(floatval($subtotal), 2); ?></span>
+                        <?php if ($taxAmount > 0): ?>
+                            <div class="total-row">
+                                <span>Tax<?php echo $taxRate ? " ({$taxRate}%)" : ''; ?></span>
+                                <span><?php echo $currencySymbol . number_format(floatval($taxAmount), 2); ?></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="total-row total-row-main">
+                            <span>Total</span>
+                            <span><?php echo $currencySymbol . number_format($totalAmount, 2); ?> <?php echo $currency; ?></span>
                         </div>
-                    <?php endif; ?>
-                    <?php if ($taxAmount > 0): ?>
-                        <div class="total-row">
-                            <span>Tax<?php echo $taxRate ? " ({$taxRate}%)" : ''; ?></span>
-                            <span><?php echo $currencySymbol . number_format(floatval($taxAmount), 2); ?></span>
+                        <?php if ($amountPaid > 0): ?>
+                            <div class="total-row total-row-paid">
+                                <span>Paid</span>
+                                <span>-<?php echo $currencySymbol . number_format($amountPaid, 2); ?></span>
+                            </div>
+                        <?php endif; ?>
+                        <div class="total-row total-row-balance <?php echo $isPaid ? 'paid' : ($isOverdue ? 'overdue' : ''); ?>">
+                            <span>Balance Due</span>
+                            <span><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></span>
                         </div>
-                    <?php endif; ?>
-                    <div class="total-row total-row-main">
-                        <span>Total</span>
-                        <span><?php echo $currencySymbol . number_format($totalAmount, 2); ?> <?php echo $currency; ?></span>
-                    </div>
-                    <?php if ($amountPaid > 0): ?>
-                        <div class="total-row total-row-paid">
-                            <span>Paid</span>
-                            <span>-<?php echo $currencySymbol . number_format($amountPaid, 2); ?></span>
-                        </div>
-                    <?php endif; ?>
-                    <div class="total-row total-row-balance <?php echo $isPaid ? 'paid' : ($isOverdue ? 'overdue' : ''); ?>">
-                        <span>Balance Due</span>
-                        <span><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></span>
                     </div>
                 </div>
-            </div>
 
-            <?php if ($notes): ?>
-                <div class="invoice-notes">
-                    <h3>Notes</h3>
-                    <p><?php echo nl2br(htmlspecialchars($notes)); ?></p>
-                </div>
+                <?php if ($notes): ?>
+                    <div class="invoice-notes">
+                        <h3>Notes</h3>
+                        <p><?php echo nl2br(htmlspecialchars($notes)); ?></p>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
 
             <!-- Payment Section -->

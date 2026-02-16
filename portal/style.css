@@ -127,6 +127,42 @@ body {
 }
 
 /* ============================================
+   Custom Invoice (iframe)
+   ============================================ */
+
+.custom-invoice-container {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+.custom-invoice-iframe {
+    width: 100%;
+    border: none;
+    min-height: 500px;
+    display: block;
+}
+
+.invoice-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.status-bar-detail {
+    font-size: 14px;
+    color: var(--gray-500);
+}
+
+/* ============================================
    Invoice View - Header Section
    ============================================ */
 

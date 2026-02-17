@@ -118,14 +118,12 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   generateErrorCategoryChart(errorData);
-  generateErrorTimeChart(errorData);
   generateErrorCategoryTimelineChart(errorData);
 
   // Feature Usage Charts
   generateFeatureUsageChart(featureUsageData);
   generatePageViewsChart(featureUsageData);
   generateFeatureTimelineChart(featureUsageData);
-  generateContextUsageChart(featureUsageData);
 
   // Receipt Scanning Charts
   generateReceiptScanOverviewChart(receiptScanningData);
@@ -209,7 +207,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Find Most Popular Feature
     const featureUsageCounts = {
       Export: exportData.length,
-      "AI Assistant": openaiData.length,
+      "Supplier Matching": openaiData.length,
       "Currency Rates": exchangeRatesData.length,
       "Google Sheets": googleSheetsData.length,
       "Receipt Scan": receiptScanningData.length,
@@ -1444,116 +1442,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateErrorCodeChart(errorData) {
-    if (errorData.length === 0) {
-      document.getElementById("errorCodeChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No error code data available</div>';
-      return;
-    }
-
-    const codeCounts = {};
-    errorData.forEach((error) => {
-      const code = error.ErrorCode || "Unknown";
-      codeCounts[code] = (codeCounts[code] || 0) + 1;
-    });
-
-    const sortedCodes = Object.entries(codeCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10);
-
-    new Chart(document.getElementById("errorCodeChart"), {
-      type: "bar",
-      data: {
-        labels: sortedCodes.map(([code]) => code),
-        datasets: [
-          {
-            label: "Error Occurrences",
-            data: sortedCodes.map(([, count]) => count),
-            backgroundColor: "#ef4444",
-            borderColor: "#dc2626",
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        indexAxis: "y",
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Number of Occurrences",
-            },
-          },
-        }
-      },
-    });
-  }
-
-  function generateErrorTimeChart(errorData) {
-    if (errorData.length === 0) {
-      document.getElementById("errorTimeChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No error trends to display</div>';
-      return;
-    }
-
-    const dailyErrors = {};
-    errorData.forEach((error) => {
-      const date = error.timestamp.slice(0, 10);
-      dailyErrors[date] = (dailyErrors[date] || 0) + 1;
-    });
-
-    const dates = Object.keys(dailyErrors).sort();
-    const errorCounts = dates.map((date) => dailyErrors[date]);
-
-    new Chart(document.getElementById("errorTimeChart"), {
-      type: "line",
-      data: {
-        labels: dates,
-        datasets: [
-          {
-            label: "Daily Error Count",
-            data: errorCounts,
-            backgroundColor: "rgba(239, 68, 68, 0.1)",
-            borderColor: "#ef4444",
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: "Error Count",
-            },
-          },
-          x: {
-            ticks: {
-              maxRotation: 45,
-            },
-          },
-        }
-      },
-    });
-  }
 
   // Usage Charts
   function generateSessionDurationChart(sessionData) {
@@ -2402,75 +2290,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateContextUsageChart(featureUsageData) {
-    if (featureUsageData.length === 0) {
-      document.getElementById("contextUsageChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No context data available</div>';
-      return;
-    }
-
-    const contextCounts = {};
-    featureUsageData.forEach((item) => {
-      const context = item.Context || "Unknown";
-      if (context !== "Unknown" && context !== "") {
-        contextCounts[context] = (contextCounts[context] || 0) + 1;
-      }
-    });
-
-    if (Object.keys(contextCounts).length === 0) {
-      document.getElementById("contextUsageChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No context data available</div>';
-      return;
-    }
-
-    const sortedContexts = Object.entries(contextCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 10);
-
-    const colors = [
-      "#3b82f6",
-      "#10b981",
-      "#f59e0b",
-      "#ef4444",
-      "#8b5cf6",
-      "#06b6d4",
-      "#84cc16",
-      "#f97316",
-      "#ec4899",
-      "#6366f1",
-    ];
-
-    new Chart(document.getElementById("contextUsageChart"), {
-      type: "doughnut",
-      data: {
-        labels: sortedContexts.map(([ctx]) => ctx),
-        datasets: [
-          {
-            data: sortedContexts.map(([, count]) => count),
-            backgroundColor: colors,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                return `${context.label}: ${context.raw} (${percentage}%)`;
-              },
-            },
-          },
-        },
-      },
-    });
-  }
 
   // =====================
   // Receipt Scanning Charts

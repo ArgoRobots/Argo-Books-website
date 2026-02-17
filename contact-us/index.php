@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </section>
 
   <!-- Contact Form Section -->
-  <section class="contact-form-section">
+  <section class="contact-form-section" id="contact">
     <div class="container">
       <div class="form-wrapper animate-on-scroll">
         <div class="form-header">
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <?php endif; ?>
 
-        <form action="" method="POST" id="contact-form" autocomplete="off">
+        <form action="#contact" method="POST" id="contact-form" autocomplete="off">
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">First Name</label>
@@ -281,6 +281,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       document.querySelectorAll('.animate-on-scroll').forEach(el => {
         observer.observe(el);
       });
+
     });
   </script>
 </body>

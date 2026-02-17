@@ -2,9 +2,11 @@
 /**
  * Invoice Email Sender
  *
- * Handles sending invoice emails using PHP's native mail() function.
- * No external dependencies required.
+ * Handles sending invoice emails via SMTP relay (Brevo) when configured,
+ * with fallback to PHP's native mail() function.
  */
+
+require_once __DIR__ . '/../../smtp_mailer.php';
 
 class InvoiceEmailSender
 {
@@ -44,33 +46,13 @@ class InvoiceEmailSender
             // Generate unique message ID
             $messageId = $this->generateMessageId($data['invoiceId'] ?? 'invoice');
 
-            // Build headers
-            $headers = [
-                'MIME-Version: 1.0',
-                'Content-Type: text/html; charset=UTF-8',
-                'From: ' . $this->formatAddress($fromEmail, $fromName),
-                'Message-ID: ' . $messageId,
-                'X-Mailer: ArgoBooks/1.0'
-            ];
-
-            // Add reply-to if provided
-            if (!empty($data['replyTo'])) {
-                $headers[] = 'Reply-To: ' . $data['replyTo'];
-            }
-
-            // Add BCC if provided
-            if (!empty($data['bcc'])) {
-                $headers[] = 'Bcc: ' . $data['bcc'];
-            }
-
-            // Format recipient
-            $to = $this->formatAddress($toEmail, $toName);
-
-            // Handle PDF attachment if provided
-            if (!empty($data['pdfAttachment'])) {
-                $result = $this->sendWithAttachment($to, $subject, $htmlBody, $textBody, $headers, $data['pdfAttachment'], $data['pdfFilename'] ?? 'invoice.pdf');
+            // Try SMTP relay first
+            $mailer = create_smtp_mailer();
+            if ($mailer) {
+                $result = $this->sendViaSMTP($mailer, $toEmail, $toName, $fromEmail, $fromName, $subject, $htmlBody, $data, $messageId);
             } else {
-                $result = mail($to, $subject, $htmlBody, implode("\r\n", $headers));
+                // Fall back to mail()
+                $result = $this->sendViaMail($toEmail, $toName, $fromEmail, $fromName, $subject, $htmlBody, $textBody, $data, $messageId);
             }
 
             if ($result) {
@@ -78,7 +60,8 @@ class InvoiceEmailSender
                     'to' => $toEmail,
                     'subject' => $subject,
                     'messageId' => $messageId,
-                    'invoiceId' => $data['invoiceId'] ?? 'N/A'
+                    'invoiceId' => $data['invoiceId'] ?? 'N/A',
+                    'method' => $mailer ? 'smtp' : 'mail'
                 ]);
 
                 return [
@@ -90,7 +73,7 @@ class InvoiceEmailSender
             } else {
                 $this->log('Email sending failed', [
                     'to' => $toEmail,
-                    'error' => 'mail() returned false'
+                    'error' => 'send returned false'
                 ], 'ERROR');
 
                 return [
@@ -119,7 +102,70 @@ class InvoiceEmailSender
     }
 
     /**
-     * Send email with PDF attachment using multipart MIME
+     * Send email via SMTP relay using PHPMailer
+     */
+    private function sendViaSMTP($mailer, string $toEmail, string $toName, string $fromEmail, string $fromName, string $subject, string $htmlBody, array $data, string $messageId): bool
+    {
+        $mailer->setFrom($fromEmail, $fromName);
+        $mailer->addAddress($toEmail, $toName);
+        $mailer->Subject = $subject;
+        $mailer->Body = $htmlBody;
+        $mailer->MessageID = $messageId;
+
+        if (!empty($data['replyTo'])) {
+            $mailer->addReplyTo($data['replyTo']);
+        }
+
+        if (!empty($data['bcc'])) {
+            $mailer->addBCC($data['bcc']);
+        }
+
+        // Handle PDF attachment
+        if (!empty($data['pdfAttachment'])) {
+            $pdfContent = base64_decode($data['pdfAttachment']);
+            if ($pdfContent === false) {
+                throw new \Exception('Invalid base64 PDF content');
+            }
+            $filename = $data['pdfFilename'] ?? 'invoice.pdf';
+            $mailer->addStringAttachment($pdfContent, $filename, 'base64', 'application/pdf');
+        }
+
+        $mailer->send();
+        return true;
+    }
+
+    /**
+     * Send email via PHP's native mail() function (fallback)
+     */
+    private function sendViaMail(string $toEmail, string $toName, string $fromEmail, string $fromName, string $subject, string $htmlBody, string $textBody, array $data, string $messageId): bool
+    {
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $this->formatAddress($fromEmail, $fromName),
+            'Message-ID: ' . $messageId,
+            'X-Mailer: ArgoBooks/1.0'
+        ];
+
+        if (!empty($data['replyTo'])) {
+            $headers[] = 'Reply-To: ' . $data['replyTo'];
+        }
+
+        if (!empty($data['bcc'])) {
+            $headers[] = 'Bcc: ' . $data['bcc'];
+        }
+
+        $to = $this->formatAddress($toEmail, $toName);
+
+        if (!empty($data['pdfAttachment'])) {
+            return $this->sendWithAttachment($to, $subject, $htmlBody, $textBody, $headers, $data['pdfAttachment'], $data['pdfFilename'] ?? 'invoice.pdf');
+        }
+
+        return mail($to, $subject, $htmlBody, implode("\r\n", $headers));
+    }
+
+    /**
+     * Send email with PDF attachment using multipart MIME (mail() fallback only)
      */
     private function sendWithAttachment(string $to, string $subject, string $htmlBody, string $textBody, array $baseHeaders, string $pdfBase64, string $filename): bool
     {

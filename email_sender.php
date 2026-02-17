@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/smtp_mailer.php';
+
 /**
  * Base function to send an email with standard Argo styling
  *
@@ -51,6 +53,22 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
         </body>
         </html>
         HTML;
+
+    // Use SMTP relay if configured, otherwise fall back to mail()
+    $mailer = create_smtp_mailer();
+    if ($mailer) {
+        try {
+            $mailer->addAddress($to_email);
+            $mailer->addReplyTo('support@argorobots.com');
+            $mailer->Subject = $subject;
+            $mailer->Body = $email_html;
+            $mailer->send();
+            return true;
+        } catch (\Exception $e) {
+            error_log("SMTP email failed for {$to_email}: " . $e->getMessage());
+            return false;
+        }
+    }
 
     $headers = [
         'MIME-Version: 1.0',

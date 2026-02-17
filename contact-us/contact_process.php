@@ -1,12 +1,53 @@
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../smtp_mailer.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->safeLoad();
+
 /**
  * Processes the contact form submission and sends an email
  *
  * @return array Result with 'success', 'message', and 'form_data' keys
  */
+function check_rate_limit()
+{
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    $max_submissions = 3;
+    $window_seconds = 600; // 10 minutes
+    $now = time();
+
+    if (!isset($_SESSION['contact_submissions'])) {
+        $_SESSION['contact_submissions'] = [];
+    }
+
+    // Remove entries older than the window
+    $_SESSION['contact_submissions'] = array_filter(
+        $_SESSION['contact_submissions'],
+        function ($timestamp) use ($now, $window_seconds) {
+            return ($now - $timestamp) < $window_seconds;
+        }
+    );
+
+    if (count($_SESSION['contact_submissions']) >= $max_submissions) {
+        return false;
+    }
+
+    $_SESSION['contact_submissions'][] = $now;
+    return true;
+}
+
 function process_contact_form()
 {
+    // Rate limit check
+    if (!check_rate_limit()) {
+        return ['success' => false, 'message' => 'Too many submissions. Please wait a few minutes before trying again.', 'form_data' => []];
+    }
+
     // Get form data
     $firstName = isset($_POST['firstName']) ? trim($_POST['firstName']) : '';
     $lastName = isset($_POST['lastName']) ? trim($_POST['lastName']) : '';
@@ -42,16 +83,32 @@ function process_contact_form()
     $email_subject = "Argo Books Contact: {$firstName} {$lastName}";
     $email_html = get_contact_email_template($firstName, $lastName, $email, $subject_label, $message);
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books Website <noreply@argorobots.com>',
-        'Reply-To: ' . $email,
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
     $to_email = 'contact@argorobots.com';
-    $mail_result = mail($to_email, $email_subject, $email_html, implode("\r\n", $headers));
+
+    // Use SMTP relay if configured, otherwise fall back to mail()
+    $mailer = create_smtp_mailer();
+    if ($mailer) {
+        try {
+            $mailer->addAddress($to_email);
+            $mailer->addReplyTo($email);
+            $mailer->Subject = $email_subject;
+            $mailer->Body = $email_html;
+            $mailer->send();
+            $mail_result = true;
+        } catch (\Exception $e) {
+            error_log("SMTP contact form email failed: " . $e->getMessage());
+            $mail_result = false;
+        }
+    } else {
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=UTF-8',
+            'From: Argo Books Website <noreply@argorobots.com>',
+            'Reply-To: ' . $email,
+            'X-Mailer: PHP/' . phpversion()
+        ];
+        $mail_result = mail($to_email, $email_subject, $email_html, implode("\r\n", $headers));
+    }
 
     if ($mail_result) {
         return ['success' => true];

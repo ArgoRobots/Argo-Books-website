@@ -89,6 +89,52 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.1 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.1</span>
+                        <span class="date-tag">February 2026</span>
+                    </div>
+                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Backup &amp; restore</strong> &mdash; Create <code>.argobk</code> backup files of your company data, and restore from them at any time.</li>
+                                <li><strong>Version history &amp; audit trail</strong> &mdash; Every change to your data is now recorded with timestamps and details. Browse, search, and undo/redo past changes from the new version history panel.</li>
+                                <li><strong>New invoice template</strong> &mdash; A new modern invoice featuring decorative wave accents.</li>
+                                <li><strong>Multi-item rentals</strong> &mdash; Rent multiple items in a single transaction, each with its own rate, quantity, and security deposit.</li>
+                                <li><strong>Generate invoices from rentals</strong> &mdash; Create invoices directly from rental records with all fields auto-populated.</li>
+                                <li><strong>Online invoice payments</strong> &mdash; Connect your Stripe, PayPal, or Square account and let your customers view and pay invoices online through a payment portal.</li>
+                                <li><strong>Receipt grid/table toggle</strong> &mdash; Switch between grid and table views on the Receipts page for flexible data browsing.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Rental payment tracking</strong> &mdash; Track paid status and view linked invoices directly from the rentals table.</li>
+                                <li><strong>Improved responsiveness</strong> &mdash; The interface now adapts more smoothly across different screen sizes.</li>
+                                <li><strong>Invoice template color controls</strong> &mdash; Added per-template color settings.</li>
+                                <li><strong>Improved undo/redo</strong> &mdash; Rapid property changes are combined into single entries.</li>
+                                <li><strong>Receipt scanner zoom &amp; pan</strong> &mdash; Added zoom and pan controls to the receipt scanner preview for easier reviewing.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Several bug fixes for improved stability.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.0 -->
             <div class="version-card">
                 <div class="version-header">

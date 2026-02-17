@@ -72,6 +72,16 @@
             </ul>
             <p>We do not store credit card numbers. Payment processing is handled securely by our payment providers.</p>
 
+            <h4>Payment Portal Information</h4>
+            <p>When you use the payment portal to publish invoices for online payment, we store:</p>
+            <ul>
+                <li>Invoice data (customer name, amounts, line items, due dates)</li>
+                <li>Connected payment provider type (Stripe, PayPal, or Square)</li>
+                <li>Authentication tokens for your connected payment accounts</li>
+                <li>Payment status for each published invoice</li>
+            </ul>
+            <p>We do not store your customers' credit card or bank details. All payment processing is handled directly by the connected payment provider.</p>
+
             <h4>Technical Information</h4>
             <p>We automatically collect certain information when you visit our Website:</p>
             <ul>
@@ -210,7 +220,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: November 24, 2025</p>
+            <p class="last-updated">Last updated: February 17, 2026</p>
         </div>
     </div>
 

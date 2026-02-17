@@ -195,7 +195,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var intentData = await response.json();
         if (!intentData.success) {
-          throw new Error(intentData.message || "Failed to create payment");
+          hideProcessing();
+          showError(intentData.message || "Failed to create payment", intentData);
+          return;
         }
 
         // Confirm the payment
@@ -233,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function () {
         showConfirmation(amount, processData.reference_number, "Stripe");
       } catch (error) {
         hideProcessing();
-        showError(error.message);
+        showError(error.message, null);
       }
     });
   }
@@ -260,7 +262,11 @@ document.addEventListener("DOMContentLoaded", function () {
           return r.json();
         })
         .then(function (data) {
-          if (!data.success) throw new Error(data.message);
+          if (!data.success) {
+            var disconnected = getDisconnectedProvider(data);
+            if (disconnected) { handleProviderDisconnected(disconnected); return; }
+            throw new Error(data.message);
+          }
 
           var script = document.createElement("script");
           script.src =
@@ -281,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .catch(function (err) {
           document.getElementById("portal-paypal-container").innerHTML =
-            '<div class="payment-error-box">' + err.message + "</div>";
+            '<div class="payment-error-box">' + escapeHtml(err.message) + "</div>";
         });
     } else {
       fetch(apiBase + "/checkout.php", {
@@ -297,12 +303,16 @@ document.addEventListener("DOMContentLoaded", function () {
           return r.json();
         })
         .then(function (data) {
-          if (!data.success) throw new Error(data.message);
+          if (!data.success) {
+            var disconnected = getDisconnectedProvider(data);
+            if (disconnected) { handleProviderDisconnected(disconnected); return; }
+            throw new Error(data.message);
+          }
           initializePayPalButtons(data.merchant_id);
         })
         .catch(function (err) {
           document.getElementById("portal-paypal-container").innerHTML =
-            '<div class="payment-error-box">' + err.message + "</div>";
+            '<div class="payment-error-box">' + escapeHtml(err.message) + "</div>";
         });
     }
   }
@@ -416,12 +426,16 @@ document.addEventListener("DOMContentLoaded", function () {
         return r.json();
       })
       .then(function (data) {
-        if (!data.success) throw new Error(data.message);
+        if (!data.success) {
+          var disconnected = getDisconnectedProvider(data);
+          if (disconnected) { handleProviderDisconnected(disconnected); return; }
+          throw new Error(data.message);
+        }
         loadSquareSDK(data.app_id, data.location_id);
       })
       .catch(function (err) {
         formContainer.innerHTML =
-          '<div class="payment-error-box">' + err.message + "</div>";
+          '<div class="payment-error-box">' + escapeHtml(err.message) + "</div>";
       });
   }
 
@@ -492,11 +506,13 @@ document.addEventListener("DOMContentLoaded", function () {
                   "Square"
                 );
               } else {
-                throw new Error(result.message || "Payment failed");
+                hideProcessing();
+                showError(result.message || "Payment failed", result);
+                return;
               }
             } catch (error) {
               hideProcessing();
-              showError(error.message);
+              showError(error.message, null);
             }
           });
         })
@@ -549,7 +565,69 @@ document.addEventListener("DOMContentLoaded", function () {
     if (overlay) overlay.remove();
   }
 
-  function showError(message) {
+  /**
+   * Check if an error response indicates a provider is no longer connected.
+   * Returns the provider name if so, or null otherwise.
+   */
+  function getDisconnectedProvider(responseData) {
+    var code = responseData.errorCode || "";
+    var disconnectedCodes = {
+      STRIPE_NOT_CONNECTED: "stripe",
+      PAYPAL_NOT_CONNECTED: "paypal",
+      SQUARE_NOT_CONNECTED: "square",
+      SQUARE_NOT_CONFIGURED: "square",
+    };
+    return disconnectedCodes[code] || null;
+  }
+
+  /**
+   * Handle a payment method that was disconnected after page load.
+   * Hides the method button and shows a helpful message.
+   */
+  function handleProviderDisconnected(provider) {
+    // Hide the button for the disconnected method
+    var btn = document.querySelector('.method-btn[data-method="' + provider + '"]');
+    if (btn) btn.style.display = "none";
+
+    // Check if there are other methods still available
+    var remainingButtons = document.querySelectorAll(".method-btn");
+    var visibleCount = 0;
+    remainingButtons.forEach(function (b) {
+      if (b.style.display !== "none") visibleCount++;
+    });
+
+    var providerName = provider.charAt(0).toUpperCase() + provider.slice(1);
+
+    if (visibleCount > 0) {
+      formContainer.innerHTML =
+        '<div class="payment-error-box">' +
+        providerName +
+        " is no longer available for this invoice. Please select another payment method." +
+        "</div>";
+      formContainer.style.display = "block";
+    } else {
+      // No methods left - hide the entire payment section and show a message
+      var paymentSection = document.getElementById("payment-section");
+      if (paymentSection) {
+        paymentSection.innerHTML =
+          '<div class="invoice-no-methods">' +
+          "<p>Online payments are not currently available for this invoice. " +
+          'Please contact the business for payment instructions, or <a href="" onclick="location.reload();return false;">refresh the page</a> to check again.</p>' +
+          "</div>";
+      }
+    }
+  }
+
+  function showError(message, responseData) {
+    // Check if this is a "provider disconnected" error
+    if (responseData) {
+      var disconnected = getDisconnectedProvider(responseData);
+      if (disconnected) {
+        handleProviderDisconnected(disconnected);
+        return;
+      }
+    }
+
     // Find or create error container
     var container = document.querySelector(".field-error:last-of-type");
     if (!container) {

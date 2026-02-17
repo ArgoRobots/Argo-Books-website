@@ -223,13 +223,44 @@ function disconnect_provider(array $company, string $provider): void
     }
 
     $stmt->bind_param('i', $company['id']);
-    $stmt->execute();
+    if (!$stmt->execute()) {
+        $error = $stmt->error;
+        $stmt->close();
+        $db->close();
+        send_error_response(500, 'Failed to disconnect ' . $provider . ': ' . $error, 'DISCONNECT_FAILED');
+    }
     $stmt->close();
+
+    // Re-fetch company to return the updated connected providers state
+    $stmtRefresh = $db->prepare(
+        'SELECT stripe_account_id, stripe_email, paypal_merchant_id, paypal_email,
+                square_merchant_id, square_email
+         FROM portal_companies WHERE id = ? LIMIT 1'
+    );
+    $stmtRefresh->bind_param('i', $company['id']);
+    $stmtRefresh->execute();
+    $updated = $stmtRefresh->get_result()->fetch_assoc();
+    $stmtRefresh->close();
     $db->close();
+
+    $connectedProviders = [
+        'stripeConnected' => !empty($updated['stripe_account_id']),
+        'stripeEmail' => $updated['stripe_email'] ?? null,
+        'paypalConnected' => !empty($updated['paypal_merchant_id']),
+        'paypalEmail' => $updated['paypal_email'] ?? null,
+        'squareConnected' => !empty($updated['square_merchant_id']),
+        'squareEmail' => $updated['square_email'] ?? null,
+    ];
 
     send_json_response(200, [
         'success' => true,
         'message' => ucfirst($provider) . ' has been disconnected.',
+        'connectedProviders' => $connectedProviders,
+        'payment_methods' => array_values(array_filter([
+            !empty($updated['stripe_account_id']) ? 'stripe' : null,
+            !empty($updated['paypal_merchant_id']) ? 'paypal' : null,
+            !empty($updated['square_merchant_id']) ? 'square' : null,
+        ])),
         'timestamp' => date('c')
     ]);
 }

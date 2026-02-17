@@ -509,6 +509,10 @@ include '../admin_header.php';
                         <h2>Feature Usage Over Time</h2>
                         <canvas id="featureTimelineChart"></canvas>
                     </div>
+                    <div class="chart-container">
+                        <h2>Context Usage</h2>
+                        <canvas id="contextUsageChart"></canvas>
+                    </div>
                 </div>
             </div>
 
@@ -521,6 +525,13 @@ include '../admin_header.php';
                         <h2>Errors by Category</h2>
                         <canvas id="errorCategoryChart"></canvas>
                     </div>
+                    <div class="chart-container">
+                        <h2>Error Frequency Over Time</h2>
+                        <canvas id="errorTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
                     <div class="chart-container">
                         <h2>Errors by Category Over Time</h2>
                         <canvas id="errorCategoryTimelineChart"></canvas>

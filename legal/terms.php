@@ -100,6 +100,15 @@
             </ul>
             <p>We reserve the right to modify subscription pricing with 30 days notice to existing subscribers.</p>
 
+            <h2>Payment Portal</h2>
+            <p>Argo Books allows you to connect your own Stripe, PayPal, or Square merchant account so your customers can view and pay invoices online through our payment portal.</p>
+            <ul>
+                <li><strong>Facilitation only</strong>: Argo Books facilitates the connection between you and your payment provider. We do not process, hold, or have access to funds at any point.</li>
+                <li><strong>Your responsibility</strong>: You are responsible for maintaining your merchant account and complying with the terms of your payment provider.</li>
+                <li><strong>Invoice data</strong>: When you publish an invoice to the portal, the invoice data (customer name, amounts, line items) is transmitted to and hosted on our servers so your customers can access it.</li>
+                <li><strong>No guarantee</strong>: We do not guarantee the availability of the payment portal or any third-party payment service.</li>
+            </ul>
+
             <h2>Google API Services</h2>
             <p>The Argo Books desktop application includes a feature to export data to Google Sheets. When you use this feature:</p>
             <ul>
@@ -162,7 +171,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: November 24, 2025</p>
+            <p class="last-updated">Last updated: February 17, 2026</p>
         </div>
     </div>
 

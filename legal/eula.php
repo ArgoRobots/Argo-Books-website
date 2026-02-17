@@ -100,7 +100,7 @@
 
             <h2>5. Third-Party Services</h2>
             <p>The Software may use third-party services for certain functionality, including but not limited to Google
-                Sheets, OpenAI, Microsoft Translator, and Open Exchange Rates. Your use of these services through the
+                Sheets, OpenAI, Microsoft Translator, Open Exchange Rates, Stripe, PayPal, and Square. Your use of these services through the
                 Software is subject to the respective terms and conditions of those services.</p>
 
             <h2>6. Warranty Disclaimer</h2>
@@ -147,7 +147,7 @@
                 <li>Email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: July 22, 2025</p>
+            <p class="last-updated">Last updated: February 17, 2026</p>
         </div>
     </div>
 

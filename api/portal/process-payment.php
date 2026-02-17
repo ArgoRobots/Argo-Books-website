@@ -93,6 +93,9 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
 
     // Verify the payment intent status with Stripe
     $stripeAccountId = $invoice['stripe_account_id'] ?? '';
+    if (empty($stripeAccountId)) {
+        send_error_response(400, 'Stripe is not configured for this business.', 'STRIPE_NOT_CONNECTED');
+    }
     $stripe_secret_key = $is_production
         ? $_ENV['STRIPE_LIVE_SECRET_KEY']
         : $_ENV['STRIPE_SANDBOX_SECRET_KEY'];
@@ -151,6 +154,11 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
 function process_paypal_payment(array $invoice, array $data, float $amount, string $referenceNumber): void
 {
     global $is_production;
+
+    $paypalMerchantId = $invoice['paypal_merchant_id'] ?? '';
+    if (empty($paypalMerchantId)) {
+        send_error_response(400, 'PayPal is not configured for this business.', 'PAYPAL_NOT_CONNECTED');
+    }
 
     $orderId = $data['order_id'] ?? '';
     if (empty($orderId)) {

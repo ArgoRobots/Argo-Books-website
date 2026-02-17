@@ -160,6 +160,9 @@ function handle_publish_invoice(): void
         }
     }
 
+    // Return currently connected payment methods so the desktop app stays in sync
+    $paymentMethods = get_available_payment_methods($company);
+
     send_json_response(200, [
         'success' => true,
         'invoiceToken' => $invoiceToken,
@@ -167,6 +170,7 @@ function handle_publish_invoice(): void
         'invoiceUrl' => $invoiceUrl,
         'portalUrl' => $portalUrl,
         'emailSent' => $emailSent,
+        'payment_methods' => $paymentMethods,
         'message' => $existing ? 'Invoice updated' : 'Invoice published',
         'timestamp' => date('c')
     ]);

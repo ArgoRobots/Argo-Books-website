@@ -1389,6 +1389,61 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
     return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'purple');
 }
 
+/**
+ * Send portal payment receipt email to a customer
+ *
+ * @param string $email Customer email address
+ * @param string $companyName Business name that received the payment
+ * @param string $invoiceId Invoice number
+ * @param float $amount Payment amount
+ * @param string $currency Currency code
+ * @param string $referenceNumber Payment reference number
+ * @param string $paymentMethod Payment method used
+ * @return bool Success status
+ */
+function send_portal_payment_receipt($email, $companyName, $invoiceId, $amount, $currency, $referenceNumber, $paymentMethod)
+{
+    $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+    $formattedAmount = number_format($amount, 2);
+    $paymentDate = date('F j, Y');
+    $paymentMethodText = ucfirst($paymentMethod);
+
+    $body = <<<HTML
+        <h1>Payment Confirmation</h1>
+        <p>Your payment to <strong>{$companyName}</strong> has been received.</p>
+
+        <div class="payment-box">
+            <h3>Payment Details</h3>
+            <table class="details-table">
+                <tr>
+                    <td><strong>Date</strong></td>
+                    <td>{$paymentDate}</td>
+                </tr>
+                <tr>
+                    <td><strong>Invoice</strong></td>
+                    <td>{$invoiceId}</td>
+                </tr>
+                <tr>
+                    <td><strong>Amount</strong></td>
+                    <td>{$currencySymbol}{$formattedAmount} {$currency}</td>
+                </tr>
+                <tr>
+                    <td><strong>Payment Method</strong></td>
+                    <td>{$paymentMethodText}</td>
+                </tr>
+                <tr>
+                    <td><strong>Reference</strong></td>
+                    <td class="monospace">{$referenceNumber}</td>
+                </tr>
+            </table>
+        </div>
+
+        <p>Please keep this email for your records. If you have any questions about this payment, please contact {$companyName} directly.</p>
+        HTML;
+
+    return send_styled_email($email, "Payment Confirmation - Invoice {$invoiceId}", $body);
+}
+
 function send_free_credit_email($email, $creditAmount, $note = '', $subscriptionId = '')
 {
     $css = file_get_contents(__DIR__ . '/email.css');

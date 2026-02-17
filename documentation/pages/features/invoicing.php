@@ -27,29 +27,12 @@ include '../../docs-header.php';
                 <li>Preview and send</li>
             </ol>
 
-            <h2>Invoice Features</h2>
-            <ul>
-                <li><strong>Tax Calculations:</strong> Automatic tax calculations based on your settings</li>
-                <li><strong>Multiple Currencies:</strong> Create invoices in any supported currency</li>
-                <li><strong>Notes & Terms:</strong> Add custom notes and payment terms</li>
-                <!-- <li><strong>Recurring Invoices:</strong> Set up invoices that repeat on a schedule</li> -->
-            </ul>
-
             <h2>Sending Invoices</h2>
-            <p>After creating an invoice, you can:</p>
             <ul>
                 <li><strong>Preview:</strong> Review the invoice before sending</li>
                 <li><strong>Create & Send:</strong> Send the invoice to your customer</li>
                 <li><strong>Save as Draft:</strong> Save and send later</li>
             </ul>
-
-            <!-- <h2>Payment Processing</h2>
-            <p>Accept payments online with integrated payment providers:</p>
-            <ul>
-                <li><strong>Stripe:</strong> Accept credit cards, debit cards, and bank transfers</li>
-                <li><strong>PayPal:</strong> Let customers pay with their PayPal account</li>
-                <li><strong>Square:</strong> Process payments through Square</li>
-            </ul> -->
 
             <h2>Payment Tracking</h2>
             <p>Keep track of all your invoices and their payment status:</p>

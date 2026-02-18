@@ -1473,7 +1473,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="container">
                 <div class="cta-content animate-on-scroll">
                     <h2>Ready to transform your business?</h2>
-                    <p>Join thousands of businesses using Argo Books to save time, reduce errors, and grow smarter.</p>
+                    <p>Start using Argo Books to save time, reduce errors, and grow smarter.</p>
                     <div class="cta-buttons">
                         <a href="downloads" class="btn btn-white btn-lg">
                             <span>Get Started Free</span>

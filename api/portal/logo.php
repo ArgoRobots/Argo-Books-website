@@ -28,6 +28,11 @@ if (!$company) {
 $companyId = $company['id'];
 $logosDir = __DIR__ . '/../../resources/uploads/logos';
 
+// Ensure the logos directory exists
+if (!is_dir($logosDir)) {
+    mkdir($logosDir, 0755, true);
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     // --- Delete the current logo ---
     delete_logo_file($company['company_logo_url'], $logosDir);

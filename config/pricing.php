@@ -7,10 +7,8 @@
  * identically without any env vars set.
  *
  * Environment variables:
- *   STANDARD_PRICE              - Standard one-time price (default: 25.00)
- *   PREMIUM_MONTHLY_PRICE       - Premium monthly subscription (default: 5.00)
- *   PREMIUM_YEARLY_PRICE        - Premium yearly subscription (default: 50.00)
- *   PREMIUM_STANDARD_DISCOUNT   - Discount for Standard users upgrading to Premium (default: 25.00)
+ *   PREMIUM_MONTHLY_PRICE       - Premium monthly subscription (default: 10.00)
+ *   PREMIUM_YEARLY_PRICE        - Premium yearly subscription (default: 100.00)
  *   PROCESSING_FEE_PERCENT      - Payment processing fee percentage (default: 2.90)
  *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
  */
@@ -20,10 +18,8 @@
  * Uses static caching so env vars are only parsed once per request.
  *
  * @return array Pricing configuration with keys:
- *   - standard_price (float)
  *   - premium_monthly_price (float)
  *   - premium_yearly_price (float)
- *   - premium_discount (float)
  *   - processing_fee_percent (float)
  *   - processing_fee_fixed (float)
  *   - currency (string)
@@ -36,10 +32,8 @@ function get_pricing_config() {
     }
 
     $config = [
-        'standard_price'        => _pricing_parse_env('STANDARD_PRICE', 25.00),
-        'premium_monthly_price' => _pricing_parse_env('PREMIUM_MONTHLY_PRICE', 5.00),
-        'premium_yearly_price'  => _pricing_parse_env('PREMIUM_YEARLY_PRICE', 50.00),
-        'premium_discount'      => _pricing_parse_env('PREMIUM_STANDARD_DISCOUNT', 25.00),
+        'premium_monthly_price' => _pricing_parse_env('PREMIUM_MONTHLY_PRICE', 10.00),
+        'premium_yearly_price'  => _pricing_parse_env('PREMIUM_YEARLY_PRICE', 100.00),
         'processing_fee_percent' => _pricing_parse_env('PROCESSING_FEE_PERCENT', 2.90),
         'processing_fee_fixed'   => _pricing_parse_env('PROCESSING_FEE_FIXED', 0.30),
         'currency'              => 'CAD',

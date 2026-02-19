@@ -11,13 +11,18 @@
  *
  * This will create:
  *   1. A Product (Argo Premium Subscription)
- *   2. A Monthly Plan ($5 CAD/month)
- *   3. A Yearly Plan ($50 CAD/year)
+ *   2. A Monthly Plan (configured in pricing.php)
+ *   3. A Yearly Plan (configured in pricing.php)
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../config/pricing.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
+
+$pricing = get_pricing_config();
+$monthlyPrice = $pricing['premium_monthly_price'];
+$yearlyPrice = $pricing['premium_yearly_price'];
 
 // Security check
 $isCli = php_sapi_name() === 'cli';
@@ -73,8 +78,8 @@ $productId = $product['id'];
 echo "Product created: $productId\n\n";
 
 // Step 2: Create Monthly Plan
-echo "Step 2: Creating Monthly Plan ($5 CAD/month)...\n";
-$monthlyPlan = createPlan($baseUrl, $accessToken, $productId, 'monthly', 5.00);
+echo "Step 2: Creating Monthly Plan (\${$monthlyPrice} CAD/month)...\n";
+$monthlyPlan = createPlan($baseUrl, $accessToken, $productId, 'monthly', $monthlyPrice);
 if (!$monthlyPlan) {
     die("ERROR: Failed to create monthly plan\n");
 }
@@ -82,8 +87,8 @@ $monthlyPlanId = $monthlyPlan['id'];
 echo "Monthly Plan created: $monthlyPlanId\n\n";
 
 // Step 3: Create Yearly Plan
-echo "Step 3: Creating Yearly Plan ($50 CAD/year)...\n";
-$yearlyPlan = createPlan($baseUrl, $accessToken, $productId, 'yearly', 50.00);
+echo "Step 3: Creating Yearly Plan (\${$yearlyPrice} CAD/year)...\n";
+$yearlyPlan = createPlan($baseUrl, $accessToken, $productId, 'yearly', $yearlyPrice);
 if (!$yearlyPlan) {
     die("ERROR: Failed to create yearly plan\n");
 }
@@ -152,7 +157,7 @@ function getAccessToken($baseUrl, $clientId, $clientSecret) {
 function createProduct($baseUrl, $accessToken) {
     $productData = [
         'name' => 'Argo Premium Subscription',
-        'description' => 'Access to AI-powered features including receipt scanning, and predictive analysis.',
+        'description' => 'Access to AI-powered features including receipt scanning, and predictive analytics.',
         'type' => 'SERVICE',
         'category' => 'SOFTWARE',
         'home_url' => 'https://argorobots.com/upgrade/premium/'

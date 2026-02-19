@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../resources/icons.php';
 // Get current page and directory for navigation highlighting
 $current_page = basename($_SERVER['PHP_SELF']);
 $current_dir = basename(dirname($_SERVER['PHP_SELF']));
@@ -40,9 +41,7 @@ $base_path = $in_subdir ? '../' : '';
                 <!-- Left: Home button and Logo -->
                 <div class="header-left">
                     <a href="<?php echo $base_path; ?>../" class="btn-small btn-home" title="Go to Main Site">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                        </svg>
+                        <?= svg_icon('home', 16) ?>
                         <span class="home-text">Home</span>
                     </a>
 
@@ -94,9 +93,7 @@ $base_path = $in_subdir ? '../' : '';
                 <ul>
                     <li>
                         <a href="<?php echo $base_path; ?>../" class="home-link">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
-                            </svg>
+                            <?= svg_icon('home', 16) ?>
                             Home
                         </a>
                     </li>

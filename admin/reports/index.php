@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../../db_connect.php';
+require_once __DIR__ . '/../../resources/icons.php';
 
 // Check if user is logged in as admin
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -175,9 +176,7 @@ include '../admin_header.php';
 <div class="reports-table">
     <?php if (empty($reports)): ?>
         <div class="empty-state">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
+            <?= svg_icon('circle-check-sm', 64) ?>
             <p>No reports found</p>
         </div>
     <?php else: ?>

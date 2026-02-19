@@ -4,6 +4,8 @@ require_once '../db_connect.php';
 require_once 'community_functions.php';
 require_once 'users/user_functions.php';
 
+require_once __DIR__ . '/../resources/icons.php';
+
 // Check for remember me cookie and auto-login user if valid
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     check_remember_me();
@@ -119,10 +121,7 @@ array_unshift($history, $current_post);
         </div>
         <div class="hero-content">
             <div class="hero-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
+                <?= svg_icon('edit', 16) ?>
                 <span>Edit History</span>
             </div>
         </div>
@@ -131,9 +130,7 @@ array_unshift($history, $current_post);
     <div class="community-wrapper">
         <div class="page-header">
             <a href="view_post.php?id=<?php echo $post_id; ?>" class="btn back-button">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
+                <?= svg_icon('arrow-back', 16) ?>
                 Back to Post
             </a>
         </div>

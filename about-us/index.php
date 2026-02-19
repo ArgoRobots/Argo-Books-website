@@ -1,3 +1,5 @@
+<?php require_once __DIR__ . '/../resources/icons.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -63,10 +65,7 @@
         </div>
         <div class="container">
             <div class="hero-badge animate-fade-in">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-                    <circle cx="12" cy="10" r="3"/>
-                </svg>
+                <?= svg_icon('map-pin', 16) ?>
                 <span>Saskatoon, SK</span>
             </div>
             <h1 class="animate-fade-in">About Argo Books</h1>
@@ -87,25 +86,19 @@
                     <div class="mission-points">
                         <div class="mission-point">
                             <div class="point-icon">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
+                                <?= svg_icon('check-rounded') ?>
                             </div>
                             <p>Better than spreadsheets, simpler than enterprise software</p>
                         </div>
                         <div class="mission-point">
                             <div class="point-icon">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
+                                <?= svg_icon('check-rounded') ?>
                             </div>
                             <p>Easy to use but packed with powerful features</p>
                         </div>
                         <div class="mission-point">
                             <div class="point-icon">
-                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
+                                <?= svg_icon('check-rounded') ?>
                             </div>
                             <p>Flexible pricing — Use it for free, or unlock more with a one-time purchase</p>
                         </div>
@@ -131,45 +124,28 @@
             <div class="features-grid">
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <rect x="3" y="4" width="18" height="16" rx="2"/>
-                            <path d="M7 8h10M7 12h6"/>
-                            <circle cx="17" cy="14" r="3"/>
-                            <path d="M17 17v-1.5"/>
-                        </svg>
+                        <?= svg_icon('receipt-scan-detail', null, '', 1.5) ?>
                     </div>
                     <h4>AI Receipt Scanning</h4>
                     <p>Snap a photo and let AI extract all the details automatically</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon purple">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 9l-5 5-4-4-3 3"/>
-                        </svg>
+                        <?= svg_icon('analytics', null, '', 1.5) ?>
                     </div>
                     <h4>Predictive Analytics</h4>
                     <p>Forecast sales trends and make data-driven decisions</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon green">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                            <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                            <line x1="12" y1="22.08" x2="12" y2="12"/>
-                        </svg>
+                        <?= svg_icon('package', null, '', 1.5) ?>
                     </div>
                     <h4>Inventory Management</h4>
                     <p>Track stock levels and never run out of best-sellers</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon amber">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14,2 14,8 20,8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                        </svg>
+                        <?= svg_icon('document', null, '', 1.5) ?>
                     </div>
                     <h4>Invoicing & Payments</h4>
                     <p>Create professional invoices and get paid faster</p>
@@ -185,10 +161,7 @@
                 <div class="story-image animate-on-scroll">
                     <img src="../resources/images/saskatoon.jpg" alt="Saskatoon Skyline">
                     <div class="image-badge">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
-                        </svg>
+                        <?= svg_icon('map-pin', 16) ?>
                         Saskatoon, SK
                     </div>
                 </div>
@@ -229,10 +202,7 @@
             <div class="values-grid">
                 <div class="value-card animate-on-scroll">
                     <div class="value-icon">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+                        <?= svg_icon('innovation') ?>
                     </div>
                     <h3>Innovation</h3>
                     <p>We constantly evolve our software to meet the changing needs of modern businesses.</p>
@@ -240,11 +210,7 @@
 
                 <div class="value-card animate-on-scroll">
                     <div class="value-icon purple">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
+                        <?= svg_icon('user-focused') ?>
                     </div>
                     <h3>User-Focused</h3>
                     <p>Every feature we build starts with understanding our users' needs and challenges.</p>
@@ -252,11 +218,7 @@
 
                 <div class="value-card animate-on-scroll">
                     <div class="value-icon green">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                            </path>
-                        </svg>
+                        <?= svg_icon('reliability') ?>
                     </div>
                     <h3>Reliability</h3>
                     <p>We build software you can trust with your business data and daily operations.</p>
@@ -276,9 +238,7 @@
                     while maintaining the simplicity and affordability that makes Argo special.</p>
                 <a href="../whats-new/" class="btn btn-secondary">
                     <span>View Changelog</span>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+                    <?= svg_icon('arrow-right', 18) ?>
                 </a>
             </div>
         </div>
@@ -294,9 +254,7 @@
                     <p>Have questions or suggestions? We'd love to hear from you and make Argo Books even better.</p>
                     <a href="../contact-us/" class="btn btn-primary">
                         <span>Contact Us</span>
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <?= svg_icon('arrow-right', 18) ?>
                     </a>
                 </div>
             </div>

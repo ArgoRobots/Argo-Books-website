@@ -11,6 +11,8 @@
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/portal-helper.php';
 
+require_once __DIR__ . '/../resources/icons.php';
+
 $token = $_GET['token'] ?? '';
 
 // Validate token format
@@ -159,7 +161,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                 </div>
                 <?php if (!empty($invoice['customer_token'])): ?>
                     <a href="/portal/<?php echo htmlspecialchars($invoice['customer_token']); ?>" class="portal-all-invoices-link">
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        <?= svg_icon('document', 16) ?>
                         View all invoices
                     </a>
                 <?php endif; ?>
@@ -382,10 +384,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                 </div>
             <?php elseif ($isPaid): ?>
                 <div class="invoice-paid-banner">
-                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
-                    </svg>
+                    <?= svg_icon('circle-check', 48) ?>
                     <h3>This invoice has been paid</h3>
                     <p>Thank you for your payment.</p>
                 </div>
@@ -397,10 +396,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
 
             <!-- Confirmation Section (shown after payment) -->
             <div id="payment-confirmation" class="payment-confirmation" style="display: none;">
-                <svg class="confirmation-icon" viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
+                <?= svg_icon('circle-check', 64, 'confirmation-icon') ?>
                 <h3>Payment Successful</h3>
                 <div class="confirmation-details">
                     <div class="detail-row">

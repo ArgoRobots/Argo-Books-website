@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Inventory Management';
 $pageDescription = 'Learn how to track stock levels, set reorder points, and manage inventory with Argo Books inventory management features.';
 $currentPage = 'inventory';
@@ -69,16 +70,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="predictive-analytics.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Predictive Analytics
                 </a>
                 <a href="rental.php" class="nav-button next">
                     Next: Rental Management
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

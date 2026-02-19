@@ -1,3 +1,5 @@
+<?php require_once __DIR__ . '/../../../resources/icons.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,9 +36,7 @@
 
     <div class="thank-you-container">
         <div class="success-icon">
-            <svg viewBox="0 0 24 24">
-                <path d="M5 13l4 4L19 7"></path>
-            </svg>
+            <?= svg_icon('check-pricing') ?>
         </div>
 
         <h1>You're All Set!</h1>
@@ -63,26 +63,15 @@
 
         <div class="features-list">
             <div class="feature-item">
-                <svg viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                </svg>
+                <?= svg_icon('document') ?>
                 <span>Invoices & Payments</span>
             </div>
             <div class="feature-item">
-                <svg viewBox="0 0 24 24">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                </svg>
+                <?= svg_icon('calendar') ?>
                 <span>AI Receipt Scanning <span>(500/month)</span></span>
             </div>
             <div class="feature-item">
-                <svg viewBox="0 0 24 24">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                </svg>
+                <?= svg_icon('package') ?>
                 <span>predictive analytics</span>
             </div>
         </div>

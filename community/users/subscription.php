@@ -268,7 +268,7 @@ if ($premium_subscription) {
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
                             </svg>
-                            <span>Predictive Analysis</span>
+                            <span>predictive analytics</span>
                         </div>
                     </div>
                 </div>
@@ -281,7 +281,7 @@ if ($premium_subscription) {
                         </svg>
                     </div>
                     <h3>No Active Subscription</h3>
-                    <p>Get access to invoices & payments and AI-powered features like receipt scanning, and predictive analysis.</p>
+                    <p>Get access to invoices & payments and AI-powered features like receipt scanning, and predictive analytics.</p>
                     <div class="pricing-preview">
                         <span class="price">$<?php echo number_format($monthlyPrice, 0); ?></span>
                         <span class="period">CAD/month</span>

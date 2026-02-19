@@ -591,8 +591,13 @@ namespace {
     function require_login($redirect_url = '')
     {
         if (!is_user_logged_in()) {
-            $current_url = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
-            $redirect = !empty($redirect_url) ? $redirect_url : $current_url;
+            // Use REQUEST_URI (already absolute) as default, or the explicit redirect
+            $redirect = !empty($redirect_url) ? $redirect_url : ($_SERVER['REQUEST_URI'] ?? '');
+
+            // Ensure the redirect path is absolute so it works from login.php's location
+            if (!empty($redirect) && $redirect[0] !== '/') {
+                $redirect = '/' . $redirect;
+            }
 
             // Store the intended destination for after login
             $_SESSION['redirect_after_login'] = $redirect;

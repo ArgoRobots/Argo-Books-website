@@ -4,15 +4,14 @@ require_once 'db_connect.php';
 /**
  * Generate a random license key
  *
- * @param string $type The type of license: 'standard' or 'premium'
- * @return string A 20-character alphanumeric license key in format XXXX-XXXX-XXXX-XXXX-XXXX
+ * @param string $type The type of license (always 'premium')
+ * @return string A 20-character alphanumeric license key in format PREM-XXXX-XXXX-XXXX-XXXX
  */
-function generate_license_key($type = 'standard')
+function generate_license_key($type = 'premium')
 {
     $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-    // First 4 characters indicate the license type
-    $prefix = ($type === 'premium') ? 'PREM' : 'STND';
+    $prefix = 'PREM';
 
     // Generate remaining 16 random characters
     $key = $prefix;
@@ -23,118 +22,8 @@ function generate_license_key($type = 'standard')
         $key .= $chars[random_int(0, strlen($chars) - 1)];
     }
 
-    // Format: XXXX-XXXX-XXXX-XXXX-XXXX
+    // Format: PREM-XXXX-XXXX-XXXX-XXXX
     return $key;
-}
-
-/**
- * Check if a license key exists in the database
- *
- * @param string $key The license key to check
- * @return bool True if the key exists, false otherwise
- */
-function license_key_exists($key)
-{
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT COUNT(*) as count FROM license_keys WHERE license_key = ?');
-    $stmt->bind_param('s', $key);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $stmt->close();
-
-    return $row['count'] > 0;
-}
-
-/**
- * Store a new license key in the database
- *
- * @param string $email The email associated with the license
- * @param int|null $user_id Optional user ID to link the license to an account
- * @return string The generated license key
- */
-function create_license_key($email, $user_id = null)
-{
-    $db = get_db_connection();
-
-    // Generate a unique key
-    do {
-        $key = generate_license_key();
-    } while (license_key_exists($key));
-
-    // Store the key in the database
-    if ($user_id !== null) {
-        $stmt = $db->prepare('INSERT INTO license_keys (license_key, email, user_id) VALUES (?, ?, ?)');
-        $stmt->bind_param('ssi', $key, $email, $user_id);
-    } else {
-        $stmt = $db->prepare('INSERT INTO license_keys (license_key, email) VALUES (?, ?)');
-        $stmt->bind_param('ss', $key, $email);
-    }
-    $stmt->execute();
-    $stmt->close();
-
-    return $key;
-}
-
-/**
- * Validate a standard license key and return structured response
- * @param string $key The license key to validate
- * @param string $ip_address The IP address for activation
- * @return array Response array with validation result
- */
-function validate_standard_license_key($key, $ip_address) {
-    $db = get_db_connection();
-
-    try {
-        $stmt = $db->prepare('SELECT * FROM license_keys WHERE license_key = ?');
-        $stmt->bind_param('s', $key);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $license = $result->fetch_assoc();
-        $stmt->close();
-
-        if (!$license) {
-            return [
-                'success' => false,
-                'message' => 'Invalid license key.'
-            ];
-        }
-
-        // Check if already activated
-        if ($license['activated']) {
-            return [
-                'success' => true,
-                'type' => 'standard',
-                'status' => 'activated',
-                'message' => 'License key is valid and already activated.',
-                'key' => $license['license_key'],
-                'activation_date' => $license['activation_date']
-            ];
-        }
-
-        // Activate the license
-        if (activate_license_key($key, $ip_address)) {
-            return [
-                'success' => true,
-                'type' => 'standard',
-                'status' => 'activated',
-                'message' => 'License key activated successfully.',
-                'key' => $license['license_key'],
-                'activation_date' => date('Y-m-d H:i:s')
-            ];
-        } else {
-            return [
-                'success' => false,
-                'message' => 'Failed to activate license key.'
-            ];
-        }
-    } catch (Exception $e) {
-        error_log("Standard license validation error: " . $e->getMessage());
-        return [
-            'success' => false,
-            'message' => 'Error validating license key. Please try again.'
-        ];
-    }
 }
 
 /**
@@ -211,44 +100,6 @@ function validate_premium_subscription_key($subscription_id) {
             'message' => 'Error validating subscription. Please try again.'
         ];
     }
-}
-
-/**
- * Mark a license key as activated
- *
- * @param string $key The license key to activate
- * @param string $ip_address The IP address of the activator
- * @return bool True if successful, false otherwise
- */
-function activate_license_key($key, $ip_address)
-{
-    $db = get_db_connection();
-    $stmt = $db->prepare('UPDATE license_keys SET activated = 1, activation_date = NOW(), ip_address = ? WHERE license_key = ?');
-    $stmt->bind_param('ss', $ip_address, $key);
-    $stmt->execute();
-    $affected_rows = $stmt->affected_rows;
-    $stmt->close();
-
-    return $affected_rows > 0;
-}
-
-/**
- * Get license key details
- *
- * @param string $key The license key
- * @return array|false The license details or false if not found
- */
-function get_license_details($key)
-{
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT * FROM license_keys WHERE license_key = ?');
-    $stmt->bind_param('s', $key);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-    $stmt->close();
-
-    return $row;
 }
 
 /**

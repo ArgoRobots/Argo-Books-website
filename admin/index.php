@@ -12,10 +12,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 $db = get_db_connection();
 
 // Get stats
-// Total license keys
-$result = $db->query('SELECT COUNT(*) as count FROM license_keys');
-$total_licenses = $result->fetch_assoc()['count'] ?? 0;
-
 // Total community posts
 $result = $db->query('SELECT COUNT(*) as count FROM community_posts');
 $total_posts = $result->fetch_assoc()['count'] ?? 0;
@@ -24,9 +20,18 @@ $total_posts = $result->fetch_assoc()['count'] ?? 0;
 $result = $db->query('SELECT COUNT(*) as count FROM community_users');
 $total_users = $result->fetch_assoc()['count'] ?? 0;
 
-// Licenses created in the last 30 days
-$result = $db->query('SELECT COUNT(*) as count FROM license_keys WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
-$monthly_licenses = $result->fetch_assoc()['count'] ?? 0;
+// Premium subscriptions
+$total_subscriptions = 0;
+$monthly_subscriptions = 0;
+try {
+    global $pdo;
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
+    $total_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $monthly_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+} catch (Exception $e) {
+    error_log("Error fetching subscription stats: " . $e->getMessage());
+}
 
 // Users registered in the last 30 days
 $result = $db->query('SELECT COUNT(*) as count FROM community_users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
@@ -76,17 +81,6 @@ if (is_dir($dataDir)) {
 
 // Get recent activity items for timeline
 $recent_items = [];
-
-// Recent license keys (last 5)
-$result = $db->query('SELECT license_key, email, created_at, activated FROM license_keys ORDER BY created_at DESC LIMIT 5');
-while ($row = $result->fetch_assoc()) {
-    $recent_items[] = [
-        'type' => 'license',
-        'time' => $row['created_at'],
-        'description' => 'New license key generated for ' . htmlspecialchars($row['email']),
-        'status' => $row['activated'] ? 'active' : 'pending'
-    ];
-}
 
 // Recent user registrations (last 5)
 $result = $db->query('SELECT username, created_at, email_verified FROM community_users ORDER BY created_at DESC LIMIT 5');
@@ -204,8 +198,8 @@ include 'admin_header.php';
     <!-- Stats Row -->
     <div class="stats-row">
         <div class="stat-card">
-            <div class="stat-label">Total Licenses</div>
-            <div class="stat-value"><?php echo number_format($total_licenses); ?></div>
+            <div class="stat-label">Active Subscriptions</div>
+            <div class="stat-value"><?php echo number_format($total_subscriptions); ?></div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Total Users</div>
@@ -229,11 +223,11 @@ include 'admin_header.php';
                     <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
                 </svg>
             </div>
-            <div class="nav-card-title">License Keys</div>
-            <div class="nav-card-description">Manage and generate license keys</div>
+            <div class="nav-card-title">Subscriptions</div>
+            <div class="nav-card-description">Manage Premium subscriptions and keys</div>
             <div class="nav-card-stat">
                 <span class="nav-card-stat-label">This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_licenses); ?></span>
+                <span class="nav-card-stat-value"><?php echo number_format($monthly_subscriptions); ?></span>
             </div>
         </a>
 

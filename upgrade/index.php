@@ -2,10 +2,8 @@
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../config/pricing.php';
 $pricing = get_pricing_config();
-$standardPrice = $pricing['standard_price'];
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
-$discount = $pricing['premium_discount'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 ?>
 <!DOCTYPE html>
@@ -19,14 +17,14 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Upgrade Argo Books. Get Standard for $<?php echo number_format($standardPrice, 0); ?> CAD lifetime access or subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
+        content="Upgrade Argo Books. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
     <meta name="keywords"
-        content="upgrade argo books, buy full version, lifetime access software, unlimited products, business software pricing, finance tracker, sales tracker standard, premium subscription">
+        content="upgrade argo books, buy full version, unlimited products, business software pricing, finance tracker, premium subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Upgrade - Argo Books">
     <meta property="og:description"
-        content="Upgrade Argo Books. Get Standard for $<?php echo number_format($standardPrice, 0); ?> CAD lifetime access or subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month.">
+        content="Upgrade Argo Books. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
     <meta property="og:url" content="https://argorobots.com/upgrade/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -36,7 +34,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Upgrade - Argo Books">
     <meta name="twitter:description"
-        content="Upgrade Argo Books. Get Standard for $<?php echo number_format($standardPrice, 0); ?> CAD lifetime access or subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month.">
+        content="Upgrade Argo Books. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/upgrade/">
@@ -73,54 +71,13 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <span>Pricing</span>
             </div>
             <h1>Upgrade Your Experience</h1>
-            <p class="hero-subtitle">Choose the plan that's right for your business</p>
+            <p class="hero-subtitle">Unlock the full power of Argo Books</p>
         </div>
     </section>
 
     <section class="pricing-section">
         <div class="container">
             <div class="pricing-cards-wrapper">
-                <!-- Standard Plan Card -->
-                <a href="standard/" class="pricing-card-link">
-                    <div class="upgrade-pricing-card premium-card">
-                        <div class="card-badge">One-Time Payment</div>
-                        <h2>Standard</h2>
-                        <div class="card-price">
-                            <span class="currency">$</span>
-                            <span class="amount"><?php echo number_format($standardPrice, 0); ?></span>
-                            <span class="period">CAD</span>
-                        </div>
-                        <p class="price-note">Lifetime access</p>
-
-                        <ul class="card-features">
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Unlimited products</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Biometric login security</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Lifetime updates</span>
-                            </li>
-                            <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Priority support</span>
-                            </li>
-                        </ul>
-
-                        <div class="card-highlight">
-                            Pay once, use forever
-                        </div>
-
-                        <div class="card-cta">
-                            <span class="cta-button premium-cta">Get Standard</span>
-                        </div>
-                    </div>
-                </a>
-
                 <!-- Premium Subscription Card -->
                 <a href="premium/" class="pricing-card-link">
                     <div class="upgrade-pricing-card ai-card">
@@ -134,9 +91,13 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <p class="price-note">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
 
                         <ul class="card-features">
-                              <li>
+                            <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Everything in Standard</span>
+                                <span>Unlimited products</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <span>Biometric login security</span>
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
@@ -148,13 +109,13 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
-                                <span>Predictive sales analysis</span>
+                                <span>predictive analytics</span>
+                            </li>
+                            <li>
+                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <span>Priority support</span>
                             </li>
                         </ul>
-
-                        <div class="card-highlight ai-highlight">
-                            Standard users get a $<?php echo number_format($discount, 0); ?> discount!
-                        </div>
 
                         <div class="card-cta">
                             <span class="cta-button ai-cta">Get Premium</span>
@@ -162,8 +123,6 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                 </a>
             </div>
-
-            <p class="pricing-note">30-day money back guarantee on all purchases</p>
         </div>
     </section>
 
@@ -182,14 +141,14 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need to track more products, consider upgrading to Standard.</p>
+                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need more, consider upgrading to Premium.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What's the difference between Standard and Premium?</h3>
+                        <h3>What does Premium include?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -198,23 +157,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p><strong>Standard ($<?php echo number_format($standardPrice, 0); ?> one-time)</strong> unlocks unlimited products, Windows Hello security, lifetime updates, and priority support. <strong>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month)</strong> adds invoices & payments, AI-powered features like receipt scanning, and predictive analysis.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does the $<?php echo number_format($discount, 0); ?> discount for Standard users work?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>If you've purchased Standard, you get $<?php echo number_format($discount, 0); ?> off your first year of Premium. Your first year drops from $<?php echo number_format($yearlyPrice, 0); ?> to $<?php echo number_format($yearlyPrice - $discount, 0); ?>. After that, it renews at the regular $<?php echo number_format($yearlyPrice, 0); ?>/year price. You will still have access to your standard license key after you switch to the Premium subscription.</p>
+                            <p>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, AI-powered features like receipt scanning, predictive analytics, and priority support.</p>
                         </div>
                     </div>
                 </div>
@@ -237,7 +180,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Is Standard a one-time payment?</h3>
+                        <h3>Is there a yearly plan?</h3>
                         <div class="faq-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="6,9 12,15 18,9"/>
@@ -246,39 +189,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes, pay once and get lifetime access to all Standard features, including future updates. No recurring charges.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I transfer my license to a different computer?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes, you can reactivate Argo Books on your new computer, but this will deactivate it on your previous device. Each license can only be active on one computer at a time.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>When will I receive my license key?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Immediately after your payment is confirmed, your license key will be sent to the email you provided during checkout. This process usually only takes a few seconds.</p>
+                            <p>Yes, you can choose to pay $<?php echo number_format($yearlyPrice, 0); ?> CAD/year instead of monthly, saving you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
                         </div>
                     </div>
                 </div>

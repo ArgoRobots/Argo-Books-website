@@ -22,13 +22,6 @@ if (!$premium_subscription || $premium_subscription['status'] !== 'active') {
 
 $error_message = '';
 
-// Check credit status for warning messages
-$originalCredit = floatval($premium_subscription['original_credit'] ?? 0);
-$creditBalance = floatval($premium_subscription['credit_balance'] ?? 0);
-$hasUnusedCredit = ($originalCredit > 0 && $creditBalance > 0);
-$hasUsedCredit = ($originalCredit > 0 && $creditBalance < $originalCredit);
-$creditUsed = $originalCredit - $creditBalance;
-
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -93,18 +86,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
         // Add PayPal warning if cancellation on their side failed
         if ($paypalCancelFailed) {
             $successMsg .= ' Note: We could not automatically cancel your PayPal subscription. Please also cancel it directly from your PayPal account to prevent future charges.';
-        }
-
-        // Add credit forfeiture notice if applicable
-        $forfeitedCredit = floatval($subscription['credit_balance'] ?? 0);
-        if ($forfeitedCredit > 0) {
-            $successMsg .= ' Your remaining $' . number_format($forfeitedCredit, 2) . ' credit has been forfeited.';
-        }
-
-        // Add discount eligibility notice if credit was used
-        $subOriginalCredit = floatval($subscription['original_credit'] ?? 0);
-        if ($subOriginalCredit > 0 && $forfeitedCredit < $subOriginalCredit) {
-            $successMsg .= ' Note: The standard user discount cannot be applied again if you resubscribe.';
         }
 
         $_SESSION['subscription_success'] = $successMsg;
@@ -175,26 +156,15 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
                     <li>After this date, Premium features will be disabled</li>
                     <li>Your subscription will not auto-renew</li>
                     <li>You can resubscribe anytime to restore access</li>
-                    <?php if ($hasUnusedCredit): ?>
-                    <li class="credit-warning"><strong>Your remaining $<?php echo number_format($creditBalance, 2); ?> credit will be forfeited</strong></li>
-                    <?php endif; ?>
                 </ul>
             </div>
-
-            <?php if ($hasUnusedCredit): ?>
-            <div class="info-box discount-warning-box">
-                <h3>Credit Will Be Lost</h3>
-                <p>You have $<?php echo number_format($creditBalance, 2); ?> in unused standard user discount credit.</p>
-                <p><strong>This credit will be forfeited if you cancel.</strong> If you resubscribe later, the discount will not be available again.</p>
-            </div>
-            <?php endif; ?>
 
             <div class="info-box features-box">
                 <h3>Features you'll lose access to:</h3>
                 <ul>
                     <li>Invoices & payments</li>
                     <li>AI-powered receipt scanning</li>
-                    <li>Predictive sales analysis</li>
+                    <li>predictive analytics</li>
                 </ul>
             </div>
 

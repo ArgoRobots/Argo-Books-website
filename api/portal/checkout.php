@@ -279,6 +279,20 @@ function process_square_payment(array $invoice, array $company, array $data, int
                 'status' => 'completed',
             ]);
 
+            // Send payment confirmation email (best-effort, don't block the response on failure)
+            if (!empty($invoice['customer_email'])) {
+                send_payment_confirmation([
+                    'customerEmail' => $invoice['customer_email'],
+                    'customerName' => $invoice['customer_name'] ?? '',
+                    'companyName' => $invoice['company_name'] ?? '',
+                    'invoiceId' => $invoice['invoice_id'],
+                    'amount' => $amount,
+                    'currency' => strtoupper($currency),
+                    'referenceNumber' => $referenceNumber,
+                    'paymentMethod' => 'square',
+                ]);
+            }
+
             send_json_response(200, [
                 'success' => true,
                 'method' => 'square',

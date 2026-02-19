@@ -79,28 +79,6 @@ function get_registrations_by_period($period = 'month', $limit = 12)
     return get_stats_by_period('community_users', $period, $limit);
 }
 
-// Function to get license purchases by period
-function get_licenses_by_period($period = 'month', $limit = 12)
-{
-    return get_stats_by_period('license_keys', $period, $limit);
-}
-
-// Function to get activation statistics
-function get_activation_rate()
-{
-    $db = get_db_connection();
-    $query = "
-        SELECT 
-            COUNT(*) as total,
-            SUM(CASE WHEN activated = 1 THEN 1 ELSE 0 END) as activated
-        FROM license_keys";
-
-    $result = $db->query($query);
-    $data = $result->fetch_assoc();
-
-    return $data;
-}
-
 // Function to get page view statistics
 function get_page_views_by_period($period = 'month', $limit = 12)
 {
@@ -249,61 +227,6 @@ function get_downloads_by_country($limit = 10)
     return $data;
 }
 
-// Function to get licenses by country (using license_keys table if it has country info, otherwise use statistics)
-function get_licenses_by_country($limit = 10)
-{
-    $db = get_db_connection();
-    // First try to get from license_keys if it has country data
-    $query = "
-        SELECT 
-            s.country_code,
-            COUNT(DISTINCT lk.id) as license_count
-        FROM license_keys lk
-        LEFT JOIN statistics s ON s.ip_address = lk.ip_address
-        WHERE s.country_code IS NOT NULL AND s.country_code != ''
-        GROUP BY s.country_code
-        ORDER BY license_count DESC
-        LIMIT ?";
-
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $data = [];
-    while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-    }
-
-    $stmt->close();
-
-    // If no data from the join, fall back to a simpler approach
-    if (empty($data)) {
-        $query = "
-            SELECT 
-                country_code,
-                COUNT(*) as license_count
-            FROM statistics
-            WHERE country_code IS NOT NULL AND country_code != ''
-            GROUP BY country_code
-            ORDER BY license_count DESC
-            LIMIT ?";
-
-        $stmt = $db->prepare($query);
-        $stmt->bind_param('i', $limit);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-
-        $stmt->close();
-    }
-
-    return $data;
-}
-
 // Function to get browser/platform statistics
 function get_user_agents()
 {
@@ -349,16 +272,9 @@ function get_conversion_data()
     $reg_result = $db->query($reg_query);
     $registrations = $reg_result->fetch_assoc()['count'];
 
-    // Get total license keys purchased
-    $license_query = "SELECT COUNT(*) as count FROM license_keys";
-    $license_result = $db->query($license_query);
-    $licenses = $license_result->fetch_assoc()['count'];
-
     return [
         'downloads' => $downloads,
         'registrations' => $registrations,
-        'licenses' => $licenses,
-        'registration_to_purchase' => $registrations > 0 ? ($licenses / $registrations) * 100 : 0
     ];
 }
 
@@ -403,14 +319,11 @@ if (!in_array($period, $allowed_periods)) {
 
 $downloads = get_downloads_by_period($period);
 $registrations = get_registrations_by_period($period);
-$licenses = get_licenses_by_period($period);
-$activation_rate = get_activation_rate();
 $page_views = get_page_views_by_period($period);
 $post_views = get_community_post_views();
 $post_types = get_community_post_types();
 $user_countries = get_user_countries();
 $downloads_by_country = get_downloads_by_country();
-$licenses_by_country = get_licenses_by_country();
 $user_agents = get_user_agents();
 $conversion_data = get_conversion_data();
 $active_users = get_most_active_users();
@@ -419,13 +332,11 @@ $active_users = get_most_active_users();
 $chart_labels = [];
 $downloads_data = [];
 $registrations_data = [];
-$licenses_data = [];
 $page_views_data = [];
 
 // Reverse arrays to show chronological order
 $downloads = array_reverse($downloads);
 $registrations = array_reverse($registrations);
-$licenses = array_reverse($licenses);
 $page_views = array_reverse($page_views);
 
 foreach ($downloads as $item) {
@@ -445,18 +356,6 @@ foreach ($downloads as $index => $item) {
     $registrations_data[] = isset($reg_data[$period_key]) ? $reg_data[$period_key] : 0;
 }
 
-$license_data = [];
-foreach ($licenses as $item) {
-    $period_key = $item['period'];
-    $license_data[$period_key] = $item['count'];
-}
-
-// Align license data with download periods
-foreach ($downloads as $index => $item) {
-    $period_key = $item['period'];
-    $licenses_data[] = isset($license_data[$period_key]) ? $license_data[$period_key] : 0;
-}
-
 // Align page view data with download periods
 $view_data = [];
 foreach ($page_views as $item) {
@@ -467,12 +366,6 @@ foreach ($page_views as $item) {
 foreach ($downloads as $index => $item) {
     $period_key = $item['period'];
     $page_views_data[] = isset($view_data[$period_key]) ? $view_data[$period_key] : 0;
-}
-
-// Calculate activation rate percentage
-$activation_percentage = 0;
-if ($activation_rate['total'] > 0) {
-    $activation_percentage = round(($activation_rate['activated'] / $activation_rate['total']) * 100, 1);
 }
 
 // Calculate growth rate
@@ -517,15 +410,6 @@ $downloads_country_counts = [];
 foreach ($downloads_by_country as $country) {
     $downloads_country_labels[] = $country['country_code'];
     $downloads_country_counts[] = $country['download_count'];
-}
-
-// Prepare licenses by country data
-$licenses_country_labels = [];
-$licenses_country_counts = [];
-
-foreach ($licenses_by_country as $country) {
-    $licenses_country_labels[] = $country['country_code'];
-    $licenses_country_counts[] = $country['license_count'];
 }
 
 // Prepare browser data for charts
@@ -809,16 +693,6 @@ foreach ($downloads_by_country as $country) {
     $downloads_country_counts[] = $country['download_count'];
 }
 
-// Prepare licenses by country data
-$licenses_country_labels = [];
-$licenses_country_counts = [];
-
-foreach ($licenses_by_country as $country) {
-    $code = $country['country_code'];
-    $licenses_country_labels[] = $country_name_map[$code] ?? $code;
-    $licenses_country_counts[] = $country['license_count'];
-}
-
 include '../admin_header.php';
 ?>
 
@@ -853,19 +727,8 @@ include '../admin_header.php';
     <!-- Charts -->
     <div class="chart-row">
         <div class="chart-container">
-            <h2>License Activation Rate</h2>
-            <canvas id="activationChart"></canvas>
-        </div>
-        <div class="chart-container">
             <h2>Downloads Over Time</h2>
             <canvas id="downloadsChart"></canvas>
-        </div>
-    </div>
-
-    <div class="chart-row">
-        <div class="chart-container">
-            <h2>License Purchases Over Time</h2>
-            <canvas id="licensesChart"></canvas>
         </div>
         <div class="chart-container">
             <h2>Page Views Over Time</h2>
@@ -899,10 +762,6 @@ include '../admin_header.php';
         <div class="chart-container">
             <h2>Downloads by Country</h2>
             <canvas id="downloadsCountryChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <h2>Licenses by Country</h2>
-            <canvas id="licensesCountryChart"></canvas>
         </div>
     </div>
 
@@ -957,12 +816,7 @@ include '../admin_header.php';
         const chartLabels = <?php echo json_encode($chart_labels); ?>;
         const downloadsData = <?php echo json_encode($downloads_data); ?>;
         const registrationsData = <?php echo json_encode($registrations_data); ?>;
-        const licensesData = <?php echo json_encode($licenses_data); ?>;
         const pageViewsData = <?php echo json_encode($page_views_data); ?>;
-        const activationData = <?php echo json_encode([
-                                    (int)$activation_rate['activated'],
-                                    (int)($activation_rate['total'] - $activation_rate['activated'])
-                                ]); ?>;
         const postTypeLabels = <?php echo json_encode($post_type_labels); ?>;
         const postTypeCounts = <?php echo json_encode($post_type_counts); ?>;
         const postTypeViews = <?php echo json_encode($post_type_views); ?>;
@@ -970,14 +824,11 @@ include '../admin_header.php';
         const countryCounts = <?php echo json_encode($country_counts); ?>;
         const downloadsCountryLabels = <?php echo json_encode($downloads_country_labels); ?>;
         const downloadsCountryCounts = <?php echo json_encode($downloads_country_counts); ?>;
-        const licensesCountryLabels = <?php echo json_encode($licenses_country_labels); ?>;
-        const licensesCountryCounts = <?php echo json_encode($licenses_country_counts); ?>;
         const browserLabels = <?php echo json_encode($browser_labels); ?>;
         const browserCounts = <?php echo json_encode($browser_counts); ?>;
         const conversionData = <?php echo json_encode([
                                     $conversion_data['downloads'],
-                                    $conversion_data['registrations'],
-                                    $conversion_data['licenses']
+                                    $conversion_data['registrations']
                                 ]); ?>;
 
         generateStatistics();
@@ -987,15 +838,10 @@ include '../admin_header.php';
 
             const totalDownloads = sumArray(downloadsData);
             const totalRegistrations = sumArray(registrationsData);
-            const totalLicenses = sumArray(licensesData);
             const totalPageViews = sumArray(pageViewsData);
-            const activationRate = <?php echo $activation_percentage; ?>;
             const downloadGrowthRate = <?php echo $latest_growth; ?>;
-            const postViews = <?php echo str_replace(',', '', $total_post_views); ?>;
-            const avgViewsPerPost = <?php echo $avg_post_views; ?>;
-            const mostViewed = <?php echo str_replace(',', '', $most_viewed); ?>;
 
-            // Add this new calculation for view growth rate:
+            // Calculate view growth rate
             let viewGrowthRate = 0;
             if (pageViewsData.length >= 2) {
                 const latestViews = pageViewsData[pageViewsData.length - 1];
@@ -1014,11 +860,6 @@ include '../admin_header.php';
                     title: 'Registrations',
                     value: totalRegistrations.toLocaleString(),
                     subtext: 'users'
-                },
-                {
-                    title: 'Licenses Purchased',
-                    value: totalLicenses.toLocaleString(),
-                    subtext: 'licenses sold'
                 },
                 {
                     title: 'Views Growth Rate',
@@ -1045,47 +886,6 @@ include '../admin_header.php';
                 </div>
             `).join('');
         }
-
-        // Activation rate chart
-        const ctxActivation = document.getElementById('activationChart').getContext('2d');
-        new Chart(ctxActivation, {
-            type: 'pie',
-            data: {
-                labels: ['Activated', 'Not Activated'],
-                datasets: [{
-                    data: activationData,
-                    backgroundColor: [
-                        'rgba(16, 185, 129, 0.8)',
-                        'rgba(239, 68, 68, 0.8)'
-                    ],
-                    borderColor: [
-                        'rgba(16, 185, 129, 1)',
-                        'rgba(239, 68, 68, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = Number(context.raw) || 0;
-                                const total = context.dataset.data.reduce((a, b) => Number(a) + Number(b), 0);
-                                const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                return `${label}: ${value} licenses (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
 
         // Downloads chart
         const ctxDownloads = document.getElementById('downloadsChart').getContext('2d');
@@ -1126,55 +926,6 @@ include '../admin_header.php';
                         callbacks: {
                             label: function(context) {
                                 return `Downloads: ${context.raw}`;
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'top',
-                    }
-                }
-            }
-        });
-
-        // Licenses chart
-        const ctxLicenses = document.getElementById('licensesChart').getContext('2d');
-        new Chart(ctxLicenses, {
-            type: 'line',
-            data: {
-                labels: chartLabels,
-                datasets: [{
-                    label: 'License Purchases',
-                    data: licensesData,
-                    backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                    borderColor: 'rgba(16, 185, 129, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: 'rgba(16, 185, 129, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            padding: 10
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Licenses: ${context.raw}`;
                             }
                         }
                     },
@@ -1426,52 +1177,6 @@ include '../admin_header.php';
             }
         });
 
-        // Licenses by Country chart
-        const ctxLicensesCountry = document.getElementById('licensesCountryChart').getContext('2d');
-        new Chart(ctxLicensesCountry, {
-            type: 'bar',
-            data: {
-                labels: licensesCountryLabels,
-                datasets: [{
-                    label: 'Licenses',
-                    data: licensesCountryCounts,
-                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                    borderColor: 'rgba(16, 185, 129, 1)',
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                indexAxis: 'y',
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = Number(context.raw) || 0;
-                                const total = context.dataset.data.reduce((a, b) => Number(a) + Number(b), 0);
-                                const percentage = Math.round((value / total) * 100);
-                                return `${label}: ${value} licenses (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
         // Browser chart
         const ctxBrowser = document.getElementById('browserChart').getContext('2d');
         new Chart(ctxBrowser, {
@@ -1528,14 +1233,13 @@ include '../admin_header.php';
 
             // Add header for time series
             csvContent += 'TIME SERIES DATA\n';
-            csvContent += 'Period,Downloads,Registrations,Licenses,Page Views\n';
+            csvContent += 'Period,Downloads,Registrations,Page Views\n';
 
             for (let i = 0; i < chartLabels.length; i++) {
                 const row = [
                     chartLabels[i],
                     downloadsData[i] || 0,
                     registrationsData[i] || 0,
-                    licensesData[i] || 0,
                     pageViewsData[i] || 0
                 ].join(',');
                 csvContent += row + '\n';
@@ -1546,9 +1250,7 @@ include '../admin_header.php';
             csvContent += 'Metric,Value\n';
             csvContent += `Total Downloads,${sumArray(downloadsData)}\n`;
             csvContent += `Total Registrations,${sumArray(registrationsData)}\n`;
-            csvContent += `Total Licenses,${sumArray(licensesData)}\n`;
             csvContent += `Total Page Views,${sumArray(pageViewsData)}\n`;
-            csvContent += `Activation Rate,${<?php echo $activation_percentage; ?>}%\n`;
             csvContent += `Latest Growth Rate,${<?php echo $latest_growth; ?>}%\n`;
             csvContent += `Total Post Views,${<?php echo str_replace(',', '', $total_post_views); ?>}\n`;
             csvContent += `Average Views per Post,${<?php echo $avg_post_views; ?>}\n`;
@@ -1573,13 +1275,6 @@ include '../admin_header.php';
             csvContent += 'Country,Downloads\n';
             for (let i = 0; i < downloadsCountryLabels.length; i++) {
                 csvContent += `${downloadsCountryLabels[i]},${downloadsCountryCounts[i]}\n`;
-            }
-
-            // Add licenses by country data
-            csvContent += '\nLICENSES BY COUNTRY\n';
-            csvContent += 'Country,Licenses\n';
-            for (let i = 0; i < licensesCountryLabels.length; i++) {
-                csvContent += `${licensesCountryLabels[i]},${licensesCountryCounts[i]}\n`;
             }
 
             // Add browser data
@@ -1613,9 +1308,7 @@ include '../admin_header.php';
                 summary: {
                     total_downloads: sumArray(downloadsData),
                     total_registrations: sumArray(registrationsData),
-                    total_licenses: sumArray(licensesData),
                     total_page_views: sumArray(pageViewsData),
-                    activation_rate: <?php echo $activation_percentage; ?>,
                     growth_rate: <?php echo $latest_growth; ?>,
                     post_views: {
                         total: <?php echo str_replace(',', '', $total_post_views); ?>,
@@ -1624,22 +1317,15 @@ include '../admin_header.php';
                     }
                 },
                 time_series: [],
-                license_activation: {
-                    activated: activationData[0],
-                    not_activated: activationData[1]
-                },
                 post_types: [],
                 countries: {
                     page_views: [],
-                    downloads: [],
-                    licenses: []
+                    downloads: []
                 },
                 browsers: [],
                 conversion: {
                     downloads: conversionData[0],
-                    registrations: conversionData[1],
-                    purchases: conversionData[2],
-                    registration_to_purchase_rate: <?php echo $conversion_data['registration_to_purchase']; ?>
+                    registrations: conversionData[1]
                 },
                 most_active_users: []
             };
@@ -1650,7 +1336,6 @@ include '../admin_header.php';
                     period: chartLabels[i],
                     downloads: downloadsData[i] || 0,
                     registrations: registrationsData[i] || 0,
-                    licenses: licensesData[i] || 0,
                     page_views: pageViewsData[i] || 0
                 });
             }
@@ -1677,14 +1362,6 @@ include '../admin_header.php';
                 jsonData.countries.downloads.push({
                     country: downloadsCountryLabels[i],
                     count: downloadsCountryCounts[i]
-                });
-            }
-
-            // Add licenses by country data
-            for (let i = 0; i < licensesCountryLabels.length; i++) {
-                jsonData.countries.licenses.push({
-                    country: licensesCountryLabels[i],
-                    count: licensesCountryCounts[i]
                 });
             }
 

@@ -34,6 +34,8 @@ function handle_pull_payments(int $companyId): void
 {
     $since = $_GET['since'] ?? null;
 
+    error_log("Portal sync GET: company=$companyId, since=" . ($since ?: 'null'));
+
     $db = get_db_connection();
 
     if ($since) {
@@ -66,28 +68,30 @@ function handle_pull_payments(int $companyId): void
     while ($row = $result->fetch_assoc()) {
         $payments[] = [
             'id' => (int) $row['id'],
-            'invoice_id' => $row['invoice_id'],
-            'customer_name' => $row['customer_name'],
+            'invoiceId' => $row['invoice_id'],
+            'customerName' => $row['customer_name'],
             'amount' => floatval($row['amount']),
-            'processing_fee' => floatval($row['processing_fee']),
+            'processingFee' => floatval($row['processing_fee']),
             'currency' => $row['currency'],
-            'payment_method' => $row['payment_method'],
-            'provider_payment_id' => $row['provider_payment_id'],
-            'provider_transaction_id' => $row['provider_transaction_id'],
-            'reference_number' => $row['reference_number'],
+            'paymentMethod' => $row['payment_method'],
+            'providerPaymentId' => $row['provider_payment_id'],
+            'providerTransactionId' => $row['provider_transaction_id'],
+            'referenceNumber' => $row['reference_number'],
             'status' => $row['status'],
-            'synced' => (bool) $row['synced_to_argo'],
-            'created_at' => $row['created_at'],
+            'syncedToArgo' => (bool) $row['synced_to_argo'],
+            'createdAt' => date('c', strtotime($row['created_at'])),
         ];
     }
     $stmt->close();
     $db->close();
 
+    error_log("Portal sync GET: returning " . count($payments) . " payments for company=$companyId");
+
     send_json_response(200, [
         'success' => true,
         'payments' => $payments,
         'count' => count($payments),
-        'timestamp' => date('c')
+        'syncTimestamp' => date('c')
     ]);
 }
 
@@ -103,7 +107,9 @@ function handle_confirm_sync(int $companyId): void
         send_error_response(400, 'Invalid JSON: ' . json_last_error_msg(), 'INVALID_JSON');
     }
 
-    $paymentIds = $data['payment_ids'] ?? [];
+    $paymentIds = $data['paymentIds'] ?? $data['payment_ids'] ?? [];
+
+    error_log("Portal sync POST: company=$companyId, received keys=" . implode(',', array_keys($data ?? [])) . ", paymentIds=" . json_encode($paymentIds));
 
     if (empty($paymentIds) || !is_array($paymentIds)) {
         send_error_response(400, 'Missing or invalid payment_ids array.', 'MISSING_FIELDS');
@@ -131,9 +137,11 @@ function handle_confirm_sync(int $companyId): void
     $stmt->close();
     $db->close();
 
+    error_log("Portal sync POST: marked $affectedRows payments as synced for company=$companyId");
+
     send_json_response(200, [
         'success' => true,
-        'synced_count' => $affectedRows,
+        'syncedCount' => $affectedRows,
         'message' => "{$affectedRows} payment(s) marked as synced.",
         'timestamp' => date('c')
     ]);

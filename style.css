@@ -1969,9 +1969,9 @@ a {
 
 .pricing-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 24px;
-    max-width: 1000px;
+    max-width: 750px;
     margin: 0 auto;
 }
 
@@ -1995,26 +1995,8 @@ a {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
-.pricing-card.featured {
-    border: 2px solid #3b82f6;
-    box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15);
-}
-
 .pricing-card.ai-card {
     border: 2px solid #8b5cf6;
-}
-
-.featured-badge {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
 }
 
 .pricing-header {
@@ -2098,56 +2080,11 @@ a {
     flex-shrink: 0;
 }
 
-.pricing-note {
-    text-align: center;
-    font-size: 0.85rem;
-    color: #64748b;
-    margin-top: 16px;
-}
-
 .pricing-card .btn-block {
     display: flex;
     justify-content: center;
     align-items: center;
     margin: 0 auto;
-}
-
-.guarantee-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    background: white;
-    border: 2px solid #10b981;
-    border-radius: 16px;
-    padding: 24px 32px;
-    margin-top: 48px;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.guarantee-icon {
-    width: 56px;
-    height: 56px;
-    background: #d1fae5;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #10b981;
-    flex-shrink: 0;
-}
-
-.guarantee-text h4 {
-    font-size: 1.1rem;
-    margin-bottom: 4px;
-}
-
-.guarantee-text p {
-    font-size: 0.9rem;
-    color: #64748b;
-    margin: 0;
 }
 
 /* ========================================

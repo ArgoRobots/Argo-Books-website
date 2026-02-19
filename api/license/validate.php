@@ -34,8 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Validate key type based on prefix
         if (str_starts_with($license_key, 'PREM-')) {
             $response = validate_premium_key($license_key);
-        } elseif (str_starts_with($license_key, 'STND-')) {
-            $response = validate_standard_license_key($license_key, $ip_address);
         } else {
             $response = [
                 'success' => false,

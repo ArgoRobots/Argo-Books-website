@@ -29,36 +29,16 @@
             <h1>Refund Policy</h1>
 
             <h2>Introduction</h2>
-            <p>This Refund Policy outlines the terms and conditions for refunds related to the purchase of Argo Books
-                license keys. We strive to provide high-quality software that meets your needs, but we
+            <p>This Refund Policy outlines the terms and conditions for refunds related to Argo Books
+                Premium subscriptions. We strive to provide high-quality software that meets your needs, but we
                 understand that sometimes a purchase may not work out as expected.</p>
 
-            <h2>Eligibility for Refunds</h2>
-            <p>We offer a <strong>30-day money-back guarantee</strong> for purchases of Argo Books license keys,
-                subject to the following conditions:</p>
-            <ol>
-                <li>The refund request must be made within 30 days of the original purchase date.</li>
-                <li>You must provide a valid reason for requesting a refund.</li>
-                <li>The license key must not have been used extensively (as determined by our system logs).</li>
-            </ol>
-
-            <h2>Ineligible for Refunds</h2>
-            <p>Refunds will not be provided in the following situations:</p>
-            <ol>
-                <li>More than 30 days have passed since the original purchase or renewal date.</li>
-                <li>The license key has been used extensively.</li>
-                <li>The license key was purchased as part of a special promotion or discount specifically marked as
-                    non-refundable.</li>
-                <li>The license key was obtained through fraudulent means.</li>
-                <li>The license key was revoked due to violation of our <a class="link" href="terms.php">Terms of Service</a>.</li>
-            </ol>
-
-            <h2>Argo Premium Subscription Refunds</h2>
+            <h2>Premium Subscription Cancellations</h2>
             <p>For Argo Premium subscriptions:</p>
             <ul>
-                <li>Refunds are prorated based on unused time in your billing period.</li>
-                <li>Cancelling your subscription does not automatically trigger a refund - you must request one separately.</li>
-                <li>After cancellation, you retain access until the end of your current billing period.</li>
+                <li>You can cancel your subscription at any time from your account settings.</li>
+                <li>After cancellation, you retain access to Premium features until the end of your current billing period.</li>
+                <li>Cancellations are not automatically refunded. If you believe you are entitled to a refund, you may request one separately.</li>
             </ul>
 
             <h2>How to Request a Refund</h2>
@@ -79,16 +59,16 @@
             <h2>Refund Processing</h2>
             <p>Once your refund request has been approved:</p>
             <ol>
-                <li>We will deactivate your license key.</li>
+                <li>Your subscription will be cancelled.</li>
                 <li>The refund will be processed back to the original payment method used for the purchase.</li>
                 <li>Refunds typically take 5-10 business days to appear on your statement, depending on your payment
                     provider.</li>
             </ol>
 
-            <h2>Changed Mind/Cancellations</h2>
-            <p>If you change your mind about your purchase or ordered the wrong type of license by mistake, please
-                contact us as soon as possible. We will try to accommodate your request if it falls within our refund
-                eligibility period.</p>
+            <h2>Cancellations</h2>
+            <p>If you change your mind about your subscription, you can cancel at any time from your account settings.
+                After cancellation, you retain access until the end of your current billing period. No partial refunds
+                are issued for unused time.</p>
 
             <h2>Technical Issues</h2>
             <p>If you are experiencing technical issues with Argo Books, we encourage you to:</p>

@@ -570,6 +570,173 @@ function send_invoice_notification(array $params): array
 }
 
 /**
+ * Send a payment confirmation email to the customer after a successful payment.
+ *
+ * @param array $params Email parameters:
+ *   - customerEmail: Recipient email
+ *   - customerName: Recipient name
+ *   - companyName: Sender business name
+ *   - invoiceId: Invoice number for display
+ *   - amount: Payment amount (float)
+ *   - currency: Currency code (USD, CAD, etc.)
+ *   - referenceNumber: Payment reference number
+ *   - paymentMethod: Payment method used (stripe, paypal, square)
+ * @return array Result with 'success' and 'message'
+ */
+function send_payment_confirmation(array $params): array
+{
+    $customerEmail = $params['customerEmail'] ?? '';
+    $customerName = $params['customerName'] ?? '';
+    $companyName = $params['companyName'] ?? '';
+    $invoiceId = $params['invoiceId'] ?? '';
+    $amount = $params['amount'] ?? 0;
+    $currency = $params['currency'] ?? 'USD';
+    $referenceNumber = $params['referenceNumber'] ?? '';
+    $paymentMethod = $params['paymentMethod'] ?? '';
+
+    if (empty($customerEmail)) {
+        return ['success' => false, 'message' => 'Missing customer email'];
+    }
+
+    $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+    $formattedAmount = $currencySymbol . number_format(floatval($amount), 2) . ' ' . $currency;
+    $subject = "Payment Confirmation - Invoice {$invoiceId}";
+
+    $methodLabels = [
+        'stripe' => 'Credit Card (Stripe)',
+        'paypal' => 'PayPal',
+        'square' => 'Credit Card (Square)',
+    ];
+    $methodLabel = $methodLabels[$paymentMethod] ?? ucfirst($paymentMethod);
+
+    $html = build_payment_confirmation_email_html([
+        'customerName' => $customerName,
+        'companyName' => $companyName,
+        'invoiceId' => $invoiceId,
+        'formattedAmount' => $formattedAmount,
+        'referenceNumber' => $referenceNumber,
+        'paymentMethod' => $methodLabel,
+    ]);
+
+    try {
+        $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
+        $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
+
+        $headers = [
+            'MIME-Version: 1.0',
+            'Content-Type: text/html; charset=UTF-8',
+            'From: ' . $fromName . ' <' . $fromEmail . '>',
+            'Reply-To: ' . $fromEmail,
+            'X-Mailer: ArgoBooks/1.0'
+        ];
+
+        $to = $customerName ? "{$customerName} <{$customerEmail}>" : $customerEmail;
+        $result = mail($to, $subject, $html, implode("\r\n", $headers));
+
+        if ($result) {
+            return ['success' => true, 'message' => 'Confirmation email sent'];
+        } else {
+            error_log('Portal payment confirmation: mail() returned false for ' . $customerEmail);
+            return ['success' => false, 'message' => 'mail() returned false'];
+        }
+    } catch (\Throwable $e) {
+        error_log('Portal payment confirmation email failed: ' . $e->getMessage());
+        return ['success' => false, 'message' => 'Failed to send email: ' . $e->getMessage()];
+    }
+}
+
+/**
+ * Build the HTML for a payment confirmation email.
+ * Uses table-based layout with inline styles for maximum email client compatibility.
+ */
+function build_payment_confirmation_email_html(array $params): string
+{
+    $customerName = htmlspecialchars($params['customerName'] ?? '');
+    $companyName = htmlspecialchars($params['companyName'] ?? '');
+    $invoiceId = htmlspecialchars($params['invoiceId'] ?? '');
+    $formattedAmount = htmlspecialchars($params['formattedAmount'] ?? '');
+    $referenceNumber = htmlspecialchars($params['referenceNumber'] ?? '');
+    $paymentMethod = htmlspecialchars($params['paymentMethod'] ?? '');
+
+    return '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <!-- Header bar -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #059669, #047857); padding: 28px 32px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 700;">Payment Confirmed</h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 20px; font-size: 16px; color: #374151; line-height: 1.5;">
+                                Hi' . ($customerName ? ' ' . $customerName : '') . ',
+                            </p>
+                            <p style="margin: 0 0 24px; font-size: 16px; color: #374151; line-height: 1.5;">
+                                Your payment to <strong>' . $companyName . '</strong> has been received. Here are the details:
+                            </p>
+
+                            <!-- Payment summary card -->
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 28px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Invoice</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;">' . $invoiceId . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Amount Paid</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">' . $formattedAmount . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Payment Method</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; color: #111827;">' . $paymentMethod . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Reference</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; font-family: monospace; color: #111827;">' . $referenceNumber . '</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Date</td>
+                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; color: #111827;">' . date('F j, Y') . '</td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5; text-align: center;">
+                                If you have any questions about this payment, please contact ' . $companyName . ' directly.
+                            </p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 20px 32px; border-top: 1px solid #e5e7eb; text-align: center;">
+                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
+                                Powered by <a href="https://argorobots.com" style="color: #2563eb; text-decoration: none;">Argo Books</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+}
+
+/**
  * Build the HTML for a generic invoice notification email.
  * Uses table-based layout with inline styles for maximum email client compatibility.
  */

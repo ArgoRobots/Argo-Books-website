@@ -5,8 +5,6 @@ require_once __DIR__ . '/../../config/pricing.php';
 $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
-$premiumDiscount = $pricing['premium_discount'];
-$standardPrice = $pricing['standard_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
 // Require login to access Premium subscription page
@@ -37,14 +35,14 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year. Standard users save $<?php echo number_format($premiumDiscount, 0); ?>!">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
     <meta name="keywords"
-        content="argo premium features, invoices payments, ai receipt scanning, predictive sales analysis, finance tracker, sales tracker subscription">
+        content="argo premium features, invoices payments, ai receipt scanning, predictive analytics, finance tracker, sales tracker subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive sales analysis. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
     <meta property="og:url" content="https://argorobots.com/upgrade/premium/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -125,7 +123,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                             <line x1="12" y1="22.08" x2="12" y2="12"></line>
                         </svg>
                     </div>
-                    <h3>Predictive Sales Analysis</h3>
+                    <h3>predictive analytics</h3>
                     <p>Forecast future trends based on your historical data. Make informed decisions with AI-powered
                         predictions.</p>
                 </div>
@@ -136,17 +134,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <section class="ai-pricing-section">
         <div class="container">
             <h2>Choose Your Plan</h2>
-            <p class="pricing-subtitle">Select billing frequency and enter your license key if you're a Standard user</p>
-
-            <div class="license-discount">
-                <h3>Standard User? Get $<?php echo number_format($premiumDiscount, 0); ?> Off!</h3>
-                <p>If you've purchased the $<?php echo number_format($standardPrice, 0); ?> Standard version, enter your license key to receive a $<?php echo number_format($premiumDiscount, 0); ?> discount.</p>
-                <div class="license-input-group">
-                    <input type="text" id="license-key" placeholder="Enter your license key">
-                    <button type="button" id="verify-license" class="btn-verify">Verify License</button>
-                </div>
-                <div id="license-status" class="license-status"></div>
-            </div>
+            <p class="pricing-subtitle">Select your billing frequency</p>
 
             <div class="billing-toggle">
                 <button type="button" class="billing-option active" data-billing="monthly">Monthly</button>
@@ -155,16 +143,10 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
             <div class="pricing-display">
                 <div class="price-box" id="price-display">
-                    <div class="original-price" id="original-price" style="display: none;">
-                        <span class="strikethrough">$<?php echo number_format($yearlyPrice, 0); ?></span>
-                    </div>
                     <div class="current-price">
                         <span class="currency">$</span>
                         <span class="amount" id="price-amount"><?php echo number_format($monthlyPrice, 0); ?></span>
                         <span class="period" id="price-period">CAD/month</span>
-                    </div>
-                    <div class="discount-badge" id="discount-badge" style="display: none;">
-                        $<?php echo number_format($premiumDiscount, 0); ?> Premium Discount Applied!
                     </div>
                 </div>
             </div>
@@ -191,9 +173,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                 <p><strong>Subscription Terms:</strong></p>
                 <ul>
                     <li>Cancel anytime - no long-term commitment</li>
-                    <li>Standard discount applies to first year only</li>
                     <li>Automatic renewal unless cancelled</li>
-                    <li>7-day free trial for new subscribers</li>
                 </ul>
             </div>
         </div>
@@ -203,22 +183,6 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
         <div class="container">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>How does the $<?php echo number_format($premiumDiscount, 0); ?> discount work?</h3>
-                        <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>If you've purchased the $<?php echo number_format($standardPrice, 0); ?> Standard version, the $<?php echo number_format($premiumDiscount, 0); ?> discount will be applied to your first yearly subscription ($<?php echo number_format($yearlyPrice, 0); ?> - $<?php echo number_format($premiumDiscount, 0); ?> = $<?php echo number_format($yearlyPrice - $premiumDiscount, 0); ?> for the first year) or as credit toward monthly payments.</p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="faq-item">
                     <div class="faq-question">
                         <h3>Can I cancel my subscription?</h3>
@@ -279,12 +243,9 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentBilling = 'monthly';
-            let hasDiscount = false;
-            let verifiedLicenseKey = null;
 
             const monthlyPrice = <?php echo $monthlyPrice; ?>;
             const yearlyPrice = <?php echo $yearlyPrice; ?>;
-            const discount = <?php echo $premiumDiscount; ?>;
 
             // Billing toggle
             document.querySelectorAll('.billing-option').forEach(btn => {
@@ -296,110 +257,15 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                 });
             });
 
-            // License verification with rate limiting
-            let lastVerifyAttempt = 0;
-            let verifyAttempts = 0;
-            const RATE_LIMIT_WINDOW = 60000; // 1 minute
-            const MAX_ATTEMPTS = 5;
-            const COOLDOWN_TIME = 3000; // 3 seconds between attempts
-
-            document.getElementById('verify-license').addEventListener('click', async function() {
-                const licenseKey = document.getElementById('license-key').value.trim();
-                const statusEl = document.getElementById('license-status');
-                const verifyBtn = this;
-                const now = Date.now();
-
-                // Reset attempt counter if window has passed
-                if (now - lastVerifyAttempt > RATE_LIMIT_WINDOW) {
-                    verifyAttempts = 0;
-                }
-
-                // Check rate limit
-                if (verifyAttempts >= MAX_ATTEMPTS) {
-                    const waitTime = Math.ceil((RATE_LIMIT_WINDOW - (now - lastVerifyAttempt)) / 1000);
-                    statusEl.innerHTML = `<span class="error">Too many attempts. Please wait ${waitTime} seconds.</span>`;
-                    return;
-                }
-
-                // Cooldown between attempts
-                if (now - lastVerifyAttempt < COOLDOWN_TIME && lastVerifyAttempt > 0) {
-                    statusEl.innerHTML = '<span class="error">Please wait a moment before trying again.</span>';
-                    return;
-                }
-
-                if (!licenseKey) {
-                    statusEl.innerHTML = '<span class="error">Please enter a license key</span>';
-                    return;
-                }
-
-                // Update rate limit tracking
-                lastVerifyAttempt = now;
-                verifyAttempts++;
-
-                // Disable button during verification
-                verifyBtn.disabled = true;
-                statusEl.innerHTML = '<span class="loading">Verifying...</span>';
-
-                try {
-                    const response = await fetch('../../api/license/check.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ license_key: licenseKey })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.valid) {
-                        hasDiscount = true;
-                        verifiedLicenseKey = licenseKey;
-                        statusEl.innerHTML = '<span class="success">Standard license verified! $' + discount + ' discount applied.</span>';
-                        updatePriceDisplay();
-                        // Reset attempts on success
-                        verifyAttempts = 0;
-                    } else {
-                        hasDiscount = false;
-                        verifiedLicenseKey = null;
-                        statusEl.innerHTML = '<span class="error">Invalid or unactivated license key</span>';
-                        updatePriceDisplay();
-                    }
-                } catch (error) {
-                    statusEl.innerHTML = '<span class="error">Error verifying license. Please try again.</span>';
-                } finally {
-                    verifyBtn.disabled = false;
-                }
-            });
-
             function updatePriceDisplay() {
                 const priceAmount = document.getElementById('price-amount');
                 const pricePeriod = document.getElementById('price-period');
-                const originalPrice = document.getElementById('original-price');
-                const discountBadge = document.getElementById('discount-badge');
 
                 if (currentBilling === 'monthly') {
                     priceAmount.textContent = monthlyPrice;
                     pricePeriod.textContent = 'CAD/month';
-                    originalPrice.style.display = 'none';
-
-                    if (hasDiscount) {
-                        discountBadge.style.display = 'block';
-                        discountBadge.textContent = '$' + discount + ' credit will be applied to your account!';
-                    } else {
-                        discountBadge.style.display = 'none';
-                    }
                 } else {
-                    if (hasDiscount) {
-                        priceAmount.textContent = yearlyPrice - discount;
-                        originalPrice.style.display = 'block';
-                        originalPrice.querySelector('.strikethrough').textContent = '$' + yearlyPrice;
-                        discountBadge.style.display = 'block';
-                        discountBadge.textContent = '$' + discount + ' Standard Discount Applied!';
-                    } else {
-                        priceAmount.textContent = yearlyPrice;
-                        originalPrice.style.display = 'none';
-                        discountBadge.style.display = 'none';
-                    }
+                    priceAmount.textContent = yearlyPrice;
                     pricePeriod.textContent = 'CAD/year';
                 }
             }
@@ -411,7 +277,6 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     billing: currentBilling
                 });
 
-                // License/discount auto-detected on checkout page from database
                 return 'checkout/?' + params.toString();
             }
 

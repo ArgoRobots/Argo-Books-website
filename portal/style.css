@@ -927,14 +927,12 @@ body {
 }
 
 /* ============================================
-   Tables (Payment History, All Invoices)
+   Tables (All Invoices)
    ============================================ */
 
-.payment-history-table-wrapper,
 .all-invoices-table-wrapper {
 }
 
-.payment-history-table,
 .all-invoices-table {
     width: 100%;
     border-collapse: collapse;
@@ -944,7 +942,6 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.payment-history-table thead th,
 .all-invoices-table thead th {
     background: var(--gray-50);
     padding: 12px 16px;
@@ -958,7 +955,6 @@ body {
     white-space: nowrap;
 }
 
-.payment-history-table tbody td,
 .all-invoices-table tbody td {
     padding: 12px 16px;
     font-size: 14px;
@@ -966,12 +962,10 @@ body {
     border-bottom: 1px solid var(--gray-100);
 }
 
-.payment-history-table tbody tr:last-child td,
 .all-invoices-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.payment-history-table code,
 .all-invoices-table code {
     font-size: 12px;
     background: var(--gray-50);

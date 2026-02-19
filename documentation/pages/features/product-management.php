@@ -47,7 +47,7 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Name:</strong> The product or service name</li>
                 <li><strong>Category:</strong> Which category the product belongs to</li>
-                <li><strong>Unit Price:</strong> The default price per unit</li>
+                <li><strong>Unit Price:</strong> The standard selling or purchase price, pre-filled when adding transactions</li>
                 <li><strong>Supplier:</strong> The vendor you purchase this product from</li>
                 <li><strong>Description:</strong> Additional notes about the product</li>
             </ul>

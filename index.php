@@ -29,7 +29,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <meta name="description"
         content="Transform your small business with Argo Books. AI-powered receipt scanning, predictive analytics, inventory management and more. Free software.">
     <meta name="keywords"
-        content="AI receipt scanning, predictive sales analysis, business software, inventory management, rental management, invoice generator, small business automation">
+        content="AI receipt scanning, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Argo Books - AI-Powered Business Management">
@@ -1163,20 +1163,19 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </li>
                     </ul>
                     <a href="downloads" class="btn btn-secondary btn-block">Get Started Free</a>
-                    <p class="pricing-note">Free forever</p>
                 </div>
 
-                <!-- Standard Plan -->
-                <div class="pricing-card featured animate-on-scroll">
-                    <div class="featured-badge">Most Popular</div>
+                <!-- Premium Plan -->
+                <div class="pricing-card ai-card animate-on-scroll">
                     <div class="pricing-header">
-                        <span class="pricing-tag">Standard</span>
+                        <span class="pricing-tag ai">Premium</span>
                         <div class="pricing-amount">
                             <span class="currency">$</span>
-                            <span class="amount"><?php echo number_format($pricing['standard_price'], 0); ?></span>
-                            <span class="period">CAD one-time</span>
+                            <span class="amount"><?php echo number_format($monthlyPrice, 0); ?></span>
+                            <span class="period">CAD/month</span>
                         </div>
-                        <p class="pricing-description">Everything you need to scale</p>
+                        <p class="pricing-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
+                        <p class="pricing-description">Unlock the full power of Argo Books</p>
                     </div>
                     <ul class="pricing-features">
                         <li>
@@ -1201,42 +1200,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polyline points="20,6 9,17 4,12"/>
                             </svg>
-                            <span>Priority support</span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
-                            <span>Lifetime updates</span>
-                        </li>
-                    </ul>
-                    <a href="upgrade/" class="btn btn-primary btn-block">Upgrade Now</a>
-                    <p class="pricing-note">30-day money-back guarantee</p>
-                </div>
-
-                <!-- Premium Plan -->
-                <div class="pricing-card ai-card animate-on-scroll">
-                    <div class="pricing-header">
-                        <span class="pricing-tag ai">Premium</span>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount"><?php echo number_format($monthlyPrice, 0); ?></span>
-                            <span class="period">CAD/month</span>
-                        </div>
-                        <p class="pricing-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
-                        <p class="pricing-description">Unlock AI-powered features</p>
-                    </div>
-                    <ul class="pricing-features">
-                           <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
-                            <span>Everything in Standard</span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
                             <span>Invoices & payments</span>
                         </li>
                         <li>
@@ -1251,21 +1214,14 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </svg>
                             <span>Predictive analytics</span>
                         </li>
+                        <li>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="20,6 9,17 4,12"/>
+                            </svg>
+                            <span>Priority support</span>
+                        </li>
                     </ul>
                     <a href="upgrade/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
-                    <p class="pricing-note">Cancel anytime</p>
-                </div>
-            </div>
-
-            <div class="guarantee-banner animate-on-scroll">
-                <div class="guarantee-icon">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
-                </div>
-                <div class="guarantee-text">
-                    <h4>30-Day Money-Back Guarantee</h4>
-                    <p>Try Standard risk-free. If you're not satisfied, get a full refund. No questions asked.</p>
                 </div>
             </div>
         </div>
@@ -1356,7 +1312,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($5/month or $50/year) includes invoices & payments, AI-powered receipt scanning, and predictive sales analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes invoices & payments, AI-powered receipt scanning, and predictive analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
                         </div>
                     </div>
                 </div>
@@ -1372,7 +1328,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>We offer a 30-day money-back guarantee on Standard license purchases. For Premium subscriptions, refunds are prorated based on the unused time remaining in your billing period. Simply contact us and we'll process your refund promptly. <a href="legal/refund.php" class="link">View full refund policy</a></p>
+                            <p>You can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period. If you believe you are entitled to a refund, please contact us and we'll review your request. <a href="legal/refund.php" class="link">View full refund policy</a></p>
                         </div>
                     </div>
                 </div>

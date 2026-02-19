@@ -109,6 +109,7 @@
                                 <li><strong>Generate invoices from rentals</strong> &mdash; Create invoices directly from rental records with all fields auto-populated.</li>
                                 <li><strong>Online invoice payments</strong> &mdash; Connect your Stripe, PayPal, or Square account and let your customers view and pay invoices online through a payment portal.</li>
                                 <li><strong>Receipt grid/table toggle</strong> &mdash; Switch between grid and table views on the Receipts page for flexible data browsing.</li>
+                                <li><strong>Default product price</strong> &mdash; Set a default price for products so new entries start with a pre-filled amount.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">

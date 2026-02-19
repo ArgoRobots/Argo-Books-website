@@ -17,6 +17,7 @@ include '../../docs-header.php';
             <p>Create detailed customer profiles that store all the information you need:</p>
             <ul>
                 <li><strong>Contact Information:</strong> First name, last name, email, and phone number</li>
+                <li><strong>Company Name:</strong> The customer's business or company name (optional)</li>
                 <li><strong>Address:</strong> Street, city, state, ZIP code, and country</li>
                 <li><strong>Status:</strong> Track whether customers are Active, Inactive, or Banned</li>
                 <li><strong>Notes:</strong> Add personal notes about preferences or special requirements</li>
@@ -44,8 +45,8 @@ include '../../docs-header.php';
                     <?= svg_icon('chevron-left', 16) ?>
                     Previous: Report Generator
                 </a>
-                <a href="invoicing.php" class="nav-button next">
-                    Next: Invoicing & Payments
+                <a href="suppliers.php" class="nav-button next">
+                    Next: Supplier Management
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

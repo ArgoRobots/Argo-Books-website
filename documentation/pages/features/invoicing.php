@@ -17,6 +17,8 @@ include '../../docs-header.php';
             <p>Create professional invoices in seconds, track payment status, and get paid faster with
             integrated payment processing. Argo Books makes invoicing simple and efficient.</p>
 
+            <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+
             <h2>Creating Invoices</h2>
             <p>Generate professional invoices with just a few clicks:</p>
             <ol class="steps-list">
@@ -32,10 +34,12 @@ include '../../docs-header.php';
             <p>Keep track of all your invoices and their payment status:</p>
             <ul>
                 <li><strong>Draft:</strong> Invoice created but not yet sent</li>
+                <li><strong>Pending:</strong> Invoice is awaiting review or approval</li>
                 <li><strong>Sent:</strong> Invoice delivered to customer</li>
                 <li><strong>Partial:</strong> Customer has made a partial payment</li>
                 <li><strong>Paid:</strong> Invoice fully paid</li>
                 <li><strong>Overdue:</strong> Payment is past the due date</li>
+                <li><strong>Cancelled:</strong> Invoice has been cancelled</li>
             </ul>
 
             <h2>Online Payment Providers</h2>
@@ -97,9 +101,9 @@ include '../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="customers.php" class="nav-button prev">
+                <a href="suppliers.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Customer Management
+                    Previous: Supplier Management
                 </a>
                 <a href="receipt-scanning.php" class="nav-button next">
                     Next: AI Receipt Scanning

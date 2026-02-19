@@ -1,309 +1,114 @@
 <?php
-session_start();
-require_once '../../../db_connect.php';
-require_once '../../../community/formatting/formatting_functions.php';
 require_once __DIR__ . '/../../../resources/icons.php';
+$pageTitle = 'Keyboard Shortcuts';
+$pageDescription = 'Reference guide for keyboard shortcuts in the Argo Books Report Generator. Speed up your workflow with shortcuts for movement, alignment, and editing.';
+$currentPage = 'keyboard_shortcuts';
+$pageCategory = 'reference';
 
+include '../../docs-header.php';
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Master the keyboard shortcuts for Argo Books's Report Generator. Speed up your workflow with shortcuts for element movement, alignment, selection, and editing.">
-    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
-    <title>Accepted Country Names - Argo Community</title>
+        <div class="docs-content">
+            <p>Speed up your workflow in the Report Generator with these keyboard shortcuts. These shortcuts are available when working in the layout designer (Step 2) of the Report Generator.</p>
 
-    <script src="../../../resources/scripts/jquery-3.6.0.js"></script>
-    <script src="../../../resources/scripts/main.js"></script>
-
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../../../resources/styles/button.css">
-    <link rel="stylesheet" href="../../../resources/styles/link.css">
-    <link rel="stylesheet" href="../../../resources/styles/custom-colors.css">
-    <link rel="stylesheet" href="../../../resources/header/style.css">
-    <link rel="stylesheet" href="../../../resources/header/dark.css">
-    <link rel="stylesheet" href="../../../resources/footer/style.css">
-</head>
-
-<body>
-    <header>
-        <div id="includeHeader"></div>
-    </header>
-
-    <div class="reference-container">
-        <a href="../../" class="link-no-underline back-link">
-            <?= svg_icon('arrow-back', 16) ?>
-            Back to Documentation
-        </a>
-
-        <div class="reference-header">
-            <h1>Report Generator Keyboard Shortcuts</h1>
-            <p>Speed up your workflow with these keyboard shortcuts.</p>
-        </div>
-
-        <div class="reference-category">
-            <div class="shortcut-section">
-                <h4>General Actions</h4>
-                <div class="shortcut-grid">
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>Z</kbd>
-                        </div>
-                        <div class="shortcut-description">Undo last action</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>Y</kbd>
-                        </div>
-                        <div class="shortcut-description">Redo last undone action</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd>
-                        </div>
-                        <div class="shortcut-description">Redo last undone action (alternative)</div>
-                    </div>
-                </div>
+            <h2>General Actions</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Ctrl + Z</strong></td><td>Undo last action</td></tr>
+                        <tr><td><strong>Ctrl + Y</strong></td><td>Redo last undone action</td></tr>
+                        <tr><td><strong>Ctrl + Shift + Z</strong></td><td>Redo last undone action (alternative)</td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="shortcut-section">
-                <h4>Selection & Editing</h4>
-                <div class="shortcut-grid">
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>A</kbd>
-                        </div>
-                        <div class="shortcut-description">Select all elements on the canvas</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>D</kbd>
-                        </div>
-                        <div class="shortcut-description">Duplicate selected element(s)</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Delete</kbd>
-                        </div>
-                        <div class="shortcut-description">Delete selected element(s)</div>
-                    </div>
-                </div>
+            <h2>Selection & Editing</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Ctrl + A</strong></td><td>Select all elements on the canvas</td></tr>
+                        <tr><td><strong>Ctrl + D</strong></td><td>Duplicate selected element(s)</td></tr>
+                        <tr><td><strong>Delete</strong></td><td>Delete selected element(s)</td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="shortcut-section">
-                <h4>Element Movement (Fine Control)</h4>
-                <div class="shortcut-grid">
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>←</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 1 pixel left</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>→</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 1 pixel right</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>↑</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 1 pixel up</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>↓</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 1 pixel down</div>
-                    </div>
-                </div>
+            <h2>Element Movement (Fine Control)</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>&larr;</strong></td><td>Move element 1 pixel left</td></tr>
+                        <tr><td><strong>&rarr;</strong></td><td>Move element 1 pixel right</td></tr>
+                        <tr><td><strong>&uarr;</strong></td><td>Move element 1 pixel up</td></tr>
+                        <tr><td><strong>&darr;</strong></td><td>Move element 1 pixel down</td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="shortcut-section">
-                <h4>Element Movement (Large Steps)</h4>
-                <div class="shortcut-grid">
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Shift</kbd> + <kbd>←</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 10 pixels left</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Shift</kbd> + <kbd>→</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 10 pixels right</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Shift</kbd> + <kbd>↑</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 10 pixels up</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Shift</kbd> + <kbd>↓</kbd>
-                        </div>
-                        <div class="shortcut-description">Move element 10 pixels down</div>
-                    </div>
-                </div>
+            <h2>Element Movement (Large Steps)</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Shift + &larr;</strong></td><td>Move element 10 pixels left</td></tr>
+                        <tr><td><strong>Shift + &rarr;</strong></td><td>Move element 10 pixels right</td></tr>
+                        <tr><td><strong>Shift + &uarr;</strong></td><td>Move element 10 pixels up</td></tr>
+                        <tr><td><strong>Shift + &darr;</strong></td><td>Move element 10 pixels down</td></tr>
+                    </tbody>
+                </table>
             </div>
 
-            <div class="shortcut-section">
-                <h4>Alignment</h4>
-                <div class="shortcut-grid">
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>←</kbd>
-                        </div>
-                        <div class="shortcut-description">Align selected elements to the left</div>
-                    </div>
+            <h2>Alignment</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Ctrl + &larr;</strong></td><td>Align selected elements to the left</td></tr>
+                        <tr><td><strong>Ctrl + &rarr;</strong></td><td>Align selected elements to the right</td></tr>
+                        <tr><td><strong>Ctrl + &uarr;</strong></td><td>Align selected elements to the top</td></tr>
+                        <tr><td><strong>Ctrl + &darr;</strong></td><td>Align selected elements to the bottom</td></tr>
+                    </tbody>
+                </table>
+            </div>
 
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>→</kbd>
-                        </div>
-                        <div class="shortcut-description">Align selected elements to the right</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>↑</kbd>
-                        </div>
-                        <div class="shortcut-description">Align selected elements to the top</div>
-                    </div>
-
-                    <div class="shortcut-item">
-                        <div class="shortcut-keys">
-                            <kbd>Ctrl</kbd> + <kbd>↓</kbd>
-                        </div>
-                        <div class="shortcut-description">Align selected elements to the bottom</div>
-                    </div>
-                </div>
+            <div class="page-navigation">
+                <a href="supported-languages.php" class="nav-button prev">
+                    <?= svg_icon('chevron-left', 16) ?>
+                    Previous: Supported Languages
+                </a>
+                <a href="../security/encryption.php" class="nav-button next">
+                    Next: Encryption
+                    <?= svg_icon('chevron-right', 16) ?>
+                </a>
             </div>
         </div>
-    </div>
 
-    <style>
-        .shortcut-section {
-            margin-bottom: 30px;
-        }
-
-        .shortcut-section h4 {
-            margin-bottom: 15px;
-            color: #374151;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .shortcut-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-        }
-
-        .shortcut-item {
-            background: #ffffff;
-            border-radius: 6px;
-            padding: 15px;
-            border: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.2s;
-        }
-
-        .shortcut-item:hover {
-            border-color: var(--primary-blue, #2563eb);
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
-        }
-
-        .shortcut-keys {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-shrink: 0;
-            min-width: 120px;
-        }
-
-        kbd {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            color: #374151;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .shortcut-description {
-            color: #6b7280;
-            font-size: 14px;
-            flex: 1;
-        }
-
-        .tips-list {
-            list-style: none;
-            padding: 0;
-            margin: 15px 0 0;
-        }
-
-        .tips-list li {
-            background: #f8fafc;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 4px;
-            border-left: 3px solid var(--primary-blue, #2563eb);
-            font-size: 14px;
-            color: #374151;
-        }
-
-        .tips-list li strong {
-            color: var(--primary-blue, #2563eb);
-        }
-
-        .tips-list kbd {
-            margin: 0 2px;
-        }
-
-        @media (max-width: 768px) {
-            .shortcut-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .shortcut-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-
-            .shortcut-keys {
-                min-width: auto;
-            }
-        }
-    </style>
-
-    <footer class="footer">
-        <div id="includeFooter"></div>
-    </footer>
-</body>
-
-</html>
+<?php include '../../docs-footer.php'; ?>

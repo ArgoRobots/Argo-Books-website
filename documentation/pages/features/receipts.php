@@ -35,9 +35,9 @@ include '../../docs-header.php';
             </ol>
 
             <div class="page-navigation">
-                <a href="sales-tracking.php" class="nav-button prev">
+                <a href="returns.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Expense/Revenue Tracking
+                    Previous: Returns
                 </a>
                 <a href="spreadsheet-import.php" class="nav-button next">
                     Next: Spreadsheet Import

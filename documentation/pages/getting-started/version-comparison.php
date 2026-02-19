@@ -103,7 +103,7 @@ include '../../docs-header.php';
                 </div>
             </div>
 
-            <h2>Feature Comparison</h2>
+            <h2 style="margin-top: 3rem;">Feature Comparison</h2>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -178,8 +178,8 @@ include '../../docs-header.php';
                     <?= svg_icon('chevron-left', 16) ?>
                     Previous: Quick Start Tutorial
                 </a>
-                <a href="../features/product-management.php" class="nav-button next">
-                    Next: Product Management
+                <a href="../features/dashboard.php" class="nav-button next">
+                    Next: Dashboard
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Encryption';
-$pageDescription = 'Learn about the AES-256 encryption used in Argo Books to protect your business data.';
+$pageDescription = 'Learn about the AES-256-GCM encryption used in Argo Books to protect your business data.';
 $currentPage = 'encryption';
 $pageCategory = 'security';
 
@@ -9,14 +9,42 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Argo Books uses AES-256 encryption to protect your business data, the same standard used by banks and military organizations.</p>
+            <p>Argo Books uses AES-256-GCM encryption to protect your business data. This is the same encryption standard used by banks and military organizations worldwide, and is considered one of the strongest available.</p>
 
-            <p>Encryption is automatic and requires no additional setup from users. It's enabled by default, but can be disabled in the settings under the "Security" tab.</p>
+            <h2>How It Works</h2>
+            <p>All sensitive data stored in your company file is encrypted automatically. When you save your data, Argo Books encrypts it before writing to disk. When you open a company file, the data is decrypted in memory so you can work with it normally.</p>
+            <ul>
+                <li><strong>AES-256-GCM:</strong> Advanced Encryption Standard with 256-bit keys and Galois/Counter Mode, providing both confidentiality and data integrity</li>
+                <li><strong>PBKDF2 Key Derivation:</strong> Your encryption key is derived using PBKDF2 with a unique salt, making it resistant to brute-force attacks</li>
+                <li><strong>Local Only:</strong> Encryption and decryption happen entirely on your device. Your encryption keys never leave your computer</li>
+            </ul>
+
+            <h2>What Gets Encrypted</h2>
+            <p>Encryption protects all the sensitive business data in your company file, including:</p>
+            <ul>
+                <li>Financial transactions (expenses, revenue, payments)</li>
+                <li>Customer and supplier information</li>
+                <li>Product and inventory data</li>
+                <li>Invoices and purchase orders</li>
+                <li>Attached receipts and documents</li>
+            </ul>
+
+            <h2>Managing Encryption</h2>
+            <p>Encryption is enabled by default and requires no additional setup. If needed, you can manage encryption settings:</p>
+            <ol class="steps-list">
+                <li>Go to "Settings"</li>
+                <li>Select the "Security" tab</li>
+                <li>Toggle the encryption setting on or off</li>
+            </ol>
+
+            <div class="warning-box">
+                <strong>Important:</strong> Disabling encryption means your company file data will be stored in plain text. We strongly recommend keeping encryption enabled for the security of your business data.
+            </div>
 
             <div class="page-navigation">
-                <a href="../reference/supported-languages.php" class="nav-button prev">
+                <a href="../reference/keyboard_shortcuts.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Supported Languages
+                    Previous: Keyboard Shortcuts
                 </a>
                 <a href="password.php" class="nav-button next">
                     Next: Password Protection

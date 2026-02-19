@@ -38,7 +38,7 @@ include '../../docs-header.php';
                 <li>Click "Add Product"</li>
                 <li>Enter the product name</li>
                 <li>Select a category</li>
-                <li>Set the unit price and any other details</li>
+                <li>Fill in any other details (description, supplier, inventory thresholds)</li>
                 <li>Save the product</li>
             </ol>
 
@@ -46,10 +46,12 @@ include '../../docs-header.php';
             <p>When adding or editing a product, you can set the following:</p>
             <ul>
                 <li><strong>Name:</strong> The product or service name</li>
+                <li><strong>Item Type:</strong> Whether this is a Product or Service</li>
                 <li><strong>Category:</strong> Which category the product belongs to</li>
-                <li><strong>Unit Price:</strong> The standard selling or purchase price, pre-filled when adding transactions</li>
                 <li><strong>Supplier:</strong> The vendor you purchase this product from</li>
                 <li><strong>Description:</strong> Additional notes about the product</li>
+                <li><strong>Reorder Point:</strong> Minimum stock level before a low-stock alert is triggered (for inventory-tracked products)</li>
+                <li><strong>Overstock Threshold:</strong> Maximum stock level before an overstock alert appears (for inventory-tracked products)</li>
             </ul>
 
             <h2>Managing Existing Products</h2>

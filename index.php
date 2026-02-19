@@ -281,20 +281,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span class="tab-subtitle">Professional invoices</span>
                         </div>
                     </button>
-                    <!-- Payment System tab - TEMPORARILY DISABLED
-                    <button class="tab-btn" data-tab="payments">
-                        <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                                <line x1="1" y1="10" x2="23" y2="10"/>
-                            </svg>
-                        </div>
-                        <div class="tab-text">
-                            <span class="tab-title">Payment System</span>
-                            <span class="tab-subtitle">Get paid faster</span>
-                        </div>
-                    </button>
-                    -->
                 </div>
 
                 <div class="features-tabs-content">
@@ -721,54 +707,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                     </div>
 
-                    <!-- Payment System - TEMPORARILY DISABLED
-                    <div class="tab-content" id="tab-payments">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Accept payments anywhere</h3>
-                                <p>Let customers pay invoices online with credit cards or bank transfers. Integrated with Stripe, PayPal, and Square for seamless transactions.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Online payment links</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Multiple payment methods</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Automatic reconciliation</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup payments-mockup">
-                                        <div class="payment-providers">
-                                            <div class="provider-card">
-                                                <img src="resources/images/Stripe-logo.svg" alt="Stripe" class="provider-logo">
-                                            </div>
-                                            <div class="provider-card">
-                                                <img src="resources/images/PayPal-logo.svg" alt="PayPal" class="provider-logo">
-                                            </div>
-                                            <div class="provider-card">
-                                                <img src="resources/images/Square-logo.svg" alt="Square" class="provider-logo">
-                                            </div>
-                                        </div>
-                                        <div class="payment-success">
-                                            <div class="success-icon">
-                                                <?= svg_icon('circle-check', 32) ?>
-                                            </div>
-                                            <span class="success-text">Payment Received</span>
-                                            <span class="success-amount">$1,234.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    -->
                 </div>
             </div>
         </div>

@@ -82,12 +82,10 @@ include '../../docs-header.php';
                     <?= svg_icon('chevron-left', 16) ?>
                     Previous: Inventory Management
                 </a>
-                <!-- Payment System nav - TEMPORARILY DISABLED
-                <a href="payments.php" class="nav-button next">
-                    Next: Payment System
+                <a href="../reference/accepted-countries.php" class="nav-button next">
+                    Next: Accepted Countries
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
-                -->
             </div>
         </div>
 

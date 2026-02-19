@@ -46,12 +46,12 @@ include '../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="spreadsheet-export.php" class="nav-button prev">
+                <a href="predictive-analytics.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Spreadsheet Export
+                    Previous: Predictive Analytics
                 </a>
-                <a href="customers.php" class="nav-button next">
-                    Next: Customer Management
+                <a href="sales-tracking.php" class="nav-button next">
+                    Next: Expense/Revenue Tracking
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

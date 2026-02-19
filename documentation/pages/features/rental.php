@@ -78,12 +78,12 @@ include '../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="inventory.php" class="nav-button prev">
+                <a href="invoicing.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Inventory Management
+                    Previous: Invoicing & Payments
                 </a>
-                <a href="../reference/accepted-countries.php" class="nav-button next">
-                    Next: Accepted Countries
+                <a href="customers.php" class="nav-button next">
+                    Next: Customer Management
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

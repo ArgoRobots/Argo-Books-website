@@ -57,8 +57,8 @@ include '../../docs-header.php';
                     <?= svg_icon('chevron-left', 16) ?>
                     Previous: Free vs. Paid Version
                 </a>
-                <a href="product-management.php" class="nav-button next">
-                    Next: Product Management
+                <a href="analytics.php" class="nav-button next">
+                    Next: Analytics
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

@@ -43,13 +43,45 @@ $sidebarSections = [
                 'title' => 'Dashboard',
                 'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'
             ],
-            'product-management' => [
-                'title' => 'Product Management',
-                'icon' => svg_icon('package', 18)
+            'analytics' => [
+                'title' => 'Analytics',
+                'icon' => svg_icon('analytics', 18)
+            ],
+            'predictive-analytics' => [
+                'title' => 'Predictive Analytics',
+                'icon' => svg_icon('analytics', 18)
+            ],
+            'report-generator' => [
+                'title' => 'Report Generator',
+                'icon' => svg_icon('document-lines', 18)
             ],
             'sales-tracking' => [
                 'title' => 'Expense/Revenue Tracking',
                 'icon' => svg_icon('trending-up', 18)
+            ],
+            'invoicing' => [
+                'title' => 'Invoicing & Payments',
+                'icon' => svg_icon('document', 18)
+            ],
+            'rental' => [
+                'title' => 'Rental Management',
+                'icon' => svg_icon('calendar', 18)
+            ],
+            'customers' => [
+                'title' => 'Customer Management',
+                'icon' => svg_icon('users', 18)
+            ],
+            'product-management' => [
+                'title' => 'Product Management',
+                'icon' => svg_icon('package', 18)
+            ],
+            'suppliers' => [
+                'title' => 'Supplier Management',
+                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+            ],
+            'inventory' => [
+                'title' => 'Inventory Management',
+                'icon' => svg_icon('package', 18)
             ],
             'purchase-orders' => [
                 'title' => 'Purchase Orders',
@@ -63,6 +95,10 @@ $sidebarSections = [
                 'title' => 'Receipt Management',
                 'icon' => svg_icon('receipt', 18)
             ],
+            'receipt-scanning' => [
+                'title' => 'AI Receipt Scanning',
+                'icon' => svg_icon('receipt-scan', 18)
+            ],
             'spreadsheet-import' => [
                 'title' => 'Spreadsheet Import',
                 'icon' => svg_icon('document-upload', 18)
@@ -70,38 +106,6 @@ $sidebarSections = [
             'spreadsheet-export' => [
                 'title' => 'Spreadsheet Export',
                 'icon' => svg_icon('document-download', 18)
-            ],
-            'report-generator' => [
-                'title' => 'Report Generator',
-                'icon' => svg_icon('document-lines', 18)
-            ],
-            'customers' => [
-                'title' => 'Customer Management',
-                'icon' => svg_icon('users', 18)
-            ],
-            'suppliers' => [
-                'title' => 'Supplier Management',
-                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
-            ],
-            'invoicing' => [
-                'title' => 'Invoicing & Payments',
-                'icon' => svg_icon('document', 18)
-            ],
-            'receipt-scanning' => [
-                'title' => 'AI Receipt Scanning',
-                'icon' => svg_icon('receipt-scan', 18)
-            ],
-            'predictive-analytics' => [
-                'title' => 'Predictive Analytics',
-                'icon' => svg_icon('analytics', 18)
-            ],
-            'inventory' => [
-                'title' => 'Inventory Management',
-                'icon' => svg_icon('package', 18)
-            ],
-            'rental' => [
-                'title' => 'Rental Management',
-                'icon' => svg_icon('calendar', 18)
             ]
         ]
     ],

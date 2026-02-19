@@ -40,12 +40,12 @@ include '../../docs-header.php';
             <p>From the Suppliers page, you can edit or delete any supplier using the action buttons in each row. Editing a supplier updates their information across all linked products and future transactions.</p>
 
             <div class="page-navigation">
-                <a href="customers.php" class="nav-button prev">
+                <a href="product-management.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Customer Management
+                    Previous: Product Management
                 </a>
-                <a href="invoicing.php" class="nav-button next">
-                    Next: Invoicing & Payments
+                <a href="inventory.php" class="nav-button next">
+                    Next: Inventory Management
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

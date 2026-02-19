@@ -6,6 +6,7 @@ require_once 'users/user_functions.php';
 include_once 'rate_limit.php';
 require_once 'formatting/formatting_functions.php';
 require_once 'report/ban_check.php';
+require_once __DIR__ . '/../resources/icons.php';
 
 require_login();
 $current_user = \CommunityUsers\get_current_user();
@@ -205,10 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="hero-content">
             <div class="hero-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 20h9"/>
-                    <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                </svg>
+                <?= svg_icon('pencil', 16) ?>
                 <span>New Post</span>
             </div>
             <h1>Create a Post</h1>

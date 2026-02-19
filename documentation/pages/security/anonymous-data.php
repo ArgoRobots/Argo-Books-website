@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Anonymous Usage Data';
 $pageDescription = 'Learn about the anonymous usage data collected by Argo Books and how to manage your privacy settings.';
 $currentPage = 'anonymous-data';
@@ -41,9 +42,7 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="backups.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Regular Backups
                 </a>
             </div>

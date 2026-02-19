@@ -5,6 +5,8 @@ $currentPage = 'version-comparison';
 $pageCategory = 'getting-started';
 
 require_once __DIR__ . '/../../../config/pricing.php';
+require_once __DIR__ . '/../../../resources/icons.php';
+
 $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
@@ -32,45 +34,27 @@ include '../../docs-header.php';
                     </div>
                     <ul class="feature-list">
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Up to 10 products</span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Unlimited transactions</span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Real-time analytics</span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Receipt management</span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Basic password protection</span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Core features</span>
                         </li>
                     </ul>
@@ -87,52 +71,31 @@ include '../../docs-header.php';
                     </div>
                     <ul class="feature-list">
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text"><strong>Everything in Free</strong></span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text"><strong>Unlimited products</strong></span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Biometric login security</span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text"><strong>Invoices & payments</strong></span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text"><strong>AI receipt scanning</strong> <span style="font-size: 0.85em; opacity: 0.8;">(500 receipts / month)</span></span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text"><strong>Predictive analytics</strong></span>
                         </li>
                         <li class="feature-item">
-                            <svg class="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M20 6L9 17l-5-5"></path>
-                            </svg>
+                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
                             <span class="feature-text">Priority support</span>
                         </li>
                     </ul>
@@ -212,16 +175,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="quick-start.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Quick Start Tutorial
                 </a>
                 <a href="../features/product-management.php" class="nav-button next">
                     Next: Product Management
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

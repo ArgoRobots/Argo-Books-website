@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Report Generator';
 $pageDescription = 'Learn how to generate professional reports with charts and analytics in Argo Books using the 3-step wizard.';
 $currentPage = 'report-generator';
@@ -46,16 +47,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="spreadsheet-export.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Spreadsheet Export
                 </a>
                 <a href="customers.php" class="nav-button next">
                     Next: Customer Management
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

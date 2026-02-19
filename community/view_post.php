@@ -7,6 +7,8 @@ require_once 'users/user_functions.php';
 require_once 'formatting/formatting_functions.php';
 require_once 'report/ban_check.php';
 
+require_once __DIR__ . '/../resources/icons.php';
+
 // Check for remember me cookie and auto-login user if valid
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     check_remember_me();
@@ -150,9 +152,7 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
         </div>
         <div class="hero-content">
             <div class="hero-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                </svg>
+                <?= svg_icon('chat', 16) ?>
                 <span><?php echo $post['post_type'] === 'bug' ? 'Bug Report' : 'Feature Request'; ?></span>
             </div>
         </div>
@@ -170,9 +170,7 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
         <div class="page-header">
             <div class="header-left">
                 <a href="./" class="btn back-button">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
-                    </svg>
+                    <?= svg_icon('arrow-back', 16) ?>
                     Back to All Posts
                 </a>
             </div>
@@ -219,16 +217,12 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
                 <!-- Post votes -->
                 <div class="post-votes">
                     <button class="vote-btn upvote <?php echo $user_vote === 1 ? 'voted' : ''; ?>" data-post-id="<?php echo $post['id']; ?>" data-vote="up">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-width="2" d="M12 19V5M5 12l7-7 7 7" />
-                        </svg>
+                        <?= svg_icon('vote-up', 24) ?>
                     </button>
 
                     <span class="vote-count"><?php echo $post['votes']; ?></span>
                     <button class="vote-btn downvote <?php echo $user_vote === -1 ? 'voted' : ''; ?>" data-post-id="<?php echo $post['id']; ?>" data-vote="down">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                            <path stroke-width="2" d="M12 5v14M5 12l7 7 7-7" />
-                        </svg>
+                        <?= svg_icon('vote-down', 24) ?>
                     </button>
                 </div>
 
@@ -339,10 +333,7 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
 
                             <!-- Views -->
                             <span class="post-views">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
+                                <?= svg_icon('eye', 14, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                 <?php echo (isset($post['views']) && (int)$post['views'] > 0) ? (int)$post['views'] : 0; ?> <?php echo ((isset($post['views']) && (int)$post['views'] == 1) ? 'view' : 'views'); ?>
                             </span>
 
@@ -357,10 +348,7 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
                         <!-- Report button -->
                         <?php if ($is_logged_in && $post['user_id'] != $user_id): ?>
                             <button class="report-btn" data-content-type="post" data-content-id="<?php echo $post['id']; ?>" title="Report this post">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                    <line x1="4" y1="22" x2="4" y2="15"></line>
-                                </svg>
+                                <?= svg_icon('flag', 16) ?>
                             </button>
                         <?php endif; ?>
                     </div>
@@ -388,15 +376,11 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
                             <!-- Vertical vote controls on left -->
                             <div class="comment-votes">
                                 <button class="comment-vote-btn upvote <?php echo $user_comment_vote === 1 ? 'voted' : ''; ?>" data-comment-id="<?php echo $comment['id']; ?>" data-vote="up">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-width="2" d="M12 19V5M5 12l7-7 7 7" />
-                                    </svg>
+                                    <?= svg_icon('vote-up', 20) ?>
                                 </button>
                                 <span class="comment-vote-count"><?php echo $comment_votes; ?></span>
                                 <button class="comment-vote-btn downvote <?php echo $user_comment_vote === -1 ? 'voted' : ''; ?>" data-comment-id="<?php echo $comment['id']; ?>" data-vote="down">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path stroke-width="2" d="M12 5v14M5 12l7 7 7-7" />
-                                    </svg>
+                                    <?= svg_icon('vote-down', 20) ?>
                                 </button>
                             </div>
 
@@ -438,10 +422,7 @@ if (isset($_GET['created']) && $_GET['created'] == '1') {
                                             <!-- Report button -->
                                             <?php if ($is_logged_in && $comment['user_id'] != $user_id): ?>
                                                 <button class="report-btn report-btn-comment" data-content-type="comment" data-content-id="<?php echo $comment['id']; ?>" title="Report this comment">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                                        <line x1="4" y1="22" x2="4" y2="15"></line>
-                                                    </svg>
+                                                    <?= svg_icon('flag', 14) ?>
                                                 </button>
                                             <?php endif; ?>
                                         </div>

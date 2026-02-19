@@ -12,6 +12,8 @@
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/portal-helper.php';
 
+require_once __DIR__ . '/../resources/icons.php';
+
 $token = $_GET['token'] ?? '';
 
 // If no token provided, show a generic portal landing page
@@ -174,10 +176,7 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
             <div class="tab-content active" id="tab-active">
                 <?php if (empty($activeInvoices)): ?>
                     <div class="empty-state">
-                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
-                        </svg>
+                        <?= svg_icon('circle-check', 48, '', 1.5, 'opacity="0.4"') ?>
                         <p>No outstanding invoices. You're all caught up!</p>
                     </div>
                 <?php else: ?>

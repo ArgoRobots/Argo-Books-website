@@ -6,6 +6,8 @@ require_once 'users/user_functions.php';
 require_once 'formatting/formatting_functions.php';
 require_once 'report/ban_check.php';
 
+require_once __DIR__ . '/../resources/icons.php';
+
 // Check for remember me cookie and auto-login user if valid
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     check_remember_me();
@@ -257,10 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
         <div class="hero-content">
             <div class="hero-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
+                <?= svg_icon('edit', 16) ?>
                 <span>Edit Post</span>
             </div>
             <h1>Edit Your Post</h1>

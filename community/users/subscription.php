@@ -4,6 +4,8 @@ require_once '../../db_connect.php';
 require_once '../community_functions.php';
 require_once 'user_functions.php';
 require_once __DIR__ . '/../../config/pricing.php';
+require_once __DIR__ . '/../../resources/icons.php';
+
 $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
@@ -85,9 +87,7 @@ if ($premium_subscription) {
 
             <div class="button-container">
                 <a href="profile.php" class="link-no-underline back-link">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
-                    </svg>
+                    <?= svg_icon('arrow-back', 16) ?>
                     Back to Profile
                 </a>
             </div>
@@ -125,10 +125,7 @@ if ($premium_subscription) {
                                 <span class="detail-label">Subscription ID</span>
                                 <span class="detail-value">
                                     <a href="resend_subscription_id.php" class="send-id-link" title="Send subscription ID to your email">
-                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                            <polyline points="22,6 12,13 2,6"></polyline>
-                                        </svg>
+                                        <?= svg_icon('mail-alt', 16) ?>
                                         Send to Email
                                     </a>
                                 </span>
@@ -176,9 +173,7 @@ if ($premium_subscription) {
 
                     <?php if ($creditBalance > 0 && $premium_subscription['status'] === 'active'): ?>
                         <div class="subscription-notice credit-notice">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke-width="2">
-                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                            </svg>
+                            <?= svg_icon('dollar', 20) ?>
                             <div>
                                 <p><strong>Credit Balance Active</strong></p>
                                 <p class="notice-detail">You have $<?php echo number_format($creditBalance, 2); ?> in credit covering your next <?php echo $monthsRemaining; ?> month<?php echo $monthsRemaining !== 1 ? 's' : ''; ?>. You won't be charged until your credit is depleted.</p>
@@ -192,11 +187,7 @@ if ($premium_subscription) {
                         </div>
                     <?php elseif ($premium_subscription['status'] === 'cancelled'): ?>
                         <div class="subscription-notice cancelled">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
+                            <?= svg_icon('alert-circle', 20) ?>
                             <div>
                                 <p>Your subscription has been cancelled.</p>
                                 <p class="notice-detail">Premium features will remain active until <strong><?php echo date('F j, Y', strtotime($premium_subscription['end_date'])); ?></strong>.</p>
@@ -211,11 +202,7 @@ if ($premium_subscription) {
                         </div>
                     <?php elseif ($premium_subscription['status'] === 'payment_failed'): ?>
                         <div class="subscription-notice payment-failed">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                                <line x1="12" y1="9" x2="12" y2="13"></line>
-                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                            </svg>
+                            <?= svg_icon('alert-triangle', 20) ?>
                             <div>
                                 <p><strong>Payment Failed</strong></p>
                                 <p class="notice-detail">We were unable to process your renewal payment. Please update your payment method or retry with your existing method.</p>
@@ -227,11 +214,7 @@ if ($premium_subscription) {
                         </div>
                     <?php elseif ($premium_subscription['status'] === 'expired'): ?>
                         <div class="subscription-notice expired">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                            </svg>
+                            <?= svg_icon('x-circle', 20) ?>
                             <div>
                                 <p>Your subscription has expired.</p>
                                 <p class="notice-detail">Renew to continue using Premium features.</p>
@@ -248,26 +231,15 @@ if ($premium_subscription) {
                     <h3>Features Included</h3>
                     <div class="features-grid">
                         <div class="feature-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                            </svg>
+                            <?= svg_icon('document') ?>
                             <span>Invoices & Payments</span>
                         </div>
                         <div class="feature-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                            </svg>
+                            <?= svg_icon('calendar') ?>
                             <span>AI Receipt Scanning <span>(500/month)</span></span>
                         </div>
                         <div class="feature-item">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-                            </svg>
+                            <?= svg_icon('package') ?>
                             <span>predictive analytics</span>
                         </div>
                     </div>
@@ -276,9 +248,7 @@ if ($premium_subscription) {
             <?php else: ?>
                 <div class="no-subscription-card">
                     <div class="no-subscription-icon">
-                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
+                        <?= svg_icon('subscription', 48, '', 1.5) ?>
                     </div>
                     <h3>No Active Subscription</h3>
                     <p>Get access to invoices & payments and AI-powered features like receipt scanning, and predictive analytics.</p>
@@ -368,19 +338,13 @@ if ($premium_subscription) {
     <div class="modal-overlay" id="retry-payment-modal">
         <div class="modal-container">
             <button class="modal-close" id="modal-close-btn" aria-label="Close modal">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+                <?= svg_icon('x', 24) ?>
             </button>
 
             <!-- Initial State -->
             <div class="modal-state" id="modal-state-confirm">
                 <div class="modal-icon">
-                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                        <path d="M21 3v5h-5"></path>
-                    </svg>
+                    <?= svg_icon('refresh', 48) ?>
                 </div>
                 <h2>Retry Payment</h2>
                 <p class="modal-description">
@@ -424,10 +388,7 @@ if ($premium_subscription) {
             <!-- Success State -->
             <div class="modal-state hidden" id="modal-state-success">
                 <div class="modal-icon success">
-                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
+                    <?= svg_icon('circle-check', 48) ?>
                 </div>
                 <h2>Payment Successful!</h2>
                 <p class="modal-description" id="success-message">Your subscription has been reactivated.</p>
@@ -439,11 +400,7 @@ if ($premium_subscription) {
             <!-- Error State -->
             <div class="modal-state hidden" id="modal-state-error">
                 <div class="modal-icon error">
-                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="15" y1="9" x2="9" y2="15"></line>
-                        <line x1="9" y1="9" x2="15" y2="15"></line>
-                    </svg>
+                    <?= svg_icon('x-circle', 48) ?>
                 </div>
                 <h2>Payment Failed</h2>
                 <p class="modal-description" id="error-message">Unable to process your payment.</p>

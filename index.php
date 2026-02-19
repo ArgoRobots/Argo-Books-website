@@ -4,6 +4,8 @@ require_once 'community/users/user_functions.php';
 require_once 'track_referral.php';
 require_once 'statistics.php';
 require_once __DIR__ . '/config/pricing.php';
+require_once __DIR__ . '/resources/icons.php';
+
 $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
@@ -136,9 +138,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">
                         <span>Get Started Free</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <?= svg_icon('arrow-right', 20) ?>
                     </a>
                     <a href="#features" class="btn btn-secondary btn-lg">
                         <span>See Features</span>
@@ -152,9 +152,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="floating-card floating-card-1 animate-float">
                         <div class="floating-card-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                            </svg>
+                            <?= svg_icon('loading', 24) ?>
                         </div>
                         <div class="floating-card-content">
                             <span class="floating-card-label">AI Scanning</span>
@@ -163,10 +161,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="floating-card floating-card-2 animate-float-delayed">
                         <div class="floating-card-icon success">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
-                                <polyline points="17,6 23,6 23,12"/>
-                            </svg>
+                            <?= svg_icon('trending-up', 24) ?>
                         </div>
                         <div class="floating-card-content">
                             <span class="floating-card-label">Revenue Up</span>
@@ -225,12 +220,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="features-tabs-nav animate-on-scroll">
                     <button class="tab-btn active" data-tab="ai-receipts">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="16" rx="2"/>
-                                <path d="M7 8h10M7 12h6"/>
-                                <circle cx="17" cy="14" r="3"/>
-                                <path d="M17 17v-1.5"/>
-                            </svg>
+                            <?= svg_icon('receipt-scan-detail', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">AI Receipt Scanning</span>
@@ -239,10 +229,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </button>
                     <button class="tab-btn" data-tab="expenses">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="1" x2="12" y2="23"/>
-                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                            </svg>
+                            <?= svg_icon('dollar', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Expense & Revenue Tracking</span>
@@ -251,10 +238,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </button>
                     <button class="tab-btn" data-tab="predictive">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 3v18h18"/>
-                                <path d="M18 9l-5 5-4-4-3 3"/>
-                            </svg>
+                            <?= svg_icon('analytics', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Predictive Analytics</span>
@@ -263,11 +247,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </button>
                     <button class="tab-btn" data-tab="inventory">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                                <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-                                <line x1="12" y1="22.08" x2="12" y2="12"/>
-                            </svg>
+                            <?= svg_icon('package', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Inventory Management</span>
@@ -276,12 +256,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </button>
                     <button class="tab-btn" data-tab="rental">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                                <line x1="16" y1="2" x2="16" y2="6"/>
-                                <line x1="8" y1="2" x2="8" y2="6"/>
-                                <line x1="3" y1="10" x2="21" y2="10"/>
-                            </svg>
+                            <?= svg_icon('calendar', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Rental Management</span>
@@ -290,12 +265,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </button>
                     <button class="tab-btn" data-tab="customers">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                <circle cx="9" cy="7" r="4"/>
-                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                            </svg>
+                            <?= svg_icon('users', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Customer Management</span>
@@ -304,12 +274,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </button>
                     <button class="tab-btn" data-tab="invoices">
                         <div class="tab-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14,2 14,8 20,8"/>
-                                <line x1="16" y1="13" x2="8" y2="13"/>
-                                <line x1="16" y1="17" x2="8" y2="17"/>
-                            </svg>
+                            <?= svg_icon('document', 24) ?>
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Invoicing</span>
@@ -341,21 +306,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts vendor, date, amount, and line items with 98% accuracy.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Works with photos from your phone</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Automatic categorization</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Searchable receipt archive</span>
                                     </li>
                                 </ul>
@@ -368,9 +327,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                 <div class="scan-animation" id="receiptScanAnimation">
                                                     <div class="scan-line"></div>
                                                     <div class="scan-complete-indicator">
-                                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                                            <polyline points="20,6 9,17 4,12"/>
-                                                        </svg>
+                                                        <?= svg_icon('check', null, '', 3, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                                     </div>
                                                 </div>
                                                 <div class="receipt-preview">
@@ -399,16 +356,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                 </div>
                                                 <div class="ai-badge" id="aiBadge">
                                                     <span class="badge-text-scanning">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <circle cx="12" cy="12" r="10"/>
-                                                            <polyline points="12,6 12,12 16,14"/>
-                                                        </svg>
+                                                        <?= svg_icon('clock', 16) ?>
                                                         AI Processing...
                                                     </span>
                                                     <span class="badge-text-complete">
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                            <polyline points="20,6 9,17 4,12"/>
-                                                        </svg>
+                                                        <?= svg_icon('check', 16) ?>
                                                         Scan Complete!
                                                     </span>
                                                 </div>
@@ -428,21 +380,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Our intuitive interface makes recording expenses and revenue simple. Smart input validation prevents errors before they happen, so your books are always accurate.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Easy-to-use guided forms</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Smart validation prevents mistakes</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Categorize and organize transactions</span>
                                     </li>
                                 </ul>
@@ -473,15 +419,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                             </div>
                                             <div class="expense-form-validation">
                                                 <div class="validation-check">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <polyline points="20,6 9,17 4,12"/>
-                                                    </svg>
+                                                    <?= svg_icon('check', 16) ?>
                                                     <span>Valid amount</span>
                                                 </div>
                                                 <div class="validation-check">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                        <polyline points="20,6 9,17 4,12"/>
-                                                    </svg>
+                                                    <?= svg_icon('check', 16) ?>
                                                     <span>Category selected</span>
                                                 </div>
                                             </div>
@@ -500,21 +442,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Our predictive engine analyzes your historical data to forecast sales trends, identify seasonal patterns, and help you make data-driven decisions.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Sales trend forecasting</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Seasonal pattern detection</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Revenue projections</span>
                                     </li>
                                 </ul>
@@ -559,21 +495,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Track stock levels, set reorder points, and never run out of your best-selling items. Real-time visibility across all your products.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Real-time stock tracking</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Low stock alerts</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Purchase order management</span>
                                     </li>
                                 </ul>
@@ -583,7 +513,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                     <div class="visual-mockup inventory-mockup">
                                         <div class="inventory-grid">
                                             <div class="inventory-item">
-                                                <div class="item-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+                                                <div class="item-icon"><?= svg_icon('shape-square', 24) ?></div>
                                                 <div class="item-details">
                                                     <span class="item-name">Widget Pro</span>
                                                     <span class="item-stock high">142 in stock</span>
@@ -591,7 +521,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                 <div class="item-bar high"></div>
                                             </div>
                                             <div class="inventory-item">
-                                                <div class="item-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div>
+                                                <div class="item-icon"><?= svg_icon('shape-circle', 24) ?></div>
                                                 <div class="item-details">
                                                     <span class="item-name">Basic Kit</span>
                                                     <span class="item-stock medium">34 in stock</span>
@@ -599,7 +529,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                 <div class="item-bar medium"></div>
                                             </div>
                                             <div class="inventory-item">
-                                                <div class="item-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/></svg></div>
+                                                <div class="item-icon"><?= svg_icon('shape-hexagon', 24) ?></div>
                                                 <div class="item-details">
                                                     <span class="item-name">Deluxe Bundle</span>
                                                     <span class="item-stock low">8 in stock</span>
@@ -621,21 +551,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Manage equipment rentals, track availability, and handle bookings with ease. Perfect for rental businesses of any size.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Availability calendar</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Booking management</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Return tracking</span>
                                     </li>
                                 </ul>
@@ -646,8 +570,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                         <div class="calendar-header">
                                             <span class="cal-month">December 2025</span>
                                             <div class="cal-nav">
-                                                <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg></button>
-                                                <button><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9,18 15,12 9,6"/></svg></button>
+                                                <button><?= svg_icon('chevron-left-sm', 16) ?></button>
+                                                <button><?= svg_icon('chevron-right-sm', 16) ?></button>
                                             </div>
                                         </div>
                                         <div class="calendar-grid">
@@ -691,21 +615,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Keep track of customer information, purchase history, and preferences. Deliver personalized service that keeps them coming back.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Customer profiles</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Purchase history</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Notes and preferences</span>
                                     </li>
                                 </ul>
@@ -761,21 +679,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Create, send, and track invoices with ease. Customize templates, set payment terms, and get paid faster.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Customizable templates</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Automatic numbering</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Payment tracking</span>
                                     </li>
                                 </ul>
@@ -817,21 +729,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <p>Let customers pay invoices online with credit cards or bank transfers. Integrated with Stripe, PayPal, and Square for seamless transactions.</p>
                                 <ul class="feature-list">
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Online payment links</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Multiple payment methods</span>
                                     </li>
                                     <li>
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <polyline points="20,6 9,17 4,12"/>
-                                        </svg>
+                                        <?= svg_icon('check', 20) ?>
                                         <span>Automatic reconciliation</span>
                                     </li>
                                 </ul>
@@ -852,10 +758,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                         </div>
                                         <div class="payment-success">
                                             <div class="success-icon">
-                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                                    <polyline points="22,4 12,14.01 9,11.01"/>
-                                                </svg>
+                                                <?= svg_icon('circle-check', 32) ?>
                                             </div>
                                             <span class="success-text">Payment Received</span>
                                             <span class="success-amount">$1,234.00</span>
@@ -884,11 +787,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <div class="step-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7,10 12,15 17,10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
+                        <?= svg_icon('download', 32) ?>
                     </div>
                     <h3>Download</h3>
                     <p>Get Argo Books for free. Installation takes less than 2 minutes.</p>
@@ -897,10 +796,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
                     <div class="step-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 20h9"/>
-                            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-                        </svg>
+                        <?= svg_icon('pencil', 32) ?>
                     </div>
                     <h3>Set Up</h3>
                     <p>Add your products, customers, and preferences. Import existing data if you have it.</p>
@@ -909,10 +805,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <div class="step-icon">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="23,6 13.5,15.5 8.5,10.5 1,18"/>
-                            <polyline points="17,6 23,6 23,12"/>
-                        </svg>
+                        <?= svg_icon('trending-up', 32) ?>
                     </div>
                     <h3>Grow</h3>
                     <p>Start tracking sales, managing inventory, and watching your business insights grow.</p>
@@ -1001,11 +894,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="mobile-features">
                         <div class="mobile-feature-item">
                             <div class="mobile-feature-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="4" width="18" height="16" rx="2"/>
-                                    <path d="M7 8h10M7 12h6"/>
-                                    <circle cx="17" cy="14" r="3"/>
-                                </svg>
+                                <?= svg_icon('receipt-scan', 24) ?>
                             </div>
                             <div class="mobile-feature-text">
                                 <h4>Snap & Scan Receipts</h4>
@@ -1014,10 +903,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                         <div class="mobile-feature-item">
                             <div class="mobile-feature-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 3v18h18"/>
-                                    <path d="M18 9l-5 5-4-4-3 3"/>
-                                </svg>
+                                <?= svg_icon('analytics', 24) ?>
                             </div>
                             <div class="mobile-feature-text">
                                 <h4>Real-time Dashboard</h4>
@@ -1026,9 +912,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                         <div class="mobile-feature-item">
                             <div class="mobile-feature-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
+                                <?= svg_icon('chat', 24) ?>
                             </div>
                             <div class="mobile-feature-text">
                                 <h4>Instant Notifications</h4>
@@ -1055,9 +939,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="security-features">
                         <div class="security-item">
                             <div class="security-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                </svg>
+                                <?= svg_icon('shield', 24) ?>
                             </div>
                             <div class="security-detail">
                                 <h4>AES-256 Encryption</h4>
@@ -1066,10 +948,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                         <div class="security-item">
                             <div class="security-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                                </svg>
+                                <?= svg_icon('lock', 24) ?>
                             </div>
                             <div class="security-detail">
                                 <h4>Local Storage</h4>
@@ -1078,10 +957,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                         <div class="security-item">
                             <div class="security-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
-                                    <path d="M12 6v6l4 2"/>
-                                </svg>
+                                <?= svg_icon('biometric-clock', 24) ?>
                             </div>
                             <div class="security-detail">
                                 <h4>Biometric Login</h4>
@@ -1132,33 +1008,23 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <ul class="pricing-features">
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Up to 10 products</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Unlimited transactions</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Real-time analytics</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Receipt management</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Core features</span>
                         </li>
                     </ul>
@@ -1179,45 +1045,31 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <ul class="pricing-features">
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Everything in Free</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Unlimited products</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Biometric login security</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Invoices & payments</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>AI receipt scanning <span>(500/month)</span></span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Predictive analytics</span>
                         </li>
                         <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 20) ?>
                             <span>Priority support</span>
                         </li>
                     </ul>
@@ -1241,9 +1093,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-question">
                         <h3>What platforms does Argo Books support?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -1257,9 +1107,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-question">
                         <h3>Is my data secure?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -1273,9 +1121,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-question">
                         <h3>How does AI receipt scanning work?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -1289,9 +1135,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-question">
                         <h3>Can I try Argo Books for free?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -1305,9 +1149,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-question">
                         <h3>What's included in the Premium subscription?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -1321,9 +1163,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-question">
                         <h3>What is your refund policy?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -1347,75 +1187,53 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="contact-grid">
                 <div class="contact-card animate-on-scroll">
                     <div class="contact-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                        </svg>
+                        <?= svg_icon('mail', null, '', 1.5) ?>
                     </div>
                     <h3>Email Support</h3>
                     <p>Get help with technical issues, account questions, or general inquiries.</p>
                     <a href="mailto:support@argorobots.com" class="contact-link">
                         support@argorobots.com
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <?= svg_icon('arrow-right', 16) ?>
                     </a>
                 </div>
                 <div class="contact-card animate-on-scroll">
                     <div class="contact-icon feedback">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
-                        </svg>
+                        <?= svg_icon('chat', null, '', 1.5) ?>
                     </div>
                     <h3>Send Feedback</h3>
                     <p>Share your ideas, feature requests, or suggestions to help us improve.</p>
                     <a href="mailto:feedback@argorobots.com" class="contact-link">
                         feedback@argorobots.com
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <?= svg_icon('arrow-right', 16) ?>
                     </a>
                 </div>
                 <div class="contact-card animate-on-scroll">
                     <div class="contact-icon community">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-                        </svg>
+                        <?= svg_icon('users', null, '', 1.5) ?>
                     </div>
                     <h3>Community</h3>
                     <p>Join our community to connect with other users and share tips.</p>
                     <a href="community/" class="contact-link">
                         Visit Community
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <?= svg_icon('arrow-right', 16) ?>
                     </a>
                 </div>
                 <div class="contact-card animate-on-scroll">
                     <div class="contact-icon docs">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
-                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
-                            <path d="M8 7h8M8 11h8M8 15h5"/>
-                        </svg>
+                        <?= svg_icon('book', null, '', 1.5) ?>
                     </div>
                     <h3>Documentation</h3>
                     <p>Browse guides, tutorials, and references to get the most out of Argo Books.</p>
                     <a href="documentation/" class="contact-link">
                         View Docs
-                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7"/>
-                        </svg>
+                        <?= svg_icon('arrow-right', 16) ?>
                     </a>
                 </div>
             </div>
             <div class="contact-cta animate-on-scroll">
                 <p>Want to reach out directly?</p>
                 <a href="contact-us/" class="btn btn-primary">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
-                    </svg>
+                    <?= svg_icon('message-circle', 20) ?>
                     Contact Form
                 </a>
             </div>
@@ -1433,9 +1251,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="cta-buttons">
                         <a href="downloads" class="btn btn-white btn-lg">
                             <span>Get Started Free</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M5 12h14M12 5l7 7-7 7"/>
-                            </svg>
+                            <?= svg_icon('arrow-right', 20) ?>
                         </a>
                         <a href="upgrade/" class="btn btn-outline-white btn-lg">
                             <span>View Pricing</span>
@@ -1443,21 +1259,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="cta-features">
                         <span class="cta-feature">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 16) ?>
                             Free to start
                         </span>
                         <span class="cta-feature">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 16) ?>
                             No credit card required
                         </span>
                         <span class="cta-feature">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="20,6 9,17 4,12"/>
-                            </svg>
+                            <?= svg_icon('check', 16) ?>
                             Setup in minutes
                         </span>
                     </div>

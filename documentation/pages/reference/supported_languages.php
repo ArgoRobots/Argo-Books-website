@@ -1,3 +1,5 @@
+<?php require_once __DIR__ . '/../../../resources/icons.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,9 +30,7 @@
 
     <div class="reference-container">
         <a href="../../" class="link-no-underline back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
+            <?= svg_icon('arrow-back', 16) ?>
             Back to Documentation
         </a>
 

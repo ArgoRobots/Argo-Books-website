@@ -1,6 +1,8 @@
 <?php
 require_once 'contact_process.php';
 
+require_once __DIR__ . '/../resources/icons.php';
+
 $error_message = '';
 $form_data = ['firstName' => '', 'lastName' => '', 'email' => '', 'subject' => 'general', 'message' => ''];
 
@@ -88,70 +90,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="options-grid">
         <div class="option-card animate-on-scroll">
           <div class="option-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-            </svg>
+            <?= svg_icon('mail', null, '', 1.5) ?>
           </div>
           <h3>Email Support</h3>
           <p>Get help with technical issues, account questions, or general inquiries.</p>
           <a href="mailto:support@argorobots.com" class="option-link">
             support@argorobots.com
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+            <?= svg_icon('arrow-right', 16) ?>
           </a>
           <span class="response-time">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M12 6v6l4 2"/>
-            </svg>
+            <?= svg_icon('clock', 14) ?>
             1-8 business hours
           </span>
         </div>
 
         <div class="option-card animate-on-scroll">
           <div class="option-icon feedback">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z"/>
-            </svg>
+            <?= svg_icon('chat', null, '', 1.5) ?>
           </div>
           <h3>Send Feedback</h3>
           <p>Share ideas, feature requests, or suggestions to help us improve Argo Books.</p>
           <a href="mailto:feedback@argorobots.com" class="option-link">
             feedback@argorobots.com
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+            <?= svg_icon('arrow-right', 16) ?>
           </a>
           <span class="response-time">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/>
-            </svg>
+            <?= svg_icon('thumbs-up', 14) ?>
             We read every message
           </span>
         </div>
 
         <div class="option-card animate-on-scroll">
           <div class="option-icon community">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-            </svg>
+            <?= svg_icon('users', null, '', 1.5) ?>
           </div>
           <h3>Community Forum</h3>
           <p>Connect with other users, share tips, and get help from the community.</p>
           <a href="../community/" class="option-link">
             Visit Community
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+            <?= svg_icon('arrow-right', 16) ?>
           </a>
           <span class="response-time">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-            </svg>
+            <?= svg_icon('user', 14) ?>
             Active community
           </span>
         </div>
@@ -170,11 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <?php if (!empty($error_message)): ?>
         <div class="error-message">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="12"/>
-            <line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
+          <?= svg_icon('alert-circle', 20) ?>
           <?php echo htmlspecialchars($error_message); ?>
         </div>
         <?php endif; ?>
@@ -215,10 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           <button type="submit" class="submit-btn">
             <span>Send Message</span>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
+            <?= svg_icon('send', 20) ?>
           </button>
         </form>
       </div>
@@ -226,11 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="form-sidebar animate-on-scroll">
         <div class="sidebar-card">
           <div class="sidebar-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
+            <?= svg_icon('help-circle', null, '', 1.5) ?>
           </div>
           <h4>Check the Docs First</h4>
           <p>Many common questions are already answered in our documentation.</p>
@@ -239,18 +208,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="sidebar-card">
           <div class="sidebar-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
+            <?= svg_icon('map-pin', null, '', 1.5) ?>
           </div>
           <h4>Based in Saskatoon</h4>
           <p>We're a Canadian company proudly serving businesses worldwide.</p>
           <span class="location-badge">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
-              <circle cx="12" cy="10" r="3"/>
-            </svg>
+            <?= svg_icon('map-pin', 14) ?>
             Saskatoon, SK, Canada
           </span>
         </div>

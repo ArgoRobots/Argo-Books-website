@@ -1,3 +1,5 @@
+<?php require_once __DIR__ . '/../resources/icons.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -65,18 +67,14 @@
         </div>
         <div class="hero-content">
             <div class="hero-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                </svg>
+                <?= svg_icon('loading', 16) ?>
                 <span>Changelog</span>
             </div>
             <h1>What's New in Argo Books</h1>
             <p>Discover the latest improvements and features we've added to make managing your business even easier</p>
             <div class="hero-buttons">
                 <a href="../downloads" class="btn btn-primary">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-                    </svg>
+                    <?= svg_icon('download', 18) ?>
                     Download Latest
                 </a>
                 <a href="../older-versions/" class="btn btn-secondary">
@@ -96,9 +94,7 @@
                         <span class="version-tag">Version 2.0.1</span>
                         <span class="date-tag">February 2026</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -142,9 +138,7 @@
                         <span class="version-tag">Version 2.0.0</span>
                         <span class="date-tag">January 2026</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -198,9 +192,7 @@
                         <span class="version-tag">Version 1.0.7</span>
                         <span class="date-tag">August 29 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -232,9 +224,7 @@
                         <span class="version-tag">Version 1.0.6</span>
                         <span class="date-tag">August 17 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -264,9 +254,7 @@
                         <span class="version-tag">Version 1.0.5</span>
                         <span class="date-tag">August 7 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -304,9 +292,7 @@
                         <span class="version-tag">Version 1.0.4</span>
                         <span class="date-tag">July 20 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -343,9 +329,7 @@
                         <span class="version-tag">Version 1.0.3</span>
                         <span class="date-tag">June 28 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -389,9 +373,7 @@
                         <span class="version-tag">Version 1.0.2</span>
                         <span class="date-tag">June 14 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -425,9 +407,7 @@
                         <span class="version-tag">Version 1.0.1</span>
                         <span class="date-tag">May 10 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">
@@ -459,9 +439,7 @@
                         <span class="version-tag">Version 1.0.0</span>
                         <span class="date-tag">May 1 2025</span>
                     </div>
-                    <svg class="dropdown-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
 
                 <div class="version-content">

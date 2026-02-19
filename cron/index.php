@@ -10,6 +10,7 @@
  */
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/../resources/icons.php';
 
 // Load environment variables
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -280,9 +281,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
             <form method="post" onsubmit="return confirm('Are you sure you want to run the renewal process now?');">
                 <input type="hidden" name="run_renewal" value="1">
                 <button type="submit" class="btn btn-green">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align: middle; margin-right: 5px;">
-                        <path d="M8 5v14l11-7z"/>
-                    </svg>
+                    <?= svg_icon('play-filled', 16, '', null, 'style="vertical-align: middle; margin-right: 5px;"') ?>
                     Run Now
                 </button>
             </form>
@@ -298,9 +297,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
                 <div class="panel-content">
                     <?php if (empty($pendingRenewals)): ?>
                         <div class="no-data">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                            </svg>
+                            <?= svg_icon('check-filled') ?>
                             <p>No renewals due in the next 7 days</p>
                         </div>
                     <?php else: ?>
@@ -339,9 +336,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
                 <div class="panel-content">
                     <?php if (empty($recentPayments)): ?>
                         <div class="no-data">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
-                            </svg>
+                            <?= svg_icon('credit-card-filled') ?>
                             <p>No recent payment activity</p>
                         </div>
                     <?php else: ?>
@@ -394,9 +389,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
                 <div class="panel-content">
                     <?php if (empty($logFiles)): ?>
                         <div class="no-data">
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                            </svg>
+                            <?= svg_icon('document-filled') ?>
                             <p>No log files available yet. Logs are created when the renewal process runs.</p>
                         </div>
                     <?php else: ?>

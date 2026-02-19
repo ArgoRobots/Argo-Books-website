@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Password Protection';
 $pageDescription = 'Learn how to set up password protection and biometric login in Argo Books to secure your business data.';
 $currentPage = 'password';
@@ -32,16 +33,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="encryption.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Encryption
                 </a>
                 <a href="backups.php" class="nav-button next">
                     Next: Regular Backups
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

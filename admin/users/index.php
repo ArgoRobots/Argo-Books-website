@@ -4,6 +4,8 @@ require_once '../../db_connect.php';
 require_once '../../email_sender.php';
 require_once '../../community/report/ban_check.php';
 
+require_once __DIR__ . '/../../resources/icons.php';
+
 // Check if user is already logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
@@ -277,10 +279,7 @@ include '../admin_header.php';
                            value="<?php echo htmlspecialchars($search); ?>"
                            class="search-input">
                     <button type="submit" class="search-button">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
+                        <?= svg_icon('search') ?>
                         Search
                     </button>
                     <?php if (!empty($search)): ?>
@@ -342,11 +341,7 @@ include '../admin_header.php';
 
         <?php if (empty($users)): ?>
             <div class="no-results">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
+                <?= svg_icon('alert-circle') ?>
                 <p>No users found matching your criteria</p>
             </div>
         <?php else: ?>
@@ -357,16 +352,11 @@ include '../admin_header.php';
                     </div>
                     <div class="bulk-actions">
                         <button type="button" class="btn btn-bulk btn-unban" data-action="unban" disabled>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                                <path d="M9 12l2 2 4-4"/>
-                            </svg>
+                            <?= svg_icon('shield-check') ?>
                             Unban Selected
                         </button>
                         <button type="button" class="btn btn-bulk btn-delete" data-action="delete" disabled>
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-                            </svg>
+                            <?= svg_icon('trash') ?>
                             Delete Selected
                         </button>
                     </div>

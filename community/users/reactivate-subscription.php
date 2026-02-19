@@ -7,6 +7,8 @@ require_once 'user_functions.php';
 require_once '../../webhooks/paypal-helper.php';
 require_once '../../config/pricing.php';
 
+require_once __DIR__ . '/../../resources/icons.php';
+
 // Ensure user is logged in
 require_login();
 
@@ -122,10 +124,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
     <div class="confirm-page-container">
         <div class="confirm-card reactivate-card">
             <div class="confirm-icon reactivate-icon">
-                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
-                    <path d="M21 3v5h-5"></path>
-                </svg>
+                <?= svg_icon('refresh', 48) ?>
             </div>
 
             <h1>Reactivate Your Subscription?</h1>

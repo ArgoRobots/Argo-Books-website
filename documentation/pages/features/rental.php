@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Rental Management';
 $pageDescription = 'Learn how to manage equipment rentals, track availability, handle bookings, and process returns with Argo Books rental features.';
 $currentPage = 'rental';
@@ -78,17 +79,13 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="inventory.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Inventory Management
                 </a>
                 <!-- Payment System nav - TEMPORARILY DISABLED
                 <a href="payments.php" class="nav-button next">
                     Next: Payment System
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
                 -->
             </div>

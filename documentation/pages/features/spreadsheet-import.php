@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Spreadsheet Import';
 $pageDescription = 'Learn how to import data from Excel spreadsheets into Argo Books. Supports multiple currencies and automatic data detection.';
 $currentPage = 'spreadsheet-import';
@@ -46,16 +47,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="receipts.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Receipt Management
                 </a>
                 <a href="spreadsheet-export.php" class="nav-button next">
                     Next: Spreadsheet Export
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

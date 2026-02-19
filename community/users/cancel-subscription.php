@@ -6,6 +6,8 @@ require_once '../community_functions.php';
 require_once 'user_functions.php';
 require_once '../../webhooks/paypal-helper.php';
 
+require_once __DIR__ . '/../../resources/icons.php';
+
 // Ensure user is logged in
 require_login();
 
@@ -132,11 +134,7 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
     <div class="confirm-page-container">
         <div class="confirm-card cancel-card">
             <div class="confirm-icon cancel-icon">
-                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="15" y1="9" x2="9" y2="15"></line>
-                    <line x1="9" y1="9" x2="15" y2="15"></line>
-                </svg>
+                <?= svg_icon('x-circle', 48) ?>
             </div>
 
             <h1>Cancel Your Subscription?</h1>

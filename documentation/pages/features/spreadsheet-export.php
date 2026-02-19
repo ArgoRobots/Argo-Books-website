@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Spreadsheet Export';
 $pageDescription = 'Learn how to export your Argo Books data to Excel spreadsheets for backup, analysis, or sharing with others.';
 $currentPage = 'spreadsheet-export';
@@ -42,16 +43,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="spreadsheet-import.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Spreadsheet Import
                 </a>
                 <a href="report-generator.php" class="nav-button next">
                     Next: Report Generator
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

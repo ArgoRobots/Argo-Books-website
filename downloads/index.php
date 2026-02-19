@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../resources/icons.php';
 // Load system requirements from JSON
 function getSystemRequirements()
 {
@@ -165,9 +166,7 @@ $systemRequirements = getSystemRequirements();
             <!-- Windows -->
             <div class="platform-card platform-windows">
                 <div class="platform-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
-                    </svg>
+                    <?= svg_icon('windows') ?>
                 </div>
                 <div class="platform-info">
                     <h2>Windows</h2>
@@ -181,11 +180,7 @@ $systemRequirements = getSystemRequirements();
                 </div>
                 <div class="platform-actions">
                     <a href="../download/avalonia/win" class="btn btn-blue download-btn" data-platform="windows">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
+                        <?= svg_icon('download', null, 'btn-icon') ?>
                         Download for Windows
                     </a>
                     <?php if ($latestVersion): ?>
@@ -197,9 +192,7 @@ $systemRequirements = getSystemRequirements();
             <!-- macOS -->
             <div class="platform-card platform-macos">
                 <div class="platform-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                    </svg>
+                    <?= svg_icon('apple') ?>
                 </div>
                 <div class="platform-info">
                     <h2>macOS</h2>
@@ -257,42 +250,27 @@ $systemRequirements = getSystemRequirements();
         <div class="additional-section">
             <div class="additional-card">
                 <div class="additional-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
+                    <?= svg_icon('clock') ?>
                 </div>
                 <div class="additional-content">
                     <h3>Looking for older versions?</h3>
                     <p>Access previous releases of Argo Books for compatibility or testing purposes.</p>
                     <a href="../older-versions/" class="link-arrow">
                         View older versions
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
+                        <?= svg_icon('arrow-right-sm') ?>
                     </a>
                 </div>
             </div>
             <div class="additional-card">
                 <div class="additional-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/>
-                        <line x1="16" y1="17" x2="8" y2="17"/>
-                        <polyline points="10 9 9 9 8 9"/>
-                    </svg>
+                    <?= svg_icon('document-lines') ?>
                 </div>
                 <div class="additional-content">
                     <h3>Need help getting started?</h3>
                     <p>Check out our documentation for installation guides and tutorials.</p>
                     <a href="../documentation/" class="link-arrow">
                         View documentation
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                            <polyline points="12 5 19 12 12 19"/>
-                        </svg>
+                        <?= svg_icon('arrow-right-sm') ?>
                     </a>
                 </div>
             </div>

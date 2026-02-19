@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 // Load system requirements from JSON
 function getSystemRequirements()
 {
@@ -55,9 +56,7 @@ include '../../docs-header.php';
             <div class="page-navigation">
                 <a href="installation.php" class="nav-button next">
                     Next: Installation Guide
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Receipt Management';
 $pageDescription = 'Learn how to manage receipts in Argo Books. Add, digitize, and export receipts for all your transactions.';
 $currentPage = 'receipts';
@@ -35,16 +36,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="returns.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Returns
                 </a>
                 <a href="spreadsheet-import.php" class="nav-button next">
                     Next: Spreadsheet Import
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

@@ -4,6 +4,8 @@ require_once '../../db_connect.php';
 require_once '../community_functions.php';
 require_once 'user_functions.php';
 
+require_once __DIR__ . '/../../resources/icons.php';
+
 // Check for remember me cookie and auto-login user if valid
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     check_remember_me();
@@ -514,11 +516,7 @@ if ($is_own_profile) {
         <div class="profile-container">
             <div class="user-not-found">
                 <div class="not-found-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="12" y1="8" x2="12" y2="12"></line>
-                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
+                    <?= svg_icon('alert-circle', 64, '', 1.5, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
                 <h2>The user "<?php echo htmlspecialchars($requested_username); ?>" could not be found</h2>
                 <p>The username you are looking for does not exist or may have been removed.</p>
@@ -538,10 +536,7 @@ if ($is_own_profile) {
                     <?php endif; ?>
                     <?php if ($is_logged_in && !$is_own_profile): ?>
                         <button class="report-btn report-btn-user" data-content-type="user" data-content-id="<?php echo $user['id']; ?>" title="Report this user">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                            </svg>
+                            <?= svg_icon('flag', 16) ?>
                         </button>
                     <?php endif; ?>
                 </h1>
@@ -582,10 +577,7 @@ if ($is_own_profile) {
 
                                 <?php if ($is_own_profile): ?>
                                     <div class="avatar-overlay">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                            <circle cx="12" cy="13" r="4"></circle>
-                                        </svg>
+                                        <?= svg_icon('camera', 24) ?>
                                         <span>Change Photo</span>
                                     </div>
                                     <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif" style="display: none;">
@@ -634,35 +626,24 @@ if ($is_own_profile) {
                             <?php if ($is_own_profile): ?>
                                 <?php if ($has_premium_subscription): ?>
                                     <a href="resend_license.php" class="btn btn-blue">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                        </svg>
+                                        <?= svg_icon('lock', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                         Resend Subscription ID
                                     </a>
                                 <?php endif; ?>
 
                                 <?php if ($is_admin): ?>
                                     <a href="admin_notification_settings.php" class="btn btn-blue">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                                        </svg>
+                                        <?= svg_icon('bell', 20) ?>
                                         Notification Settings
                                     </a>
                                 <?php endif; ?>
 
                                 <a href="subscription.php" class="btn btn-blue">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                                    </svg>
+                                    <?= svg_icon('subscription', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Manage Subscription
                                 </a>
                                 <a href="edit_profile.php" class="btn btn-blue">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                    </svg>
+                                    <?= svg_icon('edit', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Edit Account
                                 </a>
                                 <a href="logout.php" class="btn btn-gray">Log Out</a>
@@ -676,10 +657,7 @@ if ($is_own_profile) {
                         <div class="impact-stats">
                             <div class="impact-stat">
                                 <div class="impact-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
+                                    <?= svg_icon('eye', 24, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                 </div>
                                 <div class="impact-data">
                                     <span class="impact-value"><?php echo number_format($people_reached); ?></span>
@@ -688,9 +666,7 @@ if ($is_own_profile) {
                             </div>
                             <div class="impact-stat">
                                 <div class="impact-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M7 17l9.2-9.2M17 17V7H7"></path>
-                                    </svg>
+                                    <?= svg_icon('arrow-top-right', 24, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                 </div>
                                 <div class="impact-data">
                                     <span class="impact-value"><?php echo number_format($votes_cast); ?></span>
@@ -706,11 +682,7 @@ if ($is_own_profile) {
                     <div class="reputation-chart-section">
                         <h3>Reputation Overview
                             <a href="reputation_help.php" class="reputation-help-link" title="Learn about the reputation system">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                                </svg>
+                                <?= svg_icon('help-circle', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                             </a>
                         </h3>
                         <div class="reputation-container">
@@ -920,10 +892,7 @@ if ($is_own_profile) {
                                                         ?>
                                                     </span>
                                                     <span class="post-views">
-                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                            <circle cx="12" cy="12" r="3"></circle>
-                                                        </svg>
+                                                        <?= svg_icon('eye', 14, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                                         <?php echo number_format($post['views']); ?> <?php echo $post['views'] === 1 ? 'view' : 'views'; ?>
                                                     </span>
 

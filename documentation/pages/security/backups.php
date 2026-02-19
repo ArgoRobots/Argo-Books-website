@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Regular Backups';
 $pageDescription = 'Learn how to create and restore backups of your Argo Books data to prevent data loss.';
 $currentPage = 'backups';
@@ -42,16 +43,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="password.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Password Protection
                 </a>
                 <a href="anonymous-data.php" class="nav-button next">
                     Next: Anonymous Usage Data
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

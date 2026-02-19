@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../config/pricing.php';
+require_once __DIR__ . '/../resources/icons.php';
+
 $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
@@ -65,9 +67,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         </div>
         <div class="container">
             <div class="hero-badge">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
+                <?= svg_icon('star', 16) ?>
                 <span>Pricing</span>
             </div>
             <h1>Upgrade Your Experience</h1>
@@ -92,27 +92,27 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
                         <ul class="card-features">
                             <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>Unlimited products</span>
                             </li>
                             <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>Biometric login security</span>
                             </li>
                             <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>Invoices & payments</span>
                             </li>
                             <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>AI receipt scanning <span>(500/month)</span></span>
                             </li>
                             <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>predictive analytics</span>
                             </li>
                             <li>
-                                <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>Priority support</span>
                             </li>
                         </ul>
@@ -134,9 +134,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <div class="faq-question">
                         <h3>Do I have to pay to use Argo Books?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -150,9 +148,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <div class="faq-question">
                         <h3>What does Premium include?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -166,9 +162,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <div class="faq-question">
                         <h3>Can I cancel the Premium subscription anytime?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
@@ -182,9 +176,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <div class="faq-question">
                         <h3>Is there a yearly plan?</h3>
                         <div class="faq-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="6,9 12,15 18,9"/>
-                            </svg>
+                            <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">

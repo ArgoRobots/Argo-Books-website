@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Customer Management';
 $pageDescription = 'Learn how to manage customer profiles, track expense history, and build lasting relationships with Argo Books customer management features.';
 $currentPage = 'customers';
@@ -40,16 +41,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="report-generator.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Report Generator
                 </a>
                 <a href="suppliers.php" class="nav-button next">
                     Next: Supplier Management
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

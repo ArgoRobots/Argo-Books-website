@@ -5,6 +5,8 @@ require_once '../community_functions.php';
 require_once 'user_functions.php';
 require_once '../../email_sender.php';
 
+require_once __DIR__ . '/../../resources/icons.php';
+
 // Ensure user is logged in
 require_login();
 
@@ -546,9 +548,7 @@ function handle_password_change()
         </div>
 
         <a href="profile.php" class="link-no-underline back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path stroke-width="2" d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
+            <?= svg_icon('arrow-back', 16) ?>
             Back to Profile
         </a>
 

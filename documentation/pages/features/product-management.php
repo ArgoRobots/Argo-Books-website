@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../resources/icons.php';
 $pageTitle = 'Product Management';
 $pageDescription = 'Learn how to manage products and categories in Argo Books. Create categories, add products, and organize your inventory.';
 $currentPage = 'product-management';
@@ -60,16 +61,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="dashboard.php" class="nav-button prev">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 18l-6-6 6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-left', 16) ?>
                     Previous: Dashboard
                 </a>
                 <a href="sales-tracking.php" class="nav-button next">
                     Next: Expense/Revenue Tracking
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18l6-6-6-6"></path>
-                    </svg>
+                    <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>
         </div>

@@ -24,8 +24,12 @@ include '../../docs-header.php';
             <p>The following languages are supported:</p>
             <div style="column-count: 3; column-gap: 2rem; margin-bottom: 1.5rem;">
                 <ul style="margin: 0; padding-left: 1.2rem;">
+                    <li>Albanian</li>
                     <li>Arabic</li>
+                    <li>Basque</li>
+                    <li>Belarusian</li>
                     <li>Bengali</li>
+                    <li>Bosnian</li>
                     <li>Bulgarian</li>
                     <li>Catalan</li>
                     <li>Chinese (Simplified)</li>
@@ -39,27 +43,28 @@ include '../../docs-header.php';
                     <li>Filipino</li>
                     <li>Finnish</li>
                     <li>French</li>
+                    <li>Galician</li>
                     <li>German</li>
                     <li>Greek</li>
-                    <li>Gujarati</li>
                     <li>Hebrew</li>
                     <li>Hindi</li>
                     <li>Hungarian</li>
+                    <li>Icelandic</li>
                     <li>Indonesian</li>
+                    <li>Irish</li>
                     <li>Italian</li>
                     <li>Japanese</li>
-                    <li>Kannada</li>
                     <li>Korean</li>
                     <li>Latvian</li>
                     <li>Lithuanian</li>
+                    <li>Luxembourgish</li>
+                    <li>Macedonian</li>
                     <li>Malay</li>
-                    <li>Malayalam</li>
-                    <li>Marathi</li>
+                    <li>Maltese</li>
                     <li>Norwegian</li>
                     <li>Persian</li>
                     <li>Polish</li>
                     <li>Portuguese</li>
-                    <li>Punjabi</li>
                     <li>Romanian</li>
                     <li>Russian</li>
                     <li>Serbian</li>
@@ -68,8 +73,6 @@ include '../../docs-header.php';
                     <li>Spanish</li>
                     <li>Swahili</li>
                     <li>Swedish</li>
-                    <li>Tamil</li>
-                    <li>Telugu</li>
                     <li>Thai</li>
                     <li>Turkish</li>
                     <li>Ukrainian</li>

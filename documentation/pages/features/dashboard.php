@@ -36,7 +36,7 @@ include '../../docs-header.php';
             <h2>Charts</h2>
             <p>The Dashboard includes two interactive charts:</p>
             <ul>
-                <li><strong>Total Profits:</strong> Tracks your profit (revenue minus expenses) over time</li>
+                <li><strong>Profits Overview:</strong> Tracks your profit (revenue minus expenses) over time</li>
                 <li><strong>Expenses vs Revenue:</strong> Compares your spending and income side by side</li>
             </ul>
             <p>Use the date range dropdown in the top-right corner and the chart type selector to adjust the view.</p>

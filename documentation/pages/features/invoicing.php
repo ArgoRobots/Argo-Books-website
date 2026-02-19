@@ -32,10 +32,12 @@ include '../../docs-header.php';
             <p>Keep track of all your invoices and their payment status:</p>
             <ul>
                 <li><strong>Draft:</strong> Invoice created but not yet sent</li>
+                <li><strong>Pending:</strong> Invoice is awaiting review or approval</li>
                 <li><strong>Sent:</strong> Invoice delivered to customer</li>
                 <li><strong>Partial:</strong> Customer has made a partial payment</li>
                 <li><strong>Paid:</strong> Invoice fully paid</li>
                 <li><strong>Overdue:</strong> Payment is past the due date</li>
+                <li><strong>Cancelled:</strong> Invoice has been cancelled</li>
             </ul>
 
             <h2>Online Payment Providers</h2>

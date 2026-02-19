@@ -25,7 +25,8 @@ include '../../docs-header.php';
             <ul>
                 <li><strong>Name:</strong> The business or vendor name</li>
                 <li><strong>Contact Information:</strong> Phone number, email address</li>
-                <li><strong>Address:</strong> Street address, city, state/province, country</li>
+                <li><strong>Website:</strong> The supplier's website URL</li>
+                <li><strong>Address:</strong> Street address, city, state/province, ZIP code, country</li>
                 <li><strong>Notes:</strong> Any additional information about the supplier</li>
             </ul>
 

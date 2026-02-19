@@ -45,11 +45,11 @@ include '../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="customers.php" class="nav-button prev">
+                <a href="suppliers.php" class="nav-button prev">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 18l-6-6 6-6"></path>
                     </svg>
-                    Previous: Customer Management
+                    Previous: Supplier Management
                 </a>
                 <a href="receipt-scanning.php" class="nav-button next">
                     Next: AI Receipt Scanning

@@ -140,7 +140,7 @@ include '../../docs-header.php';
                 </div>
             </div>
 
-            <h2>Feature Comparison</h2>
+            <h2 style="margin-top: 3rem;">Feature Comparison</h2>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>
@@ -217,8 +217,8 @@ include '../../docs-header.php';
                     </svg>
                     Previous: Quick Start Tutorial
                 </a>
-                <a href="../features/product-management.php" class="nav-button next">
-                    Next: Product Management
+                <a href="../features/dashboard.php" class="nav-button next">
+                    Next: Dashboard
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 18l6-6-6-6"></path>
                     </svg>

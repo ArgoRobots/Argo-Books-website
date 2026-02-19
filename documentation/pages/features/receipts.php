@@ -34,11 +34,11 @@ include '../../docs-header.php';
             </ol>
 
             <div class="page-navigation">
-                <a href="sales-tracking.php" class="nav-button prev">
+                <a href="returns.php" class="nav-button prev">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M15 18l-6-6 6-6"></path>
                     </svg>
-                    Previous: Expense/Revenue Tracking
+                    Previous: Returns
                 </a>
                 <a href="spreadsheet-import.php" class="nav-button next">
                     Next: Spreadsheet Import

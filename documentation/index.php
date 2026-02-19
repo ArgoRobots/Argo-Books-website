@@ -191,6 +191,18 @@ $isDocsLanding = true;
                 </div>
             </div>
             <div class="category-cards">
+                <a href="pages/features/dashboard.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </div>
+                    <h3>Dashboard</h3>
+                    <p>Business overview and key metrics</p>
+                </a>
                 <a href="pages/features/product-management.php" class="doc-card">
                     <div class="card-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -212,6 +224,28 @@ $isDocsLanding = true;
                     </div>
                     <h3>Expense/Revenue Tracking</h3>
                     <p>Track all business transactions</p>
+                </a>
+                <a href="pages/features/purchase-orders.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <path d="M12 18v-6"></path>
+                            <path d="M9 15l3-3 3 3"></path>
+                        </svg>
+                    </div>
+                    <h3>Purchase Orders</h3>
+                    <p>Track orders placed with suppliers</p>
+                </a>
+                <a href="pages/features/returns.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="1 4 1 10 7 10"></polyline>
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                        </svg>
+                    </div>
+                    <h3>Returns</h3>
+                    <p>Process and track product returns</p>
                 </a>
                 <a href="pages/features/receipts.php" class="doc-card">
                     <div class="card-icon">
@@ -270,6 +304,18 @@ $isDocsLanding = true;
                     </div>
                     <h3>Customer Management</h3>
                     <p>Track profiles and expense history</p>
+                </a>
+                <a href="pages/features/suppliers.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>Supplier Management</h3>
+                    <p>Manage vendors and purchase sources</p>
                 </a>
                 <a href="pages/features/invoicing.php" class="doc-card">
                     <div class="card-icon">
@@ -393,6 +439,16 @@ $isDocsLanding = true;
                     </div>
                     <h3>Supported Languages</h3>
                     <p>54 languages supported</p>
+                </a>
+                <a href="pages/reference/keyboard_shortcuts.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                            <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"></path>
+                        </svg>
+                    </div>
+                    <h3>Keyboard Shortcuts</h3>
+                    <p>Report Generator shortcuts</p>
                 </a>
             </div>
         </section>

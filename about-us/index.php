@@ -105,7 +105,7 @@
                     </div>
                 </div>
                 <div class="mission-image animate-on-scroll">
-                    <img src="../resources/images/main.webp" alt="Argo Books Interface">
+                    <img src="../resources/images/dashboard.webp" alt="Argo Books Interface">
                 </div>
             </div>
         </div>
@@ -159,7 +159,7 @@
         <div class="container">
             <div class="story-grid">
                 <div class="story-image animate-on-scroll">
-                    <img src="../resources/images/saskatoon.jpg" alt="Saskatoon Skyline">
+                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline">
                     <div class="image-badge">
                         <?= svg_icon('map-pin', 16) ?>
                         Saskatoon, SK

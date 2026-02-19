@@ -17,6 +17,8 @@ include '../../docs-header.php';
             <p>Create professional invoices in seconds, track payment status, and get paid faster with
             integrated payment processing. Argo Books makes invoicing simple and efficient.</p>
 
+            <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+
             <h2>Creating Invoices</h2>
             <p>Generate professional invoices with just a few clicks:</p>
             <ol class="steps-list">

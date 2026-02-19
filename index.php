@@ -148,7 +148,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="hero-visual animate-fade-in-up delay-2">
                 <div class="hero-device">
                     <div class="device-frame">
-                        <img src="resources/images/main.webp" alt="Argo Books Dashboard" class="device-screen">
+                        <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen">
                     </div>
                     <div class="floating-card floating-card-1 animate-float">
                         <div class="floating-card-icon">

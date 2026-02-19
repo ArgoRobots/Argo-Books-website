@@ -82,74 +82,6 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
 }
 
 /**
- * Send license key via email using PHP mail
- *
- * @param string $to_email Recipient email address
- * @param string $license_key The license key to send
- * @return bool True if successful, false otherwise
- */
-function send_license_email($to_email, $license_key)
-{
-    $body = <<<HTML
-        <h1>Thank You for Your Purchase!</h1>
-        <p>Here is your Argo Books license key:</p>
-
-        <div class="license-key">{$license_key}</div>
-
-        <h2>How to Activate Your License</h2>
-        <ol>
-            <li>Open Argo Books on your computer</li>
-            <li>Click the blue upgrade button on the top right</li>
-            <li>Enter your license key</li>
-            <li>Enjoy unlimited access to all standard features!</li>
-        </ol>
-
-        <div class="button-container">
-            <a href="https://argorobots.com/documentation/" class="button">View Documentation</a>
-        </div>
-
-        <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
-        <p>Thank you for choosing Argo Books!</p>
-        HTML;
-
-    return send_styled_email($to_email, 'Your Argo Books License Key', $body);
-}
-
-/**
- * Resend license key via email using PHP mail
- *
- * @param string $to_email Recipient email address
- * @param string $license_key The license key to resend
- * @return bool True if successful, false otherwise
- */
-function resend_license_email($to_email, $license_key)
-{
-    $body = <<<HTML
-        <h1>Your License Key</h1>
-        <p>As requested, here is your Argo Books license key:</p>
-
-        <div class="license-key">{$license_key}</div>
-
-        <h2>How to Activate Your License</h2>
-        <ol>
-            <li>Open Argo Books on your computer</li>
-            <li>Click the blue upgrade button on the top right</li>
-            <li>Enter your license key</li>
-            <li>Enjoy unlimited access to all standard features!</li>
-        </ol>
-
-        <div class="button-container">
-            <a href="https://argorobots.com/documentation/" class="button">View Documentation</a>
-        </div>
-
-        <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
-        <p>Thank you for using Argo Books!</p>
-        HTML;
-
-    return send_styled_email($to_email, 'Your Requested Argo Books License Key', $body);
-}
-
-/**
  * Resend Premium subscription ID email
  *
  * @param string $to_email User's email address
@@ -1111,7 +1043,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
                     <ul class="feature-list">
                         <li>✓ Invoices & payments</li>
                         <li>✓ AI-powered receipt scanning</li>
-                        <li>✓ Predictive sales analysis</li>
+                        <li>✓ predictive analytics</li>
                         <li>✓ Natural language AI search</li>
                     </ul>
 
@@ -1179,7 +1111,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
                         <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
                     </div>
 
-                    <p>After this date, Premium features including invoices & payments, receipt scanning, predictive analysis, and AI insights will no longer be available.</p>
+                    <p>After this date, Premium features including invoices & payments, receipt scanning, predictive analytics, and AI insights will no longer be available.</p>
 
                     <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
@@ -1277,7 +1209,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
                     <ul class="styled-list">
                         <li>Invoices & payments</li>
                         <li>AI-powered receipt scanning</li>
-                        <li>Predictive sales analysis</li>
+                        <li>predictive analytics</li>
                     </ul>
 
                     <div class="button-container">
@@ -1343,14 +1275,14 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
             <li>Open Argo Books on your computer</li>
             <li>Click the blue upgrade button on the top right</li>
             <li>Enter your license key</li>
-            <li>Enjoy unlimited access to all standard features!</li>
+            <li>Enjoy unlimited access to all premium features!</li>
         </ol>
 
         <h2>What's Included:</h2>
         <ul>
             <li>Invoices & payments</li>
             <li>AI-powered receipt scanning</li>
-            <li>Predictive sales analysis</li>
+            <li>predictive analytics</li>
             <li>Natural language AI search</li>
         </ul>
 
@@ -1495,7 +1427,7 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
 
                 <div class="content">
                     <h1>You've Received Free Credit!</h1>
-                    <p>Great news! Free credit has been added to your Argo Premium subscription.</p>
+                    <p>Free credit has been added to your Argo Premium subscription.</p>
 
                     <div class="credit-display">
                         <p class="label">Credit Added</p>

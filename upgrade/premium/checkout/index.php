@@ -71,61 +71,13 @@
     // Get URL parameters
     $billing = isset($_GET['billing']) ? $_GET['billing'] : 'monthly';
 
-    // Auto-detect license from database (never passed via URL for security)
-    $hasDiscount = false;
-    $licenseKey = '';
-
-    if ($pdo !== null && !empty($user_id)) {
-        // First check if user has ALREADY used the discount on a previous subscription
-        // Once used, the discount cannot be applied again (even after cancellation)
-        $alreadyUsedDiscount = false;
-        try {
-            $stmt = $pdo->prepare("
-                SELECT id FROM premium_subscriptions
-                WHERE user_id = ? AND (discount_applied = 1 OR original_credit > 0)
-                LIMIT 1
-            ");
-            $stmt->execute([$user_id]);
-            $alreadyUsedDiscount = $stmt->fetch() !== false;
-        } catch (PDOException $e) {
-            error_log("Check discount usage error: " . $e->getMessage());
-        }
-
-        // Only check for license discount if user hasn't already used it
-        if (!$alreadyUsedDiscount) {
-            // Get user email for fallback lookup
-            $lookup_email = $user_email;
-            if (empty($lookup_email)) {
-                $user_data = get_user($user_id);
-                if ($user_data && !empty($user_data['email'])) {
-                    $lookup_email = $user_data['email'];
-                }
-            }
-
-            try {
-                // Check by user_id first, then by email (case-insensitive)
-                $stmt = $pdo->prepare("SELECT license_key FROM license_keys WHERE (user_id = ? OR LOWER(email) = LOWER(?)) AND activated = 1 LIMIT 1");
-                $stmt->execute([$user_id, $lookup_email]);
-                $userLicense = $stmt->fetch(PDO::FETCH_ASSOC);
-                if ($userLicense) {
-                    $licenseKey = $userLicense['license_key'];
-                    $hasDiscount = true;
-                }
-            } catch (PDOException $e) {
-                // Silently fail - user just won't get auto-discount
-                error_log("Auto-detect license error: " . $e->getMessage());
-            }
-        }
-    }
-
     // Calculate prices from centralized config
     $monthlyPrice = $pricing['premium_monthly_price'];
     $yearlyPrice = $pricing['premium_yearly_price'];
-    $discount = $pricing['premium_discount'];
 
     if ($billing === 'yearly') {
         $basePrice = $yearlyPrice;
-        $finalPrice = $hasDiscount ? ($yearlyPrice - $discount) : $yearlyPrice;
+        $finalPrice = $yearlyPrice;
         $billingPeriod = 'year';
     } else {
         $basePrice = $monthlyPrice;
@@ -133,31 +85,11 @@
         $billingPeriod = 'month';
     }
 
-    // Verify license if discount is applied
-    $discountVerified = false;
-    if ($hasDiscount && !empty($licenseKey)) {
-        try {
-            $stmt = $pdo->prepare("SELECT id, activated FROM license_keys WHERE license_key = ? AND activated = 1");
-            $stmt->execute([$licenseKey]);
-            $discountVerified = $stmt->fetch() !== false;
-        } catch (PDOException $e) {
-            $discountVerified = false;
-        }
-    }
+    // Processing fee
+    $feeToday = calculate_processing_fee($finalPrice);
+    $totalToday = $finalPrice + $feeToday;
 
-    // If discount claimed but not verified, remove discount
-    if ($hasDiscount && !$discountVerified && $billing === 'yearly') {
-        $hasDiscount = false;
-        $finalPrice = $yearlyPrice;
-    }
-
-    // Processing fee (only on actual charges, not credit-covered payments)
-    $isMonthlyCredit = ($hasDiscount && $billing === 'monthly');
-    $chargeToday = $isMonthlyCredit ? 0 : $finalPrice;
-    $feeToday = calculate_processing_fee($chargeToday);
-    $totalToday = $chargeToday + $feeToday;
-
-    // Renewal amounts (full price + fee, no first-year discount)
+    // Renewal amounts (same as initial since no discount)
     $renewalBase = ($billing === 'yearly') ? $yearlyPrice : $monthlyPrice;
     $renewalFee = calculate_processing_fee($renewalBase);
     $renewalTotal = $renewalBase + $renewalFee;
@@ -186,14 +118,9 @@
             finalPrice: <?php echo $finalPrice; ?>,
             processingFee: <?php echo $feeToday; ?>,
             totalCharge: <?php echo $totalToday; ?>,
-            hasDiscount: <?php echo $hasDiscount ? 'true' : 'false'; ?>,
-            discountAmount: <?php echo $discount; ?>,
-            licenseKey: '<?php echo htmlspecialchars($licenseKey); ?>',
             userId: <?php echo $user_id; ?>,
             userEmail: '<?php echo htmlspecialchars($user_email); ?>',
-            isUpdatingPaymentMethod: <?php echo $is_changing_method ? 'true' : 'false'; ?>,
-            isMonthlyWithCredit: <?php echo ($hasDiscount && $billing === 'monthly') ? 'true' : 'false'; ?>,
-            creditAmount: <?php echo ($hasDiscount && $billing === 'monthly') ? $discount : 0; ?>
+            isUpdatingPaymentMethod: <?php echo $is_changing_method ? 'true' : 'false'; ?>
         };
     </script>
 
@@ -202,7 +129,6 @@
     <script src="../../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="../../standard/checkout/style.css">
     <link rel="stylesheet" href="../../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../../resources/styles/link.css">
     <link rel="stylesheet" href="../../../resources/header/style.css">
@@ -227,12 +153,6 @@
                     <span>Argo Premium (<?php echo ucfirst($billing); ?>)</span>
                     <span>$<?php echo number_format($basePrice, 2); ?> CAD</span>
                 </div>
-                <?php if ($hasDiscount && $billing === 'yearly'): ?>
-                <div class="order-item discount-item">
-                    <span>Standard User Discount</span>
-                    <span class="discount-amount">-$<?php echo number_format($discount, 2); ?> CAD</span>
-                </div>
-                <?php endif; ?>
                 <?php if ($feeToday > 0): ?>
                 <div class="order-item">
                     <span>Processing Fee</span>
@@ -241,25 +161,12 @@
                 <?php endif; ?>
                 <div class="order-total">
                     <span>Total</span>
-                    <span>$<?php echo number_format($totalToday > 0 ? $totalToday : $finalPrice, 2); ?> CAD/<?php echo $billingPeriod; ?></span>
+                    <span>$<?php echo number_format($totalToday, 2); ?> CAD/<?php echo $billingPeriod; ?></span>
                 </div>
-                <?php if ($hasDiscount && $billing === 'monthly'): ?>
-                <div class="credit-notice">
-                    <p><strong>$<?php echo number_format($discount, 2); ?> Credit Applied!</strong></p>
-                    <p>Your first <?php echo floor($discount / $monthlyPrice); ?> months are covered by this credit. You won't be charged today - your card will be saved for when the credit is depleted.</p>
-                </div>
-                <?php endif; ?>
             </div>
 
             <div class="subscription-notice">
-                <?php if ($hasDiscount && $billing === 'monthly'): ?>
-                <?php $creditMonths = floor($discount / $monthlyPrice); ?>
-                <p>This is a recurring subscription. Your $<?php echo number_format($discount, 2); ?> credit covers your first <?php echo $creditMonths; ?> months. You will be charged $<?php echo number_format($renewalTotal, 2); ?> CAD/month starting month <?php echo $creditMonths + 1; ?>.</p>
-                <?php elseif ($hasDiscount && $billing === 'yearly'): ?>
-                <p>You will be charged $<?php echo number_format($totalToday, 2); ?> CAD today (discounted), then $<?php echo number_format($renewalTotal, 2); ?> CAD/year on each renewal.</p>
-                <?php else: ?>
                 <p>You will be charged $<?php echo number_format($totalToday, 2); ?> CAD today, then $<?php echo number_format($renewalTotal, 2); ?> CAD/<?php echo $billingPeriod; ?> on each renewal.</p>
-                <?php endif; ?>
                 <p>Cancel anytime from your account settings.</p>
             </div>
 
@@ -284,11 +191,7 @@
                     </div>
 
                     <button type="submit" id="stripe-submit-btn" class="checkout-btn ai-checkout-btn">
-                        <?php if ($hasDiscount && $billing === 'monthly'): ?>
-                        Subscribe - $0.00 Today (Credit Applied)
-                        <?php else: ?>
                         Subscribe - $<?php echo number_format($totalToday, 2); ?> CAD/<?php echo $billingPeriod; ?>
-                        <?php endif; ?>
                     </button>
                 </form>
             </div>

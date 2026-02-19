@@ -1,7 +1,7 @@
 <?php
 /**
  * Premium Subscription Payment Processor
- * Handles subscription creation for AI features with recurring billing support
+ * Handles subscription creation with recurring billing support
  */
 
 header('Content-Type: application/json');
@@ -29,68 +29,31 @@ if (!$input) {
 
 // Extract common fields
 $email = $input['email'] ?? $input['payer_email'] ?? '';
-$amount = floatval($input['amount'] ?? 0);
 $currency = $input['currency'] ?? 'CAD';
 $billing = $input['billing'] ?? 'monthly';
-$hasDiscount = $input['hasDiscount'] ?? false;
-$premiumLicenseKey = $input['premiumLicenseKey'] ?? '';
 $paymentMethod = $input['payment_method'] ?? 'unknown';
 $userId = intval($input['user_id'] ?? 0);
 
-// Credit configuration for monthly subscriptions with discount (from centralized config)
+// Compute server-side total (base price + processing fee) — never trust client amount
 $pricingConfig = get_pricing_config();
-$discountAmount = $pricingConfig['premium_discount'];
 $monthlyPrice = $pricingConfig['premium_monthly_price'];
 $yearlyPrice = $pricingConfig['premium_yearly_price'];
-$isMonthlyWithCredit = ($billing === 'monthly' && $hasDiscount);
-$creditBalance = 0;
-$originalCredit = 0;
 
-// Compute server-side total (base price + processing fee) — never trust client amount
-if (!$isMonthlyWithCredit) {
-    if ($billing === 'yearly') {
-        $baseCharge = $hasDiscount ? ($yearlyPrice - $discountAmount) : $yearlyPrice;
-    } else {
-        $baseCharge = $monthlyPrice;
-    }
-    $processingFee = calculate_processing_fee($baseCharge);
-    $amount = $baseCharge + $processingFee;
+if ($billing === 'yearly') {
+    $baseCharge = $yearlyPrice;
+} else {
+    $baseCharge = $monthlyPrice;
 }
+$processingFee = calculate_processing_fee($baseCharge);
+$amount = $baseCharge + $processingFee;
 
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';
 
-// For monthly with credit, amount can be 0 (first months covered by credit)
-if (empty($email) || $userId <= 0 || ($amount <= 0 && !$isMonthlyWithCredit)) {
+if (empty($email) || $userId <= 0 || $amount <= 0) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing required fields or invalid user']);
     exit();
-}
-
-// Verify license key for discount if claimed
-if ($hasDiscount && !empty($premiumLicenseKey)) {
-    try {
-        $stmt = $pdo->prepare("SELECT id, activated FROM license_keys WHERE license_key = ? AND activated = 1");
-        $stmt->execute([$premiumLicenseKey]);
-        if (!$stmt->fetch()) {
-            http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Invalid or inactive license key for discount']);
-            exit();
-        }
-    } catch (PDOException $e) {
-        // License verification failed - proceed without discount
-        $hasDiscount = false;
-        $isMonthlyWithCredit = false;
-    }
-}
-
-// Set credit balance for monthly subscriptions with verified discount
-if ($isMonthlyWithCredit) {
-    $originalCredit = $discountAmount;
-    // Deduct first month from credit balance
-    $creditBalance = $discountAmount - $monthlyPrice; // $20 - $5 = $15 remaining
-    // Set amount to 0 for initial payment - will use credit
-    $amount = 0;
 }
 
 // Verify user exists
@@ -154,10 +117,8 @@ try {
     // Check if this is a PayPal subscription
     $paypalSubscriptionId = null;
 
-    // Skip payment processing for:
-    // 1. Monthly subscriptions with credit (no charge needed)
-    // 2. Updating payment method when subscription is still within paid period
-    $skipPaymentProcessing = $isMonthlyWithCredit || ($isUpdatingPaymentMethod && $subscriptionStillValid);
+    // Skip payment processing when updating payment method and subscription is still valid
+    $skipPaymentProcessing = ($isUpdatingPaymentMethod && $subscriptionStillValid);
 
     switch ($paymentMethod) {
         case 'paypal':
@@ -209,10 +170,9 @@ try {
                 // Store customer ID for recurring billing
                 $stripeCustomerId = $customer->id;
 
-                // For monthly with credit, just store the payment method without charging
                 if ($skipPaymentProcessing) {
-                    $transactionId = 'CREDIT_' . strtoupper(bin2hex(random_bytes(8)));
-                    $paymentToken = $paymentMethodId; // Store for future renewals when credit depleted
+                    $transactionId = 'UPDATE_' . strtoupper(bin2hex(random_bytes(8)));
+                    $paymentToken = $paymentMethodId; // Store for future renewals
                 } else {
                     // Create payment intent for the initial charge
                     $paymentIntent = \Stripe\PaymentIntent::create([
@@ -337,10 +297,9 @@ try {
                     throw new Exception($errorDetail);
                 }
 
-                // For monthly with credit, just store the card without charging
                 if ($skipPaymentProcessing) {
-                    $transactionId = 'CREDIT_' . strtoupper(bin2hex(random_bytes(8)));
-                    $paymentToken = $cardId; // Store card ID for future renewals when credit depleted
+                    $transactionId = 'UPDATE_' . strtoupper(bin2hex(random_bytes(8)));
+                    $paymentToken = $cardId; // Store card ID for future renewals
                 } else {
                     // Process initial payment
                     $paymentData = [
@@ -456,34 +415,25 @@ try {
             INSERT INTO premium_subscriptions (
                 subscription_id, user_id, email, billing_cycle, amount, currency,
                 start_date, end_date, status, payment_method, transaction_id,
-                standard_license_key, discount_applied, credit_balance, original_credit,
                 payment_token, stripe_customer_id, auto_renew, created_at
             ) VALUES (
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, 'active', ?, ?,
-                ?, ?, ?, ?,
                 ?, ?, 1, NOW()
             )
         ");
-
-        // For monthly with credit, store actual monthly price as amount (for display)
-        $storedAmount = $isMonthlyWithCredit ? $monthlyPrice : $amount;
 
         $stmt->execute([
             $subscriptionId,
             $userId,
             $email,
             $billing,
-            $storedAmount,
+            $amount,
             $currency,
             $startDate,
             $endDate,
             $paymentMethod,
             $transactionId,
-            $premiumLicenseKey ?: null,
-            $hasDiscount ? 1 : 0,
-            $creditBalance,
-            $originalCredit,
             $paymentToken,
             $stripeCustomerId
         ]);
@@ -500,47 +450,35 @@ try {
         }
 
         // Log the payment transaction
-        // For monthly with credit, log $0 payment with 'credit' payment type
-        $paymentLogAmount = $isMonthlyWithCredit ? 0 : $amount;
-        $paymentType = $isMonthlyWithCredit ? 'credit' : 'initial';
-
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, created_at
-            ) VALUES (?, ?, ?, ?, ?, 'completed', ?, NOW())
+            ) VALUES (?, ?, ?, ?, ?, 'completed', 'initial', NOW())
         ");
 
         $stmt->execute([
             $subscriptionId,
-            $paymentLogAmount,
+            $amount,
             $currency,
             $paymentMethod,
-            $transactionId,
-            $paymentType
+            $transactionId
         ]);
 
         $pdo->commit();
 
-        // Send receipt email (skip for monthly with credit - no charge was made)
-        if (!$isMonthlyWithCredit) {
-            try {
-                send_premium_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod);
-            } catch (Exception $e) {
-                // Log email error but don't fail the transaction
-                error_log("Failed to send Premium subscription email: " . $e->getMessage());
-            }
+        // Send receipt email
+        try {
+            send_premium_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod);
+        } catch (Exception $e) {
+            // Log email error but don't fail the transaction
+            error_log("Failed to send Premium subscription email: " . $e->getMessage());
         }
-
-        $responseMessage = $isMonthlyWithCredit
-            ? 'Subscription created with $' . number_format($originalCredit, 2) . ' credit applied. Your first ' . floor($originalCredit / $monthlyPrice) . ' months are covered! Remaining credit: $' . number_format($creditBalance, 2)
-            : 'Subscription created successfully';
 
         echo json_encode([
             'success' => true,
             'subscription_id' => $subscriptionId,
-            'message' => $responseMessage,
-            'credit_applied' => $isMonthlyWithCredit ? $originalCredit : 0
+            'message' => 'Subscription created successfully'
         ]);
     }
 

@@ -5,7 +5,7 @@
  * Displays all invoices and payment history for a customer.
  * URL: /portal/{token} (rewritten by .htaccess)
  *
- * Tabbed interface: Active Invoices | Payment History | All Invoices
+ * Tabbed interface: Active Invoices | All Invoices
  * No login required - token-based access.
  */
 
@@ -79,7 +79,6 @@ if (!$result['company']) {
 
 $company = $result['company'];
 $invoices = $result['invoices'];
-$payments = get_payments_by_customer_token($token);
 $paymentMethods = get_available_payment_methods($company);
 
 $companyName = $company['company_name'] ?? '';
@@ -165,12 +164,6 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
                         <span class="tab-count"><?php echo count($activeInvoices); ?></span>
                     <?php endif; ?>
                 </button>
-                <button class="tab-btn" data-tab="history">
-                    Payment History
-                    <?php if (count($payments) > 0): ?>
-                        <span class="tab-count"><?php echo count($payments); ?></span>
-                    <?php endif; ?>
-                </button>
                 <button class="tab-btn" data-tab="all">
                     All Invoices
                     <span class="tab-count"><?php echo count($invoices); ?></span>
@@ -227,58 +220,6 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Payment History Tab -->
-            <div class="tab-content" id="tab-history" style="display: none;">
-                <?php if (empty($payments)): ?>
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-                            <line x1="1" y1="10" x2="23" y2="10"/>
-                        </svg>
-                        <p>No payment history yet.</p>
-                    </div>
-                <?php else: ?>
-                    <div class="payment-history-table-wrapper">
-                        <table class="payment-history-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Invoice</th>
-                                    <th>Method</th>
-                                    <th>Reference</th>
-                                    <th>Amount</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($payments as $pay):
-                                    $payAmount = floatval($pay['amount']);
-                                    $payCurrency = $pay['currency'] ?: 'USD';
-                                    $paySymbol = $payCurrency === 'CAD' ? 'CA$' : '$';
-                                ?>
-                                    <tr>
-                                        <td><?php echo date('M j, Y', strtotime($pay['created_at'])); ?></td>
-                                        <td><?php echo htmlspecialchars($pay['invoice_id']); ?></td>
-                                        <td class="method-cell">
-                                            <?php echo ucfirst(htmlspecialchars($pay['payment_method'])); ?>
-                                        </td>
-                                        <td><code><?php echo htmlspecialchars($pay['reference_number']); ?></code></td>
-                                        <td class="amount-cell <?php echo $pay['status'] === 'refunded' ? 'refunded' : ''; ?>">
-                                            <?php echo $paySymbol . number_format(abs($payAmount), 2); ?> <?php echo $payCurrency; ?>
-                                        </td>
-                                        <td>
-                                            <span class="status-badge status-<?php echo htmlspecialchars($pay['status']); ?>">
-                                                <?php echo ucfirst(htmlspecialchars($pay['status'])); ?>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
                     </div>
                 <?php endif; ?>
             </div>

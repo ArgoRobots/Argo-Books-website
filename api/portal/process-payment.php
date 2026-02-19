@@ -137,6 +137,20 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
         send_error_response(500, $result['message'], 'RECORD_FAILED');
     }
 
+    // Send payment confirmation email (best-effort, don't block the response on failure)
+    if (!empty($invoice['customer_email'])) {
+        send_payment_confirmation([
+            'customerEmail' => $invoice['customer_email'],
+            'customerName' => $invoice['customer_name'] ?? '',
+            'companyName' => $invoice['company_name'] ?? '',
+            'invoiceId' => $invoice['invoice_id'],
+            'amount' => $amount,
+            'currency' => strtoupper($invoice['currency'] ?: 'usd'),
+            'referenceNumber' => $result['reference_number'],
+            'paymentMethod' => 'stripe',
+        ]);
+    }
+
     send_json_response(200, [
         'success' => true,
         'method' => 'stripe',
@@ -245,6 +259,20 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
 
     if (!$result['success']) {
         send_error_response(500, $result['message'], 'RECORD_FAILED');
+    }
+
+    // Send payment confirmation email (best-effort, don't block the response on failure)
+    if (!empty($invoice['customer_email'])) {
+        send_payment_confirmation([
+            'customerEmail' => $invoice['customer_email'],
+            'customerName' => $invoice['customer_name'] ?? '',
+            'companyName' => $invoice['company_name'] ?? '',
+            'invoiceId' => $invoice['invoice_id'],
+            'amount' => $amount,
+            'currency' => strtoupper($invoice['currency'] ?: 'usd'),
+            'referenceNumber' => $result['reference_number'],
+            'paymentMethod' => 'paypal',
+        ]);
     }
 
     send_json_response(200, [

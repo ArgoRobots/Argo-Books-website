@@ -78,12 +78,12 @@ include '../../docs-header.php';
             </div>
 
             <div class="page-navigation">
-                <a href="receipt-scanning.php" class="nav-button prev">
+                <a href="analytics.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: AI Receipt Scanning
+                    Previous: Analytics
                 </a>
-                <a href="inventory.php" class="nav-button next">
-                    Next: Inventory Management
+                <a href="report-generator.php" class="nav-button next">
+                    Next: Report Generator
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

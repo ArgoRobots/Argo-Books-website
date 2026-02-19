@@ -39,8 +39,8 @@ include '../../docs-header.php';
                     <?= svg_icon('chevron-left', 16) ?>
                     Previous: Returns
                 </a>
-                <a href="spreadsheet-import.php" class="nav-button next">
-                    Next: Spreadsheet Import
+                <a href="receipt-scanning.php" class="nav-button next">
+                    Next: AI Receipt Scanning
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

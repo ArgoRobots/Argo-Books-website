@@ -169,12 +169,26 @@ $isDocsLanding = true;
                     <h3>Dashboard</h3>
                     <p>Business overview and key metrics</p>
                 </a>
-                <a href="pages/features/product-management.php" class="doc-card">
+                <a href="pages/features/analytics.php" class="doc-card">
                     <div class="card-icon">
-                        <?= svg_icon('shopping-bag', 20) ?>
+                        <?= svg_icon('analytics', 20) ?>
                     </div>
-                    <h3>Product Management</h3>
-                    <p>Organize categories and inventory</p>
+                    <h3>Analytics</h3>
+                    <p>Interactive charts and business insights</p>
+                </a>
+                <a href="pages/features/predictive-analytics.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('analytics', 20) ?>
+                    </div>
+                    <h3>Predictive Analytics</h3>
+                    <p>ML-powered forecasting and insights</p>
+                </a>
+                <a href="pages/features/report-generator.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('pie-chart', 20) ?>
+                    </div>
+                    <h3>Report Generator</h3>
+                    <p>Create charts and analytics</p>
                 </a>
                 <a href="pages/features/sales-tracking.php" class="doc-card">
                     <div class="card-icon">
@@ -182,6 +196,53 @@ $isDocsLanding = true;
                     </div>
                     <h3>Expense/Revenue Tracking</h3>
                     <p>Track all business transactions</p>
+                </a>
+                <a href="pages/features/invoicing.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('document', 20) ?>
+                    </div>
+                    <h3>Invoicing & Payments</h3>
+                    <p>Create invoices, accept payments</p>
+                </a>
+                <a href="pages/features/rental.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('calendar', 20) ?>
+                    </div>
+                    <h3>Rental Management</h3>
+                    <p>Bookings and availability calendar</p>
+                </a>
+                <a href="pages/features/customers.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('users', 20) ?>
+                    </div>
+                    <h3>Customer Management</h3>
+                    <p>Track profiles and expense history</p>
+                </a>
+                <a href="pages/features/product-management.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('shopping-bag', 20) ?>
+                    </div>
+                    <h3>Product Management</h3>
+                    <p>Organize categories and inventory</p>
+                </a>
+                <a href="pages/features/suppliers.php" class="doc-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3>Supplier Management</h3>
+                    <p>Manage vendors and purchase sources</p>
+                </a>
+                <a href="pages/features/inventory.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('package', 20) ?>
+                    </div>
+                    <h3>Inventory Management</h3>
+                    <p>Track stock levels and reorder points</p>
                 </a>
                 <a href="pages/features/purchase-orders.php" class="doc-card">
                     <div class="card-icon">
@@ -212,6 +273,13 @@ $isDocsLanding = true;
                     <h3>Receipt Management</h3>
                     <p>Attach and manage digital receipts</p>
                 </a>
+                <a href="pages/features/receipt-scanning.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('receipt-scan', 20) ?>
+                    </div>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Extract data from receipts with AI</p>
+                </a>
                 <a href="pages/features/spreadsheet-import.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('document-plus', 20) ?>
@@ -225,67 +293,6 @@ $isDocsLanding = true;
                     </div>
                     <h3>Spreadsheet Export</h3>
                     <p>Export data to Excel for backup</p>
-                </a>
-                <a href="pages/features/report-generator.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('pie-chart', 20) ?>
-                    </div>
-                    <h3>Report Generator</h3>
-                    <p>Create charts and analytics</p>
-                </a>
-                <a href="pages/features/customers.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('users', 20) ?>
-                    </div>
-                    <h3>Customer Management</h3>
-                    <p>Track profiles and expense history</p>
-                </a>
-                <a href="pages/features/suppliers.php" class="doc-card">
-                    <div class="card-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-                    <h3>Supplier Management</h3>
-                    <p>Manage vendors and purchase sources</p>
-                </a>
-                <a href="pages/features/invoicing.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('document', 20) ?>
-                    </div>
-                    <h3>Invoicing & Payments</h3>
-                    <p>Create invoices, accept payments</p>
-                </a>
-                <a href="pages/features/receipt-scanning.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('receipt-scan', 20) ?>
-                    </div>
-                    <h3>AI Receipt Scanning</h3>
-                    <p>Extract data from receipts with AI</p>
-                </a>
-                <a href="pages/features/predictive-analytics.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('analytics', 20) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>ML-powered forecasting and insights</p>
-                </a>
-                <a href="pages/features/inventory.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('package', 20) ?>
-                    </div>
-                    <h3>Inventory Management</h3>
-                    <p>Track stock levels and reorder points</p>
-                </a>
-                <a href="pages/features/rental.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('calendar', 20) ?>
-                    </div>
-                    <h3>Rental Management</h3>
-                    <p>Bookings and availability calendar</p>
                 </a>
             </div>
         </section>

@@ -46,9 +46,9 @@ include '../../docs-header.php';
             </div>
 
             <div class="page-navigation">
-                <a href="receipts.php" class="nav-button prev">
+                <a href="receipt-scanning.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Receipt Management
+                    Previous: AI Receipt Scanning
                 </a>
                 <a href="spreadsheet-export.php" class="nav-button next">
                     Next: Spreadsheet Export

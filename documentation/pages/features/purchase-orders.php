@@ -58,9 +58,9 @@ include '../../docs-header.php';
             <p>From the Purchase Orders page, you can view, edit, or delete existing orders. Use the search and filter options to find specific orders by supplier, date, or product.</p>
 
             <div class="page-navigation">
-                <a href="sales-tracking.php" class="nav-button prev">
+                <a href="inventory.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Expense/Revenue Tracking
+                    Previous: Inventory Management
                 </a>
                 <a href="returns.php" class="nav-button next">
                     Next: Returns

@@ -101,12 +101,12 @@ include '../../docs-header.php';
             </ul>
 
             <div class="page-navigation">
-                <a href="suppliers.php" class="nav-button prev">
+                <a href="sales-tracking.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Supplier Management
+                    Previous: Expense/Revenue Tracking
                 </a>
-                <a href="receipt-scanning.php" class="nav-button next">
-                    Next: AI Receipt Scanning
+                <a href="rental.php" class="nav-button next">
+                    Next: Rental Management
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

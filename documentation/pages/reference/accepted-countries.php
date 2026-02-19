@@ -54,9 +54,9 @@ include '../../docs-header.php';
             </div>
 
             <div class="page-navigation">
-                <a href="../features/rental.php" class="nav-button prev">
+                <a href="../features/spreadsheet-export.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Rental Management
+                    Previous: Spreadsheet Export
                 </a>
                 <a href="supported-currencies.php" class="nav-button next">
                     Next: Supported Currencies

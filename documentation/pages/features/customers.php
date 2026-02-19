@@ -41,12 +41,12 @@ include '../../docs-header.php';
             </ol>
 
             <div class="page-navigation">
-                <a href="report-generator.php" class="nav-button prev">
+                <a href="rental.php" class="nav-button prev">
                     <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Report Generator
+                    Previous: Rental Management
                 </a>
-                <a href="suppliers.php" class="nav-button next">
-                    Next: Supplier Management
+                <a href="product-management.php" class="nav-button next">
+                    Next: Product Management
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

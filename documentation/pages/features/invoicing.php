@@ -28,13 +28,6 @@ include '../../docs-header.php';
                 <li>Preview and send</li>
             </ol>
 
-            <h2>Sending Invoices</h2>
-            <ul>
-                <li><strong>Preview:</strong> Review the invoice before sending</li>
-                <li><strong>Create & Send:</strong> Send the invoice to your customer</li>
-                <li><strong>Save as Draft:</strong> Save and send later</li>
-            </ul>
-
             <h2>Payment Tracking</h2>
             <p>Keep track of all your invoices and their payment status:</p>
             <ul>
@@ -56,10 +49,9 @@ include '../../docs-header.php';
             <h2>Setting Up Payment Integration</h2>
             <ol class="steps-list">
                 <li>Go to Settings > Payment Providers</li>
-                <li>Select your preferred payment provider</li>
-                <li>Click "Connect Account" to link your existing account (or create a new one)</li>
+                <li>Select your preferred payment providers</li>
+                <li>Click "Connect" to link your existing account (or create a new one)</li>
                 <li>Authorize Argo Books to process payments on your behalf</li>
-                <li>Configure your payment preferences</li>
             </ol>
 
             <div class="info-box">
@@ -74,25 +66,6 @@ include '../../docs-header.php';
                 <li>Payments sync automatically with your Argo Books account</li>
             </ul>
 
-            <h2>Accepting a Payment</h2>
-            <p>When a customer clicks your payment link:</p>
-            <ol class="steps-list">
-                <li>They're taken to a secure payment page</li>
-                <li>Customer enters their payment details</li>
-                <li>Payment is processed through your connected provider</li>
-                <li>You receive confirmation and funds are deposited to your account</li>
-                <li>The invoice is automatically marked as paid in Argo Books</li>
-            </ol>
-
-            <h2>Automatic Reconciliation</h2>
-            <p>Payments are automatically matched to invoices:</p>
-            <ul>
-                <li><strong>Auto-matching:</strong> Payments linked to invoices update automatically</li>
-                <li><strong>Partial Payments:</strong> Track partial payments and remaining balances</li>
-                <li><strong>Overpayments:</strong> Handle credits and refunds</li>
-                <li><strong>Manual Matching:</strong> Match unlinked payments to invoices manually</li>
-            </ul>
-
             <h2>Transaction Fees</h2>
             <p>Payment processing fees are charged by the payment provider, not Argo Books:</p>
             <ul>
@@ -102,7 +75,7 @@ include '../../docs-header.php';
             </ul>
 
             <div class="info-box">
-                <p><strong>Tip:</strong> Fee rates may vary based on your account type, location, and transaction volume. Check with your payment provider for exact rates.</p>
+                <p><strong>Tip:</strong> Transaction fees are added on top of the invoice subtotal and are paid by the customer at checkout.</p>
             </div>
 
             <h2>Payment Dashboard</h2>

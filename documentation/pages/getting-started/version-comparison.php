@@ -72,11 +72,11 @@ include '../../docs-header.php';
                     <ul class="feature-list">
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><strong>Everything in Free</strong></span>
+                            <span class="feature-text">Everything in Free</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><strong>Unlimited products</strong></span>
+                            <span class="feature-text">Unlimited products</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
@@ -84,15 +84,15 @@ include '../../docs-header.php';
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><strong>Invoices & payments</strong></span>
+                            <span class="feature-text">Invoices & payments</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><strong>AI receipt scanning</strong> <span style="font-size: 0.85em; opacity: 0.8;">(500 receipts / month)</span></span>
+                            <span class="feature-text">AI receipt scanning <span>(500 receipts / month)</span></span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text"><strong>Predictive analytics</strong></span>
+                            <span class="feature-text">Predictive analytics</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
@@ -155,9 +155,9 @@ include '../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
-                            <td>AI Receipt Scanning <span style="font-size: 0.85em; opacity: 0.7;">(500 receipts / month)</span></td>
+                            <td>AI Receipt Scanning</td>
                             <td>—</td>
-                            <td>✓</td>
+                            <td>(500 receipts / month)</td>
                         </tr>
                         <tr>
                             <td>Predictive Analytics</td>

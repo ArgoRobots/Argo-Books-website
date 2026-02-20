@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
   const googleSheetsData = rawData.dataPoints.GoogleSheets || [];
   const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
-  const translatorData = rawData.dataPoints.MicrosoftTranslator || [];
   const sessionData = rawData.dataPoints.Session || [];
   const errorData = rawData.dataPoints.Error || [];
   const featureUsageData = rawData.dataPoints.FeatureUsage || [];
@@ -46,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exchangeRatesData,
     googleSheetsData,
     receiptScanningData,
-    translatorData,
     sessionData,
     errorData,
     featureUsageData
@@ -118,7 +116,9 @@ document.addEventListener("DOMContentLoaded", function () {
   );
 
   generateErrorCategoryChart(errorData);
+  generateErrorCodeChart(errorData);
   generateErrorCategoryTimelineChart(errorData);
+  generateErrorDetailsTable(errorData);
 
   // Feature Usage Charts
   generateFeatureUsageChart(featureUsageData);
@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
   generateExportFileSizeByTypeChart(exportData);
 
   generateOpenAIChart(openaiData);
-  generateOpenAITokenChart(openaiData);
+  generateOpenAIResponseTimeChart(openaiData);
   generateExchangeRatesChart(exchangeRatesData);
 
   generateOverallActivityChart(
@@ -145,7 +145,6 @@ document.addEventListener("DOMContentLoaded", function () {
     openaiData,
     exchangeRatesData,
     googleSheetsData,
-    translatorData,
     sessionData,
     errorData
   );
@@ -157,7 +156,6 @@ document.addEventListener("DOMContentLoaded", function () {
     exchangeRatesData,
     googleSheetsData,
     receiptScanningData,
-    translatorData,
     sessionData,
     errorData,
     featureUsageData
@@ -169,8 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
       openaiData.length +
       exchangeRatesData.length +
       googleSheetsData.length +
-      receiptScanningData.length +
-      translatorData.length;
+      receiptScanningData.length;
     const totalErrors = errorData.length;
     const totalSessions = sessionData.length;
     const totalFeatureUsage = featureUsageData.length;
@@ -182,7 +179,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...openaiData.map((d) => parseFloat(d.DurationMS || 0)),
       ...exchangeRatesData.map((d) => parseFloat(d.DurationMS || 0)),
       ...receiptScanningData.map((d) => parseFloat(d.DurationMS || 0)),
-      ...translatorData.map((d) => parseFloat(d.DurationMS || 0)),
     ].filter((d) => d > 0);
 
     const avgDuration =
@@ -211,7 +207,6 @@ document.addEventListener("DOMContentLoaded", function () {
       "Currency Rates": exchangeRatesData.length,
       "Google Sheets": googleSheetsData.length,
       "Receipt Scan": receiptScanningData.length,
-      Translator: translatorData.length,
     };
     const mostUsedFeature = Object.entries(featureUsageCounts).sort(
       ([, a], [, b]) => b - a
@@ -245,7 +240,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exchangeRatesData,
       ...googleSheetsData,
       ...receiptScanningData,
-      ...translatorData,
       ...sessionData,
       ...featureUsageData,
     ];
@@ -325,7 +319,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...exchangeRatesData,
       ...googleSheetsData,
       ...receiptScanningData,
-      ...translatorData,
       ...sessionData,
       ...errorData,
       ...featureUsageData,
@@ -437,13 +430,6 @@ document.addEventListener("DOMContentLoaded", function () {
         `
       )
       .join("");
-  }
-
-  // Helper function to format file sizes
-  function formatFileSize(bytes) {
-    if (bytes >= 1048576) return (bytes / 1048576).toFixed(1) + "MB";
-    if (bytes >= 1024) return (bytes / 1024).toFixed(1) + "KB";
-    return bytes + "B";
   }
 
   // Geographic Charts
@@ -1443,6 +1429,141 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
 
+  function generateErrorCodeChart(errorData) {
+    if (errorData.length === 0) {
+      document.getElementById("errorCodeChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No error data available</div>';
+      return;
+    }
+
+    const codeCounts = {};
+    errorData.forEach((error) => {
+      const code = error.ErrorCode || "Unknown";
+      codeCounts[code] = (codeCounts[code] || 0) + 1;
+    });
+
+    const sortedCodes = Object.entries(codeCounts).sort(
+      ([, a], [, b]) => b - a
+    );
+    const labels = sortedCodes.map(([code]) => code);
+    const data = sortedCodes.map(([, count]) => count);
+    const colors = [
+      "#ef4444",
+      "#f97316",
+      "#eab308",
+      "#84cc16",
+      "#22c55e",
+      "#06b6d4",
+      "#6366f1",
+      "#8b5cf6",
+      "#ec4899",
+      "#14b8a6",
+    ];
+
+    new Chart(document.getElementById("errorCodeChart"), {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Occurrences",
+            data: data,
+            backgroundColor: colors.slice(0, labels.length).concat(
+              Array(Math.max(0, labels.length - colors.length)).fill("#94a3b8")
+            ),
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: labels.length > 8 ? "y" : "x",
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.raw} errors (${percentage}%)`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+          },
+          y: {
+            beginAtZero: true,
+          },
+        },
+      },
+    });
+  }
+
+  function generateErrorDetailsTable(errorData) {
+    const wrapper = document.getElementById("errorDetailsTableWrapper");
+    if (errorData.length === 0) {
+      wrapper.innerHTML =
+        '<p style="text-align: center; color: #9ca3af;">No error data available</p>';
+      return;
+    }
+
+    const sorted = [...errorData].sort(
+      (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+    );
+
+    let html =
+      '<table class="error-details-table"><thead><tr>' +
+      "<th>Time</th>" +
+      "<th>Category</th>" +
+      "<th>Error Code</th>" +
+      "<th>Message</th>" +
+      "<th>Source</th>" +
+      "<th>Version</th>" +
+      "</tr></thead><tbody>";
+
+    sorted.forEach((error) => {
+      const time = new Date(error.timestamp).toLocaleString();
+      const category = error.ErrorCategory || "Unknown";
+      const code = error.ErrorCode || "—";
+      const message = error.Message || "—";
+      let source = "—";
+      if (error.SourceFile) {
+        source = error.SourceFile;
+        if (error.LineNumber) source += ":" + error.LineNumber;
+        if (error.MethodName) source += " (" + error.MethodName + ")";
+      } else if (error.MethodName) {
+        source = error.MethodName;
+        if (error.LineNumber) source += ":" + error.LineNumber;
+      }
+      const version = error.appVersion || "—";
+
+      html +=
+        "<tr>" +
+        `<td>${escapeHtml(time)}</td>` +
+        `<td>${escapeHtml(category)}</td>` +
+        `<td class="error-code">${escapeHtml(code)}</td>` +
+        `<td>${escapeHtml(message)}</td>` +
+        `<td class="error-source">${escapeHtml(source)}</td>` +
+        `<td>${escapeHtml(version)}</td>` +
+        "</tr>";
+    });
+
+    html += "</tbody></table>";
+    wrapper.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
   // Usage Charts
   function generateSessionDurationChart(sessionData) {
     const sessionEndData = sessionData.filter(
@@ -1733,27 +1854,18 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const modelCounts = {};
-    openaiData.forEach((item) => {
-      const model = item.Model || "Unspecified";
-      modelCounts[model] = (modelCounts[model] || 0) + 1;
-    });
+    const successful = openaiData.filter((d) => d.Success === true).length;
+    const failed = openaiData.filter((d) => d.Success === false).length;
 
     new Chart(document.getElementById("openaiChart"), {
-      type: "pie",
+      type: "doughnut",
       data: {
-        labels: Object.keys(modelCounts),
+        labels: ["Successful", "Failed"],
         datasets: [
           {
-            data: Object.values(modelCounts),
-            backgroundColor: [
-              "#3b82f6",
-              "#10b981",
-              "#f59e0b",
-              "#ef4444",
-              "#8b5cf6",
-              "#06b6d4",
-            ],
+            data: [successful, failed],
+            backgroundColor: ["#10b981", "#ef4444"],
+            borderWidth: 2,
           },
         ],
       },
@@ -1764,33 +1876,49 @@ document.addEventListener("DOMContentLoaded", function () {
           legend: {
             position: "bottom",
           },
-        }
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} calls (${percentage}%)`;
+              },
+            },
+          },
+        },
       },
     });
   }
 
-  function generateOpenAITokenChart(openaiData) {
-    if (openaiData.length === 0) {
-      document.getElementById("openaiTokenChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No OpenAI token data available</div>';
+  function generateOpenAIResponseTimeChart(openaiData) {
+    const dataWithDuration = openaiData.filter(
+      (d) => d.DurationMS && d.DurationMS > 0
+    );
+
+    if (dataWithDuration.length === 0) {
+      document.getElementById("openaiResponseTimeChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No OpenAI response time data available</div>';
       return;
     }
 
-    const recentData = openaiData.slice(-50);
-    const labels = recentData.map((d, index) => `Call ${index + 1}`);
-    const tokens = recentData.map((d) => parseInt(d.TokensUsed) || 0);
+    const recentData = dataWithDuration.slice(-50);
+    const labels = recentData.map((d) =>
+      new Date(d.timestamp).toLocaleDateString()
+    );
+    const durations = recentData.map((d) => parseInt(d.DurationMS) || 0);
 
-    new Chart(document.getElementById("openaiTokenChart"), {
-      type: "bar",
+    new Chart(document.getElementById("openaiResponseTimeChart"), {
+      type: "line",
       data: {
         labels: labels,
         datasets: [
           {
-            label: "Tokens Used",
-            data: tokens,
-            backgroundColor: "#8b5cf6",
-            borderColor: "#7c3aed",
-            borderWidth: 1,
+            label: "Response Time (ms)",
+            data: durations,
+            borderColor: "#8b5cf6",
+            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            fill: true,
+            tension: 0.4,
           },
         ],
       },
@@ -1807,10 +1935,10 @@ document.addEventListener("DOMContentLoaded", function () {
             beginAtZero: true,
             title: {
               display: true,
-              text: "Tokens",
+              text: "Duration (ms)",
             },
           },
-        }
+        },
       },
     });
   }
@@ -1870,7 +1998,6 @@ document.addEventListener("DOMContentLoaded", function () {
     openaiData,
     exchangeRatesData,
     googleSheetsData,
-    translatorData,
     sessionData,
     errorData
   ) {
@@ -1894,10 +2021,6 @@ document.addEventListener("DOMContentLoaded", function () {
       ...(rawData.dataPoints.ReceiptScanning || []).map((d) => ({
         ...d,
         type: "Receipt Scan",
-      })),
-      ...translatorData.map((d) => ({
-        ...d,
-        type: "Translator",
       })),
       ...sessionData.map((d) => ({
         ...d,
@@ -2035,7 +2158,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     errorData.forEach((error) => {
       const date = new Date(error.timestamp).toLocaleDateString();
-      const category = error.Category || error.ErrorCategory || "Unknown";
+      const category = error.ErrorCategory || "Unknown";
       categories.add(category);
 
       if (!categoryByDate[date]) {
@@ -2309,16 +2432,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const failed = receiptScanningData.filter(
       (r) => r.Success === false
     ).length;
-    const unknown = receiptScanningData.length - successful - failed;
 
     new Chart(document.getElementById("receiptScanOverviewChart"), {
       type: "doughnut",
       data: {
-        labels: ["Successful", "Failed", "Unknown"],
+        labels: ["Successful", "Failed"],
         datasets: [
           {
-            data: [successful, failed, unknown],
-            backgroundColor: ["#10b981", "#ef4444", "#9ca3af"],
+            data: [successful, failed],
+            backgroundColor: ["#10b981", "#ef4444"],
             borderWidth: 2,
           },
         ],

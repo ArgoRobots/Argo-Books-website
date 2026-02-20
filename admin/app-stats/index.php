@@ -21,17 +21,13 @@ $aggregatedData = [
         'OpenExchangeRates' => [],
         'GoogleSheets' => [],
         'ReceiptScanning' => [],
-        'MicrosoftTranslator' => [],
         'Session' => [],
         'Error' => [],
         'FeatureUsage' => []
     ],
     'geoLocationEnabled' => false,
     'privacySettings' => [
-        'collectCityData' => true,
-        'collectIPHashes' => false,
-        'collectISPData' => true,
-        'collectCoordinates' => false
+        'collectCityData' => true
     ]
 ];
 $fileInfo = [];
@@ -95,8 +91,6 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
 
             switch ($apiName) {
                 case 'OpenAI':
-                    $normalized['TokensUsed'] = $event['tokensUsed'] ?? 0;
-                    $normalized['Model'] = $event['model'] ?? 'Unknown';
                     return ['category' => 'OpenAI', 'data' => $normalized];
 
                 case 'OpenExchangeRates':
@@ -107,9 +101,6 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
 
                 case 'AzureDocumentIntelligence':
                     return ['category' => 'ReceiptScanning', 'data' => $normalized];
-
-                case 'MicrosoftTranslator':
-                    return ['category' => 'MicrosoftTranslator', 'data' => $normalized];
 
                 default:
                     return null;
@@ -345,15 +336,67 @@ include '../admin_header.php';
     .tab-buttons {
         gap: 2px;
     }
-    
+
     .tab-button {
         padding: 10px 14px;
         font-size: 13px;
     }
-    
+
     .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
+}
+
+.error-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.error-details-table th,
+.error-details-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.error-details-table th {
+    background: #f9fafb;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    position: sticky;
+    top: 0;
+}
+
+.error-details-table tr:hover {
+    background: #f9fafb;
+}
+
+.error-details-table td.error-code {
+    font-family: monospace;
+    font-weight: 600;
+    color: #ef4444;
+}
+
+.error-details-table td.error-source {
+    font-family: monospace;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.error-details-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    border-radius: 8px;
+    margin-top: 1rem;
 }
 </style>
 
@@ -522,9 +565,21 @@ include '../admin_header.php';
                         <canvas id="errorCategoryChart"></canvas>
                     </div>
                     <div class="chart-container">
+                        <h2>Errors by Code</h2>
+                        <canvas id="errorCodeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
                         <h2>Errors by Category Over Time</h2>
                         <canvas id="errorCategoryTimelineChart"></canvas>
                     </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 2rem;">Error Details</h2>
+                <div class="error-details-wrapper" id="errorDetailsTableWrapper">
+                    <p style="text-align: center; color: #9ca3af;">No error data available</p>
                 </div>
             </div>
 
@@ -561,23 +616,23 @@ include '../admin_header.php';
 
                 <div class="chart-row">
                     <div class="chart-container">
-                        <h2>OpenAI API Usage</h2>
+                        <h2>OpenAI Success Rate</h2>
                         <canvas id="openaiChart"></canvas>
                     </div>
                     <div class="chart-container">
-                        <h2>OpenAI Token Usage</h2>
-                        <canvas id="openaiTokenChart"></canvas>
+                        <h2>OpenAI Response Time</h2>
+                        <canvas id="openaiResponseTimeChart"></canvas>
                     </div>
                 </div>
 
                 <div class="chart-row">
                     <div class="chart-container">
-                        <h2>Exchange Rates API Usage</h2>
+                        <h2>Currency Conversion Response Time</h2>
                         <canvas id="exchangeRatesChart"></canvas>
                     </div>
                 </div>
 
-                <h2 class="section-title" style="margin-top: 2rem;">Receipt Scanning (Azure AI)</h2>
+                <h2 class="section-title" style="margin-top: 2rem;">Receipt Scanning (Azure Document Intelligence)</h2>
 
                 <div class="chart-row">
                     <div class="chart-container">

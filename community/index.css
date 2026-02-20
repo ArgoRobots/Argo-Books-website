@@ -136,14 +136,6 @@ header .header-inner .menu-container .menu .community:after {
   padding: 0 24px;
 }
 
-.community-content {
-  padding: 20px;
-  background-color: var(--white);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  margin: 20px 20px 40px 20px;
-}
-
 .community-actions {
   display: flex;
   justify-content: space-between;
@@ -296,23 +288,6 @@ header .header-inner .menu-container .menu .community:after {
   color: var(--blueText);
 }
 
-/* View count styling */
-.view-count {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 15px;
-  padding-top: 15px;
-  border-top: 1px solid var(--gray-border);
-  color: var(--gray-500);
-  font-size: 14px;
-}
-
-.view-count svg {
-  margin-bottom: 5px;
-  color: var(--gray-400);
-}
-
 .post-content {
   flex: 1;
   padding: 15px;
@@ -389,10 +364,6 @@ header .header-inner .menu-container .menu .community:after {
   gap: 10px;
 }
 
-.view-comments-btn {
-  font-size: 14px;
-}
-
 .post-info {
   font-size: 14px;
   color: var(--gray-500);
@@ -460,11 +431,6 @@ header .header-inner .menu-container .menu .community:after {
   }
 }
 
-.highlighted-post {
-  border: 2px solid var(--primary-blue);
-  animation: highlight-pulse 2s infinite;
-}
-
 /* Style for selected posts */
 .post-card.selectable {
   border-left: 3px solid var(--primary-blue);
@@ -485,18 +451,6 @@ header .header-inner .menu-container .menu .community:after {
   display: flex;
   align-items: center;
   gap: 15px;
-}
-
-.select-all-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.checkbox-label {
-  font-size: 14px;
-  color: var(--gray-text-light);
 }
 
 .selected-count {
@@ -638,9 +592,6 @@ header .header-inner .menu-container .menu .community:after {
     gap: 12px;
   }
 
-  .select-all-container {
-    margin-bottom: 8px;
-  }
 }
 
 @media (max-width: 480px) {

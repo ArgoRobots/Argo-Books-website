@@ -193,14 +193,6 @@
   text-align: center;
 }
 
-.email-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  margin-top: 5px;
-}
-
 .profile-stats {
   display: flex;
   justify-content: center;
@@ -655,38 +647,6 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-/* Verification alert on profile page */
-.verification-alert-profile {
-  background-color: var(--blue-50);
-  border: 1px solid var(--blue-200);
-  color: var(--blue-800);
-  padding: 12px;
-  border-radius: 6px;
-  margin-top: 10px;
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: center;
-}
-
-/* License verified status */
-.license-verified {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--green-600);
-  background-color: var(--green-100);
-  border: 1px solid var(--green-300);
-  border-radius: 6px;
-  padding: 10px;
-  font-weight: 500;
-  width: 100%;
-}
-
-.license-verified svg {
-  color: var(--green-600);
 }
 
 .profile-actions svg {

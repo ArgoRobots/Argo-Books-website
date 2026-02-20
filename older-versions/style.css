@@ -289,22 +289,6 @@
   width: auto;
 }
 
-/* Additional info section */
-.additional-info {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 32px;
-  margin-top: 40px;
-}
-
-.additional-info h3 {
-  color: #1f2937;
-  font-size: 1.25rem;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
   .hero {

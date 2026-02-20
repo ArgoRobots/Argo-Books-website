@@ -38,10 +38,6 @@ body {
     padding: 30px;
 }
 
-.content-centered {
-    text-align: center;
-}
-
 /* Typography */
 h1 {
     font-size: 24px;
@@ -83,22 +79,6 @@ a:hover {
     text-align: center;
 }
 
-/* Code display */
-.code-box,
-.verification-code,
-.reset-code {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 16px;
-    letter-spacing: 2px;
-    margin: 20px auto;
-    max-width: 300px;
-    padding: 16px;
-    text-align: center;
-}
-
 /* Button styles */
 .button {
     background-color: #2563eb;
@@ -115,10 +95,6 @@ a:hover {
 .button:hover {
     background-color: #1d4ed8;
     text-decoration: none;
-}
-
-.button-resend {
-    padding: 10px 24px;
 }
 
 .button-container {
@@ -305,15 +281,6 @@ a:hover {
 /* Text colors */
 .text-muted {
     color: #6b7280;
-}
-
-/* Margin helpers */
-.mt-0 {
-    margin-top: 0;
-}
-
-.mb-0 {
-    margin-bottom: 0;
 }
 
 /* Mobile responsive */

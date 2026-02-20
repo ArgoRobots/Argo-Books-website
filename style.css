@@ -63,11 +63,6 @@ a {
     50% { transform: translateY(-15px); }
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(0.95); }
-}
-
 @keyframes scanLine {
     0% { top: 0; }
     100% { top: 100%; }
@@ -101,11 +96,6 @@ a {
     100% { background-position: 200% 0; }
 }
 
-@keyframes gradientMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
 
 /* Initial states for animations */
 .animate-fade-in {
@@ -123,11 +113,6 @@ a {
 
 .animate-fade-in-up.delay-2 {
     animation-delay: 0.2s;
-    opacity: 0;
-}
-
-.animate-fade-in-up.delay-3 {
-    animation-delay: 0.3s;
     opacity: 0;
 }
 
@@ -438,16 +423,6 @@ a {
     margin-bottom: 48px;
 }
 
-.hero-stats {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-}
-
-.hero-stat {
-    text-align: center;
-}
-
 .stat-value {
     display: block;
     font-size: 1.75rem;
@@ -459,12 +434,6 @@ a {
     display: block;
     font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.6);
-}
-
-.hero-stat-divider {
-    width: 1px;
-    height: 40px;
-    background: rgba(255, 255, 255, 0.2);
 }
 
 /* Hero Visual */
@@ -1003,78 +972,6 @@ a {
     color: #64748b;
 }
 
-/* Insights Mockup */
-.insights-mockup {
-    padding: 24px;
-}
-
-.insight-card-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.insight-item {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px;
-    border-radius: 12px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-}
-
-.insight-item.priority-high {
-    border-left: 4px solid #f59e0b;
-}
-
-.insight-item.priority-success {
-    border-left: 4px solid #10b981;
-}
-
-.insight-item.priority-info {
-    border-left: 4px solid #3b82f6;
-}
-
-.insight-item .insight-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.insight-item.priority-high .insight-icon {
-    background: #fef3c7;
-    color: #f59e0b;
-}
-
-.insight-item.priority-success .insight-icon {
-    background: #d1fae5;
-    color: #10b981;
-}
-
-.insight-item.priority-info .insight-icon {
-    background: #dbeafe;
-    color: #3b82f6;
-}
-
-.insight-item .insight-text {
-    flex: 1;
-}
-
-.insight-item .insight-text strong {
-    display: block;
-    font-size: 0.95rem;
-    margin-bottom: 2px;
-}
-
-.insight-item .insight-text span {
-    font-size: 0.85rem;
-    color: #64748b;
-}
-
 /* Inventory Mockup */
 .inventory-mockup {
     padding: 24px;
@@ -1399,41 +1296,6 @@ a {
     color: #059669;
 }
 
-/* Payments Mockup */
-.payments-mockup {
-    padding: 24px;
-}
-
-.payment-providers {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.provider-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.provider-logo {
-    height: 20px;
-    width: auto;
-    opacity: 0.7;
-}
-
-.payment-success {
-    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-    border-radius: 16px;
-    padding: 32px;
-    text-align: center;
-}
-
 .success-icon {
     width: 64px;
     height: 64px;
@@ -1444,21 +1306,6 @@ a {
     justify-content: center;
     margin: 0 auto 16px;
     color: #10b981;
-}
-
-.success-text {
-    display: block;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #065f46;
-    margin-bottom: 4px;
-}
-
-.success-amount {
-    display: block;
-    font-size: 2rem;
-    font-weight: 700;
-    color: #047857;
 }
 
 /* Expense Tracking Mockup */
@@ -1828,59 +1675,6 @@ a {
     font-size: 0.95rem;
     color: #64748b;
     margin: 0;
-}
-
-.app-store-badges {
-    display: flex;
-    gap: 16px;
-    margin-top: 32px;
-}
-
-.app-badge {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.app-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.app-badge svg {
-    width: 24px;
-    height: 24px;
-}
-
-.app-badge-text {
-    display: flex;
-    flex-direction: column;
-}
-
-.app-badge-text .small {
-    font-size: 10px;
-    opacity: 0.8;
-}
-
-.app-badge-text .large {
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.coming-soon-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 50px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-left: 16px;
 }
 
 /* ========================================
@@ -2373,10 +2167,6 @@ a {
         justify-content: center;
     }
 
-    .hero-stats {
-        justify-content: center;
-    }
-
     .hero-visual {
         max-width: 500px;
         margin: 40px auto 0;
@@ -2460,9 +2250,6 @@ a {
         max-width: 400px;
     }
 
-    .app-store-badges {
-        justify-content: center;
-    }
 }
 
 @media (max-width: 768px) {
@@ -2481,16 +2268,6 @@ a {
     .hero-cta {
         flex-direction: column;
         align-items: center;
-    }
-
-    .hero-stats {
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .hero-stat-divider {
-        width: 40px;
-        height: 1px;
     }
 
     .floating-card {
@@ -2525,11 +2302,6 @@ a {
         margin: 0;
     }
 
-    .app-store-badges {
-        flex-direction: column;
-        align-items: center;
-    }
-
     .cta-content h2 {
         font-size: 2rem;
     }
@@ -2547,22 +2319,6 @@ a {
         margin-top: 8px;
     }
 
-    /* Payment providers responsive */
-    .payment-providers {
-        flex-wrap: wrap;
-        gap: 12px;
-    }
-
-    .provider-card {
-        flex: 1 1 auto;
-        min-width: 80px;
-        max-width: 100px;
-        padding: 12px;
-    }
-
-    .provider-logo {
-        height: 16px;
-    }
 }
 
 @media (max-width: 600px){
@@ -2636,28 +2392,12 @@ a {
         min-width: 60px;
     }
 
-    /* Payment providers - smaller on very small screens */
-    .payment-providers {
-        justify-content: center;
-    }
-
-    .provider-card {
-        min-width: 70px;
-        max-width: 90px;
-        padding: 10px;
-    }
-
-    .provider-logo {
-        height: 14px;
-    }
-
     /* Feature visual card padding */
     .feature-visual-card {
         padding: 16px;
     }
 
-    .customers-mockup,
-    .payments-mockup {
+    .customers-mockup {
         padding: 16px;
     }
 }

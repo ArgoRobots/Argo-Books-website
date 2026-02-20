@@ -740,7 +740,6 @@ function initializeMentionsForTextarea(textarea) {
       const success = window.mentionsSystem.addMentionableElement(textarea);
 
       if (success) {
-        console.log("Mentions initialized for edit textarea");
         return true;
       }
     }
@@ -753,7 +752,6 @@ function initializeMentionsForTextarea(textarea) {
         if (window.mentionsSystem) {
           window.mentionsSystem.attachListeners(textarea);
         }
-        console.warn("Had to force initialize mentions for edit textarea");
       }
     }, 100);
   }

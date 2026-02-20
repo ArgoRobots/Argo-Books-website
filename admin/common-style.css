@@ -388,22 +388,6 @@ h3 {
   background: var(--success-green-dark);
 }
 
-.btn-deactivate {
-  background: #f59e0b;
-}
-
-.btn-deactivate:hover {
-  background: #d97706;
-}
-
-.btn-email {
-  background: #6366f1;
-}
-
-.btn-email:hover {
-  background: #4f46e5;
-}
-
 /* Forms */
 .form-group {
   margin-bottom: 15px;
@@ -458,11 +442,6 @@ input[type="number"]::-webkit-inner-spin-button {
 .table-header {
   display: flex;
   justify-content: space-between;
-}
-
-.total-count {
-  font-weight: bold;
-  color: var(--blueText);
 }
 
 table {
@@ -545,11 +524,6 @@ tbody tr:hover {
   flex-direction: column;
   gap: 5px;
   justify-content: center;
-}
-
-.header-buttons {
-  display: flex;
-  gap: 10px;
 }
 
 /* Statistics Cards */
@@ -1004,12 +978,6 @@ tbody tr:hover {
     font-size: 1.5rem;
   }
 
-  .header-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
   .container {
     padding: 0.75rem;
   }
@@ -1024,10 +992,6 @@ tbody tr:hover {
     flex: 1 0 calc(50% - 15px);
   }
 
-  .export-types-grid {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 0.75rem;
-  }
 }
 
 @media (max-width: 768px) {

@@ -31,29 +31,19 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
       - name: Deploy via SFTP
-        env:
-          DEPLOY_USER: ${{ secrets.FTP_USERNAME }}
-          DEPLOY_HOST: ${{ secrets.FTP_SERVER }}
-          DEPLOY_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
-          cat > /tmp/lftp_deploy.sh <<'SCRIPT'
-          set sftp:connect-program "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no"
-          set net:max-retries 3
-          set net:timeout 30
-          open sftp://${DEPLOY_USER}@${DEPLOY_HOST}
-          mirror --reverse --delete --verbose \
-            --exclude ^\.git/$ \
-            --exclude ^\.github/$ \
-            --exclude ^\.gitignore$ \
-            --exclude ^README\.md$ \
-            --exclude ^read-me/$ \
-            --exclude ^composer\.json$ \
-            --exclude ^composer\.lock$ \
-            --exclude ^mysql_schema\.sql$ \
-            --exclude ^\.ftp-deploy-sync-state\.json$ \
-            ./ ${DEPLOY_DIR}
-          bye
-          SCRIPT
-          # Substitute env vars into the script
-          envsubst < /tmp/lftp_deploy.sh > /tmp/lftp_deploy_final.sh
-          lftp -f /tmp/lftp_deploy_final.sh
+          lftp -u "${{ secrets.FTP_USERNAME }}," \
+            -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
+                mirror --reverse --delete --verbose \
+                  --exclude ^\.git/$ \
+                  --exclude ^\.github/$ \
+                  --exclude ^\.gitignore$ \
+                  --exclude ^README\.md$ \
+                  --exclude ^read-me/$ \
+                  --exclude ^composer\.json$ \
+                  --exclude ^composer\.lock$ \
+                  --exclude ^mysql_schema\.sql$ \
+                  --exclude ^\.ftp-deploy-sync-state\.json$ \
+                  ./ ${{ secrets.FTP_SERVER_DIR }}; \
+                bye" \
+            sftp://${{ secrets.FTP_SERVER }}

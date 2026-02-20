@@ -30,24 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
   setupUpdatePostStatus();
   updateSearchFilterLabel();
 
-  // Initialize countdowns for any rate limit messages on page load
-  const countdownElements = document.querySelectorAll(".countdown-timer");
-
-  countdownElements.forEach((element) => {
-    if (element.dataset.resetTimestamp) {
-      startCountdown(element, parseInt(element.dataset.resetTimestamp));
-    }
-  });
-
-  // Listen for rate limit error events
-  document.addEventListener("ratelimit:error", function (e) {
-    const data = e.detail;
-
-    if (data && data.rate_limited) {
-      showRateLimitNotification(data);
-    }
-  });
-
   function isUserLoggedIn() {
     // We'll check this by looking for disabled vote buttons
     const voteBtn = document.querySelector(".vote-btn");
@@ -125,15 +107,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 downvoteBtn.classList.add("voted");
               }
             } else {
-              // Check for rate limiting
-              if (data.rate_limited) {
-                // Create and dispatch a custom event for the rate limit system
-                const rateLimitEvent = new CustomEvent("ratelimit:error", {
-                  detail: data,
-                });
-                document.dispatchEvent(rateLimitEvent);
-              } else if (data.show_message) {
-                // Use the existing displayServerMessage function
+              if (data.show_message) {
                 displayServerMessage(data);
               } else {
                 alert("Error voting: " + data.message);

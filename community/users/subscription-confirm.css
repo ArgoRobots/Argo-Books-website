@@ -122,63 +122,6 @@
     margin-bottom: 16px;
 }
 
-.current-payment-method {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: var(--white);
-    border-radius: 8px;
-    margin-bottom: 12px;
-}
-
-.payment-method-icon {
-    width: 60px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--gray-bg-light);
-    border-radius: 8px;
-    padding: 8px;
-}
-
-.payment-method-icon img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.payment-method-details {
-    flex: 1;
-}
-
-.payment-method-name {
-    display: block;
-    font-weight: 600;
-    color: var(--gray-text-darker);
-    font-size: 15px;
-}
-
-.payment-method-note {
-    display: block;
-    font-size: 13px;
-    color: var(--gray-text);
-    margin-top: 2px;
-}
-
-.change-payment-link {
-    display: inline-block;
-    font-size: 14px;
-    color: var(--purple-500);
-    text-decoration: none;
-}
-
-.change-payment-link:hover {
-    text-decoration: underline;
-    color: var(--purple-600);
-}
-
 /* Payment Provider Selection */
 .change-payment-section {
     margin-top: 16px;
@@ -271,47 +214,6 @@
 
 .billing-cycle-btn.current .billing-cycle-name {
     color: var(--purple-600);
-}
-
-/* Alert Boxes */
-.alert-warning {
-    background: var(--amber-100);
-    color: var(--amber-800);
-    border: 1px solid var(--amber-300);
-    padding: 16px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    text-align: left;
-}
-
-/* Discount Warning Box */
-.discount-warning-box {
-    background: var(--amber-100);
-    border: 1px solid var(--amber-500);
-    padding: 16px;
-    border-radius: 8px;
-    margin-top: 16px;
-}
-
-.discount-warning-box h3 {
-    color: var(--amber-700);
-    margin: 0 0 8px 0;
-    font-size: 16px;
-}
-
-.discount-warning-box p {
-    color: var(--amber-900);
-    margin: 0 0 8px 0;
-    font-size: 14px;
-}
-
-.discount-warning-box p:last-child {
-    margin-bottom: 0;
-}
-
-/* Credit Warning in list */
-.credit-warning {
-    color: var(--amber-700);
 }
 
 /* Action Buttons */

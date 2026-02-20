@@ -98,16 +98,6 @@ h1 {
   font-size: 18px;
 }
 
-.card-icons {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.card-icons img {
-  height: 30px;
-}
-
 #stripe-submit-btn,
 #square-submit-btn {
   background-color: var(--primary-blue);
@@ -177,10 +167,6 @@ h1 {
   color: var(--red-800);
   font-size: 14px;
   margin-top: 8px;
-}
-
-.sq-payment-form {
-  margin: 20px 0;
 }
 
 .loading-square {

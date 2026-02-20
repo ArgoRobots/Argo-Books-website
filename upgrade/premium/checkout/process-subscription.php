@@ -8,6 +8,7 @@ header('Content-Type: application/json');
 
 require_once '../../../db_connect.php';
 require_once '../../../email_sender.php';
+require_once '../../../license_functions.php';
 require_once '../../../vendor/autoload.php';
 require_once __DIR__ . '/../../../config/pricing.php';
 
@@ -90,9 +91,9 @@ try {
     // Continue with new subscription if check fails
 }
 
-// Generate subscription ID
+// Generate subscription ID using the shared license key generator
 function generateSubscriptionId() {
-    return 'AI-' . strtoupper(bin2hex(random_bytes(8)));
+    return generate_license_key('premium');
 }
 
 try {

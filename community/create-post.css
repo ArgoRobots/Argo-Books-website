@@ -388,22 +388,6 @@ header .header-inner .menu-container .menu .community:after {
   display: none;
 }
 
-.form-section.preview-section {
-  background: var(--white);
-  border: 1px solid var(--gray-border);
-}
-
-/* Loading animation */
-.preview-loading {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--gray-100);
-  border-top: 2px solid var(--primary-blue);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
 @keyframes spin {
   0% {
     transform: rotate(0deg);

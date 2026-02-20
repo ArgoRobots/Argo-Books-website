@@ -104,28 +104,6 @@
   }
 }
 
-/* License info section on verification page */
-.license-info {
-  background-color: var(--sky-50);
-  border: 1px solid var(--sky-200);
-  color: var(--sky-700);
-  border-radius: 6px;
-  padding: 15px 20px;
-  margin: 20px 0;
-}
-
-.license-info h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: var(--sky-700);
-  font-size: 18px;
-}
-
-.license-info p {
-  margin: 0;
-  line-height: 1.6;
-}
-
 /* Styling for verification messages */
 .success-message {
   background-color: var(--emerald-100);

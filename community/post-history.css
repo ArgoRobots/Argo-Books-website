@@ -47,11 +47,6 @@ header .header-inner .menu-container .menu .community:after {
   margin-left: 10px;
 }
 
-.diff-highlight {
-  background-color: var(--yellow-100);
-  padding: 2px 0;
-}
-
 .history-title {
   font-size: 18px;
   font-weight: 600;

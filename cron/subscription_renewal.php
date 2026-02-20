@@ -533,7 +533,7 @@ function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $ne
 <body>
     <div class="container">
         <div class="header" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-            <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+            <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
         </div>
 
         <div class="content">
@@ -617,7 +617,7 @@ function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
 <body>
     <div class="container">
         <div class="header" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
-            <img src="https://argorobots.com/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
+            <img src="https://argorobots.com/resources/images/argo-logo/Argo-white.svg" alt="Argo Logo" width="140">
         </div>
 
         <div class="content">

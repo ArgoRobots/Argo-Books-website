@@ -1,19 +1,6 @@
-/* Filter Container */
-.filter-container {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
 .filter-group {
     display: flex;
     flex-direction: column;
-}
-
-.filter-group.date-filter-group,
-.filter-group.search-group {
-    flex: 1;
 }
 
 .filter-group label {
@@ -43,27 +30,6 @@
     border-color: var(--primary-blue);
 }
 
-/* Date Preset Select */
-.date-preset-select {
-    padding: 8px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: 4px;
-    font-size: 14px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.date-preset-select:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.date-preset-select:hover {
-    border-color: var(--primary-blue);
-}
-
 /* Custom Date Range */
 .custom-date-range {
     display: flex;
@@ -73,52 +39,6 @@
     background: var(--gray-50);
     border-radius: 6px;
     border: 1px solid var(--gray-200);
-}
-
-.date-input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    flex: 1;
-}
-
-.date-input-group label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gray-600);
-}
-
-/* Date Input Fields */
-.date-input-group input[type="date"] {
-    padding: 8px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: 4px;
-    font-size: 14px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.date-input-group input[type="date"]:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.date-input-group input[type="date"]:hover {
-    border-color: var(--primary-blue);
-}
-
-/* Filter Actions */
-.filter-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: end;
-}
-
-.filter-actions .btn {
-    padding: 8px 16px;
-    line-height: 1.5;
 }
 
 /* Bulk Actions */
@@ -168,33 +88,6 @@
     height: 16px;
 }
 
-.btn-email {
-    background-color: #0891b2;
-    color: white;
-}
-
-.btn-email:not(:disabled):hover {
-    background-color: #0e7490;
-}
-
-.btn-activate {
-    background-color: #10b981;
-    color: white;
-}
-
-.btn-activate:not(:disabled):hover {
-    background-color: #059669;
-}
-
-.btn-deactivate {
-    background-color: #f59e0b;
-    color: white;
-}
-
-.btn-deactivate:not(:disabled):hover {
-    background-color: #d97706;
-}
-
 .btn-delete {
     background-color: #ef4444;
     color: white;
@@ -212,26 +105,8 @@
 
 /* Responsive */
 @media (max-width: 900px) {
-    .filter-container {
-        flex-direction: column;
-    }
-
-    .filter-group.search-group,
-    .filter-group.date-filter-group {
-        min-width: 100%;
-    }
-
     .custom-date-range {
         flex-direction: column;
-    }
-
-    .filter-actions {
-        width: 100%;
-        flex-direction: row;
-    }
-
-    .filter-actions .btn {
-        flex: 1;
     }
 
     .bulk-actions-container {

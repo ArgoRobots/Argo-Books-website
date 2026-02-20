@@ -158,3 +158,114 @@ function validate_premium_key($key) {
         ];
     }
 }
+
+/**
+ * Redeem a free/promo premium subscription key
+ * Validates the key, creates a premium subscription, and marks the key as redeemed.
+ *
+ * @param string $key The premium subscription key to redeem
+ * @param int $user_id The user ID redeeming the key
+ * @param string $email The user's email address
+ * @return array Response array with redemption result
+ */
+function redeem_premium_key($key, $user_id, $email) {
+    global $pdo;
+
+    // First validate the key
+    $validation = validate_premium_key($key);
+
+    if (!$validation['success']) {
+        return $validation;
+    }
+
+    if ($validation['status'] === 'redeemed') {
+        return [
+            'success' => false,
+            'message' => 'This premium key has already been redeemed.',
+            'redeemed_at' => $validation['redeemed_at']
+        ];
+    }
+
+    // Check email restriction if set
+    if (!empty($validation['restricted_email']) && strtolower($validation['restricted_email']) !== strtolower($email)) {
+        return [
+            'success' => false,
+            'message' => 'This premium key is restricted to a different email address.'
+        ];
+    }
+
+    $duration_months = $validation['duration_months'];
+
+    try {
+        $pdo->beginTransaction();
+
+        // Generate a subscription ID for the new subscription
+        $subscriptionId = generate_license_key('premium');
+
+        // Calculate subscription dates
+        $startDate = date('Y-m-d H:i:s');
+        if ($duration_months == 0) {
+            // Permanent subscription — set end date far in the future
+            $endDate = date('Y-m-d H:i:s', strtotime('+100 years'));
+            $billingCycle = 'yearly';
+        } elseif ($duration_months >= 12) {
+            $endDate = date('Y-m-d H:i:s', strtotime("+$duration_months months"));
+            $billingCycle = 'yearly';
+        } else {
+            $endDate = date('Y-m-d H:i:s', strtotime("+$duration_months months"));
+            $billingCycle = 'monthly';
+        }
+
+        // Create the premium subscription
+        $stmt = $pdo->prepare("
+            INSERT INTO premium_subscriptions (
+                subscription_id, user_id, email, billing_cycle, amount, currency,
+                start_date, end_date, status, payment_method, transaction_id,
+                auto_renew, created_at
+            ) VALUES (
+                ?, ?, ?, ?, 0.00, 'CAD',
+                ?, ?, 'active', 'free_key', ?,
+                0, NOW()
+            )
+        ");
+        $stmt->execute([
+            $subscriptionId,
+            $user_id,
+            $email,
+            $billingCycle,
+            $startDate,
+            $endDate,
+            $key
+        ]);
+
+        // Mark the key as redeemed
+        $stmt = $pdo->prepare("
+            UPDATE premium_subscription_keys
+            SET redeemed_at = NOW(),
+                redeemed_by_user_id = ?,
+                subscription_id = ?
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$user_id, $subscriptionId, $key]);
+
+        $pdo->commit();
+
+        return [
+            'success' => true,
+            'type' => 'premium_key',
+            'status' => 'redeemed',
+            'message' => 'Premium key redeemed successfully.',
+            'subscription_id' => $subscriptionId,
+            'end_date' => $endDate,
+            'duration_months' => $duration_months
+        ];
+
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        error_log("Premium key redemption error: " . $e->getMessage());
+        return [
+            'success' => false,
+            'message' => 'Error redeeming premium key. Please try again.'
+        ];
+    }
+}

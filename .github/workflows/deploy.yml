@@ -23,6 +23,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+          # Remove passphrase from key so rsync can use it non-interactively
+          ssh-keygen -p -f ~/.ssh/deploy_key -P "${{ secrets.SSH_PASSPHRASE }}" -N ""
           ssh-keyscan -T 10 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Deploy via rsync
@@ -40,5 +42,5 @@ jobs:
             --exclude='composer.lock' \
             --exclude='mysql_schema.sql' \
             --exclude='.ftp-deploy-sync-state.json' \
-            -e "ssh -i ~/.ssh/deploy_key" \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:${{ secrets.FTP_SERVER_DIR }}

@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy via rsync
+    name: Deploy via SFTP
     runs-on: ubuntu-latest
 
     steps:
@@ -23,24 +23,26 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          # Remove passphrase from key so rsync can use it non-interactively
+          # Remove passphrase from key so lftp can use it non-interactively
           ssh-keygen -p -f ~/.ssh/deploy_key -P "${{ secrets.SSH_PASSPHRASE }}" -N ""
           ssh-keyscan -T 10 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Deploy via rsync
+      - name: Deploy via SFTP
         run: |
-          rsync -azv --delete --protocol=30 \
-            --include='/vendor/' \
-            --include='/vendor/**' \
-            --exclude-from=.gitignore \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.gitignore' \
-            --exclude='README.md' \
-            --exclude='read-me' \
-            --exclude='composer.json' \
-            --exclude='composer.lock' \
-            --exclude='mysql_schema.sql' \
-            --exclude='.ftp-deploy-sync-state.json' \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:${{ secrets.FTP_SERVER_DIR }}
+          sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+          lftp -e "
+            set sftp:connect-program 'ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no';
+            open sftp://${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }};
+            mirror --reverse --delete --verbose \
+              --exclude ^\.git/$ \
+              --exclude ^\.github/$ \
+              --exclude ^\.gitignore$ \
+              --exclude ^README\.md$ \
+              --exclude ^read-me/$ \
+              --exclude ^composer\.json$ \
+              --exclude ^composer\.lock$ \
+              --exclude ^mysql_schema\.sql$ \
+              --exclude ^\.ftp-deploy-sync-state\.json$ \
+              ./ ${{ secrets.FTP_SERVER_DIR }};
+            bye
+          "

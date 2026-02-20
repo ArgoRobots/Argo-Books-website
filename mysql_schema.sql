@@ -290,7 +290,7 @@ CREATE TABLE IF NOT EXISTS user_bans (
     INDEX idx_expires_at (expires_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- AI Subscriptions table
+-- Premium Subscriptions table
 CREATE TABLE IF NOT EXISTS premium_subscriptions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_id VARCHAR(50) NOT NULL UNIQUE,
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- AI Subscription Payments table
+-- Premium Subscription Payments table
 CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_id VARCHAR(50) NOT NULL,
@@ -343,7 +343,7 @@ CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     INDEX idx_payment_type (payment_type)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- AI Subscription Keys table (free/promo keys)
+-- Premium Subscription Keys table (free/promo keys)
 CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_key VARCHAR(50) NOT NULL UNIQUE,

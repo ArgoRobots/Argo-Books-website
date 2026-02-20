@@ -234,12 +234,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['message_type'] = 'error';
             }
 
-            header('Location: index.php#ai-subscriptions');
+            header('Location: index.php#premium-subscriptions');
             exit;
         } else {
             $_SESSION['message'] = "Please select subscriptions and enter a valid credit amount.";
             $_SESSION['message_type'] = 'error';
-            header('Location: index.php#ai-subscriptions');
+            header('Location: index.php#premium-subscriptions');
             exit;
         }
     }
@@ -298,7 +298,7 @@ include '../admin_header.php';
 <div class="container">
     <!-- Section Tabs -->
     <div class="section-tabs">
-        <button class="section-tab active" data-tab="ai-subscriptions">Premium Subscriptions</button>
+        <button class="section-tab active" data-tab="premium-subscriptions">Premium Subscriptions</button>
         <button class="section-tab" data-tab="free-sub-keys">Free Premium Subscription Keys</button>
     </div>
 
@@ -309,7 +309,7 @@ include '../admin_header.php';
     <?php endif; ?>
 
     <!-- Premium Subscriptions Tab -->
-    <div id="ai-subscriptions" class="tab-content active">
+    <div id="premium-subscriptions" class="tab-content active">
         <div class="stats-grid">
             <div class="stat-card active">
                 <h3>Active Subscriptions</h3>

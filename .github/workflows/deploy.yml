@@ -1,4 +1,4 @@
-name: Deploy to FTP Server
+name: Deploy to Server
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy via FTP
+    name: Deploy via rsync
     runs-on: ubuntu-latest
 
     steps:
@@ -18,21 +18,27 @@ jobs:
       - name: Install PHP dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
-      - name: Deploy to FTP server
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/.github*
-            **/.github*/**
-            .gitignore
-            README.md
-            read-me/**
-            composer.json
-            composer.lock
-            mysql_schema.sql
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -T 10 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync
+        run: |
+          rsync -azv --delete \
+            --include='/vendor/' \
+            --include='/vendor/**' \
+            --exclude-from=.gitignore \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='README.md' \
+            --exclude='read-me' \
+            --exclude='composer.json' \
+            --exclude='composer.lock' \
+            --exclude='mysql_schema.sql' \
+            --exclude='.ftp-deploy-sync-state.json' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            ./ ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }}:${{ secrets.FTP_SERVER_DIR }}

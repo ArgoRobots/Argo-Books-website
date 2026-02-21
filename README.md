@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is the website for [Argo Books](https://github.com/ArgoRobots/Argo-Books), AI-powered accounting software with receipt scanning, predictive analytics, inventory management, and more. This website serves as a platform for users to download the software, purchase license keys, access documentation, and has an administrative system for managing licenses, user accounts, and analytics.
+This is the website for [Argo Books](https://github.com/ArgoRobots/Argo-Books), accounting software with receipt scanning, predictive analytics, inventory management, and more. This website serves as a platform for users to download the software, purchase license keys, access documentation, and has an administrative system for managing licenses, user accounts, and viewing analytics.
 
 You can view the live website here: https://argorobots.com/
 
@@ -10,8 +10,8 @@ You can view the live website here: https://argorobots.com/
 
 ### Frontend:
 
-- **HTML5/CSS3**: Structure and styling
-- **JavaScript/jQuery**: Interactive elements and dynamic content loading
+- **HTML5 and CSS3**: Structure and styling
+- **JavaScript and jQuery**: Interactive elements and dynamic content loading
 - **Chart.js**: Data visualization for analytics dashboard
 
 ### Backend:
@@ -104,7 +104,7 @@ You need to create a MySQL database and import the schema.
 1. Open Laragon and click **Start All**
 2. Navigate to http://localhost/argo-books-website in your browser (adjust the folder name if different)
 3. The website should now be running locally
-4. To view emails sent by the application, open http://localhost:8025
+4. To view emails sent by the application, open http://localhost:8025 (requires MailHog setup — see [Local email setup](read-me/Local%20email%20setup.md))
 
 ## Publishing a new version of Argo Books
 1. Create a new folder in `resources/downloads/versions` named whatever the version number is

@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      full_deploy:
+        description: 'Force full deployment (re-upload all files)'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   deploy:
@@ -14,6 +20,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Install PHP dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction
@@ -30,11 +38,43 @@ jobs:
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
-      - name: Deploy via SFTP
+      - name: Determine changed files
+        id: changes
+        run: |
+          FULL_DEPLOY="${{ github.event.inputs.full_deploy }}"
+
+          if [ "$FULL_DEPLOY" = "true" ]; then
+            echo "mode=full" >> "$GITHUB_OUTPUT"
+          elif ! git rev-parse HEAD~1 >/dev/null 2>&1; then
+            echo "First commit detected, doing full deploy"
+            echo "mode=full" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=incremental" >> "$GITHUB_OUTPUT"
+
+            # Files that were added, copied, modified, or renamed
+            git diff --name-only --diff-filter=ACMR HEAD~1 HEAD > /tmp/changed_files.txt || true
+            # Files that were deleted
+            git diff --name-only --diff-filter=D HEAD~1 HEAD > /tmp/deleted_files.txt || true
+
+            # Check if composer files changed (need to re-upload vendor/)
+            if git diff --name-only HEAD~1 HEAD | grep -qE '^composer\.(json|lock)$'; then
+              echo "composer_changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "composer_changed=false" >> "$GITHUB_OUTPUT"
+            fi
+
+            echo "=== Changed files ==="
+            cat /tmp/changed_files.txt
+            echo "=== Deleted files ==="
+            cat /tmp/deleted_files.txt
+          fi
+
+      - name: Deploy (full mirror)
+        if: steps.changes.outputs.mode == 'full'
         run: |
           lftp -u "${{ secrets.FTP_USERNAME }}," \
             -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
-                mirror --reverse --delete --verbose \
+                mirror --reverse --delete --verbose --no-perms \
                   --exclude ^\.git/$ \
                   --exclude ^\.github/$ \
                   --exclude ^\.gitignore$ \
@@ -45,5 +85,60 @@ jobs:
                   --exclude ^mysql_schema\.sql$ \
                   --exclude ^\.ftp-deploy-sync-state\.json$ \
                   ./ ${{ secrets.FTP_SERVER_DIR }}; \
+                bye" \
+            sftp://${{ secrets.FTP_SERVER }}
+
+      - name: Deploy (incremental)
+        if: steps.changes.outputs.mode == 'incremental'
+        run: |
+          REMOTE_DIR="${{ secrets.FTP_SERVER_DIR }}"
+          LFTP_CMDS=""
+
+          # Function to check if a file should be excluded
+          is_excluded() {
+            case "$1" in
+              .git/*|.github/*|.gitignore|README.md|read-me/*|composer.json|composer.lock|mysql_schema.sql|.ftp-deploy-sync-state.json) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          # Upload changed files
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            is_excluded "$file" && continue
+            [ ! -f "$file" ] && continue
+            dir=$(dirname "$file")
+            if [ "$dir" != "." ]; then
+              LFTP_CMDS="${LFTP_CMDS}mkdir -p -f ${REMOTE_DIR}/${dir}; "
+              LFTP_CMDS="${LFTP_CMDS}put ./${file} -o ${REMOTE_DIR}/${file}; "
+            else
+              LFTP_CMDS="${LFTP_CMDS}put ./${file} -o ${REMOTE_DIR}/${file}; "
+            fi
+          done < /tmp/changed_files.txt
+
+          # Delete removed files from remote
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            is_excluded "$file" && continue
+            LFTP_CMDS="${LFTP_CMDS}rm -f ${REMOTE_DIR}/${file}; "
+          done < /tmp/deleted_files.txt
+
+          # If composer deps changed, mirror the entire vendor/ directory
+          if [ "${{ steps.changes.outputs.composer_changed }}" = "true" ]; then
+            echo "Composer files changed, re-uploading vendor/"
+            LFTP_CMDS="${LFTP_CMDS}mirror --reverse --delete --verbose --no-perms vendor/ ${REMOTE_DIR}/vendor/; "
+          fi
+
+          if [ -z "$LFTP_CMDS" ]; then
+            echo "No files to deploy"
+            exit 0
+          fi
+
+          echo "Deploying changed files..."
+          echo "Commands: $LFTP_CMDS"
+
+          lftp -u "${{ secrets.FTP_USERNAME }}," \
+            -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
+                ${LFTP_CMDS} \
                 bye" \
             sftp://${{ secrets.FTP_SERVER }}

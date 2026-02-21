@@ -9,27 +9,18 @@
 - **Standard Rate:** 2.9% + $0.30 CAD per transaction
 - **International Cards:** Additional 1.5%
 - **Currency Conversion:** Additional 1%
-- **No monthly fees**
 
 ### PayPal
 
 - **Standard Rate:** 2.9% + $0.30 CAD per transaction
 - **PayPal Account Payments:** Same rate
 - **International:** 4.4% + fixed fee
-- **No monthly fees**
 
 ### Square
 
 - **Online Payments:** 2.9% + $0.30 CAD per transaction
 - **Card on File:** Same rate
 - **International:** Additional 1.5%
-- **No monthly fees**
-
-**For a $20 CAD transaction:**
-
-- Stripe: $20.00 - $0.88 = **$19.12 net**
-- PayPal: $20.00 - $0.88 = **$19.12 net**
-- Square: $20.00 - $0.88 = **$19.12 net**
 
 ---
 
@@ -129,7 +120,7 @@ The subscription renewal process checks for Premium subscriptions due for renewa
 To run the renewal process automatically every day at 3:00 PM, add this cron entry:
 
 ```bash
-0 15 * * * /usr/bin/php /path/to/your/website/cron/subscription_renewal.php
+/usr/bin/php /home/argorobots/public_html/cron/subscription_renewal.php
 ```
 
 This will check for subscriptions due within 24 hours and process their renewals automatically.
@@ -148,7 +139,7 @@ This will check for subscriptions due within 24 hours and process their renewals
 
 **Via CLI:**
 ```bash
-php /path/to/your/website/cron/subscription_renewal.php
+php /home/argorobots/public_html/cron/subscription_renewal.php
 ```
 
 **Via Web (with secret key):**
@@ -162,13 +153,3 @@ Visit `/cron/` and authenticate with TOTP to access the renewal management dashb
 ### Logs
 
 Logs are stored in: `/cron/logs/subscription_renewal_YYYY-MM-DD.log`
-
----
-
-## Security Best Practices
-
-### API Keys
-
-- **Never** commit .env to git
-- **Never** expose secret keys in frontend code
-- Rotate keys regularly (every 90 days)

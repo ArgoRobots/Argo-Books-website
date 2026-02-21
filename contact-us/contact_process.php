@@ -1,11 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../smtp_mailer.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->safeLoad();
-
 /**
  * Processes the contact form submission and sends an email
  *
@@ -85,30 +79,14 @@ function process_contact_form()
 
     $to_email = 'contact@argorobots.com';
 
-    // Use SMTP relay if configured, otherwise fall back to mail()
-    $mailer = create_smtp_mailer();
-    if ($mailer) {
-        try {
-            $mailer->addAddress($to_email);
-            $mailer->addReplyTo($email);
-            $mailer->Subject = $email_subject;
-            $mailer->Body = $email_html;
-            $mailer->send();
-            $mail_result = true;
-        } catch (\Exception $e) {
-            error_log("SMTP contact form email failed: " . $e->getMessage());
-            $mail_result = false;
-        }
-    } else {
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-Type: text/html; charset=UTF-8',
-            'From: Argo Books Website <noreply@argorobots.com>',
-            'Reply-To: ' . $email,
-            'X-Mailer: PHP/' . phpversion()
-        ];
-        $mail_result = mail($to_email, $email_subject, $email_html, implode("\r\n", $headers));
-    }
+    $headers = [
+        'MIME-Version: 1.0',
+        'Content-Type: text/html; charset=UTF-8',
+        'From: Argo Books Website <noreply@argorobots.com>',
+        'Reply-To: ' . $email,
+        'X-Mailer: PHP/' . phpversion()
+    ];
+    $mail_result = mail($to_email, $email_subject, $email_html, implode("\r\n", $headers));
 
     if ($mail_result) {
         return ['success' => true];

@@ -1,6 +1,6 @@
 # Local Email Setup with MailHog
 
-When running the Argo Books website locally on XAMPP, PHP's `mail()` function won't work without a mail server. MailHog is a fake SMTP server that catches all emails locally and displays them in a web interface - no emails are actually sent.
+When running the Argo Books website locally on Laragon, PHP's `mail()` function won't work without a mail server. MailHog is a fake SMTP server that catches all emails locally and displays them in a web interface - no emails are actually sent.
 
 ## Setup Instructions
 
@@ -10,50 +10,39 @@ When running the Argo Books website locally on XAMPP, PHP's `mail()` function wo
 2. Download `MailHog_windows_386.exe` (or `MailHog_windows_amd64.exe`)
 3. Save it somewhere convenient
 
-### 2. Configure php.ini
+### 2. Create and configure php.ini
 
-Open `C:\xampp\php\php.ini` and find the `[mail function]` section. Update these settings:
+Laragon doesn't ship with a `php.ini` by default — only template files. You need to create one first:
+
+1. Open your Laragon PHP folder (e.g. `C:\laragon\bin\php\php-8.x.x-nts-Win32-vs17-x64`)
+2. Copy `php.ini-development` and rename the copy to `php.ini`
+3. Open the new `php.ini` and find the `[mail function]` section. Update these settings:
 
 ```ini
 [mail function]
 SMTP=localhost
 smtp_port=1025
 sendmail_from = noreply@localhost
-sendmail_path = "C:\xampp\sendmail\sendmail.exe -t"
 ```
 
-> **Note:** The `sendmail_path` comment says "For Unix only" but XAMPP includes a Windows sendmail wrapper, so this works.
+Make sure `sendmail_path` is commented out (has a `;` in front of it). On Windows, PHP uses `SMTP` and `smtp_port` directly — no sendmail needed.
 
-### 3. Configure sendmail.ini
-
-Open `C:\xampp\sendmail\sendmail.ini` and update these settings:
-
-```ini
-smtp_server=localhost
-smtp_port=1025
-smtp_ssl=none
-force_sender=noreply@localhost
-error_logfile=error.log
-```
-
-> **Important:** `smtp_ssl` must be `none` because MailHog doesn't support TLS/SSL.
-
-### 4. Run MailHog
+### 3. Run MailHog
 
 Double-click `MailHog_windows_386.exe`. A console window will open. Keep it running (you can minimize it).
 
-### 5. Restart Apache
+### 4. Restart Apache
 
-In XAMPP Control Panel, stop and start Apache.
+In Laragon, right-click the tray icon and select "Reload Apache" (or stop and start all services).
 
-### 6. View Emails
+### 5. View Emails
 
 Open http://localhost:8025 in your browser. All captured emails will appear here.
 
 ## How It Works
 
 ```
-PHP mail() → sendmail.exe → MailHog (port 1025) → Web UI (port 8025)
+PHP mail() → SMTP localhost:1025 → MailHog → Web UI (port 8025)
 ```
 
 ## Troubleshooting
@@ -66,11 +55,13 @@ PHP mail() → sendmail.exe → MailHog (port 1025) → Web UI (port 8025)
    ```
    You should see `0.0.0.0:1025` in LISTENING state.
 
-2. **Check sendmail error log:** `C:\xampp\sendmail\error.log`
+2. **Make sure php.ini exists and is being loaded.** Create a file called `phpinfo.php` in your project root:
+   ```php
+   <?php phpinfo();
+   ```
+   Open it in your browser and search for "Loaded Configuration File" — it should show the path to your `php.ini`. Also check that `SMTP` shows `localhost` and `smtp_port` shows `1025`.
 
-3. **Check Apache error log:** `C:\xampp\apache\logs\error.log`
-
-4. **Test PHP mail directly:** Create `test_mail.php` in htdocs:
+3. **Test PHP mail directly:** Create `test_mail.php` in your project root:
    ```php
    <?php
    $result = mail("test@example.com", "Test", "Test body");

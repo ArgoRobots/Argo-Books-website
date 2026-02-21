@@ -100,7 +100,7 @@
                             <div class="point-icon">
                                 <?= svg_icon('check-rounded') ?>
                             </div>
-                            <p>Flexible pricing — Use it for free, or unlock more with a one-time purchase</p>
+                            <p>Flexible pricing — Use it for free, or unlock more with the premium version</p>
                         </div>
                     </div>
                 </div>

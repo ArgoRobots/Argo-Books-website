@@ -2,6 +2,8 @@
 .env*
 *.exe
 .VSCodeCounter
+.secrets-backup
+SSH Key.ppk
 error_log.txt
 error_log
 /vendor/

@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="sidebar-icon">
             <?= svg_icon('map-pin', null, '', 1.5) ?>
           </div>
-          <h4>Based in Saskatoon</h4>
+          <h4>Based in Canada</h4>
           <p>We're a Canadian company proudly serving businesses worldwide.</p>
           <span class="location-badge">
             <?= svg_icon('map-pin', 14) ?>

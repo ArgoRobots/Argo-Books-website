@@ -305,6 +305,8 @@ include '../admin_header.php';
     cursor: pointer;
     vertical-align: middle;
     transition: all 0.15s ease;
+    min-width: 60px;
+    text-align: center;
 }
 .btn-copy:hover {
     background: #e5e7eb;
@@ -517,7 +519,7 @@ include '../admin_header.php';
                     <div class="form-group">
                         <label for="notes">Notes (optional)</label>
                         <input type="text" id="notes" name="notes" placeholder="e.g., Giveaway winner">
-                         <p style="position: absolute; margin: 5px 0 20px;">This will also appear in the recipient's email.</p>
+                         <p style="position: absolute; margin: 5px 0 20px; color: var(--gray-text);">This will also appear in the recipient's email.</p>
                     </div>
                     <div class="form-group">
                         <button type="submit" name="generate_sub_key" class="btn btn-purple" style="margin-top: 24px;">Generate Key</button>

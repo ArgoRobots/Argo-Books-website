@@ -123,7 +123,7 @@ $systemRequirements = getSystemRequirements();
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
-    <meta name="geo.placename" content="Saskatoon">
+    <meta name="geo.placename" content="Canada">
     <meta name="geo.position" content="52.1579;-106.6702">
     <meta name="ICBM" content="52.1579, -106.6702">
 

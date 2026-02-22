@@ -17,13 +17,12 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     global $pdo;
     try {
         $stmt = $pdo->query("
-            SELECT p.created_at, c.company_name, p.customer_name, i.invoice_id,
+            SELECT p.created_at, c.company_name, p.customer_name, p.invoice_id,
                    p.amount, p.processing_fee, p.currency, p.payment_method,
                    p.status, p.synced_to_argo, p.reference_number,
                    p.provider_payment_id
             FROM portal_payments p
-            LEFT JOIN portal_invoices i ON p.invoice_id = i.id
-            LEFT JOIN portal_companies c ON i.company_id = c.id
+            LEFT JOIN portal_companies c ON p.company_id = c.id
             ORDER BY p.created_at DESC
         ");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -129,8 +128,7 @@ try {
         SELECT p.created_at, c.company_name, p.customer_name, p.amount,
                p.currency, p.payment_method, p.status
         FROM portal_payments p
-        LEFT JOIN portal_invoices i ON p.invoice_id = i.id
-        LEFT JOIN portal_companies c ON i.company_id = c.id
+        LEFT JOIN portal_companies c ON p.company_id = c.id
         ORDER BY p.created_at DESC
         LIMIT 10
     ");
@@ -148,10 +146,9 @@ $tx_company = $_GET['tx_company'] ?? '';
 
 try {
     $query = "
-        SELECT p.*, i.invoice_id as inv_id, c.company_name
+        SELECT p.*, c.company_name
         FROM portal_payments p
-        LEFT JOIN portal_invoices i ON p.invoice_id = i.id
-        LEFT JOIN portal_companies c ON i.company_id = c.id
+        LEFT JOIN portal_companies c ON p.company_id = c.id
         WHERE 1=1
     ";
     $params = [];
@@ -193,8 +190,7 @@ try {
                COALESCE(SUM(CASE WHEN p.status = 'completed' THEN p.amount ELSE 0 END), 0) as total_revenue,
                MAX(p.created_at) as last_payment_date
         FROM portal_companies c
-        LEFT JOIN portal_invoices i ON i.company_id = c.id
-        LEFT JOIN portal_payments p ON p.invoice_id = i.id
+        LEFT JOIN portal_payments p ON p.company_id = c.id
         GROUP BY c.id
         ORDER BY total_revenue DESC
     ");
@@ -255,8 +251,7 @@ try {
     $stmt = $pdo->query("
         SELECT c.company_name, SUM(p.amount) as revenue
         FROM portal_payments p
-        JOIN portal_invoices i ON p.invoice_id = i.id
-        JOIN portal_companies c ON i.company_id = c.id
+        JOIN portal_companies c ON p.company_id = c.id
         WHERE p.status = 'completed'
         GROUP BY c.id
         ORDER BY revenue DESC
@@ -330,8 +325,7 @@ try {
                p.currency, p.payment_method, p.status,
                p.provider_payment_id
         FROM portal_payments p
-        LEFT JOIN portal_invoices i ON p.invoice_id = i.id
-        LEFT JOIN portal_companies c ON i.company_id = c.id
+        LEFT JOIN portal_companies c ON p.company_id = c.id
         WHERE p.status = 'failed'
         ORDER BY p.created_at DESC
         LIMIT 100
@@ -342,8 +336,7 @@ try {
         SELECT p.created_at, c.company_name, p.customer_name, p.amount,
                p.currency, p.payment_method, p.provider_payment_id
         FROM portal_payments p
-        LEFT JOIN portal_invoices i ON p.invoice_id = i.id
-        LEFT JOIN portal_companies c ON i.company_id = c.id
+        LEFT JOIN portal_companies c ON p.company_id = c.id
         WHERE p.status = 'refunded'
         ORDER BY p.created_at DESC
         LIMIT 100
@@ -572,7 +565,7 @@ include '../admin_header.php';
                                     <td><?php echo date('M j, Y', strtotime($tx['created_at'])); ?></td>
                                     <td><?php echo htmlspecialchars($tx['company_name'] ?? 'N/A'); ?></td>
                                     <td><?php echo htmlspecialchars($tx['customer_name']); ?></td>
-                                    <td class="key-field"><?php echo htmlspecialchars($tx['inv_id'] ?? 'N/A'); ?></td>
+                                    <td class="key-field"><?php echo htmlspecialchars($tx['invoice_id'] ?? 'N/A'); ?></td>
                                     <td>$<?php echo number_format($tx['amount'], 2); ?></td>
                                     <td>$<?php echo number_format($tx['processing_fee'] ?? 0, 2); ?></td>
                                     <td><span class="badge badge-method"><?php echo htmlspecialchars(ucfirst($tx['payment_method'])); ?></span></td>
@@ -633,33 +626,92 @@ include '../admin_header.php';
                                 <tr class="detail-row" id="company-detail-<?php echo $company['id']; ?>" style="display: none;">
                                     <td colspan="5">
                                         <div class="company-detail">
-                                            <div class="detail-grid">
-                                                <div class="detail-item">
-                                                    <span class="detail-label">API Key</span>
-                                                    <span class="detail-value key-field"><?php
-                                                        $key = $company['api_key'] ?? '';
-                                                        echo $key ? htmlspecialchars(substr($key, 0, 8) . '...' . substr($key, -4)) : 'N/A';
-                                                    ?></span>
+                                            <!-- General Info -->
+                                            <div class="detail-section">
+                                                <h4 class="detail-section-title">General</h4>
+                                                <div class="detail-section-grid">
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Owner Email</span>
+                                                        <span class="detail-value"><?php echo htmlspecialchars($company['owner_email'] ?? 'N/A'); ?></span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">API Key</span>
+                                                        <span class="detail-value key-field"><?php
+                                                            $key = $company['api_key'] ?? '';
+                                                            echo $key ? htmlspecialchars(substr($key, 0, 8) . '...' . substr($key, -4)) : 'N/A';
+                                                        ?></span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Created</span>
+                                                        <span class="detail-value"><?php echo $company['created_at'] ? date('M j, Y', strtotime($company['created_at'])) : 'N/A'; ?></span>
+                                                    </div>
                                                 </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">Stripe Account</span>
-                                                    <span class="detail-value key-field"><?php echo htmlspecialchars($company['stripe_account_id'] ?? 'Not connected'); ?></span>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">Stripe Email</span>
-                                                    <span class="detail-value"><?php echo htmlspecialchars($company['stripe_email'] ?? 'N/A'); ?></span>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">PayPal Merchant</span>
-                                                    <span class="detail-value key-field"><?php echo htmlspecialchars($company['paypal_merchant_id'] ?? 'Not connected'); ?></span>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">PayPal Email</span>
-                                                    <span class="detail-value"><?php echo htmlspecialchars($company['paypal_email'] ?? 'N/A'); ?></span>
-                                                </div>
-                                                <div class="detail-item">
-                                                    <span class="detail-label">Square Merchant</span>
-                                                    <span class="detail-value key-field"><?php echo htmlspecialchars($company['square_merchant_id'] ?? 'Not connected'); ?></span>
+                                            </div>
+
+                                            <!-- Provider Connections -->
+                                            <div class="detail-section">
+                                                <h4 class="detail-section-title">Payment Providers</h4>
+                                                <div class="provider-cards">
+                                                    <div class="provider-card <?php echo !empty($company['stripe_account_id']) ? 'provider-connected' : 'provider-disconnected'; ?>">
+                                                        <div class="provider-card-header">
+                                                            <span class="provider-card-name">Stripe</span>
+                                                            <span class="provider-card-status"><?php echo !empty($company['stripe_account_id']) ? 'Connected' : 'Not connected'; ?></span>
+                                                        </div>
+                                                        <?php if (!empty($company['stripe_account_id'])): ?>
+                                                        <div class="provider-card-details">
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Account ID</span>
+                                                                <span class="detail-value key-field"><?php echo htmlspecialchars($company['stripe_account_id']); ?></span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Email</span>
+                                                                <span class="detail-value"><?php echo htmlspecialchars($company['stripe_email'] ?? 'N/A'); ?></span>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                    </div>
+
+                                                    <div class="provider-card <?php echo !empty($company['paypal_merchant_id']) ? 'provider-connected' : 'provider-disconnected'; ?>">
+                                                        <div class="provider-card-header">
+                                                            <span class="provider-card-name">PayPal</span>
+                                                            <span class="provider-card-status"><?php echo !empty($company['paypal_merchant_id']) ? 'Connected' : 'Not connected'; ?></span>
+                                                        </div>
+                                                        <?php if (!empty($company['paypal_merchant_id'])): ?>
+                                                        <div class="provider-card-details">
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Merchant ID</span>
+                                                                <span class="detail-value key-field"><?php echo htmlspecialchars($company['paypal_merchant_id']); ?></span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Email</span>
+                                                                <span class="detail-value"><?php echo htmlspecialchars($company['paypal_email'] ?? 'N/A'); ?></span>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                    </div>
+
+                                                    <div class="provider-card <?php echo !empty($company['square_merchant_id']) ? 'provider-connected' : 'provider-disconnected'; ?>">
+                                                        <div class="provider-card-header">
+                                                            <span class="provider-card-name">Square</span>
+                                                            <span class="provider-card-status"><?php echo !empty($company['square_merchant_id']) ? 'Connected' : 'Not connected'; ?></span>
+                                                        </div>
+                                                        <?php if (!empty($company['square_merchant_id'])): ?>
+                                                        <div class="provider-card-details">
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Merchant ID</span>
+                                                                <span class="detail-value key-field"><?php echo htmlspecialchars($company['square_merchant_id']); ?></span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Location ID</span>
+                                                                <span class="detail-value key-field"><?php echo htmlspecialchars($company['square_location_id'] ?? 'N/A'); ?></span>
+                                                            </div>
+                                                            <div class="detail-item">
+                                                                <span class="detail-label">Email</span>
+                                                                <span class="detail-value"><?php echo htmlspecialchars($company['square_email'] ?? 'N/A'); ?></span>
+                                                            </div>
+                                                        </div>
+                                                        <?php endif; ?>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

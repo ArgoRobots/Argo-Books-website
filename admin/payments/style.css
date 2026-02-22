@@ -127,6 +127,20 @@
     box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
+.payments-page .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    line-height: 1.25;
+    box-sizing: border-box;
+}
+
 .btn-primary-blue {
     background: var(--primary-blue, #3b82f6);
     color: white;
@@ -288,6 +302,86 @@
     border-top: 1px solid #e5e7eb;
 }
 
+.detail-section {
+    margin-bottom: 16px;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-section-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.provider-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.provider-card {
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+}
+
+.provider-card.provider-connected {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.provider-card.provider-disconnected {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+}
+
+.provider-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.provider-card-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #1f2937;
+}
+
+.provider-card-status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.provider-connected .provider-card-status {
+    color: #059669;
+}
+
+.provider-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.provider-card-details .detail-item {
+    gap: 1px;
+}
+
 .detail-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -357,6 +451,11 @@
     }
 
     .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-section-grid,
+    .provider-cards {
         grid-template-columns: 1fr;
     }
 }

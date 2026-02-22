@@ -1,0 +1,484 @@
+/* Payment Portal Admin Styles */
+
+.payments-page {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   Tab Buttons (matches app-stats pattern)
+   ============================================================ */
+.tab-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.tab-button {
+    padding: 12px 20px;
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6b7280;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.tab-button:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.tab-button.active {
+    background: white;
+    color: #1f2937;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ============================================================
+   Stats Grid
+   ============================================================ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stats-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* ============================================================
+   Text Colors
+   ============================================================ */
+.text-red {
+    color: var(--red-500, #ef4444) !important;
+}
+
+.text-green {
+    color: var(--emerald-500, #10b981) !important;
+}
+
+/* ============================================================
+   Filters Bar
+   ============================================================ */
+.filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    padding: 15px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    flex-wrap: wrap;
+}
+
+.filters-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    color: #374151;
+    background: white;
+    min-width: 140px;
+}
+
+.filter-group input {
+    min-width: 220px;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: var(--primary-blue, #3b82f6);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+.payments-page .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    line-height: 1.25;
+    box-sizing: border-box;
+}
+
+.btn-primary-blue {
+    background: var(--primary-blue, #3b82f6);
+    color: white;
+}
+
+.btn-primary-blue:hover {
+    background: var(--blueHover, #1d4ed8);
+}
+
+.btn-outline {
+    background: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.btn-outline:hover {
+    background: #f3f4f6;
+}
+
+.result-count {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* ============================================================
+   Payment Method Badge
+   ============================================================ */
+.badge-method {
+    background-color: #eef2ff;
+    color: #4338ca;
+    font-weight: 500;
+}
+
+/* ============================================================
+   Payment Status Badges
+   ============================================================ */
+.badge-completed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-failed {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-refunded {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+
+/* ============================================================
+   Invoice Status Badges
+   ============================================================ */
+.badge-invoice-draft {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.badge-invoice-sent {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-invoice-viewed {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-invoice-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-invoice-partial {
+    background-color: #f3e8ff;
+    color: #6d28d9;
+}
+
+.badge-invoice-paid {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.badge-invoice-overdue {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-invoice-cancelled {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ============================================================
+   Overdue Row Highlight
+   ============================================================ */
+.row-overdue {
+    background-color: #fef2f2 !important;
+}
+
+.row-overdue:hover {
+    background-color: #fee2e2 !important;
+}
+
+/* ============================================================
+   Provider Badges (Companies tab)
+   ============================================================ */
+.provider-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.provider-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.provider-badge.connected {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.provider-badge.disconnected {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+}
+
+/* ============================================================
+   Expandable Company Detail Row
+   ============================================================ */
+.expandable-row {
+    cursor: pointer;
+}
+
+.expandable-row:hover {
+    background-color: #f9fafb !important;
+}
+
+.expand-arrow-cell {
+    text-align: center;
+    width: 40px;
+}
+
+.expand-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.expandable-row.expanded .expand-arrow {
+    transform: rotate(180deg);
+}
+
+.detail-row td {
+    padding: 0 !important;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.company-detail {
+    padding: 20px 15px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+}
+
+.detail-section {
+    margin-bottom: 16px;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.detail-section-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.provider-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.provider-card {
+    border-radius: 8px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+}
+
+.provider-card.provider-connected {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.provider-card.provider-disconnected {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+}
+
+.provider-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.provider-card-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #1f2937;
+}
+
+.provider-card-status {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.provider-connected .provider-card-status {
+    color: #059669;
+}
+
+.provider-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.provider-card-details .detail-item {
+    gap: 1px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 0.875rem;
+    color: #1f2937;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 900px) {
+    .filters-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filters-form {
+        flex-direction: column;
+    }
+
+    .filter-group input,
+    .filter-group select {
+        width: 100%;
+        min-width: unset;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .payments-page {
+        padding: 0;
+    }
+
+    .tab-buttons {
+        gap: 2px;
+    }
+
+    .tab-button {
+        padding: 10px 12px;
+        font-size: 0.8rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detail-section-grid,
+    .provider-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-button {
+        padding: 8px 10px;
+        font-size: 0.75rem;
+    }
+}

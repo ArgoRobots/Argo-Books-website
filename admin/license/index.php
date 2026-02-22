@@ -25,7 +25,7 @@ function get_premium_subscriptions($search_filter = '')
             SELECT s.*, u.username
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
-            WHERE 1=1
+            WHERE s.payment_method != 'free_key'
         ";
         $params = [];
 
@@ -98,6 +98,7 @@ function get_subscription_chart_data()
                    COUNT(*) as total,
                    SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active
             FROM premium_subscriptions
+            WHERE payment_method != 'free_key'
             GROUP BY DATE(created_at)
             ORDER BY date
         ");
@@ -160,14 +161,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($action === 'delete') {
                 try {
-                    $stmt = $pdo->prepare("DELETE FROM premium_subscription_keys WHERE id IN ($placeholders) AND redeemed_at IS NULL");
+                    $stmt = $pdo->prepare("DELETE FROM premium_subscription_keys WHERE id IN ($placeholders)");
                     $stmt->execute($key_ids);
                     $deleted = $stmt->rowCount();
                     if ($deleted > 0) {
                         $_SESSION['message'] = "$deleted subscription key(s) deleted successfully.";
                         $_SESSION['message_type'] = 'success';
                     } else {
-                        $_SESSION['message'] = "No keys deleted. Keys may have been redeemed.";
+                        $_SESSION['message'] = "No keys deleted.";
                         $_SESSION['message_type'] = 'error';
                     }
                 } catch (PDOException $e) {
@@ -344,10 +345,6 @@ include '../admin_header.php';
             <div class="stat-card">
                 <h3>Total Subscriptions</h3>
                 <div class="value"><?php echo count($premium_subscriptions); ?></div>
-            </div>
-            <div class="stat-card free">
-                <h3>Free Keys Available</h3>
-                <div class="value"><?php echo $unredeemed_keys; ?></div>
             </div>
         </div>
 
@@ -569,12 +566,10 @@ include '../admin_header.php';
                                 <?php foreach ($premium_subscription_keys as $key): ?>
                                     <tr class="<?php echo $key['redeemed_at'] ? 'redeemed-row' : ''; ?>">
                                         <td class="checkbox-column">
-                                            <?php if (!$key['redeemed_at']): ?>
-                                                <div class="checkbox">
-                                                    <input type="checkbox" name="selected_sub_keys[]" value="<?php echo $key['id']; ?>" class="sub-key-checkbox" id="sub-key-<?php echo $key['id']; ?>">
-                                                    <label for="sub-key-<?php echo $key['id']; ?>"></label>
-                                                </div>
-                                            <?php endif; ?>
+                                            <div class="checkbox">
+                                                <input type="checkbox" name="selected_sub_keys[]" value="<?php echo $key['id']; ?>" class="sub-key-checkbox" id="sub-key-<?php echo $key['id']; ?>">
+                                                <label for="sub-key-<?php echo $key['id']; ?>"></label>
+                                            </div>
                                         </td>
                                         <td class="key-field">
                                             <?php echo htmlspecialchars($key['subscription_key']); ?>

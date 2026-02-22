@@ -30,6 +30,9 @@
 .tab-content.active {
     display: block;
 }
+table th {
+    white-space: nowrap;
+}
 .generate-form-grid {
     display: grid;
     grid-template-columns: 1fr 120px 1fr auto;

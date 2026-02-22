@@ -294,8 +294,8 @@ CREATE TABLE IF NOT EXISTS user_bans (
 CREATE TABLE IF NOT EXISTS premium_subscriptions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     subscription_id VARCHAR(50) NOT NULL UNIQUE,
-    user_id INT NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    user_id INT DEFAULT NULL,
+    email VARCHAR(100) DEFAULT NULL,
     billing_cycle ENUM('monthly', 'yearly') NOT NULL DEFAULT 'monthly',
     amount DECIMAL(10,2) NOT NULL,
     currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
@@ -322,7 +322,6 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     INDEX idx_end_date (end_date),
     INDEX idx_premium_license (standard_license_key),
     INDEX idx_renewal (status, end_date, auto_renew),
-    FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Premium Subscription Payments table
@@ -352,6 +351,7 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     redeemed_at DATETIME DEFAULT NULL,
     redeemed_by_user_id INT DEFAULT NULL,
+    device_id VARCHAR(255) DEFAULT NULL COMMENT 'Hashed machine identifier of redeeming device',
     subscription_id VARCHAR(50) DEFAULT NULL COMMENT 'Link to created subscription',
     notes TEXT DEFAULT NULL COMMENT 'Admin notes about this key',
     INDEX idx_subscription_key (subscription_key),
@@ -500,3 +500,22 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================================
+-- Migration: Device-based license key system
+-- Run these statements on an existing database to apply the schema changes.
+-- ============================================================================
+
+-- Add device_id column to premium_subscription_keys
+-- ALTER TABLE premium_subscription_keys
+--   ADD COLUMN device_id VARCHAR(255) DEFAULT NULL COMMENT 'Hashed machine identifier of redeeming device'
+--   AFTER redeemed_by_user_id;
+
+-- Make user_id and email nullable for device-based subscriptions (no user account)
+-- ALTER TABLE premium_subscriptions
+--   MODIFY user_id INT DEFAULT NULL,
+--   MODIFY email VARCHAR(100) DEFAULT NULL;
+
+-- Drop the foreign key constraint on user_id
+-- (constraint name may vary — run SHOW CREATE TABLE premium_subscriptions to find the actual name)
+-- ALTER TABLE premium_subscriptions DROP FOREIGN KEY premium_subscriptions_ibfk_1;

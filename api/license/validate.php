@@ -8,43 +8,26 @@ require_once __DIR__ . '/../../db_connect.php';
 // Initialize response array
 $response = [
     'success' => false,
-    'message' => 'Invalid request method'
+    'status' => 'error',
+    'message' => 'Invalid request method.'
 ];
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get the license key from the request
+    // Get the request data
     $data = json_decode(file_get_contents('php://input'), true);
 
-    // Check for Premium subscription key validation (active subscriptions)
-    if (isset($data['subscription_id'])) {
-        $subscription_id = trim($data['subscription_id']);
-        $response = validate_premium_subscription_key($subscription_id);
-    }
-    // Check for free/promo premium key validation
-    elseif (isset($data['premium_key'])) {
-        $premium_key = trim($data['premium_key']);
-        $response = validate_premium_key($premium_key);
-    }
-    // Check for license key validation (auto-detect type by prefix)
-    elseif (isset($data['license_key'])) {
-        $license_key = trim($data['license_key']);
-        $ip_address = $_SERVER['REMOTE_ADDR'];
+    $license_key = trim($data['license_key'] ?? '');
+    $device_id = trim($data['device_id'] ?? '');
 
-        // Validate key type based on prefix
-        if (str_starts_with($license_key, 'PREM-')) {
-            $response = validate_premium_key($license_key);
-        } else {
-            $response = [
-                'success' => false,
-                'message' => 'Invalid license key format.'
-            ];
-        }
-    } else {
+    if (empty($license_key) || empty($device_id)) {
         $response = [
             'success' => false,
-            'message' => 'License key, subscription ID, or premium key is required.'
+            'status' => 'error',
+            'message' => 'License key and device ID are required.'
         ];
+    } else {
+        $response = validate_license($license_key, $device_id);
     }
 }
 

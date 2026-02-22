@@ -113,7 +113,7 @@ function validate_premium_key($key) {
     try {
         $stmt = $pdo->prepare("
             SELECT subscription_key, email, duration_months, created_at,
-                redeemed_at, redeemed_by_user_id, subscription_id, notes
+                redeemed_at, redeemed_by_user_id, device_id, subscription_id, notes
             FROM premium_subscription_keys
             WHERE subscription_key = ?
         ");
@@ -160,40 +160,34 @@ function validate_premium_key($key) {
 }
 
 /**
- * Redeem a free/promo premium subscription key
- * Validates the key, creates a premium subscription, and marks the key as redeemed.
+ * Redeem a free/promo premium subscription key (device-based).
+ * On first redemption: validates the key, creates a premium subscription, and marks the key as redeemed.
+ * On re-redemption: allows transferring the key to a new device by updating device_id.
  *
  * @param string $key The premium subscription key to redeem
- * @param int $user_id The user ID redeeming the key
- * @param string $email The user's email address
+ * @param string $device_id The hashed machine identifier of the redeeming device
  * @return array Response array with redemption result
  */
-function redeem_premium_key($key, $user_id, $email) {
+function redeem_premium_key($key, $device_id) {
     global $pdo;
 
     // First validate the key
     $validation = validate_premium_key($key);
 
     if (!$validation['success']) {
-        return $validation;
+        return [
+            'success' => false,
+            'status' => 'invalid_key',
+            'message' => 'Invalid license key.'
+        ];
     }
 
+    // Key already redeemed — handle re-redemption (device transfer)
     if ($validation['status'] === 'redeemed') {
-        return [
-            'success' => false,
-            'message' => 'This premium key has already been redeemed.',
-            'redeemed_at' => $validation['redeemed_at']
-        ];
+        return _handle_re_redemption($key, $device_id, $validation['subscription_id']);
     }
 
-    // Check email restriction if set
-    if (!empty($validation['restricted_email']) && strtolower($validation['restricted_email']) !== strtolower($email)) {
-        return [
-            'success' => false,
-            'message' => 'This premium key is restricted to a different email address.'
-        ];
-    }
-
+    // First-time redemption
     $duration_months = $validation['duration_months'];
 
     try {
@@ -216,45 +210,43 @@ function redeem_premium_key($key, $user_id, $email) {
             $billingCycle = 'monthly';
         }
 
-        // Create the premium subscription
+        // Create the premium subscription (no user account — user_id and email are NULL)
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscriptions (
-                subscription_id, user_id, email, billing_cycle, amount, currency,
+                subscription_id, billing_cycle, amount, currency,
                 start_date, end_date, status, payment_method, transaction_id,
                 auto_renew, created_at
             ) VALUES (
-                ?, ?, ?, ?, 0.00, 'CAD',
+                ?, ?, 0.00, 'CAD',
                 ?, ?, 'active', 'free_key', ?,
                 0, NOW()
             )
         ");
         $stmt->execute([
             $subscriptionId,
-            $user_id,
-            $email,
             $billingCycle,
             $startDate,
             $endDate,
             $key
         ]);
 
-        // Mark the key as redeemed
+        // Mark the key as redeemed with device_id
         $stmt = $pdo->prepare("
             UPDATE premium_subscription_keys
             SET redeemed_at = NOW(),
-                redeemed_by_user_id = ?,
+                device_id = ?,
                 subscription_id = ?
             WHERE subscription_key = ?
         ");
-        $stmt->execute([$user_id, $subscriptionId, $key]);
+        $stmt->execute([$device_id, $subscriptionId, $key]);
 
         $pdo->commit();
 
         return [
             'success' => true,
-            'type' => 'premium_key',
-            'status' => 'redeemed',
-            'message' => 'Premium key redeemed successfully.',
+            'type' => 'premium',
+            'status' => 'active',
+            'message' => 'License activated successfully!',
             'subscription_id' => $subscriptionId,
             'end_date' => $endDate,
             'duration_months' => $duration_months
@@ -265,7 +257,173 @@ function redeem_premium_key($key, $user_id, $email) {
         error_log("Premium key redemption error: " . $e->getMessage());
         return [
             'success' => false,
+            'status' => 'error',
             'message' => 'Error redeeming premium key. Please try again.'
+        ];
+    }
+}
+
+/**
+ * Handle re-redemption of an already-redeemed key (device transfer).
+ * If the subscription is still active, updates the device_id on the key.
+ * If the subscription is expired, returns an error.
+ *
+ * @param string $key The premium subscription key
+ * @param string $device_id The new device's hashed machine identifier
+ * @param string $subscription_id The subscription ID linked to this key
+ * @return array Response array
+ */
+function _handle_re_redemption($key, $device_id, $subscription_id) {
+    global $pdo;
+
+    try {
+        // Look up the linked subscription to check status/expiry
+        $stmt = $pdo->prepare("
+            SELECT subscription_id, status, end_date
+            FROM premium_subscriptions
+            WHERE subscription_id = ?
+        ");
+        $stmt->execute([$subscription_id]);
+        $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$subscription) {
+            return [
+                'success' => false,
+                'status' => 'error',
+                'message' => 'Linked subscription not found.'
+            ];
+        }
+
+        // Check if subscription has expired
+        $now = new DateTime();
+        $end_date = new DateTime($subscription['end_date']);
+
+        if ($subscription['status'] === 'expired' || $end_date <= $now) {
+            // Mark as expired if not already
+            if ($subscription['status'] !== 'expired') {
+                $stmt = $pdo->prepare("UPDATE premium_subscriptions SET status = 'expired' WHERE subscription_id = ?");
+                $stmt->execute([$subscription_id]);
+            }
+            return [
+                'success' => false,
+                'status' => 'expired',
+                'message' => "This license key's subscription has expired."
+            ];
+        }
+
+        // Subscription is still active — transfer to new device
+        $stmt = $pdo->prepare("
+            UPDATE premium_subscription_keys
+            SET device_id = ?
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$device_id, $key]);
+
+        return [
+            'success' => true,
+            'type' => 'premium',
+            'status' => 'active',
+            'message' => 'License activated successfully!',
+            'subscription_id' => $subscription['subscription_id'],
+            'end_date' => $subscription['end_date'],
+        ];
+
+    } catch (PDOException $e) {
+        error_log("Premium key re-redemption error: " . $e->getMessage());
+        return [
+            'success' => false,
+            'status' => 'error',
+            'message' => 'Error redeeming premium key. Please try again.'
+        ];
+    }
+}
+
+/**
+ * Validate a license key against a device.
+ * Checks that the key exists, is redeemed, matches the device, and the subscription is active.
+ *
+ * @param string $key The premium subscription key to validate
+ * @param string $device_id The hashed machine identifier to check against
+ * @return array Response array with validation result
+ */
+function validate_license($key, $device_id) {
+    global $pdo;
+
+    try {
+        // Look up the key
+        $stmt = $pdo->prepare("
+            SELECT subscription_key, device_id, subscription_id, redeemed_at
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$key]);
+        $premium_key = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Key not found or not yet redeemed
+        if (!$premium_key || $premium_key['redeemed_at'] === null) {
+            return [
+                'success' => false,
+                'status' => 'invalid_key',
+                'message' => 'License key is not valid.'
+            ];
+        }
+
+        // Check device_id matches
+        if ($premium_key['device_id'] !== $device_id) {
+            return [
+                'success' => false,
+                'status' => 'wrong_device',
+                'message' => 'This license key is active on a different device.'
+            ];
+        }
+
+        // Look up the linked subscription
+        $stmt = $pdo->prepare("
+            SELECT subscription_id, status, end_date
+            FROM premium_subscriptions
+            WHERE subscription_id = ?
+        ");
+        $stmt->execute([$premium_key['subscription_id']]);
+        $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$subscription) {
+            return [
+                'success' => false,
+                'status' => 'invalid_key',
+                'message' => 'License key is not valid.'
+            ];
+        }
+
+        // Check if subscription has expired
+        $now = new DateTime();
+        $end_date = new DateTime($subscription['end_date']);
+
+        if ($subscription['status'] === 'expired' || $end_date <= $now) {
+            // Mark as expired if not already
+            if ($subscription['status'] !== 'expired') {
+                $stmt = $pdo->prepare("UPDATE premium_subscriptions SET status = 'expired' WHERE subscription_id = ?");
+                $stmt->execute([$premium_key['subscription_id']]);
+            }
+            return [
+                'success' => false,
+                'status' => 'expired',
+                'message' => 'Your premium subscription has expired.'
+            ];
+        }
+
+        // Key is valid, device matches, subscription active
+        return [
+            'success' => true,
+            'status' => 'valid',
+            'message' => 'License is valid.'
+        ];
+
+    } catch (PDOException $e) {
+        error_log("License validation error: " . $e->getMessage());
+        return [
+            'success' => false,
+            'status' => 'error',
+            'message' => 'Error validating license. Please try again.'
         ];
     }
 }

@@ -290,6 +290,32 @@ include '../admin_header.php';
 <link rel="stylesheet" href="../search.css">
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
 
+<style>
+.btn-copy {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    vertical-align: middle;
+    transition: all 0.15s ease;
+}
+.btn-copy:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+.btn-copy.copied {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+</style>
+
 <script>
     const subscriptionChartData = <?php echo json_encode($subscription_chart_data); ?>;
 </script>
@@ -550,7 +576,10 @@ include '../admin_header.php';
                                                 </div>
                                             <?php endif; ?>
                                         </td>
-                                        <td class="key-field"><?php echo htmlspecialchars($key['subscription_key']); ?></td>
+                                        <td class="key-field">
+                                            <?php echo htmlspecialchars($key['subscription_key']); ?>
+                                            <button type="button" class="btn-copy" onclick="copyToClipboard('<?php echo htmlspecialchars($key['subscription_key'], ENT_QUOTES); ?>', this)" title="Copy key">Copy</button>
+                                        </td>
                                         <td><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
                                         <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:#9ca3af;">Any user</span>'; ?></td>
                                         <td>
@@ -574,6 +603,17 @@ include '../admin_header.php';
 </div>
 
 <script>
+function copyToClipboard(text, btn) {
+    navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(function() {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+        }, 1500);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Tab switching
     const tabs = document.querySelectorAll('.section-tab');

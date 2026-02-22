@@ -56,6 +56,9 @@ $base_path = $in_subdir ? '../' : '';
                     <a href="<?php echo $base_path; ?>license/" class="header-link <?php echo $current_dir === 'license' ? 'active' : ''; ?>">
                         License Keys
                     </a>
+                    <a href="<?php echo $base_path; ?>payments/" class="header-link <?php echo $current_dir === 'payments' ? 'active' : ''; ?>">
+                        Payments
+                    </a>
                     <a href="<?php echo $base_path; ?>app-stats/" class="header-link <?php echo $current_dir === 'app-stats' ? 'active' : ''; ?>">
                         App Stats
                     </a>
@@ -99,6 +102,7 @@ $base_path = $in_subdir ? '../' : '';
                     </li>
                     <li><a href="<?php echo $base_path; ?>index.php" class="<?php echo $current_dir === 'admin' ? 'active' : ''; ?>">Dashboard</a></li>
                     <li><a href="<?php echo $base_path; ?>license/" class="<?php echo $current_dir === 'license' ? 'active' : ''; ?>">License Keys</a></li>
+                    <li><a href="<?php echo $base_path; ?>payments/" class="<?php echo $current_dir === 'payments' ? 'active' : ''; ?>">Payments</a></li>
                     <li><a href="<?php echo $base_path; ?>app-stats/" class="<?php echo $current_dir === 'app-stats' ? 'active' : ''; ?>">App Stats</a></li>
                     <li><a href="<?php echo $base_path; ?>website-stats/" class="<?php echo $current_dir === 'website-stats' ? 'active' : ''; ?>">Website Stats</a></li>
                     <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referral Links</a></li>

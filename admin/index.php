@@ -34,6 +34,16 @@ try {
     error_log("Error fetching subscription stats: " . $e->getMessage());
 }
 
+// Portal payments this month
+$monthly_portal_payments = 0;
+try {
+    global $pdo;
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $monthly_portal_payments = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+} catch (Exception $e) {
+    error_log("Error fetching portal payment stats: " . $e->getMessage());
+}
+
 // Users registered in the last 30 days
 $result = $db->query('SELECT COUNT(*) as count FROM community_users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
 $monthly_users = $result->fetch_assoc()['count'] ?? 0;
@@ -263,6 +273,18 @@ include 'admin_header.php';
             <div class="nav-card-stat">
                 <span class="nav-card-stat-label">This Month</span>
                 <span class="nav-card-stat-value"><?php echo number_format($monthly_users); ?></span>
+            </div>
+        </a>
+
+        <a href="payments/" class="nav-card">
+            <div class="nav-card-icon">
+                <?= svg_icon('credit-card-filled', 24) ?>
+            </div>
+            <div class="nav-card-title">Payment Portal</div>
+            <div class="nav-card-description">Monitor portal payments and invoices</div>
+            <div class="nav-card-stat">
+                <span class="nav-card-stat-label">Payments This Month</span>
+                <span class="nav-card-stat-value"><?php echo number_format($monthly_portal_payments); ?></span>
             </div>
         </a>
     </div>

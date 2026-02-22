@@ -25,7 +25,7 @@ function get_premium_subscriptions($search_filter = '')
             SELECT s.*, u.username
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
-            WHERE 1=1
+            WHERE s.payment_method != 'free_key'
         ";
         $params = [];
 

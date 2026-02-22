@@ -212,10 +212,6 @@ foreach ($platforms as $key => $platform) {
                             <h3>Version <?php echo htmlspecialchars($version['version']); ?></h3>
                             <div class="version-meta">
                                 <div class="meta-item">
-                                    <strong>Released:</strong>
-                                    <?php echo date('F j, Y', $version['modified']); ?>
-                                </div>
-                                <div class="meta-item">
                                     <strong>File Size:</strong>
                                     <?php echo formatFileSize($version['filesize']); ?>
                                 </div>

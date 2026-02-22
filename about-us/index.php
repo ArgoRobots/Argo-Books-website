@@ -11,14 +11,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Learn about Argo, the Saskatoon-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
+        content="Learn about Argo, the Canada-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
     <meta name="keywords"
-        content="about argo books, saskatoon startup, small business software company, affordable business tools, finance management developers, canadian software company, saskatoon business, saskatchewan tech company">
+        content="about argo books, Canada startup, small business software company, affordable business tools, finance management developers, canadian software company, Canadian, saskatchewan tech company">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="About Us - Argo Books | Saskatoon Business Software Company">
+    <meta property="og:title" content="About Us - Argo Books | Canadian Software Company">
     <meta property="og:description"
-        content="Learn about Argo, the Saskatoon-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
+        content="Learn about Argo, the Canada-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
     <meta property="og:url" content="https://argorobots.com/about-us/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -26,13 +26,13 @@
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="About Us - Argo Books | Saskatoon Business Software Company">
+    <meta name="twitter:title" content="About Us - Argo Books | Canadian Software Company">
     <meta name="twitter:description"
-        content="Learn about Argo, the Saskatoon-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
+        content="Learn about Argo, the Canada-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
-    <meta name="geo.placename" content="Saskatoon">
+    <meta name="geo.placename" content="Canada">
     <meta name="geo.position" content="52.1579;-106.6702">
     <meta name="ICBM" content="52.1579, -106.6702">
 
@@ -40,7 +40,7 @@
     <link rel="canonical" href="https://argorobots.com/about-us/">
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
-    <title>About Us - Argo Books | Saskatoon Business Software Company</title>
+    <title>About Us - Argo Books | Canadian Software Company</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
@@ -66,7 +66,7 @@
         <div class="container">
             <div class="hero-badge animate-fade-in">
                 <?= svg_icon('map-pin', 16) ?>
-                <span>Saskatoon, SK</span>
+                <span>Saskatoon, SK, Canada</span>
             </div>
             <h1 class="animate-fade-in">About Argo Books</h1>
             <p class="hero-subtitle animate-fade-in">Building the future of small business management, one feature at a time.</p>
@@ -162,7 +162,7 @@
                     <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline">
                     <div class="image-badge">
                         <?= svg_icon('map-pin', 16) ?>
-                        Saskatoon, SK
+                        Saskatoon, SK, Canada
                     </div>
                 </div>
                 <div class="story-content animate-on-scroll">
@@ -233,7 +233,7 @@
             <div class="future-content animate-on-scroll">
                 <span class="section-label">What's Next</span>
                 <h2>Looking Forward</h2>
-                <p>As a growing Saskatoon-based startup, we're excited about what's ahead. Our roadmap is filled with new
+                <p>As a growing Canadian startup, we're excited about what's ahead. Our roadmap is filled with new
                     features and improvements based directly on user feedback. We're committed to expanding our offerings
                     while maintaining the simplicity and affordability that makes Argo special.</p>
                 <a href="../whats-new/" class="btn btn-secondary">

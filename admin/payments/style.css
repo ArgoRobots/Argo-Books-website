@@ -291,6 +291,22 @@
     background-color: #f9fafb !important;
 }
 
+.expand-arrow-cell {
+    text-align: center;
+    width: 40px;
+}
+
+.expand-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    color: #9ca3af;
+    font-size: 0.875rem;
+}
+
+.expandable-row.expanded .expand-arrow {
+    transform: rotate(180deg);
+}
+
 .detail-row td {
     padding: 0 !important;
     border-bottom: 1px solid #e5e7eb;

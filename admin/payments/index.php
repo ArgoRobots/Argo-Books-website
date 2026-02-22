@@ -12,37 +12,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 $page_title = "Payment Portal";
 $page_description = "Monitor portal payments, companies, invoices, and revenue analytics";
 
-// --- CSV Export ---
-if (isset($_GET['export']) && $_GET['export'] === 'csv') {
-    global $pdo;
-    try {
-        $stmt = $pdo->query("
-            SELECT p.created_at, c.company_name, p.customer_name, p.invoice_id,
-                   p.amount, p.processing_fee, p.currency, p.payment_method,
-                   p.status, p.synced_to_argo, p.reference_number,
-                   p.provider_payment_id
-            FROM portal_payments p
-            LEFT JOIN portal_companies c ON p.company_id = c.id
-            ORDER BY p.created_at DESC
-        ");
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="portal_payments_' . date('Y-m-d') . '.csv"');
-        $output = fopen('php://output', 'w');
-        if (!empty($rows)) {
-            fputcsv($output, array_keys($rows[0]));
-            foreach ($rows as $row) {
-                fputcsv($output, $row);
-            }
-        }
-        fclose($output);
-        exit;
-    } catch (PDOException $e) {
-        error_log("CSV export error: " . $e->getMessage());
-    }
-}
-
 global $pdo;
 
 // ============================================================
@@ -532,7 +501,6 @@ include '../admin_header.php';
                     <a href="?tab=transactions" class="btn btn-small btn-outline">Clear</a>
                 <?php endif; ?>
             </form>
-            <a href="?export=csv" class="btn btn-small btn-green" style="margin-left: auto;">Export CSV</a>
         </div>
 
         <div class="table-container">
@@ -608,23 +576,27 @@ include '../admin_header.php';
                                 <th>Total Payments</th>
                                 <th>Total Revenue</th>
                                 <th>Last Payment</th>
+                                <th style="width: 40px;"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php foreach ($companies as $company): ?>
                                 <tr class="expandable-row" onclick="toggleCompanyDetail(<?php echo $company['id']; ?>)">
                                     <td><strong><?php echo htmlspecialchars($company['company_name']); ?></strong></td>
-                                    <td class="provider-badges">
-                                        <span class="provider-badge <?php echo !empty($company['stripe_account_id']) ? 'connected' : 'disconnected'; ?>" title="Stripe">Stripe</span>
-                                        <span class="provider-badge <?php echo !empty($company['paypal_merchant_id']) ? 'connected' : 'disconnected'; ?>" title="PayPal">PayPal</span>
-                                        <span class="provider-badge <?php echo !empty($company['square_merchant_id']) ? 'connected' : 'disconnected'; ?>" title="Square">Square</span>
+                                    <td>
+                                        <div class="provider-badges">
+                                            <span class="provider-badge <?php echo !empty($company['stripe_account_id']) ? 'connected' : 'disconnected'; ?>" title="Stripe">Stripe</span>
+                                            <span class="provider-badge <?php echo !empty($company['paypal_merchant_id']) ? 'connected' : 'disconnected'; ?>" title="PayPal">PayPal</span>
+                                            <span class="provider-badge <?php echo !empty($company['square_merchant_id']) ? 'connected' : 'disconnected'; ?>" title="Square">Square</span>
+                                        </div>
                                     </td>
                                     <td><?php echo number_format($company['total_payments']); ?></td>
                                     <td>$<?php echo number_format($company['total_revenue'], 2); ?></td>
                                     <td><?php echo $company['last_payment_date'] ? date('M j, Y', strtotime($company['last_payment_date'])) : 'Never'; ?></td>
+                                    <td class="expand-arrow-cell"><span class="expand-arrow">&#9662;</span></td>
                                 </tr>
                                 <tr class="detail-row" id="company-detail-<?php echo $company['id']; ?>" style="display: none;">
-                                    <td colspan="5">
+                                    <td colspan="6">
                                         <div class="company-detail">
                                             <!-- General Info -->
                                             <div class="detail-section">
@@ -1007,7 +979,10 @@ if (tabParam) {
 function toggleCompanyDetail(companyId) {
     const detailRow = document.getElementById('company-detail-' + companyId);
     if (detailRow) {
-        detailRow.style.display = detailRow.style.display === 'none' ? 'table-row' : 'none';
+        const isHidden = detailRow.style.display === 'none';
+        detailRow.style.display = isHidden ? 'table-row' : 'none';
+        const expandableRow = detailRow.previousElementSibling;
+        if (expandableRow) expandableRow.classList.toggle('expanded', isHidden);
     }
 }
 

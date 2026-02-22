@@ -10,7 +10,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 // Set page variables for the header
 $page_title = "Payment Portal";
-$page_description = "Monitor portal payments, companies, invoices, and revenue analytics";
+$page_description = "Monitor portal payments, companies, invoices, and payment analytics";
 
 global $pdo;
 
@@ -349,7 +349,7 @@ include '../admin_header.php';
         <div class="tab-button" onclick="switchTab('transactions')">Transactions</div>
         <div class="tab-button" onclick="switchTab('companies')">Companies</div>
         <div class="tab-button" onclick="switchTab('invoices')">Invoices</div>
-        <div class="tab-button" onclick="switchTab('revenue')">Revenue Analytics</div>
+        <div class="tab-button" onclick="switchTab('revenue')">Payment Analytics</div>
         <div class="tab-button" onclick="switchTab('failures')">Failed & Refunds</div>
     </div>
 
@@ -360,12 +360,12 @@ include '../admin_header.php';
         <!-- Stat Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>Total Revenue</h3>
+                <h3>Total Payments</h3>
                 <div class="stat-value">$<?php echo number_format($total_revenue, 2); ?></div>
                 <div class="subtext">All time (CAD)</div>
             </div>
             <div class="stat-card">
-                <h3>Revenue This Month</h3>
+                <h3>Payments This Month</h3>
                 <div class="stat-value">$<?php echo number_format($monthly_revenue, 2); ?></div>
                 <div class="subtext">Last 30 days</div>
             </div>
@@ -394,9 +394,9 @@ include '../admin_header.php';
         <!-- Charts Row -->
         <div class="chart-row">
             <div class="chart-container">
-                <h3>Daily Revenue (Last 30 Days)</h3>
+                <h3>Daily Payments (Last 30 Days)</h3>
                 <?php if (empty($daily_revenue)): ?>
-                    <div class="chart-no-data"><p>No revenue data yet</p></div>
+                    <div class="chart-no-data"><p>No payment data yet</p></div>
                 <?php else: ?>
                     <canvas id="dailyRevenueChart"></canvas>
                 <?php endif; ?>
@@ -574,7 +574,7 @@ include '../admin_header.php';
                                 <th>Company Name</th>
                                 <th>Connected Providers</th>
                                 <th>Total Payments</th>
-                                <th>Total Revenue</th>
+                                <th>Total Payments</th>
                                 <th>Last Payment</th>
                                 <th style="width: 40px;"></th>
                             </tr>
@@ -785,7 +785,7 @@ include '../admin_header.php';
         <!-- Summary Metrics -->
         <div class="stats-grid">
             <div class="stat-card">
-                <h3>Total Revenue</h3>
+                <h3>Total Payments</h3>
                 <div class="stat-value">$<?php echo number_format($total_revenue, 2); ?></div>
                 <div class="subtext">All time</div>
             </div>
@@ -811,15 +811,15 @@ include '../admin_header.php';
         <!-- Charts -->
         <div class="chart-row">
             <div class="chart-container">
-                <h3>Top 10 Companies by Revenue</h3>
+                <h3>Top 10 Companies by Payments</h3>
                 <?php if (empty($revenue_by_company)): ?>
-                    <div class="chart-no-data"><p>No revenue data yet</p></div>
+                    <div class="chart-no-data"><p>No payment data yet</p></div>
                 <?php else: ?>
                     <canvas id="companyRevenueChart"></canvas>
                 <?php endif; ?>
             </div>
             <div class="chart-container">
-                <h3>Revenue by Payment Method (Monthly)</h3>
+                <h3>Payments by Method (Monthly)</h3>
                 <?php if (empty($revenue_by_method_monthly)): ?>
                     <div class="chart-no-data"><p>No data yet</p></div>
                 <?php else: ?>
@@ -1015,7 +1015,7 @@ new Chart(document.getElementById('dailyRevenueChart'), {
     data: {
         labels: <?php echo json_encode(array_column($daily_revenue, 'date')); ?>,
         datasets: [{
-            label: 'Revenue ($)',
+            label: 'Payments ($)',
             data: <?php echo json_encode(array_map('floatval', array_column($daily_revenue, 'revenue'))); ?>,
             borderColor: chartColors.blue,
             backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -1102,7 +1102,7 @@ new Chart(document.getElementById('companyRevenueChart'), {
     data: {
         labels: <?php echo json_encode(array_column($revenue_by_company, 'company_name')); ?>,
         datasets: [{
-            label: 'Revenue ($)',
+            label: 'Payments ($)',
             data: <?php echo json_encode(array_map('floatval', array_column($revenue_by_company, 'revenue'))); ?>,
             backgroundColor: Object.values(chartColors).slice(0, <?php echo count($revenue_by_company); ?>),
             borderRadius: 4

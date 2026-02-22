@@ -27,7 +27,7 @@ $platforms = [
 // Get available older versions for a specific platform
 function getOlderVersions($filePattern)
 {
-    $basePath = '../resources/downloads/versions/';
+    $basePath = '../resources/downloads/';
     $versions = [];
 
     if (!is_dir($basePath)) {

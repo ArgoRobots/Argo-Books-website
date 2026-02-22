@@ -32,7 +32,7 @@ $avaloniaPatterns = [
 // Get latest version information from filesystem
 function getLatestVersion()
 {
-    $basePath = '../resources/downloads/versions/';
+    $basePath = '../resources/downloads/';
 
     if (!is_dir($basePath)) {
         return null;

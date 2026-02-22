@@ -3,7 +3,7 @@
  * Serves Argo Books Avalonia (cross-platform) installer files.
  *
  * Filesystem layout:
- *   resources/downloads/versions/{version}/
+ *   resources/downloads/{version}/
  *     Argo Books Installer V.{version}.exe        (Windows)
  *     ArgoBooks-{version}-osx-arm64.zip            (macOS, future)
  *     ArgoBooks-{version}-linux-x64.AppImage       (Linux, future)
@@ -38,7 +38,7 @@ $mimeTypes = [
  */
 function getAvaloniaVersions(): array
 {
-    $basePath = __DIR__ . '/resources/downloads/versions/';
+    $basePath = __DIR__ . '/resources/downloads/';
     $versions = [];
 
     if (!is_dir($basePath)) {
@@ -75,7 +75,7 @@ function findInstaller(string $version, string $platform): ?array
     }
 
     $filename = str_replace('{version}', $version, $platformPatterns[$platform]);
-    $filepath = __DIR__ . "/resources/downloads/versions/$version/$filename";
+    $filepath = __DIR__ . "/resources/downloads/$version/$filename";
 
     if (!file_exists($filepath)) {
         return null;

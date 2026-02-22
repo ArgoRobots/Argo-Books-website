@@ -98,6 +98,7 @@ function get_subscription_chart_data()
                    COUNT(*) as total,
                    SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active
             FROM premium_subscriptions
+            WHERE payment_method != 'free_key'
             GROUP BY DATE(created_at)
             ORDER BY date
         ");

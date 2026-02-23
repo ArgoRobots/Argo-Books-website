@@ -305,7 +305,7 @@ include 'admin_header.php';
             <div class="nav-card-description">Manage Premium subscriptions and keys</div>
             <div class="nav-card-stats">
                 <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">New Subscriptions This Month</span>
+                    <span class="nav-card-stat-label">New This Month</span>
                     <span class="nav-card-stat-value"><?php echo number_format($monthly_subscriptions); ?></span>
                 </div>
                 <div class="nav-card-stat">
@@ -351,7 +351,7 @@ include 'admin_header.php';
                     <span class="nav-card-stat-value"><?php echo number_format($monthly_portal_payments); ?></span>
                 </div>
                 <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">Total Payments This Month</span>
+                    <span class="nav-card-stat-label">Total This Month</span>
                     <span class="nav-card-stat-value">$<?php echo number_format($monthly_portal_payments_amount, 2); ?></span>
                 </div>
             </div>

@@ -31,7 +31,7 @@ try {
     $total_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscriptions");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(ps.amount), 0) as total FROM premium_subscriptions ps LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id WHERE psk.id IS NULL");
     $total_subscription_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 } catch (Exception $e) {
     error_log("Error fetching subscription stats: " . $e->getMessage());
@@ -43,11 +43,11 @@ $total_portal_payments_amount = 0;
 $monthly_portal_payments_amount = 0;
 try {
     global $pdo;
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE payment_environment = 'production' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_portal_payments = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed'");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production'");
     $total_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 } catch (Exception $e) {
     error_log("Error fetching portal payment stats: " . $e->getMessage());
@@ -361,10 +361,10 @@ include 'admin_header.php';
     <!-- Content Grid -->
     <div class="content-grid">
         <!-- Activity Timeline -->
-        <div class="activity-section">
+        <div class="activity-section" id="activity">
             <div class="activity-header">
                 <h2 class="section-title">Recent Activity <button class="activity-info-btn" onclick="document.getElementById('activityInfoModal').classList.add('show')" title="What's tracked?"><?= svg_icon('info', 16) ?></button></h2>
-                <select class="activity-count-select" onchange="window.location.href='?activity=' + this.value">
+                <select class="activity-count-select" onchange="window.location.href='?activity=' + this.value + '#activity'">
                     <?php foreach ($allowed_counts as $count): ?>
                         <option value="<?= $count ?>" <?= $activity_count === $count ? 'selected' : '' ?>><?= $count ?> events</option>
                     <?php endforeach; ?>

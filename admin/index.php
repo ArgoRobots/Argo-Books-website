@@ -40,12 +40,15 @@ try {
 // Portal payments
 $monthly_portal_payments = 0;
 $total_portal_payments_amount = 0;
+$monthly_portal_payments_amount = 0;
 try {
     global $pdo;
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_portal_payments = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
     $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed'");
     $total_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $monthly_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 } catch (Exception $e) {
     error_log("Error fetching portal payment stats: " . $e->getMessage());
 }
@@ -96,6 +99,18 @@ if (is_dir($dataDir)) {
     $monthly_app_users = count($monthlyIPs);
 }
 
+// Monthly downloads from statistics table
+$monthly_downloads = 0;
+$total_downloads = 0;
+try {
+    $dl_result = $db->query("SELECT COUNT(*) as count FROM statistics WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia') AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $monthly_downloads = $dl_result->fetch_assoc()['count'] ?? 0;
+    $dl_total_result = $db->query("SELECT COUNT(*) as count FROM statistics WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')");
+    $total_downloads = $dl_total_result->fetch_assoc()['count'] ?? 0;
+} catch (Exception $e) {
+    error_log("Error fetching download stats: " . $e->getMessage());
+}
+
 // Activity event count from query parameter
 $activity_count = isset($_GET['activity']) ? (int)$_GET['activity'] : 10;
 $allowed_counts = [5, 10, 25, 50];
@@ -123,14 +138,13 @@ try {
     global $pdo;
     // New subscriptions
     $stmt = $pdo->query("
-        SELECT ps.email, ps.billing_cycle, ps.created_at, psk.subscription_key
+        SELECT ps.email, ps.billing_cycle, ps.created_at, ps.subscription_id
         FROM premium_subscriptions ps
-        LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id
         ORDER BY ps.created_at DESC
         LIMIT $per_source_limit
     ");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $label = htmlspecialchars($row['email'] ?: $row['subscription_key'] ?: 'Device subscription');
+        $label = htmlspecialchars($row['email'] ?: $row['subscription_id']);
         $cycle = ucfirst($row['billing_cycle']);
         $recent_items[] = [
             'type' => 'subscription',
@@ -141,15 +155,14 @@ try {
     }
     // Cancelled subscriptions
     $stmt = $pdo->query("
-        SELECT ps.email, ps.cancelled_at, psk.subscription_key
+        SELECT ps.email, ps.cancelled_at, ps.subscription_id
         FROM premium_subscriptions ps
-        LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id
         WHERE ps.status = 'cancelled' AND ps.cancelled_at IS NOT NULL
         ORDER BY ps.cancelled_at DESC
         LIMIT $per_source_limit
     ");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $label = htmlspecialchars($row['email'] ?: $row['subscription_key'] ?: 'Device subscription');
+        $label = htmlspecialchars($row['email'] ?: $row['subscription_id']);
         $recent_items[] = [
             'type' => 'cancellation',
             'time' => $row['cancelled_at'],
@@ -260,7 +273,6 @@ include 'admin_header.php';
     <!-- Hero Section -->
     <div class="hero-section">
         <h1>Dashboard Overview</h1>
-        <p>Welcome back, <?php echo htmlspecialchars($_SESSION['admin_username']); ?></p>
     </div>
 
     <!-- Stats Row -->
@@ -293,7 +305,7 @@ include 'admin_header.php';
             <div class="nav-card-description">Manage Premium subscriptions and keys</div>
             <div class="nav-card-stats">
                 <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">This Month</span>
+                    <span class="nav-card-stat-label">New Subscriptions This Month</span>
                     <span class="nav-card-stat-value"><?php echo number_format($monthly_subscriptions); ?></span>
                 </div>
                 <div class="nav-card-stat">
@@ -310,7 +322,7 @@ include 'admin_header.php';
             <div class="nav-card-title">App Statistics</div>
             <div class="nav-card-description">View application analytics and metrics</div>
             <div class="nav-card-stat">
-                <span class="nav-card-stat-label">This Month</span>
+                <span class="nav-card-stat-label">New Users This Month</span>
                 <span class="nav-card-stat-value"><?php echo number_format($monthly_app_users); ?></span>
             </div>
         </a>
@@ -319,11 +331,11 @@ include 'admin_header.php';
             <div class="nav-card-icon">
                 <?= svg_icon('globe-filled', 24) ?>
             </div>
-            <div class="nav-card-title">Website Statistics</div>
-            <div class="nav-card-description">View website analytics and metrics</div>
+            <div class="nav-card-title">Total Downloads</div>
+            <div class="nav-card-description">View website analytics and download metrics</div>
             <div class="nav-card-stat">
-                <span class="nav-card-stat-label">This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_posts); ?></span>
+                <span class="nav-card-stat-label">Downloads This Month</span>
+                <span class="nav-card-stat-value"><?php echo number_format($monthly_downloads); ?></span>
             </div>
         </a>
 
@@ -335,12 +347,12 @@ include 'admin_header.php';
             <div class="nav-card-description">Monitor portal payments and invoices</div>
             <div class="nav-card-stats">
                 <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">This Month</span>
+                    <span class="nav-card-stat-label">Transactions This Month</span>
                     <span class="nav-card-stat-value"><?php echo number_format($monthly_portal_payments); ?></span>
                 </div>
                 <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">Total Payments</span>
-                    <span class="nav-card-stat-value">$<?php echo number_format($total_portal_payments_amount, 2); ?></span>
+                    <span class="nav-card-stat-label">Total Payments This Month</span>
+                    <span class="nav-card-stat-value">$<?php echo number_format($monthly_portal_payments_amount, 2); ?></span>
                 </div>
             </div>
         </a>

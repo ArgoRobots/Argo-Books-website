@@ -24,9 +24,10 @@ function track_event($event_type, $event_data = '')
     $ip_address = $_SERVER['REMOTE_ADDR'];
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-    // Only record the first occurrence of an event for each IP and event data
-    $exists_stmt = $db->prepare('SELECT 1 FROM statistics WHERE event_type = ? AND event_data = ? AND ip_address = ? LIMIT 1');
-    $exists_stmt->bind_param('sss', $event_type, $event_data, $ip_address);
+    // Only record one occurrence of an event per IP per day
+    $today_start = date('Y-m-d 00:00:00');
+    $exists_stmt = $db->prepare('SELECT 1 FROM statistics WHERE event_type = ? AND event_data = ? AND ip_address = ? AND created_at >= ? LIMIT 1');
+    $exists_stmt->bind_param('ssss', $event_type, $event_data, $ip_address, $today_start);
     $exists_stmt->execute();
     $exists_result = $exists_stmt->get_result();
     if ($exists_result->num_rows > 0) {

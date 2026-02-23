@@ -24,22 +24,28 @@ $total_users = $result->fetch_assoc()['count'] ?? 0;
 // Premium subscriptions
 $total_subscriptions = 0;
 $monthly_subscriptions = 0;
+$total_subscription_revenue = 0;
 try {
     global $pdo;
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
     $total_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscriptions");
+    $total_subscription_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 } catch (Exception $e) {
     error_log("Error fetching subscription stats: " . $e->getMessage());
 }
 
-// Portal payments this month
+// Portal payments
 $monthly_portal_payments = 0;
+$total_portal_payments_amount = 0;
 try {
     global $pdo;
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_portal_payments = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed'");
+    $total_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 } catch (Exception $e) {
     error_log("Error fetching portal payment stats: " . $e->getMessage());
 }
@@ -90,11 +96,19 @@ if (is_dir($dataDir)) {
     $monthly_app_users = count($monthlyIPs);
 }
 
+// Activity event count from query parameter
+$activity_count = isset($_GET['activity']) ? (int)$_GET['activity'] : 10;
+$allowed_counts = [5, 10, 25, 50];
+if (!in_array($activity_count, $allowed_counts)) {
+    $activity_count = 10;
+}
+$per_source_limit = $activity_count; // fetch enough per source to fill the total
+
 // Get recent activity items for timeline
 $recent_items = [];
 
-// Recent user registrations (last 5)
-$result = $db->query('SELECT username, created_at, email_verified FROM community_users ORDER BY created_at DESC LIMIT 5');
+// Recent user registrations
+$result = $db->query("SELECT username, created_at, email_verified FROM community_users ORDER BY created_at DESC LIMIT $per_source_limit");
 while ($row = $result->fetch_assoc()) {
     $recent_items[] = [
         'type' => 'user',
@@ -104,13 +118,56 @@ while ($row = $result->fetch_assoc()) {
     ];
 }
 
+// Recent subscription events (new and cancelled)
+try {
+    global $pdo;
+    // New subscriptions
+    $stmt = $pdo->query("
+        SELECT ps.email, ps.billing_cycle, ps.created_at, psk.subscription_key
+        FROM premium_subscriptions ps
+        LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id
+        ORDER BY ps.created_at DESC
+        LIMIT $per_source_limit
+    ");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $label = htmlspecialchars($row['email'] ?: $row['subscription_key'] ?: 'Device subscription');
+        $cycle = ucfirst($row['billing_cycle']);
+        $recent_items[] = [
+            'type' => 'subscription',
+            'time' => $row['created_at'],
+            'description' => "Subscription added: $label ($cycle)",
+            'status' => 'active'
+        ];
+    }
+    // Cancelled subscriptions
+    $stmt = $pdo->query("
+        SELECT ps.email, ps.cancelled_at, psk.subscription_key
+        FROM premium_subscriptions ps
+        LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id
+        WHERE ps.status = 'cancelled' AND ps.cancelled_at IS NOT NULL
+        ORDER BY ps.cancelled_at DESC
+        LIMIT $per_source_limit
+    ");
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $label = htmlspecialchars($row['email'] ?: $row['subscription_key'] ?: 'Device subscription');
+        $recent_items[] = [
+            'type' => 'cancellation',
+            'time' => $row['cancelled_at'],
+            'description' => "Subscription cancelled: $label",
+            'status' => 'cancelled'
+        ];
+    }
+} catch (Exception $e) {
+    error_log("Error fetching subscription activity: " . $e->getMessage());
+}
+
 // Sort by time
 usort($recent_items, function ($a, $b) {
     return strtotime($b['time']) - strtotime($a['time']);
 });
 
-// Keep only 10 most recent
-$recent_items = array_slice($recent_items, 0, 10);
+// Keep only the requested number
+$recent_items = array_slice($recent_items, 0, $activity_count);
 
 // System health checks - comprehensive production-ready implementation
 $system_health = [];
@@ -221,8 +278,8 @@ include 'admin_header.php';
             <div class="stat-value"><?php echo number_format($total_posts); ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Total Accounts</div>
-            <div class="stat-value"><?php echo number_format($total_users); ?></div>
+            <div class="stat-label">Total Payments</div>
+            <div class="stat-value">$<?php echo number_format($total_portal_payments_amount, 2); ?></div>
         </div>
     </div>
 
@@ -234,9 +291,15 @@ include 'admin_header.php';
             </div>
             <div class="nav-card-title">Subscriptions</div>
             <div class="nav-card-description">Manage Premium subscriptions and keys</div>
-            <div class="nav-card-stat">
-                <span class="nav-card-stat-label">This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_subscriptions); ?></span>
+            <div class="nav-card-stats">
+                <div class="nav-card-stat">
+                    <span class="nav-card-stat-label">This Month</span>
+                    <span class="nav-card-stat-value"><?php echo number_format($monthly_subscriptions); ?></span>
+                </div>
+                <div class="nav-card-stat">
+                    <span class="nav-card-stat-label">Total Revenue</span>
+                    <span class="nav-card-stat-value">$<?php echo number_format($total_subscription_revenue, 2); ?></span>
+                </div>
             </div>
         </a>
 
@@ -264,27 +327,21 @@ include 'admin_header.php';
             </div>
         </a>
 
-        <a href="users/" class="nav-card">
-            <div class="nav-card-icon">
-                <?= svg_icon('users-filled', 24) ?>
-            </div>
-            <div class="nav-card-title">User Management</div>
-            <div class="nav-card-description">Manage community users</div>
-            <div class="nav-card-stat">
-                <span class="nav-card-stat-label">This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_users); ?></span>
-            </div>
-        </a>
-
         <a href="payments/" class="nav-card">
             <div class="nav-card-icon">
                 <?= svg_icon('credit-card-filled', 24) ?>
             </div>
             <div class="nav-card-title">Payment Portal</div>
             <div class="nav-card-description">Monitor portal payments and invoices</div>
-            <div class="nav-card-stat">
-                <span class="nav-card-stat-label">Payments This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_portal_payments); ?></span>
+            <div class="nav-card-stats">
+                <div class="nav-card-stat">
+                    <span class="nav-card-stat-label">This Month</span>
+                    <span class="nav-card-stat-value"><?php echo number_format($monthly_portal_payments); ?></span>
+                </div>
+                <div class="nav-card-stat">
+                    <span class="nav-card-stat-label">Total Payments</span>
+                    <span class="nav-card-stat-value">$<?php echo number_format($total_portal_payments_amount, 2); ?></span>
+                </div>
             </div>
         </a>
     </div>
@@ -293,7 +350,14 @@ include 'admin_header.php';
     <div class="content-grid">
         <!-- Activity Timeline -->
         <div class="activity-section">
-            <h2 class="section-title">Recent Activity</h2>
+            <div class="activity-header">
+                <h2 class="section-title">Recent Activity <button class="activity-info-btn" onclick="document.getElementById('activityInfoModal').classList.add('show')" title="What's tracked?"><?= svg_icon('info', 16) ?></button></h2>
+                <select class="activity-count-select" onchange="window.location.href='?activity=' + this.value">
+                    <?php foreach ($allowed_counts as $count): ?>
+                        <option value="<?= $count ?>" <?= $activity_count === $count ? 'selected' : '' ?>><?= $count ?> events</option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <div class="timeline">
                 <?php if (empty($recent_items)): ?>
                     <p style="color: #94a3b8; text-align: center; padding: 2rem 0;">No recent activity</p>
@@ -366,6 +430,43 @@ include 'admin_header.php';
                     <?php echo strtoupper($overall_status); ?>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Info Modal -->
+<div class="activity-info-modal" id="activityInfoModal">
+    <div class="activity-info-modal-backdrop" onclick="document.getElementById('activityInfoModal').classList.remove('show')"></div>
+    <div class="activity-info-modal-content">
+        <div class="activity-info-modal-header">
+            <h3>What's Tracked</h3>
+            <button class="activity-info-modal-close" onclick="document.getElementById('activityInfoModal').classList.remove('show')"><?= svg_icon('x', 20) ?></button>
+        </div>
+        <div class="activity-info-modal-body">
+            <p>The Recent Activity timeline shows the most recent events across these categories:</p>
+            <ul>
+                <li>
+                    <span class="activity-info-dot"></span>
+                    <div>
+                        <strong>User Registrations</strong>
+                        <span>New community user sign-ups with verification status</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="activity-info-dot"></span>
+                    <div>
+                        <strong>Subscription Added</strong>
+                        <span>New premium subscriptions (monthly or yearly)</span>
+                    </div>
+                </li>
+                <li>
+                    <span class="activity-info-dot"></span>
+                    <div>
+                        <strong>Subscription Cancelled</strong>
+                        <span>Premium subscriptions that were cancelled</span>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </div>

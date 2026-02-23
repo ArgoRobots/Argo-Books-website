@@ -113,8 +113,8 @@ function serveFile(array $installer): void
     header('Pragma: no-cache');
     header('Expires: 0');
 
-    // Track the download
-    track_event('download_avalonia', $installer['version'] . '_' . $installer['platform']);
+    // Track the download with platform-specific event type
+    track_event('download_' . $installer['platform'], $installer['version']);
 
     readfile($installer['filepath']);
     exit;

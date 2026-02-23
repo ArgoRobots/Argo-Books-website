@@ -77,6 +77,7 @@ echo json_encode(['received' => true]);
  */
 function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
 {
+    global $is_production;
     $metadata = $paymentIntent->metadata;
     $invoiceId = $metadata['portal_invoice_id'] ?? '';
     $companyId = $metadata['portal_company_id'] ?? '';
@@ -101,6 +102,7 @@ function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
         'provider_transaction_id' => $paymentIntent->latest_charge ?? $paymentIntent->id,
         'reference_number' => generate_reference_number(),
         'status' => 'completed',
+        'payment_environment' => $is_production ? 'production' : 'sandbox',
     ]);
 }
 
@@ -109,6 +111,7 @@ function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
  */
 function handle_refund(\Stripe\Charge $charge): void
 {
+    global $is_production;
     $providerPaymentId = $charge->payment_intent;
 
     if (empty($providerPaymentId)) {
@@ -149,6 +152,7 @@ function handle_refund(\Stripe\Charge $charge): void
         'provider_transaction_id' => $charge->id,
         'reference_number' => generate_reference_number(),
         'status' => 'refunded',
+        'payment_environment' => $is_production ? 'production' : 'sandbox',
     ]);
 
     // Update the original payment status

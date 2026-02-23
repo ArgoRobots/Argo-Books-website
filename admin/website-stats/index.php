@@ -67,10 +67,10 @@ function get_stats_by_period($table, $period = 'month', $limit = 12, $where_clau
     return $data;
 }
 
-// Function to get download statistics by period
+// Function to get download statistics by period (all platforms combined)
 function get_downloads_by_period($period = 'month', $limit = 12)
 {
-    return get_stats_by_period('statistics', $period, $limit, "event_type = 'download'");
+    return get_stats_by_period('statistics', $period, $limit, "event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')");
 }
 
 // Function to get user registrations by period
@@ -207,7 +207,7 @@ function get_downloads_by_country($limit = 10)
             country_code,
             COUNT(*) as download_count
         FROM statistics
-        WHERE event_type = 'download' AND country_code IS NOT NULL AND country_code != ''
+        WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia') AND country_code IS NOT NULL AND country_code != ''
         GROUP BY country_code
         ORDER BY download_count DESC
         LIMIT ?";
@@ -263,7 +263,7 @@ function get_conversion_data()
     $db = get_db_connection();
 
     // Get total downloads (from statistics table)
-    $download_query = "SELECT COUNT(*) as count FROM statistics WHERE event_type = 'download'";
+    $download_query = "SELECT COUNT(*) as count FROM statistics WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')";
     $download_result = $db->query($download_query);
     $downloads = $download_result->fetch_assoc()['count'];
 
@@ -697,6 +697,11 @@ include '../admin_header.php';
 ?>
 
 <div class="container">
+    <!-- Statistics Cards -->
+    <div class="stats-grid" id="statsGrid">
+        <!-- Will be populated by JavaScript -->
+    </div>
+
     <!-- Period selection -->
     <div class="period-selection">
         <span>Time Period:</span>
@@ -717,11 +722,6 @@ include '../admin_header.php';
             }
             ?>
         </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="stats-grid" id="statsGrid">
-        <!-- Will be populated by JavaScript -->
     </div>
 
     <!-- Charts -->

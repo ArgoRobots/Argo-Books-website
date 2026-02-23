@@ -14,6 +14,27 @@ $page_description = "Monitor portal payments, companies, invoices, and payment a
 
 global $pdo;
 
+// Determine view environment (production vs sandbox)
+$view_env = $_GET['view_env'] ?? 'production';
+if ($view_env !== 'sandbox') {
+    $view_env = 'production';
+}
+
+// SQL conditions for environment filtering
+// Production mode: only explicitly production-marked payments
+// Sandbox mode: everything else (sandbox, unknown/NULL, empty)
+if ($view_env === 'sandbox') {
+    $env_sql = "(payment_environment IS NULL OR payment_environment != 'production')";
+    $env_sql_p = "(p.payment_environment IS NULL OR p.payment_environment != 'production')";
+    // For invoices: show invoices that have a non-production payment
+    $env_sql_inv = "(p.id IS NOT NULL AND (p.payment_environment IS NULL OR p.payment_environment != 'production'))";
+} else {
+    $env_sql = "(payment_environment = 'production')";
+    $env_sql_p = "(p.payment_environment = 'production')";
+    // For invoices: show invoices with a production payment, or unpaid invoices
+    $env_sql_inv = "(p.id IS NULL OR p.payment_environment = 'production')";
+}
+
 // ============================================================
 // DATA QUERIES
 // ============================================================
@@ -27,22 +48,22 @@ $total_invoices = 0;
 $overdue_invoices = 0;
 
 try {
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed'");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND $env_sql");
     $total_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND $env_sql AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $monthly_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    $stmt = $pdo->query("SELECT COALESCE(SUM(processing_fee), 0) as total FROM portal_payments WHERE status = 'completed'");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(processing_fee), 0) as total FROM portal_payments WHERE status = 'completed' AND $env_sql");
     $total_fees = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_companies");
     $active_companies = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_invoices");
+    $stmt = $pdo->query("SELECT COUNT(DISTINCT i.id) as count FROM portal_invoices i LEFT JOIN portal_payments p ON p.invoice_id = i.id WHERE $env_sql_inv");
     $total_invoices = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_invoices WHERE status = 'overdue'");
+    $stmt = $pdo->query("SELECT COUNT(DISTINCT i.id) as count FROM portal_invoices i LEFT JOIN portal_payments p ON p.invoice_id = i.id WHERE i.status = 'overdue' AND $env_sql_inv");
     $overdue_invoices = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 } catch (PDOException $e) {
     error_log("Payment stats error: " . $e->getMessage());
@@ -54,7 +75,7 @@ try {
     $stmt = $pdo->query("
         SELECT DATE(created_at) as date, SUM(amount) as revenue
         FROM portal_payments
-        WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        WHERE status = 'completed' AND $env_sql AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         GROUP BY DATE(created_at)
         ORDER BY date ASC
     ");
@@ -69,7 +90,7 @@ try {
     $stmt = $pdo->query("
         SELECT payment_method, COUNT(*) as count, SUM(amount) as total
         FROM portal_payments
-        WHERE status = 'completed'
+        WHERE status = 'completed' AND $env_sql
         GROUP BY payment_method
     ");
     $method_distribution = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -81,9 +102,11 @@ try {
 $invoice_statuses = [];
 try {
     $stmt = $pdo->query("
-        SELECT status, COUNT(*) as count
-        FROM portal_invoices
-        GROUP BY status
+        SELECT i.status, COUNT(DISTINCT i.id) as count
+        FROM portal_invoices i
+        LEFT JOIN portal_payments p ON p.invoice_id = i.id
+        WHERE $env_sql_inv
+        GROUP BY i.status
     ");
     $invoice_statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -95,9 +118,10 @@ $recent_payments = [];
 try {
     $stmt = $pdo->query("
         SELECT p.created_at, c.company_name, p.customer_name, p.amount,
-               p.currency, p.payment_method, p.status
+               p.currency, p.payment_method, p.status, p.payment_environment
         FROM portal_payments p
         LEFT JOIN portal_companies c ON p.company_id = c.id
+        WHERE $env_sql_p
         ORDER BY p.created_at DESC
         LIMIT 10
     ");
@@ -112,13 +136,12 @@ $tx_search = $_GET['tx_search'] ?? '';
 $tx_method = $_GET['tx_method'] ?? '';
 $tx_status = $_GET['tx_status'] ?? '';
 $tx_company = $_GET['tx_company'] ?? '';
-
 try {
     $query = "
         SELECT p.*, c.company_name
         FROM portal_payments p
         LEFT JOIN portal_companies c ON p.company_id = c.id
-        WHERE 1=1
+        WHERE $env_sql_p
     ";
     $params = [];
 
@@ -141,7 +164,6 @@ try {
         $query .= " AND c.id = ?";
         $params[] = $tx_company;
     }
-
     $query .= " ORDER BY p.created_at DESC LIMIT 200";
     $stmt = $pdo->prepare($query);
     $stmt->execute($params);
@@ -155,9 +177,9 @@ $companies = [];
 try {
     $stmt = $pdo->query("
         SELECT c.*,
-               COUNT(p.id) as total_payments,
-               COALESCE(SUM(CASE WHEN p.status = 'completed' THEN p.amount ELSE 0 END), 0) as total_revenue,
-               MAX(p.created_at) as last_payment_date
+               COUNT(CASE WHEN $env_sql_p THEN p.id ELSE NULL END) as total_payments,
+               COALESCE(SUM(CASE WHEN p.status = 'completed' AND $env_sql_p THEN p.amount ELSE 0 END), 0) as total_revenue,
+               MAX(CASE WHEN $env_sql_p THEN p.created_at ELSE NULL END) as last_payment_date
         FROM portal_companies c
         LEFT JOIN portal_payments p ON p.company_id = c.id
         GROUP BY c.id
@@ -177,7 +199,7 @@ $inv_company = $_GET['inv_company'] ?? '';
 try {
     $query = "
         SELECT i.*, c.company_name,
-               COALESCE(SUM(CASE WHEN p.status = 'completed' THEN p.amount ELSE 0 END), 0) as paid_amount
+               COALESCE(SUM(CASE WHEN p.status = 'completed' AND $env_sql_p THEN p.amount ELSE 0 END), 0) as paid_amount
         FROM portal_invoices i
         LEFT JOIN portal_companies c ON i.company_id = c.id
         LEFT JOIN portal_payments p ON p.invoice_id = i.id
@@ -221,7 +243,7 @@ try {
         SELECT c.company_name, SUM(p.amount) as revenue
         FROM portal_payments p
         JOIN portal_companies c ON p.company_id = c.id
-        WHERE p.status = 'completed'
+        WHERE p.status = 'completed' AND $env_sql_p
         GROUP BY c.id
         ORDER BY revenue DESC
         LIMIT 10
@@ -232,7 +254,7 @@ try {
     $stmt = $pdo->query("
         SELECT DATE_FORMAT(created_at, '%Y-%m') as month, payment_method, SUM(amount) as revenue
         FROM portal_payments
-        WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        WHERE status = 'completed' AND $env_sql AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
         GROUP BY month, payment_method
         ORDER BY month ASC
     ");
@@ -242,7 +264,7 @@ try {
     $stmt = $pdo->query("
         SELECT DATE_FORMAT(created_at, '%Y-%m') as month, AVG(amount) as avg_amount, COUNT(*) as count
         FROM portal_payments
-        WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        WHERE status = 'completed' AND $env_sql AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
         GROUP BY month
         ORDER BY month ASC
     ");
@@ -252,7 +274,7 @@ try {
     $stmt = $pdo->query("
         SELECT DATE_FORMAT(created_at, '%Y-%m') as month, SUM(processing_fee) as fees, SUM(amount) as revenue
         FROM portal_payments
-        WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        WHERE status = 'completed' AND $env_sql AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
         GROUP BY month
         ORDER BY month ASC
     ");
@@ -266,12 +288,12 @@ $total_tx_count = 0;
 $avg_payment_size = 0;
 $prev_month_revenue = 0;
 try {
-    $stmt = $pdo->query("SELECT COUNT(*) as count, AVG(amount) as avg_amount FROM portal_payments WHERE status = 'completed'");
+    $stmt = $pdo->query("SELECT COUNT(*) as count, AVG(amount) as avg_amount FROM portal_payments WHERE status = 'completed' AND $env_sql");
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_tx_count = $row['count'];
     $avg_payment_size = $row['avg_amount'] ?? 0;
 
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY) AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND $env_sql AND created_at >= DATE_SUB(NOW(), INTERVAL 60 DAY) AND created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $prev_month_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 } catch (PDOException $e) {
     error_log("Revenue summary error: " . $e->getMessage());
@@ -292,10 +314,10 @@ try {
     $stmt = $pdo->query("
         SELECT p.created_at, c.company_name, p.customer_name, p.amount,
                p.currency, p.payment_method, p.status,
-               p.provider_payment_id
+               p.provider_payment_id, p.payment_environment
         FROM portal_payments p
         LEFT JOIN portal_companies c ON p.company_id = c.id
-        WHERE p.status = 'failed'
+        WHERE p.status = 'failed' AND $env_sql_p
         ORDER BY p.created_at DESC
         LIMIT 100
     ");
@@ -303,24 +325,25 @@ try {
 
     $stmt = $pdo->query("
         SELECT p.created_at, c.company_name, p.customer_name, p.amount,
-               p.currency, p.payment_method, p.provider_payment_id
+               p.currency, p.payment_method, p.provider_payment_id,
+               p.payment_environment
         FROM portal_payments p
         LEFT JOIN portal_companies c ON p.company_id = c.id
-        WHERE p.status = 'refunded'
+        WHERE p.status = 'refunded' AND $env_sql_p
         ORDER BY p.created_at DESC
         LIMIT 100
     ");
     $refunded_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE status = 'failed'");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE status = 'failed' AND $env_sql");
     $total_failed = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'refunded'");
+    $stmt = $pdo->query("SELECT COUNT(*) as count, COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'refunded' AND $env_sql");
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_refunded = $row['count'];
     $total_refund_amount = $row['total'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE $env_sql");
     $all_payments_count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
     $failure_rate = ($all_payments_count > 0) ? ($total_failed / $all_payments_count * 100) : 0;
 } catch (PDOException $e) {
@@ -342,6 +365,13 @@ include '../admin_header.php';
 <link rel="stylesheet" href="style.css">
 
 <div class="container payments-page">
+
+    <!-- Environment Toggle -->
+    <?php $current_tab = $_GET['tab'] ?? ''; $tab_param = !empty($current_tab) ? '&tab=' . urlencode($current_tab) : ''; ?>
+    <div class="env-toggle-bar">
+        <a href="?view_env=production<?php echo $tab_param; ?>" class="env-toggle-btn env-toggle-production <?php echo $view_env === 'production' ? 'active' : ''; ?>">Production</a>
+        <a href="?view_env=sandbox<?php echo $tab_param; ?>" class="env-toggle-btn env-toggle-sandbox <?php echo $view_env === 'sandbox' ? 'active' : ''; ?>">Sandbox</a>
+    </div>
 
     <!-- Tab Navigation -->
     <div class="tab-buttons">
@@ -488,6 +518,7 @@ include '../admin_header.php';
                         <option value="refunded" <?php echo $tx_status === 'refunded' ? 'selected' : ''; ?>>Refunded</option>
                     </select>
                 </div>
+                <input type="hidden" name="view_env" value="<?php echo htmlspecialchars($view_env); ?>">
                 <div class="filter-group">
                     <select name="tx_company" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Companies</option>
@@ -498,7 +529,7 @@ include '../admin_header.php';
                 </div>
                 <button type="submit" class="btn btn-small btn-primary-blue">Search</button>
                 <?php if (!empty($tx_search) || !empty($tx_method) || !empty($tx_status) || !empty($tx_company)): ?>
-                    <a href="?tab=transactions" class="btn btn-small btn-outline">Clear</a>
+                    <a href="?tab=transactions&view_env=<?php echo htmlspecialchars($view_env); ?>" class="btn btn-small btn-outline">Clear</a>
                 <?php endif; ?>
             </form>
         </div>
@@ -705,6 +736,7 @@ include '../admin_header.php';
         <div class="filters-bar">
             <form method="GET" class="filters-form" id="inv-filters-form">
                 <input type="hidden" name="tab" value="invoices">
+                <input type="hidden" name="view_env" value="<?php echo htmlspecialchars($view_env); ?>">
                 <div class="filter-group">
                     <input type="text" name="inv_search" placeholder="Search customer, invoice ID, company..." value="<?php echo htmlspecialchars($inv_search); ?>">
                 </div>
@@ -731,7 +763,7 @@ include '../admin_header.php';
                 </div>
                 <button type="submit" class="btn btn-small btn-primary-blue">Search</button>
                 <?php if (!empty($inv_search) || !empty($inv_status) || !empty($inv_company)): ?>
-                    <a href="?tab=invoices" class="btn btn-small btn-outline">Clear</a>
+                    <a href="?tab=invoices&view_env=<?php echo htmlspecialchars($view_env); ?>" class="btn btn-small btn-outline">Clear</a>
                 <?php endif; ?>
             </form>
         </div>

@@ -238,6 +238,7 @@ include '../admin_header.php';
     margin-bottom: 1.5rem;
     border-bottom: 2px solid #e5e7eb;
     padding-bottom: 0;
+    justify-content: center;
 }
 
 .tab-button {

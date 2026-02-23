@@ -195,7 +195,7 @@ GROUP BY
 -- Create statistics table for more detailed tracking
 CREATE TABLE IF NOT EXISTS statistics (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    event_type VARCHAR(50) NOT NULL, -- 'download', 'page_view', etc.
+    event_type VARCHAR(50) NOT NULL, -- 'download_avalonia', 'page_view', etc.
     event_data VARCHAR(255), -- Additional data like version, page, etc.
     ip_address VARCHAR(45),
     user_agent VARCHAR(255),
@@ -490,6 +490,7 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     reference_number VARCHAR(50) NOT NULL COMMENT 'Human-readable reference (PAY-YYYYMMDD-XXXXXX)',
     status ENUM('pending', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
     synced_to_argo TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Whether Argo Books has pulled this payment',
+    payment_environment VARCHAR(10) DEFAULT NULL COMMENT 'sandbox or production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_company_id (company_id),
     INDEX idx_invoice_id (invoice_id),

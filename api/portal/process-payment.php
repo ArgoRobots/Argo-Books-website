@@ -131,6 +131,7 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
         'provider_transaction_id' => $paymentIntent->latest_charge ?? $paymentIntentId,
         'reference_number' => $referenceNumber,
         'status' => 'completed',
+        'payment_environment' => $is_production ? 'production' : 'sandbox',
     ]);
 
     if (!$result['success']) {
@@ -255,6 +256,7 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         'provider_transaction_id' => $captureId ?: $orderId,
         'reference_number' => $referenceNumber,
         'status' => 'completed',
+        'payment_environment' => $is_production ? 'production' : 'sandbox',
     ]);
 
     if (!$result['success']) {

@@ -501,22 +501,3 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ============================================================================
--- Migration: Device-based license key system
--- Run these statements on an existing database to apply the schema changes.
--- ============================================================================
-
--- Add device_id column to premium_subscription_keys
--- ALTER TABLE premium_subscription_keys
---   ADD COLUMN device_id VARCHAR(255) DEFAULT NULL COMMENT 'Hashed machine identifier of redeeming device'
---   AFTER redeemed_by_user_id;
-
--- Make user_id and email nullable for device-based subscriptions (no user account)
--- ALTER TABLE premium_subscriptions
---   MODIFY user_id INT DEFAULT NULL,
---   MODIFY email VARCHAR(100) DEFAULT NULL;
-
--- Drop the foreign key constraint on user_id
--- (constraint name may vary — run SHOW CREATE TABLE premium_subscriptions to find the actual name)
--- ALTER TABLE premium_subscriptions DROP FOREIGN KEY premium_subscriptions_ibfk_1;

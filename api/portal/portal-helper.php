@@ -313,6 +313,7 @@ function record_portal_payment(array $params): array
     $providerTransactionId = $params['provider_transaction_id'] ?? '';
     $referenceNumber = $params['reference_number'] ?? generate_reference_number();
     $status = $params['status'] ?? 'completed';
+    $paymentEnvironment = $params['payment_environment'] ?? null;
 
     // Check for duplicate payment (idempotency)
     if (!empty($providerPaymentId)) {
@@ -340,14 +341,14 @@ function record_portal_payment(array $params): array
         'INSERT INTO portal_payments
          (company_id, invoice_id, customer_name, amount, processing_fee,
           currency, payment_method, provider_payment_id, provider_transaction_id,
-          reference_number, status, synced_to_argo, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW())'
+          reference_number, status, synced_to_argo, payment_environment, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW())'
     );
     $stmt->bind_param(
-        'issddssssss',
+        'issddsssssss',
         $companyId, $invoiceId, $customerName, $amount, $processingFee,
         $currency, $paymentMethod, $providerPaymentId, $providerTransactionId,
-        $referenceNumber, $status
+        $referenceNumber, $status, $paymentEnvironment
     );
 
     if (!$stmt->execute()) {

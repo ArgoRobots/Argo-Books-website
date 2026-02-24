@@ -251,10 +251,6 @@
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
-.timeline-item.type-user::before {
-  border-color: var(--sky-400);
-  box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.1);
-}
 
 .timeline-time {
   font-size: 0.75rem;
@@ -292,15 +288,6 @@
   color: var(--red-800, #991b1b);
 }
 
-.timeline-item.type-subscription::before {
-  border-color: var(--emerald-400);
-  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.1);
-}
-
-.timeline-item.type-cancellation::before {
-  border-color: var(--red-400, #f87171);
-  box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.1);
-}
 
 /* System Health Panel */
 .health-section {

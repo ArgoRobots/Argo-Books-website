@@ -411,7 +411,7 @@ function _svg_icon_definitions() {
             'body' => '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>',
         ],
         'info' => [
-            'body' => '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><circle cx="12" cy="8" r="1" fill="currentColor" stroke="none"/>',
+            'body' => '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4" stroke-linecap="round"/><circle cx="12" cy="8" r="1.25" fill="currentColor" stroke="none"/>',
         ],
     ];
 }

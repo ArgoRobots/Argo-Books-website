@@ -364,7 +364,7 @@ include 'admin_header.php';
         <div class="activity-section" id="activity">
             <div class="activity-header">
                 <h2 class="section-title">Recent Activity <button class="activity-info-btn" onclick="document.getElementById('activityInfoModal').classList.add('show')" title="What's tracked?"><?= svg_icon('info', 16) ?></button></h2>
-                <select class="activity-count-select" onchange="window.location.href='?activity=' + this.value + '#activity'">
+                <select class="activity-count-select" onchange="sessionStorage.setItem('scrollPos', window.scrollY); window.location.href='?activity=' + this.value">
                     <?php foreach ($allowed_counts as $count): ?>
                         <option value="<?= $count ?>" <?= $activity_count === $count ? 'selected' : '' ?>><?= $count ?> events</option>
                     <?php endforeach; ?>
@@ -445,6 +445,13 @@ include 'admin_header.php';
         </div>
     </div>
 </div>
+
+<script>
+if (sessionStorage.getItem('scrollPos') !== null) {
+    window.scrollTo(0, parseInt(sessionStorage.getItem('scrollPos')));
+    sessionStorage.removeItem('scrollPos');
+}
+</script>
 
 <!-- Activity Info Modal -->
 <div class="activity-info-modal" id="activityInfoModal">

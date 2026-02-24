@@ -308,7 +308,6 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     stripe_customer_id VARCHAR(255) COMMENT 'Stripe customer ID for recurring billing',
     auto_renew TINYINT(1) DEFAULT 1 COMMENT 'Whether to auto-renew the subscription',
     paypal_subscription_id VARCHAR(100) COMMENT 'PayPal subscription ID for recurring billing',
-    standard_license_key VARCHAR(255),
     discount_applied TINYINT(1) DEFAULT 0,
     credit_balance DECIMAL(10,2) DEFAULT 0 COMMENT 'Remaining credit balance from premium discount',
     original_credit DECIMAL(10,2) DEFAULT 0 COMMENT 'Original credit amount (to track if credit was used)',
@@ -320,7 +319,6 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     INDEX idx_email (email),
     INDEX idx_status (status),
     INDEX idx_end_date (end_date),
-    INDEX idx_premium_license (standard_license_key),
     INDEX idx_renewal (status, end_date, auto_renew),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -350,7 +348,6 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     duration_months INT NOT NULL DEFAULT 1 COMMENT 'Duration in months (0 = permanent)',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     redeemed_at DATETIME DEFAULT NULL,
-    redeemed_by_user_id INT DEFAULT NULL,
     device_id VARCHAR(255) DEFAULT NULL COMMENT 'Hashed machine identifier of redeeming device',
     subscription_id VARCHAR(50) DEFAULT NULL COMMENT 'Link to created subscription',
     notes TEXT DEFAULT NULL COMMENT 'Admin notes about this key',

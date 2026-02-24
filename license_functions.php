@@ -113,7 +113,7 @@ function validate_premium_key($key) {
     try {
         $stmt = $pdo->prepare("
             SELECT subscription_key, email, duration_months, created_at,
-                redeemed_at, redeemed_by_user_id, device_id, subscription_id, notes
+                redeemed_at, device_id, subscription_id, notes
             FROM premium_subscription_keys
             WHERE subscription_key = ?
         ");

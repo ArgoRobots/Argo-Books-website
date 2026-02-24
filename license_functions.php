@@ -267,6 +267,7 @@ function redeem_premium_key($key, $device_id) {
  * Handle re-redemption of an already-redeemed key (device transfer).
  * If the subscription is still active, updates the device_id on the key.
  * If the subscription is expired, returns an error.
+ * If the linked subscription is missing, recreates it from the key's metadata.
  *
  * @param string $key The premium subscription key
  * @param string $device_id The new device's hashed machine identifier
@@ -278,20 +279,21 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
 
     try {
         // Look up the linked subscription to check status/expiry
-        $stmt = $pdo->prepare("
-            SELECT subscription_id, status, end_date
-            FROM premium_subscriptions
-            WHERE subscription_id = ?
-        ");
-        $stmt->execute([$subscription_id]);
-        $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+        $subscription = null;
+        if ($subscription_id) {
+            $stmt = $pdo->prepare("
+                SELECT subscription_id, status, end_date
+                FROM premium_subscriptions
+                WHERE subscription_id = ?
+            ");
+            $stmt->execute([$subscription_id]);
+            $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+        }
 
         if (!$subscription) {
-            return [
-                'success' => false,
-                'status' => 'error',
-                'message' => 'Linked subscription not found.'
-            ];
+            // Linked subscription is missing (deleted or never created).
+            // Recreate the subscription from the key's metadata.
+            return _recreate_subscription_for_key($key, $device_id);
         }
 
         // Check if subscription has expired
@@ -334,6 +336,112 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
             'success' => false,
             'status' => 'error',
             'message' => 'Error redeeming premium key. Please try again.'
+        ];
+    }
+}
+
+/**
+ * Recreate a missing subscription for an already-redeemed key.
+ * This handles the case where a key was marked as redeemed but the linked
+ * subscription row in premium_subscriptions is missing (deleted or never created).
+ *
+ * @param string $key The premium subscription key
+ * @param string $device_id The device's hashed machine identifier
+ * @return array Response array with redemption result
+ */
+function _recreate_subscription_for_key($key, $device_id) {
+    global $pdo;
+
+    try {
+        // Fetch the key's metadata to get duration_months
+        $stmt = $pdo->prepare("
+            SELECT duration_months
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$key]);
+        $key_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$key_data) {
+            return [
+                'success' => false,
+                'status' => 'error',
+                'message' => 'License key not found.'
+            ];
+        }
+
+        $duration_months = $key_data['duration_months'];
+
+        $pdo->beginTransaction();
+
+        // Generate a new subscription ID
+        $newSubscriptionId = generate_license_key('premium');
+
+        // Calculate subscription dates
+        $startDate = date('Y-m-d H:i:s');
+        if ($duration_months == 0) {
+            $endDate = date('Y-m-d H:i:s', strtotime('+100 years'));
+            $billingCycle = 'yearly';
+        } elseif ($duration_months >= 12) {
+            $endDate = date('Y-m-d H:i:s', strtotime("+$duration_months months"));
+            $billingCycle = 'yearly';
+        } else {
+            $endDate = date('Y-m-d H:i:s', strtotime("+$duration_months months"));
+            $billingCycle = 'monthly';
+        }
+
+        // Create the premium subscription
+        $stmt = $pdo->prepare("
+            INSERT INTO premium_subscriptions (
+                subscription_id, billing_cycle, amount, currency,
+                start_date, end_date, status, payment_method, transaction_id,
+                auto_renew, created_at
+            ) VALUES (
+                ?, ?, 0.00, 'CAD',
+                ?, ?, 'active', 'free_key', ?,
+                0, NOW()
+            )
+        ");
+        $stmt->execute([
+            $newSubscriptionId,
+            $billingCycle,
+            $startDate,
+            $endDate,
+            $key
+        ]);
+
+        // Update the key with the new subscription_id and device_id
+        $stmt = $pdo->prepare("
+            UPDATE premium_subscription_keys
+            SET device_id = ?,
+                subscription_id = ?
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$device_id, $newSubscriptionId, $key]);
+
+        $pdo->commit();
+
+        error_log("Recreated missing subscription for key $key: new subscription_id = $newSubscriptionId");
+
+        return [
+            'success' => true,
+            'type' => 'premium',
+            'status' => 'active',
+            'message' => 'License activated successfully!',
+            'subscription_id' => $newSubscriptionId,
+            'end_date' => $endDate,
+            'duration_months' => $duration_months
+        ];
+
+    } catch (PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        error_log("Error recreating subscription for key $key: " . $e->getMessage());
+        return [
+            'success' => false,
+            'status' => 'error',
+            'message' => 'Error activating license key. Please try again.'
         ];
     }
 }

@@ -46,8 +46,8 @@ include '../../docs-header.php';
                     <?= svg_icon('chevron-left', 16) ?>
                     Previous: Spreadsheet Import
                 </a>
-                <a href="../reference/accepted-countries.php" class="nav-button next">
-                    Next: Accepted Countries
+                <a href="history-modal.php" class="nav-button next">
+                    Next: Version History
                     <?= svg_icon('chevron-right', 16) ?>
                 </a>
             </div>

@@ -39,7 +39,7 @@ include '../../docs-header.php';
             </ul>
 
             <div class="info-box">
-                <strong>Tip:</strong> Accounting reports are generated directly from your transaction records — no Chart of Accounts setup is required. Currency formatting automatically matches your company's localization settings.
+                <strong>Tip:</strong> Accounting reports are generated directly from your transaction records — no Chart of Accounts setup is required.
             </div>
 
             <h2>Step 2: Layout Designer</h2>
@@ -56,17 +56,12 @@ include '../../docs-header.php';
             </ul>
 
             <h3>Multi-Page Reports</h3>
-            <p>Reports can span multiple pages for more detailed documents. Pages are displayed vertically in the designer so you can see your entire report at a glance.</p>
+            <p>Reports can span multiple pages for more detailed documents.</p>
             <ul>
                 <li><strong>Add Page:</strong> Use the "Add Page" button in the footer toolbar to add a new page</li>
                 <li><strong>Delete Page:</strong> Use the "Delete Page" button to remove the current page</li>
-                <li><strong>Page Navigation:</strong> Scroll through pages in the designer — all pages are stacked vertically for easy editing</li>
-                <li><strong>Element Placement:</strong> Each element belongs to a specific page. Drag elements onto the page where you want them to appear</li>
+                <li><strong>Page Navigation:</strong> Scroll through pages in the designer — all pages are stacked vertically</li>
             </ul>
-
-            <div class="info-box">
-                <strong>Tip:</strong> Adding or removing pages is fully supported by undo/redo, so you can easily reverse any page changes.
-            </div>
 
             <h2>Step 3: Preview and Export</h2>
             <p>Review your report and export in your preferred format.</p>

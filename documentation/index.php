@@ -294,6 +294,13 @@ $isDocsLanding = true;
                     <h3>Spreadsheet Export</h3>
                     <p>Export data to Excel for backup</p>
                 </a>
+                <a href="pages/features/history-modal.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('clock', 20) ?>
+                    </div>
+                    <h3>Version History</h3>
+                    <p>Review, undo, and redo changes</p>
+                </a>
             </div>
         </section>
 

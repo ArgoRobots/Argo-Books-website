@@ -106,6 +106,10 @@ $sidebarSections = [
             'spreadsheet-export' => [
                 'title' => 'Spreadsheet Export',
                 'icon' => svg_icon('document-download', 18)
+            ],
+            'history-modal' => [
+                'title' => 'Version History',
+                'icon' => svg_icon('clock', 18)
             ]
         ]
     ],

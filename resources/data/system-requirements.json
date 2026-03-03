@@ -6,7 +6,7 @@
         "requirements": [
             "Windows 10 or later (64-bit)",
             "4 GB RAM minimum",
-            "200 MB available disk space",
+            "500 MB available disk space",
             "1280x720 screen resolution or higher"
         ]
     },
@@ -18,7 +18,7 @@
             "macOS 10.15 Catalina or later",
             "Apple Silicon or Intel processor",
             "4 GB RAM minimum",
-            "200 MB available disk space",
+            "500 MB available disk space",
             "1280x720 screen resolution or higher"
         ]
     },
@@ -30,7 +30,7 @@
             "Ubuntu 20.04+, Debian 11+, Fedora 35+, or equivalent",
             "64-bit processor",
             "4 GB RAM minimum",
-            "200 MB available disk space",
+            "500 MB available disk space",
             "1280x720 screen resolution or higher"
         ]
     }

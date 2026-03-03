@@ -101,32 +101,26 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Accounting reports</strong> &mdash; Generate professional accounting reports including Income Statement, Balance Sheet, Cash Flow Statement, Trial Balance, General Ledger, AR/AP Aging, and Tax Summary &mdash; all with localized tax terminology for your country.</li>
+                                <li><strong>Accounting reports</strong> &mdash; Generate professional accounting reports including Income Statement, Balance Sheet, Cash Flow Statement, General Ledger, AR Aging, and Tax Summary &mdash; all with localized tax terminology for your country.</li>
                                 <li><strong>Multi-page reports</strong> &mdash; Create reports that span multiple pages. All pages display on the canvas at once, and tables that overflow automatically continue onto the next page.</li>
                                 <li><strong>Company details on reports</strong> &mdash; Reports can now display your company logo, name, address, phone, and email in a header. Enabled by default on accounting templates.</li>
                                 <li><strong>Auto-create revenue from invoices</strong> &mdash; Sending an invoice now automatically creates a matching revenue entry, so your dashboard and reports stay in sync without manual data entry.</li>
+                                <li><strong>Tax analytics</strong> &mdash; A new Taxes tab on the Analytics page with charts for tax collected vs. paid, net tax liability, tax rate distribution, and breakdowns by category and product.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
                                 <li><strong>Faster tables</strong> &mdash; Tables now use virtualization so only visible rows are rendered, resulting in noticeably faster page loads and lower memory usage.</li>
-                                <li><strong>Report currency support</strong> &mdash; Report and chart amounts are automatically converted to your display currency. Changing your default currency regenerates open reports instantly.</li>
-                                <li><strong>Improved report designer</strong> &mdash; Drag elements across pages, customize chart axis font sizes, set functional page margins, and edit the export file name directly.</li>
-                                <li><strong>Better charts</strong> &mdash; Dynamic axis labels that no longer overlap, thicker bars, and the currency symbol on the Y-axis now matches your configured currency.</li>
                                 <li><strong>Date range label</strong> &mdash; The Dashboard and Analytics pages now display the active date span, and "All Time" starts from your earliest transaction instead of a fixed date.</li>
                                 <li><strong>Sidebar remembers state</strong> &mdash; Sidebar sections stay expanded or collapsed between sessions.</li>
                                 <li><strong>Improved version history</strong> &mdash; History entries are now nested and show exactly which fields changed.</li>
-                                <li><strong>Report zoom &amp; scroll</strong> &mdash; Scroll to pan, Ctrl+scroll to zoom. Trackpad two-finger scrolling now pans instead of zooming.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>File rename</strong> &mdash; Fixed company file rename and Save As causing errors on Windows.</li>
-                                <li><strong>Stock adjustments table</strong> &mdash; Removed a phantom column that was consuming space.</li>
-                                <li><strong>Modal appearance</strong> &mdash; Fixed rounded corners and shadows on several dialog windows.</li>
-                                <li>Several undo/redo and report designer bug fixes for improved reliability.</li>
+                                <li>Several bug fixes for improved stability.</li>
                             </ul>
                         </div>
                     </div>

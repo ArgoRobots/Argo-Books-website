@@ -9,7 +9,7 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>The Analytics page provides detailed visualizations and metrics to help you understand your business performance. Data is organized into seven tabs, each focused on a different aspect of your operations.</p>
+            <p>The Analytics page provides detailed visualizations and metrics to help you understand your business performance. Data is organized into eight tabs, each focused on a different aspect of your operations.</p>
 
             <img src="../../../resources/images/analytics.webp" alt="Argo Books Analytics" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
@@ -73,6 +73,17 @@ include '../../docs-header.php';
             <ul>
                 <li>Loss cause analysis</li>
                 <li>Insurance claim tracking</li>
+            </ul>
+
+            <h2>Taxes Tab</h2>
+            <p>Monitor tax collection, liabilities, and rates across your business:</p>
+            <ul>
+                <li><strong>Tax Collected vs. Tax Paid:</strong> Compare how much tax you collected on sales against how much you paid on purchases</li>
+                <li><strong>Net Tax Liability:</strong> The difference between tax collected and tax paid over time</li>
+                <li><strong>Effective Tax Rate:</strong> Your actual tax rate as a percentage of revenue</li>
+                <li><strong>Tax Rate Distribution:</strong> Breakdown of transactions by tax rate bracket</li>
+                <li><strong>Tax by Category:</strong> See which product categories generate the most tax</li>
+                <li><strong>Tax by Product:</strong> Drill down to individual product-level tax amounts</li>
             </ul>
 
             <h2>Chart Interactions</h2>

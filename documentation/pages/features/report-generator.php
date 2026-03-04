@@ -56,7 +56,7 @@ include '../../docs-header.php';
             <h3>Multi-Page Reports</h3>
             <p>Reports can span multiple pages for more detailed documents.</p>
             <ul>
-                <li><strong>Add Page:</strong> Use the "Add Page" button in the footer toolbar to add a new page</li>
+                <li><strong>Add Page:</strong> Use the "Add Page" button in the bottom to add a new page</li>
                 <li><strong>Delete Page:</strong> Use the "Delete Page" button to remove the current page</li>
                 <li><strong>Page Navigation:</strong> Scroll through pages in the designer — all pages are stacked vertically</li>
             </ul>

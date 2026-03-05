@@ -91,21 +91,21 @@
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon">
-                        <?= svg_icon('dollar', null, '', 1.5) ?>
+                        <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>Radically more affordable</h3>
                     <p>QuickBooks starts at $38 CAD/month for their most basic plan. Argo Books has a free version with core features, and Premium is a fraction of the cost.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
-                        <?= svg_icon('bolt', null, '', 1.5) ?>
+                        <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
                     <h3>Simple from day one</h3>
                     <p>No accounting degree needed. Argo Books is intuitive and focused, so you spend less time learning software and more time running your business.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
-                        <?= svg_icon('map-pin', null, '', 1.5) ?>
+                        <?= svg_icon('map-pin', 28, '', 1.5) ?>
                     </div>
                     <h3>Made in Canada</h3>
                     <p>Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.</p>

@@ -346,12 +346,6 @@ body {
   gap: 8px;
 }
 
-.table-logo {
-  height: 20px;
-  width: auto;
-  filter: brightness(0) invert(1);
-}
-
 .comparison-table td {
   padding: 16px 24px;
   border-bottom: 1px solid var(--gray-100);
@@ -448,12 +442,6 @@ body {
   margin-bottom: 28px;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--gray-100);
-}
-
-.pricing-logo {
-  height: 24px;
-  width: auto;
-  filter: none;
 }
 
 .pricing-brand {
@@ -659,9 +647,6 @@ body {
     width: 40%;
   }
 
-  .table-logo {
-    display: none;
-  }
 }
 
 @media (max-width: 600px) {

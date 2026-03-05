@@ -127,7 +127,6 @@
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col argo-col">
-                                <img src="../../resources/images/argo-logo/Argo-black.svg" alt="Argo Books" class="table-logo">
                                 Argo Books
                             </th>
                             <th class="brand-col qb-col">QuickBooks</th>
@@ -212,7 +211,6 @@
                 <div class="pricing-col animate-on-scroll">
                     <div class="pricing-box argo-box">
                         <div class="pricing-box-header">
-                            <img src="../../resources/images/argo-logo/Argo-black.svg" alt="Argo Books" class="pricing-logo">
                             <span class="pricing-brand">Argo Books</span>
                         </div>
                         <div class="pricing-tiers">

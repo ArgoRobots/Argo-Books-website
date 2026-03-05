@@ -99,6 +99,11 @@ body {
   .hero-subtitle {
     font-size: 1.1rem;
   }
+
+  .pricing-cards-wrapper {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+  }
 }
 
 /* Pricing Section */
@@ -109,9 +114,9 @@ body {
 
 .pricing-cards-wrapper {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 32px;
-  max-width: 450px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -138,6 +143,14 @@ body {
 .upgrade-pricing-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.free-card {
+  border-color: var(--gray-200);
+}
+
+.free-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
 }
 
 .ai-card {
@@ -257,6 +270,16 @@ body {
   font-weight: 600;
   font-size: 16px;
   transition: all 0.3s ease;
+}
+
+.free-cta {
+  background: var(--white);
+  color: var(--gray-900);
+  border: 2px solid var(--gray-200);
+}
+
+.free-card:hover .free-cta {
+  border-color: var(--gray-400);
 }
 
 .ai-cta {

@@ -78,6 +78,42 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <section class="pricing-section">
         <div class="container">
             <div class="pricing-cards-wrapper">
+                <!-- Free Card -->
+                <a href="../downloads/" class="pricing-card-link">
+                    <div class="upgrade-pricing-card free-card">
+                        <h2>Free</h2>
+                        <div class="card-price">
+                            <span class="currency">$</span>
+                            <span class="amount">0</span>
+                            <span class="period">forever</span>
+                        </div>
+                        <p class="price-note">No credit card required</p>
+
+                        <ul class="card-features">
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Up to 10 products</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Expense & revenue tracking</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Financial reports</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Cross-platform desktop app</span>
+                            </li>
+                        </ul>
+
+                        <div class="card-cta">
+                            <span class="cta-button free-cta">Download Free</span>
+                        </div>
+                    </div>
+                </a>
+
                 <!-- Premium Subscription Card -->
                 <a href="premium/" class="pricing-card-link">
                     <div class="upgrade-pricing-card ai-card">

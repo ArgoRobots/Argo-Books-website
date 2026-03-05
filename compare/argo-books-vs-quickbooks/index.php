@@ -127,7 +127,7 @@
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col argo-col">
-                                <img src="../../resources/images/argo-logo/Argo-blue.svg" alt="Argo Books" class="table-logo">
+                                <img src="../../resources/images/argo-logo/Argo-black.svg" alt="Argo Books" class="table-logo">
                                 Argo Books
                             </th>
                             <th class="brand-col qb-col">QuickBooks</th>
@@ -212,7 +212,7 @@
                 <div class="pricing-col animate-on-scroll">
                     <div class="pricing-box argo-box">
                         <div class="pricing-box-header">
-                            <img src="../../resources/images/argo-logo/Argo-blue.svg" alt="Argo Books" class="pricing-logo">
+                            <img src="../../resources/images/argo-logo/Argo-black.svg" alt="Argo Books" class="pricing-logo">
                             <span class="pricing-brand">Argo Books</span>
                         </div>
                         <div class="pricing-tiers">
@@ -300,7 +300,7 @@
                 </div>
                 <h3>An honest take</h3>
                 <p>QuickBooks is a powerful, mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, QuickBooks is a solid choice.</p>
-                <p>But if you're a small business, freelancer, or startup that needs straightforward finance tracking, inventory management, and invoicing without the complexity or cost, Argo Books is built for you.</p>
+                <p>But if you're a small business, freelancer, or startup that needs straightforward finance management, inventory tracking, and invoicing without the complexity or cost, Argo Books is built for you.</p>
             </div>
         </div>
     </section>
@@ -310,20 +310,6 @@
         <div class="container">
             <h2>Frequently Asked Questions</h2>
             <div class="faq-grid">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        <h3>Can I switch from QuickBooks to Argo Books?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes. Argo Books lets you start fresh with a clean setup. Since Argo Books focuses on straightforward expense tracking, inventory, and invoicing, getting started takes just a few minutes.</p>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="faq-item">
                     <div class="faq-question">
                         <h3>Is Argo Books really free?</h3>
@@ -361,7 +347,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Not yet. Argo Books is focused on expense tracking, inventory management, invoicing, and financial reporting. If payroll and tax filing are critical for your business right now, QuickBooks may be a better fit. We're always adding new features based on user feedback.</p>
+                            <p>Not yet. Argo Books is focused on finance management, inventory management, invoicing, and financial reporting. If payroll and tax filing are critical for your business right now, QuickBooks may be a better fit. We're always adding new features based on user feedback.</p>
                         </div>
                     </div>
                 </div>
@@ -375,7 +361,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available on Windows and macOS as a native desktop application. A mobile version is on our roadmap.</p>
+                            <p>Argo Books is available on Windows, macOS, and Linux as a native desktop application.</p>
                         </div>
                     </div>
                 </div>

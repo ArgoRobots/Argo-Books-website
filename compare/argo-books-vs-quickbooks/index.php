@@ -127,8 +127,8 @@
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/mo</span></th>
-                            <th class="brand-col">QuickBooks<span class="th-sub">Simple Start — $38/mo</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD / month</span></th>
+                            <th class="brand-col">QuickBooks<span class="th-sub">Simple Start — $38 / month</span></th>
                         </tr>
                     </thead>
                     <tbody>

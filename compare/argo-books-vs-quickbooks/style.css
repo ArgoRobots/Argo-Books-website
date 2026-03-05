@@ -262,7 +262,7 @@ body {
   width: 28px;
   height: 28px;
   color: var(--primary-blue);
-  display: block;
+  margin: auto;
 }
 
 .diff-icon.purple {

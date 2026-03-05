@@ -332,19 +332,13 @@ body {
 
 .comparison-table th.feature-col {
   text-align: left;
-  width: 45%;
+  width: 40%;
 }
 
 .comparison-table th.brand-col {
-  width: 27.5%;
+  width: 20%;
 }
 
-.comparison-table th.argo-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
 
 .comparison-table td {
   padding: 16px 24px;
@@ -353,8 +347,7 @@ body {
   color: var(--gray-700);
 }
 
-.comparison-table td.argo-col,
-.comparison-table td.qb-col {
+.comparison-table td:not(:first-child) {
   text-align: center;
 }
 
@@ -377,11 +370,11 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--green-50);
+  background: var(--emerald-50);
 }
 
 .check-yes svg {
-  color: var(--emerald-500);
+  color: var(--emerald-600);
 }
 
 .check-no {

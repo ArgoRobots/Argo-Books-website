@@ -126,72 +126,89 @@
                     <thead>
                         <tr>
                             <th class="feature-col">Feature</th>
-                            <th class="brand-col argo-col">
-                                Argo Books
-                            </th>
-                            <th class="brand-col qb-col">QuickBooks</th>
+                            <th class="brand-col">Argo Free</th>
+                            <th class="brand-col">Argo Premium</th>
+                            <th class="brand-col">QuickBooks</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Free plan available</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td>Expense &amp; revenue tracking</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Expense tracking</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Invoicing & payments</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Inventory management</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>AI receipt scanning</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Predictive analytics</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td>Financial reports</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Desktop app (offline-capable)</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                        </tr>
-                        <tr>
-                            <td>Biometric login security</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>No accounting knowledge required</td>
-                            <td class="argo-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Unlimited products</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Invoicing &amp; payments</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Inventory management</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>AI receipt scanning</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Predictive analytics</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Biometric login security</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Payroll</td>
-                            <td class="argo-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Tax filing</td>
-                            <td class="argo-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Third-party app integrations</td>
-                            <td class="argo-col"><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td class="qb-col"><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                     </tbody>
                 </table>

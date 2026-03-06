@@ -106,6 +106,7 @@
                                 <li><strong>Company details on reports</strong> &mdash; Reports can now display your company logo, name, address, phone, and email in a header. Enabled by default on accounting templates.</li>
                                 <li><strong>Auto-create revenue from invoices</strong> &mdash; Sending an invoice now automatically creates a matching revenue entry, so your dashboard and reports stay in sync without manual data entry.</li>
                                 <li><strong>Tax analytics</strong> &mdash; A new Taxes tab on the Analytics page with charts for tax collected vs. paid, net tax liability, tax rate distribution, and breakdowns by category and product.</li>
+                                <li><strong>Fullscreen charts</strong> &mdash; A new button in the top-right corner of charts lets you open them in fullscreen for easier viewing and detailed analysis.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -115,6 +116,7 @@
                                 <li><strong>Date range label</strong> &mdash; The Dashboard and Analytics pages now display the active date span, and "All Time" starts from your earliest transaction instead of a fixed date.</li>
                                 <li><strong>Sidebar remembers state</strong> &mdash; Sidebar sections stay expanded or collapsed between sessions.</li>
                                 <li><strong>Improved version history</strong> &mdash; History entries are now nested and show exactly which fields changed.</li>
+                                <li><strong>Interactive column resizing</strong> &mdash; Adjust column widths directly in the report designer by dragging column edges.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">

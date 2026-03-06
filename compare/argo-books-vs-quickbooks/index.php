@@ -94,7 +94,7 @@
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>No price creep</h3>
-                    <p>QuickBooks prices have risen 60-80% since 2020. Their cheapest plan is now $24 CAD/month. Argo Books has a free version with core features, and Premium is $10 CAD/month — with no annual price increases.</p>
+                    <p>QuickBooks prices have risen 60-80% since 2020. Their cheapest plan is now $28 CAD/month. Argo Books has a free version with core features, and Premium is $10 CAD/month — with no annual price increases.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -128,7 +128,7 @@
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD / month</span></th>
-                            <th class="brand-col">QuickBooks<span class="th-sub">EasyStart — $24 CAD / month</span></th>
+                            <th class="brand-col">QuickBooks<span class="th-sub">EasyStart — $28 CAD / month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,7 +222,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $24 to $160 CAD/month depending on the plan — and those prices keep climbing year over year. Argo Books keeps it simple with predictable, affordable pricing.</p>
+                <p class="section-desc">QuickBooks charges $28 to $160 CAD/month depending on the plan — and those prices keep climbing year over year. Argo Books keeps it simple with predictable, affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -271,15 +271,7 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">EasyStart</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$24</span>
-                                    <span class="tier-period">CAD/month</span>
-                                </div>
-                            </div>
-                            <div class="tier-divider"></div>
-                            <div class="pricing-tier">
-                                <span class="tier-name">Essentials</span>
-                                <div class="tier-price">
-                                    <span class="tier-amount">$54</span>
+                                    <span class="tier-amount">$28</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -287,7 +279,7 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Plus</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$80</span>
+                                    <span class="tier-amount">$95</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -295,7 +287,7 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Advanced</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$160</span>
+                                    <span class="tier-amount">$190</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>

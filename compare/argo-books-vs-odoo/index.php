@@ -128,7 +128,7 @@
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/mo</span></th>
-                            <th class="brand-col">Odoo<span class="th-sub">One App Free / $25+ USD/user/mo</span></th>
+                            <th class="brand-col">Odoo<span class="th-sub">One App Free / $44+ CAD/user/mo</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -216,7 +216,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Flat pricing vs per-user fees</h2>
-                <p class="section-desc">Odoo's Enterprise plan starts at $25 USD/user/month and scales up with every team member. Argo Books is a flat $10 CAD/month for Premium — no per-user charges.</p>
+                <p class="section-desc">Odoo's Enterprise plan starts at $44 CAD/user/month and scales up with every team member. Argo Books is a flat $10 CAD/month for Premium — no per-user charges.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -274,8 +274,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Standard</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$25</span>
-                                    <span class="tier-period">USD/user/month</span>
+                                    <span class="tier-amount">$44</span>
+                                    <span class="tier-period">CAD/user/month</span>
                                 </div>
                                 <span class="tier-limit">All apps, cloud hosting</span>
                             </div>
@@ -283,8 +283,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Custom</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$37</span>
-                                    <span class="tier-period">USD/user/month</span>
+                                    <span class="tier-amount">$68.50</span>
+                                    <span class="tier-period">CAD/user/month</span>
                                 </div>
                                 <span class="tier-limit">All apps, multi-company, on-premise</span>
                             </div>

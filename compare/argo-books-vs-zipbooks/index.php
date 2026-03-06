@@ -94,7 +94,7 @@
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>Lower premium price</h3>
-                    <p>ZipBooks' paid plans start at $15 USD/month. Argo Books Premium is $10 CAD/month — with AI receipt scanning, predictive analytics, and inventory management included.</p>
+                    <p>ZipBooks' paid plans start at $20 CAD/month. Argo Books Premium is $10 CAD/month — with AI receipt scanning, predictive analytics, and inventory management included.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -216,7 +216,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Both free to start — here's how they compare</h2>
-                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $15 USD/month, while Argo Books Premium is $10 CAD/month with AI features, inventory, and predictive analytics included.</p>
+                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $20 CAD/month, while Argo Books Premium is $10 CAD/month with AI features, inventory, and predictive analytics included.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -274,8 +274,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Smarter</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$15</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$20</span>
+                                    <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Recurring invoices, time tracking</span>
                             </div>
@@ -283,8 +283,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Sophisticated</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$35</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$50</span>
+                                    <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Tagging, custom categories</span>
                             </div>
@@ -351,7 +351,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management — all at a lower premium price ($10 CAD vs $15+ USD).</p>
+                            <p>Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management — all at a lower premium price ($10 CAD vs $20+ CAD).</p>
                         </div>
                     </div>
                 </div>

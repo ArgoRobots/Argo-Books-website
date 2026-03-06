@@ -94,7 +94,7 @@
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>FreshBooks starts at $19 USD/month for just 5 clients. Argo Books has a free version with core features, and Premium is a fraction of the cost with no client limits.</p>
+                    <p>FreshBooks starts at $26 CAD/month for just 5 clients. Argo Books has a free version with core features, and Premium is a fraction of the cost with no client limits.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -128,7 +128,7 @@
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/mo</span></th>
-                            <th class="brand-col">FreshBooks<span class="th-sub">Lite — $19 USD/mo</span></th>
+                            <th class="brand-col">FreshBooks<span class="th-sub">Lite — $26 CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,7 +222,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">FreshBooks charges $19 to $60+ USD/month depending on the plan, and limits the number of clients on lower tiers. Argo Books keeps it simple.</p>
+                <p class="section-desc">FreshBooks charges $26 to $60+ CAD/month depending on the plan, and limits the number of clients on lower tiers. Argo Books keeps it simple.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -271,8 +271,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Lite</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$19</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$26</span>
+                                    <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Up to 5 clients</span>
                             </div>
@@ -280,8 +280,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Plus</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$33</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$42</span>
+                                    <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Up to 50 clients</span>
                             </div>
@@ -289,8 +289,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$60</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$72</span>
+                                    <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Unlimited clients</span>
                             </div>
@@ -310,7 +310,7 @@
                 </div>
                 <h3>An honest take</h3>
                 <p>FreshBooks excels at invoicing, time tracking, and client management — especially for freelancers and service-based businesses. If those are your core needs, FreshBooks is a great tool.</p>
-                <p>But if you're a product-based small business that needs inventory management, offline access, and straightforward finance tracking without paying $19+ USD/month, Argo Books is built for you.</p>
+                <p>But if you're a product-based small business that needs inventory management, offline access, and straightforward finance tracking without paying $26+ CAD/month, Argo Books is built for you.</p>
             </div>
         </div>
     </section>

@@ -204,12 +204,6 @@
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
-                        <tr>
-                            <td>Manufacturing &amp; MRP</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>

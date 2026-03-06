@@ -127,8 +127,8 @@
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/mo</span></th>
-                            <th class="brand-col">Wave<span class="th-sub">Starter — Free</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
+                            <th class="brand-col">Wave<span class="th-sub">Pro — $25 CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -222,7 +222,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Both free to start — here's how they compare</h2>
-                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports and multi-user access. Argo Books Premium is $10 CAD/month with inventory, AI, and more.</p>
+                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports and AI receipt scanning. Argo Books Premium is $10 CAD/month with inventory, AI, and more.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">

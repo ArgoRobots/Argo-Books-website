@@ -127,7 +127,7 @@
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/mo</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
                             <th class="brand-col">Odoo<span class="th-sub">One App Free / $44+ CAD/user/mo</span></th>
                         </tr>
                     </thead>

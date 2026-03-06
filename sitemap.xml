@@ -104,6 +104,13 @@
         <priority>0.8</priority>
     </url>
 
+    <url>
+        <loc>https://argorobots.com/compare/argo-books-vs-zipbooks/</loc>
+        <lastmod>2026-03-06</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
     <!-- Legal Pages -->
     <url>
         <loc>https://argorobots.com/legal/privacy.php</loc>

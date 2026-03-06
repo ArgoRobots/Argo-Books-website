@@ -73,7 +73,7 @@
                     <span>Try Argo Books Free</span>
                     <?= svg_icon('arrow-right', 18) ?>
                 </a>
-                <a href="../../upgrade/" class="btn-cta btn-cta-outline">
+                <a href="../../pricing/" class="btn-cta btn-cta-outline">
                     <span>View Pricing</span>
                 </a>
             </div>
@@ -398,7 +398,7 @@
                             <span>Download Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
-                        <a href="../../upgrade/" class="btn-cta btn-cta-ghost">
+                        <a href="../../pricing/" class="btn-cta btn-cta-ghost">
                             <span>View Pricing</span>
                         </a>
                     </div>

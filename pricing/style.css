@@ -1,5 +1,5 @@
 /* Underline current page */
-header .header-inner .menu-container .menu .upgrade-now:after {
+header .header-inner .menu-container .menu .pricing:after {
   transform: translateX(-50%) scaleX(1);
 }
 
@@ -126,7 +126,7 @@ body {
   display: block;
 }
 
-.upgrade-pricing-card {
+.pricing-card {
   background: var(--white);
   border-radius: 20px;
   padding: 40px 32px;
@@ -140,7 +140,7 @@ body {
   flex-direction: column;
 }
 
-.upgrade-pricing-card:hover {
+.pricing-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
@@ -179,7 +179,7 @@ body {
   background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
 }
 
-.upgrade-pricing-card h2 {
+.pricing-card h2 {
   font-size: 28px;
   margin: 16px 0;
   color: var(--gray-text-darker);

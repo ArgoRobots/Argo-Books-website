@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
                     You don't have an active Premium subscription.
                 </div>
                 <div class="centered">
-                    <a href="../../upgrade/premium/" class="btn btn-purple">Subscribe to Premium Features</a>
+                    <a href="../../pricing/premium/" class="btn btn-purple">Subscribe to Premium Features</a>
                 </div>
             <?php else: ?>
                 <p class="auth-subtitle">We'll send your Premium subscription ID to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>

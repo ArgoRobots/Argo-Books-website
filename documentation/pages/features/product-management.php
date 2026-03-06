@@ -58,7 +58,7 @@ include '../../docs-header.php';
             <p>From the Products/Services page, you can edit or delete any product using the action buttons. Changes to a product's details (like category or description) apply going forward and do not modify past transactions.</p>
 
             <div class="warning-box">
-                <strong>Important:</strong> Free version users are limited to 10 products. <a class="link" href="../../../upgrade/">Upgrade to the paid version</a> for unlimited products.
+                <strong>Important:</strong> Free version users are limited to 10 products. <a class="link" href="../../../pricing/">Upgrade to the paid version</a> for unlimited products.
             </div>
 
             <div class="page-navigation">

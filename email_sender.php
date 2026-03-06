@@ -1116,7 +1116,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
                     <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
                     <div class="button-container">
-                        <a href="https://argorobots.com/upgrade/premium/" class="button button-purple">Resubscribe</a>
+                        <a href="https://argorobots.com/pricing/premium/" class="button button-purple">Resubscribe</a>
                     </div>
 
                     <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>

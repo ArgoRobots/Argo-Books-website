@@ -10,7 +10,7 @@ $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
 // Require login to access Premium subscription page
-require_login('upgrade/premium/');
+require_login('pricing/premium/');
 
 $user_id = $_SESSION['user_id'];
 $user = get_user($user_id);
@@ -45,7 +45,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
         content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
-    <meta property="og:url" content="https://argorobots.com/upgrade/premium/">
+    <meta property="og:url" content="https://argorobots.com/pricing/premium/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 

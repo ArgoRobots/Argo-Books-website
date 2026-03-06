@@ -13,7 +13,7 @@ APP_ENV=sandbox
 1. Go to checkout page with PayPal selected:
 
 ```
-https://dev.argorobots.com/upgrade/checkout/index.php?method=paypal
+https://dev.argorobots.com/pricing/checkout/index.php?method=paypal
 ```
 
 2. Click the PayPal button

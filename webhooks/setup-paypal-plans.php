@@ -160,7 +160,7 @@ function createProduct($baseUrl, $accessToken) {
         'description' => 'Access to AI-powered features including receipt scanning, and predictive analytics.',
         'type' => 'SERVICE',
         'category' => 'SOFTWARE',
-        'home_url' => 'https://argorobots.com/upgrade/premium/'
+        'home_url' => 'https://argorobots.com/pricing/premium/'
     ];
 
     $ch = curl_init("$baseUrl/v1/catalogs/products");

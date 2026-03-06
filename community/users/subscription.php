@@ -221,7 +221,7 @@ if ($premium_subscription) {
                             </div>
                         </div>
                         <div class="subscription-actions">
-                            <a href="../../upgrade/premium/" class="btn btn-blue">Renew Subscription</a>
+                            <a href="../../pricing/premium/" class="btn btn-blue">Renew Subscription</a>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -259,7 +259,7 @@ if ($premium_subscription) {
                         <span class="price">$<?php echo number_format($yearlyPrice, 0); ?></span>
                         <span class="period">CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</span>
                     </div>
-                    <a href="../../upgrade/premium/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
+                    <a href="../../pricing/premium/" class="btn btn-purple btn-subscribe">Subscribe to Premium</a>
                 </div>
             <?php endif; ?>
         </div>

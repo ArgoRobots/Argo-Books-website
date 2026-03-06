@@ -79,7 +79,7 @@ try {
                         'success' => false,
                         'error' => 'Unable to reactivate your PayPal subscription. The subscription may have been cancelled. Please set up a new subscription.',
                         'action' => 'new_subscription',
-                        'redirect' => "../../upgrade/premium/checkout/?method=paypal&billing={$billing_cycle}&change_method=1"
+                        'redirect' => "../../pricing/premium/checkout/?method=paypal&billing={$billing_cycle}&change_method=1"
                     ]);
                     exit;
                 }
@@ -89,7 +89,7 @@ try {
                     'success' => false,
                     'error' => 'Failed to reactivate PayPal subscription. Please try setting up a new subscription.',
                     'action' => 'new_subscription',
-                    'redirect' => "../../upgrade/premium/checkout/?method=paypal&billing={$billing_cycle}&change_method=1"
+                    'redirect' => "../../pricing/premium/checkout/?method=paypal&billing={$billing_cycle}&change_method=1"
                 ]);
                 exit;
             }
@@ -98,7 +98,7 @@ try {
                 'success' => false,
                 'error' => 'No PayPal subscription found. Please set up a new subscription.',
                 'action' => 'new_subscription',
-                'redirect' => "../../upgrade/premium/checkout/?method=paypal&billing={$billing_cycle}&change_method=1"
+                'redirect' => "../../pricing/premium/checkout/?method=paypal&billing={$billing_cycle}&change_method=1"
             ]);
             exit;
         }

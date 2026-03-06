@@ -4,7 +4,7 @@
  * Handles the checkout process for Stripe, PayPal, and Square payments
  * on the customer-facing invoice portal.
  *
- * Uses the same SDK patterns as the existing license checkout (/upgrade/standard/checkout/main.js)
+ * Uses the same SDK patterns as the existing license checkout (/pricing/standard/checkout/main.js)
  * but routes payments to the business's connected account via Stripe Connect,
  * PayPal for Marketplaces, or Square OAuth.
  */

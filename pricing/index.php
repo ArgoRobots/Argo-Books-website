@@ -19,30 +19,30 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Upgrade Argo Books. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, Windows Hello, AI-powered insights, and more.">
     <meta name="keywords"
-        content="upgrade argo books, buy full version, unlimited products, business software pricing, finance tracker, premium subscription">
+        content="argo books pricing, buy full version, unlimited products, business software pricing, finance tracker, premium subscription">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Upgrade - Argo Books">
+    <meta property="og:title" content="Pricing - Argo Books">
     <meta property="og:description"
-        content="Upgrade Argo Books. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
-    <meta property="og:url" content="https://argorobots.com/upgrade/">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
+    <meta property="og:url" content="https://argorobots.com/pricing/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Upgrade - Argo Books">
+    <meta name="twitter:title" content="Pricing - Argo Books">
     <meta name="twitter:description"
-        content="Upgrade Argo Books. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
+        content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/upgrade/">
+    <link rel="canonical" href="https://argorobots.com/pricing/">
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
-    <title>Upgrade - Argo Books</title>
+    <title>Pricing - Argo Books</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
@@ -70,7 +70,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <?= svg_icon('star', 16) ?>
                 <span>Pricing</span>
             </div>
-            <h1>Upgrade Your Experience</h1>
+            <h1>Choose Your Plan</h1>
             <p class="hero-subtitle">Unlock the full power of Argo Books</p>
         </div>
     </section>
@@ -80,7 +80,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             <div class="pricing-cards-wrapper">
                 <!-- Free Card -->
                 <a href="../downloads/" class="pricing-card-link">
-                    <div class="upgrade-pricing-card free-card">
+                    <div class="pricing-card free-card">
                         <h2>Free</h2>
                         <div class="card-price">
                             <span class="currency">$</span>
@@ -116,7 +116,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
                 <!-- Premium Subscription Card -->
                 <a href="premium/" class="pricing-card-link">
-                    <div class="upgrade-pricing-card ai-card">
+                    <div class="pricing-card ai-card">
                         <div class="card-badge ai-badge">AI-Powered</div>
                         <h2>Premium</h2>
                         <div class="card-price">

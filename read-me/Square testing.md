@@ -13,7 +13,7 @@ APP_ENV=sandbox
 1. Go to checkout page with Square selected:
 
 ```
-https://dev.argorobots.com/upgrade/checkout/index.php?method=square
+https://dev.argorobots.com/pricing/checkout/index.php?method=square
 ```
 
 2. Fill in the form:

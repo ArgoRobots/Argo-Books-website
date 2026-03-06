@@ -28,9 +28,9 @@
         <priority>0.9</priority>
     </url>
 
-    <!-- Upgrade/Pricing -->
+    <!-- Pricing -->
     <url>
-        <loc>https://argorobots.com/upgrade/</loc>
+        <loc>https://argorobots.com/pricing/</loc>
         <lastmod>2025-11-03</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.9</priority>

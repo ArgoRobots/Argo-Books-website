@@ -1011,7 +1011,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span>Priority support</span>
                         </li>
                     </ul>
-                    <a href="upgrade/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
+                    <a href="pricing/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                 </div>
             </div>
         </div>
@@ -1191,7 +1191,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span>Get Started Free</span>
                             <?= svg_icon('arrow-right', 20) ?>
                         </a>
-                        <a href="upgrade/" class="btn btn-outline-white btn-lg">
+                        <a href="pricing/" class="btn btn-outline-white btn-lg">
                             <span>View Pricing</span>
                         </a>
                     </div>

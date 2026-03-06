@@ -1,5 +1,5 @@
 /* Underline current page */
-header .header-inner .menu-container .menu .upgrade-now:after {
+header .header-inner .menu-container .menu .pricing:after {
   transform: translateX(-50%) scaleX(1);
 }
 

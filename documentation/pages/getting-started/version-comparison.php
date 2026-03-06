@@ -21,7 +21,7 @@ include '../../docs-header.php';
             grows, upgrade to Premium for unlimited products and AI-powered features.</p>
 
             <p>Not sure which version is right for you? <a href="../../../downloads/" class="link">Try our free
-                version first</a> – you can always <a href="../../../upgrade/" class="link">upgrade
+                version first</a> – you can always <a href="../../../pricing/" class="link">upgrade
                 later</a> when you need more features.</p>
 
             <div class="version-cards">
@@ -99,7 +99,7 @@ include '../../docs-header.php';
                             <span class="feature-text">Priority support</span>
                         </li>
                     </ul>
-                    <a href="../../../upgrade/premium/" class="btn btn-purple">Subscribe to Premium</a>
+                    <a href="../../../pricing/premium/" class="btn btn-purple">Subscribe to Premium</a>
                 </div>
             </div>
 

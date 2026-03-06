@@ -19,7 +19,7 @@
     $pricing = get_pricing_config();
 
     // Require login to checkout
-    require_login('upgrade/premium/');
+    require_login('pricing/premium/');
 
     $user_id = $_SESSION['user_id'];
     $user_email = $_SESSION['email'] ?? '';

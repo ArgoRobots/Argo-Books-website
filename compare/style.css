@@ -241,6 +241,7 @@ body {
   border-radius: 16px;
   border: 1px solid var(--gray-200);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  justify-items: center;
 }
 
 .diff-card:hover {

@@ -109,7 +109,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         </ul>
 
                         <div class="card-cta">
-                            <span class="cta-button free-cta">Download Free</span>
+                            <span class="cta-button free-cta">Download for Free</span>
                         </div>
                     </div>
                 </a>

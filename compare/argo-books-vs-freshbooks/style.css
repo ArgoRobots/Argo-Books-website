@@ -262,7 +262,6 @@ body {
   width: 28px;
   height: 28px;
   color: var(--primary-blue);
-  margin: auto;
 }
 
 .diff-icon.purple {
@@ -292,7 +291,7 @@ body {
   font-size: 0.95rem;
   color: var(--gray-500);
   line-height: 1.7;
-  margin: 0;
+  text-align: center;
 }
 
 /* ========================================

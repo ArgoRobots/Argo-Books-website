@@ -196,7 +196,7 @@
                             <td>Auto bank transaction import</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Mobile app</td>
@@ -222,7 +222,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Both free to start — here's how they compare</h2>
-                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $19 USD/month per business for features like auto bank imports and multi-user access. Argo Books Premium is $10 CAD/month with inventory, AI, and more.</p>
+                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $16 USD/month for features like auto bank imports and multi-user access. Argo Books Premium is $10 CAD/month with inventory, AI, and more.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -280,8 +280,8 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Pro</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$19</span>
-                                    <span class="tier-period">USD/month per business</span>
+                                    <span class="tier-amount">$16</span>
+                                    <span class="tier-period">USD/month</span>
                                 </div>
                                 <span class="tier-limit">Auto bank import, multi-user</span>
                             </div>

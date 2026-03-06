@@ -94,7 +94,7 @@
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>QuickBooks starts at $38 CAD/month for their most basic plan. Argo Books has a free version with core features, and Premium is a fraction of the cost.</p>
+                    <p>QuickBooks starts at $24 CAD/month for their most basic plan. Argo Books has a free version with core features, and Premium is a fraction of the cost.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -128,7 +128,7 @@
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD / month</span></th>
-                            <th class="brand-col">QuickBooks<span class="th-sub">Simple Start — $38 / month</span></th>
+                            <th class="brand-col">QuickBooks<span class="th-sub">EasyStart — $24 CAD / month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -172,7 +172,7 @@
                             <td>Inventory management</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
@@ -222,7 +222,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $38 to $275 CAD/month depending on the plan. Argo Books keeps it simple.</p>
+                <p class="section-desc">QuickBooks charges $24 to $160 CAD/month depending on the plan. Argo Books keeps it simple.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -269,9 +269,9 @@
                         </div>
                         <div class="pricing-tiers">
                             <div class="pricing-tier">
-                                <span class="tier-name">Simple Start</span>
+                                <span class="tier-name">EasyStart</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$38</span>
+                                    <span class="tier-amount">$24</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -279,7 +279,7 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Essentials</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$75</span>
+                                    <span class="tier-amount">$54</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -287,7 +287,7 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Plus</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$115</span>
+                                    <span class="tier-amount">$80</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -295,7 +295,7 @@
                             <div class="pricing-tier">
                                 <span class="tier-name">Advanced</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$275</span>
+                                    <span class="tier-amount">$160</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>

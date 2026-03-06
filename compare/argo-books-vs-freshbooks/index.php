@@ -42,7 +42,7 @@
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/faq.css">
@@ -263,7 +263,7 @@
                     </div>
                 </div>
                 <div class="pricing-col animate-on-scroll">
-                    <div class="pricing-box fb-box">
+                    <div class="pricing-box competitor-box">
                         <div class="pricing-box-header">
                             <span class="pricing-brand">FreshBooks</span>
                         </div>

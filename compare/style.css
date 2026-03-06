@@ -347,7 +347,6 @@ body {
   width: 20%;
 }
 
-
 .comparison-table td {
   padding: 16px 24px;
   border-bottom: 1px solid var(--gray-100);
@@ -430,7 +429,7 @@ body {
   box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
 }
 
-.qb-box {
+.competitor-box {
   background: var(--white);
   border: 1px solid var(--gray-200);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
@@ -486,6 +485,13 @@ body {
 .tier-period {
   font-size: 0.9rem;
   color: var(--gray-400);
+}
+
+.tier-limit {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  font-style: italic;
 }
 
 .tier-features {
@@ -647,7 +653,6 @@ body {
   .comparison-table th.feature-col {
     width: 40%;
   }
-
 }
 
 @media (max-width: 600px) {

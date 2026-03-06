@@ -47,7 +47,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
                     {$body_content}
                 </div>
                 <div class="footer">
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                 </div>
             </div>
         </body>
@@ -235,7 +235,7 @@ function send_notification_email($type, $data)
                     <p>This is an automated notification from the Argo Community system.</p>
                     <p>You received this message because you're an administrator of the Argo Community.
                     You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                 </div>
             </div>
         </body>
@@ -283,7 +283,7 @@ HTML;
                     <p>This is an automated notification from the Argo Community system.</p>
                     <p>You received this message because you're an administrator of the Argo Community.
                     You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                 </div>
             </div>
         </body>
@@ -417,7 +417,7 @@ function send_account_deletion_scheduled_email($email, $username, $scheduled_dat
                 
                 <div class="footer">
                     <p>This is an automated message from the Argo Community system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>
@@ -494,7 +494,7 @@ function send_account_deletion_cancelled_email($email, $username)
 
                 <div class="footer">
                     <p>This is an automated message from the Argo Community system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>
@@ -611,7 +611,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
 
                 <div class="footer">
                     <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>
@@ -684,7 +684,7 @@ function send_unban_notification_email($email, $username)
 
                 <div class="footer">
                     <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>
@@ -774,7 +774,7 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
 
                 <div class="footer">
                     <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>
@@ -861,7 +861,7 @@ function send_bio_cleared_email($email, $username, $violation_type, $additional_
 
                 <div class="footer">
                     <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>
@@ -945,7 +945,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
 
                 <div class="footer">
                     <p>This is an automated notification from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2025. All rights reserved.</p>
+                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                     <p>This email was sent to {$email}</p>
                 </div>
             </div>

@@ -644,7 +644,7 @@ function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
             <p>If you need assistance, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
             <div class="footer" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-                <p>Argo Books &copy; 2025. All rights reserved.</p>
+                <p>Argo Books &copy; 2026. All rights reserved.</p>
                 <p><a href="https://argorobots.com">argorobots.com</a></p>
             </div>
         </div>

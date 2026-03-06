@@ -93,7 +93,7 @@
                     <div class="diff-icon">
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
-                    <h3>Radically more affordable</h3>
+                    <h3>More affordable</h3>
                     <p>QuickBooks starts at $38 CAD/month for their most basic plan. Argo Books has a free version with core features, and Premium is a fraction of the cost.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">

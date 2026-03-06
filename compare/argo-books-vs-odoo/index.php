@@ -10,34 +10,34 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Argo Books vs FreshBooks: Compare features, pricing, and ease of use. See why small businesses choose Argo Books as a simpler, more affordable FreshBooks alternative.">
+        content="Argo Books vs Odoo: Compare features, pricing, and ease of use. See why small businesses choose Argo Books as a simpler, more affordable Odoo alternative.">
     <meta name="keywords"
-        content="Argo Books vs FreshBooks, FreshBooks alternative, FreshBooks alternative Canada, cheap FreshBooks alternative, simple bookkeeping software, small business accounting, affordable accounting software">
+        content="Argo Books vs Odoo, Odoo alternative, Odoo alternative small business, simple bookkeeping software, small business accounting, affordable accounting software, Odoo accounting alternative">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs FreshBooks — A Simpler, More Affordable Alternative">
+    <meta property="og:title" content="Argo Books vs Odoo — Simple Finance Management Without the ERP Complexity">
     <meta property="og:description"
-        content="Compare Argo Books and FreshBooks side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
-    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-freshbooks/">
+        content="Compare Argo Books and Odoo side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
+    <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-odoo/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs FreshBooks — A Simpler, More Affordable Alternative">
+    <meta name="twitter:title" content="Argo Books vs Odoo — Simple Finance Management Without the ERP Complexity">
     <meta name="twitter:description"
-        content="Compare Argo Books and FreshBooks side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
+        content="Compare Argo Books and Odoo side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-freshbooks/">
+    <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-odoo/">
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
-    <title>Argo Books vs FreshBooks — Simpler & More Affordable | Argo Books</title>
+    <title>Argo Books vs Odoo — Simpler & More Affordable | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -66,8 +66,8 @@
                 <?= svg_icon('analytics', 16) ?>
                 <span>Comparison</span>
             </div>
-            <h1 class="animate-fade-in">Argo Books vs FreshBooks</h1>
-            <p class="hero-subtitle animate-fade-in">A simpler, more affordable way to manage your small business finances.</p>
+            <h1 class="animate-fade-in">Argo Books vs Odoo</h1>
+            <p class="hero-subtitle animate-fade-in">Simple finance management without the ERP complexity.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Try Argo Books Free</span>
@@ -85,8 +85,8 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
-                <h2>Everything you need, nothing you don't</h2>
-                <p class="section-desc">FreshBooks is built around invoicing and time tracking for freelancers. Argo Books is built for small businesses that need straightforward finance and inventory management.</p>
+                <h2>Built for small businesses, not enterprise ERP</h2>
+                <p class="section-desc">Odoo is a full ERP suite with hundreds of apps designed for mid-to-large businesses. Argo Books is purpose-built for small businesses that need finance and inventory management without the complexity.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
@@ -94,14 +94,14 @@
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>FreshBooks starts at $23 USD/month for just 5 clients. Argo Books has a free version with core features, and Premium is a fraction of the cost with no client limits.</p>
+                    <p>Odoo Enterprise charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $10 CAD/month — no per-user fees.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
                         <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
-                    <h3>Works offline</h3>
-                    <p>FreshBooks is cloud-only — no internet, no access. Argo Books is a desktop app that works offline, so you're never locked out of your own data.</p>
+                    <h3>Simple from day one</h3>
+                    <p>Odoo's learning curve is steep — it's a full ERP with hundreds of modules. Argo Books is focused and intuitive, so you can get started in minutes, not weeks.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -128,7 +128,7 @@
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/mo</span></th>
-                            <th class="brand-col">FreshBooks<span class="th-sub">Lite — $23 USD/mo</span></th>
+                            <th class="brand-col">Odoo<span class="th-sub">One App Free / $25+ USD/user/mo</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -145,12 +145,6 @@
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Invoicing &amp; payments</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                        </tr>
-                        <tr>
                             <td>Desktop app (offline-capable)</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
@@ -160,19 +154,25 @@
                             <td>No accounting knowledge required</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Unlimited products</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                        </tr>
+                        <tr>
+                            <td>Invoicing &amp; payments</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Inventory management</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
@@ -184,7 +184,7 @@
                             <td>Predictive analytics</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Biometric login security</td>
@@ -193,19 +193,19 @@
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Time tracking</td>
+                            <td>CRM &amp; sales pipeline</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Client portal</td>
+                            <td>HR &amp; payroll</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
-                            <td>Mobile app</td>
+                            <td>Manufacturing &amp; MRP</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
@@ -221,8 +221,8 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
-                <h2>Save hundreds every year</h2>
-                <p class="section-desc">FreshBooks charges $23 to $70+ USD/month depending on the plan, and limits the number of clients on lower tiers. Argo Books keeps it simple.</p>
+                <h2>Flat pricing vs per-user fees</h2>
+                <p class="section-desc">Odoo's Enterprise plan starts at $25 USD/user/month and scales up with every team member. Argo Books is a flat $10 CAD/month for Premium — no per-user charges.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -265,34 +265,34 @@
                 <div class="pricing-col animate-on-scroll">
                     <div class="pricing-box competitor-box">
                         <div class="pricing-box-header">
-                            <span class="pricing-brand">FreshBooks</span>
+                            <span class="pricing-brand">Odoo</span>
                         </div>
                         <div class="pricing-tiers">
                             <div class="pricing-tier">
-                                <span class="tier-name">Lite</span>
+                                <span class="tier-name">One App Free</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$23</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$0</span>
+                                    <span class="tier-period">one app only</span>
                                 </div>
-                                <span class="tier-limit">Up to 5 clients</span>
+                                <span class="tier-limit">Unlimited users, single app</span>
                             </div>
                             <div class="tier-divider"></div>
                             <div class="pricing-tier">
-                                <span class="tier-name">Plus</span>
+                                <span class="tier-name">Standard</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$43</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$25</span>
+                                    <span class="tier-period">USD/user/month</span>
                                 </div>
-                                <span class="tier-limit">Up to 50 clients</span>
+                                <span class="tier-limit">All apps, cloud hosting</span>
                             </div>
                             <div class="tier-divider"></div>
                             <div class="pricing-tier">
-                                <span class="tier-name">Premium</span>
+                                <span class="tier-name">Custom</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$70</span>
-                                    <span class="tier-period">USD/month</span>
+                                    <span class="tier-amount">$37</span>
+                                    <span class="tier-period">USD/user/month</span>
                                 </div>
-                                <span class="tier-limit">Unlimited clients</span>
+                                <span class="tier-limit">All apps, multi-company, on-premise</span>
                             </div>
                         </div>
                     </div>
@@ -309,8 +309,8 @@
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>An honest take</h3>
-                <p>FreshBooks excels at invoicing, time tracking, and client management — especially for freelancers and service-based businesses. If those are your core needs, FreshBooks is a great tool.</p>
-                <p>But if you're a product-based small business that needs inventory management, offline access, and straightforward finance tracking without paying $23+ USD/month, Argo Books is built for you.</p>
+                <p>Odoo is a powerful, full-featured ERP platform with CRM, HR, manufacturing, e-commerce, and hundreds of other modules. If your business needs an all-in-one enterprise system, Odoo is hard to beat.</p>
+                <p>But if you're a small business that just needs straightforward finance management, inventory tracking, and invoicing without configuring an entire ERP — Argo Books gets you there in minutes, not months.</p>
             </div>
         </div>
     </section>
@@ -343,21 +343,21 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books is a desktop application that works offline. Your data is stored locally on your device, so you can manage your finances even without an internet connection. FreshBooks is cloud-only and requires a constant internet connection.</p>
+                            <p>Yes. Argo Books is a desktop application that works offline. Your data is stored locally on your device, so you can manage your finances even without an internet connection. Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Does Argo Books have time tracking?</h3>
+                        <h3>Does Argo Books have CRM or HR features?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Not yet. FreshBooks has built-in time tracking, which is great for freelancers and consultants. If billable hours are a core part of your business, FreshBooks may be a better fit. Argo Books is focused on product-based businesses, inventory, and financial management.</p>
+                            <p>No. Argo Books is focused on finance management, inventory, and invoicing. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice. Argo Books is designed to do fewer things really well.</p>
                         </div>
                     </div>
                 </div>

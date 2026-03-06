@@ -86,22 +86,22 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
                 <h2>Built for small businesses, not accountants</h2>
-                <p class="section-desc">QuickBooks was designed for accounting professionals. Argo Books was built for business owners who want to manage finances without the learning curve.</p>
+                <p class="section-desc">QuickBooks assumes double-entry knowledge, surfaces accounting jargon throughout the UI, and gates useful features behind expensive tiers. Argo Books was built for business owners who want to manage finances without the learning curve or the price creep.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon">
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
-                    <h3>More affordable</h3>
-                    <p>QuickBooks starts at $24 CAD/month for their most basic plan. Argo Books has a free version with core features, and Premium is a fraction of the cost.</p>
+                    <h3>No price creep</h3>
+                    <p>QuickBooks prices have risen 60-80% since 2020. Their cheapest plan is now $24 CAD/month. Argo Books has a free version with core features, and Premium is $10 CAD/month — with no annual price increases.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
                         <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
-                    <h3>Simple from day one</h3>
-                    <p>No accounting degree needed. Argo Books is intuitive and focused, so you spend less time learning software and more time running your business.</p>
+                    <h3>No feature gating</h3>
+                    <p>QuickBooks locks inventory management, project tracking, and other core features behind their $80+/month plans. Argo Books Premium gives you everything for $10 CAD/month — no upsells, no surprises.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -222,7 +222,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $24 to $160 CAD/month depending on the plan. Argo Books keeps it simple.</p>
+                <p class="section-desc">QuickBooks charges $24 to $160 CAD/month depending on the plan — and those prices keep climbing year over year. Argo Books keeps it simple with predictable, affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -315,7 +315,7 @@
                 </div>
                 <h3>An honest take</h3>
                 <p>QuickBooks is a powerful, mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, QuickBooks is a solid choice.</p>
-                <p>But if you're a small business, freelancer, or startup that needs straightforward finance management, inventory tracking, and invoicing without the complexity or cost, Argo Books is built for you.</p>
+                <p>But if you're tired of rising prices, aggressive feature gating, and complexity you don't need — Argo Books is built for you. Simple pricing, no upsells, and every feature included in one plan.</p>
             </div>
         </div>
     </section>

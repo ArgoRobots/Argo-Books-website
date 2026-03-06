@@ -93,7 +93,7 @@
                     <div class="diff-icon">
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
-                    <h3>Inventory management included</h3>
+                    <h3>Inventory management</h3>
                     <p>Wave has no inventory features at all. Argo Books Premium includes full inventory management, so you can track stock levels alongside your finances.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">

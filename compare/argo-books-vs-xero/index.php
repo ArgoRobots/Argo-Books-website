@@ -85,7 +85,7 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
-                <h2>Built for business owners, not bookkeepers</h2>
+                <h2>Built for business owners, not accountants</h2>
                 <p class="section-desc">Xero is polished and globally popular, but it's cloud-only, designed for businesses that already have an accountant, and its Starter plan caps you at just 20 invoices per month. Argo Books is built for non-accountants who want simplicity, privacy, and affordable pricing.</p>
             </div>
             <div class="diff-grid">

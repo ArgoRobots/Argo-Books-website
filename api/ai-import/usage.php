@@ -41,14 +41,15 @@ if (!isset($input['action']) || !in_array($input['action'], ['check', 'increment
 $license_key = trim($input['license_key']);
 $action = $input['action'];
 
-// Load database connection
+// Load database connection and pricing config
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../config/pricing.php';
 
 /**
  * Determine tier and validate license key
  * @param PDO $pdo
  * @param string $license_key
- * @return array|null Returns ['tier' => 'premium', 'limit' => 10] for valid premium keys,
+ * @return array|null Returns ['tier' => 'premium', 'limit' => N] for valid premium keys,
  *                    or null if invalid
  */
 function validateAndGetTier($pdo, $license_key) {
@@ -58,7 +59,8 @@ function validateAndGetTier($pdo, $license_key) {
         $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            return ['tier' => 'premium', 'limit' => 10];
+            $config = get_pricing_config();
+            return ['tier' => 'premium', 'limit' => $config['ai_import_monthly_limit']];
         }
 
         // Check premium_subscriptions table for active subscriptions
@@ -70,7 +72,8 @@ function validateAndGetTier($pdo, $license_key) {
         ");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            return ['tier' => 'premium', 'limit' => 10];
+            $config = get_pricing_config();
+            return ['tier' => 'premium', 'limit' => $config['ai_import_monthly_limit']];
         }
 
         return null;

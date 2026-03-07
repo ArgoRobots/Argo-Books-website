@@ -11,6 +11,8 @@
  *   PREMIUM_YEARLY_PRICE        - Premium yearly subscription (default: 100.00)
  *   PROCESSING_FEE_PERCENT      - Payment processing fee percentage (default: 2.90)
  *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
+ *   RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for premium tier (default: 500)
+ *   AI_IMPORT_MONTHLY_LIMIT     - Monthly AI import limit for premium tier (default: 10)
  */
 
 /**
@@ -36,6 +38,8 @@ function get_pricing_config() {
         'premium_yearly_price'  => _pricing_parse_env('PREMIUM_YEARLY_PRICE', 100.00),
         'processing_fee_percent' => _pricing_parse_env('PROCESSING_FEE_PERCENT', 2.90),
         'processing_fee_fixed'   => _pricing_parse_env('PROCESSING_FEE_FIXED', 0.30),
+        'receipt_scan_monthly_limit' => _pricing_parse_int_env('RECEIPT_SCAN_MONTHLY_LIMIT', 500),
+        'ai_import_monthly_limit'    => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 10),
         'currency'              => 'CAD',
     ];
 
@@ -58,6 +62,28 @@ function _pricing_parse_env($key, $default) {
     $value = round(floatval($_ENV[$key]), 2);
 
     if ($value < 0) {
+        return $default;
+    }
+
+    return $value;
+}
+
+/**
+ * Parse an integer value from an environment variable.
+ * Returns the default if the env var is missing, empty, non-numeric, or less than 1.
+ *
+ * @param string $key     Environment variable name
+ * @param int    $default Default value if env var is invalid
+ * @return int Validated integer value
+ */
+function _pricing_parse_int_env($key, $default) {
+    if (!isset($_ENV[$key]) || $_ENV[$key] === '' || !is_numeric($_ENV[$key])) {
+        return $default;
+    }
+
+    $value = intval($_ENV[$key]);
+
+    if ($value < 1) {
         return $default;
     }
 

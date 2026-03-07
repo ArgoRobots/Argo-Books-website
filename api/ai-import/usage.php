@@ -1,8 +1,8 @@
 <?php
 /**
- * Receipt Scan Usage Tracking API
- * Tracks and enforces monthly scan limits for Premium tier subscribers.
- * AI Receipt Scanning is only available on the Premium plan with 500 scans/month.
+ * AI Spreadsheet Import Usage Tracking API
+ * Tracks and enforces monthly import limits for Premium tier subscribers.
+ * AI Spreadsheet Import is only available on the Premium plan with 10 imports/month.
  */
 
 header('Content-Type: application/json');
@@ -60,7 +60,7 @@ function validateAndGetTier($pdo, $license_key) {
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
             $config = get_pricing_config();
-            return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit']];
+            return ['tier' => 'premium', 'limit' => $config['ai_import_monthly_limit']];
         }
 
         // Check premium_subscriptions table for active subscriptions
@@ -73,7 +73,7 @@ function validateAndGetTier($pdo, $license_key) {
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
             $config = get_pricing_config();
-            return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit']];
+            return ['tier' => 'premium', 'limit' => $config['ai_import_monthly_limit']];
         }
 
         return null;
@@ -95,7 +95,7 @@ function getOrCreateUsageRecord($pdo, $license_key, $monthly_limit) {
     // Try to get existing record
     $stmt = $pdo->prepare("
         SELECT id, scan_count, monthly_limit
-        FROM receipt_scan_usage
+        FROM ai_import_usage
         WHERE license_key = ? AND usage_month = ?
     ");
     $stmt->execute([$license_key, $usage_month]);
@@ -107,7 +107,7 @@ function getOrCreateUsageRecord($pdo, $license_key, $monthly_limit) {
 
     // Create new record for this month
     $stmt = $pdo->prepare("
-        INSERT INTO receipt_scan_usage (license_key, usage_month, scan_count, monthly_limit)
+        INSERT INTO ai_import_usage (license_key, usage_month, scan_count, monthly_limit)
         VALUES (?, ?, 0, ?)
     ");
     $stmt->execute([$license_key, $usage_month, $monthly_limit]);
@@ -121,16 +121,16 @@ function getOrCreateUsageRecord($pdo, $license_key, $monthly_limit) {
 
 /**
  * Build response array
- * @param int $scan_count
+ * @param int $import_count
  * @param int $monthly_limit
  * @param string $tier
- * @param bool $can_scan
+ * @param bool $can_import
  * @return array
  */
-function buildResponse($scan_count, $monthly_limit, $tier, $can_scan = null) {
-    $remaining = max(0, $monthly_limit - $scan_count);
-    if ($can_scan === null) {
-        $can_scan = $remaining > 0;
+function buildResponse($import_count, $monthly_limit, $tier, $can_import = null) {
+    $remaining = max(0, $monthly_limit - $import_count);
+    if ($can_import === null) {
+        $can_import = $remaining > 0;
     }
 
     $usage_month = date('Y-m-01');
@@ -138,8 +138,8 @@ function buildResponse($scan_count, $monthly_limit, $tier, $can_scan = null) {
 
     return [
         'success' => true,
-        'can_scan' => $can_scan,
-        'scan_count' => (int)$scan_count,
+        'can_import' => $can_import,
+        'import_count' => (int)$import_count,
         'monthly_limit' => (int)$monthly_limit,
         'remaining' => (int)$remaining,
         'tier' => $tier,
@@ -163,44 +163,44 @@ try {
 
     // Get or create usage record
     $usage = getOrCreateUsageRecord($pdo, $license_key, $monthly_limit);
-    $scan_count = $usage['scan_count'];
+    $import_count = $usage['scan_count'];
     // Use the limit from the tier info (in case it changed)
     $monthly_limit = $tierInfo['limit'];
 
     if ($action === 'check') {
         // Just return current status
-        echo json_encode(buildResponse($scan_count, $monthly_limit, $tier));
+        echo json_encode(buildResponse($import_count, $monthly_limit, $tier));
         exit();
     }
 
     if ($action === 'increment') {
         // Check if limit reached before incrementing
-        if ($scan_count >= $monthly_limit) {
-            $response = buildResponse($scan_count, $monthly_limit, $tier, false);
+        if ($import_count >= $monthly_limit) {
+            $response = buildResponse($import_count, $monthly_limit, $tier, false);
             $response['success'] = false;
-            $response['error'] = 'Monthly scan limit reached';
+            $response['error'] = 'Monthly import limit reached';
             http_response_code(429);
             echo json_encode($response);
             exit();
         }
 
-        // Increment the scan count
+        // Increment the import count
         $usage_month = date('Y-m-01');
         $stmt = $pdo->prepare("
-            UPDATE receipt_scan_usage
+            UPDATE ai_import_usage
             SET scan_count = scan_count + 1
             WHERE license_key = ? AND usage_month = ?
         ");
         $stmt->execute([$license_key, $usage_month]);
 
         // Return updated status
-        $new_scan_count = $scan_count + 1;
-        echo json_encode(buildResponse($new_scan_count, $monthly_limit, $tier));
+        $new_import_count = $import_count + 1;
+        echo json_encode(buildResponse($new_import_count, $monthly_limit, $tier));
         exit();
     }
 
 } catch (PDOException $e) {
-    error_log("Receipt usage API error: " . $e->getMessage());
+    error_log("AI import usage API error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database error']);
     exit();

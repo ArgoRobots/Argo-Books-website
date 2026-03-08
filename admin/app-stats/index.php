@@ -118,7 +118,7 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
         case 'FeatureUsage':
             $normalized['FeatureName'] = $event['featureName'] ?? 'Unknown';
             $normalized['Context'] = $event['context'] ?? '';
-            $normalized['Detail'] = $event['detail'] ?? '';
+            $normalized['Detail'] = $event['detail'] ?? $event['context'] ?? '';
             return ['category' => 'FeatureUsage', 'data' => $normalized];
 
         default:

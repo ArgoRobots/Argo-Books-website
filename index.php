@@ -758,15 +758,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="demo-spreadsheet">
                             <div class="demo-spreadsheet-header">
                                 <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
-                                <span class="demo-file-name">Q4_vendor_dump.xlsx</span>
+                                <span class="demo-file-name">bill_export.xlsx</span>
                                 <span class="demo-file-badge">Excel</span>
                             </div>
                             <div class="demo-spreadsheet-table">
                                 <div class="demo-table-row demo-table-header-row">
-                                    <span>vendor_nm</span>
-                                    <span>amt_owed</span>
-                                    <span>dt_due</span>
-                                    <span>memo/ref</span>
+                                    <span>Supplier</span>
+                                    <span>Amt Owed</span>
+                                    <span>Pay By</span>
+                                    <span>Memo</span>
                                 </div>
                                 <div class="demo-table-row">
                                     <span>Acme Supply Co</span>
@@ -815,7 +815,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <span class="demo-mapping-badge">4/4 matched</span>
                             </div>
                             <div class="demo-mapping-row" data-delay="0">
-                                <div class="demo-map-source">vendor_nm</div>
+                                <div class="demo-map-source">Supplier</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
@@ -823,28 +823,28 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <div class="demo-map-confidence">97%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="1">
-                                <div class="demo-map-source">amt_owed</div>
+                                <div class="demo-map-source">Amt Owed</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
                                 <div class="demo-map-target">Balance Due</div>
-                                <div class="demo-map-confidence">92%</div>
+                                <div class="demo-map-confidence">93%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="2">
-                                <div class="demo-map-source">dt_due</div>
+                                <div class="demo-map-source">Pay By</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
                                 <div class="demo-map-target">Due Date</div>
-                                <div class="demo-map-confidence">89%</div>
+                                <div class="demo-map-confidence">91%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="3">
-                                <div class="demo-map-source">memo/ref</div>
+                                <div class="demo-map-source">Memo</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
                                 <div class="demo-map-target">Reference #</div>
-                                <div class="demo-map-confidence">84%</div>
+                                <div class="demo-map-confidence">86%</div>
                             </div>
                             <div class="demo-mapping-footer" id="aiMappingFooter">
                                 <div class="demo-mapping-success">

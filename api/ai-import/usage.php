@@ -1,8 +1,8 @@
 <?php
 /**
  * AI Spreadsheet Import Usage Tracking API
- * Tracks and enforces monthly import limits for Premium tier subscribers.
- * AI Spreadsheet Import is only available on the Premium plan with 10 imports/month.
+ * Tracks and enforces monthly import limits for all users.
+ * Every user gets 100 AI-powered imports per month.
  */
 
 header('Content-Type: application/json');
@@ -47,20 +47,23 @@ require_once __DIR__ . '/../../config/pricing.php';
 
 /**
  * Determine tier and validate license key
+ * AI import is available to all users (free and premium) with 100 imports/month.
  * @param PDO $pdo
  * @param string $license_key
- * @return array|null Returns ['tier' => 'premium', 'limit' => N] for valid premium keys,
+ * @return array|null Returns ['tier' => string, 'limit' => N] for valid keys,
  *                    or null if invalid
  */
 function validateAndGetTier($pdo, $license_key) {
+    $config = get_pricing_config();
+    $limit = $config['ai_import_monthly_limit'];
+
     // Check if it's a Premium key (starts with PREM-)
     if (strpos($license_key, 'PREM-') === 0) {
         // Check premium_subscription_keys table (unredeemed promo keys)
         $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            $config = get_pricing_config();
-            return ['tier' => 'premium', 'limit' => $config['ai_import_monthly_limit']];
+            return ['tier' => 'premium', 'limit' => $limit];
         }
 
         // Check premium_subscriptions table for active subscriptions
@@ -72,11 +75,17 @@ function validateAndGetTier($pdo, $license_key) {
         ");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            $config = get_pricing_config();
-            return ['tier' => 'premium', 'limit' => $config['ai_import_monthly_limit']];
+            return ['tier' => 'premium', 'limit' => $limit];
         }
 
         return null;
+    }
+
+    // Check if it's a valid free license key
+    $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
+    $stmt->execute([$license_key]);
+    if ($stmt->fetch()) {
+        return ['tier' => 'free', 'limit' => $limit];
     }
 
     return null;

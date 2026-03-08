@@ -284,8 +284,8 @@ $isDocsLanding = true;
                     <div class="card-icon">
                         <?= svg_icon('document-plus', 20) ?>
                     </div>
-                    <h3>Spreadsheet Import</h3>
-                    <p>Import data from Excel files</p>
+                    <h3>AI Spreadsheet Import</h3>
+                    <p>Import from any Excel or CSV file with AI</p>
                 </a>
                 <a href="pages/features/spreadsheet-export.php" class="doc-card">
                     <div class="card-icon">

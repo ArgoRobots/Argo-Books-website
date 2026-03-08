@@ -106,6 +106,10 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                                 <?= svg_icon('check-pricing') ?>
                                 <span>Cross-platform desktop app</span>
                             </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>AI spreadsheet import <span>(100/month)</span></span>
+                            </li>
                         </ul>
 
                         <div class="card-cta">
@@ -145,7 +149,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>predictive analytics</span>
+                                <span>Predictive analytics</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
@@ -189,7 +193,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, AI-powered features like receipt scanning, predictive analytics, and priority support.</p>
+                            <p>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, predictive analytics, and priority support.</p>
                         </div>
                     </div>
                 </div>

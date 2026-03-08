@@ -29,9 +29,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Transform your small business with Argo Books. AI-powered receipt scanning, predictive analytics, inventory management and more. Free software.">
+        content="Transform your small business with Argo Books. AI-powered receipt scanning, AI spreadsheet import, predictive analytics, inventory management and more. Free software.">
     <meta name="keywords"
-        content="AI receipt scanning, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation">
+        content="AI receipt scanning, AI spreadsheet import, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation, data import">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Argo Books - AI-Powered Business Management">
@@ -213,7 +213,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Features</span>
                 <h2 class="section-title">Everything you need to grow</h2>
-                <p class="section-description">Easy-to-use accounting software with AI-powered receipt scanning, predictive analytics, and inventory management. Everything you need to run your business.</p>
+                <p class="section-description">Easy-to-use accounting software with AI-powered receipt scanning, smart spreadsheet import, predictive analytics, and inventory management. Everything you need to run your business.</p>
             </div>
 
             <div class="features-tabs">
@@ -712,6 +712,153 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         </div>
     </section>
 
+    <!-- AI Spreadsheet Import Section -->
+    <section class="ai-import-section">
+        <div class="container">
+            <div class="ai-import-content">
+                <div class="ai-import-text animate-on-scroll">
+                    <span class="section-tag">AI-Powered</span>
+                    <h2 class="section-title text-left">Import any spreadsheet — instantly</h2>
+                    <p class="section-description text-left">Just upload your spreadsheet — our AI figures out what each column means and puts everything in the right place for you.</p>
+
+                    <div class="ai-import-features">
+                        <div class="ai-import-feature">
+                            <div class="ai-feature-icon">
+                                <?= svg_icon('bolt', 24) ?>
+                            </div>
+                            <div class="ai-feature-detail">
+                                <h4>Instant Column Detection</h4>
+                                <p>AI recognizes names, emails, phone numbers, dates, currencies, and more — regardless of column names</p>
+                            </div>
+                        </div>
+                        <div class="ai-import-feature">
+                            <div class="ai-feature-icon">
+                                <?= svg_icon('table', 24) ?>
+                            </div>
+                            <div class="ai-feature-detail">
+                                <h4>Any Format, Any Layout</h4>
+                                <p>Works with messy spreadsheets, unusual column names, and mixed data — no reformatting needed</p>
+                            </div>
+                        </div>
+                        <div class="ai-import-feature">
+                            <div class="ai-feature-icon">
+                                <?= svg_icon('shield', 24) ?>
+                            </div>
+                            <div class="ai-feature-detail">
+                                <h4>Private &amp; Secure</h4>
+                                <p>Your data is encrypted and processed securely — it's never stored or used for training</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-import-visual animate-on-scroll">
+                    <div class="ai-import-demo" id="aiImportDemo">
+                        <!-- Spreadsheet source -->
+                        <div class="demo-spreadsheet">
+                            <div class="demo-spreadsheet-header">
+                                <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
+                                <span class="demo-file-name">bill_export.xlsx</span>
+                                <span class="demo-file-badge">Excel</span>
+                            </div>
+                            <div class="demo-spreadsheet-table">
+                                <div class="demo-table-row demo-table-header-row">
+                                    <span>Supplier</span>
+                                    <span>Amt Owed</span>
+                                    <span>Pay By</span>
+                                    <span>Memo</span>
+                                </div>
+                                <div class="demo-table-row">
+                                    <span>Acme Supply Co</span>
+                                    <span>$4,280.00</span>
+                                    <span>12/15/2025</span>
+                                    <span>INV-3847</span>
+                                </div>
+                                <div class="demo-table-row">
+                                    <span>TechFlow LLC</span>
+                                    <span>$950.50</span>
+                                    <span>01/02/2026</span>
+                                    <span>PO-9912</span>
+                                </div>
+                                <div class="demo-table-row demo-table-faded">
+                                    <span>NovaCorp Int'l</span>
+                                    <span>$12,100.00</span>
+                                    <span>11/30/2025</span>
+                                    <span>Contract #441</span>
+                                </div>
+                            </div>
+                            <div class="demo-row-count">384 more rows...</div>
+                        </div>
+
+                        <!-- AI Processing indicator -->
+                        <div class="demo-ai-processor" id="aiProcessor">
+                            <div class="ai-processor-ring">
+                                <svg viewBox="0 0 48 48" class="processor-ring-svg">
+                                    <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                                    <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
+                                    <defs>
+                                        <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#6366f1"/>
+                                            <stop offset="100%" style="stop-color:#8b5cf6"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <span class="processor-label">AI</span>
+                            </div>
+                            <span class="processor-text">Mapping columns...</span>
+                        </div>
+
+                        <!-- Mapping results -->
+                        <div class="demo-mapping-results" id="aiMappingResults">
+                            <div class="demo-mapping-header">
+                                <span class="demo-mapping-title">Mapped Fields</span>
+                                <span class="demo-mapping-badge">4/4 matched</span>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="0">
+                                <div class="demo-map-source">Supplier</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Vendor Name</div>
+                                <div class="demo-map-confidence">97%</div>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="1">
+                                <div class="demo-map-source">Amt Owed</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Balance Due</div>
+                                <div class="demo-map-confidence">93%</div>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="2">
+                                <div class="demo-map-source">Pay By</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Due Date</div>
+                                <div class="demo-map-confidence">91%</div>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="3">
+                                <div class="demo-map-source">Memo</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Reference #</div>
+                                <div class="demo-map-confidence">86%</div>
+                            </div>
+                            <div class="demo-mapping-footer" id="aiMappingFooter">
+                                <div class="demo-mapping-success">
+                                    <?= svg_icon('check', 16) ?>
+                                    <span>Ready to import 387 rows</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- How It Works Section -->
     <section class="how-it-works-section">
         <div class="container">
@@ -737,7 +884,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <?= svg_icon('pencil', 32) ?>
                     </div>
                     <h3>Set Up</h3>
-                    <p>Add your products, customers, and preferences. Import existing data if you have it.</p>
+                    <p>Add your products, customers, and preferences. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
                 </div>
                 <div class="step-connector animate-on-scroll"></div>
                 <div class="step-card animate-on-scroll">
@@ -963,6 +1110,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
+                            <span>AI spreadsheet import <span>(100/month)</span></span>
+                        </li>
+                        <li>
+                            <?= svg_icon('check', 20) ?>
                             <span>Core features</span>
                         </li>
                     </ul>
@@ -1092,7 +1243,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes invoices & payments, AI-powered receipt scanning, and predictive analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes unlimited products, invoices & payments, predictive analytics, and priority support. These features help you scale your business as it grows.</p>
                         </div>
                     </div>
                 </div>
@@ -1310,6 +1461,75 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         // Start the scan animation cycle
         if (scanAnimation) {
             runScanCycle();
+        }
+
+        // AI Import demo animation
+        const aiImportDemo = document.getElementById('aiImportDemo');
+        if (aiImportDemo) {
+            let aiAnimationStarted = false;
+
+            function runAiImportAnimation() {
+                const processor = document.getElementById('aiProcessor');
+                const results = document.getElementById('aiMappingResults');
+                const rows = results.querySelectorAll('.demo-mapping-row');
+                const footer = document.getElementById('aiMappingFooter');
+
+                // Reset
+                processor.classList.remove('active');
+                results.classList.remove('active');
+                rows.forEach(r => r.classList.remove('visible'));
+                footer.classList.remove('visible');
+                const progressRing = processor.querySelector('.processor-progress');
+                progressRing.style.transition = 'none';
+                progressRing.style.strokeDashoffset = '126';
+                processor.querySelector('.processor-text').textContent = 'Mapping columns...';
+
+                // Step 1: Show AI processor (0.5s)
+                setTimeout(() => {
+                    processor.classList.add('active');
+                    // Re-enable transition, then animate progress ring
+                    requestAnimationFrame(() => {
+                        progressRing.style.transition = '';
+                        requestAnimationFrame(() => {
+                            progressRing.style.strokeDashoffset = '0';
+                        });
+                    });
+                }, 500);
+
+                // Step 2: Show mapping results card (2s)
+                setTimeout(() => {
+                    processor.querySelector('.processor-text').textContent = 'Complete!';
+                    results.classList.add('active');
+                }, 2000);
+
+                // Step 3: Reveal rows one by one (2.3s, 2.6s, 2.9s, 3.2s)
+                rows.forEach((row, i) => {
+                    setTimeout(() => {
+                        row.classList.add('visible');
+                    }, 2300 + (i * 300));
+                });
+
+                // Step 4: Show footer (3.8s)
+                setTimeout(() => {
+                    footer.classList.add('visible');
+                }, 3800);
+
+                // Step 5: Hold for 4s, then restart (7.8s)
+                setTimeout(() => {
+                    runAiImportAnimation();
+                }, 8000);
+            }
+
+            const aiObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !aiAnimationStarted) {
+                        aiAnimationStarted = true;
+                        runAiImportAnimation();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            aiObserver.observe(aiImportDemo);
         }
 
         // FAQ Accordion

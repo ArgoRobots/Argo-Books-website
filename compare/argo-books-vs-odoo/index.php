@@ -181,6 +181,12 @@
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
+                            <td>AI spreadsheet import</td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                        </tr>
+                        <tr>
                             <td>Predictive analytics</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
@@ -236,6 +242,7 @@
                                     <li><?= svg_icon('check', 14) ?> Expense tracking</li>
                                     <li><?= svg_icon('check', 14) ?> Financial reports</li>
                                     <li><?= svg_icon('check', 14) ?> Cross-platform desktop app</li>
+                                    <li><?= svg_icon('check', 14) ?> AI spreadsheet import</li>
                                 </ul>
                             </div>
                             <div class="tier-divider"></div>

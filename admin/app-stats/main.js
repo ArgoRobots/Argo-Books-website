@@ -131,6 +131,13 @@ document.addEventListener("DOMContentLoaded", function () {
   generateReceiptScanDurationChart(receiptScanningData);
   generateReceiptScanTrendChart(receiptScanningData);
 
+  // AI Spreadsheet Importer Charts
+  generateAIImportStats(featureUsageData);
+  generateAIImportOverviewChart(featureUsageData);
+  generateAIVsStandardChart(featureUsageData);
+  generateAIImportTrendChart(featureUsageData);
+  generateAIImportTypeTimeChart(featureUsageData);
+
   generateSessionDurationChart(sessionData);
   generateExportTypesBreakdown(exportData);
   generateExportDurationByTypeChart(exportData);
@@ -380,6 +387,17 @@ document.addEventListener("DOMContentLoaded", function () {
           scanSuccessRate !== "N/A"
             ? `${scanSuccessRate}% success rate`
             : "No scans yet",
+      },
+      {
+        title: "AI Imports",
+        value: featureUsageData
+          .filter(
+            (f) =>
+              f.FeatureName === "DataImported" &&
+              (f.Context === "ai-xlsx" || f.Context === "ai-csv")
+          )
+          .length.toLocaleString(),
+        subtext: `${featureUsageData.filter((f) => f.FeatureName === "DataImported" && f.Context === ".xlsx").length} standard imports`,
       },
       {
         title: "Peak Usage Time",
@@ -2662,6 +2680,304 @@ document.addEventListener("DOMContentLoaded", function () {
             },
           },
           x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  // =====================
+  // AI Spreadsheet Importer Charts
+  // =====================
+
+  // Helper to extract DataImported events from featureUsageData
+  function getDataImportedEvents(featureUsageData) {
+    return featureUsageData.filter((f) => f.FeatureName === "DataImported");
+  }
+
+  function generateAIImportStats(featureUsageData) {
+    const statsGrid = document.getElementById("aiImportStatsGrid");
+    if (!statsGrid) return;
+
+    const importEvents = getDataImportedEvents(featureUsageData);
+    const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx");
+    const aiCsv = importEvents.filter((e) => e.Context === "ai-csv");
+    const standardXlsx = importEvents.filter((e) => e.Context === ".xlsx");
+    const totalAI = aiXlsx.length + aiCsv.length;
+    const totalAll = importEvents.length;
+    const aiPercentage =
+      totalAll > 0 ? ((totalAI / totalAll) * 100).toFixed(1) : "0";
+
+    const stats = [
+      {
+        title: "Total AI Imports",
+        value: totalAI.toLocaleString(),
+        subtext: `${aiPercentage}% of all imports`,
+      },
+      {
+        title: "AI Excel Imports",
+        value: aiXlsx.length.toLocaleString(),
+        subtext: "ai-xlsx mapped imports",
+      },
+      {
+        title: "AI CSV Imports",
+        value: aiCsv.length.toLocaleString(),
+        subtext: "ai-csv mapped imports",
+      },
+      {
+        title: "Standard Imports",
+        value: standardXlsx.length.toLocaleString(),
+        subtext: "Non-AI .xlsx imports",
+      },
+    ];
+
+    statsGrid.innerHTML = stats
+      .map(
+        (stat) => `
+      <div class="stat-card">
+        <h3>${stat.title}</h3>
+        <div class="value">${stat.value}</div>
+        <p class="subtext">${stat.subtext}</p>
+      </div>
+    `
+      )
+      .join("");
+  }
+
+  function generateAIImportOverviewChart(featureUsageData) {
+    const importEvents = getDataImportedEvents(featureUsageData);
+
+    if (importEvents.length === 0) {
+      document.getElementById("aiImportOverviewChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No AI import data available</div>';
+      return;
+    }
+
+    const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx").length;
+    const aiCsv = importEvents.filter((e) => e.Context === "ai-csv").length;
+
+    if (aiXlsx === 0 && aiCsv === 0) {
+      document.getElementById("aiImportOverviewChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No AI import data available</div>';
+      return;
+    }
+
+    new Chart(document.getElementById("aiImportOverviewChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["AI Excel (.xlsx)", "AI CSV (.csv)"],
+        datasets: [
+          {
+            data: [aiXlsx, aiCsv],
+            backgroundColor: ["#3b82f6", "#8b5cf6"],
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} imports (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateAIVsStandardChart(featureUsageData) {
+    const importEvents = getDataImportedEvents(featureUsageData);
+
+    if (importEvents.length === 0) {
+      document.getElementById("aiVsStandardChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No import data available</div>';
+      return;
+    }
+
+    const aiTotal = importEvents.filter(
+      (e) => e.Context === "ai-xlsx" || e.Context === "ai-csv"
+    ).length;
+    const standardTotal = importEvents.filter(
+      (e) => e.Context === ".xlsx"
+    ).length;
+
+    new Chart(document.getElementById("aiVsStandardChart"), {
+      type: "doughnut",
+      data: {
+        labels: ["AI-Mapped Imports", "Standard Imports"],
+        datasets: [
+          {
+            data: [aiTotal, standardTotal],
+            backgroundColor: ["#10b981", "#f59e0b"],
+            borderWidth: 2,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((context.raw / total) * 100);
+                return `${context.label}: ${context.raw} imports (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateAIImportTrendChart(featureUsageData) {
+    const importEvents = getDataImportedEvents(featureUsageData);
+    const aiEvents = importEvents.filter(
+      (e) => e.Context === "ai-xlsx" || e.Context === "ai-csv"
+    );
+
+    if (aiEvents.length === 0) {
+      document.getElementById("aiImportTrendChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No AI import trend data available</div>';
+      return;
+    }
+
+    const dailyCounts = {};
+    aiEvents.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      dailyCounts[date] = (dailyCounts[date] || 0) + 1;
+    });
+
+    const dates = Object.keys(dailyCounts).sort().slice(-30);
+    const counts = dates.map((date) => dailyCounts[date]);
+
+    new Chart(document.getElementById("aiImportTrendChart"), {
+      type: "bar",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "AI Imports",
+            data: counts,
+            backgroundColor: "#10b981",
+            borderColor: "#059669",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Imports per Day",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateAIImportTypeTimeChart(featureUsageData) {
+    const importEvents = getDataImportedEvents(featureUsageData);
+
+    if (importEvents.length === 0) {
+      document.getElementById("aiImportTypeTimeChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No import data available</div>';
+      return;
+    }
+
+    const dailyByType = {};
+    importEvents.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      if (!dailyByType[date]) {
+        dailyByType[date] = { "ai-xlsx": 0, "ai-csv": 0, ".xlsx": 0 };
+      }
+      const detail = item.Context || "";
+      if (dailyByType[date][detail] !== undefined) {
+        dailyByType[date][detail]++;
+      }
+    });
+
+    const dates = Object.keys(dailyByType).sort().slice(-30);
+
+    new Chart(document.getElementById("aiImportTypeTimeChart"), {
+      type: "bar",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "AI Excel",
+            data: dates.map((d) => dailyByType[d]["ai-xlsx"]),
+            backgroundColor: "#3b82f6",
+            borderColor: "#2563eb",
+            borderWidth: 1,
+          },
+          {
+            label: "AI CSV",
+            data: dates.map((d) => dailyByType[d]["ai-csv"]),
+            backgroundColor: "#8b5cf6",
+            borderColor: "#7c3aed",
+            borderWidth: 1,
+          },
+          {
+            label: "Standard .xlsx",
+            data: dates.map((d) => dailyByType[d][".xlsx"]),
+            backgroundColor: "#f59e0b",
+            borderColor: "#d97706",
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            stacked: true,
+            title: {
+              display: true,
+              text: "Imports per Day",
+            },
+          },
+          x: {
+            stacked: true,
             ticks: {
               maxRotation: 45,
             },

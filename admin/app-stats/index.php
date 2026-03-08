@@ -656,6 +656,34 @@ include '../admin_header.php';
                         <canvas id="receiptScanTrendChart"></canvas>
                     </div>
                 </div>
+
+                <h2 class="section-title" style="margin-top: 2rem;">AI Spreadsheet Importer</h2>
+
+                <div class="stats-grid" id="aiImportStatsGrid">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>AI Import Type Breakdown</h2>
+                        <canvas id="aiImportOverviewChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>AI vs Standard Imports</h2>
+                        <canvas id="aiVsStandardChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>AI Imports Per Day Trend</h2>
+                        <canvas id="aiImportTrendChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Import Type Over Time</h2>
+                        <canvas id="aiImportTypeTimeChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <!-- Activity Tab -->

@@ -140,6 +140,11 @@ include '../../docs-header.php';
                             <td>✓</td>
                         </tr>
                         <tr>
+                            <td>AI Spreadsheet Import</td>
+                            <td>—</td>
+                            <td>✓</td>
+                        </tr>
+                        <tr>
                             <td>Report Generator</td>
                             <td>✓</td>
                             <td>✓</td>

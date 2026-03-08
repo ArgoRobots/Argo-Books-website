@@ -181,6 +181,12 @@
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
+                            <td>AI spreadsheet import</td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                        </tr>
+                        <tr>
                             <td>Predictive analytics</td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
@@ -255,6 +261,7 @@
                                     <li><?= svg_icon('check', 14) ?> Everything in Free</li>
                                     <li><?= svg_icon('check', 14) ?> Unlimited products</li>
                                     <li><?= svg_icon('check', 14) ?> AI receipt scanning</li>
+                                    <li><?= svg_icon('check', 14) ?> AI spreadsheet import</li>
                                     <li><?= svg_icon('check', 14) ?> Invoicing & payments</li>
                                     <li><?= svg_icon('check', 14) ?> Predictive analytics</li>
                                 </ul>

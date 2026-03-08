@@ -1145,6 +1145,23 @@ body.docs-page {
   border-radius: 0 12px 12px 0;
 }
 
+/* Two-column list */
+.two-column-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 2rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.two-column-list ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.two-column-list li {
+  padding: 2px 0;
+}
+
 /* Steps list */
 .steps-list {
   list-style: none;

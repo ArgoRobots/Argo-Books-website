@@ -145,7 +145,11 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>predictive analytics</span>
+                                <span>AI spreadsheet import <span>(10/month)</span></span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Predictive analytics</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
@@ -189,7 +193,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, AI-powered features like receipt scanning, predictive analytics, and priority support.</p>
+                            <p>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, AI-powered features like receipt scanning, smart spreadsheet import, predictive analytics, and priority support.</p>
                         </div>
                     </div>
                 </div>

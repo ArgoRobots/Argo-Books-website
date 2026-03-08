@@ -1296,6 +1296,99 @@ a {
     color: #059669;
 }
 
+/* AI Import Mockup */
+.import-mockup {
+    padding: 24px;
+}
+
+.import-preview {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.import-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.import-badge-ai {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.import-mapping {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.mapping-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.source-col {
+    flex: 1;
+    color: #64748b;
+}
+
+.mapping-arrow {
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+.target-col {
+    flex: 1;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.mapping-confidence {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 50px;
+}
+
+.mapping-confidence.high {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.mapping-confidence.medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.import-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 16px;
+    border-top: 2px solid #e2e8f0;
+    font-size: 0.8rem;
+    color: #059669;
+    font-weight: 500;
+}
+
+.import-status svg {
+    color: #059669;
+}
+
 .success-icon {
     width: 64px;
     height: 64px;

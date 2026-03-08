@@ -29,9 +29,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Transform your small business with Argo Books. AI-powered receipt scanning, predictive analytics, inventory management and more. Free software.">
+        content="Transform your small business with Argo Books. AI-powered receipt scanning, AI spreadsheet import, predictive analytics, inventory management and more. Free software.">
     <meta name="keywords"
-        content="AI receipt scanning, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation">
+        content="AI receipt scanning, AI spreadsheet import, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation, data import">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Argo Books - AI-Powered Business Management">
@@ -213,7 +213,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Features</span>
                 <h2 class="section-title">Everything you need to grow</h2>
-                <p class="section-description">Easy-to-use accounting software with AI-powered receipt scanning, predictive analytics, and inventory management. Everything you need to run your business.</p>
+                <p class="section-description">Easy-to-use accounting software with AI-powered receipt scanning, smart spreadsheet import, predictive analytics, and inventory management. Everything you need to run your business.</p>
             </div>
 
             <div class="features-tabs">
@@ -279,6 +279,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="tab-text">
                             <span class="tab-title">Invoicing</span>
                             <span class="tab-subtitle">Professional invoices</span>
+                        </div>
+                    </button>
+                    <button class="tab-btn" data-tab="ai-import">
+                        <div class="tab-icon">
+                            <?= svg_icon('table', 24) ?>
+                        </div>
+                        <div class="tab-text">
+                            <span class="tab-title">AI Spreadsheet Import</span>
+                            <span class="tab-subtitle">Import any spreadsheet</span>
                         </div>
                     </button>
                 </div>
@@ -707,6 +716,66 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                     </div>
 
+                    <!-- AI Spreadsheet Import -->
+                    <div class="tab-content" id="tab-ai-import">
+                        <div class="tab-content-inner">
+                            <div class="tab-content-text">
+                                <h3>Import any spreadsheet with AI</h3>
+                                <p>Drop in any Excel or CSV file — no reformatting needed. Our AI detects your data types, maps columns automatically, and imports everything in a couple of clicks.</p>
+                                <ul class="feature-list">
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Works with any spreadsheet format</span>
+                                    </li>
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>AI auto-maps columns to Argo Books fields</span>
+                                    </li>
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Supports 20+ data types in one file</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-content-visual">
+                                <div class="feature-visual-card">
+                                    <div class="visual-mockup import-mockup">
+                                        <div class="import-preview">
+                                            <div class="import-header">
+                                                <span class="form-title">AI Import</span>
+                                                <span class="import-badge-ai">AI-Powered</span>
+                                            </div>
+                                            <div class="import-mapping">
+                                                <div class="mapping-row">
+                                                    <span class="source-col">Customer Name</span>
+                                                    <span class="mapping-arrow">→</span>
+                                                    <span class="target-col">Name</span>
+                                                    <span class="mapping-confidence high">98%</span>
+                                                </div>
+                                                <div class="mapping-row">
+                                                    <span class="source-col">Email Address</span>
+                                                    <span class="mapping-arrow">→</span>
+                                                    <span class="target-col">Email</span>
+                                                    <span class="mapping-confidence high">95%</span>
+                                                </div>
+                                                <div class="mapping-row">
+                                                    <span class="source-col">Phone #</span>
+                                                    <span class="mapping-arrow">→</span>
+                                                    <span class="target-col">Phone</span>
+                                                    <span class="mapping-confidence medium">82%</span>
+                                                </div>
+                                            </div>
+                                            <div class="import-status">
+                                                <?= svg_icon('check', 16) ?>
+                                                <span>3 sheets detected · 1,247 rows ready</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -737,7 +806,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <?= svg_icon('pencil', 32) ?>
                     </div>
                     <h3>Set Up</h3>
-                    <p>Add your products, customers, and preferences. Import existing data if you have it.</p>
+                    <p>Add your products, customers, and preferences. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
                 </div>
                 <div class="step-connector animate-on-scroll"></div>
                 <div class="step-card animate-on-scroll">
@@ -1004,6 +1073,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
+                            <span>AI spreadsheet import <span>(10/month)</span></span>
+                        </li>
+                        <li>
+                            <?= svg_icon('check', 20) ?>
                             <span>Predictive analytics</span>
                         </li>
                         <li>
@@ -1092,7 +1165,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes invoices & payments, AI-powered receipt scanning, and predictive analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes invoices & payments, AI-powered receipt scanning, AI spreadsheet import, and predictive analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
                         </div>
                     </div>
                 </div>

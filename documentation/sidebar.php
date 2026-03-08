@@ -100,7 +100,7 @@ $sidebarSections = [
                 'icon' => svg_icon('receipt-scan', 18)
             ],
             'spreadsheet-import' => [
-                'title' => 'Spreadsheet Import',
+                'title' => 'AI Spreadsheet Import',
                 'icon' => svg_icon('document-upload', 18)
             ],
             'spreadsheet-export' => [

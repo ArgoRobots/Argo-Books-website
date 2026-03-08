@@ -733,7 +733,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                     </li>
                                     <li>
                                         <?= svg_icon('check', 20) ?>
-                                        <span>Supports 20+ data types in one file</span>
+                                        <span>Encrypted and secure</span>
                                     </li>
                                 </ul>
                             </div>

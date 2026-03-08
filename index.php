@@ -758,36 +758,36 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="demo-spreadsheet">
                             <div class="demo-spreadsheet-header">
                                 <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
-                                <span class="demo-file-name">customers_2025.xlsx</span>
+                                <span class="demo-file-name">Q4_vendor_dump.xlsx</span>
                                 <span class="demo-file-badge">Excel</span>
                             </div>
                             <div class="demo-spreadsheet-table">
                                 <div class="demo-table-row demo-table-header-row">
-                                    <span>Full Name</span>
-                                    <span>Email Address</span>
-                                    <span>Phone #</span>
-                                    <span>Company</span>
+                                    <span>vendor_nm</span>
+                                    <span>amt_owed</span>
+                                    <span>dt_due</span>
+                                    <span>memo/ref</span>
                                 </div>
                                 <div class="demo-table-row">
-                                    <span>Jane Cooper</span>
-                                    <span>jane@acme.co</span>
-                                    <span>(555) 123-4567</span>
-                                    <span>Acme Inc</span>
+                                    <span>Acme Supply Co</span>
+                                    <span>$4,280.00</span>
+                                    <span>12/15/2025</span>
+                                    <span>INV-3847</span>
                                 </div>
                                 <div class="demo-table-row">
-                                    <span>Marcus Chen</span>
-                                    <span>m.chen@mail.com</span>
-                                    <span>(555) 987-6543</span>
-                                    <span>TechFlow</span>
+                                    <span>TechFlow LLC</span>
+                                    <span>$950.50</span>
+                                    <span>01/02/2026</span>
+                                    <span>PO-9912</span>
                                 </div>
                                 <div class="demo-table-row demo-table-faded">
-                                    <span>Sarah Kim</span>
-                                    <span>sarah.k@corp.io</span>
-                                    <span>(555) 456-7890</span>
-                                    <span>NovaCorp</span>
+                                    <span>NovaCorp Int'l</span>
+                                    <span>$12,100.00</span>
+                                    <span>11/30/2025</span>
+                                    <span>Contract #441</span>
                                 </div>
                             </div>
-                            <div class="demo-row-count">1,247 more rows...</div>
+                            <div class="demo-row-count">384 more rows...</div>
                         </div>
 
                         <!-- AI Processing indicator -->
@@ -815,41 +815,41 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <span class="demo-mapping-badge">4/4 matched</span>
                             </div>
                             <div class="demo-mapping-row" data-delay="0">
-                                <div class="demo-map-source">Full Name</div>
+                                <div class="demo-map-source">vendor_nm</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
-                                <div class="demo-map-target">Name</div>
-                                <div class="demo-map-confidence">98%</div>
+                                <div class="demo-map-target">Vendor Name</div>
+                                <div class="demo-map-confidence">97%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="1">
-                                <div class="demo-map-source">Email Address</div>
+                                <div class="demo-map-source">amt_owed</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
-                                <div class="demo-map-target">Email</div>
-                                <div class="demo-map-confidence">96%</div>
+                                <div class="demo-map-target">Balance Due</div>
+                                <div class="demo-map-confidence">92%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="2">
-                                <div class="demo-map-source">Phone #</div>
+                                <div class="demo-map-source">dt_due</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
-                                <div class="demo-map-target">Phone</div>
-                                <div class="demo-map-confidence">85%</div>
+                                <div class="demo-map-target">Due Date</div>
+                                <div class="demo-map-confidence">89%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="3">
-                                <div class="demo-map-source">Company</div>
+                                <div class="demo-map-source">memo/ref</div>
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
-                                <div class="demo-map-target">Company</div>
-                                <div class="demo-map-confidence">99%</div>
+                                <div class="demo-map-target">Reference #</div>
+                                <div class="demo-map-confidence">84%</div>
                             </div>
                             <div class="demo-mapping-footer" id="aiMappingFooter">
                                 <div class="demo-mapping-success">
                                     <?= svg_icon('check', 16) ?>
-                                    <span>Ready to import 1,251 rows</span>
+                                    <span>Ready to import 387 rows</span>
                                 </div>
                             </div>
                         </div>

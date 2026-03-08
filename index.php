@@ -719,7 +719,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="ai-import-text animate-on-scroll">
                     <span class="section-tag">AI-Powered</span>
                     <h2 class="section-title text-left">Import any spreadsheet — instantly</h2>
-                    <p class="section-description text-left">Drop in any Excel or CSV file, no matter how it's formatted. Our AI reads your column headers, detects data types, and maps everything to the right fields automatically.</p>
+                    <p class="section-description text-left">Just upload your spreadsheet — our AI figures out what each column means and puts everything in the right place for you.</p>
 
                     <div class="ai-import-features">
                         <div class="ai-import-feature">

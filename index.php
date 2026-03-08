@@ -1032,6 +1032,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
+                            <span>AI spreadsheet import <span>(100/month)</span></span>
+                        </li>
+                        <li>
+                            <?= svg_icon('check', 20) ?>
                             <span>Core features</span>
                         </li>
                     </ul>
@@ -1070,10 +1074,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>AI receipt scanning <span>(500/month)</span></span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>AI spreadsheet import <span>(10/month)</span></span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -1165,7 +1165,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes invoices & payments, AI-powered receipt scanning, AI spreadsheet import, and predictive analytics. These features use advanced machine learning to help you understand your business better and make smarter decisions.</p>
+                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes unlimited products, invoices & payments, predictive analytics, and priority support. These features help you scale your business as it grows.</p>
                         </div>
                     </div>
                 </div>

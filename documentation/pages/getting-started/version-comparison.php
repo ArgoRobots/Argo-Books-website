@@ -141,7 +141,7 @@ include '../../docs-header.php';
                         </tr>
                         <tr>
                             <td>AI Spreadsheet Import</td>
-                            <td>—</td>
+                            <td>✓</td>
                             <td>✓</td>
                         </tr>
                         <tr>

@@ -11,10 +11,6 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>Import your existing business data from any Excel (.xlsx) or CSV file into Argo Books. The AI-powered importer automatically detects what type of data you have and maps your columns — no need to reformat your spreadsheet or follow a template.</p>
 
-            <div class="info-box">
-                <strong>Premium Feature:</strong> AI-powered import is available with an Argo Books Premium subscription. Free users can still import using the <a class="link" href="#standard-import">standard template format</a>.
-            </div>
-
             <h2>How AI Import Works</h2>
             <p>The AI importer analyzes your spreadsheet and figures out the rest. Here's what happens when you import a file:</p>
             <ol class="steps-list">
@@ -37,9 +33,9 @@ include '../../docs-header.php';
                     <li>Invoices</li>
                     <li>Payments</li>
                     <li>Inventory</li>
-                    <li>Employees</li>
                 </ul>
                 <ul>
+                    <li>Employees</li>
                     <li>Locations</li>
                     <li>Departments</li>
                     <li>Rental Inventory</li>
@@ -85,36 +81,7 @@ include '../../docs-header.php';
             </ul>
 
             <h2>Usage Limits</h2>
-            <p>Premium subscribers get 10 AI-powered imports per month. Each file you import (regardless of the number of sheets) counts as one import. Standard template imports are unlimited.</p>
-
-            <h2 id="standard-import">Standard Import (Free)</h2>
-            <p>You can also import data using our predefined template format, which is available on all plans including Free:</p>
-            <ol class="steps-list">
-                <li>Download the <a class="link" href="../../../resources/downloads/Argo Books format.xlsx">spreadsheet template</a></li>
-                <li>Fill in your data following the template format exactly</li>
-                <li>Click <strong>File &gt; Import</strong>, then select <strong>Excel (XLSX)</strong></li>
-                <li>Select the currency and click <strong>Import</strong></li>
-            </ol>
-
-            <h3>Standard Import Formatting Requirements</h3>
-            <ul>
-                <li><strong>Date format:</strong> YYYY-MM-DD (e.g., 2025-01-15)</li>
-                <li><strong>Country names:</strong> Must match the <a class="link" href="../reference/accepted-countries.php">accepted country list</a></li>
-                <li><strong>Everything else:</strong> Follow the template format exactly</li>
-            </ul>
-
-            <h2>Receipt Import</h2>
-            <p>If you have receipt files to import alongside your data:</p>
-            <ol class="steps-list">
-                <li>Organize your receipt files in a folder on your computer</li>
-                <li>In your spreadsheet, include the receipt file name in the "Receipt" column</li>
-                <li>During import, select the folder containing your receipt files</li>
-                <li>The system will automatically link receipts to their corresponding transactions</li>
-            </ol>
-
-            <div class="info-box">
-                <strong>Tip:</strong> The system automatically looks for a receipts folder next to your spreadsheet file with names like "receipts".
-            </div>
+            <p>Every user gets 100 AI-powered imports per month. Each file you import (regardless of the number of sheets) counts as one import.</p>
 
             <div class="page-navigation">
                 <a href="receipt-scanning.php" class="nav-button prev">

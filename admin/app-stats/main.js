@@ -394,10 +394,10 @@ document.addEventListener("DOMContentLoaded", function () {
           .filter(
             (f) =>
               f.FeatureName === "DataImported" &&
-              (f.Detail === "ai-xlsx" || f.Detail === "ai-csv")
+              (f.Context === "ai-xlsx" || f.Context === "ai-csv")
           )
           .length.toLocaleString(),
-        subtext: `${featureUsageData.filter((f) => f.FeatureName === "DataImported" && f.Detail === ".xlsx").length} standard imports`,
+        subtext: `${featureUsageData.filter((f) => f.FeatureName === "DataImported" && f.Context === ".xlsx").length} standard imports`,
       },
       {
         title: "Peak Usage Time",
@@ -2703,9 +2703,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!statsGrid) return;
 
     const importEvents = getDataImportedEvents(featureUsageData);
-    const aiXlsx = importEvents.filter((e) => e.Detail === "ai-xlsx");
-    const aiCsv = importEvents.filter((e) => e.Detail === "ai-csv");
-    const standardXlsx = importEvents.filter((e) => e.Detail === ".xlsx");
+    const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx");
+    const aiCsv = importEvents.filter((e) => e.Context === "ai-csv");
+    const standardXlsx = importEvents.filter((e) => e.Context === ".xlsx");
     const totalAI = aiXlsx.length + aiCsv.length;
     const totalAll = importEvents.length;
     const aiPercentage =
@@ -2756,8 +2756,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const aiXlsx = importEvents.filter((e) => e.Detail === "ai-xlsx").length;
-    const aiCsv = importEvents.filter((e) => e.Detail === "ai-csv").length;
+    const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx").length;
+    const aiCsv = importEvents.filter((e) => e.Context === "ai-csv").length;
 
     if (aiXlsx === 0 && aiCsv === 0) {
       document.getElementById("aiImportOverviewChart").parentElement.innerHTML =
@@ -2808,10 +2808,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const aiTotal = importEvents.filter(
-      (e) => e.Detail === "ai-xlsx" || e.Detail === "ai-csv"
+      (e) => e.Context === "ai-xlsx" || e.Context === "ai-csv"
     ).length;
     const standardTotal = importEvents.filter(
-      (e) => e.Detail === ".xlsx"
+      (e) => e.Context === ".xlsx"
     ).length;
 
     new Chart(document.getElementById("aiVsStandardChart"), {
@@ -2850,7 +2850,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateAIImportTrendChart(featureUsageData) {
     const importEvents = getDataImportedEvents(featureUsageData);
     const aiEvents = importEvents.filter(
-      (e) => e.Detail === "ai-xlsx" || e.Detail === "ai-csv"
+      (e) => e.Context === "ai-xlsx" || e.Context === "ai-csv"
     );
 
     if (aiEvents.length === 0) {
@@ -2923,7 +2923,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!dailyByType[date]) {
         dailyByType[date] = { "ai-xlsx": 0, "ai-csv": 0, ".xlsx": 0 };
       }
-      const detail = item.Detail || "";
+      const detail = item.Context || "";
       if (dailyByType[date][detail] !== undefined) {
         dailyByType[date][detail]++;
       }

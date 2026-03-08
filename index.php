@@ -281,15 +281,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span class="tab-subtitle">Professional invoices</span>
                         </div>
                     </button>
-                    <button class="tab-btn" data-tab="ai-import">
-                        <div class="tab-icon">
-                            <?= svg_icon('table', 24) ?>
-                        </div>
-                        <div class="tab-text">
-                            <span class="tab-title">AI Spreadsheet Import</span>
-                            <span class="tab-subtitle">Import any spreadsheet</span>
-                        </div>
-                    </button>
                 </div>
 
                 <div class="features-tabs-content">
@@ -716,66 +707,153 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                     </div>
 
-                    <!-- AI Spreadsheet Import -->
-                    <div class="tab-content" id="tab-ai-import">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Import any spreadsheet with AI</h3>
-                                <p>Drop in any Excel or CSV file — no reformatting needed. Our AI detects your data types, maps columns automatically, and imports everything in a couple of clicks.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Works with any spreadsheet format</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>AI auto-maps columns to Argo Books fields</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Encrypted and secure</span>
-                                    </li>
-                                </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Spreadsheet Import Section -->
+    <section class="ai-import-section">
+        <div class="container">
+            <div class="ai-import-content">
+                <div class="ai-import-text animate-on-scroll">
+                    <span class="section-tag">AI-Powered</span>
+                    <h2 class="section-title text-left">Import any spreadsheet — instantly</h2>
+                    <p class="section-description text-left">Drop in any Excel or CSV file, no matter how it's formatted. Our AI reads your column headers, detects data types, and maps everything to the right fields automatically.</p>
+
+                    <div class="ai-import-features">
+                        <div class="ai-import-feature">
+                            <div class="ai-feature-icon">
+                                <?= svg_icon('bolt', 24) ?>
                             </div>
-                            <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup import-mockup">
-                                        <div class="import-preview">
-                                            <div class="import-header">
-                                                <span class="form-title">AI Import</span>
-                                                <span class="import-badge-ai">AI-Powered</span>
-                                            </div>
-                                            <div class="import-mapping">
-                                                <div class="mapping-row">
-                                                    <span class="source-col">Customer Name</span>
-                                                    <span class="mapping-arrow">→</span>
-                                                    <span class="target-col">Name</span>
-                                                    <span class="mapping-confidence high">98%</span>
-                                                </div>
-                                                <div class="mapping-row">
-                                                    <span class="source-col">Email Address</span>
-                                                    <span class="mapping-arrow">→</span>
-                                                    <span class="target-col">Email</span>
-                                                    <span class="mapping-confidence high">95%</span>
-                                                </div>
-                                                <div class="mapping-row">
-                                                    <span class="source-col">Phone #</span>
-                                                    <span class="mapping-arrow">→</span>
-                                                    <span class="target-col">Phone</span>
-                                                    <span class="mapping-confidence medium">82%</span>
-                                                </div>
-                                            </div>
-                                            <div class="import-status">
-                                                <?= svg_icon('check', 16) ?>
-                                                <span>3 sheets detected · 1,247 rows ready</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div class="ai-feature-detail">
+                                <h4>Instant Column Detection</h4>
+                                <p>AI recognizes names, emails, phone numbers, dates, currencies, and more — regardless of column names</p>
+                            </div>
+                        </div>
+                        <div class="ai-import-feature">
+                            <div class="ai-feature-icon">
+                                <?= svg_icon('table', 24) ?>
+                            </div>
+                            <div class="ai-feature-detail">
+                                <h4>Any Format, Any Layout</h4>
+                                <p>Works with messy spreadsheets, unusual column names, and mixed data — no reformatting needed</p>
+                            </div>
+                        </div>
+                        <div class="ai-import-feature">
+                            <div class="ai-feature-icon">
+                                <?= svg_icon('shield', 24) ?>
+                            </div>
+                            <div class="ai-feature-detail">
+                                <h4>Private &amp; Secure</h4>
+                                <p>Your data is encrypted and processed securely — it's never stored or used for training</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ai-import-visual animate-on-scroll">
+                    <div class="ai-import-demo" id="aiImportDemo">
+                        <!-- Spreadsheet source -->
+                        <div class="demo-spreadsheet">
+                            <div class="demo-spreadsheet-header">
+                                <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
+                                <span class="demo-file-name">customers_2025.xlsx</span>
+                                <span class="demo-file-badge">Excel</span>
+                            </div>
+                            <div class="demo-spreadsheet-table">
+                                <div class="demo-table-row demo-table-header-row">
+                                    <span>Full Name</span>
+                                    <span>Email Address</span>
+                                    <span>Phone #</span>
+                                    <span>Company</span>
+                                </div>
+                                <div class="demo-table-row">
+                                    <span>Jane Cooper</span>
+                                    <span>jane@acme.co</span>
+                                    <span>(555) 123-4567</span>
+                                    <span>Acme Inc</span>
+                                </div>
+                                <div class="demo-table-row">
+                                    <span>Marcus Chen</span>
+                                    <span>m.chen@mail.com</span>
+                                    <span>(555) 987-6543</span>
+                                    <span>TechFlow</span>
+                                </div>
+                                <div class="demo-table-row demo-table-faded">
+                                    <span>Sarah Kim</span>
+                                    <span>sarah.k@corp.io</span>
+                                    <span>(555) 456-7890</span>
+                                    <span>NovaCorp</span>
+                                </div>
+                            </div>
+                            <div class="demo-row-count">1,247 more rows...</div>
+                        </div>
+
+                        <!-- AI Processing indicator -->
+                        <div class="demo-ai-processor" id="aiProcessor">
+                            <div class="ai-processor-ring">
+                                <svg viewBox="0 0 48 48" class="processor-ring-svg">
+                                    <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                                    <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
+                                    <defs>
+                                        <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" style="stop-color:#6366f1"/>
+                                            <stop offset="100%" style="stop-color:#8b5cf6"/>
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <span class="processor-label">AI</span>
+                            </div>
+                            <span class="processor-text">Mapping columns...</span>
+                        </div>
+
+                        <!-- Mapping results -->
+                        <div class="demo-mapping-results" id="aiMappingResults">
+                            <div class="demo-mapping-header">
+                                <span class="demo-mapping-title">Mapped Fields</span>
+                                <span class="demo-mapping-badge">4/4 matched</span>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="0">
+                                <div class="demo-map-source">Full Name</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Name</div>
+                                <div class="demo-map-confidence">98%</div>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="1">
+                                <div class="demo-map-source">Email Address</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Email</div>
+                                <div class="demo-map-confidence">96%</div>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="2">
+                                <div class="demo-map-source">Phone #</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Phone</div>
+                                <div class="demo-map-confidence">85%</div>
+                            </div>
+                            <div class="demo-mapping-row" data-delay="3">
+                                <div class="demo-map-source">Company</div>
+                                <div class="demo-map-arrow">
+                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="demo-map-target">Company</div>
+                                <div class="demo-map-confidence">99%</div>
+                            </div>
+                            <div class="demo-mapping-footer" id="aiMappingFooter">
+                                <div class="demo-mapping-success">
+                                    <?= svg_icon('check', 16) ?>
+                                    <span>Ready to import 1,251 rows</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -1383,6 +1461,70 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         // Start the scan animation cycle
         if (scanAnimation) {
             runScanCycle();
+        }
+
+        // AI Import demo animation
+        const aiImportDemo = document.getElementById('aiImportDemo');
+        if (aiImportDemo) {
+            let aiAnimationStarted = false;
+
+            function runAiImportAnimation() {
+                const processor = document.getElementById('aiProcessor');
+                const results = document.getElementById('aiMappingResults');
+                const rows = results.querySelectorAll('.demo-mapping-row');
+                const footer = document.getElementById('aiMappingFooter');
+
+                // Reset
+                processor.classList.remove('active');
+                results.classList.remove('active');
+                rows.forEach(r => r.classList.remove('visible'));
+                footer.classList.remove('visible');
+                processor.querySelector('.processor-progress').style.strokeDashoffset = '126';
+                processor.querySelector('.processor-text').textContent = 'Mapping columns...';
+
+                // Step 1: Show AI processor (0.5s)
+                setTimeout(() => {
+                    processor.classList.add('active');
+                    // Animate progress ring
+                    requestAnimationFrame(() => {
+                        processor.querySelector('.processor-progress').style.strokeDashoffset = '0';
+                    });
+                }, 500);
+
+                // Step 2: Show mapping results card (2s)
+                setTimeout(() => {
+                    processor.querySelector('.processor-text').textContent = 'Complete!';
+                    results.classList.add('active');
+                }, 2000);
+
+                // Step 3: Reveal rows one by one (2.3s, 2.6s, 2.9s, 3.2s)
+                rows.forEach((row, i) => {
+                    setTimeout(() => {
+                        row.classList.add('visible');
+                    }, 2300 + (i * 300));
+                });
+
+                // Step 4: Show footer (3.8s)
+                setTimeout(() => {
+                    footer.classList.add('visible');
+                }, 3800);
+
+                // Step 5: Hold for 4s, then restart (7.8s)
+                setTimeout(() => {
+                    runAiImportAnimation();
+                }, 8000);
+            }
+
+            const aiObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !aiAnimationStarted) {
+                        aiAnimationStarted = true;
+                        runAiImportAnimation();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            aiObserver.observe(aiImportDemo);
         }
 
         // FAQ Accordion

@@ -1479,15 +1479,20 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 results.classList.remove('active');
                 rows.forEach(r => r.classList.remove('visible'));
                 footer.classList.remove('visible');
-                processor.querySelector('.processor-progress').style.strokeDashoffset = '126';
+                const progressRing = processor.querySelector('.processor-progress');
+                progressRing.style.transition = 'none';
+                progressRing.style.strokeDashoffset = '126';
                 processor.querySelector('.processor-text').textContent = 'Mapping columns...';
 
                 // Step 1: Show AI processor (0.5s)
                 setTimeout(() => {
                     processor.classList.add('active');
-                    // Animate progress ring
+                    // Re-enable transition, then animate progress ring
                     requestAnimationFrame(() => {
-                        processor.querySelector('.processor-progress').style.strokeDashoffset = '0';
+                        progressRing.style.transition = '';
+                        requestAnimationFrame(() => {
+                            progressRing.style.strokeDashoffset = '0';
+                        });
                     });
                 }, 500);
 

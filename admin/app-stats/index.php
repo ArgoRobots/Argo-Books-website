@@ -671,10 +671,6 @@ include '../admin_header.php';
                         <h2>AI Import Type Breakdown</h2>
                         <canvas id="aiImportOverviewChart"></canvas>
                     </div>
-                    <div class="chart-container">
-                        <h2>AI vs Standard Imports</h2>
-                        <canvas id="aiVsStandardChart"></canvas>
-                    </div>
                 </div>
 
                 <div class="chart-row">

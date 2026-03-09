@@ -134,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // AI Spreadsheet Importer Charts
   generateAIImportStats(featureUsageData);
   generateAIImportOverviewChart(featureUsageData);
-  generateAIVsStandardChart(featureUsageData);
   generateAIImportTrendChart(featureUsageData);
   generateAIImportTypeTimeChart(featureUsageData);
   generateAIImportDurationChart(featureUsageData);
@@ -399,7 +398,7 @@ document.addEventListener("DOMContentLoaded", function () {
               (f.Context === "ai-xlsx" || f.Context === "ai-csv")
           )
           .length.toLocaleString(),
-        subtext: `${featureUsageData.filter((f) => f.FeatureName === "DataImported" && f.Context === ".xlsx").length} standard imports`,
+        subtext: `${featureUsageData.filter((f) => f.FeatureName === "DataImported" && f.Context === "ai-csv").length} CSV imports`,
       },
       {
         title: "Peak Usage Time",
@@ -2724,17 +2723,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const importEvents = getDataImportedEvents(featureUsageData);
     const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx");
     const aiCsv = importEvents.filter((e) => e.Context === "ai-csv");
-    const standardXlsx = importEvents.filter((e) => e.Context === ".xlsx");
     const totalAI = aiXlsx.length + aiCsv.length;
-    const totalAll = importEvents.length;
-    const aiPercentage =
-      totalAll > 0 ? ((totalAI / totalAll) * 100).toFixed(1) : "0";
 
     const stats = [
       {
         title: "Total AI Imports",
         value: totalAI.toLocaleString(),
-        subtext: `${aiPercentage}% of all imports`,
+        subtext: `${aiXlsx.length} Excel, ${aiCsv.length} CSV`,
       },
       {
         title: "AI Excel Imports",
@@ -2745,11 +2740,6 @@ document.addEventListener("DOMContentLoaded", function () {
         title: "AI CSV Imports",
         value: aiCsv.length.toLocaleString(),
         subtext: "ai-csv mapped imports",
-      },
-      {
-        title: "Standard Imports",
-        value: standardXlsx.length.toLocaleString(),
-        subtext: "Non-AI .xlsx imports",
       },
     ];
 
@@ -2807,55 +2797,6 @@ document.addEventListener("DOMContentLoaded", function () {
           {
             data: [aiXlsx, aiCsv],
             backgroundColor: ["#3b82f6", "#8b5cf6"],
-            borderWidth: 2,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-          tooltip: {
-            callbacks: {
-              label: function (context) {
-                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                const percentage = Math.round((context.raw / total) * 100);
-                return `${context.label}: ${context.raw} imports (${percentage}%)`;
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  function generateAIVsStandardChart(featureUsageData) {
-    const importEvents = getDataImportedEvents(featureUsageData);
-
-    if (importEvents.length === 0) {
-      document.getElementById("aiVsStandardChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No import data available</div>';
-      return;
-    }
-
-    const aiTotal = importEvents.filter(
-      (e) => e.Context === "ai-xlsx" || e.Context === "ai-csv"
-    ).length;
-    const standardTotal = importEvents.filter(
-      (e) => e.Context === ".xlsx"
-    ).length;
-
-    new Chart(document.getElementById("aiVsStandardChart"), {
-      type: "doughnut",
-      data: {
-        labels: ["AI-Mapped Imports", "Standard Imports"],
-        datasets: [
-          {
-            data: [aiTotal, standardTotal],
-            backgroundColor: ["#10b981", "#f59e0b"],
             borderWidth: 2,
           },
         ],
@@ -3144,7 +3085,7 @@ document.addEventListener("DOMContentLoaded", function () {
     importEvents.forEach((item) => {
       const date = new Date(item.timestamp).toLocaleDateString();
       if (!dailyByType[date]) {
-        dailyByType[date] = { "ai-xlsx": 0, "ai-csv": 0, ".xlsx": 0 };
+        dailyByType[date] = { "ai-xlsx": 0, "ai-csv": 0 };
       }
       const detail = item.Context || "";
       if (dailyByType[date][detail] !== undefined) {
@@ -3171,13 +3112,6 @@ document.addEventListener("DOMContentLoaded", function () {
             data: dates.map((d) => dailyByType[d]["ai-csv"]),
             backgroundColor: "#8b5cf6",
             borderColor: "#7c3aed",
-            borderWidth: 1,
-          },
-          {
-            label: "Standard .xlsx",
-            data: dates.map((d) => dailyByType[d][".xlsx"]),
-            backgroundColor: "#f59e0b",
-            borderColor: "#d97706",
             borderWidth: 1,
           },
         ],

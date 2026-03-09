@@ -137,6 +137,8 @@ document.addEventListener("DOMContentLoaded", function () {
   generateAIVsStandardChart(featureUsageData);
   generateAIImportTrendChart(featureUsageData);
   generateAIImportTypeTimeChart(featureUsageData);
+  generateAIImportDurationChart(featureUsageData);
+  generateAIImportDurationByTypeChart(featureUsageData);
 
   generateSessionDurationChart(sessionData);
   generateExportTypesBreakdown(exportData);
@@ -2242,6 +2244,23 @@ document.addEventListener("DOMContentLoaded", function () {
   // =====================
   // Feature Usage Charts
   // =====================
+  // Convert camelCase/PascalCase feature names to readable labels
+  function formatFeatureLabel(name) {
+    const labelMap = {
+      DataImported: "AI Spreadsheet Import",
+      PageView: "Page View",
+      ReceiptScanned: "Receipt Scanned",
+      GoogleSheetsExport: "Google Sheets Export",
+      BackupCreated: "Backup Created",
+      BackupRestored: "Backup Restored",
+      CurrencyConverted: "Currency Converted",
+      SupplierMatched: "Supplier Matched",
+    };
+    if (labelMap[name]) return labelMap[name];
+    // Fallback: insert spaces before uppercase letters
+    return name.replace(/([a-z])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2");
+  }
+
   function generateFeatureUsageChart(featureUsageData) {
     if (featureUsageData.length === 0) {
       document.getElementById("featureUsageChart").parentElement.innerHTML =
@@ -2275,7 +2294,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("featureUsageChart"), {
       type: "bar",
       data: {
-        labels: sortedFeatures.map(([feature]) => feature),
+        labels: sortedFeatures.map(([feature]) => formatFeatureLabel(feature)),
         datasets: [
           {
             label: "Usage Count",
@@ -2734,6 +2753,21 @@ document.addEventListener("DOMContentLoaded", function () {
       },
     ];
 
+    // Add avg duration stat if any AI imports have duration data
+    const aiWithDuration = [...aiXlsx, ...aiCsv].filter(
+      (e) => e.DurationMs != null && e.DurationMs > 0
+    );
+    if (aiWithDuration.length > 0) {
+      const avgMs =
+        aiWithDuration.reduce((sum, e) => sum + e.DurationMs, 0) /
+        aiWithDuration.length;
+      stats.push({
+        title: "Avg Import Duration",
+        value: avgMs >= 1000 ? (avgMs / 1000).toFixed(1) + "s" : Math.round(avgMs) + "ms",
+        subtext: `Based on ${aiWithDuration.length} imports with timing data`,
+      });
+    }
+
     statsGrid.innerHTML = stats
       .map(
         (stat) => `
@@ -2901,6 +2935,195 @@ document.addEventListener("DOMContentLoaded", function () {
           x: {
             ticks: {
               maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateAIImportDurationChart(featureUsageData) {
+    const importEvents = getDataImportedEvents(featureUsageData).filter(
+      (e) =>
+        (e.Context === "ai-xlsx" || e.Context === "ai-csv") &&
+        e.DurationMs != null &&
+        e.DurationMs > 0
+    );
+
+    if (importEvents.length === 0) {
+      document.getElementById("aiImportDurationChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No AI import duration data available</div>';
+      return;
+    }
+
+    // Group by day and compute average duration
+    const dailyDurations = {};
+    importEvents.forEach((item) => {
+      const date = new Date(item.timestamp).toLocaleDateString();
+      if (!dailyDurations[date]) {
+        dailyDurations[date] = { total: 0, count: 0 };
+      }
+      dailyDurations[date].total += item.DurationMs;
+      dailyDurations[date].count++;
+    });
+
+    const dates = Object.keys(dailyDurations).sort().slice(-30);
+    const avgDurations = dates.map((d) =>
+      Math.round(dailyDurations[d].total / dailyDurations[d].count)
+    );
+
+    new Chart(document.getElementById("aiImportDurationChart"), {
+      type: "line",
+      data: {
+        labels: dates,
+        datasets: [
+          {
+            label: "Avg Duration (ms)",
+            data: avgDurations,
+            borderColor: "#8b5cf6",
+            backgroundColor: "rgba(139, 92, 246, 0.1)",
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: "#8b5cf6",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const ms = context.raw;
+                const label =
+                  ms >= 1000
+                    ? (ms / 1000).toFixed(1) + "s"
+                    : ms + "ms";
+                const count =
+                  dailyDurations[dates[context.dataIndex]].count;
+                return `Avg: ${label} (${count} imports)`;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Duration (ms)",
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  function generateAIImportDurationByTypeChart(featureUsageData) {
+    const importEvents = getDataImportedEvents(featureUsageData).filter(
+      (e) =>
+        (e.Context === "ai-xlsx" || e.Context === "ai-csv") &&
+        e.DurationMs != null &&
+        e.DurationMs > 0
+    );
+
+    if (importEvents.length === 0) {
+      document.getElementById(
+        "aiImportDurationByTypeChart"
+      ).parentElement.innerHTML =
+        '<div class="chart-no-data">No AI import duration data available</div>';
+      return;
+    }
+
+    const byType = { "ai-xlsx": [], "ai-csv": [] };
+    importEvents.forEach((e) => {
+      if (byType[e.Context]) {
+        byType[e.Context].push(e.DurationMs);
+      }
+    });
+
+    const labels = [];
+    const avgData = [];
+    const minData = [];
+    const maxData = [];
+    const colors = { "ai-xlsx": "#3b82f6", "ai-csv": "#8b5cf6" };
+    const bgColors = [];
+
+    for (const [type, durations] of Object.entries(byType)) {
+      if (durations.length === 0) continue;
+      labels.push(type === "ai-xlsx" ? "AI Excel (.xlsx)" : "AI CSV (.csv)");
+      const avg = Math.round(
+        durations.reduce((a, b) => a + b, 0) / durations.length
+      );
+      avgData.push(avg);
+      minData.push(Math.min(...durations));
+      maxData.push(Math.max(...durations));
+      bgColors.push(colors[type]);
+    }
+
+    new Chart(document.getElementById("aiImportDurationByTypeChart"), {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Average",
+            data: avgData,
+            backgroundColor: bgColors,
+            borderColor: bgColors,
+            borderWidth: 1,
+          },
+          {
+            label: "Min",
+            data: minData,
+            backgroundColor: bgColors.map((c) => c + "66"),
+            borderColor: bgColors,
+            borderWidth: 1,
+          },
+          {
+            label: "Max",
+            data: maxData,
+            backgroundColor: bgColors.map((c) => c + "33"),
+            borderColor: bgColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const ms = context.raw;
+                const label =
+                  ms >= 1000
+                    ? (ms / 1000).toFixed(1) + "s"
+                    : ms + "ms";
+                return `${context.dataset.label}: ${label}`;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "Duration (ms)",
             },
           },
         },

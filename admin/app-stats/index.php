@@ -118,6 +118,9 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
         case 'FeatureUsage':
             $normalized['FeatureName'] = $event['featureName'] ?? 'Unknown';
             $normalized['Context'] = $event['context'] ?? '';
+            if (isset($event['durationMs'])) {
+                $normalized['DurationMs'] = $event['durationMs'];
+            }
             return ['category' => 'FeatureUsage', 'data' => $normalized];
 
         default:
@@ -682,6 +685,17 @@ include '../admin_header.php';
                     <div class="chart-container">
                         <h2>Import Type Over Time</h2>
                         <canvas id="aiImportTypeTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>AI Import Duration Over Time</h2>
+                        <canvas id="aiImportDurationChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>AI Import Duration by Type</h2>
+                        <canvas id="aiImportDurationByTypeChart"></canvas>
                     </div>
                 </div>
             </div>

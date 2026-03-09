@@ -31,10 +31,8 @@ include '../../docs-header.php';
                 <li><strong>Income Statement:</strong> Revenue, expenses, and net income over the selected period</li>
                 <li><strong>Balance Sheet:</strong> Assets, liabilities, and equity at a point in time</li>
                 <li><strong>Cash Flow Statement:</strong> Cash inflows and outflows across operating, investing, and financing activities</li>
-                <li><strong>Trial Balance:</strong> All account balances with debit and credit columns</li>
                 <li><strong>General Ledger:</strong> Detailed transaction records for all accounts</li>
                 <li><strong>Accounts Receivable Aging:</strong> Outstanding customer payments grouped by age</li>
-                <li><strong>Accounts Payable Aging:</strong> Outstanding supplier payments grouped by age</li>
                 <li><strong>Tax Summary:</strong> Tax-related totals for the selected period</li>
             </ul>
 
@@ -58,7 +56,7 @@ include '../../docs-header.php';
             <h3>Multi-Page Reports</h3>
             <p>Reports can span multiple pages for more detailed documents.</p>
             <ul>
-                <li><strong>Add Page:</strong> Use the "Add Page" button in the footer toolbar to add a new page</li>
+                <li><strong>Add Page:</strong> Use the "Add Page" button in the bottom to add a new page</li>
                 <li><strong>Delete Page:</strong> Use the "Delete Page" button to remove the current page</li>
                 <li><strong>Page Navigation:</strong> Scroll through pages in the designer — all pages are stacked vertically</li>
             </ul>

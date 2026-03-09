@@ -188,7 +188,7 @@ $isDocsLanding = true;
                         <?= svg_icon('pie-chart', 20) ?>
                     </div>
                     <h3>Report Generator</h3>
-                    <p>Create charts and analytics</p>
+                    <p>Create charts, tables, and analytics</p>
                 </a>
                 <a href="pages/features/sales-tracking.php" class="doc-card">
                     <div class="card-icon">

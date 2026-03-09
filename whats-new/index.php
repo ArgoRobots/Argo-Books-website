@@ -86,6 +86,50 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.2 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.2</span>
+                        <span class="date-tag">March 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>AI spreadsheet import</strong> &mdash; Import spreadsheets in any format and let AI automatically detect the data type and map your columns, so you can bring in your data without reformatting.</li>
+                                <li><strong>Accounting reports</strong> &mdash; Generate professional accounting reports including Income Statement, Balance Sheet, Cash Flow Statement, General Ledger, AR Aging, and Tax Summary &mdash; all with localized tax terminology for your country.</li>
+                                <li><strong>Multi-page reports</strong> &mdash; Create reports that span multiple pages. All pages display on the canvas at once, and tables that overflow automatically continue onto the next page.</li>
+                                <li><strong>Company details on reports</strong> &mdash; Reports can now display your company logo, name, address, phone, and email in a header. Enabled by default on accounting templates.</li>
+                                <li><strong>Auto-create revenue from invoices</strong> &mdash; Sending an invoice now automatically creates a matching revenue entry, so your dashboard and reports stay in sync without manual data entry.</li>
+                                <li><strong>Tax analytics</strong> &mdash; A new Taxes tab on the Analytics page with charts for tax collected vs. paid, net tax liability, tax rate distribution, and breakdowns by category and product.</li>
+                                <li><strong>Fullscreen charts</strong> &mdash; A new button in the top-right corner of charts lets you open them in fullscreen for easier viewing and detailed analysis.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Faster tables</strong> &mdash; Tables now use virtualization so only visible rows are rendered, resulting in noticeably faster page loads and lower memory usage.</li>
+                                <li><strong>Date range label</strong> &mdash; The Dashboard and Analytics pages now display the active date span, and "All Time" starts from your earliest transaction instead of a fixed date.</li>
+                                <li><strong>Sidebar remembers state</strong> &mdash; Sidebar sections stay expanded or collapsed between sessions.</li>
+                                <li><strong>Improved version history</strong> &mdash; History entries are now nested and show exactly which fields changed.</li>
+                                <li><strong>Interactive column resizing</strong> &mdash; Adjust column widths directly in the report designer by dragging column edges.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Several bug fixes for improved stability.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.1 -->
             <div class="version-card">
                 <div class="version-header">

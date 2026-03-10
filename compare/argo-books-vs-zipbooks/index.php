@@ -36,7 +36,7 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-zipbooks/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs ZipBooks — More Features, Lower Price | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>

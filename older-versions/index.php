@@ -125,7 +125,7 @@ foreach ($platforms as $key => $platform) {
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/older-versions/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Older Versions - Argo Books | Previous Releases</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>

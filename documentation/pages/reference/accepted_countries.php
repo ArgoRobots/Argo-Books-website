@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../../resources/icons.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Complete list of accepted country names and variants for importing data into Argo Books. Find all recognized country codes and alternative names.">
-    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/argo-icon.ico">
     <title>Accepted Country Names - Argo Community</title>
 
     <script src="../../../resources/scripts/jquery-3.6.0.js"></script>

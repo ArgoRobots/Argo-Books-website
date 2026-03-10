@@ -49,7 +49,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Premium Subscription - Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>

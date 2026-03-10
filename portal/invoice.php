@@ -116,7 +116,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Invoice <?php echo htmlspecialchars($invoiceId); ?> - <?php echo htmlspecialchars($companyName); ?></title>
-    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
 
     <link rel="stylesheet" href="/resources/styles/custom-colors.css">
     <link rel="stylesheet" href="/portal/style.css">

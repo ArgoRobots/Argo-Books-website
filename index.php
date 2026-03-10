@@ -99,7 +99,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         }
     </script>
 
-    <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books - AI-Powered Business Management Software</title>
 
     <script src="resources/scripts/jquery-3.6.0.js"></script>

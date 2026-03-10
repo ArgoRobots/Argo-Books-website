@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- Canonical URL -->
   <link rel="canonical" href="https://argorobots.com/contact-us/">
 
-  <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
   <title>Contact Us - Argo Books Support | Saskatoon Software Company</title>
 
   <script src="../resources/scripts/jquery-3.6.0.js"></script>

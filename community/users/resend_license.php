@@ -57,7 +57,7 @@ $page_title = 'Resend Subscription ID';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($page_title); ?> - Argo Community</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>

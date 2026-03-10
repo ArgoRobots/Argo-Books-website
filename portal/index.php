@@ -26,7 +26,7 @@ if (empty($token) || !preg_match('/^[a-fA-F0-9]{48}$/', $token)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Payment Portal - Argo Books</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
     <link rel="stylesheet" href="/resources/styles/custom-colors.css">
     <link rel="stylesheet" href="/portal/style.css">
 </head>
@@ -126,7 +126,7 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Invoice Portal - <?php echo htmlspecialchars($companyName); ?></title>
-    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
 
     <link rel="stylesheet" href="/resources/styles/custom-colors.css">
     <link rel="stylesheet" href="/portal/style.css">

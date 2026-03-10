@@ -60,7 +60,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($fullTitle); ?></title>
 
     <script src="<?php echo $resourcePath; ?>resources/scripts/jquery-3.6.0.js"></script>

@@ -9,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Premium Subscription Confirmed - Argo Books">
     <meta name="author" content="Argo">
-    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../../../resources/images/argo-logo/argo-icon.ico">
     <title>Premium Subscription Confirmed - Argo Books</title>
 
     <script src="../../../resources/scripts/jquery-3.6.0.js"></script>

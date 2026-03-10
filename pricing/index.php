@@ -41,7 +41,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/pricing/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Pricing - Argo Books</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>

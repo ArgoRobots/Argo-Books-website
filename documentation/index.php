@@ -34,7 +34,7 @@ $isDocsLanding = true;
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
 
-    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/A-logo.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($pageTitle); ?> - Argo Books</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>

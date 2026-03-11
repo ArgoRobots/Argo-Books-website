@@ -12,257 +12,130 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 // Get database connection
 $db = get_db_connection();
 
-// Get stats
-// Total community posts
-$result = $db->query('SELECT COUNT(*) as count FROM community_posts');
-$total_posts = $result->fetch_assoc()['count'] ?? 0;
+// --- Revenue & Subscription Queries ---
 
-// Total users
-$result = $db->query('SELECT COUNT(*) as count FROM community_users');
-$total_users = $result->fetch_assoc()['count'] ?? 0;
-
-// Premium subscriptions
-$total_subscriptions = 0;
-$monthly_subscriptions = 0;
+// Total revenue (subscriptions + portal payments)
 $total_subscription_revenue = 0;
+$total_portal_revenue = 0;
+$monthly_subscription_revenue = 0;
+$monthly_portal_revenue = 0;
+$total_active_licenses = 0;
+$total_inactive_licenses = 0;
+
 try {
     global $pdo;
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
-    $total_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-    $monthly_subscriptions = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+    // Total subscription revenue (excluding key-based)
     $stmt = $pdo->query("SELECT COALESCE(SUM(ps.amount), 0) as total FROM premium_subscriptions ps LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id WHERE psk.id IS NULL");
     $total_subscription_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+    // This month subscription revenue
+    $stmt = $pdo->query("SELECT COALESCE(SUM(ps.amount), 0) as total FROM premium_subscriptions ps LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id WHERE psk.id IS NULL AND ps.created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
+    $monthly_subscription_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+    // Active licenses
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
+    $total_active_licenses = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+    // Inactive licenses (cancelled, expired, past_due, payment_failed)
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status != 'active'");
+    $total_inactive_licenses = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+    // Monthly revenue over time (last 12 months) - subscriptions
+    $stmt = $pdo->query("
+        SELECT DATE_FORMAT(ps.created_at, '%Y-%m') as month, COALESCE(SUM(ps.amount), 0) as total
+        FROM premium_subscriptions ps
+        LEFT JOIN premium_subscription_keys psk ON psk.subscription_id = ps.subscription_id
+        WHERE psk.id IS NULL AND ps.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(ps.created_at, '%Y-%m')
+        ORDER BY month ASC
+    ");
+    $subscription_revenue_by_month = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $subscription_revenue_by_month[$row['month']] = (float)$row['total'];
+    }
+
+    // License status breakdown
+    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM premium_subscriptions GROUP BY status");
+    $license_breakdown = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $license_breakdown[$row['status']] = (int)$row['count'];
+    }
+
+    // New subscriptions this month
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
+    $new_subscriptions_this_month = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+    // Cancelled this month
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'cancelled' AND cancelled_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
+    $cancelled_this_month = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
 } catch (Exception $e) {
     error_log("Error fetching subscription stats: " . $e->getMessage());
+    $subscription_revenue_by_month = [];
+    $license_breakdown = [];
+    $new_subscriptions_this_month = 0;
+    $cancelled_this_month = 0;
 }
 
 // Portal payments
-$monthly_portal_payments = 0;
-$total_portal_payments_amount = 0;
-$monthly_portal_payments_amount = 0;
 try {
     global $pdo;
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE payment_environment = 'production' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-    $monthly_portal_payments = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
+
+    // Total portal revenue
     $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production'");
-    $total_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-    $monthly_portal_payments_amount = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+    $total_portal_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+    // This month portal revenue
+    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
+    $monthly_portal_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
+
+    // Monthly portal revenue over time (last 12 months)
+    $stmt = $pdo->query("
+        SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COALESCE(SUM(amount), 0) as total
+        FROM portal_payments
+        WHERE status = 'completed' AND payment_environment = 'production' AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+        ORDER BY month ASC
+    ");
+    $portal_revenue_by_month = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $portal_revenue_by_month[$row['month']] = (float)$row['total'];
+    }
+
 } catch (Exception $e) {
     error_log("Error fetching portal payment stats: " . $e->getMessage());
+    $portal_revenue_by_month = [];
 }
 
-// Users registered in the last 30 days
-$result = $db->query('SELECT COUNT(*) as count FROM community_users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
-$monthly_users = $result->fetch_assoc()['count'] ?? 0;
+// Build combined revenue data for last 12 months
+$revenue_labels = [];
+$subscription_data = [];
+$portal_data = [];
+$combined_data = [];
 
-// Posts created in the last 30 days
-$result = $db->query('SELECT COUNT(*) as count FROM community_posts WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
-$monthly_posts = $result->fetch_assoc()['count'] ?? 0;
-
-// App users from data-logs (unique IP addresses)
-$total_app_users = 0;
-$monthly_app_users = 0;
-$dataDir = __DIR__ . '/data-logs/';
-$thirtyDaysAgo = strtotime('-30 days');
-
-if (is_dir($dataDir)) {
-    $allIPs = [];
-    $monthlyIPs = [];
-    $dataFiles = glob($dataDir . '*.json');
-
-    foreach ($dataFiles as $file) {
-        $jsonData = file_get_contents($file);
-        if ($jsonData === false) continue;
-
-        $fileData = json_decode($jsonData, true);
-        if ($fileData === null || !isset($fileData['dataPoints'])) continue;
-
-        foreach ($fileData['dataPoints'] as $category => $dataPoints) {
-            foreach ($dataPoints as $dataPoint) {
-                if (!empty($dataPoint['hashedIP'])) {
-                    $allIPs[$dataPoint['hashedIP']] = true;
-
-                    if (!empty($dataPoint['timestamp'])) {
-                        $timestamp = strtotime($dataPoint['timestamp']);
-                        if ($timestamp >= $thirtyDaysAgo) {
-                            $monthlyIPs[$dataPoint['hashedIP']] = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    $total_app_users = count($allIPs);
-    $monthly_app_users = count($monthlyIPs);
+for ($i = 11; $i >= 0; $i--) {
+    $month_key = date('Y-m', strtotime("-$i months"));
+    $month_label = date('M Y', strtotime("-$i months"));
+    $revenue_labels[] = $month_label;
+    $sub_amount = $subscription_revenue_by_month[$month_key] ?? 0;
+    $portal_amount = $portal_revenue_by_month[$month_key] ?? 0;
+    $subscription_data[] = $sub_amount;
+    $portal_data[] = $portal_amount;
+    $combined_data[] = $sub_amount + $portal_amount;
 }
 
-// Monthly downloads from statistics table
-$monthly_downloads = 0;
-$total_downloads = 0;
-try {
-    $dl_result = $db->query("SELECT COUNT(*) as count FROM statistics WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia') AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-    $monthly_downloads = $dl_result->fetch_assoc()['count'] ?? 0;
-    $dl_total_result = $db->query("SELECT COUNT(*) as count FROM statistics WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')");
-    $total_downloads = $dl_total_result->fetch_assoc()['count'] ?? 0;
-} catch (Exception $e) {
-    error_log("Error fetching download stats: " . $e->getMessage());
-}
+// Calculate totals
+$total_revenue = $total_subscription_revenue + $total_portal_revenue;
+$monthly_revenue = $monthly_subscription_revenue + $monthly_portal_revenue;
+$total_licenses = $total_active_licenses + $total_inactive_licenses;
 
-// Activity event count from query parameter
-$activity_count = isset($_GET['activity']) ? (int)$_GET['activity'] : 10;
-$allowed_counts = [5, 10, 25, 50];
-if (!in_array($activity_count, $allowed_counts)) {
-    $activity_count = 10;
-}
-$per_source_limit = $activity_count; // fetch enough per source to fill the total
-
-// Get recent activity items for timeline
-$recent_items = [];
-
-// Recent user registrations
-$result = $db->query("SELECT username, created_at, email_verified FROM community_users ORDER BY created_at DESC LIMIT $per_source_limit");
-while ($row = $result->fetch_assoc()) {
-    $recent_items[] = [
-        'type' => 'user',
-        'time' => $row['created_at'],
-        'description' => 'New user registered: ' . htmlspecialchars($row['username']),
-        'status' => $row['email_verified'] ? 'verified' : 'pending'
-    ];
-}
-
-// Recent subscription events (new and cancelled)
-try {
-    global $pdo;
-    // New subscriptions
-    $stmt = $pdo->query("
-        SELECT ps.email, ps.billing_cycle, ps.created_at, ps.subscription_id
-        FROM premium_subscriptions ps
-        ORDER BY ps.created_at DESC
-        LIMIT $per_source_limit
-    ");
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $label = htmlspecialchars($row['email'] ?: $row['subscription_id']);
-        $cycle = ucfirst($row['billing_cycle']);
-        $recent_items[] = [
-            'type' => 'subscription',
-            'time' => $row['created_at'],
-            'description' => "Subscription added: $label ($cycle)",
-            'status' => 'active'
-        ];
-    }
-    // Cancelled subscriptions
-    $stmt = $pdo->query("
-        SELECT ps.email, ps.cancelled_at, ps.subscription_id
-        FROM premium_subscriptions ps
-        WHERE ps.status = 'cancelled' AND ps.cancelled_at IS NOT NULL
-        ORDER BY ps.cancelled_at DESC
-        LIMIT $per_source_limit
-    ");
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $label = htmlspecialchars($row['email'] ?: $row['subscription_id']);
-        $recent_items[] = [
-            'type' => 'cancellation',
-            'time' => $row['cancelled_at'],
-            'description' => "Subscription cancelled: $label",
-            'status' => 'cancelled'
-        ];
-    }
-} catch (Exception $e) {
-    error_log("Error fetching subscription activity: " . $e->getMessage());
-}
-
-// Sort by time
-usort($recent_items, function ($a, $b) {
-    return strtotime($b['time']) - strtotime($a['time']);
-});
-
-// Keep only the requested number
-$recent_items = array_slice($recent_items, 0, $activity_count);
-
-// System health checks - comprehensive production-ready implementation
-$system_health = [];
-$health_details = [];
-$overall_status = 'operational';
-
-// 1. Database connectivity and performance
-try {
-    $start_time = microtime(true);
-    $db->query('SELECT 1');
-    $db_response_time = round((microtime(true) - $start_time) * 1000, 2);
-
-    // Get MySQL version
-    $mysql_version_result = $db->query('SELECT VERSION() as version');
-    $mysql_version = $mysql_version_result->fetch_assoc()['version'] ?? 'Unknown';
-
-    // Get database size
-    $db_name = $db->query("SELECT DATABASE() as db_name")->fetch_assoc()['db_name'];
-    $size_result = $db->query("SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS size_mb FROM information_schema.TABLES WHERE table_schema = '$db_name'");
-    $db_size = $size_result->fetch_assoc()['size_mb'] ?? 0;
-
-    $system_health['database'] = $db_response_time < 100 ? 'operational' : 'warning';
-    $health_details['database'] = [
-        'response_time' => $db_response_time . ' ms',
-        'version' => $mysql_version,
-        'size' => $db_size . ' MB / 10 GB'
-    ];
-} catch (Exception $e) {
-    $system_health['database'] = 'error';
-    $health_details['database'] = ['error' => 'Connection failed'];
-    $overall_status = 'error';
-}
-
-// 2. PHP Environment
-$php_version = phpversion();
-$memory_limit = ini_get('memory_limit');
-
-// Convert shorthand to full notation (128M -> 128 MB)
-if (preg_match('/^(\d+)([KMG])$/', $memory_limit, $matches)) {
-    $memory_limit = $matches[1] . ' ' . $matches[2] . 'B';
-}
-
-$memory_usage = round(memory_get_usage(true) / 1024 / 1024, 2);
-$max_execution_time = ini_get('max_execution_time');
-
-$system_health['php'] = 'operational';
-$health_details['php'] = [
-    'version' => $php_version,
-    'memory_usage' => $memory_usage . ' MB',
-    'memory_limit' => $memory_limit,
-    'max_execution_time' => $max_execution_time . 's'
-];
-
-// 3. Session Directory
-$session_path = session_save_path() ?: sys_get_temp_dir();
-$session_writable = is_writable($session_path);
-$system_health['sessions'] = $session_writable ? 'operational' : 'error';
-$health_details['sessions'] = [
-    'writable' => $session_writable ? 'Yes' : 'No'
-];
-
-if (!$session_writable && $overall_status === 'operational') {
-    $overall_status = 'warning';
-}
-
-// 4. Upload Directory
-$upload_path = $_SERVER['DOCUMENT_ROOT'] . '/admin/data-logs';
-
-if (file_exists($upload_path)) {
-    $upload_writable = is_writable($upload_path);
-    $system_health['uploads'] = $upload_writable ? 'operational' : 'warning';
-    $health_details['uploads'] = [
-        'writable' => $upload_writable ? 'Yes' : 'No'
-    ];
-
-    if (!$upload_writable && $overall_status === 'operational') {
-        $overall_status = 'warning';
-    }
-} else {
-    $system_health['uploads'] = 'warning';
-    $health_details['uploads'] = ['status' => 'Directory not found'];
-}
+// Calculate last month revenue for comparison
+$last_month_key = date('Y-m', strtotime('-1 month'));
+$last_month_sub = $subscription_revenue_by_month[$last_month_key] ?? 0;
+$last_month_portal = $portal_revenue_by_month[$last_month_key] ?? 0;
+$last_month_revenue = $last_month_sub + $last_month_portal;
+$revenue_change = $last_month_revenue > 0 ? round(($monthly_revenue - $last_month_revenue) / $last_month_revenue * 100, 1) : 0;
 
 include 'admin_header.php';
 ?>
@@ -272,220 +145,246 @@ include 'admin_header.php';
 <div class="dashboard-home">
     <!-- Hero Section -->
     <div class="hero-section">
-        <h1>Dashboard Overview</h1>
+        <h1>Revenue Dashboard</h1>
     </div>
 
     <!-- Stats Row -->
     <div class="stats-row">
         <div class="stat-card">
-            <div class="stat-label">Active Subscriptions</div>
-            <div class="stat-value"><?php echo number_format($total_subscriptions); ?></div>
+            <div class="stat-icon"><?= svg_icon('dollar', 24) ?></div>
+            <div class="stat-label">Revenue This Month</div>
+            <div class="stat-value">$<?php echo number_format($monthly_revenue, 2); ?></div>
+            <?php if ($revenue_change != 0): ?>
+                <div class="stat-change <?php echo $revenue_change >= 0 ? 'positive' : 'negative'; ?>">
+                    <?= svg_icon($revenue_change >= 0 ? 'trending-up' : 'chevron-down', 14) ?>
+                    <?php echo ($revenue_change >= 0 ? '+' : '') . $revenue_change; ?>% vs last month
+                </div>
+            <?php endif; ?>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Total Users</div>
-            <div class="stat-value"><?php echo number_format($total_app_users); ?></div>
+            <div class="stat-icon"><?= svg_icon('analytics', 24) ?></div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value">$<?php echo number_format($total_revenue, 2); ?></div>
+            <div class="stat-breakdown">
+                <span>Subscriptions: $<?php echo number_format($total_subscription_revenue, 2); ?></span>
+                <span>Portal: $<?php echo number_format($total_portal_revenue, 2); ?></span>
+            </div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Total Community Posts</div>
-            <div class="stat-value"><?php echo number_format($total_posts); ?></div>
+            <div class="stat-icon"><?= svg_icon('shield-check', 24) ?></div>
+            <div class="stat-label">Active Licenses</div>
+            <div class="stat-value"><?php echo number_format($total_active_licenses); ?></div>
+            <div class="stat-sub">of <?php echo number_format($total_licenses); ?> total</div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Total Payments</div>
-            <div class="stat-value">$<?php echo number_format($total_portal_payments_amount, 2); ?></div>
+            <div class="stat-icon"><?= svg_icon('shield-filled', 24) ?></div>
+            <div class="stat-label">Inactive Licenses</div>
+            <div class="stat-value"><?php echo number_format($total_inactive_licenses); ?></div>
+            <div class="stat-sub"><?php echo $total_licenses > 0 ? round($total_inactive_licenses / $total_licenses * 100, 1) : 0; ?>% of total</div>
+        </div>
+    </div>
+
+    <!-- Revenue Chart -->
+    <div class="chart-section">
+        <div class="chart-header">
+            <h2 class="section-title">Revenue Over Time</h2>
+            <div class="chart-legend">
+                <span class="legend-item"><span class="legend-color legend-subscriptions"></span> Subscriptions</span>
+                <span class="legend-item"><span class="legend-color legend-portal"></span> Portal Payments</span>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="revenueChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="bottom-grid">
+        <!-- Revenue Breakdown -->
+        <div class="panel">
+            <h2 class="section-title">Monthly Breakdown</h2>
+            <div class="breakdown-items">
+                <div class="breakdown-item">
+                    <div class="breakdown-label">
+                        <?= svg_icon('subscription', 16) ?>
+                        <span>Subscription Revenue</span>
+                    </div>
+                    <div class="breakdown-value">$<?php echo number_format($monthly_subscription_revenue, 2); ?></div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">
+                        <?= svg_icon('credit-card', 16) ?>
+                        <span>Portal Revenue</span>
+                    </div>
+                    <div class="breakdown-value">$<?php echo number_format($monthly_portal_revenue, 2); ?></div>
+                </div>
+                <div class="breakdown-divider"></div>
+                <div class="breakdown-item breakdown-total">
+                    <div class="breakdown-label">
+                        <?= svg_icon('dollar', 16) ?>
+                        <span>Total This Month</span>
+                    </div>
+                    <div class="breakdown-value">$<?php echo number_format($monthly_revenue, 2); ?></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- License Overview -->
+        <div class="panel">
+            <h2 class="section-title">License Overview</h2>
+            <div class="license-stats">
+                <div class="license-bar">
+                    <?php if ($total_licenses > 0): ?>
+                        <div class="license-bar-active" style="width: <?php echo round($total_active_licenses / $total_licenses * 100, 1); ?>%"></div>
+                    <?php endif; ?>
+                </div>
+                <div class="license-details">
+                    <?php
+                    $status_labels = [
+                        'active' => ['Active', 'emerald'],
+                        'cancelled' => ['Cancelled', 'red'],
+                        'expired' => ['Expired', 'gray'],
+                        'past_due' => ['Past Due', 'amber'],
+                        'payment_failed' => ['Payment Failed', 'red']
+                    ];
+                    foreach ($status_labels as $status => $info):
+                        $count = $license_breakdown[$status] ?? 0;
+                        if ($count > 0):
+                    ?>
+                        <div class="license-detail">
+                            <span class="license-dot license-dot-<?php echo $info[1]; ?>"></span>
+                            <span class="license-detail-label"><?php echo $info[0]; ?></span>
+                            <span class="license-detail-value"><?php echo number_format($count); ?></span>
+                        </div>
+                    <?php
+                        endif;
+                    endforeach;
+                    ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subscription Activity -->
+        <div class="panel">
+            <h2 class="section-title">This Month</h2>
+            <div class="month-stats">
+                <div class="month-stat">
+                    <div class="month-stat-value positive-text"><?php echo number_format($new_subscriptions_this_month); ?></div>
+                    <div class="month-stat-label">New Subscriptions</div>
+                </div>
+                <div class="month-stat">
+                    <div class="month-stat-value negative-text"><?php echo number_format($cancelled_this_month); ?></div>
+                    <div class="month-stat-label">Cancelled</div>
+                </div>
+                <div class="month-stat">
+                    <div class="month-stat-value"><?php echo $new_subscriptions_this_month - $cancelled_this_month >= 0 ? '+' : ''; ?><?php echo number_format($new_subscriptions_this_month - $cancelled_this_month); ?></div>
+                    <div class="month-stat-label">Net Change</div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Navigation Cards -->
     <div class="nav-cards">
         <a href="license/" class="nav-card">
-            <div class="nav-card-icon">
-                <?= svg_icon('shield-filled', 24) ?>
-            </div>
+            <div class="nav-card-icon"><?= svg_icon('shield-filled', 24) ?></div>
             <div class="nav-card-title">Subscriptions</div>
             <div class="nav-card-description">Manage Premium subscriptions and keys</div>
-            <div class="nav-card-stats">
-                <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">New This Month</span>
-                    <span class="nav-card-stat-value"><?php echo number_format($monthly_subscriptions); ?></span>
-                </div>
-                <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">Total Revenue</span>
-                    <span class="nav-card-stat-value">$<?php echo number_format($total_subscription_revenue, 2); ?></span>
-                </div>
-            </div>
         </a>
-
-        <a href="app-stats/" class="nav-card">
-            <div class="nav-card-icon">
-                <?= svg_icon('bar-chart-filled', 24) ?>
-            </div>
-            <div class="nav-card-title">App Statistics</div>
-            <div class="nav-card-description">View application analytics and metrics</div>
-            <div class="nav-card-stat">
-                <span class="nav-card-stat-label">New Users This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_app_users); ?></span>
-            </div>
-        </a>
-
-        <a href="website-stats/" class="nav-card">
-            <div class="nav-card-icon">
-                <?= svg_icon('globe-filled', 24) ?>
-            </div>
-            <div class="nav-card-title">Total Downloads</div>
-            <div class="nav-card-description">View website analytics and download metrics</div>
-            <div class="nav-card-stat">
-                <span class="nav-card-stat-label">Downloads This Month</span>
-                <span class="nav-card-stat-value"><?php echo number_format($monthly_downloads); ?></span>
-            </div>
-        </a>
-
         <a href="payments/" class="nav-card">
-            <div class="nav-card-icon">
-                <?= svg_icon('credit-card-filled', 24) ?>
-            </div>
+            <div class="nav-card-icon"><?= svg_icon('credit-card-filled', 24) ?></div>
             <div class="nav-card-title">Payment Portal</div>
             <div class="nav-card-description">Monitor portal payments and invoices</div>
-            <div class="nav-card-stats">
-                <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">Transactions This Month</span>
-                    <span class="nav-card-stat-value"><?php echo number_format($monthly_portal_payments); ?></span>
-                </div>
-                <div class="nav-card-stat">
-                    <span class="nav-card-stat-label">Total This Month</span>
-                    <span class="nav-card-stat-value">$<?php echo number_format($monthly_portal_payments_amount, 2); ?></span>
-                </div>
-            </div>
         </a>
-    </div>
-
-    <!-- Content Grid -->
-    <div class="content-grid">
-        <!-- Activity Timeline -->
-        <div class="activity-section" id="activity">
-            <div class="activity-header">
-                <h2 class="section-title">Recent Activity <button class="activity-info-btn" onclick="document.getElementById('activityInfoModal').classList.add('show')" title="What's tracked?"><?= svg_icon('info', 16) ?></button></h2>
-                <select class="activity-count-select" onchange="sessionStorage.setItem('scrollPos', window.scrollY); window.location.href='?activity=' + this.value">
-                    <?php foreach ($allowed_counts as $count): ?>
-                        <option value="<?= $count ?>" <?= $activity_count === $count ? 'selected' : '' ?>><?= $count ?> events</option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="timeline">
-                <?php if (empty($recent_items)): ?>
-                    <p style="color: #94a3b8; text-align: center; padding: 2rem 0;">No recent activity</p>
-                <?php else: ?>
-                    <?php foreach ($recent_items as $item): ?>
-                        <div class="timeline-item type-<?php echo $item['type']; ?>">
-                            <div class="timeline-time">
-                                <?php
-                                $time = strtotime($item['time']);
-                                $diff = time() - $time;
-                                if ($diff < 60) {
-                                    echo 'Just now';
-                                } elseif ($diff < 3600) {
-                                    echo floor($diff / 60) . ' minutes ago';
-                                } elseif ($diff < 86400) {
-                                    echo floor($diff / 3600) . ' hours ago';
-                                } else {
-                                    echo date('M j, Y g:i A', $time);
-                                }
-                                ?>
-                            </div>
-                            <div class="timeline-description"><?php echo $item['description']; ?></div>
-                            <span class="timeline-status <?php echo $item['status']; ?>"><?php echo ucfirst($item['status']); ?></span>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- System Health -->
-        <div class="health-section">
-            <h2 class="section-title">System Health</h2>
-            <div class="health-items">
-                <?php foreach ($system_health as $component => $status): ?>
-                    <div class="health-item">
-                        <div class="health-item-header">
-                            <span class="health-item-name"><?php echo ucfirst(str_replace('_', ' ', $component)); ?></span>
-                            <div class="health-status">
-                                <div class="health-indicator <?php echo $status === 'error' ? 'error' : ($status === 'warning' ? 'warning' : ''); ?>"></div>
-                                <span><?php echo ucfirst($status); ?></span>
-                            </div>
-                        </div>
-                        <?php if (isset($health_details[$component]) && !empty($health_details[$component])): ?>
-                            <div class="health-details">
-                                <?php foreach ($health_details[$component] as $key => $value): ?>
-                                    <div class="health-detail-item">
-                                        <span class="health-detail-label"><?php echo ucfirst(str_replace('_', ' ', $key)); ?>:</span>
-                                        <span class="health-detail-value"><?php echo htmlspecialchars($value); ?></span>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-            <div class="health-divider"></div>
-            <div class="health-summary">
-                <div class="health-summary-text">
-                    <?php
-                    if ($overall_status === 'operational') {
-                        echo 'All systems operational';
-                    } elseif ($overall_status === 'warning') {
-                        echo 'Some systems require attention';
-                    } else {
-                        echo 'Critical issues detected';
-                    }
-                    ?>
-                </div>
-                <div class="health-summary-status <?php echo $overall_status; ?>">
-                    <?php echo strtoupper($overall_status); ?>
-                </div>
-            </div>
-        </div>
+        <a href="app-stats/" class="nav-card">
+            <div class="nav-card-icon"><?= svg_icon('bar-chart-filled', 24) ?></div>
+            <div class="nav-card-title">App Statistics</div>
+            <div class="nav-card-description">View application analytics and metrics</div>
+        </a>
+        <a href="website-stats/" class="nav-card">
+            <div class="nav-card-icon"><?= svg_icon('globe-filled', 24) ?></div>
+            <div class="nav-card-title">Website Stats</div>
+            <div class="nav-card-description">View website analytics and downloads</div>
+        </a>
     </div>
 </div>
 
 <script>
-if (sessionStorage.getItem('scrollPos') !== null) {
-    window.scrollTo(0, parseInt(sessionStorage.getItem('scrollPos')));
-    sessionStorage.removeItem('scrollPos');
-}
+// Revenue Over Time Chart
+const ctx = document.getElementById('revenueChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: <?php echo json_encode($revenue_labels); ?>,
+        datasets: [
+            {
+                label: 'Subscriptions',
+                data: <?php echo json_encode($subscription_data); ?>,
+                backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                borderRadius: 4,
+                borderSkipped: false
+            },
+            {
+                label: 'Portal Payments',
+                data: <?php echo json_encode($portal_data); ?>,
+                backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                borderRadius: 4,
+                borderSkipped: false
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            intersect: false,
+            mode: 'index'
+        },
+        plugins: {
+            legend: {
+                display: false
+            },
+            tooltip: {
+                backgroundColor: '#1e293b',
+                titleColor: '#f8fafc',
+                bodyColor: '#cbd5e1',
+                padding: 12,
+                cornerRadius: 8,
+                titleFont: { size: 13, weight: '600' },
+                bodyFont: { size: 12 },
+                callbacks: {
+                    label: function(context) {
+                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    },
+                    footer: function(items) {
+                        let total = items.reduce((sum, item) => sum + item.parsed.y, 0);
+                        return 'Total: $' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                stacked: true,
+                grid: { display: false },
+                ticks: {
+                    color: '#94a3b8',
+                    font: { size: 11 },
+                    maxRotation: 45
+                }
+            },
+            y: {
+                stacked: true,
+                grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                ticks: {
+                    color: '#94a3b8',
+                    font: { size: 11 },
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
 </script>
-
-<!-- Activity Info Modal -->
-<div class="activity-info-modal" id="activityInfoModal">
-    <div class="activity-info-modal-backdrop" onclick="document.getElementById('activityInfoModal').classList.remove('show')"></div>
-    <div class="activity-info-modal-content">
-        <div class="activity-info-modal-header">
-            <h3>What's Tracked</h3>
-            <button class="activity-info-modal-close" onclick="document.getElementById('activityInfoModal').classList.remove('show')"><?= svg_icon('x', 20) ?></button>
-        </div>
-        <div class="activity-info-modal-body">
-            <p>The Recent Activity timeline shows the most recent events across these categories:</p>
-            <ul>
-                <li>
-                    <span class="activity-info-dot"></span>
-                    <div>
-                        <strong>User Registrations</strong>
-                        <span>New community user sign-ups with verification status</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="activity-info-dot"></span>
-                    <div>
-                        <strong>Subscription Added</strong>
-                        <span>New premium subscriptions (monthly or yearly)</span>
-                    </div>
-                </li>
-                <li>
-                    <span class="activity-info-dot"></span>
-                    <div>
-                        <strong>Subscription Cancelled</strong>
-                        <span>Premium subscriptions that were cancelled</span>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-</div>

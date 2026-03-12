@@ -1392,16 +1392,31 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         // Feature tabs
         const tabBtns = document.querySelectorAll('.tab-btn');
         const tabContents = document.querySelectorAll('.tab-content');
+        let activeTabAnimation = null;
+
+        function clearTabAnimation() {
+            if (activeTabAnimation) {
+                activeTabAnimation.forEach(id => clearTimeout(id));
+                activeTabAnimation = null;
+            }
+        }
 
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 const tabId = btn.dataset.tab;
+
+                clearTabAnimation();
 
                 tabBtns.forEach(b => b.classList.remove('active'));
                 tabContents.forEach(c => c.classList.remove('active'));
 
                 btn.classList.add('active');
                 document.getElementById('tab-' + tabId).classList.add('active');
+
+                // Reset animation classes on all mockups
+                document.querySelectorAll('.animating').forEach(el => el.classList.remove('animating'));
+
+                startTabAnimation(tabId);
             });
         });
 
@@ -1461,6 +1476,328 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         // Start the scan animation cycle
         if (scanAnimation) {
             runScanCycle();
+        }
+
+        // Feature tab animation controller
+        function startTabAnimation(tabId) {
+            const timeouts = [];
+            function t(fn, delay) {
+                timeouts.push(setTimeout(fn, delay));
+            }
+
+            switch (tabId) {
+                case 'expenses': animateExpenses(t); break;
+                case 'predictive': animatePredictive(t); break;
+                case 'inventory': animateInventory(t); break;
+                case 'rental': animateRental(t); break;
+                case 'customers': animateCustomers(t); break;
+                case 'invoices': animateInvoices(t); break;
+            }
+
+            activeTabAnimation = timeouts;
+        }
+
+        // Expense & Revenue Tracking animation
+        function animateExpenses(t) {
+            const mockup = document.querySelector('.expenses-mockup');
+            if (!mockup) return;
+
+            function runCycle() {
+                const fields = mockup.querySelectorAll('.form-field');
+                const checks = mockup.querySelectorAll('.validation-check');
+                const toggleOptions = mockup.querySelectorAll('.toggle-option');
+
+                // Reset
+                mockup.classList.add('animating');
+                fields.forEach(f => f.classList.remove('field-visible'));
+                checks.forEach(c => c.classList.remove('check-visible'));
+
+                // Stagger fields appearing
+                fields.forEach((field, i) => {
+                    t(() => field.classList.add('field-visible'), 300 + i * 400);
+                });
+
+                // Toggle flip after fields appear
+                t(() => {
+                    toggleOptions.forEach(opt => opt.classList.toggle('active'));
+                    const amountField = fields[1]?.querySelector('.field-value');
+                    if (amountField) amountField.textContent = '$120.50';
+                    const catField = fields[2]?.querySelector('.field-value');
+                    if (catField) catField.textContent = 'Office Supplies';
+                }, 1800);
+
+                // Show validation checks
+                checks.forEach((check, i) => {
+                    t(() => check.classList.add('check-visible'), 2400 + i * 300);
+                });
+
+                // Hold, then reset and loop
+                t(() => {
+                    mockup.classList.remove('animating');
+                    fields.forEach(f => f.classList.remove('field-visible'));
+                    checks.forEach(c => c.classList.remove('check-visible'));
+                    toggleOptions.forEach(opt => opt.classList.toggle('active'));
+                    const amountField = fields[1]?.querySelector('.field-value');
+                    if (amountField) amountField.textContent = '$85.00';
+                    const catField = fields[2]?.querySelector('.field-value');
+                    if (catField) catField.textContent = 'Books';
+                    t(() => runCycle(), 300);
+                }, 5500);
+            }
+
+            runCycle();
+        }
+
+        // Predictive Analytics animation
+        function animatePredictive(t) {
+            const mockup = document.querySelector('.chart-mockup');
+            if (!mockup) return;
+
+            function runCycle() {
+                const svg = mockup.querySelector('.forecast-chart');
+                const paths = svg.querySelectorAll('path');
+                const circle = svg.querySelector('circle');
+                const badge = mockup.querySelector('.prediction-badge');
+
+                mockup.classList.add('animating');
+
+                // Add draw classes to SVG elements
+                if (paths[0]) paths[0].classList.add('draw-fill');   // gradient fill
+                if (paths[1]) paths[1].classList.add('draw-line');   // main line
+                if (paths[2]) paths[2].classList.add('draw-dashed'); // dashed forecast
+                if (circle) circle.classList.add('draw-dot');
+
+                // Show prediction badge after chart draws
+                t(() => {
+                    if (badge) badge.classList.add('badge-visible');
+                }, 2500);
+
+                // Hold and restart
+                t(() => {
+                    mockup.classList.remove('animating');
+                    [paths[0], paths[1], paths[2]].forEach(p => {
+                        if (p) p.className = '';
+                    });
+                    if (circle) circle.className = '';
+                    if (badge) badge.classList.remove('badge-visible');
+                    t(() => runCycle(), 300);
+                }, 6000);
+            }
+
+            runCycle();
+        }
+
+        // Inventory Management animation
+        function animateInventory(t) {
+            const mockup = document.querySelector('.inventory-mockup');
+            if (!mockup) return;
+
+            function runCycle() {
+                const items = mockup.querySelectorAll('.inventory-item');
+                const bars = mockup.querySelectorAll('.item-bar');
+
+                mockup.classList.add('animating');
+
+                // Stagger items appearing
+                items.forEach((item, i) => {
+                    t(() => item.classList.add('item-visible'), 200 + i * 300);
+                });
+
+                // Fill bars after items visible
+                bars.forEach((bar, i) => {
+                    t(() => bar.classList.add('bar-fill'), 1200 + i * 200);
+                });
+
+                // Pulse low stock item
+                t(() => {
+                    const lastItem = items[items.length - 1];
+                    if (lastItem) lastItem.classList.add('low-stock-alert');
+                }, 2000);
+
+                // Hold and restart
+                t(() => {
+                    mockup.classList.remove('animating');
+                    items.forEach(item => {
+                        item.classList.remove('item-visible', 'low-stock-alert');
+                    });
+                    bars.forEach(bar => bar.classList.remove('bar-fill'));
+                    t(() => runCycle(), 300);
+                }, 6000);
+            }
+
+            runCycle();
+        }
+
+        // Rental Management animation
+        function animateRental(t) {
+            const mockup = document.querySelector('.calendar-mockup');
+            if (!mockup) return;
+
+            function runCycle() {
+                const days = mockup.querySelectorAll('.cal-day:not(.header)');
+                const bookedDays = mockup.querySelectorAll('.cal-day.booked');
+                const availDays = mockup.querySelectorAll('.cal-day.available');
+
+                mockup.classList.add('animating');
+
+                // Fade in days row by row (7 per row)
+                days.forEach((day, i) => {
+                    const row = Math.floor(i / 7);
+                    t(() => day.classList.add('day-visible'), 200 + row * 250);
+                });
+
+                // Highlight booked days
+                bookedDays.forEach((day, i) => {
+                    t(() => day.classList.add('day-highlight'), 1200 + i * 200);
+                });
+
+                // Highlight available days
+                availDays.forEach((day, i) => {
+                    t(() => day.classList.add('day-highlight'), 2000 + i * 200);
+                });
+
+                // Hold and restart
+                t(() => {
+                    mockup.classList.remove('animating');
+                    days.forEach(d => d.classList.remove('day-visible', 'day-highlight'));
+                    t(() => runCycle(), 300);
+                }, 5500);
+            }
+
+            runCycle();
+        }
+
+        // Customer Management animation
+        function animateCustomers(t) {
+            const mockup = document.querySelector('.customers-mockup');
+            if (!mockup) return;
+
+            function animateCounter(el, target, prefix, duration) {
+                const start = 0;
+                const startTime = performance.now();
+                function update(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = Math.round(start + (target - start) * eased);
+                    el.textContent = prefix + current.toLocaleString();
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+            }
+
+            function runCycle() {
+                const cards = mockup.querySelectorAll('.customer-card');
+
+                mockup.classList.add('animating');
+
+                // Slide in cards
+                cards.forEach((card, i) => {
+                    t(() => {
+                        card.classList.add('card-visible');
+
+                        // Count up stats after card lands
+                        t(() => {
+                            const statVals = card.querySelectorAll('.stat-val');
+                            statVals.forEach(sv => {
+                                sv.classList.add('counting');
+                                const text = sv.textContent;
+                                if (text.startsWith('$')) {
+                                    const num = parseInt(text.replace(/[$,]/g, ''));
+                                    animateCounter(sv, num, '$', 1000);
+                                } else {
+                                    const num = parseInt(text);
+                                    animateCounter(sv, num, '', 800);
+                                }
+                            });
+                        }, 500);
+                    }, 300 + i * 500);
+                });
+
+                // Hold and restart
+                t(() => {
+                    mockup.classList.remove('animating');
+                    cards.forEach(card => card.classList.remove('card-visible'));
+                    const statVals = mockup.querySelectorAll('.stat-val');
+                    statVals.forEach(sv => {
+                        sv.classList.remove('counting');
+                        // Restore original values
+                    });
+                    // Reset original stat values
+                    const firstStats = cards[0]?.querySelectorAll('.stat-val');
+                    if (firstStats) {
+                        firstStats[0].textContent = '$4,230';
+                        firstStats[1].textContent = '12';
+                    }
+                    const secondStats = cards[1]?.querySelectorAll('.stat-val');
+                    if (secondStats) {
+                        secondStats[0].textContent = '$2,890';
+                        secondStats[1].textContent = '8';
+                    }
+                    t(() => runCycle(), 300);
+                }, 5500);
+            }
+
+            runCycle();
+        }
+
+        // Invoicing animation
+        function animateInvoices(t) {
+            const mockup = document.querySelector('.invoice-mockup');
+            if (!mockup) return;
+
+            function animateCounter(el, target, prefix, suffix, duration) {
+                const startTime = performance.now();
+                function update(now) {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    const current = (target * eased).toFixed(2);
+                    el.textContent = prefix + parseFloat(current).toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }) + suffix;
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
+            }
+
+            function runCycle() {
+                const header = mockup.querySelector('.invoice-header');
+                const meta = mockup.querySelector('.invoice-meta');
+                const total = mockup.querySelector('.invoice-total');
+                const status = mockup.querySelector('.invoice-status');
+                const totalVal = mockup.querySelector('.total-value');
+
+                mockup.classList.add('animating');
+
+                // Sequential build-up
+                t(() => { if (header) header.classList.add('section-visible'); }, 300);
+                t(() => { if (meta) meta.classList.add('section-visible'); }, 700);
+                t(() => {
+                    if (total) total.classList.add('section-visible');
+                    // Count up total
+                    if (totalVal) animateCounter(totalVal, 1234, '$', '', 1000);
+                }, 1100);
+
+                // Stamp in paid badge
+                t(() => {
+                    if (status) status.classList.add('stamp-visible');
+                }, 2300);
+
+                // Hold and restart
+                t(() => {
+                    mockup.classList.remove('animating');
+                    [header, meta, total].forEach(el => {
+                        if (el) el.classList.remove('section-visible');
+                    });
+                    if (status) status.classList.remove('stamp-visible');
+                    if (totalVal) totalVal.textContent = '$1,234.00';
+                    t(() => runCycle(), 300);
+                }, 5800);
+            }
+
+            runCycle();
         }
 
         // AI Import demo animation

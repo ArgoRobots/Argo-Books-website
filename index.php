@@ -456,7 +456,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                         <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0"/>
                                                     </linearGradient>
                                                 </defs>
-                                                <path d="M0,120 Q50,100 100,80 T200,50 T300,20 L300,150 L0,150 Z" fill="url(#chartGradient)"/>
+                                                <path d="M0,120 Q50,100 100,80 T200,50 Q250,30 300,20 L300,150 L0,150 Z" fill="url(#chartGradient)"/>
                                                 <path d="M0,120 Q50,100 100,80 T200,50" fill="none" stroke="#3b82f6" stroke-width="3"/>
                                                 <path d="M200,50 Q250,30 300,20" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
                                                 <circle cx="200" cy="50" r="5" fill="#3b82f6"/>

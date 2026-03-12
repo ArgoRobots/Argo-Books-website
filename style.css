@@ -190,7 +190,7 @@ a {
     animation: drawLine 2s ease-out forwards;
 }
 .chart-mockup.animating .forecast-chart path.draw-fill {
-    animation: fillGradient 0.8s ease-out 1.5s forwards;
+    animation: fillGradient 0.8s ease-out 2.7s forwards;
 }
 .chart-mockup.animating .forecast-chart path.draw-dashed {
     opacity: 1;

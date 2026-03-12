@@ -227,8 +227,9 @@ function process_square_payment(array $invoice, array $company, array $data, int
         ? 'https://connect.squareup.com/v2'
         : 'https://connect.squareupsandbox.com/v2';
 
-    // Always generate server-side idempotency key to prevent manipulation
-    $idempotencyKey = bin2hex(random_bytes(16));
+    // Derive idempotency key from invoice+amount+source so retries reuse the same key,
+    // but clients cannot manipulate it (server-side HMAC with encryption key as secret)
+    $idempotencyKey = hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
     $referenceNumber = generate_reference_number();
 
     $paymentData = [

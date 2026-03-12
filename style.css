@@ -156,11 +156,6 @@ a {
     100% { transform: scale(1); }
 }
 
-@keyframes lowStockPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
-    50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
-}
-
 /* Feature tab animation states */
 
 /* Expenses: animating state */
@@ -235,10 +230,6 @@ a {
 .inventory-mockup.animating .item-bar.high.bar-fill::after { width: 90%; }
 .inventory-mockup.animating .item-bar.medium.bar-fill::after { width: 50%; }
 .inventory-mockup.animating .item-bar.low.bar-fill::after { width: 15%; }
-.inventory-mockup.animating .inventory-item.low-stock-alert {
-    animation: lowStockPulse 1.5s ease-in-out 2;
-}
-
 /* Calendar: highlight animation */
 .calendar-mockup.animating .cal-day:not(.header) {
     opacity: 0;
@@ -253,6 +244,9 @@ a {
 }
 
 /* Customers: slide-in animation */
+.customers-mockup.animating {
+    overflow: hidden;
+}
 .customers-mockup.animating .customer-card {
     opacity: 0;
     transform: translateX(40px);

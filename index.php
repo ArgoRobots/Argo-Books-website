@@ -457,7 +457,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                     </linearGradient>
                                                 </defs>
                                                 <path d="M0,120 Q50,100 100,80 T200,50 T300,20 L300,150 L0,150 Z" fill="url(#chartGradient)"/>
-                                                <path d="M0,120 Q50,100 100,80 T200,50 T300,20" fill="none" stroke="#3b82f6" stroke-width="3"/>
+                                                <path d="M0,120 Q50,100 100,80 T200,50" fill="none" stroke="#3b82f6" stroke-width="3"/>
                                                 <path d="M200,50 Q250,30 300,20" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
                                                 <circle cx="200" cy="50" r="5" fill="#3b82f6"/>
                                             </svg>
@@ -1608,17 +1608,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     t(() => bar.classList.add('bar-fill'), 1200 + i * 200);
                 });
 
-                // Pulse low stock item
-                t(() => {
-                    const lastItem = items[items.length - 1];
-                    if (lastItem) lastItem.classList.add('low-stock-alert');
-                }, 2000);
-
                 // Hold and restart
                 t(() => {
                     mockup.classList.remove('animating');
                     items.forEach(item => {
-                        item.classList.remove('item-visible', 'low-stock-alert');
+                        item.classList.remove('item-visible');
                     });
                     bars.forEach(bar => bar.classList.remove('bar-fill'));
                     t(() => runCycle(), 300);

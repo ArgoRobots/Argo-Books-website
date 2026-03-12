@@ -80,7 +80,11 @@ function read_rate_limits_locked(int $windowSeconds = 900): array
         return ['rateLimits' => [], 'handle' => null];
     }
 
-    flock($handle, LOCK_EX);
+    if (!flock($handle, LOCK_EX)) {
+        fclose($handle);
+        return ['rateLimits' => [], 'handle' => null];
+    }
+
     $content = stream_get_contents($handle);
     $rateLimits = json_decode($content, true) ?: [];
 
@@ -145,7 +149,7 @@ function is_rate_limited(string $ip, int $maxAttempts = 10, int $windowSeconds =
  * @param string $ip Client IP address
  * @param string $prefix Key prefix for different rate limit buckets (default: 'portal')
  */
-function record_failed_lookup(string $ip, string $prefix = 'portal'): void
+function record_rate_limit_attempt(string $ip, string $prefix = 'portal'): void
 {
     $windowSeconds = 900;
     $result = read_rate_limits_locked($windowSeconds);
@@ -172,18 +176,57 @@ function record_failed_lookup(string $ip, string $prefix = 'portal'): void
 }
 
 /**
+ * Backwards-compatible alias for record_rate_limit_attempt().
+ * Used by portal/invoice.php and portal/index.php for failed token lookups.
+ */
+function record_failed_lookup(string $ip): void
+{
+    record_rate_limit_attempt($ip, 'portal');
+}
+
+/**
  * Check and enforce rate limiting for payment endpoints.
+ * Atomically checks the limit and records the attempt under a single file lock
+ * to prevent concurrent requests from bypassing the limit.
  * Allows 20 payment attempts per IP per 15 minutes.
  * Sends a 429 response and exits if rate limited.
  */
 function enforce_payment_rate_limit(): void
 {
     $ip = get_client_ip();
-    if (is_rate_limited($ip, 20, 900, 'payment')) {
+    $maxAttempts = 20;
+    $windowSeconds = 900;
+    $prefix = 'payment';
+
+    // Atomic check + increment under a single lock
+    $result = read_rate_limits_locked($windowSeconds);
+    $rateLimits = $result['rateLimits'];
+    $handle = $result['handle'];
+
+    $key = $prefix . '_' . hash('sha256', $ip);
+    $isLimited = isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts;
+
+    if ($isLimited) {
+        if ($handle) {
+            write_rate_limits_unlock($handle, $rateLimits);
+        }
         send_error_response(429, 'Too many payment attempts. Please try again later.', 'RATE_LIMITED');
     }
-    // Record this attempt (count all attempts, not just failures)
-    record_failed_lookup($ip, 'payment');
+
+    // Record this attempt while still holding the lock
+    $now = time();
+    if (!isset($rateLimits[$key])) {
+        $rateLimits[$key] = [
+            'count' => 1,
+            'first_attempt' => $now
+        ];
+    } else {
+        $rateLimits[$key]['count']++;
+    }
+
+    if ($handle) {
+        write_rate_limits_unlock($handle, $rateLimits);
+    }
 }
 
 /**

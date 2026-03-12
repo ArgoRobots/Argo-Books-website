@@ -31,6 +31,7 @@ $webhookId = $_ENV['PORTAL_PAYPAL_WEBHOOK_ID'] ?? '';
 if (empty($webhookId)) {
     error_log('Portal PayPal webhook: PORTAL_PAYPAL_WEBHOOK_ID not configured - rejecting request');
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode(['error' => 'Webhook not configured']);
     exit;
 }

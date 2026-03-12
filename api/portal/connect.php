@@ -145,7 +145,7 @@ function initiate_connect(array $company, string $provider): void
                 $authUrl = $accountLink->url;
             } catch (\Stripe\Exception\ApiErrorException $e) {
                 error_log('Stripe Connect error: ' . $e->getMessage());
-                send_error_response(500, 'Stripe error: ' . $e->getMessage(), 'STRIPE_API_ERROR');
+                send_error_response(500, 'Failed to connect Stripe. Please try again.', 'STRIPE_API_ERROR');
             }
             break;
 
@@ -227,7 +227,8 @@ function disconnect_provider(array $company, string $provider): void
         $error = $stmt->error;
         $stmt->close();
         $db->close();
-        send_error_response(500, 'Failed to disconnect ' . $provider . ': ' . $error, 'DISCONNECT_FAILED');
+        error_log('Portal disconnect DB error (' . $provider . '): ' . $error);
+        send_error_response(500, 'Failed to disconnect ' . $provider . '. Please try again.', 'DISCONNECT_FAILED');
     }
     $stmt->close();
 

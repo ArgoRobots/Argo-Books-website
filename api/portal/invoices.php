@@ -127,7 +127,8 @@ function handle_publish_invoice(): void
         $error = $stmt->error;
         $stmt->close();
         $db->close();
-        send_error_response(500, 'Failed to save invoice: ' . $error, 'DB_ERROR');
+        error_log('Portal invoice DB error: ' . $error);
+        send_error_response(500, 'Failed to save invoice. Please try again.', 'DB_ERROR');
     }
     $stmt->close();
     $db->close();

@@ -401,6 +401,11 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
             ? 'https://connect.squareup.com/v2'
             : 'https://connect.squareupsandbox.com/v2';
 
+        // Validate card ID format to prevent SSRF via URL path injection
+        if (!preg_match('/^[A-Za-z0-9\-_:]+$/', $cardId)) {
+            return ['success' => false, 'error' => 'Invalid card ID format'];
+        }
+
         // First, retrieve the card to get the customer_id (required for card-on-file payments)
         $ch = curl_init("$apiBaseUrl/cards/$cardId");
         curl_setopt_array($ch, [
@@ -409,7 +414,9 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
                 "Square-Version: 2025-10-16",
                 "Authorization: Bearer $accessToken",
                 "Content-Type: application/json"
-            ]
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
         ]);
         $cardResponse = curl_exec($ch);
         $cardHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -425,7 +432,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
 
         // Create payment request with customer_id
         $paymentData = [
-            'idempotency_key' => uniqid('renewal_', true),
+            'idempotency_key' => bin2hex(random_bytes(16)),
             'source_id' => $cardId,
             'customer_id' => $customerId,
             'amount_money' => [
@@ -447,7 +454,9 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
                 "Square-Version: 2025-10-16",
                 "Authorization: Bearer $accessToken",
                 "Content-Type: application/json"
-            ]
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
         ]);
 
         $response = curl_exec($ch);

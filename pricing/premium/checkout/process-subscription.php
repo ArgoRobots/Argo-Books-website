@@ -269,7 +269,7 @@ try {
                 } else {
                     // Create new customer
                     $customerData = [
-                        'idempotency_key' => uniqid('cust_', true),
+                        'idempotency_key' => bin2hex(random_bytes(16)),
                         'email_address' => $email,
                         'reference_id' => "user_$userId"
                     ];
@@ -283,7 +283,7 @@ try {
 
                 // Create card on file for recurring billing
                 $cardData = [
-                    'idempotency_key' => uniqid('card_', true),
+                    'idempotency_key' => bin2hex(random_bytes(16)),
                     'source_id' => $sourceId,
                     'card' => [
                         'customer_id' => $customerId
@@ -306,7 +306,7 @@ try {
                 } else {
                     // Process initial payment
                     $paymentData = [
-                        'idempotency_key' => uniqid('payment_', true),
+                        'idempotency_key' => bin2hex(random_bytes(16)),
                         'source_id' => $cardId ?? $sourceId,
                         'amount_money' => [
                             'amount' => intval($amount * 100),

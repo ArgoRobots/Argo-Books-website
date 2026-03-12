@@ -86,11 +86,23 @@ if (!isset($allowedMimes[$detectedMime])) {
 
 $extension = $allowedMimes[$detectedMime];
 
-// For SVG files, do a basic safety check (no script tags)
+// For SVG files, check for scripts, event handlers, and XXE entities
 if ($extension === 'svg') {
     $svgContent = file_get_contents($file['tmp_name']);
-    if (preg_match('/<script/i', $svgContent) || preg_match('/on\w+\s*=/i', $svgContent)) {
-        send_error_response(400, 'SVG file contains potentially unsafe content.', 'UNSAFE_SVG');
+    $unsafePatterns = [
+        '/<script/i',                          // Script tags
+        '/on\w+\s*=/i',                        // Event handlers
+        '/<!DOCTYPE/i',                        // XXE DOCTYPE declarations
+        '/<!ENTITY/i',                         // XXE entity definitions
+        '/\bSYSTEM\s/i',                       // External entity references
+        '/\bPUBLIC\s/i',                       // Public entity references
+        '/<\?xml-stylesheet/i',                // XML stylesheet processing instructions
+        '/href\s*=\s*["\']javascript:/i',      // JavaScript URIs in links
+    ];
+    foreach ($unsafePatterns as $pattern) {
+        if (preg_match($pattern, $svgContent)) {
+            send_error_response(400, 'SVG file contains potentially unsafe content.', 'UNSAFE_SVG');
+        }
     }
 }
 

@@ -85,6 +85,9 @@ $stripeAccountId = $data['stripeAccountId'] ?? null;
 $paypalMerchantId = $data['paypalMerchantId'] ?? null;
 $squareMerchantId = $data['squareMerchantId'] ?? null;
 $squareAccessToken = $data['squareAccessToken'] ?? null;
+if ($squareAccessToken !== null && $squareAccessToken !== '') {
+    $squareAccessToken = portal_encrypt($squareAccessToken);
+}
 $squareLocationId = $data['squareLocationId'] ?? null;
 
 $stmt = $db->prepare(

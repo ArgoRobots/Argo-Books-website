@@ -355,8 +355,8 @@ namespace {
             return false;
         }
 
-        // Generate reset token
-        $reset_token = md5(uniqid(rand(), true));
+        // Generate cryptographically secure reset token
+        $reset_token = bin2hex(random_bytes(32));
 
         // Set token expiry (24 hours from now)
         $expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
@@ -443,10 +443,13 @@ namespace {
             return false;
         }
 
-        // Validate image type
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!in_array($file['type'], $allowed_types)) {
-            error_log("Invalid file type: " . $file['type']);
+        // Validate image type using server-side detection (not client-supplied MIME)
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $detected_type = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($detected_type, $allowed_types)) {
+            error_log("Invalid file type detected: " . $detected_type);
             return false;
         }
 
@@ -666,7 +669,7 @@ namespace {
      */
     function generate_verification_code()
     {
-        return sprintf('%06d', mt_rand(100000, 999999));
+        return sprintf('%06d', random_int(100000, 999999));
     }
 
     /**

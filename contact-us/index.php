@@ -1,19 +1,30 @@
 <?php
+session_start();
 require_once 'contact_process.php';
 
 require_once __DIR__ . '/../resources/icons.php';
+
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $error_message = '';
 $form_data = ['firstName' => '', 'lastName' => '', 'email' => '', 'subject' => 'general', 'message' => ''];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $result = process_contact_form();
-  if ($result['success']) {
+  // Verify CSRF token
+  if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+      $error_message = 'Invalid request. Please refresh the page and try again.';
+  } else {
+      $result = process_contact_form();
+      if ($result['success']) {
     header('Location: message-sent-successfully/index.php');
     exit;
   }
-  $error_message = $result['message'];
-  $form_data = $result['form_data'];
+      $error_message = $result['message'];
+      $form_data = $result['form_data'];
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -156,6 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
 
         <form action="#contact" method="POST" id="contact-form" autocomplete="off">
+          <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">First Name</label>

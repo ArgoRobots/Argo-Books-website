@@ -40,6 +40,7 @@ AddDefaultCharset UTF-8
 
 # Protect against XSS attacks and set security policy
 <IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
     Header set X-XSS-Protection "1; mode=block"
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"

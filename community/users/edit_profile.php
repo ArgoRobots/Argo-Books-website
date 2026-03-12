@@ -13,6 +13,11 @@ require_login();
 $user_id = $_SESSION['user_id'];
 $user = get_user($user_id);
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $success_message = '';
 $error_message = '';
 
@@ -28,6 +33,13 @@ if (isset($_SESSION['profile_error'])) {
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['profile_error'] = 'Invalid request. Please try again.';
+        header('Location: edit_profile.php');
+        exit;
+    }
+
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
@@ -161,6 +173,7 @@ function handle_avatar_change()
     $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $file_info = finfo_open(FILEINFO_MIME_TYPE);
     $mime_type = finfo_file($file_info, $file['tmp_name']);
+    finfo_close($file_info);
 
     if (!in_array($mime_type, $allowed_types)) {
         $_SESSION['profile_error'] = 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.';
@@ -202,9 +215,13 @@ function handle_avatar_change()
     $filename = 'avatar_' . $user_id . '_' . time() . '.' . $extension;
     $filepath = $avatar_dir . $filename;
 
-    // Delete old avatar if it exists
-    if (!empty($user['avatar']) && file_exists('../' . $user['avatar'])) {
-        unlink('../' . $user['avatar']);
+    // Delete old avatar if it exists (validate path to prevent traversal)
+    if (!empty($user['avatar'])) {
+        $old_avatar_name = basename($user['avatar']);
+        $old_avatar_path = $avatar_dir . $old_avatar_name;
+        if (file_exists($old_avatar_path) && realpath($old_avatar_path) && strpos(realpath($old_avatar_path), realpath($avatar_dir)) === 0) {
+            unlink($old_avatar_path);
+        }
     }
 
     // Move uploaded file
@@ -245,17 +262,13 @@ function handle_avatar_removal()
     global $user_id, $user;
 
     if (!empty($user['avatar'])) {
-        // Handle both old path formats during transition
-        $file_paths = [
-            '../../' . $user['avatar'],  // Current format
-            '../' . $user['avatar']      // Alternative format
-        ];
-
-        // Delete file if it exists in any location
-        foreach ($file_paths as $file_path) {
-            if (file_exists($file_path)) {
-                unlink($file_path);
-                break; // Only need to delete once
+        // Validate and delete old avatar (prevent path traversal)
+        $avatar_name = basename($user['avatar']);
+        $uploads_dir = realpath(dirname(__DIR__) . '/uploads/avatars/');
+        if ($uploads_dir) {
+            $avatar_path = $uploads_dir . '/' . $avatar_name;
+            if (file_exists($avatar_path) && realpath($avatar_path) && strpos(realpath($avatar_path), $uploads_dir) === 0) {
+                unlink($avatar_path);
             }
         }
 
@@ -568,6 +581,7 @@ function handle_password_change()
                 <div class="avatar-controls">
                     <form method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="change_avatar">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                         <div class="file-input-wrapper">
                             <input type="file" name="avatar" id="avatarFile" accept="image/*" onchange="previewAvatar(this)">
                             <label for="avatarFile" class="file-input-label">Choose New Avatar</label>
@@ -582,6 +596,7 @@ function handle_password_change()
                     <?php if (!empty($user['avatar'])): ?>
                         <form method="post" style="margin-top: 15px;">
                             <input type="hidden" name="action" value="remove_avatar">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                             <button type="submit" class="btn btn-red" onclick="return confirm('Are you sure you want to remove your avatar?')">Remove Avatar</button>
                         </form>
                     <?php endif; ?>
@@ -594,6 +609,7 @@ function handle_password_change()
             <h2>Profile Information</h2>
             <form method="post">
                 <input type="hidden" name="action" value="update_profile">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -630,6 +646,7 @@ function handle_password_change()
                     <p>We've sent a verification code to <strong><?php echo htmlspecialchars($_SESSION['pending_email']); ?></strong></p>
                     <form method="post">
                         <input type="hidden" name="action" value="verify_email">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                         <div class="form-group">
                             <label for="email_verification_code">Verification Code</label>
                             <input type="text" id="email_verification_code" name="email_verification_code" class="verification-code-input" placeholder="Enter 6-digit code" maxlength="6" required>
@@ -640,6 +657,7 @@ function handle_password_change()
             <?php else: ?>
                 <form method="post">
                     <input type="hidden" name="action" value="change_email">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                     <div class="form-group">
                         <label for="new_email">New Email Address</label>
@@ -665,6 +683,7 @@ function handle_password_change()
             <h2>Change Password</h2>
             <form method="post">
                 <input type="hidden" name="action" value="change_password">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                 <div class="form-group">
                     <label for="current_password">Current Password</label>

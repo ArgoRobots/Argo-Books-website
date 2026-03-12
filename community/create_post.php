@@ -11,6 +11,11 @@ require_once __DIR__ . '/../resources/icons.php';
 require_login();
 $current_user = \CommunityUsers\get_current_user();
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Check if user is banned and redirect to index
 $user_ban = is_user_banned($current_user['id']);
 if ($user_ban) {
@@ -27,6 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Check if this is an AJAX request
     $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        if ($is_ajax) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Invalid request. Please refresh and try again.']);
+            exit;
+        }
+        $error_message = 'Invalid request. Please refresh and try again.';
+    }
 
     // Check if user is banned
     $ban = is_user_banned($user_id);
@@ -78,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // For regular form submissions, keep the existing behavior
             $html_message = $rate_limit_message;
         }
-    } else {
+    } elseif (empty($error_message)) {
         // Process the form normally
         $title = isset($_POST['post_title']) ? trim($_POST['post_title']) : '';
         $content = isset($_POST['post_content']) ? trim($_POST['post_content']) : '';
@@ -236,6 +251,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Edit Form -->
                 <div class="edit-form-container" id="edit-container">
                     <form id="community-post-form" method="post" action="create_post.php">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                         <div class="form-group">
                             <label for="post_title">Title</label>
                             <input type="text" id="post_title" name="post_title" required>

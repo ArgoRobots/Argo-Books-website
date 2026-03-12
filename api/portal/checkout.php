@@ -49,20 +49,20 @@ if ($invoice['status'] === 'cancelled') {
     send_error_response(400, 'This invoice has been cancelled.', 'CANCELLED');
 }
 
-// Validate payment amount
+// Validate payment amount using integer cents for precision
 $requestedAmount = floatval($data['amount']);
-$balanceDue = floatval($invoice['balance_due']);
+$amountCents = (int) round($requestedAmount * 100);
+$balanceDueCents = (int) round(floatval($invoice['balance_due']) * 100);
 
-if ($requestedAmount <= 0) {
+if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($requestedAmount > $balanceDue + 0.01) { // Small tolerance for floating point
+if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
     send_error_response(400, 'Payment amount exceeds balance due.', 'AMOUNT_EXCEEDS_BALANCE');
 }
 
 $method = strtolower($data['method']);
 $currency = strtolower($invoice['currency'] ?: 'usd');
-$amountCents = (int) round($requestedAmount * 100);
 $companyId = $invoice['company_id'];
 
 // Get environment-based keys
@@ -221,13 +221,15 @@ function process_square_payment(array $invoice, array $company, array $data, int
 {
     global $is_production;
 
-    $accessToken = $company['square_access_token'];
+    $accessToken = portal_decrypt($company['square_access_token']);
     $locationId = $company['square_location_id'] ?? '';
     $apiBaseUrl = $is_production
         ? 'https://connect.squareup.com/v2'
         : 'https://connect.squareupsandbox.com/v2';
 
-    $idempotencyKey = $data['idempotency_key'] ?? (time() . bin2hex(random_bytes(4)));
+    // Derive idempotency key from invoice+amount+source so retries reuse the same key,
+    // but clients cannot manipulate it (server-side HMAC with encryption key as secret)
+    $idempotencyKey = hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
     $referenceNumber = generate_reference_number();
 
     $paymentData = [
@@ -252,7 +254,9 @@ function process_square_payment(array $invoice, array $company, array $data, int
             "Square-Version: 2025-10-16",
             "Authorization: Bearer $accessToken",
             "Content-Type: application/json"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $responseData = curl_exec($ch);
@@ -308,11 +312,8 @@ function process_square_payment(array $invoice, array $company, array $data, int
         }
     } else {
         $errors = json_decode($responseData, true);
-        $errorMsg = 'Square payment failed';
-        if (isset($errors['errors'][0]['detail'])) {
-            $errorMsg = $errors['errors'][0]['detail'];
-        }
-        error_log("Square portal payment error: $errorMsg");
-        send_error_response(500, $errorMsg, 'SQUARE_ERROR');
+        $errorDetail = $errors['errors'][0]['detail'] ?? 'Unknown error';
+        error_log("Square portal payment error for invoice " . $invoice['invoice_id'] . ": $errorDetail");
+        send_error_response(500, 'Square payment failed. Please try again.', 'SQUARE_ERROR');
     }
 }

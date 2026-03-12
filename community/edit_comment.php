@@ -31,8 +31,20 @@ if ($ban) {
     exit;
 }
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $response['message'] = 'Invalid request. Please refresh and try again.';
+        echo json_encode($response);
+        exit;
+    }
+
     $comment_id = isset($_POST['comment_id']) ? intval($_POST['comment_id']) : 0;
     $comment_content = isset($_POST['comment_content']) ? trim($_POST['comment_content']) : '';
 
@@ -68,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check if user has permission to edit this comment
     // Admin can edit any comment, regular users can only edit their own comments
-    if ($role === 'admin' || $comment['user_id'] == $user_id) {
+    if ($role === 'admin' || (int)$comment['user_id'] === (int)$user_id) {
         // Process @mentions in the comment content before saving
         $mentions = extract_mentions($comment_content);
         $has_mentions = !empty($mentions);
@@ -102,10 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'comment' => $updated_comment
             ];
         } else {
-            $response['message'] = 'Error updating comment: ' . $db->error;
+            error_log('Error updating comment ' . $comment_id . ': ' . $db->error);
+            $response['message'] = 'Error updating comment. Please try again.';
         }
     } else {
-        $response['message'] = "You do not have permission to edit this comment. Your user ID: $user_id, Comment user ID: {$comment['user_id']}";
+        $response['message'] = 'You do not have permission to edit this comment.';
     }
 
     $stmt->close();

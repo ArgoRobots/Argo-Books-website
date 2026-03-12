@@ -26,8 +26,20 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $email = $_SESSION['email'] ?? '';
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $response['message'] = 'Invalid request. Please refresh and try again.';
+        echo json_encode($response);
+        exit;
+    }
+
     // Validate and sanitize inputs
     $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
     $comment_id = isset($_POST['comment_id']) ? intval($_POST['comment_id']) : 0;
@@ -50,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response['message'] = 'Post not found';
             } else {
                 // Check if user is the author of the post
-                if ($post['user_id'] == $user_id) {
+                if ((int)$post['user_id'] === (int)$user_id) {
                     $response['success'] = false;
                     $response['message'] = 'You cannot vote on your own post';
                     $response['show_message'] = true;
@@ -92,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!$comment) {
                 $response['message'] = 'Comment not found';
-            } elseif ($comment['user_id'] == $user_id) {
+            } elseif ((int)$comment['user_id'] === (int)$user_id) {
                 $response['success'] = false;
                 $response['message'] = 'You cannot vote on your own comment';
                 $response['show_message'] = true;

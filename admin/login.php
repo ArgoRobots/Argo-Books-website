@@ -29,6 +29,8 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
                 $error = "Authentication error: Unable to retrieve your 2FA secret.";
             } else if (verify_2fa_code($secret, $verification_code)) {
                 // Code is valid, complete login
+                session_regenerate_id(true);
+                unset($_SESSION['admin_login_attempts']);
                 $_SESSION['awaiting_2fa'] = false;
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $username;
@@ -50,12 +52,27 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
 }
 // Process login form submission
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
+    // Rate limit login attempts (max 5 per 15 minutes)
+    if (!isset($_SESSION['admin_login_attempts'])) {
+        $_SESSION['admin_login_attempts'] = [];
+    }
+    $now = time();
+    $_SESSION['admin_login_attempts'] = array_filter($_SESSION['admin_login_attempts'], function ($t) use ($now) {
+        return ($now - $t) < 900;
+    });
+    if (count($_SESSION['admin_login_attempts']) >= 5) {
+        $error = 'Too many login attempts. Please wait 15 minutes before trying again.';
+    }
+
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    if (empty($username) || empty($password)) {
+    if (empty($error) && (empty($username) || empty($password))) {
         $error = 'Please enter both username and password.';
-    } else {
+    }
+
+    if (empty($error)) {
+        $_SESSION['admin_login_attempts'][] = $now;
         $db = get_db_connection();
         $stmt = $db->prepare('SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?)');
         $stmt->bind_param('s', $username);
@@ -73,6 +90,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 $show_2fa_form = true;
             } else {
                 // No 2FA, complete login
+                session_regenerate_id(true);
+                unset($_SESSION['admin_login_attempts']);
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $actual_username;
 
@@ -87,7 +106,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         } else {
             $error = 'Invalid username or password.';
         }
-    }
+    } // end rate limit check
 }
 ?>
 <!DOCTYPE html>

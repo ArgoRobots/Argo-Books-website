@@ -236,7 +236,9 @@ try {
                         "Square-Version: 2025-10-16",
                         "Authorization: Bearer $squareAccessToken",
                         "Content-Type: application/json"
-                    ]
+                    ],
+                    CURLOPT_SSL_VERIFYPEER => true,
+                    CURLOPT_SSL_VERIFYHOST => 2,
                 ]);
                 if ($data !== null) {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));

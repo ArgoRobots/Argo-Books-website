@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Get CSRF token from meta tag
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
   function isUserLoggedIn() {
     // We'll check this by looking for disabled vote buttons
     const voteBtn = document.querySelector(".vote-btn");
@@ -209,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: `post_id=${postId}&vote_type=${voteType}`,
+        body: `post_id=${postId}&vote_type=${voteType}&csrf_token=${encodeURIComponent(csrfToken)}`,
       })
         .then((response) => response.json())
         .then((data) => {
@@ -274,7 +277,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: `comment_id=${commentId}&vote_type=${voteType}`,
+        body: `comment_id=${commentId}&vote_type=${voteType}&csrf_token=${encodeURIComponent(csrfToken)}`,
       })
         .then((response) => response.json())
         .then((data) => {
@@ -357,6 +360,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const formData = new FormData();
       formData.append("post_id", postId);
       formData.append("comment_content", contentInput.value);
+      formData.append("csrf_token", csrfToken);
 
       fetch("add_comment.php", {
         method: "POST",
@@ -500,7 +504,7 @@ document.addEventListener("DOMContentLoaded", function () {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `post_id=${postId}`,
+          body: `post_id=${postId}&csrf_token=${encodeURIComponent(csrfToken)}`,
         })
           .then((response) => response.json())
           .then((data) => {
@@ -618,6 +622,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
           const formData = new FormData(form);
           formData.append("comment_id", commentId);
+          formData.append("csrf_token", csrfToken);
 
           // Show loading state
           const submitButton = form.querySelector('button[type="submit"]');
@@ -688,7 +693,7 @@ document.addEventListener("DOMContentLoaded", function () {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: `comment_id=${commentId}`,
+            body: `comment_id=${commentId}&csrf_token=${encodeURIComponent(csrfToken)}`,
           })
             .then((response) => response.json())
             .then((data) => {

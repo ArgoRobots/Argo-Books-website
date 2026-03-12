@@ -45,20 +45,21 @@ $amount = floatval($data['amount']);
 $referenceNumber = generate_reference_number();
 $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 
-// Validate amount and invoice state
-$balanceDue = floatval($invoice['balance_due']);
+// Use integer cents for precise monetary comparisons
+$amountCents = (int) round($amount * 100);
+$balanceDueCents = (int) round(floatval($invoice['balance_due']) * 100);
 $invoiceStatus = $invoice['status'] ?? '';
 
-if ($amount <= 0) {
+if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($amount > $balanceDue + 0.01) {
+if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
     send_error_response(400, 'Payment amount exceeds balance due.', 'EXCEEDS_BALANCE');
 }
 if (in_array($invoiceStatus, ['paid', 'cancelled'])) {
     send_error_response(400, 'This invoice is not payable.', 'NOT_PAYABLE');
 }
-if ($balanceDue <= 0) {
+if ($balanceDueCents <= 0) {
     send_error_response(400, 'This invoice has no balance due.', 'NO_BALANCE');
 }
 
@@ -115,7 +116,7 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
     $paidAmountCents = $paymentIntent->amount;
     $expectedCents = (int) round($amount * 100);
     if (abs($paidAmountCents - $expectedCents) > 1) { // 1 cent tolerance
-        error_log("Portal Stripe amount mismatch: paid={$paidAmountCents} expected={$expectedCents}");
+        error_log("Portal Stripe amount mismatch for invoice " . $invoice['invoice_id'] . " (PI: $paymentIntentId)");
         send_error_response(400, 'Payment amount mismatch.', 'AMOUNT_MISMATCH');
     }
 
@@ -198,7 +199,9 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
         CURLOPT_USERPWD => "$paypalClientId:$paypalSecret",
-        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
+        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $tokenResponse = json_decode(curl_exec($ch), true);
     curl_close($ch);
@@ -216,7 +219,9 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         CURLOPT_HTTPHEADER => [
             "Authorization: Bearer $accessToken",
             "Content-Type: application/json"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $orderResponse = json_decode(curl_exec($ch), true);
     curl_close($ch);
@@ -239,7 +244,7 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         send_error_response(400, 'Could not verify PayPal payment amount.', 'PAYPAL_AMOUNT_INVALID');
     }
     if (abs($capturedAmount - $amount) > 0.01) {
-        error_log("Portal PayPal amount mismatch: captured={$capturedAmount} claimed={$amount}");
+        error_log("Portal PayPal amount mismatch for invoice " . $invoice['invoice_id'] . " (order: $orderId)");
         send_error_response(400, 'Payment amount mismatch.', 'AMOUNT_MISMATCH');
     }
     $amount = $capturedAmount; // Use the verified amount

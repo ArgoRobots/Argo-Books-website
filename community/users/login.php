@@ -19,15 +19,32 @@ $verification_notice = '';
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Rate limit login attempts (max 5 per 15 minutes)
+    if (!isset($_SESSION['login_attempts'])) {
+        $_SESSION['login_attempts'] = [];
+    }
+    $now = time();
+    $_SESSION['login_attempts'] = array_filter($_SESSION['login_attempts'], function ($t) use ($now) {
+        return ($now - $t) < 900;
+    });
+    if (count($_SESSION['login_attempts']) >= 5) {
+        $error = 'Too many login attempts. Please wait 15 minutes before trying again.';
+    }
+
     // Get form data
     $login = isset($_POST['login']) ? trim($_POST['login']) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $remember_me = isset($_POST['remember_me']) ? true : false;
 
     // Basic validation
-    if (empty($login) || empty($password)) {
+    if (empty($error) && (empty($login) || empty($password))) {
         $error = 'Please enter both username/email and password';
-    } else {
+    }
+
+    if (empty($error)) {
+        // Record the attempt
+        $_SESSION['login_attempts'][] = $now;
+
         // Attempt to log in
         $user = login_user($login, $password);
 
@@ -40,6 +57,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: verify_code.php');
                 exit;
             }
+
+            // Regenerate session ID to prevent session fixation
+            session_regenerate_id(true);
+
+            // Clear rate limit counter on successful login
+            unset($_SESSION['login_attempts']);
 
             // Set session data
             $_SESSION['user_id'] = $user['id'];
@@ -68,17 +91,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     setcookie(
                         'remember_me',
                         $token,
-                        time() + (30 * 24 * 60 * 60), // 30 days
-                        '/'
+                        [
+                            'expires' => time() + (30 * 24 * 60 * 60), // 30 days
+                            'path' => '/',
+                            'secure' => true,
+                            'httponly' => true,
+                            'samesite' => 'Lax'
+                        ]
                     );
                 }
             }
 
-            // Redirect after login
+            // Redirect after login (validate redirect is a local path to prevent open redirect)
             if (isset($_SESSION['redirect_after_login']) && !empty($_SESSION['redirect_after_login'])) {
                 $redirect = $_SESSION['redirect_after_login'];
                 unset($_SESSION['redirect_after_login']);
-                header("Location: $redirect");
+                // Only allow relative paths starting with / and no protocol-relative URLs
+                if (preg_match('#^/[^/\\\\]#', $redirect) && !preg_match('#[:\s]#', $redirect)) {
+                    header("Location: $redirect");
+                } else {
+                    header('Location: profile.php');
+                }
             } else {
                 header('Location: profile.php');
             }
@@ -86,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Invalid username/email or password';
         }
-    }
+    } // end rate limit check
 }
 ?>
 <!DOCTYPE html>

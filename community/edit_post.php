@@ -52,7 +52,7 @@ $role = $_SESSION['role'] ?? 'user';
 
 // Determine if user can edit this post
 $can_edit_post = ($role === 'admin') ||
-    (isset($post['user_id']) && $post['user_id'] == $user_id);
+    (isset($post['user_id']) && (int)$post['user_id'] === (int)$user_id);
 
 if (!$can_edit_post) {
     // Redirect to view post if no permission
@@ -83,10 +83,22 @@ if ($metadata_exists) {
     $stmt->close();
 }
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Process form submission
 $error_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_message = 'Invalid request. Please refresh and try again.';
+    }
+
+    if (empty($error_message)):
+
     // Validate and sanitize inputs
     $title = isset($_POST['title']) ? trim($_POST['title']) : '';
     $content = isset($_POST['content']) ? trim($_POST['content']) : '';
@@ -215,6 +227,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
+
+    endif; // CSRF check
 }
 
 ?>
@@ -287,6 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Edit Form -->
                 <div class="edit-form-container" id="edit-container">
                     <form method="post" action="edit_post.php?id=<?php echo $post_id; ?>" id="edit-post-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <div class="form-group">
                         <label for="title">Title</label>
                         <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($post['title']); ?>" required>

@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Get CSRF token from meta tag
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
   const postsPerPage = 15;
   let isLoading = false;
   let hasMorePosts = true;
@@ -81,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function () {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: `post_id=${postId}&vote_type=${voteType}`,
+          body: `post_id=${postId}&vote_type=${voteType}&csrf_token=${encodeURIComponent(csrfToken)}`,
         })
           .then((response) => response.json())
           .then((data) => {
@@ -341,7 +344,7 @@ document.addEventListener("DOMContentLoaded", function () {
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
               },
-              body: `post_id=${id}`,
+              body: `post_id=${id}&csrf_token=${encodeURIComponent(csrfToken)}`,
             }).then((response) => response.json());
           })
         )
@@ -697,7 +700,7 @@ document.addEventListener("DOMContentLoaded", function () {
             headers: {
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: `post_id=${postId}`,
+            body: `post_id=${postId}&csrf_token=${encodeURIComponent(csrfToken)}`,
           })
             .then((response) => response.json())
             .then((data) => {

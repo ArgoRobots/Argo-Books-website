@@ -54,17 +54,21 @@ $webhookId = $isProduction
     ? ($_ENV['PAYPAL_LIVE_WEBHOOK_ID'] ?? '')
     : ($_ENV['PAYPAL_SANDBOX_WEBHOOK_ID'] ?? '');
 
-// Verify webhook signature (skip in development if webhook ID not configured)
-if (!empty($webhookId)) {
+// Verify webhook signature (mandatory in production)
+if (empty($webhookId)) {
+    if ($isProduction) {
+        error_log("CRITICAL: PayPal webhook ID not configured in production - rejecting request");
+        http_response_code(500);
+        exit('Webhook not configured');
+    }
+    error_log("WARNING: PayPal webhook signature verification is disabled in development. Set PAYPAL_*_WEBHOOK_ID in environment.");
+} else {
     $headers = getallheaders();
     if (!verifyPayPalWebhookSignature($headers, $rawBody, $webhookId)) {
         logPayPalWebhookEvent($event['event_type'] ?? 'UNKNOWN', $event, 'SIGNATURE_VERIFICATION_FAILED');
         http_response_code(401);
         exit('Invalid signature');
     }
-} else {
-    // Log warning that signature verification is disabled
-    error_log("WARNING: PayPal webhook signature verification is disabled. Set PAYPAL_*_WEBHOOK_ID in environment.");
 }
 
 // Extract event details

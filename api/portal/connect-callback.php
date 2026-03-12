@@ -195,6 +195,8 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/x-www-form-urlencoded',
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -221,6 +223,8 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
             "Authorization: Bearer $accessToken",
             'Content-Type: application/json',
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -286,6 +290,8 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
             'Square-Version: 2025-10-16',
             'Content-Type: application/json',
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -317,6 +323,8 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
             'Square-Version: 2025-10-16',
             "Authorization: Bearer $accessToken",
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -346,6 +354,9 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
         }
     }
 
+    // Encrypt the access token before storing
+    $encryptedAccessToken = portal_encrypt($accessToken);
+
     // Store credentials
     $stmt = $db->prepare(
         'UPDATE portal_companies
@@ -353,7 +364,7 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
              square_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->bind_param('ssssi', $merchantId, $accessToken, $locationId, $email, $companyId);
+    $stmt->bind_param('ssssi', $merchantId, $encryptedAccessToken, $locationId, $email, $companyId);
     $stmt->execute();
     $stmt->close();
 }

@@ -53,7 +53,9 @@ curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
     CURLOPT_USERPWD => "$paypalClientId:$paypalSecret",
-    CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
+    CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+    CURLOPT_SSL_VERIFYPEER => true,
+    CURLOPT_SSL_VERIFYHOST => 2,
 ]);
 $tokenResponse = json_decode(curl_exec($ch), true);
 curl_close($ch);
@@ -84,7 +86,9 @@ curl_setopt_array($ch, [
     CURLOPT_HTTPHEADER => [
         "Authorization: Bearer {$tokenResponse['access_token']}",
         "Content-Type: application/json"
-    ]
+    ],
+    CURLOPT_SSL_VERIFYPEER => true,
+    CURLOPT_SSL_VERIFYHOST => 2,
 ]);
 $verifyResponse = json_decode(curl_exec($ch), true);
 curl_close($ch);

@@ -41,7 +41,7 @@ if (empty($requested_username)) {
     $stmt->close();
 
     if ($user) {
-        $is_own_profile = ($user['id'] == $_SESSION['user_id']);
+        $is_own_profile = ((int)$user['id'] === (int)$_SESSION['user_id']);
     } else {
         $user_not_found = true;
     }

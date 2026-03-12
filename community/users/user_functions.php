@@ -443,10 +443,13 @@ namespace {
             return false;
         }
 
-        // Validate image type
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!in_array($file['type'], $allowed_types)) {
-            error_log("Invalid file type: " . $file['type']);
+        // Validate image type using server-side detection (not client-supplied MIME)
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $detected_type = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($detected_type, $allowed_types)) {
+            error_log("Invalid file type detected: " . $detected_type);
             return false;
         }
 

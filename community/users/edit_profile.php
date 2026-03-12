@@ -173,6 +173,7 @@ function handle_avatar_change()
     $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $file_info = finfo_open(FILEINFO_MIME_TYPE);
     $mime_type = finfo_file($file_info, $file['tmp_name']);
+    finfo_close($file_info);
 
     if (!in_array($mime_type, $allowed_types)) {
         $_SESSION['profile_error'] = 'Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.';
@@ -214,9 +215,13 @@ function handle_avatar_change()
     $filename = 'avatar_' . $user_id . '_' . time() . '.' . $extension;
     $filepath = $avatar_dir . $filename;
 
-    // Delete old avatar if it exists
-    if (!empty($user['avatar']) && file_exists('../' . $user['avatar'])) {
-        unlink('../' . $user['avatar']);
+    // Delete old avatar if it exists (validate path to prevent traversal)
+    if (!empty($user['avatar'])) {
+        $old_avatar_name = basename($user['avatar']);
+        $old_avatar_path = $avatar_dir . $old_avatar_name;
+        if (file_exists($old_avatar_path) && realpath($old_avatar_path) && strpos(realpath($old_avatar_path), realpath($avatar_dir)) === 0) {
+            unlink($old_avatar_path);
+        }
     }
 
     // Move uploaded file
@@ -257,17 +262,13 @@ function handle_avatar_removal()
     global $user_id, $user;
 
     if (!empty($user['avatar'])) {
-        // Handle both old path formats during transition
-        $file_paths = [
-            '../../' . $user['avatar'],  // Current format
-            '../' . $user['avatar']      // Alternative format
-        ];
-
-        // Delete file if it exists in any location
-        foreach ($file_paths as $file_path) {
-            if (file_exists($file_path)) {
-                unlink($file_path);
-                break; // Only need to delete once
+        // Validate and delete old avatar (prevent path traversal)
+        $avatar_name = basename($user['avatar']);
+        $uploads_dir = realpath(dirname(__DIR__) . '/uploads/avatars/');
+        if ($uploads_dir) {
+            $avatar_path = $uploads_dir . '/' . $avatar_name;
+            if (file_exists($avatar_path) && realpath($avatar_path) && strpos(realpath($avatar_path), $uploads_dir) === 0) {
+                unlink($avatar_path);
             }
         }
 

@@ -12,10 +12,6 @@ session_start();
 require_once '../../db_connect.php';
 header('Content-Type: application/json');
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);

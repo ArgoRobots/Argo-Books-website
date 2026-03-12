@@ -19,8 +19,20 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $response['message'] = 'Invalid request. Please refresh and try again.';
+        echo json_encode($response);
+        exit;
+    }
+
     $comment_id = isset($_POST['comment_id']) ? intval($_POST['comment_id']) : 0;
 
     if ($comment_id <= 0) {
@@ -49,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Check permission: admin or comment owner can delete
     $can_delete = ($role === 'admin') ||
-        (isset($comment['user_id']) && $comment['user_id'] == $user_id);
+        (isset($comment['user_id']) && (int)$comment['user_id'] === (int)$user_id);
 
     if (!$can_delete) {
         $response['message'] = 'You do not have permission to delete this comment';
@@ -69,7 +81,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'post_id' => $comment['post_id']
         ];
     } else {
-        $response['message'] = 'Error deleting comment: ' . $db->error;
+        error_log('Error deleting comment ' . $comment_id . ': ' . $db->error);
+        $response['message'] = 'Error deleting comment. Please try again.';
     }
 
     $stmt->close();

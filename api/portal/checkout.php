@@ -311,11 +311,8 @@ function process_square_payment(array $invoice, array $company, array $data, int
         }
     } else {
         $errors = json_decode($responseData, true);
-        $errorMsg = 'Square payment failed';
-        if (isset($errors['errors'][0]['detail'])) {
-            $errorMsg = $errors['errors'][0]['detail'];
-        }
-        error_log("Square portal payment error: $errorMsg");
-        send_error_response(500, $errorMsg, 'SQUARE_ERROR');
+        $errorDetail = $errors['errors'][0]['detail'] ?? 'Unknown error';
+        error_log("Square portal payment error for invoice " . $invoice['invoice_id'] . ": $errorDetail");
+        send_error_response(500, 'Square payment failed. Please try again.', 'SQUARE_ERROR');
     }
 }

@@ -97,6 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'Invalid request. Please refresh and try again.';
     }
 
+    if (empty($error_message)):
+
     // Validate and sanitize inputs
     $title = isset($_POST['title']) ? trim($_POST['title']) : '';
     $content = isset($_POST['content']) ? trim($_POST['content']) : '';
@@ -225,6 +227,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     }
+
+    endif; // CSRF check
 }
 
 ?>

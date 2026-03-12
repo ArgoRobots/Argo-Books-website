@@ -39,9 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Invalid request. Please refresh and try again.']);
             exit;
-        } else {
-            $error_message = 'Invalid request. Please refresh and try again.';
         }
+        $error_message = 'Invalid request. Please refresh and try again.';
     }
 
     // Check if user is banned
@@ -94,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // For regular form submissions, keep the existing behavior
             $html_message = $rate_limit_message;
         }
-    } else {
+    } elseif (empty($error_message)) {
         // Process the form normally
         $title = isset($_POST['post_title']) ? trim($_POST['post_title']) : '';
         $content = isset($_POST['post_content']) ? trim($_POST['post_content']) : '';

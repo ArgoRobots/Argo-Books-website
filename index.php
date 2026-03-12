@@ -1567,10 +1567,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 if (paths[2]) paths[2].classList.add('draw-dashed'); // dashed forecast
                 if (circle) circle.classList.add('draw-dot');
 
-                // Show prediction badge after chart draws
+                // Show prediction badge after dashed line finishes
                 t(() => {
                     if (badge) badge.classList.add('badge-visible');
-                }, 2500);
+                }, 3500);
 
                 // Hold and restart
                 t(() => {

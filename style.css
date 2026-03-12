@@ -196,7 +196,7 @@ a {
     opacity: 1;
     stroke-dasharray: 5, 5;
     clip-path: inset(0 100% 0 0);
-    animation: revealDashed 0.8s ease-out 2s forwards;
+    animation: revealDashed 0.8s ease-out 1.85s forwards;
 }
 @keyframes revealDashed {
     to { clip-path: inset(0 0 0 0); }

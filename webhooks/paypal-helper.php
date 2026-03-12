@@ -144,12 +144,29 @@ function verifyPayPalWebhookSignature($headers, $body, $webhookId) {
 }
 
 /**
+ * Validate a PayPal resource ID to prevent SSRF via URL path injection.
+ * PayPal IDs contain only alphanumeric characters and hyphens.
+ *
+ * @param string $id The PayPal resource ID to validate
+ * @return bool True if the ID format is valid
+ */
+function isValidPayPalResourceId(string $id): bool
+{
+    return (bool) preg_match('/^[A-Za-z0-9\-]+$/', $id);
+}
+
+/**
  * Get PayPal subscription details
  *
  * @param string $subscriptionId The PayPal subscription ID
  * @return array|false The subscription details or false on failure
  */
 function getPayPalSubscriptionDetails($subscriptionId) {
+    if (!isValidPayPalResourceId($subscriptionId)) {
+        error_log("Invalid PayPal subscription ID format: " . substr($subscriptionId, 0, 50));
+        return false;
+    }
+
     $accessToken = getPayPalAccessToken();
     if (!$accessToken) {
         return false;
@@ -188,6 +205,11 @@ function getPayPalSubscriptionDetails($subscriptionId) {
  * @return bool True if cancellation was successful
  */
 function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user') {
+    if (!isValidPayPalResourceId($subscriptionId)) {
+        error_log("Invalid PayPal subscription ID format for cancellation");
+        return false;
+    }
+
     $accessToken = getPayPalAccessToken();
     if (!$accessToken) {
         error_log("Failed to get access token for subscription cancellation");
@@ -230,6 +252,11 @@ function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user'
  * @return bool True if suspension was successful
  */
 function suspendPayPalSubscription($subscriptionId, $reason = 'Payment failed') {
+    if (!isValidPayPalResourceId($subscriptionId)) {
+        error_log("Invalid PayPal subscription ID format for suspension");
+        return false;
+    }
+
     $accessToken = getPayPalAccessToken();
     if (!$accessToken) {
         return false;
@@ -265,6 +292,11 @@ function suspendPayPalSubscription($subscriptionId, $reason = 'Payment failed') 
  * @return bool True if activation was successful
  */
 function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by user') {
+    if (!isValidPayPalResourceId($subscriptionId)) {
+        error_log("Invalid PayPal subscription ID format for activation");
+        return false;
+    }
+
     $accessToken = getPayPalAccessToken();
     if (!$accessToken) {
         return false;
@@ -299,6 +331,11 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
  * @return array|false The transaction details or false on failure
  */
 function getPayPalCaptureDetails($captureId) {
+    if (!isValidPayPalResourceId($captureId)) {
+        error_log("Invalid PayPal capture ID format");
+        return false;
+    }
+
     $accessToken = getPayPalAccessToken();
     if (!$accessToken) {
         return false;

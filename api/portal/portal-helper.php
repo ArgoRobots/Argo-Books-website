@@ -66,66 +66,102 @@ function authenticate_portal_request(): ?array
 }
 
 /**
- * Check rate limiting for token lookups by IP address
+ * Read rate limits file with exclusive lock to prevent TOCTOU race conditions.
+ * Returns the parsed array and keeps the file handle open for atomic updates.
  *
- * @param string $ip Client IP address
- * @param int $maxAttempts Maximum failed lookups allowed (default: 10)
- * @param int $windowSeconds Time window in seconds (default: 900 = 15 minutes)
- * @return bool True if rate limit exceeded
+ * @param int $windowSeconds Time window for cleanup
+ * @return array{rateLimits: array, handle: resource|null}
  */
-function is_rate_limited(string $ip, int $maxAttempts = 10, int $windowSeconds = 900): bool
+function read_rate_limits_locked(int $windowSeconds = 900): array
 {
     $rateFile = __DIR__ . '/rate_limits.json';
-
-    $rateLimits = [];
-    if (file_exists($rateFile)) {
-        $content = file_get_contents($rateFile);
-        $rateLimits = json_decode($content, true) ?: [];
+    $handle = fopen($rateFile, 'c+');
+    if (!$handle) {
+        return ['rateLimits' => [], 'handle' => null];
     }
 
-    $now = time();
+    if (!flock($handle, LOCK_EX)) {
+        fclose($handle);
+        return ['rateLimits' => [], 'handle' => null];
+    }
+
+    $content = stream_get_contents($handle);
+    $rateLimits = json_decode($content, true) ?: [];
 
     // Clean up expired entries
+    $now = time();
     foreach ($rateLimits as $key => $data) {
-        if ($now - $data['first_attempt'] > $windowSeconds) {
+        if ($now - ($data['first_attempt'] ?? 0) > $windowSeconds) {
             unset($rateLimits[$key]);
         }
     }
 
-    $key = 'portal_' . md5($ip);
-
-    if (!isset($rateLimits[$key])) {
-        return false;
-    }
-
-    return $rateLimits[$key]['count'] >= $maxAttempts;
+    return ['rateLimits' => $rateLimits, 'handle' => $handle];
 }
 
 /**
- * Record a failed token lookup attempt for rate limiting
+ * Write rate limits and release the file lock.
+ *
+ * @param resource $handle File handle from read_rate_limits_locked
+ * @param array $rateLimits Updated rate limits data
+ */
+function write_rate_limits_unlock($handle, array $rateLimits): void
+{
+    ftruncate($handle, 0);
+    rewind($handle);
+    fwrite($handle, json_encode($rateLimits));
+    fflush($handle);
+    flock($handle, LOCK_UN);
+    fclose($handle);
+}
+
+/**
+ * Check rate limiting for an IP address and action type.
+ * Uses file locking to prevent race conditions under concurrent requests.
  *
  * @param string $ip Client IP address
+ * @param int $maxAttempts Maximum attempts allowed (default: 10)
+ * @param int $windowSeconds Time window in seconds (default: 900 = 15 minutes)
+ * @param string $prefix Key prefix for different rate limit buckets (default: 'portal')
+ * @return bool True if rate limit exceeded
  */
-function record_failed_lookup(string $ip): void
+function is_rate_limited(string $ip, int $maxAttempts = 10, int $windowSeconds = 900, string $prefix = 'portal'): bool
 {
-    $rateFile = __DIR__ . '/rate_limits.json';
-    $windowSeconds = 900;
+    $result = read_rate_limits_locked($windowSeconds);
+    $rateLimits = $result['rateLimits'];
+    $handle = $result['handle'];
 
-    $rateLimits = [];
-    if (file_exists($rateFile)) {
-        $content = file_get_contents($rateFile);
-        $rateLimits = json_decode($content, true) ?: [];
+    $key = $prefix . '_' . hash('sha256', $ip);
+    $isLimited = isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts;
+
+    if ($handle) {
+        // Write back cleaned data and release lock
+        write_rate_limits_unlock($handle, $rateLimits);
+    }
+
+    return $isLimited;
+}
+
+/**
+ * Record a rate-limited action attempt for an IP address.
+ * Uses file locking to prevent race conditions under concurrent requests.
+ *
+ * @param string $ip Client IP address
+ * @param string $prefix Key prefix for different rate limit buckets (default: 'portal')
+ */
+function record_rate_limit_attempt(string $ip, string $prefix = 'portal'): void
+{
+    $windowSeconds = 900;
+    $result = read_rate_limits_locked($windowSeconds);
+    $rateLimits = $result['rateLimits'];
+    $handle = $result['handle'];
+
+    if (!$handle) {
+        return;
     }
 
     $now = time();
-    $key = 'portal_' . md5($ip);
-
-    // Clean up expired entries
-    foreach ($rateLimits as $k => $data) {
-        if ($now - $data['first_attempt'] > $windowSeconds) {
-            unset($rateLimits[$k]);
-        }
-    }
+    $key = $prefix . '_' . hash('sha256', $ip);
 
     if (!isset($rateLimits[$key])) {
         $rateLimits[$key] = [
@@ -136,7 +172,61 @@ function record_failed_lookup(string $ip): void
         $rateLimits[$key]['count']++;
     }
 
-    file_put_contents($rateFile, json_encode($rateLimits), LOCK_EX);
+    write_rate_limits_unlock($handle, $rateLimits);
+}
+
+/**
+ * Backwards-compatible alias for record_rate_limit_attempt().
+ * Used by portal/invoice.php and portal/index.php for failed token lookups.
+ */
+function record_failed_lookup(string $ip): void
+{
+    record_rate_limit_attempt($ip, 'portal');
+}
+
+/**
+ * Check and enforce rate limiting for payment endpoints.
+ * Atomically checks the limit and records the attempt under a single file lock
+ * to prevent concurrent requests from bypassing the limit.
+ * Allows 20 payment attempts per IP per 15 minutes.
+ * Sends a 429 response and exits if rate limited.
+ */
+function enforce_payment_rate_limit(): void
+{
+    $ip = get_client_ip();
+    $maxAttempts = 20;
+    $windowSeconds = 900;
+    $prefix = 'payment';
+
+    // Atomic check + increment under a single lock
+    $result = read_rate_limits_locked($windowSeconds);
+    $rateLimits = $result['rateLimits'];
+    $handle = $result['handle'];
+
+    $key = $prefix . '_' . hash('sha256', $ip);
+    $isLimited = isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts;
+
+    if ($isLimited) {
+        if ($handle) {
+            write_rate_limits_unlock($handle, $rateLimits);
+        }
+        send_error_response(429, 'Too many payment attempts. Please try again later.', 'RATE_LIMITED');
+    }
+
+    // Record this attempt while still holding the lock
+    $now = time();
+    if (!isset($rateLimits[$key])) {
+        $rateLimits[$key] = [
+            'count' => 1,
+            'first_attempt' => $now
+        ];
+    } else {
+        $rateLimits[$key]['count']++;
+    }
+
+    if ($handle) {
+        write_rate_limits_unlock($handle, $rateLimits);
+    }
 }
 
 /**
@@ -529,6 +619,11 @@ function send_invoice_notification(array $params): array
         return ['success' => false, 'message' => 'Missing customer email or invoice URL'];
     }
 
+    // Sanitize inputs against email header injection (strip CRLF and control chars)
+    $customerName = preg_replace('/[\r\n\x00-\x1F]/', '', $customerName);
+    $customerEmail = preg_replace('/[\r\n\x00-\x1F]/', '', $customerEmail);
+    $companyName = preg_replace('/[\r\n\x00-\x1F]/', '', $companyName);
+
     $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
     $formattedAmount = $currencySymbol . number_format(floatval($balanceDue), 2) . ' ' . $currency;
     $formattedDueDate = $dueDate ? date('F j, Y', strtotime($dueDate)) : '';
@@ -598,6 +693,11 @@ function send_payment_confirmation(array $params): array
     if (empty($customerEmail)) {
         return ['success' => false, 'message' => 'Missing customer email'];
     }
+
+    // Sanitize inputs against email header injection (strip CRLF and control chars)
+    $customerName = preg_replace('/[\r\n\x00-\x1F]/', '', $customerName);
+    $customerEmail = preg_replace('/[\r\n\x00-\x1F]/', '', $customerEmail);
+    $companyName = preg_replace('/[\r\n\x00-\x1F]/', '', $companyName);
 
     $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
     $formattedAmount = $currencySymbol . number_format(floatval($amount), 2) . ' ' . $currency;

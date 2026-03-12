@@ -1,11 +1,27 @@
+# Protect sensitive files from direct access
+<Files ".env">
+Order allow,deny
+Deny from all
+</Files>
+
+<Files "composer.json">
+Order allow,deny
+Deny from all
+</Files>
+
+<Files "composer.lock">
+Order allow,deny
+Deny from all
+</Files>
+
 # Deny access to database directory
 <Files ~ "\.sqlite$">
 Order allow,deny
 Deny from all
 </Files>
 
-# Deny access to the schema.sql file
-<Files ~ "schema\.sql$">
+# Deny access to SQL schema files
+<Files ~ "\.sql$">
 Order allow,deny
 Deny from all
 </Files>

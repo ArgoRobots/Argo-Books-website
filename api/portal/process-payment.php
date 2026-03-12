@@ -14,6 +14,9 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 set_portal_headers();
 require_method(['POST']);
 
+// Rate limit payment attempts (20 per IP per 15 minutes)
+enforce_payment_rate_limit();
+
 // Parse request body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -90,6 +93,11 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
     $paymentIntentId = $data['payment_intent_id'] ?? '';
     if (empty($paymentIntentId)) {
         send_error_response(400, 'Missing payment_intent_id.', 'MISSING_FIELD');
+    }
+
+    // Validate payment intent ID format (Stripe IDs are alphanumeric with underscores)
+    if (!preg_match('/^pi_[A-Za-z0-9]+$/', $paymentIntentId)) {
+        send_error_response(400, 'Invalid payment intent ID format.', 'INVALID_PAYMENT_INTENT');
     }
 
     // Verify the payment intent status with Stripe
@@ -179,6 +187,11 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
     $orderId = $data['order_id'] ?? '';
     if (empty($orderId)) {
         send_error_response(400, 'Missing PayPal order_id.', 'MISSING_FIELD');
+    }
+
+    // Validate order ID format to prevent SSRF via URL path injection
+    if (!preg_match('/^[A-Za-z0-9\-]+$/', $orderId)) {
+        send_error_response(400, 'Invalid PayPal order ID format.', 'INVALID_ORDER_ID');
     }
 
     // Verify the order with PayPal

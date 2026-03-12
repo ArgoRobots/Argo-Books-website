@@ -29,9 +29,10 @@ $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 // Verify webhook signature with PayPal
 $webhookId = $_ENV['PORTAL_PAYPAL_WEBHOOK_ID'] ?? '';
 if (empty($webhookId)) {
-    error_log('Portal PayPal webhook: No webhook ID configured');
-    http_response_code(200); // Acknowledge but log error
-    echo json_encode(['received' => true]);
+    error_log('Portal PayPal webhook: PORTAL_PAYPAL_WEBHOOK_ID not configured - rejecting request');
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['error' => 'Webhook not configured']);
     exit;
 }
 

@@ -15,6 +15,9 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 set_portal_headers();
 require_method(['POST']);
 
+// Rate limit payment attempts (20 per IP per 15 minutes)
+enforce_payment_rate_limit();
+
 // Parse request body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -281,6 +284,7 @@ function process_square_payment(array $invoice, array $company, array $data, int
                 'provider_transaction_id' => $payment['id'],
                 'reference_number' => $referenceNumber,
                 'status' => 'completed',
+                'payment_environment' => $is_production ? 'production' : 'sandbox',
             ]);
 
             // Send payment confirmation email (best-effort, don't block the response on failure)

@@ -884,7 +884,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <?= svg_icon('pencil', 32) ?>
                     </div>
                     <h3>Set Up</h3>
-                    <p>Add your products, customers, and preferences. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
+                    <p>Add your products, customers, and vendors. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
                 </div>
                 <div class="step-connector animate-on-scroll"></div>
                 <div class="step-card animate-on-scroll">
@@ -893,7 +893,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <?= svg_icon('trending-up', 32) ?>
                     </div>
                     <h3>Grow</h3>
-                    <p>Start tracking sales, managing inventory, and watching your business insights grow.</p>
+                    <p>Start tracking sales, managing inventory, and watch your business grow.</p>
                 </div>
             </div>
         </div>

@@ -14,11 +14,9 @@ $db = get_db_connection();
 
 // --- Revenue & Subscription Queries ---
 
-// Total revenue (subscriptions + portal payments)
+// Revenue & License Queries
 $total_subscription_revenue = 0;
-$total_portal_revenue = 0;
 $monthly_subscription_revenue = 0;
-$monthly_portal_revenue = 0;
 $total_active_licenses = 0;
 $total_inactive_licenses = 0;
 
@@ -78,64 +76,24 @@ try {
     $cancelled_this_month = 0;
 }
 
-// Portal payments
-try {
-    global $pdo;
-
-    // Total portal revenue
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production'");
-    $total_portal_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-
-    // This month portal revenue
-    $stmt = $pdo->query("SELECT COALESCE(SUM(amount), 0) as total FROM portal_payments WHERE status = 'completed' AND payment_environment = 'production' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
-    $monthly_portal_revenue = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
-
-    // Monthly portal revenue over time (last 12 months)
-    $stmt = $pdo->query("
-        SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COALESCE(SUM(amount), 0) as total
-        FROM portal_payments
-        WHERE status = 'completed' AND payment_environment = 'production' AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-        ORDER BY month ASC
-    ");
-    $portal_revenue_by_month = [];
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $portal_revenue_by_month[$row['month']] = (float)$row['total'];
-    }
-
-} catch (Exception $e) {
-    error_log("Error fetching portal payment stats: " . $e->getMessage());
-    $portal_revenue_by_month = [];
-}
-
-// Build combined revenue data for last 12 months
+// Build revenue data for last 12 months
 $revenue_labels = [];
 $subscription_data = [];
-$portal_data = [];
-$combined_data = [];
 
 for ($i = 11; $i >= 0; $i--) {
     $month_key = date('Y-m', strtotime("-$i months"));
     $month_label = date('M Y', strtotime("-$i months"));
     $revenue_labels[] = $month_label;
-    $sub_amount = $subscription_revenue_by_month[$month_key] ?? 0;
-    $portal_amount = $portal_revenue_by_month[$month_key] ?? 0;
-    $subscription_data[] = $sub_amount;
-    $portal_data[] = $portal_amount;
-    $combined_data[] = $sub_amount + $portal_amount;
+    $subscription_data[] = $subscription_revenue_by_month[$month_key] ?? 0;
 }
 
 // Calculate totals
-$total_revenue = $total_subscription_revenue + $total_portal_revenue;
-$monthly_revenue = $monthly_subscription_revenue + $monthly_portal_revenue;
 $total_licenses = $total_active_licenses + $total_inactive_licenses;
 
 // Calculate last month revenue for comparison
 $last_month_key = date('Y-m', strtotime('-1 month'));
-$last_month_sub = $subscription_revenue_by_month[$last_month_key] ?? 0;
-$last_month_portal = $portal_revenue_by_month[$last_month_key] ?? 0;
-$last_month_revenue = $last_month_sub + $last_month_portal;
-$revenue_change = $last_month_revenue > 0 ? round(($monthly_revenue - $last_month_revenue) / $last_month_revenue * 100, 1) : 0;
+$last_month_revenue = $subscription_revenue_by_month[$last_month_key] ?? 0;
+$revenue_change = $last_month_revenue > 0 ? round(($monthly_subscription_revenue - $last_month_revenue) / $last_month_revenue * 100, 1) : 0;
 
 include 'admin_header.php';
 ?>
@@ -145,7 +103,7 @@ include 'admin_header.php';
 <div class="dashboard-home">
     <!-- Hero Section -->
     <div class="hero-section">
-        <h1>Revenue Dashboard</h1>
+        <h1>Admin Dashboard</h1>
     </div>
 
     <!-- Stats Row -->
@@ -153,7 +111,7 @@ include 'admin_header.php';
         <div class="stat-card">
             <div class="stat-icon"><?= svg_icon('dollar', 24) ?></div>
             <div class="stat-label">Revenue This Month</div>
-            <div class="stat-value">$<?php echo number_format($monthly_revenue, 2); ?></div>
+            <div class="stat-value">$<?php echo number_format($monthly_subscription_revenue, 2); ?></div>
             <?php if ($revenue_change != 0): ?>
                 <div class="stat-change <?php echo $revenue_change >= 0 ? 'positive' : 'negative'; ?>">
                     <?= svg_icon($revenue_change >= 0 ? 'trending-up' : 'chevron-down', 14) ?>
@@ -164,11 +122,8 @@ include 'admin_header.php';
         <div class="stat-card">
             <div class="stat-icon"><?= svg_icon('analytics', 24) ?></div>
             <div class="stat-label">Total Revenue</div>
-            <div class="stat-value">$<?php echo number_format($total_revenue, 2); ?></div>
-            <div class="stat-breakdown">
-                <span>Subscriptions: $<?php echo number_format($total_subscription_revenue, 2); ?></span>
-                <span>Portal: $<?php echo number_format($total_portal_revenue, 2); ?></span>
-            </div>
+            <div class="stat-value">$<?php echo number_format($total_subscription_revenue, 2); ?></div>
+            <div class="stat-sub">From premium subscriptions</div>
         </div>
         <div class="stat-card">
             <div class="stat-icon"><?= svg_icon('shield-check', 24) ?></div>
@@ -188,10 +143,6 @@ include 'admin_header.php';
     <div class="chart-section">
         <div class="chart-header">
             <h2 class="section-title">Revenue Over Time</h2>
-            <div class="chart-legend">
-                <span class="legend-item"><span class="legend-color legend-subscriptions"></span> Subscriptions</span>
-                <span class="legend-item"><span class="legend-color legend-portal"></span> Portal Payments</span>
-            </div>
         </div>
         <div class="chart-container">
             <canvas id="revenueChart"></canvas>
@@ -202,7 +153,7 @@ include 'admin_header.php';
     <div class="bottom-grid">
         <!-- Revenue Breakdown -->
         <div class="panel">
-            <h2 class="section-title">Monthly Breakdown</h2>
+            <h2 class="section-title">Monthly Revenue</h2>
             <div class="breakdown-items">
                 <div class="breakdown-item">
                     <div class="breakdown-label">
@@ -210,21 +161,6 @@ include 'admin_header.php';
                         <span>Subscription Revenue</span>
                     </div>
                     <div class="breakdown-value">$<?php echo number_format($monthly_subscription_revenue, 2); ?></div>
-                </div>
-                <div class="breakdown-item">
-                    <div class="breakdown-label">
-                        <?= svg_icon('credit-card', 16) ?>
-                        <span>Portal Revenue</span>
-                    </div>
-                    <div class="breakdown-value">$<?php echo number_format($monthly_portal_revenue, 2); ?></div>
-                </div>
-                <div class="breakdown-divider"></div>
-                <div class="breakdown-item breakdown-total">
-                    <div class="breakdown-label">
-                        <?= svg_icon('dollar', 16) ?>
-                        <span>Total This Month</span>
-                    </div>
-                    <div class="breakdown-value">$<?php echo number_format($monthly_revenue, 2); ?></div>
                 </div>
             </div>
         </div>
@@ -318,16 +254,9 @@ new Chart(ctx, {
         labels: <?php echo json_encode($revenue_labels); ?>,
         datasets: [
             {
-                label: 'Subscriptions',
+                label: 'Revenue',
                 data: <?php echo json_encode($subscription_data); ?>,
                 backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                borderRadius: 4,
-                borderSkipped: false
-            },
-            {
-                label: 'Portal Payments',
-                data: <?php echo json_encode($portal_data); ?>,
-                backgroundColor: 'rgba(16, 185, 129, 0.8)',
                 borderRadius: 4,
                 borderSkipped: false
             }
@@ -354,18 +283,13 @@ new Chart(ctx, {
                 bodyFont: { size: 12 },
                 callbacks: {
                     label: function(context) {
-                        return context.dataset.label + ': $' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                    },
-                    footer: function(items) {
-                        let total = items.reduce((sum, item) => sum + item.parsed.y, 0);
-                        return 'Total: $' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        return '$' + context.parsed.y.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
                     }
                 }
             }
         },
         scales: {
             x: {
-                stacked: true,
                 grid: { display: false },
                 ticks: {
                     color: '#94a3b8',
@@ -374,7 +298,6 @@ new Chart(ctx, {
                 }
             },
             y: {
-                stacked: true,
                 grid: { color: 'rgba(148, 163, 184, 0.1)' },
                 ticks: {
                     color: '#94a3b8',

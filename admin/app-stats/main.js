@@ -110,8 +110,9 @@ document.addEventListener("DOMContentLoaded", function () {
   generateErrorDetailsTable(errorData);
 
   // Feature Usage Charts
-  generateFeatureUsageChart(featureUsageData);
-  generateFeatureTimelineChart(featureUsageData);
+  const filteredFeatureUsageData = featureUsageData.filter(f => f.FeatureName !== "PageView");
+  generateFeatureUsageChart(filteredFeatureUsageData);
+  generateFeatureTimelineChart(filteredFeatureUsageData);
 
   // Receipt Scanning Charts
   generateReceiptScanOverviewChart(receiptScanningData);
@@ -1941,7 +1942,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function formatFeatureLabel(name) {
     const labelMap = {
       DataImported: "AI Spreadsheet Import",
-      PageView: "Page View",
       ReceiptScanned: "Receipt Scanned",
       GoogleSheetsExport: "Google Sheets Export",
       BackupCreated: "Backup Created",

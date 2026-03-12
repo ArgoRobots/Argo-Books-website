@@ -13,6 +13,11 @@ require_login();
 $user_id = $_SESSION['user_id'];
 $user = get_user($user_id);
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $success_message = '';
 $error_message = '';
 
@@ -28,6 +33,13 @@ if (isset($_SESSION['profile_error'])) {
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['profile_error'] = 'Invalid request. Please try again.';
+        header('Location: edit_profile.php');
+        exit;
+    }
+
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
@@ -568,6 +580,7 @@ function handle_password_change()
                 <div class="avatar-controls">
                     <form method="post" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="change_avatar">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                         <div class="file-input-wrapper">
                             <input type="file" name="avatar" id="avatarFile" accept="image/*" onchange="previewAvatar(this)">
                             <label for="avatarFile" class="file-input-label">Choose New Avatar</label>
@@ -582,6 +595,7 @@ function handle_password_change()
                     <?php if (!empty($user['avatar'])): ?>
                         <form method="post" style="margin-top: 15px;">
                             <input type="hidden" name="action" value="remove_avatar">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                             <button type="submit" class="btn btn-red" onclick="return confirm('Are you sure you want to remove your avatar?')">Remove Avatar</button>
                         </form>
                     <?php endif; ?>
@@ -594,6 +608,7 @@ function handle_password_change()
             <h2>Profile Information</h2>
             <form method="post">
                 <input type="hidden" name="action" value="update_profile">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -630,6 +645,7 @@ function handle_password_change()
                     <p>We've sent a verification code to <strong><?php echo htmlspecialchars($_SESSION['pending_email']); ?></strong></p>
                     <form method="post">
                         <input type="hidden" name="action" value="verify_email">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                         <div class="form-group">
                             <label for="email_verification_code">Verification Code</label>
                             <input type="text" id="email_verification_code" name="email_verification_code" class="verification-code-input" placeholder="Enter 6-digit code" maxlength="6" required>
@@ -640,6 +656,7 @@ function handle_password_change()
             <?php else: ?>
                 <form method="post">
                     <input type="hidden" name="action" value="change_email">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                     <div class="form-group">
                         <label for="new_email">New Email Address</label>
@@ -665,6 +682,7 @@ function handle_password_change()
             <h2>Change Password</h2>
             <form method="post">
                 <input type="hidden" name="action" value="change_password">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
                 <div class="form-group">
                     <label for="current_password">Current Password</label>

@@ -355,8 +355,8 @@ namespace {
             return false;
         }
 
-        // Generate reset token
-        $reset_token = md5(uniqid(rand(), true));
+        // Generate cryptographically secure reset token
+        $reset_token = bin2hex(random_bytes(32));
 
         // Set token expiry (24 hours from now)
         $expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
@@ -666,7 +666,7 @@ namespace {
      */
     function generate_verification_code()
     {
-        return sprintf('%06d', mt_rand(100000, 999999));
+        return sprintf('%06d', random_int(100000, 999999));
     }
 
     /**

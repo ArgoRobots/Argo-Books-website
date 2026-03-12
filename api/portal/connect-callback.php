@@ -195,6 +195,8 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/x-www-form-urlencoded',
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -221,6 +223,8 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
             "Authorization: Bearer $accessToken",
             'Content-Type: application/json',
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -286,6 +290,8 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
             'Square-Version: 2025-10-16',
             'Content-Type: application/json',
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -317,6 +323,8 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
             'Square-Version: 2025-10-16',
             "Authorization: Bearer $accessToken",
         ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

@@ -73,6 +73,11 @@ function process_contact_form()
         return ['success' => false, 'message' => 'All fields are required.', 'form_data' => $form_data];
     }
 
+    // Validate email format and reject header injection attempts
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL) || preg_match('/[\r\n]/', $email)) {
+        return ['success' => false, 'message' => 'Please enter a valid email address.', 'form_data' => $form_data];
+    }
+
     // Send the email
     $email_subject = "Argo Books Contact: {$firstName} {$lastName}";
     $email_html = get_contact_email_template($firstName, $lastName, $email, $subject_label, $message);

@@ -18,26 +18,30 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $payload = file_get_contents('php://input');
 
-// Verify webhook signature
+// Verify webhook signature (mandatory)
 $signature = $_SERVER['HTTP_X_SQUARE_HMACSHA256_SIGNATURE'] ?? '';
 $webhookSignatureKey = $_ENV['PORTAL_SQUARE_WEBHOOK_SIGNATURE_KEY'] ?? '';
 
-if (!empty($webhookSignatureKey)) {
-    if (empty($signature)) {
-        error_log('Portal Square webhook: Missing signature header');
-        http_response_code(401);
-        exit;
-    }
+if (empty($webhookSignatureKey)) {
+    error_log('Portal Square webhook: PORTAL_SQUARE_WEBHOOK_SIGNATURE_KEY not configured - rejecting request');
+    http_response_code(500);
+    exit;
+}
 
-    $notificationUrl = ($_ENV['APP_URL'] ?? 'https://argorobots.com') . '/api/portal/webhooks/square';
-    $stringToSign = $notificationUrl . $payload;
-    $expectedSignature = base64_encode(hash_hmac('sha256', $stringToSign, $webhookSignatureKey, true));
+if (empty($signature)) {
+    error_log('Portal Square webhook: Missing signature header');
+    http_response_code(401);
+    exit;
+}
 
-    if (!hash_equals($expectedSignature, $signature)) {
-        error_log('Portal Square webhook: Invalid signature');
-        http_response_code(400);
-        exit;
-    }
+$notificationUrl = ($_ENV['APP_URL'] ?? 'https://argorobots.com') . '/api/portal/webhooks/square';
+$stringToSign = $notificationUrl . $payload;
+$expectedSignature = base64_encode(hash_hmac('sha256', $stringToSign, $webhookSignatureKey, true));
+
+if (!hash_equals($expectedSignature, $signature)) {
+    error_log('Portal Square webhook: Invalid signature');
+    http_response_code(400);
+    exit;
 }
 
 $data = json_decode($payload, true);

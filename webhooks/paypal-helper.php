@@ -51,7 +51,9 @@ function getPayPalAccessToken() {
             'Accept-Language: en_US',
             'Content-Type: application/x-www-form-urlencoded'
         ],
-        CURLOPT_USERPWD => "$clientId:$clientSecret"
+        CURLOPT_USERPWD => "$clientId:$clientSecret",
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -121,7 +123,9 @@ function verifyPayPalWebhookSignature($headers, $body, $webhookId) {
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
             "Authorization: Bearer $accessToken"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -159,7 +163,9 @@ function getPayPalSubscriptionDetails($subscriptionId) {
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
             "Authorization: Bearer $accessToken"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -198,7 +204,9 @@ function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user'
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
             "Authorization: Bearer $accessToken"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);
@@ -237,7 +245,9 @@ function suspendPayPalSubscription($subscriptionId, $reason = 'Payment failed') 
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
             "Authorization: Bearer $accessToken"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     curl_exec($ch);
@@ -270,7 +280,9 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
             "Authorization: Bearer $accessToken"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     curl_exec($ch);
@@ -300,7 +312,9 @@ function getPayPalCaptureDetails($captureId) {
         CURLOPT_HTTPHEADER => [
             'Content-Type: application/json',
             "Authorization: Bearer $accessToken"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $response = curl_exec($ch);

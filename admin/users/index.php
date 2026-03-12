@@ -17,8 +17,21 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 $page_title = "User Account Management";
 $page_description = "Manage community user accounts, view user statistics, and moderate users";
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle bulk user actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $_SESSION['message'] = 'Invalid request. Please try again.';
+        $_SESSION['message_type'] = 'error';
+        header('Location: index.php');
+        exit;
+    }
+
     $action = $_POST['bulk_action'];
     $selected_ids = $_POST['selected_ids'] ?? [];
 
@@ -100,6 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
 // Handle usage reset via AJAX
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_usage'])) {
     header('Content-Type: application/json');
+
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        echo json_encode(['success' => false, 'error' => 'Invalid request']);
+        exit;
+    }
+
     $user_ids = $_POST['user_ids'] ?? [];
     if (!is_array($user_ids)) $user_ids = [$user_ids];
     $user_ids = array_filter(array_map('intval', $user_ids), function($id) { return $id > 0; });
@@ -489,6 +509,7 @@ include '../admin_header.php';
             </div>
         <?php else: ?>
             <form id="bulk-form" method="POST" action="">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div class="bulk-actions-bar">
                     <div class="selection-info">
                         <span id="selected-count">0</span> users selected
@@ -689,6 +710,7 @@ include '../admin_header.php';
                         const userIds = Array.from(checkedBoxes).map(cb => cb.value);
                         const formData = new FormData();
                         formData.append('reset_usage', '1');
+                        formData.append('csrf_token', document.querySelector('input[name="csrf_token"]').value);
                         userIds.forEach(id => formData.append('user_ids[]', id));
 
                         resetUsageButton.disabled = true;

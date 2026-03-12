@@ -49,12 +49,27 @@ if (!$user) {
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Rate limit verification attempts (max 5 attempts per 15 minutes)
+    if (!isset($_SESSION['verify_attempts'])) {
+        $_SESSION['verify_attempts'] = [];
+    }
+    $now = time();
+    $_SESSION['verify_attempts'] = array_filter($_SESSION['verify_attempts'], function ($t) use ($now) {
+        return ($now - $t) < 900; // 15-minute window
+    });
+    if (count($_SESSION['verify_attempts']) >= 5) {
+        $error = 'Too many verification attempts. Please wait 15 minutes before trying again.';
+    }
+
+    if (empty($error)) {
     // Combine the 6 digits into a single verification code
     $digits = [];
     for ($i = 1; $i <= 6; $i++) {
         $digits[] = isset($_POST["digit$i"]) ? trim($_POST["digit$i"]) : '';
     }
     $verification_code = implode('', $digits);
+
+    $_SESSION['verify_attempts'][] = $now;
 
     // Basic validation
     if (strlen($verification_code) !== 6 || !ctype_digit($verification_code)) {
@@ -112,6 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
+    } // end rate limit check
 }
 
 // If verification is successful, redirect to profile

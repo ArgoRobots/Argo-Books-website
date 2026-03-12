@@ -24,8 +24,20 @@ if (!is_user_logged_in()) {
 $user_id = $_SESSION['user_id'] ?? 0;
 $current_user = \CommunityUsers\get_current_user();
 
+// Generate CSRF token if not present
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $response['message'] = 'Invalid request. Please refresh and try again.';
+        echo json_encode($response);
+        exit;
+    }
+
     $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
     $content = isset($_POST['comment_content']) ? trim($_POST['comment_content']) : '';
 

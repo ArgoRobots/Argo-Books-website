@@ -198,7 +198,9 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
         CURLOPT_USERPWD => "$paypalClientId:$paypalSecret",
-        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']
+        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $tokenResponse = json_decode(curl_exec($ch), true);
     curl_close($ch);
@@ -216,7 +218,9 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         CURLOPT_HTTPHEADER => [
             "Authorization: Bearer $accessToken",
             "Content-Type: application/json"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $orderResponse = json_decode(curl_exec($ch), true);
     curl_close($ch);

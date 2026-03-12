@@ -227,7 +227,8 @@ function process_square_payment(array $invoice, array $company, array $data, int
         ? 'https://connect.squareup.com/v2'
         : 'https://connect.squareupsandbox.com/v2';
 
-    $idempotencyKey = $data['idempotency_key'] ?? (time() . bin2hex(random_bytes(4)));
+    // Always generate server-side idempotency key to prevent manipulation
+    $idempotencyKey = bin2hex(random_bytes(16));
     $referenceNumber = generate_reference_number();
 
     $paymentData = [
@@ -252,7 +253,9 @@ function process_square_payment(array $invoice, array $company, array $data, int
             "Square-Version: 2025-10-16",
             "Authorization: Bearer $accessToken",
             "Content-Type: application/json"
-        ]
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
     ]);
 
     $responseData = curl_exec($ch);

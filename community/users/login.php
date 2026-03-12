@@ -68,17 +68,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     setcookie(
                         'remember_me',
                         $token,
-                        time() + (30 * 24 * 60 * 60), // 30 days
-                        '/'
+                        [
+                            'expires' => time() + (30 * 24 * 60 * 60), // 30 days
+                            'path' => '/',
+                            'secure' => true,
+                            'httponly' => true,
+                            'samesite' => 'Lax'
+                        ]
                     );
                 }
             }
 
-            // Redirect after login
+            // Redirect after login (validate redirect is a local path to prevent open redirect)
             if (isset($_SESSION['redirect_after_login']) && !empty($_SESSION['redirect_after_login'])) {
                 $redirect = $_SESSION['redirect_after_login'];
                 unset($_SESSION['redirect_after_login']);
-                header("Location: $redirect");
+                // Only allow relative paths starting with / and no protocol-relative URLs
+                if (preg_match('#^/[^/\\\\]#', $redirect) && !preg_match('#[:\s]#', $redirect)) {
+                    header("Location: $redirect");
+                } else {
+                    header('Location: profile.php');
+                }
             } else {
                 header('Location: profile.php');
             }

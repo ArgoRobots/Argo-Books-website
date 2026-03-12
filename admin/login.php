@@ -30,6 +30,7 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
             } else if (verify_2fa_code($secret, $verification_code)) {
                 // Code is valid, complete login
                 session_regenerate_id(true);
+                unset($_SESSION['admin_login_attempts']);
                 $_SESSION['awaiting_2fa'] = false;
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $username;
@@ -90,6 +91,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             } else {
                 // No 2FA, complete login
                 session_regenerate_id(true);
+                unset($_SESSION['admin_login_attempts']);
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $actual_username;
 

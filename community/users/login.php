@@ -61,6 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Regenerate session ID to prevent session fixation
             session_regenerate_id(true);
 
+            // Clear rate limit counter on successful login
+            unset($_SESSION['login_attempts']);
+
             // Set session data
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];

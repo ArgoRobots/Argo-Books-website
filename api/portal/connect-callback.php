@@ -354,6 +354,9 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
         }
     }
 
+    // Encrypt the access token before storing
+    $encryptedAccessToken = portal_encrypt($accessToken);
+
     // Store credentials
     $stmt = $db->prepare(
         'UPDATE portal_companies
@@ -361,7 +364,7 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
              square_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->bind_param('ssssi', $merchantId, $accessToken, $locationId, $email, $companyId);
+    $stmt->bind_param('ssssi', $merchantId, $encryptedAccessToken, $locationId, $email, $companyId);
     $stmt->execute();
     $stmt->close();
 }

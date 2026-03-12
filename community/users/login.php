@@ -19,15 +19,32 @@ $verification_notice = '';
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Rate limit login attempts (max 5 per 15 minutes)
+    if (!isset($_SESSION['login_attempts'])) {
+        $_SESSION['login_attempts'] = [];
+    }
+    $now = time();
+    $_SESSION['login_attempts'] = array_filter($_SESSION['login_attempts'], function ($t) use ($now) {
+        return ($now - $t) < 900;
+    });
+    if (count($_SESSION['login_attempts']) >= 5) {
+        $error = 'Too many login attempts. Please wait 15 minutes before trying again.';
+    }
+
     // Get form data
     $login = isset($_POST['login']) ? trim($_POST['login']) : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $remember_me = isset($_POST['remember_me']) ? true : false;
 
     // Basic validation
-    if (empty($login) || empty($password)) {
+    if (empty($error) && (empty($login) || empty($password))) {
         $error = 'Please enter both username/email and password';
-    } else {
+    }
+
+    if (empty($error)) {
+        // Record the attempt
+        $_SESSION['login_attempts'][] = $now;
+
         // Attempt to log in
         $user = login_user($login, $password);
 
@@ -96,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = 'Invalid username/email or password';
         }
-    }
+    } // end rate limit check
 }
 ?>
 <!DOCTYPE html>

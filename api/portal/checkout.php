@@ -49,20 +49,20 @@ if ($invoice['status'] === 'cancelled') {
     send_error_response(400, 'This invoice has been cancelled.', 'CANCELLED');
 }
 
-// Validate payment amount
+// Validate payment amount using integer cents for precision
 $requestedAmount = floatval($data['amount']);
-$balanceDue = floatval($invoice['balance_due']);
+$amountCents = (int) round($requestedAmount * 100);
+$balanceDueCents = (int) round(floatval($invoice['balance_due']) * 100);
 
-if ($requestedAmount <= 0) {
+if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($requestedAmount > $balanceDue + 0.01) { // Small tolerance for floating point
+if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
     send_error_response(400, 'Payment amount exceeds balance due.', 'AMOUNT_EXCEEDS_BALANCE');
 }
 
 $method = strtolower($data['method']);
 $currency = strtolower($invoice['currency'] ?: 'usd');
-$amountCents = (int) round($requestedAmount * 100);
 $companyId = $invoice['company_id'];
 
 // Get environment-based keys
@@ -221,7 +221,7 @@ function process_square_payment(array $invoice, array $company, array $data, int
 {
     global $is_production;
 
-    $accessToken = $company['square_access_token'];
+    $accessToken = portal_decrypt($company['square_access_token']);
     $locationId = $company['square_location_id'] ?? '';
     $apiBaseUrl = $is_production
         ? 'https://connect.squareup.com/v2'

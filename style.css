@@ -193,13 +193,13 @@ a {
     animation: fillGradient 0.8s ease-out 1.5s forwards;
 }
 .chart-mockup.animating .forecast-chart path.draw-dashed {
+    opacity: 1;
     stroke-dasharray: 5, 5;
-    stroke-dashoffset: 120;
-    animation: drawDashedLine 0.8s ease-out 2s forwards;
+    clip-path: inset(0 100% 0 0);
+    animation: revealDashed 0.8s ease-out 2s forwards;
 }
-@keyframes drawDashedLine {
-    0% { opacity: 1; stroke-dashoffset: 120; }
-    100% { opacity: 1; stroke-dashoffset: 0; }
+@keyframes revealDashed {
+    to { clip-path: inset(0 0 0 0); }
 }
 .chart-mockup.animating .forecast-chart circle.draw-dot {
     animation: fillGradient 0.3s ease-out 1.8s forwards;

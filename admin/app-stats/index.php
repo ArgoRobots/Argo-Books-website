@@ -443,11 +443,10 @@ include '../admin_header.php';
 
         <div class="tabs-container">
             <div class="tab-buttons">
-                <div class="tab-button active" onclick="switchTab('overview')">Overview</div>
                 <?php if ($aggregatedData['geoLocationEnabled']): ?>
-                <div class="tab-button" onclick="switchTab('geographic')">Geographic</div>
+                <div class="tab-button active" onclick="switchTab('geographic')">Geographic</div>
                 <?php endif; ?>
-                <div class="tab-button" onclick="switchTab('versions')">Versions</div>
+                <div class="tab-button <?php if (!$aggregatedData['geoLocationEnabled']): ?>active<?php endif; ?>" onclick="switchTab('versions')">Versions</div>
                 <div class="tab-button" onclick="switchTab('features')">Features</div>
                 <div class="tab-button" onclick="switchTab('errors')">Errors</div>
                 <div class="tab-button" onclick="switchTab('usage')">Usage</div>
@@ -455,16 +454,9 @@ include '../admin_header.php';
                 <div class="tab-button" onclick="switchTab('activity')">Activity</div>
             </div>
 
-            <!-- Overview Tab -->
-            <div id="overview-tab" class="tab-content active">
-                <div class="stats-grid" id="statsGrid">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </div>
-
             <!-- Geographic Tab -->
             <?php if ($aggregatedData['geoLocationEnabled']): ?>
-            <div id="geographic-tab" class="tab-content">
+            <div id="geographic-tab" class="tab-content active">
                 <h2 class="section-title">Geographic Analytics</h2>
                 
                 <div class="chart-row">
@@ -503,7 +495,7 @@ include '../admin_header.php';
             <?php endif; ?>
 
             <!-- Versions Tab -->
-            <div id="versions-tab" class="tab-content">
+            <div id="versions-tab" class="tab-content <?php if (!$aggregatedData['geoLocationEnabled']): ?>active<?php endif; ?>">
                 <h2 class="section-title">Version Analytics</h2>
 
                 <div class="chart-row">
@@ -544,10 +536,6 @@ include '../admin_header.php';
                     <div class="chart-container">
                         <h2>Most Used Features</h2>
                         <canvas id="featureUsageChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h2>Page Views Distribution</h2>
-                        <canvas id="pageViewsChart"></canvas>
                     </div>
                 </div>
 

@@ -101,10 +101,6 @@ a {
     to { stroke-dashoffset: 0; }
 }
 
-@keyframes drawDashedLine {
-    to { stroke-dashoffset: 0; }
-}
-
 @keyframes fillGradient {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -197,10 +193,13 @@ a {
     animation: fillGradient 0.8s ease-out 1.5s forwards;
 }
 .chart-mockup.animating .forecast-chart path.draw-dashed {
-    opacity: 1;
     stroke-dasharray: 5, 5;
     stroke-dashoffset: 120;
     animation: drawDashedLine 0.8s ease-out 2s forwards;
+}
+@keyframes drawDashedLine {
+    0% { opacity: 1; stroke-dashoffset: 120; }
+    100% { opacity: 1; stroke-dashoffset: 0; }
 }
 .chart-mockup.animating .forecast-chart circle.draw-dot {
     animation: fillGradient 0.3s ease-out 1.8s forwards;
@@ -939,7 +938,6 @@ a {
     border-radius: 24px;
     padding: 32px;
     border: 1px solid #e2e8f0;
-    max-width: 100%;
 }
 
 .visual-mockup {
@@ -1401,6 +1399,7 @@ a {
 .customer-stats .stat-val {
     display: block;
     font-weight: 700;
+    min-width: 3.5em;
 }
 
 .customer-stats .stat-lbl {

@@ -29,8 +29,9 @@ try {
  */
 function portal_encrypt(string $plaintext): string
 {
-    $key = hex2bin($_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
-    if (strlen($key) !== 32) {
+    $raw = trim($_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
+    $key = @hex2bin($raw);
+    if ($key === false || strlen($key) !== 32) {
         throw new RuntimeException('PORTAL_ENCRYPTION_KEY must be a 64-character hex string (256 bits).');
     }
     $iv = random_bytes(12); // 96-bit IV for GCM
@@ -47,8 +48,9 @@ function portal_encrypt(string $plaintext): string
  */
 function portal_decrypt(string $encoded): string
 {
-    $key = hex2bin($_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
-    if (strlen($key) !== 32) {
+    $raw = trim($_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
+    $key = @hex2bin($raw);
+    if ($key === false || strlen($key) !== 32) {
         throw new RuntimeException('PORTAL_ENCRYPTION_KEY must be a 64-character hex string (256 bits).');
     }
     $data = base64_decode($encoded, true);

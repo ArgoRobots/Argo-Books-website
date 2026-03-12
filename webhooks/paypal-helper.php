@@ -338,7 +338,7 @@ function getPayPalCaptureDetails($captureId) {
 function logPayPalWebhookEvent($eventType, $data, $result = 'processed') {
     $logDir = __DIR__ . '/../cron/logs';
     if (!is_dir($logDir)) {
-        mkdir($logDir, 0755, true);
+        mkdir($logDir, 0700, true);
     }
 
     $logFile = $logDir . '/paypal_webhooks_' . date('Y-m-d') . '.log';

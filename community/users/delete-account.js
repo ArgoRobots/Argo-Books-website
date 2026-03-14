@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: "confirm=1",
+        body: "confirm=1&csrf_token=" + encodeURIComponent(document.querySelector('input[name="csrf_token"]')?.value || ''),
       })
         .then((response) => {
           if (!response.ok) {

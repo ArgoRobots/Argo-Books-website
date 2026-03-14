@@ -15,11 +15,9 @@ $dotenv->safeLoad();
 // Set headers
 header('Content-Type: application/json; charset=utf-8');
 
-// Restrict CORS to the specific allowed origin from environment, fallback to deny
+// Set CORS to the specific allowed origin from environment if configured
 $allowed_origin = $_ENV['INVOICE_API_ALLOWED_ORIGIN'] ?? '';
-if (!empty($allowed_origin) && isset($_SERVER['HTTP_ORIGIN']) && $_SERVER['HTTP_ORIGIN'] === $allowed_origin) {
-    header('Access-Control-Allow-Origin: ' . $allowed_origin);
-} elseif (!empty($allowed_origin)) {
+if (!empty($allowed_origin)) {
     header('Access-Control-Allow-Origin: ' . $allowed_origin);
 }
 header('Access-Control-Allow-Methods: POST, OPTIONS');

@@ -30,9 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // to prevent email enumeration attacks
         $success = 'If an account with that email exists, a password reset link has been sent. Please check your inbox and spam folder.';
 
-        // Silently log failures for debugging
+        // Silently log failures for debugging (hash email to avoid PII in logs)
         if (!$result) {
-            error_log("Password reset requested for non-existent or failed email: " . $email);
+            $email_hash = substr(hash('sha256', strtolower($email)), 0, 12);
+            error_log("Password reset failure (email_hash={$email_hash})");
         }
     }
 }

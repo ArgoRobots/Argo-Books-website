@@ -137,14 +137,23 @@ try {
 
         $stmt = $db->prepare($sql_anywhere);
         if (!$stmt) {
+            error_log('Mentions search prepare failed: ' . $db->error);
             throw new Exception('Prepare failed');
         }
 
         $types = 's' . str_repeat('i', count($exclude_ids)) . 'ii';
         $params = array_merge([$search_anywhere], $exclude_ids, [$current_user_id, $remaining]);
-        $stmt->bind_param($types, ...$params);
+        // mysqli bind_param requires pass-by-reference; use call_user_func_array
+        $bindParams = [];
+        $bindParams[] = &$types;
+        foreach ($params as $key => $value) {
+            $bindParams[] = &$params[$key];
+        }
+        if (!call_user_func_array([$stmt, 'bind_param'], $bindParams)) {
+            throw new Exception('Bind failed');
+        }
         if (!$stmt->execute()) {
-            throw new Exception('Execute failed: ' . $stmt->error);
+            throw new Exception('Execute failed');
         }
 
         $result = $stmt->get_result();

@@ -122,26 +122,27 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
     <link rel="stylesheet" href="/portal/style.css">
 
     <?php if (!$isPaid && !empty($paymentMethods)): ?>
+    <?php $je = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT; ?>
     <script>
         window.PORTAL_CONFIG = {
-            invoiceToken: '<?php echo htmlspecialchars($token); ?>',
-            invoiceId: '<?php echo htmlspecialchars($invoiceId); ?>',
+            invoiceToken: <?php echo json_encode($token, $je); ?>,
+            invoiceId: <?php echo json_encode($invoiceId, $je); ?>,
             balanceDue: <?php echo $balanceDue; ?>,
-            currency: '<?php echo htmlspecialchars($currency); ?>',
-            currencySymbol: <?php echo json_encode($currencySymbol); ?>,
-            paymentMethods: <?php echo json_encode($paymentMethods); ?>,
+            currency: <?php echo json_encode($currency, $je); ?>,
+            currencySymbol: <?php echo json_encode($currencySymbol, $je); ?>,
+            paymentMethods: <?php echo json_encode($paymentMethods, $je); ?>,
             stripe: {
-                publishableKey: <?php echo json_encode($stripe_publishable_key); ?>,
-                accountId: <?php echo json_encode($invoice['stripe_account_id'] ?? ''); ?>
+                publishableKey: <?php echo json_encode($stripe_publishable_key, $je); ?>,
+                accountId: <?php echo json_encode($invoice['stripe_account_id'] ?? '', $je); ?>
             },
             paypal: {
-                clientId: <?php echo json_encode($paypal_client_id); ?>
+                clientId: <?php echo json_encode($paypal_client_id, $je); ?>
             },
             square: {
-                appId: <?php echo json_encode($square_app_id); ?>
+                appId: <?php echo json_encode($square_app_id, $je); ?>
             },
             apiBase: '/api/portal',
-            singleMethod: <?php echo $singleMethod ? "'" . $singleMethod . "'" : 'null'; ?>
+            singleMethod: <?php echo json_encode($singleMethod, $je); ?>
         };
     </script>
     <script src="/portal/main.js" defer></script>

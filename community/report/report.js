@@ -61,6 +61,9 @@
         e.preventDefault();
 
         const formData = new FormData(form);
+        // Include CSRF token from the meta tag
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+        formData.append('csrf_token', csrfToken);
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.textContent;
 

@@ -26,11 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Attempt to send password reset link
         $result = request_password_reset($email);
 
-        if ($result) {
-            $success = 'A password reset link has been sent to your email address. If you don\'t see it in your inbox, please check your spam or junk folder.';
-        } else {
-            // Don't reveal if email exists for security reasons
-            $success = 'If an account with that email exists, a password reset link has been sent.';
+        // Always show the same message regardless of whether the email exists,
+        // to prevent email enumeration attacks
+        $success = 'If an account with that email exists, a password reset link has been sent. Please check your inbox and spam folder.';
+
+        // Silently log failures for debugging (hash email to avoid PII in logs)
+        if (!$result) {
+            $email_hash = substr(hash('sha256', strtolower($email)), 0, 12);
+            error_log("Password reset failure (email_hash={$email_hash})");
         }
     }
 }

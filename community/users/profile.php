@@ -13,6 +13,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
 require_login();
 
+// Ensure CSRF token exists for report functionality
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $is_logged_in = isset($_SESSION['user_id']);
 $requested_username = isset($_GET['username']) ? trim($_GET['username']) : '';
 $is_own_profile = false;
@@ -32,8 +37,8 @@ if (empty($requested_username)) {
 } else {
     $db = get_db_connection();
 
-    // MySQL prepared statement 
-    $stmt = $db->prepare("SELECT * FROM community_users WHERE username = ?");
+    // Only select needed columns - avoid exposing sensitive fields like password_hash, reset_token, etc.
+    $stmt = $db->prepare("SELECT id, username, email, bio, avatar, role, reputation, created_at, last_login, email_verified, deletion_scheduled_at FROM community_users WHERE username = ?");
     $stmt->bind_param("s", $requested_username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -1122,6 +1127,8 @@ if ($is_own_profile) {
                 e.preventDefault();
 
                 const formData = new FormData(form);
+                // Include CSRF token
+                formData.append('csrf_token', <?php echo json_encode($_SESSION['csrf_token']); ?>);
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.textContent;
 

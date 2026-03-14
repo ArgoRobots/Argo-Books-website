@@ -68,8 +68,10 @@
         ? $_ENV['SQUARE_LIVE_LOCATION_ID']
         : $_ENV['SQUARE_SANDBOX_LOCATION_ID'];
 
-    // Get URL parameters
-    $billing = isset($_GET['billing']) ? $_GET['billing'] : 'monthly';
+    // Get URL parameters - whitelist to allowed values to prevent injection
+    $billing = isset($_GET['billing']) && in_array($_GET['billing'], ['monthly', 'yearly'], true)
+        ? $_GET['billing']
+        : 'monthly';
 
     // Calculate prices from centralized config
     $monthlyPrice = $pricing['premium_monthly_price'];
@@ -96,30 +98,31 @@
     ?>
 
     <!-- Payment processor keys -->
+    <?php $je = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT; ?>
     <script>
         window.PAYMENT_CONFIG = {
             stripe: {
-                publishableKey: '<?php echo $stripe_publishable_key; ?>'
+                publishableKey: <?php echo json_encode($stripe_publishable_key, $je); ?>
             },
             paypal: {
-                clientId: '<?php echo $paypal_client_id; ?>',
-                monthlyPlanId: '<?php echo $paypal_monthly_plan_id; ?>',
-                yearlyPlanId: '<?php echo $paypal_yearly_plan_id; ?>'
+                clientId: <?php echo json_encode($paypal_client_id, $je); ?>,
+                monthlyPlanId: <?php echo json_encode($paypal_monthly_plan_id, $je); ?>,
+                yearlyPlanId: <?php echo json_encode($paypal_yearly_plan_id, $je); ?>
             },
             square: {
-                appId: '<?php echo $square_app_id; ?>',
-                locationId: '<?php echo $square_location_id; ?>'
+                appId: <?php echo json_encode($square_app_id, $je); ?>,
+                locationId: <?php echo json_encode($square_location_id, $je); ?>
             }
         };
 
         window.AI_SUBSCRIPTION = {
-            billing: '<?php echo $billing; ?>',
+            billing: <?php echo json_encode($billing, $je); ?>,
             basePrice: <?php echo $basePrice; ?>,
             finalPrice: <?php echo $finalPrice; ?>,
             processingFee: <?php echo $feeToday; ?>,
             totalCharge: <?php echo $totalToday; ?>,
             userId: <?php echo $user_id; ?>,
-            userEmail: '<?php echo htmlspecialchars($user_email); ?>',
+            userEmail: <?php echo json_encode($user_email, $je); ?>,
             isUpdatingPaymentMethod: <?php echo $is_changing_method ? 'true' : 'false'; ?>
         };
     </script>

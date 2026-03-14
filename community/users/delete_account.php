@@ -22,6 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Verify CSRF token
+if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    $response['message'] = 'Invalid CSRF token';
+    echo json_encode($response);
+    exit;
+}
+
 $user_id = $_SESSION['user_id'];
 $db = get_db_connection();
 

@@ -30,8 +30,8 @@
     </header>
 
     <?php
-    $subscriptionId = isset($_GET['subscription_id']) ? htmlspecialchars($_GET['subscription_id']) : 'N/A';
-    $email = isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '';
+    $subscriptionId = isset($_GET['subscription_id']) ? htmlspecialchars($_GET['subscription_id'], ENT_QUOTES, 'UTF-8') : 'N/A';
+    $email = isset($_GET['email']) ? htmlspecialchars($_GET['email'], ENT_QUOTES, 'UTF-8') : '';
     ?>
 
     <div class="thank-you-container">

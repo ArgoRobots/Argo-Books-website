@@ -132,6 +132,10 @@
         function fetchServerPreview() {
             const formData = new FormData();
             formData.append('preview_request', '1');
+            // Include CSRF token from meta tag or hidden form input
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                || document.querySelector('input[name="csrf_token"]')?.value || '';
+            formData.append('csrf_token', csrfToken);
             formData.append('title', postTitle ? postTitle.value : '');
             formData.append('content', postContent ? postContent.value : '');
             formData.append('post_type', postType ? postType.value : '');

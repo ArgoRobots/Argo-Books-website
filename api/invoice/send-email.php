@@ -14,7 +14,12 @@ $dotenv->safeLoad();
 
 // Set headers
 header('Content-Type: application/json; charset=utf-8');
-header('Access-Control-Allow-Origin: *');
+
+// Set CORS to the specific allowed origin from environment if configured
+$allowed_origin = $_ENV['INVOICE_API_ALLOWED_ORIGIN'] ?? '';
+if (!empty($allowed_origin)) {
+    header('Access-Control-Allow-Origin: ' . $allowed_origin);
+}
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
 
@@ -200,10 +205,11 @@ try {
     http_response_code($result['success'] ? 200 : 500);
     echo json_encode($result);
 } catch (\Throwable $e) {
+    error_log('Invoice email send error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Server error: ' . $e->getMessage(),
+        'message' => 'An internal server error occurred.',
         'messageId' => null,
         'errorCode' => 'SERVER_ERROR',
         'timestamp' => date('c')

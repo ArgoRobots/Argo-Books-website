@@ -33,9 +33,11 @@ function save_2fa_secret($username, $secret)
     if (!$user) return false;
 
     try {
+        // Encrypt the 2FA secret before storing to protect against DB compromise
+        $encrypted_secret = portal_encrypt($secret);
         $db = get_db_connection();
         $stmt = $db->prepare('UPDATE admin_users SET two_factor_secret = ?, two_factor_enabled = 1 WHERE username = ?');
-        $stmt->bind_param('ss', $secret, $user['username']);
+        $stmt->bind_param('ss', $encrypted_secret, $user['username']);
         $success = $stmt->execute() && $stmt->affected_rows > 0;
         $stmt->close();
         return $success;
@@ -77,7 +79,9 @@ function get_2fa_secret($username)
 {
     try {
         $user = get_user_by_username($username);
-        return $user ? $user['two_factor_secret'] : null;
+        if (!$user || empty($user['two_factor_secret'])) return null;
+        // Decrypt the stored 2FA secret
+        return portal_decrypt($user['two_factor_secret']);
     } catch (Exception $e) {
         return null;
     }

@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", function () {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: `post_id=${postId}&status=${newStatus}`,
+        body: `post_id=${postId}&status=${newStatus}&csrf_token=${encodeURIComponent(csrfToken)}`,
       })
         .then((response) => response.json())
         .then((data) => {

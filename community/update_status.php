@@ -12,9 +12,16 @@ $response = [
 ];
 
 // Check if user is an admin
-if ($_SESSION['role'] === 'admin') {
+if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
     // Only accept POST requests
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Verify CSRF token
+        if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+            $response['message'] = 'Invalid CSRF token';
+            echo json_encode($response);
+            exit;
+        }
+
         $post_id = isset($_POST['post_id']) ? intval($_POST['post_id']) : 0;
         $status = isset($_POST['status']) ? trim($_POST['status']) : '';
 

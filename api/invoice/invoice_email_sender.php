@@ -126,7 +126,8 @@ class InvoiceEmailSender
             if ($pdfContent === false) {
                 throw new \Exception('Invalid base64 PDF content');
             }
-            $filename = $data['pdfFilename'] ?? 'invoice.pdf';
+            // Sanitize filename to prevent header injection or path traversal
+            $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $data['pdfFilename'] ?? 'invoice.pdf');
             $mailer->addStringAttachment($pdfContent, $filename, 'base64', 'application/pdf');
         }
 
@@ -158,7 +159,9 @@ class InvoiceEmailSender
         $to = $this->formatAddress($toEmail, $toName);
 
         if (!empty($data['pdfAttachment'])) {
-            return $this->sendWithAttachment($to, $subject, $htmlBody, $textBody, $headers, $data['pdfAttachment'], $data['pdfFilename'] ?? 'invoice.pdf');
+            // Sanitize filename to prevent header injection or path traversal
+            $safe_filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $data['pdfFilename'] ?? 'invoice.pdf');
+            return $this->sendWithAttachment($to, $subject, $htmlBody, $textBody, $headers, $data['pdfAttachment'], $safe_filename);
         }
 
         return mail($to, $subject, $htmlBody, implode("\r\n", $headers));

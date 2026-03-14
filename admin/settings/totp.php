@@ -63,8 +63,8 @@ class TOTP {
         // Get current time
         $currentTime = time();
         
-        // Use a reasonable time window (±2 minutes) to account for clock drift
-        $window = 4;
+        // Use a tight time window (±1 step = ±30 seconds) to limit brute-force surface
+        $window = 1;
         
         for ($i = -$window; $i <= $window; $i++) {
             $checkTime = $currentTime + ($i * 30);
@@ -126,7 +126,7 @@ class TOTP {
         $secret = '';
         
         for ($i = 0; $i < $length; $i++) {
-            $secret .= $chars[rand(0, 31)];
+            $secret .= $chars[random_int(0, 31)];
         }
         
         return $secret;

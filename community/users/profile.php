@@ -32,8 +32,8 @@ if (empty($requested_username)) {
 } else {
     $db = get_db_connection();
 
-    // MySQL prepared statement 
-    $stmt = $db->prepare("SELECT * FROM community_users WHERE username = ?");
+    // Only select needed columns - avoid exposing sensitive fields like password_hash, reset_token, etc.
+    $stmt = $db->prepare("SELECT id, username, email, bio, avatar, role, reputation, created_at, last_login, email_verified, deletion_scheduled_at FROM community_users WHERE username = ?");
     $stmt->bind_param("s", $requested_username);
     $stmt->execute();
     $result = $stmt->get_result();

@@ -11,6 +11,20 @@ if ($mentions_available) {
 
 header('Content-Type: application/json');
 
+// Require authentication to prevent abuse
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Authentication required']);
+    exit;
+}
+
+// Verify CSRF token
+if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Invalid CSRF token']);
+    exit;
+}
+
 // Only handle AJAX preview requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['preview_request'])) {
     http_response_code(400);

@@ -211,6 +211,9 @@ namespace {
                     }
                 }
 
+                // Regenerate session ID to prevent session fixation
+                session_regenerate_id(true);
+
                 // Set session variables
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
@@ -242,9 +245,10 @@ namespace {
         $stmt->execute();
         $stmt->close();
 
-        // Store the new token
+        // Store a hash of the token (never store raw tokens in the database)
+        $token_hash = hash('sha256', $token);
         $stmt = $db->prepare('INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)');
-        $stmt->bind_param('iss', $user_id, $token, $expires);
+        $stmt->bind_param('iss', $user_id, $token_hash, $expires);
         $success = $stmt->execute();
         $stmt->close();
 
@@ -265,10 +269,12 @@ namespace {
     {
         $db = get_db_connection();
 
-        $stmt = $db->prepare('SELECT rt.user_id, u.* FROM remember_tokens rt 
+        // Hash the token to compare against the stored hash
+        $token_hash = hash('sha256', $token);
+        $stmt = $db->prepare('SELECT rt.user_id, u.* FROM remember_tokens rt
                          JOIN community_users u ON rt.user_id = u.id
                          WHERE rt.token = ? AND rt.expires_at > NOW()');
-        $stmt->bind_param('s', $token);
+        $stmt->bind_param('s', $token_hash);
         $stmt->execute();
         $result = $stmt->get_result();
         $user = $result->fetch_assoc();
@@ -358,8 +364,8 @@ namespace {
         // Generate cryptographically secure reset token
         $reset_token = bin2hex(random_bytes(32));
 
-        // Set token expiry (24 hours from now)
-        $expiry = date('Y-m-d H:i:s', strtotime('+24 hours'));
+        // Set token expiry (1 hour from now) - shorter window reduces risk of token interception
+        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
         // Update user with reset token
         $stmt = $db->prepare('UPDATE community_users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?');

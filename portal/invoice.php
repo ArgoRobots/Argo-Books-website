@@ -128,17 +128,17 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             invoiceId: '<?php echo htmlspecialchars($invoiceId); ?>',
             balanceDue: <?php echo $balanceDue; ?>,
             currency: '<?php echo htmlspecialchars($currency); ?>',
-            currencySymbol: '<?php echo $currencySymbol; ?>',
+            currencySymbol: <?php echo json_encode($currencySymbol); ?>,
             paymentMethods: <?php echo json_encode($paymentMethods); ?>,
             stripe: {
-                publishableKey: '<?php echo $stripe_publishable_key; ?>',
-                accountId: '<?php echo htmlspecialchars($invoice['stripe_account_id'] ?? ''); ?>'
+                publishableKey: <?php echo json_encode($stripe_publishable_key); ?>,
+                accountId: <?php echo json_encode($invoice['stripe_account_id'] ?? ''); ?>
             },
             paypal: {
-                clientId: '<?php echo $paypal_client_id; ?>'
+                clientId: <?php echo json_encode($paypal_client_id); ?>
             },
             square: {
-                appId: '<?php echo $square_app_id; ?>'
+                appId: <?php echo json_encode($square_app_id); ?>
             },
             apiBase: '/api/portal',
             singleMethod: <?php echo $singleMethod ? "'" . $singleMethod . "'" : 'null'; ?>

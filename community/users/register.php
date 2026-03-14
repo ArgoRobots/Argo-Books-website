@@ -233,14 +233,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 passwordConfirm.setAttribute('type', type);
             });
 
-            // If there was a form error, restore password values
+            // If there was a form error, password fields are intentionally NOT restored
+            // for security reasons (prevents password leakage in page source).
+            // Update password policy indicators if user starts typing
             if (<?php echo !empty($error) ? 'true' : 'false'; ?>) {
-                passwordField.value = '<?php echo isset($_POST['password']) ? addslashes($_POST['password']) : ''; ?>';
-                passwordConfirm.value = '<?php echo isset($_POST['password_confirm']) ? addslashes($_POST['password_confirm']) : ''; ?>';
-
-                // Update password policy indicators
-                const event = new Event('keyup');
-                passwordField.dispatchEvent(event);
+                passwordField.setAttribute('placeholder', 'Please re-enter your password');
+                passwordConfirm.setAttribute('placeholder', 'Please re-enter your password');
             }
 
             // Show password policies on focus

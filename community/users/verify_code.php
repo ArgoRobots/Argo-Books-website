@@ -104,6 +104,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->close();
 
                     if ($verified_user) {
+                        // Regenerate session ID to prevent session fixation
+                        session_regenerate_id(true);
+
                         // Update session to mark user as logged in
                         $_SESSION['user_id'] = $verified_user['id'];
                         $_SESSION['username'] = $verified_user['username'];

@@ -99,27 +99,27 @@
     <script>
         window.PAYMENT_CONFIG = {
             stripe: {
-                publishableKey: '<?php echo $stripe_publishable_key; ?>'
+                publishableKey: <?php echo json_encode($stripe_publishable_key); ?>
             },
             paypal: {
-                clientId: '<?php echo $paypal_client_id; ?>',
-                monthlyPlanId: '<?php echo $paypal_monthly_plan_id; ?>',
-                yearlyPlanId: '<?php echo $paypal_yearly_plan_id; ?>'
+                clientId: <?php echo json_encode($paypal_client_id); ?>,
+                monthlyPlanId: <?php echo json_encode($paypal_monthly_plan_id); ?>,
+                yearlyPlanId: <?php echo json_encode($paypal_yearly_plan_id); ?>
             },
             square: {
-                appId: '<?php echo $square_app_id; ?>',
-                locationId: '<?php echo $square_location_id; ?>'
+                appId: <?php echo json_encode($square_app_id); ?>,
+                locationId: <?php echo json_encode($square_location_id); ?>
             }
         };
 
         window.AI_SUBSCRIPTION = {
-            billing: '<?php echo $billing; ?>',
+            billing: <?php echo json_encode($billing); ?>,
             basePrice: <?php echo $basePrice; ?>,
             finalPrice: <?php echo $finalPrice; ?>,
             processingFee: <?php echo $feeToday; ?>,
             totalCharge: <?php echo $totalToday; ?>,
             userId: <?php echo $user_id; ?>,
-            userEmail: '<?php echo htmlspecialchars($user_email); ?>',
+            userEmail: <?php echo json_encode($user_email); ?>,
             isUpdatingPaymentMethod: <?php echo $is_changing_method ? 'true' : 'false'; ?>
         };
     </script>

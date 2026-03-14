@@ -599,7 +599,7 @@ HTML;
         'Content-Type: text/html; charset=UTF-8',
         'From: Argo Books <noreply@argorobots.com>',
         'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
+        'X-Mailer: ArgoBooks'
     ];
 
     return mail($email, $subject, $email_html, implode("\r\n", $headers));
@@ -667,7 +667,7 @@ HTML;
         'Content-Type: text/html; charset=UTF-8',
         'From: Argo Books <noreply@argorobots.com>',
         'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
+        'X-Mailer: ArgoBooks'
     ];
 
     return mail($email, $subject, $email_html, implode("\r\n", $headers));

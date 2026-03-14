@@ -125,20 +125,24 @@ try {
 
     // Then, if we have fewer than 10 results, get partial matches anywhere in the username (excluding current user)
     if (count($users) < 10) {
-        $ids_to_exclude = !empty($users) ? implode(',', array_keys($users)) : '0';
+        $exclude_ids = !empty($users) ? array_keys($users) : [0];
+        $placeholders = implode(',', array_fill(0, count($exclude_ids), '?'));
+        $remaining = 10 - count($users);
         $sql_anywhere = "
             SELECT id, username, avatar, role
             FROM community_users
-            WHERE username LIKE ? AND id NOT IN ($ids_to_exclude) AND id != ?
+            WHERE username LIKE ? AND id NOT IN ($placeholders) AND id != ?
             ORDER BY username ASC
-            LIMIT " . (10 - count($users));
+            LIMIT ?";
 
         $stmt = $db->prepare($sql_anywhere);
         if (!$stmt) {
-            throw new Exception('Prepare failed: ' . $db->error);
+            throw new Exception('Prepare failed');
         }
 
-        $stmt->bind_param('si', $search_anywhere, $current_user_id);
+        $types = 's' . str_repeat('i', count($exclude_ids)) . 'ii';
+        $params = array_merge([$search_anywhere], $exclude_ids, [$current_user_id, $remaining]);
+        $stmt->bind_param($types, ...$params);
         if (!$stmt->execute()) {
             throw new Exception('Execute failed: ' . $stmt->error);
         }
@@ -190,6 +194,6 @@ try {
 } catch (Exception $e) {
     http_response_code(500);
     error_log('Error in mentions/search.php: ' . $e->getMessage());
-    echo json_encode(['error' => 'Server error', 'details' => $e->getMessage()]);
+    echo json_encode(['error' => 'An internal error occurred']);
 }
 exit;

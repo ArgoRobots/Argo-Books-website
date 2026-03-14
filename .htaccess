@@ -213,6 +213,20 @@ php_value error_log error_log.txt
     # Portal API: registration
     RewriteRule ^api/portal/register/?$ api/portal/register.php [L,QSA]
 
+    # AI completions proxy
+    RewriteRule ^api/ai/completions/?$ api/ai/completions.php [L,QSA]
+
+    # Receipt scanning proxy
+    RewriteRule ^api/receipt/scan/?$ api/receipt/scan.php [L,QSA]
+
+    # Exchange rates proxy
+    RewriteRule ^api/exchange-rates/?$ api/exchange-rates.php [L,QSA]
+
+    # Google OAuth and Sheets proxy
+    RewriteRule ^api/google/auth/?$ api/google/auth.php [L,QSA]
+    RewriteRule ^api/google/callback/?$ api/google/callback.php [L,QSA]
+    RewriteRule ^api/google/sheets/export/?$ api/google/sheets/export.php [L,QSA]
+
     # Portal API: company logo upload/delete
     RewriteRule ^api/portal/logo/?$ api/portal/logo.php [L,QSA]
 

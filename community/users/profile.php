@@ -1128,7 +1128,7 @@ if ($is_own_profile) {
 
                 const formData = new FormData(form);
                 // Include CSRF token
-                formData.append('csrf_token', '<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>');
+                formData.append('csrf_token', <?php echo json_encode($_SESSION['csrf_token']); ?>);
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.textContent;
 

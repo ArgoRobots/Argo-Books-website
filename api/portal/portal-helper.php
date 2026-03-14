@@ -580,10 +580,20 @@ function set_portal_headers(): void
  */
 function get_client_ip(): string
 {
-    // Use REMOTE_ADDR as the primary source to prevent IP spoofing via headers.
-    // X-Forwarded-For is trivially spoofable and should only be trusted when
-    // behind a known reverse proxy with proper configuration.
-    return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+    // Only trust X-Forwarded-For when the request comes from a known trusted proxy.
+    // Configure via environment: TRUSTED_PROXY_IPS="203.0.113.10,203.0.113.11"
+    $trustedProxyConfig = $_ENV['TRUSTED_PROXY_IPS'] ?? getenv('TRUSTED_PROXY_IPS') ?: '';
+    if (!empty($trustedProxyConfig) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $trustedProxies = array_map('trim', explode(',', $trustedProxyConfig));
+        if (in_array($remoteAddr, $trustedProxies, true)) {
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return trim($ips[0]);
+        }
+    }
+
+    return $remoteAddr;
 }
 
 /**

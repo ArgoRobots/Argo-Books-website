@@ -93,7 +93,7 @@ class InvoiceEmailSender
 
             return [
                 'success' => false,
-                'message' => 'Failed to send email: ' . $e->getMessage(),
+                'message' => 'Failed to send email.',
                 'messageId' => null,
                 'errorCode' => 'SEND_FAILED',
                 'timestamp' => $timestamp
@@ -128,6 +128,9 @@ class InvoiceEmailSender
             }
             // Sanitize filename to prevent header injection or path traversal
             $filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $data['pdfFilename'] ?? 'invoice.pdf');
+            if ($filename === null || $filename === '' || !str_ends_with(strtolower($filename), '.pdf')) {
+                $filename = 'invoice.pdf';
+            }
             $mailer->addStringAttachment($pdfContent, $filename, 'base64', 'application/pdf');
         }
 
@@ -161,6 +164,9 @@ class InvoiceEmailSender
         if (!empty($data['pdfAttachment'])) {
             // Sanitize filename to prevent header injection or path traversal
             $safe_filename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $data['pdfFilename'] ?? 'invoice.pdf');
+            if ($safe_filename === null || $safe_filename === '' || !str_ends_with(strtolower($safe_filename), '.pdf')) {
+                $safe_filename = 'invoice.pdf';
+            }
             return $this->sendWithAttachment($to, $subject, $htmlBody, $textBody, $headers, $data['pdfAttachment'], $safe_filename);
         }
 

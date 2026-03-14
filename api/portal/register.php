@@ -22,6 +22,13 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
+// Rate limiting: 10 registration attempts per 15 minutes per IP
+$ip = get_client_ip();
+if (is_rate_limited($ip, 10, 900, 'register')) {
+    send_error_response(429, 'Too many registration attempts. Please try again later.', 'RATE_LIMITED');
+}
+record_rate_limit_attempt($ip, 'register');
+
 // Parse request body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);

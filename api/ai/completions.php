@@ -54,7 +54,8 @@ if (empty($data['systemPrompt']) && empty($data['userPrompt'])) {
 
 $systemPrompt = $data['systemPrompt'] ?? '';
 $userPrompt = $data['userPrompt'] ?? '';
-$model = $data['model'] ?? $defaultModel;
+$allowedModels = ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'];
+$model = in_array($data['model'] ?? '', $allowedModels, true) ? $data['model'] : $defaultModel;
 $maxTokens = min((int)($data['maxTokens'] ?? 4000), 16000); // Cap at 16k
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 

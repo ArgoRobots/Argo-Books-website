@@ -79,11 +79,12 @@ curl_setopt_array($ch, [
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch);
 curl_close($ch);
 
 if ($response === false || $httpCode !== 200) {
     $db->close();
-    error_log('Google token exchange failed: ' . ($response ?: 'curl error'));
+    error_log('Google token exchange failed (HTTP ' . $httpCode . '): ' . ($response ?: $curlError));
     showResult(false, 'Failed to complete Google authorization. Please try again.');
 }
 

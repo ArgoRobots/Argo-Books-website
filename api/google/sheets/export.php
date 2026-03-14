@@ -121,9 +121,12 @@ foreach ($sheets as $i => $sheet) {
     }
 
     if (!empty($values)) {
-        $range = urlencode($sheetName) . '!A1';
+        $range = "'" . str_replace("'", "''", $sheetName) . "'!A1";
         $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}/values/{$range}?valueInputOption=RAW";
-        googleApiRequest($accessToken, 'PUT', $url, ['values' => $values]);
+        $writeResult = googleApiRequest($accessToken, 'PUT', $url, ['values' => $values]);
+        if (isset($writeResult['error'])) {
+            error_log('Google Sheets data write failed: ' . json_encode($writeResult['error']));
+        }
     }
 }
 

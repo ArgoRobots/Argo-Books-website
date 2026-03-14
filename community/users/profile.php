@@ -13,6 +13,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
 require_login();
 
+// Ensure CSRF token exists for report functionality
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $is_logged_in = isset($_SESSION['user_id']);
 $requested_username = isset($_GET['username']) ? trim($_GET['username']) : '';
 $is_own_profile = false;
@@ -1122,6 +1127,8 @@ if ($is_own_profile) {
                 e.preventDefault();
 
                 const formData = new FormData(form);
+                // Include CSRF token
+                formData.append('csrf_token', '<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>');
                 const submitBtn = form.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.textContent;
 

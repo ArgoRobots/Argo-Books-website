@@ -66,6 +66,86 @@ function authenticate_portal_request(): ?array
 }
 
 /**
+ * Authenticate an API request using a premium license key.
+ * Supports X-License-Key header and Authorization: Bearer header.
+ *
+ * @return array|null Returns ['license_key_hash' => string, 'subscription_id' => string] if valid, null otherwise
+ */
+function authenticate_license_request(): ?array
+{
+    $licenseKey = '';
+    if (!empty($_SERVER['HTTP_X_LICENSE_KEY'])) {
+        $licenseKey = $_SERVER['HTTP_X_LICENSE_KEY'];
+    } elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+        if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
+            $licenseKey = $matches[1];
+        }
+    }
+
+    if (empty($licenseKey)) {
+        return null;
+    }
+
+    global $pdo;
+    try {
+        $stmt = $pdo->prepare("
+            SELECT subscription_key, subscription_id, redeemed_at
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$licenseKey]);
+        $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$premiumKey || $premiumKey['redeemed_at'] === null) {
+            return null;
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT status, end_date
+            FROM premium_subscriptions
+            WHERE subscription_id = ?
+        ");
+        $stmt->execute([$premiumKey['subscription_id']]);
+        $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$subscription) {
+            return null;
+        }
+
+        $now = new DateTime();
+        $endDate = new DateTime($subscription['end_date']);
+
+        if (!in_array($subscription['status'], ['active', 'cancelled']) || $endDate <= $now) {
+            return null;
+        }
+
+        return [
+            'license_key_hash' => hash('sha256', $licenseKey),
+            'subscription_id' => $premiumKey['subscription_id'],
+        ];
+    } catch (PDOException $e) {
+        error_log("License authentication error: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Authenticate a request using a device ID (for free features like Google Sheets).
+ * Uses X-Device-Id header.
+ *
+ * @return string|null Device ID hash if present, null otherwise
+ */
+function authenticate_device_request(): ?string
+{
+    $deviceId = $_SERVER['HTTP_X_DEVICE_ID'] ?? '';
+    if (empty($deviceId)) {
+        return null;
+    }
+    return hash('sha256', $deviceId);
+}
+
+/**
  * Read rate limits file with exclusive lock to prevent TOCTOU race conditions.
  * Returns the parsed array and keeps the file handle open for atomic updates.
  *

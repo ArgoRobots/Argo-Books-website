@@ -18,18 +18,19 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate
-$company = authenticate_portal_request();
-if (!$company) {
-    send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
+// Authenticate using license key
+$license = authenticate_license_request();
+if (!$license) {
+    send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
 }
 
-// Rate limiting: 60 requests per 15 minutes per company
+// Rate limiting: 60 requests per 15 minutes per license
 $ip = get_client_ip();
-if (is_rate_limited($ip, 60, 900, 'ai_' . $company['id'])) {
+$rateLimitKey = 'ai_' . substr($license['license_key_hash'], 0, 16);
+if (is_rate_limited($ip, 60, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, 'ai_' . $company['id']);
+record_rate_limit_attempt($ip, $rateLimitKey);
 
 // Validate server configuration
 $openaiKey = $_ENV['OPENAI_API_KEY'] ?? '';

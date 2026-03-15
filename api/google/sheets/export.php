@@ -7,7 +7,7 @@
  * Receives spreadsheet data from the Argo Books app, creates a Google Sheet
  * using the company's stored OAuth tokens, and returns the spreadsheet URL.
  *
- * Supports authentication via portal API key or premium license key.
+ * Free feature — authentication uses device ID.
  */
 
 require_once __DIR__ . '/../google-helper.php';
@@ -20,17 +20,15 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate via portal API key or license key
+// Authenticate via device ID (free feature)
 $authContext = authenticate_google_request();
 if (!$authContext) {
-    send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
+    send_error_response(401, 'Missing device identifier.', 'UNAUTHORIZED');
 }
 
 // Rate limiting: 30 exports per 15 minutes
 $ip = get_client_ip();
-$rateLimitId = $authContext['type'] === 'portal'
-    ? 'sheets_' . $authContext['company_id']
-    : 'sheets_' . substr($authContext['license_key_hash'], 0, 16);
+$rateLimitId = 'sheets_' . substr($authContext['device_id_hash'], 0, 16);
 if (is_rate_limited($ip, 30, 900, $rateLimitId)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }

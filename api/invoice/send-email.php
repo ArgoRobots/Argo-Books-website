@@ -35,13 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Authenticate using portal API key
-$company = authenticate_portal_request();
-if (!$company) {
+// Authenticate using license key
+$license = authenticate_license_request();
+if (!$license) {
     http_response_code(401);
     echo json_encode([
         'success' => false,
-        'message' => 'Invalid or missing API key.',
+        'message' => 'Invalid or missing license key.',
         'messageId' => null,
         'errorCode' => 'UNAUTHORIZED',
         'timestamp' => date('c')

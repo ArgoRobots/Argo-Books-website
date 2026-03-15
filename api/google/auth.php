@@ -9,7 +9,7 @@
  *   - { action: "status" }   — Check if company has valid Google tokens
  *   - { action: "revoke" }   — Revoke Google tokens for this company
  *
- * Supports authentication via portal API key or premium license key.
+ * Free feature — authentication uses device ID.
  */
 
 require_once __DIR__ . '/google-helper.php';
@@ -22,10 +22,10 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate via portal API key or license key
+// Authenticate via device ID (free feature)
 $authContext = authenticate_google_request();
 if (!$authContext) {
-    send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
+    send_error_response(401, 'Missing device identifier.', 'UNAUTHORIZED');
 }
 
 // Validate server configuration

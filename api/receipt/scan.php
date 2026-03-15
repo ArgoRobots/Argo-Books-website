@@ -9,8 +9,6 @@
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
-require_once __DIR__ . '/../../db_connect.php';
-require_once __DIR__ . '/../../license_functions.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../vendor/autoload.php';

@@ -174,7 +174,13 @@ if ($chartConfig && !empty($sheets)) {
                             ],
                         ],
                         'position' => [
-                            'newSheet' => true,
+                            'overlayPosition' => [
+                                'anchorCell' => [
+                                    'sheetId' => $sheetId,
+                                    'rowIndex' => $numRows + 1,
+                                    'columnIndex' => 0,
+                                ],
+                            ],
                         ],
                     ],
                 ],

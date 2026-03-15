@@ -38,21 +38,7 @@ function get_google_tokens(array $authContext): ?array
 {
     $db = get_db_connection();
 
-    // Ensure table exists
-    $db->query(
-        'CREATE TABLE IF NOT EXISTS google_oauth_tokens (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            device_id_hash VARCHAR(64) NOT NULL UNIQUE,
-            google_refresh_token TEXT DEFAULT NULL,
-            google_access_token TEXT DEFAULT NULL,
-            google_token_expires DATETIME DEFAULT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX idx_device_id_hash (device_id_hash)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-    );
-
-    // Try device-based tokens first
+    // Query device-based tokens
     $stmt = $db->prepare(
         'SELECT google_access_token, google_refresh_token, google_token_expires
          FROM google_oauth_tokens WHERE device_id_hash = ? LIMIT 1'
@@ -129,19 +115,6 @@ function clear_google_tokens(array $authContext): void
 function store_google_oauth_state(array $authContext, string $state): void
 {
     $db = get_db_connection();
-
-    // Ensure table exists
-    $db->query(
-        'CREATE TABLE IF NOT EXISTS google_oauth_states (
-            id INT PRIMARY KEY AUTO_INCREMENT,
-            state_token VARCHAR(255) NOT NULL UNIQUE,
-            device_id_hash VARCHAR(64) NOT NULL,
-            expires_at DATETIME NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            INDEX idx_device_id_hash (device_id_hash),
-            INDEX idx_expires_at (expires_at)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
-    );
 
     // Clean up expired states for this device
     $stmt = $db->prepare('DELETE FROM google_oauth_states WHERE device_id_hash = ? OR expires_at < NOW()');

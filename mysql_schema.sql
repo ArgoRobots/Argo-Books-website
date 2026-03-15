@@ -444,6 +444,17 @@ CREATE TABLE IF NOT EXISTS google_oauth_tokens (
     INDEX idx_device_id_hash (device_id_hash)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Google OAuth state tokens for CSRF protection during Google auth flow
+CREATE TABLE IF NOT EXISTS google_oauth_states (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    state_token VARCHAR(255) NOT NULL UNIQUE,
+    device_id_hash VARCHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_device_id_hash (device_id_hash),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- OAuth state tokens for CSRF protection during provider connect flows
 CREATE TABLE IF NOT EXISTS portal_oauth_states (
     id INT PRIMARY KEY AUTO_INCREMENT,

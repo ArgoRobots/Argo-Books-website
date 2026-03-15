@@ -58,7 +58,6 @@ if (empty($azureEndpoint) || empty($azureKey)) {
 
 // Validate uploaded file
 if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-    $errorCode = $_FILES['image']['error'] ?? 'no_file';
     send_error_response(400, 'No image file uploaded or upload error.', 'UPLOAD_ERROR');
 }
 
@@ -167,7 +166,7 @@ for ($i = 0; $i < $maxAttempts; $i++) {
     curl_close($ch);
 
     if ($pollResponse === false || $pollHttpCode !== 200) {
-        error_log("Azure poll attempt {$attempt}: HTTP {$pollHttpCode}, curl error: {$pollError}");
+        error_log("Azure poll attempt {$i}: HTTP {$pollHttpCode}, curl error: {$pollError}");
         continue;
     }
 

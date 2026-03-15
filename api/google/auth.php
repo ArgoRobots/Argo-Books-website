@@ -123,8 +123,8 @@ function handleRevoke(array $authContext): void
 
     // Try to revoke at Google (best effort)
     if (!empty($tokenRow['google_access_token'])) {
-        $token = google_decrypt($tokenRow['google_access_token']);
-        if ($token) {
+        try {
+            $token = google_decrypt($tokenRow['google_access_token']);
             $ch = curl_init('https://oauth2.googleapis.com/revoke?token=' . urlencode($token));
             curl_setopt_array($ch, [
                 CURLOPT_RETURNTRANSFER => true,
@@ -133,6 +133,8 @@ function handleRevoke(array $authContext): void
             ]);
             curl_exec($ch);
             curl_close($ch);
+        } catch (RuntimeException $e) {
+            error_log('Failed to decrypt Google token for revocation: ' . $e->getMessage());
         }
     }
 

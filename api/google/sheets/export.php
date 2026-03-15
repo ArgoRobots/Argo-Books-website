@@ -42,8 +42,13 @@ if (empty($tokenRow['google_refresh_token'])) {
 }
 
 // Decrypt tokens
-$accessToken = google_decrypt($tokenRow['google_access_token']);
-$refreshToken = google_decrypt($tokenRow['google_refresh_token']);
+try {
+    $accessToken = google_decrypt($tokenRow['google_access_token']);
+    $refreshToken = google_decrypt($tokenRow['google_refresh_token']);
+} catch (RuntimeException $e) {
+    error_log('Failed to decrypt Google tokens: ' . $e->getMessage());
+    send_error_response(500, 'Failed to decrypt stored credentials. Please re-authorize Google Sheets.', 'DECRYPT_ERROR');
+}
 $tokenExpires = $tokenRow['google_token_expires'];
 
 // Refresh token if expired

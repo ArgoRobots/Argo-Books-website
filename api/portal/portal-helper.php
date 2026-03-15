@@ -574,7 +574,7 @@ function require_method($allowed): void
         $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
         header('Access-Control-Allow-Origin: ' . $allowedOrigin);
         header('Access-Control-Allow-Methods: ' . implode(', ', $allowed) . ', OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
+        header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
         http_response_code(204);
         exit;
     }
@@ -592,7 +592,7 @@ function set_portal_headers(): void
     $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);
     header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
+    header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
     header('X-Content-Type-Options: nosniff');
 }
 

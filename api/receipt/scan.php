@@ -323,6 +323,17 @@ function parseAzureReceiptResult(array $result): array
         }
     }
 
+    // Extract payment method if available
+    if (isset($fields['PaymentType'])) {
+        $output['paymentMethod'] = $fields['PaymentType']['valueString']
+            ?? $fields['PaymentType']['content'] ?? null;
+    }
+
+    // If no PaymentType field, try to detect from raw text
+    if (empty($output['paymentMethod']) && !empty($output['rawText'])) {
+        $output['paymentMethod'] = detectPaymentMethodFromText($output['rawText']);
+    }
+
     // Auto-calculate missing subtotal
     if ($output['subtotal'] === null && $output['total'] !== null && $output['tax'] !== null) {
         $output['subtotal'] = round($output['total'] - $output['tax'], 2);
@@ -417,11 +428,16 @@ function parseLineItem(array $fields): ?array
         }
     }
 
+    // Default quantity to 1 if not extracted (most common case for receipts)
+    if ($item['quantity'] === null) {
+        $item['quantity'] = 1;
+    }
+
     // Auto-calculate missing values
-    if ($item['totalPrice'] === null && $item['quantity'] !== null && $item['unitPrice'] !== null) {
+    if ($item['totalPrice'] === null && $item['unitPrice'] !== null) {
         $item['totalPrice'] = round($item['quantity'] * $item['unitPrice'], 2);
     }
-    if ($item['unitPrice'] === null && $item['totalPrice'] !== null && $item['quantity'] !== null && $item['quantity'] > 0) {
+    if ($item['unitPrice'] === null && $item['totalPrice'] !== null && $item['quantity'] > 0) {
         $item['unitPrice'] = round($item['totalPrice'] / $item['quantity'], 2);
     }
 
@@ -434,4 +450,49 @@ function parseLineItem(array $fields): ?array
     }
 
     return $item;
+}
+
+/**
+ * Detect payment method from receipt raw text.
+ */
+function detectPaymentMethodFromText(string $text): ?string
+{
+    $text = strtoupper($text);
+
+    // Credit card indicators
+    $creditCardPatterns = [
+        'VISA', 'MASTERCARD', 'MASTER CARD', 'MC',
+        'AMEX', 'AMERICAN EXPRESS',
+        'DISCOVER', 'DINERS', 'JCB',
+        'CREDIT CARD', 'CREDIT',
+    ];
+    foreach ($creditCardPatterns as $pattern) {
+        if (strpos($text, $pattern) !== false) {
+            return 'Credit Card';
+        }
+    }
+
+    // Debit card indicators
+    $debitPatterns = ['DEBIT CARD', 'DEBIT', 'EFTPOS', 'INTERAC'];
+    foreach ($debitPatterns as $pattern) {
+        if (strpos($text, $pattern) !== false) {
+            return 'Debit Card';
+        }
+    }
+
+    // Other methods
+    if (preg_match('/\bCASH\b/', $text)) {
+        return 'Cash';
+    }
+    if (strpos($text, 'PAYPAL') !== false) {
+        return 'PayPal';
+    }
+    if (preg_match('/\bCHECK\b|\bCHEQUE\b/', $text)) {
+        return 'Check';
+    }
+    if (preg_match('/\bBANK TRANSFER\b|\bWIRE TRANSFER\b|\bEFT\b/', $text)) {
+        return 'Bank Transfer';
+    }
+
+    return null;
 }

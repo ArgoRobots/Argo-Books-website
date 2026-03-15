@@ -160,51 +160,58 @@ if ($numCols > 0) {
 if ($chartConfig && $numRows > 1 && $numCols >= 2) {
     $chartType = mapChartType($chartConfig['type'] ?? 'column');
 
-    $basicChart = [
-        'chartType' => $chartType,
-        'legendPosition' => 'BOTTOM_LEGEND',
-        'domains' => [[
-            'domain' => [
-                'sourceRange' => [
-                    'sources' => [[
-                        'sheetId' => $sheetId,
-                        'startRowIndex' => 0,
-                        'endRowIndex' => $numRows,
-                        'startColumnIndex' => 0,
-                        'endColumnIndex' => 1,
-                    ]],
-                ],
+    $sourceRange = function ($col) use ($sheetId, $numRows) {
+        return [
+            'sourceRange' => [
+                'sources' => [[
+                    'sheetId' => $sheetId,
+                    'startRowIndex' => 0,
+                    'endRowIndex' => $numRows,
+                    'startColumnIndex' => $col,
+                    'endColumnIndex' => $col + 1,
+                ]],
             ],
-        ]],
-        'series' => array_map(function ($colIdx) use ($sheetId, $numRows) {
-            return [
-                'series' => [
-                    'sourceRange' => [
-                        'sources' => [[
-                            'sheetId' => $sheetId,
-                            'startRowIndex' => 0,
-                            'endRowIndex' => $numRows,
-                            'startColumnIndex' => $colIdx,
-                            'endColumnIndex' => $colIdx + 1,
-                        ]],
-                    ],
-                ],
-            ];
-        }, range(1, $numCols - 1)),
-        'headerCount' => 1,
-    ];
+        ];
+    };
 
-    if (in_array($chartType, ['LINE', 'AREA'])) {
-        $basicChart['lineSmoothing'] = true;
+    if ($chartType === 'PIE') {
+        $chartSpec = [
+            'title' => $chartConfig['title'] ?? $title,
+            'pieChart' => [
+                'legendPosition' => 'BOTTOM_LEGEND',
+                'domain' => $sourceRange(0),
+                'series' => $sourceRange(1),
+            ],
+        ];
+    } else {
+        $basicChart = [
+            'chartType' => $chartType,
+            'legendPosition' => 'BOTTOM_LEGEND',
+            'domains' => [[
+                'domain' => $sourceRange(0),
+            ]],
+            'series' => array_map(function ($colIdx) use ($sourceRange) {
+                return [
+                    'series' => $sourceRange($colIdx),
+                ];
+            }, range(1, $numCols - 1)),
+            'headerCount' => 1,
+        ];
+
+        if (in_array($chartType, ['LINE', 'AREA'])) {
+            $basicChart['lineSmoothing'] = true;
+        }
+
+        $chartSpec = [
+            'title' => $chartConfig['title'] ?? $title,
+            'basicChart' => $basicChart,
+        ];
     }
 
     $batchRequests[] = [
         'addChart' => [
             'chart' => [
-                'spec' => [
-                    'title' => $chartConfig['title'] ?? $title,
-                    'basicChart' => $basicChart,
-                ],
+                'spec' => $chartSpec,
                 'position' => [
                     'overlayPosition' => [
                         'anchorCell' => [

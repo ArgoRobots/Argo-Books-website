@@ -62,54 +62,8 @@ function get_google_tokens(array $authContext): ?array
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
-    if (!empty($row['google_refresh_token'])) {
-        $db->close();
-        return $row;
-    }
-
-    // Fallback: check portal_companies for tokens from the old auth flow
-    $portalApiKey = $_SERVER['HTTP_X_API_KEY'] ?? '';
-    if (empty($portalApiKey) && !empty($_SERVER['HTTP_AUTHORIZATION'])) {
-        if (preg_match('/Bearer\s+(.+)/i', $_SERVER['HTTP_AUTHORIZATION'], $matches)) {
-            $portalApiKey = $matches[1];
-        }
-    }
-
-    // Also try to find any portal company with Google tokens
-    // (for migration from old portal-based auth)
-    $result = $db->query(
-        'SELECT google_access_token, google_refresh_token, google_token_expires
-         FROM portal_companies
-         WHERE google_refresh_token IS NOT NULL AND google_refresh_token != ""
-         LIMIT 1'
-    );
-    $portalRow = $result ? $result->fetch_assoc() : null;
-
-    if (!empty($portalRow['google_refresh_token'])) {
-        // Migrate tokens to the new device-based table
-        $migStmt = $db->prepare(
-            'INSERT INTO google_oauth_tokens (device_id_hash, google_access_token, google_refresh_token, google_token_expires)
-             VALUES (?, ?, ?, ?)
-             ON DUPLICATE KEY UPDATE
-                google_access_token = VALUES(google_access_token),
-                google_refresh_token = VALUES(google_refresh_token),
-                google_token_expires = VALUES(google_token_expires)'
-        );
-        $migStmt->bind_param('ssss',
-            $authContext['device_id_hash'],
-            $portalRow['google_access_token'],
-            $portalRow['google_refresh_token'],
-            $portalRow['google_token_expires']
-        );
-        $migStmt->execute();
-        $migStmt->close();
-
-        $db->close();
-        return $portalRow;
-    }
-
     $db->close();
-    return null;
+    return $row ?: null;
 }
 
 /**

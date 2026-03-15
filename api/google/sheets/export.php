@@ -168,6 +168,7 @@ if ($chartConfig && $numRows > 1 && $numCols >= 2) {
                     'basicChart' => [
                         'chartType' => $chartType,
                         'legendPosition' => 'BOTTOM_LEGEND',
+                        'smoothLine' => in_array($chartType, ['LINE', 'AREA']),
                         'domains' => [[
                             'domain' => [
                                 'sourceRange' => [

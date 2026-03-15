@@ -402,67 +402,6 @@ function get_invoices_by_customer_token(string $customerToken): array
 }
 
 /**
- * Get payment history for a customer token
- *
- * @param string $customerToken Customer portal token
- * @return array Array of payment records
- */
-function get_payments_by_customer_token(string $customerToken): array
-{
-    $db = get_db_connection();
-
-    // First get all invoice_ids for this customer
-    $stmt = $db->prepare(
-        'SELECT pi.invoice_id, pi.company_id
-         FROM portal_invoices pi
-         WHERE pi.customer_token = ?'
-    );
-    $stmt->bind_param('s', $customerToken);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $invoiceIds = [];
-    $companyId = null;
-    while ($row = $result->fetch_assoc()) {
-        $invoiceIds[] = $row['invoice_id'];
-        $companyId = $row['company_id'];
-    }
-    $stmt->close();
-
-    if (empty($invoiceIds) || !$companyId) {
-        $db->close();
-        return [];
-    }
-
-    // Get payments for those invoices
-    $placeholders = implode(',', array_fill(0, count($invoiceIds), '?'));
-    $types = str_repeat('s', count($invoiceIds));
-
-    $stmt = $db->prepare(
-        "SELECT pp.*
-         FROM portal_payments pp
-         WHERE pp.company_id = ?
-           AND pp.invoice_id IN ({$placeholders})
-         ORDER BY pp.created_at DESC"
-    );
-
-    $params = array_merge([$companyId], $invoiceIds);
-    $types = 'i' . $types;
-    $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $payments = [];
-    while ($row = $result->fetch_assoc()) {
-        $payments[] = $row;
-    }
-    $stmt->close();
-    $db->close();
-
-    return $payments;
-}
-
-/**
  * Record a portal payment and update the invoice balance
  *
  * @param array $params Payment parameters

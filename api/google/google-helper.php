@@ -53,28 +53,6 @@ function get_google_tokens(array $authContext): ?array
 }
 
 /**
- * Store Google OAuth tokens for the given auth context.
- */
-function store_google_tokens(array $authContext, string $encryptedAccessToken, string $encryptedRefreshToken, string $expiresAt): void
-{
-    $db = get_db_connection();
-
-    $stmt = $db->prepare(
-        'INSERT INTO google_oauth_tokens (device_id_hash, google_access_token, google_refresh_token, google_token_expires)
-         VALUES (?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE
-            google_access_token = VALUES(google_access_token),
-            google_refresh_token = VALUES(google_refresh_token),
-            google_token_expires = VALUES(google_token_expires)'
-    );
-    $stmt->bind_param('ssss', $authContext['device_id_hash'], $encryptedAccessToken, $encryptedRefreshToken, $expiresAt);
-
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
-}
-
-/**
  * Update just the access token for the given auth context (after refresh).
  */
 function update_google_access_token(array $authContext, string $encryptedAccessToken, string $expiresAt): void

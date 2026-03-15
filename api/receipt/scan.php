@@ -203,6 +203,10 @@ send_json_response(200, $scanResult);
 function authenticate_license_key(string $key): bool
 {
     global $pdo;
+    if ($pdo === null) {
+        error_log("License authentication failed: database connection unavailable");
+        return false;
+    }
 
     try {
         $stmt = $pdo->prepare("

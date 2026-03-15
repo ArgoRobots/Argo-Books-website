@@ -88,6 +88,10 @@ function authenticate_license_request(): ?array
     }
 
     global $pdo;
+    if ($pdo === null) {
+        error_log("License authentication failed: database connection unavailable");
+        return null;
+    }
     try {
         $stmt = $pdo->prepare("
             SELECT subscription_key, subscription_id, redeemed_at

@@ -10,14 +10,7 @@
  */
 
 require_once __DIR__ . '/portal-helper.php';
-
-// Load environment variables and license validation
-require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../../license_functions.php';
-require_once __DIR__ . '/../../db_connect.php';
-
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-$dotenv->safeLoad();
 
 set_portal_headers();
 require_method(['POST']);
@@ -52,6 +45,11 @@ $licenseKey = trim($data['licenseKey']);
 $deviceId = trim($data['deviceId']);
 
 // Validate license key using existing license validation
+global $pdo;
+if ($pdo === null) {
+    error_log('Portal registration failed: database connection unavailable');
+    send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_UNAVAILABLE');
+}
 $licenseResult = validate_license($licenseKey, $deviceId);
 if (!($licenseResult['success'] ?? false)) {
     $message = $licenseResult['message'] ?? 'Invalid license key.';

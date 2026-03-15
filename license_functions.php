@@ -457,6 +457,15 @@ function _recreate_subscription_for_key($key, $device_id) {
 function validate_license($key, $device_id) {
     global $pdo;
 
+    if ($pdo === null) {
+        error_log("License validation failed: database connection unavailable");
+        return [
+            'success' => false,
+            'status' => 'db_error',
+            'message' => 'Service temporarily unavailable.'
+        ];
+    }
+
     try {
         // Look up the key
         $stmt = $pdo->prepare("

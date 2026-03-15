@@ -124,74 +124,100 @@ foreach ($sheets as $i => $sheet) {
     }
 }
 
-// Step 3: Create chart if configured
-if ($chartConfig && !empty($sheets)) {
-    $chartType = mapChartType($chartConfig['type'] ?? 'column');
-    $sheetId = 0;
-    $firstSheet = $sheets[0];
-    $numRows = count($firstSheet['rows'] ?? []) + 1; // +1 for header
-    $numCols = count($firstSheet['headers'] ?? []);
+// Step 3: Format header row + create chart via single batchUpdate
+$firstSheet = $sheets[0] ?? null;
+$sheetId = 0;
+$numRows = count($firstSheet['rows'] ?? []) + 1; // +1 for header
+$numCols = count($firstSheet['headers'] ?? []);
 
-    if ($numRows > 1 && $numCols >= 2) {
-        $chartRequest = [
-            'requests' => [[
-                'addChart' => [
-                    'chart' => [
-                        'spec' => [
-                            'title' => $chartConfig['title'] ?? $title,
-                            'basicChart' => [
-                                'chartType' => $chartType,
-                                'legendPosition' => 'BOTTOM_LEGEND',
-                                'domains' => [[
-                                    'domain' => [
-                                        'sourceRange' => [
-                                            'sources' => [[
-                                                'sheetId' => $sheetId,
-                                                'startRowIndex' => 0,
-                                                'endRowIndex' => $numRows,
-                                                'startColumnIndex' => 0,
-                                                'endColumnIndex' => 1,
-                                            ]],
-                                        ],
-                                    ],
-                                ]],
-                                'series' => array_map(function ($colIdx) use ($sheetId, $numRows) {
-                                    return [
-                                        'series' => [
-                                            'sourceRange' => [
-                                                'sources' => [[
-                                                    'sheetId' => $sheetId,
-                                                    'startRowIndex' => 0,
-                                                    'endRowIndex' => $numRows,
-                                                    'startColumnIndex' => $colIdx,
-                                                    'endColumnIndex' => $colIdx + 1,
-                                                ]],
-                                            ],
-                                        ],
-                                    ];
-                                }, range(1, $numCols - 1)),
-                                'headerCount' => 1,
-                            ],
-                        ],
-                        'position' => [
-                            'overlayPosition' => [
-                                'anchorCell' => [
-                                    'sheetId' => $sheetId,
-                                    'rowIndex' => 0,
-                                    'columnIndex' => $numCols + 2,
+$batchRequests = [];
+
+// Bold header row with background color
+if ($numCols > 0) {
+    $batchRequests[] = [
+        'repeatCell' => [
+            'range' => [
+                'sheetId' => $sheetId,
+                'startRowIndex' => 0,
+                'endRowIndex' => 1,
+                'startColumnIndex' => 0,
+                'endColumnIndex' => $numCols,
+            ],
+            'cell' => [
+                'userEnteredFormat' => [
+                    'textFormat' => ['bold' => true],
+                    'backgroundColor' => [
+                        'red' => 0.937, 'green' => 0.937, 'blue' => 0.957, 'alpha' => 1,
+                    ],
+                ],
+            ],
+            'fields' => 'userEnteredFormat(textFormat,backgroundColor)',
+        ],
+    ];
+}
+
+// Chart positioned to the right of data
+if ($chartConfig && $numRows > 1 && $numCols >= 2) {
+    $chartType = mapChartType($chartConfig['type'] ?? 'column');
+
+    $batchRequests[] = [
+        'addChart' => [
+            'chart' => [
+                'spec' => [
+                    'title' => $chartConfig['title'] ?? $title,
+                    'basicChart' => [
+                        'chartType' => $chartType,
+                        'legendPosition' => 'BOTTOM_LEGEND',
+                        'domains' => [[
+                            'domain' => [
+                                'sourceRange' => [
+                                    'sources' => [[
+                                        'sheetId' => $sheetId,
+                                        'startRowIndex' => 0,
+                                        'endRowIndex' => $numRows,
+                                        'startColumnIndex' => 0,
+                                        'endColumnIndex' => 1,
+                                    ]],
                                 ],
                             ],
+                        ]],
+                        'series' => array_map(function ($colIdx) use ($sheetId, $numRows) {
+                            return [
+                                'series' => [
+                                    'sourceRange' => [
+                                        'sources' => [[
+                                            'sheetId' => $sheetId,
+                                            'startRowIndex' => 0,
+                                            'endRowIndex' => $numRows,
+                                            'startColumnIndex' => $colIdx,
+                                            'endColumnIndex' => $colIdx + 1,
+                                        ]],
+                                    ],
+                                ],
+                            ];
+                        }, range(1, $numCols - 1)),
+                        'headerCount' => 1,
+                    ],
+                ],
+                'position' => [
+                    'overlayPosition' => [
+                        'anchorCell' => [
+                            'sheetId' => $sheetId,
+                            'rowIndex' => 1,
+                            'columnIndex' => $numCols + 1,
                         ],
                     ],
                 ],
-            ]],
-        ];
+            ],
+        ],
+    ];
+}
 
-        googleApiRequest($accessToken, 'POST',
-            "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}:batchUpdate",
-            $chartRequest
-        );
-    }
+if (!empty($batchRequests)) {
+    googleApiRequest($accessToken, 'POST',
+        "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}:batchUpdate",
+        ['requests' => $batchRequests]
+    );
 }
 
 // Step 4: Share if requested

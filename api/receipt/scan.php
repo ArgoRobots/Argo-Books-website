@@ -9,6 +9,8 @@
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../license_functions.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -18,18 +20,36 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate
-$company = authenticate_portal_request();
-if (!$company) {
-    send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
+// Authenticate using license key (premium feature, not tied to payment portal)
+$licenseKey = '';
+if (!empty($_SERVER['HTTP_X_LICENSE_KEY'])) {
+    $licenseKey = $_SERVER['HTTP_X_LICENSE_KEY'];
+} elseif (!empty($_SERVER['HTTP_X_API_KEY'])) {
+    $licenseKey = $_SERVER['HTTP_X_API_KEY'];
+} elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
+        $licenseKey = $matches[1];
+    }
 }
 
-// Rate limiting: 30 scans per 15 minutes per company
+if (empty($licenseKey)) {
+    send_error_response(401, 'Missing license key.', 'UNAUTHORIZED');
+}
+
+// Validate the license key has an active premium subscription
+$licenseValidation = authenticate_license_key($licenseKey);
+if (!$licenseValidation) {
+    send_error_response(401, 'Invalid or expired license key.', 'UNAUTHORIZED');
+}
+
+// Rate limiting: 30 scans per 15 minutes per license key
+$rateLimitKey = 'receipt_' . hash('sha256', $licenseKey);
 $ip = get_client_ip();
-if (is_rate_limited($ip, 30, 900, 'receipt_' . $company['id'])) {
+if (is_rate_limited($ip, 30, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, 'receipt_' . $company['id']);
+record_rate_limit_attempt($ip, $rateLimitKey);
 
 // Validate server configuration
 $azureEndpoint = $_ENV['AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT'] ?? '';
@@ -174,6 +194,53 @@ if ($result === null) {
 $scanResult = parseAzureReceiptResult($result);
 
 send_json_response(200, $scanResult);
+
+/**
+ * Authenticate a request using a premium license key.
+ * Checks that the key exists, has been redeemed, and the linked subscription is active.
+ *
+ * @param string $key The license key to validate
+ * @return bool True if the license is valid and has an active subscription
+ */
+function authenticate_license_key(string $key): bool
+{
+    global $pdo;
+
+    try {
+        $stmt = $pdo->prepare("
+            SELECT subscription_key, subscription_id, redeemed_at
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$key]);
+        $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$premiumKey || $premiumKey['redeemed_at'] === null) {
+            return false;
+        }
+
+        // Check the linked subscription is active
+        $stmt = $pdo->prepare("
+            SELECT status, end_date
+            FROM premium_subscriptions
+            WHERE subscription_id = ?
+        ");
+        $stmt->execute([$premiumKey['subscription_id']]);
+        $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$subscription) {
+            return false;
+        }
+
+        $now = new DateTime();
+        $endDate = new DateTime($subscription['end_date']);
+
+        return in_array($subscription['status'], ['active', 'cancelled']) && $endDate > $now;
+    } catch (PDOException $e) {
+        error_log("License authentication error: " . $e->getMessage());
+        return false;
+    }
+}
 
 /**
  * Parse Azure Document Intelligence receipt result into app-compatible format.

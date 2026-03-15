@@ -99,8 +99,8 @@ if (empty($accessToken)) {
 }
 
 // Encrypt tokens before storing
-$encryptedAccess = portal_encrypt($accessToken);
-$encryptedRefresh = !empty($refreshToken) ? portal_encrypt($refreshToken) : null;
+$encryptedAccess = google_encrypt($accessToken);
+$encryptedRefresh = !empty($refreshToken) ? google_encrypt($refreshToken) : null;
 $expiresAt = date('Y-m-d H:i:s', time() + $expiresIn);
 
 // Store tokens in database

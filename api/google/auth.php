@@ -123,7 +123,7 @@ function handleRevoke(array $authContext): void
 
     // Try to revoke at Google (best effort)
     if (!empty($tokenRow['google_access_token'])) {
-        $token = portal_decrypt($tokenRow['google_access_token']);
+        $token = google_decrypt($tokenRow['google_access_token']);
         if ($token) {
             $ch = curl_init('https://oauth2.googleapis.com/revoke?token=' . urlencode($token));
             curl_setopt_array($ch, [

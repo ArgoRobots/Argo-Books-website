@@ -42,8 +42,8 @@ if (empty($tokenRow['google_refresh_token'])) {
 }
 
 // Decrypt tokens
-$accessToken = portal_decrypt($tokenRow['google_access_token']);
-$refreshToken = portal_decrypt($tokenRow['google_refresh_token']);
+$accessToken = google_decrypt($tokenRow['google_access_token']);
+$refreshToken = google_decrypt($tokenRow['google_refresh_token']);
 $tokenExpires = $tokenRow['google_token_expires'];
 
 // Refresh token if expired

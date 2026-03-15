@@ -134,6 +134,49 @@ function store_google_oauth_state(array $authContext, string $state): void
 }
 
 /**
+ * Encrypt a string using AES-256-GCM with a key derived from GOOGLE_CLIENT_SECRET.
+ * This keeps Google OAuth token encryption independent of the payment portal.
+ */
+function google_encrypt(string $plaintext): string
+{
+    $secret = trim($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
+    if (empty($secret)) {
+        throw new RuntimeException('GOOGLE_CLIENT_SECRET is not configured.');
+    }
+    $key = hash('sha256', $secret, true); // 32 bytes
+    $iv = random_bytes(12);
+    $ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($ciphertext === false) {
+        throw new RuntimeException('Encryption failed.');
+    }
+    return base64_encode($iv . $tag . $ciphertext);
+}
+
+/**
+ * Decrypt a string encrypted with google_encrypt().
+ */
+function google_decrypt(string $encoded): string
+{
+    $secret = trim($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
+    if (empty($secret)) {
+        throw new RuntimeException('GOOGLE_CLIENT_SECRET is not configured.');
+    }
+    $key = hash('sha256', $secret, true);
+    $data = base64_decode($encoded, true);
+    if ($data === false || strlen($data) < 28) {
+        throw new RuntimeException('Invalid encrypted data.');
+    }
+    $iv = substr($data, 0, 12);
+    $tag = substr($data, 12, 16);
+    $ciphertext = substr($data, 28);
+    $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+    if ($plaintext === false) {
+        throw new RuntimeException('Decryption failed.');
+    }
+    return $plaintext;
+}
+
+/**
  * Refresh an expired Google access token.
  *
  * @param string $refreshToken Decrypted refresh token
@@ -179,7 +222,7 @@ function refresh_google_token(string $refreshToken, array $authContext): ?string
     }
 
     // Update stored token
-    $encrypted = portal_encrypt($newAccessToken);
+    $encrypted = google_encrypt($newAccessToken);
     $expiresAt = date('Y-m-d H:i:s', time() + $expiresIn);
     update_google_access_token($authContext, $encrypted, $expiresAt);
 

@@ -177,8 +177,8 @@ if ($chartConfig && !empty($sheets)) {
                             'overlayPosition' => [
                                 'anchorCell' => [
                                     'sheetId' => $sheetId,
-                                    'rowIndex' => $numRows + 1,
-                                    'columnIndex' => 0,
+                                    'rowIndex' => 0,
+                                    'columnIndex' => $numCols + 2,
                                 ],
                             ],
                         ],

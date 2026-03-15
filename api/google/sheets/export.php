@@ -195,7 +195,7 @@ if ($chartConfig && $numRows > 1 && $numCols >= 2) {
     ];
 
     if (in_array($chartType, ['LINE', 'AREA'])) {
-        $basicChart['smoothLine'] = true;
+        $basicChart['lineSmoothing'] = true;
     }
 
     $batchRequests[] = [

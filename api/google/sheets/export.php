@@ -114,10 +114,12 @@ foreach ($sheets as $i => $sheet) {
 
     if (!empty($values)) {
         $range = "'" . str_replace("'", "''", $sheetName) . "'!A1";
-        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}/values/{$range}?valueInputOption=RAW";
+        $url = "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}/values/" . rawurlencode($range) . "?valueInputOption=RAW";
         $writeResult = googleApiRequest($accessToken, 'PUT', $url, ['values' => $values]);
-        if (isset($writeResult['error'])) {
-            error_log('Google Sheets data write failed: ' . json_encode($writeResult['error']));
+        if ($writeResult === null || isset($writeResult['error'])) {
+            $errorDetail = isset($writeResult['error']) ? json_encode($writeResult['error']) : 'API request failed';
+            error_log('Google Sheets data write failed for sheet "' . $sheetName . '": ' . $errorDetail);
+            send_error_response(502, 'Failed to write data to spreadsheet.', 'DATA_WRITE_ERROR');
         }
     }
 }

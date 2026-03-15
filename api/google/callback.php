@@ -117,16 +117,18 @@ $stmt->execute();
 $stmt->close();
 $db->close();
 
-showResult(true, 'Google Sheets connected successfully! You can close this window.');
+showResult(true, 'Google Sheets connected successfully!');
 
 /**
- * Show a simple HTML result page that auto-closes.
+ * Show a result page that auto-closes on success.
  */
 function showResult(bool $success, string $message): void
 {
     $color = $success ? '#059669' : '#dc2626';
     $icon = $success ? '&#10003;' : '&#10007;';
     $title = $success ? 'Connected' : 'Error';
+    $autoCloseScript = $success ? '<script>setTimeout(function(){window.close()},1500);</script>' : '';
+    $closingNote = $success ? '<p style="font-size:13px;color:#9ca3af;margin-top:12px;">This window will close automatically...</p>' : '';
 
     header('Content-Type: text/html; charset=utf-8');
     echo <<<HTML
@@ -136,6 +138,7 @@ function showResult(bool $success, string $message): void
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sheets - {$title}</title>
+    {$autoCloseScript}
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: #f3f4f6; }
         .card { background: white; border-radius: 12px; padding: 48px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; }
@@ -149,6 +152,7 @@ function showResult(bool $success, string $message): void
         <div class="icon">{$icon}</div>
         <h1>{$title}</h1>
         <p>{$message}</p>
+        {$closingNote}
     </div>
 </body>
 </html>

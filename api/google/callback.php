@@ -29,10 +29,10 @@ if (empty($state) || empty($code)) {
     showResult(false, 'Missing authorization parameters.');
 }
 
-// Validate state token against database
+// Validate state token against google_oauth_states table
 $db = get_db_connection();
 $stmt = $db->prepare(
-    'SELECT company_id, provider FROM portal_oauth_states
+    'SELECT device_id_hash FROM google_oauth_states
      WHERE state_token = ? AND expires_at > NOW()
      LIMIT 1'
 );
@@ -46,12 +46,10 @@ if (!$row) {
     showResult(false, 'Invalid or expired authorization state. Please try again from the app.');
 }
 
-$provider = $row['provider'];
-$isDeviceAuth = str_starts_with($provider, 'google_device_');
-$deviceIdHash = $isDeviceAuth ? substr($provider, strlen('google_device_')) : null;
+$deviceIdHash = $row['device_id_hash'];
 
 // Clean up used state token
-$stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE state_token = ?');
+$stmt = $db->prepare('DELETE FROM google_oauth_states WHERE state_token = ?');
 $stmt->bind_param('s', $state);
 $stmt->execute();
 $stmt->close();
@@ -106,20 +104,15 @@ $encryptedRefresh = !empty($refreshToken) ? portal_encrypt($refreshToken) : null
 $expiresAt = date('Y-m-d H:i:s', time() + $expiresIn);
 
 // Store tokens in database
-if ($isDeviceAuth && $deviceIdHash) {
-    $stmt = $db->prepare(
-        'INSERT INTO google_oauth_tokens (device_id_hash, google_access_token, google_refresh_token, google_token_expires)
-         VALUES (?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE
-            google_access_token = VALUES(google_access_token),
-            google_refresh_token = COALESCE(VALUES(google_refresh_token), google_refresh_token),
-            google_token_expires = VALUES(google_token_expires)'
-    );
-    $stmt->bind_param('ssss', $deviceIdHash, $encryptedAccess, $encryptedRefresh, $expiresAt);
-} else {
-    $db->close();
-    showResult(false, 'Invalid authentication context.');
-}
+$stmt = $db->prepare(
+    'INSERT INTO google_oauth_tokens (device_id_hash, google_access_token, google_refresh_token, google_token_expires)
+     VALUES (?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE
+        google_access_token = VALUES(google_access_token),
+        google_refresh_token = COALESCE(VALUES(google_refresh_token), google_refresh_token),
+        google_token_expires = VALUES(google_token_expires)'
+);
+$stmt->bind_param('ssss', $deviceIdHash, $encryptedAccess, $encryptedRefresh, $expiresAt);
 $stmt->execute();
 $stmt->close();
 $db->close();

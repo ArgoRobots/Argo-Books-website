@@ -124,25 +124,36 @@ function clear_google_tokens(array $authContext): void
 
 /**
  * Store an OAuth state token for Google auth flow.
+ * Uses a dedicated table to avoid FK constraints on portal_oauth_states.
  */
 function store_google_oauth_state(array $authContext, string $state): void
 {
     $db = get_db_connection();
 
-    // Clean up expired states
-    $providerKey = 'google_device_' . $authContext['device_id_hash'];
-    $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE provider = ? OR expires_at < NOW()');
-    $stmt->bind_param('s', $providerKey);
+    // Ensure table exists
+    $db->query(
+        'CREATE TABLE IF NOT EXISTS google_oauth_states (
+            id INT PRIMARY KEY AUTO_INCREMENT,
+            state_token VARCHAR(255) NOT NULL UNIQUE,
+            device_id_hash VARCHAR(64) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_device_id_hash (device_id_hash),
+            INDEX idx_expires_at (expires_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+
+    // Clean up expired states for this device
+    $stmt = $db->prepare('DELETE FROM google_oauth_states WHERE device_id_hash = ? OR expires_at < NOW()');
+    $stmt->bind_param('s', $authContext['device_id_hash']);
     $stmt->execute();
     $stmt->close();
 
-    // Use company_id = 0 for device-based states, store hash in provider
-    $companyId = 0;
     $stmt = $db->prepare(
-        'INSERT INTO portal_oauth_states (state_token, company_id, provider, expires_at)
-         VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))'
+        'INSERT INTO google_oauth_states (state_token, device_id_hash, expires_at)
+         VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))'
     );
-    $stmt->bind_param('sis', $state, $companyId, $providerKey);
+    $stmt->bind_param('ss', $state, $authContext['device_id_hash']);
 
     $stmt->execute();
     $stmt->close();

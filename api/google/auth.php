@@ -8,9 +8,11 @@
  *   - { action: "initiate" } — Generate OAuth URL, return to app to open in browser
  *   - { action: "status" }   — Check if company has valid Google tokens
  *   - { action: "revoke" }   — Revoke Google tokens for this company
+ *
+ * Supports authentication via portal API key or premium license key.
  */
 
-require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/google-helper.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -20,9 +22,9 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate
-$company = authenticate_portal_request();
-if (!$company) {
+// Authenticate via portal API key or license key
+$authContext = authenticate_google_request();
+if (!$authContext) {
     send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
 }
 
@@ -45,15 +47,15 @@ $action = $data['action'] ?? '';
 
 switch ($action) {
     case 'initiate':
-        handleInitiate($company, $clientId);
+        handleInitiate($authContext, $clientId);
         break;
 
     case 'status':
-        handleStatus($company);
+        handleStatus($authContext);
         break;
 
     case 'revoke':
-        handleRevoke($company);
+        handleRevoke($authContext);
         break;
 
     default:
@@ -63,29 +65,11 @@ switch ($action) {
 /**
  * Generate Google OAuth URL and store state token.
  */
-function handleInitiate(array $company, string $clientId): void
+function handleInitiate(array $authContext, string $clientId): void
 {
     $state = bin2hex(random_bytes(16));
-    $companyId = $company['id'];
 
-    // Store state token in database for CSRF validation
-    $db = get_db_connection();
-
-    // Clean up expired states for this company
-    $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE company_id = ? OR expires_at < NOW()');
-    $stmt->bind_param('i', $companyId);
-    $stmt->execute();
-    $stmt->close();
-
-    // Store new state
-    $stmt = $db->prepare(
-        'INSERT INTO portal_oauth_states (state_token, company_id, provider, expires_at)
-         VALUES (?, ?, "google", DATE_ADD(NOW(), INTERVAL 10 MINUTE))'
-    );
-    $stmt->bind_param('si', $state, $companyId);
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    store_google_oauth_state($authContext, $state);
 
     $baseUrl = $_ENV['APP_URL'] ?? 'https://argorobots.com';
     $redirectUri = $baseUrl . '/api/google/callback';
@@ -117,20 +101,10 @@ function handleInitiate(array $company, string $clientId): void
 /**
  * Check if company has valid Google tokens.
  */
-function handleStatus(array $company): void
+function handleStatus(array $authContext): void
 {
-    $db = get_db_connection();
-    $stmt = $db->prepare(
-        'SELECT google_refresh_token, google_token_expires
-         FROM portal_companies WHERE id = ? LIMIT 1'
-    );
-    $stmt->bind_param('i', $company['id']);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    $db->close();
-
-    $hasTokens = !empty($row['google_refresh_token']);
+    $tokenRow = get_google_tokens($authContext);
+    $hasTokens = !empty($tokenRow['google_refresh_token']);
 
     send_json_response(200, [
         'success' => true,
@@ -143,22 +117,13 @@ function handleStatus(array $company): void
 /**
  * Revoke Google tokens for this company.
  */
-function handleRevoke(array $company): void
+function handleRevoke(array $authContext): void
 {
-    $db = get_db_connection();
-
-    // Get current access token to revoke at Google
-    $stmt = $db->prepare(
-        'SELECT google_access_token FROM portal_companies WHERE id = ? LIMIT 1'
-    );
-    $stmt->bind_param('i', $company['id']);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $tokenRow = get_google_tokens($authContext);
 
     // Try to revoke at Google (best effort)
-    if (!empty($row['google_access_token'])) {
-        $token = portal_decrypt($row['google_access_token']);
+    if (!empty($tokenRow['google_access_token'])) {
+        $token = portal_decrypt($tokenRow['google_access_token']);
         if ($token) {
             $ch = curl_init('https://oauth2.googleapis.com/revoke?token=' . urlencode($token));
             curl_setopt_array($ch, [
@@ -171,16 +136,7 @@ function handleRevoke(array $company): void
         }
     }
 
-    // Clear tokens from database
-    $stmt = $db->prepare(
-        'UPDATE portal_companies
-         SET google_refresh_token = NULL, google_access_token = NULL, google_token_expires = NULL
-         WHERE id = ?'
-    );
-    $stmt->bind_param('i', $company['id']);
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    clear_google_tokens($authContext);
 
     send_json_response(200, [
         'success' => true,

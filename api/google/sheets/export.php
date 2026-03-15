@@ -6,9 +6,11 @@
  *
  * Receives spreadsheet data from the Argo Books app, creates a Google Sheet
  * using the company's stored OAuth tokens, and returns the spreadsheet URL.
+ *
+ * Supports authentication via portal API key or premium license key.
  */
 
-require_once __DIR__ . '/../../portal/portal-helper.php';
+require_once __DIR__ . '/../google-helper.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../../vendor/autoload.php';
@@ -18,32 +20,26 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate
-$company = authenticate_portal_request();
-if (!$company) {
+// Authenticate via portal API key or license key
+$authContext = authenticate_google_request();
+if (!$authContext) {
     send_error_response(401, 'Invalid or missing API key.', 'UNAUTHORIZED');
 }
 
 // Rate limiting: 30 exports per 15 minutes
 $ip = get_client_ip();
-if (is_rate_limited($ip, 30, 900, 'sheets_' . $company['id'])) {
+$rateLimitId = $authContext['type'] === 'portal'
+    ? 'sheets_' . $authContext['company_id']
+    : 'sheets_' . substr($authContext['license_key_hash'], 0, 16);
+if (is_rate_limited($ip, 30, 900, $rateLimitId)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, 'sheets_' . $company['id']);
+record_rate_limit_attempt($ip, $rateLimitId);
 
-// Get Google tokens for this company
-$db = get_db_connection();
-$stmt = $db->prepare(
-    'SELECT google_access_token, google_refresh_token, google_token_expires
-     FROM portal_companies WHERE id = ? LIMIT 1'
-);
-$stmt->bind_param('i', $company['id']);
-$stmt->execute();
-$tokenRow = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+// Get Google tokens
+$tokenRow = get_google_tokens($authContext);
 
 if (empty($tokenRow['google_refresh_token'])) {
-    $db->close();
     send_error_response(403, 'Google Sheets not connected. Please authorize via Settings.', 'NOT_AUTHENTICATED');
 }
 
@@ -54,13 +50,11 @@ $tokenExpires = $tokenRow['google_token_expires'];
 
 // Refresh token if expired
 if (empty($accessToken) || (!empty($tokenExpires) && strtotime($tokenExpires) <= time())) {
-    $accessToken = refreshGoogleToken($refreshToken, $company['id'], $db);
+    $accessToken = refresh_google_token($refreshToken, $authContext);
     if (!$accessToken) {
-        $db->close();
         send_error_response(403, 'Google authorization expired. Please re-authorize via Settings.', 'TOKEN_EXPIRED');
     }
 }
-$db->close();
 
 // Parse request body
 $input = file_get_contents('php://input');
@@ -256,61 +250,6 @@ function googleApiRequest(string $accessToken, string $method, string $url, ?arr
     }
 
     return json_decode($response, true);
-}
-
-/**
- * Refresh an expired Google access token using the refresh token.
- */
-function refreshGoogleToken(string $refreshToken, int $companyId, $db): ?string
-{
-    $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
-    $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? '';
-
-    $payload = http_build_query([
-        'client_id' => $clientId,
-        'client_secret' => $clientSecret,
-        'refresh_token' => $refreshToken,
-        'grant_type' => 'refresh_token',
-    ]);
-
-    $ch = curl_init('https://oauth2.googleapis.com/token');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => $payload,
-        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
-        CURLOPT_TIMEOUT => 10,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($response === false || $httpCode !== 200) {
-        error_log('Google token refresh failed: ' . ($response ?: 'curl error'));
-        return null;
-    }
-
-    $tokenData = json_decode($response, true);
-    $newAccessToken = $tokenData['access_token'] ?? '';
-    $expiresIn = $tokenData['expires_in'] ?? 3600;
-
-    if (empty($newAccessToken)) {
-        return null;
-    }
-
-    // Update stored token
-    $encrypted = portal_encrypt($newAccessToken);
-    $expiresAt = date('Y-m-d H:i:s', time() + $expiresIn);
-
-    $stmt = $db->prepare(
-        'UPDATE portal_companies SET google_access_token = ?, google_token_expires = ? WHERE id = ?'
-    );
-    $stmt->bind_param('ssi', $encrypted, $expiresAt, $companyId);
-    $stmt->execute();
-    $stmt->close();
-
-    return $newAccessToken;
 }
 
 /**

@@ -432,6 +432,18 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     INDEX idx_is_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Google OAuth tokens for license-key-based auth (independent of payment portal)
+CREATE TABLE IF NOT EXISTS google_oauth_tokens (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    license_key_hash VARCHAR(64) NOT NULL UNIQUE COMMENT 'SHA-256 hash of the license key',
+    google_refresh_token TEXT DEFAULT NULL,
+    google_access_token TEXT DEFAULT NULL,
+    google_token_expires DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_license_key_hash (license_key_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- OAuth state tokens for CSRF protection during provider connect flows
 CREATE TABLE IF NOT EXISTS portal_oauth_states (
     id INT PRIMARY KEY AUTO_INCREMENT,

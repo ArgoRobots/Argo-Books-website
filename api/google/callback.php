@@ -8,7 +8,7 @@
  * (encrypted) in the portal_companies table.
  */
 
-require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/google-helper.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -32,8 +32,8 @@ if (empty($state) || empty($code)) {
 // Validate state token against database
 $db = get_db_connection();
 $stmt = $db->prepare(
-    'SELECT company_id FROM portal_oauth_states
-     WHERE state_token = ? AND provider = "google" AND expires_at > NOW()
+    'SELECT company_id, provider FROM portal_oauth_states
+     WHERE state_token = ? AND expires_at > NOW()
      LIMIT 1'
 );
 $stmt->bind_param('s', $state);
@@ -47,6 +47,9 @@ if (!$row) {
 }
 
 $companyId = $row['company_id'];
+$provider = $row['provider'];
+$isLicenseAuth = str_starts_with($provider, 'google_license_');
+$licenseKeyHash = $isLicenseAuth ? substr($provider, strlen('google_license_')) : null;
 
 // Clean up used state token
 $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE state_token = ?');
@@ -104,12 +107,26 @@ $encryptedRefresh = !empty($refreshToken) ? portal_encrypt($refreshToken) : null
 $expiresAt = date('Y-m-d H:i:s', time() + $expiresIn);
 
 // Store tokens in database
-$stmt = $db->prepare(
-    'UPDATE portal_companies
-     SET google_access_token = ?, google_refresh_token = COALESCE(?, google_refresh_token), google_token_expires = ?
-     WHERE id = ?'
-);
-$stmt->bind_param('sssi', $encryptedAccess, $encryptedRefresh, $expiresAt, $companyId);
+if ($isLicenseAuth) {
+    // License-key-based auth: store in google_oauth_tokens table
+    $stmt = $db->prepare(
+        'INSERT INTO google_oauth_tokens (license_key_hash, google_access_token, google_refresh_token, google_token_expires)
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE
+            google_access_token = VALUES(google_access_token),
+            google_refresh_token = COALESCE(VALUES(google_refresh_token), google_refresh_token),
+            google_token_expires = VALUES(google_token_expires)'
+    );
+    $stmt->bind_param('ssss', $licenseKeyHash, $encryptedAccess, $encryptedRefresh, $expiresAt);
+} else {
+    // Portal-based auth: store in portal_companies table
+    $stmt = $db->prepare(
+        'UPDATE portal_companies
+         SET google_access_token = ?, google_refresh_token = COALESCE(?, google_refresh_token), google_token_expires = ?
+         WHERE id = ?'
+    );
+    $stmt->bind_param('sssi', $encryptedAccess, $encryptedRefresh, $expiresAt, $companyId);
+}
 $stmt->execute();
 $stmt->close();
 $db->close();

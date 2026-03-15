@@ -160,45 +160,50 @@ if ($numCols > 0) {
 if ($chartConfig && $numRows > 1 && $numCols >= 2) {
     $chartType = mapChartType($chartConfig['type'] ?? 'column');
 
+    $basicChart = [
+        'chartType' => $chartType,
+        'legendPosition' => 'BOTTOM_LEGEND',
+        'domains' => [[
+            'domain' => [
+                'sourceRange' => [
+                    'sources' => [[
+                        'sheetId' => $sheetId,
+                        'startRowIndex' => 0,
+                        'endRowIndex' => $numRows,
+                        'startColumnIndex' => 0,
+                        'endColumnIndex' => 1,
+                    ]],
+                ],
+            ],
+        ]],
+        'series' => array_map(function ($colIdx) use ($sheetId, $numRows) {
+            return [
+                'series' => [
+                    'sourceRange' => [
+                        'sources' => [[
+                            'sheetId' => $sheetId,
+                            'startRowIndex' => 0,
+                            'endRowIndex' => $numRows,
+                            'startColumnIndex' => $colIdx,
+                            'endColumnIndex' => $colIdx + 1,
+                        ]],
+                    ],
+                ],
+            ];
+        }, range(1, $numCols - 1)),
+        'headerCount' => 1,
+    ];
+
+    if (in_array($chartType, ['LINE', 'AREA'])) {
+        $basicChart['smoothLine'] = true;
+    }
+
     $batchRequests[] = [
         'addChart' => [
             'chart' => [
                 'spec' => [
                     'title' => $chartConfig['title'] ?? $title,
-                    'basicChart' => [
-                        'chartType' => $chartType,
-                        'legendPosition' => 'BOTTOM_LEGEND',
-                        'smoothLine' => in_array($chartType, ['LINE', 'AREA']),
-                        'domains' => [[
-                            'domain' => [
-                                'sourceRange' => [
-                                    'sources' => [[
-                                        'sheetId' => $sheetId,
-                                        'startRowIndex' => 0,
-                                        'endRowIndex' => $numRows,
-                                        'startColumnIndex' => 0,
-                                        'endColumnIndex' => 1,
-                                    ]],
-                                ],
-                            ],
-                        ]],
-                        'series' => array_map(function ($colIdx) use ($sheetId, $numRows) {
-                            return [
-                                'series' => [
-                                    'sourceRange' => [
-                                        'sources' => [[
-                                            'sheetId' => $sheetId,
-                                            'startRowIndex' => 0,
-                                            'endRowIndex' => $numRows,
-                                            'startColumnIndex' => $colIdx,
-                                            'endColumnIndex' => $colIdx + 1,
-                                        ]],
-                                    ],
-                                ],
-                            ];
-                        }, range(1, $numCols - 1)),
-                        'headerCount' => 1,
-                    ],
+                    'basicChart' => $basicChart,
                 ],
                 'position' => [
                     'overlayPosition' => [

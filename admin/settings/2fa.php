@@ -34,14 +34,24 @@ function save_2fa_secret($username, $secret)
 
     try {
         // Encrypt the 2FA secret before storing to protect against DB compromise
+        $encryptionKey = trim($_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
+        if (empty($encryptionKey)) {
+            error_log("2FA setup failed: PORTAL_ENCRYPTION_KEY is not configured in environment");
+            return false;
+        }
         $encrypted_secret = portal_encrypt($secret);
         $db = get_db_connection();
         $stmt = $db->prepare('UPDATE admin_users SET two_factor_secret = ?, two_factor_enabled = 1 WHERE username = ?');
         $stmt->bind_param('ss', $encrypted_secret, $user['username']);
-        $success = $stmt->execute() && $stmt->affected_rows > 0;
+        if (!$stmt->execute()) {
+            error_log("2FA setup failed: DB update error - " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
         $stmt->close();
-        return $success;
+        return true;
     } catch (Exception $e) {
+        error_log("2FA setup failed: " . $e->getMessage());
         return false;
     }
 }

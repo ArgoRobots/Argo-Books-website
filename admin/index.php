@@ -116,29 +116,12 @@ try {
         $active_start_by_month[$row['month']] = (int)$row['active_start'];
     }
 
-    // License status breakdown (for bottom panel)
-    $stmt = $pdo->query("SELECT status, COUNT(*) as count FROM premium_subscriptions WHERE payment_method != 'free_key' GROUP BY status");
-    $license_breakdown = [];
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $license_breakdown[$row['status']] = (int)$row['count'];
-    }
-
-    // New and cancelled this month
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE payment_method != 'free_key' AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
-    $new_subscriptions_this_month = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
-
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE payment_method != 'free_key' AND status = 'cancelled' AND cancelled_at >= DATE_FORMAT(NOW(), '%Y-%m-01')");
-    $cancelled_this_month = $stmt->fetch(PDO::FETCH_ASSOC)['count'] ?? 0;
-
 } catch (Exception $e) {
     error_log("Error fetching subscription stats: " . $e->getMessage());
     $mrr_by_month = [];
-    $licence_by_month = [];
+    $license_by_month = [];
     $cancelled_by_month = [];
     $active_start_by_month = [];
-    $license_breakdown = [];
-    $new_subscriptions_this_month = 0;
-    $cancelled_this_month = 0;
 }
 
 // Build arrays for last 12 months
@@ -173,11 +156,6 @@ for ($i = 11; $i >= 0; $i--) {
     $active_start = $active_start_by_month[$month_key] ?? 0;
     $churn_data[] = $active_start > 0 ? round($cancelled / $active_start * 100, 1) : 0;
 }
-
-// Current totals for bottom panels
-$total_active = array_sum(array_column(array_values($license_breakdown), null));
-$total_active_licenses = $license_breakdown['active'] ?? 0;
-$total_licenses = array_sum($license_breakdown);
 
 include 'admin_header.php';
 ?>
@@ -221,63 +199,6 @@ include 'admin_header.php';
             <h2 class="chart-card-title">Monthly Churn Rate</h2>
             <div class="chart-card-container">
                 <canvas id="churnChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Grid -->
-    <div class="bottom-grid">
-        <!-- License Overview -->
-        <div class="panel">
-            <h2 class="section-title">License Overview</h2>
-            <div class="license-stats">
-                <div class="license-bar">
-                    <?php if ($total_licenses > 0): ?>
-                        <div class="license-bar-active" style="width: <?php echo round($total_active_licenses / $total_licenses * 100, 1); ?>%"></div>
-                    <?php endif; ?>
-                </div>
-                <div class="license-details">
-                    <?php
-                    $status_labels = [
-                        'active' => ['Active', 'emerald'],
-                        'cancelled' => ['Cancelled', 'red'],
-                        'expired' => ['Expired', 'gray'],
-                        'past_due' => ['Past Due', 'amber'],
-                        'payment_failed' => ['Payment Failed', 'red']
-                    ];
-                    foreach ($status_labels as $status => $info):
-                        $count = $license_breakdown[$status] ?? 0;
-                        if ($count > 0):
-                    ?>
-                        <div class="license-detail">
-                            <span class="license-dot license-dot-<?php echo $info[1]; ?>"></span>
-                            <span class="license-detail-label"><?php echo $info[0]; ?></span>
-                            <span class="license-detail-value"><?php echo number_format($count); ?></span>
-                        </div>
-                    <?php
-                        endif;
-                    endforeach;
-                    ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Subscription Activity -->
-        <div class="panel">
-            <h2 class="section-title">This Month</h2>
-            <div class="month-stats">
-                <div class="month-stat">
-                    <div class="month-stat-value positive-text"><?php echo number_format($new_subscriptions_this_month); ?></div>
-                    <div class="month-stat-label">New Subscriptions</div>
-                </div>
-                <div class="month-stat">
-                    <div class="month-stat-value negative-text"><?php echo number_format($cancelled_this_month); ?></div>
-                    <div class="month-stat-label">Cancelled</div>
-                </div>
-                <div class="month-stat">
-                    <div class="month-stat-value"><?php echo $new_subscriptions_this_month - $cancelled_this_month >= 0 ? '+' : ''; ?><?php echo number_format($new_subscriptions_this_month - $cancelled_this_month); ?></div>
-                    <div class="month-stat-label">Net Change</div>
-                </div>
             </div>
         </div>
     </div>

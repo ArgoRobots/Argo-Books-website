@@ -440,8 +440,7 @@ CREATE TABLE IF NOT EXISTS google_oauth_tokens (
     google_access_token TEXT DEFAULT NULL,
     google_token_expires DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_device_id_hash (device_id_hash)
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Google OAuth state tokens for CSRF protection during Google auth flow

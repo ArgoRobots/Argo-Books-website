@@ -127,6 +127,7 @@ function showResult(bool $success, string $message): void
     $color = $success ? '#059669' : '#dc2626';
     $icon = $success ? '&#10003;' : '&#10007;';
     $title = $success ? 'Connected' : 'Error';
+    $safeMessage = htmlspecialchars($message, ENT_QUOTES, 'UTF-8');
     $autoCloseScript = $success ? '<script>setTimeout(function(){window.close()},1500);</script>' : '';
     $closingNote = $success ? '<p style="font-size:13px;color:#9ca3af;margin-top:12px;">This window will close automatically...</p>' : '';
 
@@ -151,7 +152,7 @@ function showResult(bool $success, string $message): void
     <div class="card">
         <div class="icon">{$icon}</div>
         <h1>{$title}</h1>
-        <p>{$message}</p>
+        <p>{$safeMessage}</p>
         {$closingNote}
     </div>
 </body>

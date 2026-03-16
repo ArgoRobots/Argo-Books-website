@@ -4,18 +4,12 @@
  *
  * A secure interface for managing subscription renewals with:
  * - Dashboard showing subscriptions due for renewal
- * - Manual renewal execution
  * - Log viewer
  */
 
 session_start();
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../resources/icons.php';
-
-// Load environment variables
-require_once __DIR__ . '/../../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
-$dotenv->load();
 
 // Require admin login (includes 2FA if enabled)
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -24,42 +18,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 }
 
 $error = '';
-$success = '';
-
-// Handle manual renewal execution
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_renewal'])) {
-    $cronSecret = $_ENV['CRON_SECRET'] ?? '';
-    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
-    $renewalUrl = $baseUrl . '/cron/subscription_renewal.php?key=' . urlencode($cronSecret);
-
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $renewalUrl);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 300);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200) {
-        $_SESSION['cron_success'] = 'Renewal process completed successfully. Check the logs for details.';
-    } else {
-        $_SESSION['cron_error'] = 'Failed to execute renewal process. HTTP Code: ' . $httpCode;
-    }
-    header('Location: index.php');
-    exit;
-}
-
-// Check for flash messages from redirect
-if (isset($_SESSION['cron_success'])) {
-    $success = $_SESSION['cron_success'];
-    unset($_SESSION['cron_success']);
-}
-if (isset($_SESSION['cron_error'])) {
-    $error = $_SESSION['cron_error'];
-    unset($_SESSION['cron_error']);
-}
 
 // Get subscriptions data
 $pendingRenewals = [];
@@ -161,12 +119,6 @@ include '../admin_header.php';
         </div>
     <?php endif; ?>
 
-    <?php if ($success): ?>
-        <div class="alert alert-success" style="margin-bottom: 20px;">
-            <?php echo htmlspecialchars($success); ?>
-        </div>
-    <?php endif; ?>
-
     <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -185,21 +137,6 @@ include '../admin_header.php';
             <div class="stat-value"><?php echo $stats['failed_30d'] ?? 0; ?></div>
             <div class="stat-label">Failed (30 days)</div>
         </div>
-    </div>
-
-    <!-- Manual Execution -->
-    <div class="action-panel">
-        <div class="action-info">
-            <h3>Manual Renewal Process</h3>
-            <p>Run the subscription renewal process manually to check and process pending renewals now.</p>
-        </div>
-        <form method="post" onsubmit="return confirm('Are you sure you want to run the renewal process now?');">
-            <input type="hidden" name="run_renewal" value="1">
-            <button type="submit" class="btn btn-green">
-                <?= svg_icon('play-filled', 16, '', null, 'style="vertical-align: middle; margin-right: 5px;"') ?>
-                Run Now
-            </button>
-        </form>
     </div>
 
     <div class="content-grid">

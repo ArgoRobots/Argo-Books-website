@@ -266,6 +266,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             header('Location: index.php#premium-subscriptions');
             exit;
+        } elseif (!empty($subscription_ids) && $action === 'resend_email') {
+            $count = count($subscription_ids);
+            $placeholders = implode(',', array_fill(0, $count, '?'));
+
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT email, subscription_id, billing_cycle, end_date
+                    FROM premium_subscriptions
+                    WHERE id IN ($placeholders)
+                ");
+                $stmt->execute($subscription_ids);
+                $subscriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $sent = 0;
+                foreach ($subscriptions as $sub) {
+                    if (resend_subscription_id_email($sub['email'], $sub['subscription_id'], $sub['billing_cycle'], $sub['end_date'])) {
+                        $sent++;
+                    }
+                }
+
+                $_SESSION['message'] = "Subscription ID email resent to $sent of $count recipient(s).";
+                $_SESSION['message_type'] = $sent > 0 ? 'success' : 'error';
+            } catch (PDOException $e) {
+                error_log("Error resending subscription emails: " . $e->getMessage());
+                $_SESSION['message'] = "Error resending emails.";
+                $_SESSION['message_type'] = 'error';
+            }
+
+            header('Location: index.php#premium-subscriptions');
+            exit;
         } else {
             $_SESSION['message'] = "Please select subscriptions and enter a valid credit amount.";
             $_SESSION['message_type'] = 'error';
@@ -403,6 +433,9 @@ include '../admin_header.php';
                 <div class="bulk-buttons">
                     <button type="button" class="btn btn-bulk btn-purple" id="open-credit-modal" disabled>
                         Give Credit
+                    </button>
+                    <button type="button" class="btn btn-bulk btn-blue" id="subscription-bulk-resend" disabled>
+                        Resend Email
                     </button>
                 </div>
             </div>
@@ -738,7 +771,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const subscriptionCheckboxes = document.querySelectorAll('.subscription-checkbox');
     const subscriptionSelectedCount = document.getElementById('subscription-selected-count');
     const openCreditModalBtn = document.getElementById('open-credit-modal');
+    const subscriptionBulkResend = document.getElementById('subscription-bulk-resend');
     const subscriptionBulkForm = document.getElementById('subscription-bulk-form');
+    const bulkSubscriptionActionInput = document.getElementById('bulk_subscription_action_input');
     const creditAmountInput = document.getElementById('credit_amount_input');
     const creditNoteInput = document.getElementById('credit_note_input');
 
@@ -757,6 +792,9 @@ document.addEventListener('DOMContentLoaded', function() {
         subscriptionSelectedCount.textContent = count;
         if (openCreditModalBtn) {
             openCreditModalBtn.disabled = count === 0;
+        }
+        if (subscriptionBulkResend) {
+            subscriptionBulkResend.disabled = count === 0;
         }
     }
 
@@ -799,6 +837,19 @@ document.addEventListener('DOMContentLoaded', function() {
         openCreditModalBtn.addEventListener('click', openModal);
     }
 
+    if (subscriptionBulkResend) {
+        subscriptionBulkResend.addEventListener('click', function() {
+            const checked = document.querySelectorAll('.subscription-checkbox:checked');
+            if (checked.length === 0) return;
+
+            if (confirm(`Resend subscription ID email to ${checked.length} recipient(s)?`)) {
+                bulkSubscriptionActionInput.value = 'resend_email';
+                creditAmountInput.value = '0';
+                subscriptionBulkForm.submit();
+            }
+        });
+    }
+
     if (closeCreditModalBtn) {
         closeCreditModalBtn.addEventListener('click', closeModal);
     }
@@ -837,6 +888,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (confirm(`Are you sure you want to give $${amount.toFixed(2)} credit to ${checkedCount} subscription(s)?`)) {
+                bulkSubscriptionActionInput.value = 'give_credit';
                 creditAmountInput.value = amount;
                 creditNoteInput.value = note;
                 subscriptionBulkForm.submit();

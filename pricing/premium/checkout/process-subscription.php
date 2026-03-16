@@ -4,6 +4,9 @@
  * Handles subscription creation with recurring billing support
  */
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 header('Content-Type: application/json');
 
 require_once '../../../db_connect.php';
@@ -16,6 +19,13 @@ require_once __DIR__ . '/../../../config/pricing.php';
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
+    exit();
+}
+
+// Verify user is logged in - user_id must come from session, not POST body
+if (empty($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'Not authenticated']);
     exit();
 }
 
@@ -33,7 +43,8 @@ $email = $input['email'] ?? $input['payer_email'] ?? '';
 $currency = $input['currency'] ?? 'CAD';
 $billing = $input['billing'] ?? 'monthly';
 $paymentMethod = $input['payment_method'] ?? 'unknown';
-$userId = intval($input['user_id'] ?? 0);
+// Use session user_id as authoritative source (POST user_id is untrusted)
+$userId = intval($_SESSION['user_id']);
 
 // Compute server-side total (base price + processing fee) — never trust client amount
 $pricingConfig = get_pricing_config();

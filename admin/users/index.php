@@ -212,14 +212,6 @@ $db = get_db_connection();
 // Total users
 $total_users = count($users);
 
-// Verified users count
-$verified_count = 0;
-foreach ($users as $user) {
-    if ($user['email_verified']) {
-        $verified_count++;
-    }
-}
-
 // Admin users count
 $admin_count = 0;
 foreach ($users as $user) {
@@ -261,10 +253,6 @@ include '../admin_header.php';
             <div class="stat-value"><?php echo $total_users; ?></div>
         </div>
         <div class="stat-card">
-            <h3>Verified Users</h3>
-            <div class="stat-value"><?php echo $verified_count; ?></div>
-        </div>
-        <div class="stat-card">
             <h3>Admin Users</h3>
             <div class="stat-value"><?php echo $admin_count; ?></div>
         </div>
@@ -285,71 +273,61 @@ include '../admin_header.php';
             <h2>Users</h2>
             <div class="search-container">
                 <form method="GET" action="" class="search-form">
-                    <input type="text" 
-                           id="search" 
-                           name="search" 
+                    <input type="text"
+                           id="search"
+                           name="search"
                            placeholder="Search by username or email..."
                            value="<?php echo htmlspecialchars($search); ?>"
                            class="search-input">
+
+                    <div class="filter-group">
+                        <select name="date_preset" id="date_preset" onchange="this.form.submit()">
+                            <option value="">All Time</option>
+                            <option value="today" <?php echo $date_preset === 'today' ? 'selected' : ''; ?>>Today</option>
+                            <option value="last_week" <?php echo $date_preset === 'last_week' ? 'selected' : ''; ?>>Last 7 Days</option>
+                            <option value="last_month" <?php echo $date_preset === 'last_month' ? 'selected' : ''; ?>>Last 30 Days</option>
+                            <option value="last_year" <?php echo $date_preset === 'last_year' ? 'selected' : ''; ?>>Last Year</option>
+                            <option value="last_3_years" <?php echo $date_preset === 'last_3_years' ? 'selected' : ''; ?>>Last 3 Years</option>
+                            <option value="last_5_years" <?php echo $date_preset === 'last_5_years' ? 'selected' : ''; ?>>Last 5 Years</option>
+                            <option value="custom" <?php echo $date_preset === 'custom' ? 'selected' : ''; ?>>Custom Range</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="ban_status" id="ban_status" onchange="this.form.submit()">
+                            <option value="all" <?php echo $ban_status === 'all' ? 'selected' : ''; ?>>All Users</option>
+                            <option value="banned" <?php echo $ban_status === 'banned' ? 'selected' : ''; ?>>Banned</option>
+                            <option value="unbanned" <?php echo $ban_status === 'unbanned' ? 'selected' : ''; ?>>Not Banned</option>
+                        </select>
+                    </div>
+
                     <button type="submit" class="search-button">
                         <?= svg_icon('search') ?>
                         Search
                     </button>
-                    <?php if (!empty($search)): ?>
+                    <?php if (!empty($search) || !empty($date_preset) || $ban_status !== 'all'): ?>
                         <a href="index.php" class="clear-button">Clear</a>
                     <?php endif; ?>
+
+                    <div id="custom_date_range" class="custom-date-range" style="display: <?php echo $date_preset === 'custom' ? 'flex' : 'none'; ?>;">
+                        <div class="filter-group">
+                            <label for="date_from">From</label>
+                            <input type="date"
+                                   name="date_from"
+                                   id="date_from"
+                                   value="<?php echo htmlspecialchars($date_from); ?>">
+                        </div>
+                        <div class="filter-group">
+                            <label for="date_to">To</label>
+                            <input type="date"
+                                   name="date_to"
+                                   id="date_to"
+                                   value="<?php echo htmlspecialchars($date_to); ?>">
+                        </div>
+                        <button type="submit" class="apply-button">Apply</button>
+                    </div>
                 </form>
             </div>
-        </div>
-
-        <!-- Filter Options -->
-        <div class="filter-section">
-            <form method="GET" action="" class="filter-form">
-                <?php if (!empty($search)): ?>
-                    <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
-                <?php endif; ?>
-                
-                <div class="filter-group">
-                    <label for="date_preset">Date Range</label>
-                    <select name="date_preset" id="date_preset" onchange="this.form.submit()">
-                        <option value="">All Time</option>
-                        <option value="today" <?php echo $date_preset === 'today' ? 'selected' : ''; ?>>Today</option>
-                        <option value="last_week" <?php echo $date_preset === 'last_week' ? 'selected' : ''; ?>>Last 7 Days</option>
-                        <option value="last_month" <?php echo $date_preset === 'last_month' ? 'selected' : ''; ?>>Last 30 Days</option>
-                        <option value="last_year" <?php echo $date_preset === 'last_year' ? 'selected' : ''; ?>>Last Year</option>
-                        <option value="last_3_years" <?php echo $date_preset === 'last_3_years' ? 'selected' : ''; ?>>Last 3 Years</option>
-                        <option value="last_5_years" <?php echo $date_preset === 'last_5_years' ? 'selected' : ''; ?>>Last 5 Years</option>
-                        <option value="custom" <?php echo $date_preset === 'custom' ? 'selected' : ''; ?>>Custom Range</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label for="ban_status">Ban Status</label>
-                    <select name="ban_status" id="ban_status" onchange="this.form.submit()">
-                        <option value="all" <?php echo $ban_status === 'all' ? 'selected' : ''; ?>>All Users</option>
-                        <option value="banned" <?php echo $ban_status === 'banned' ? 'selected' : ''; ?>>Banned</option>
-                        <option value="unbanned" <?php echo $ban_status === 'unbanned' ? 'selected' : ''; ?>>Not Banned</option>
-                    </select>
-                </div>
-
-                <div id="custom_date_range" class="custom-date-range" style="display: <?php echo $date_preset === 'custom' ? 'flex' : 'none'; ?>;">
-                    <div class="filter-group">
-                        <label for="date_from">From</label>
-                        <input type="date" 
-                               name="date_from" 
-                               id="date_from"
-                               value="<?php echo htmlspecialchars($date_from); ?>">
-                    </div>
-                    <div class="filter-group">
-                        <label for="date_to">To</label>
-                        <input type="date" 
-                               name="date_to" 
-                               id="date_to"
-                               value="<?php echo htmlspecialchars($date_to); ?>">
-                    </div>
-                    <button type="submit" class="apply-button">Apply</button>
-                </div>
-            </form>
         </div>
 
         <?php if (empty($users)): ?>
@@ -391,7 +369,6 @@ include '../admin_header.php';
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th>Verified</th>
                                 <th>Banned</th>
                                 <th>Created</th>
                                 <th>Last Login</th>
@@ -417,13 +394,6 @@ include '../admin_header.php';
                                         <span class="badge badge-<?php echo $user['role'] === 'admin' ? 'admin' : 'user'; ?>">
                                             <?php echo htmlspecialchars(ucfirst($user['role'])); ?>
                                         </span>
-                                    </td>
-                                    <td>
-                                        <?php if ($user['email_verified']): ?>
-                                            <span class="badge badge-success">Verified</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-pending">Pending</span>
-                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if ($user['is_banned']): ?>
@@ -581,13 +551,8 @@ include '../admin_header.php';
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 if (this.value.trim() === '') {
-                    const datePreset = document.getElementById('date_preset').value;
-                    const banStatus = document.getElementById('ban_status').value;
-
-                    if (!datePreset && banStatus === 'all') {
-                        sessionStorage.setItem('scrollPosition', window.scrollY);
-                        window.location.href = 'index.php';
-                    }
+                    sessionStorage.setItem('scrollPosition', window.scrollY);
+                    this.form.submit();
                 }
             });
 
@@ -595,12 +560,7 @@ include '../admin_header.php';
                 if (e.key === 'Escape') {
                     sessionStorage.setItem('scrollPosition', window.scrollY);
                     this.value = '';
-                    const datePreset = document.getElementById('date_preset').value;
-                    const banStatus = document.getElementById('ban_status').value;
-
-                    if (!datePreset && banStatus === 'all') {
-                        window.location.href = 'index.php';
-                    }
+                    this.form.submit();
                 }
             });
         }

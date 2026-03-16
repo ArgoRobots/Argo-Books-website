@@ -52,14 +52,13 @@
 /* Search Form */
 .search-container {
   width: 100%;
-  display: flex;
-  justify-content: center;
 }
 
 .search-form {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .search-input {
@@ -67,7 +66,10 @@
   border: 1px solid var(--gray-input-border);
   border-radius: 6px;
   font-size: 0.875rem;
+  flex: 3;
   min-width: 300px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -89,6 +91,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .search-button:hover {
@@ -109,6 +113,10 @@
   font-size: 0.875rem;
   font-weight: 500;
   transition: background 0.2s;
+  height: 38px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .clear-button:hover {
@@ -116,21 +124,7 @@
   color: var(--gray-700);
 }
 
-/* Filter Section */
-.filter-section {
-  padding: 1rem 1.5rem;
-  background: var(--gray-50);
-  border-bottom: 1px solid var(--gray-border);
-}
-
-.filter-form {
-  display: flex;
-  gap: 1rem;
-  align-items: end;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
+/* Filter Groups (inline with search) */
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -153,6 +147,8 @@
   font-size: 0.875rem;
   background: var(--white);
   min-width: 150px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .filter-group select:focus,
@@ -166,6 +162,9 @@
   display: flex;
   gap: 1rem;
   align-items: end;
+  width: 100%;
+  justify-content: center;
+  padding-top: 0.5rem;
 }
 
 .apply-button {
@@ -300,9 +299,8 @@
     justify-content: center;
   }
 
-  .filter-form {
-    flex-direction: column;
-    align-items: stretch;
+  .filter-group {
+    width: 100%;
   }
 
   .filter-group select,

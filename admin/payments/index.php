@@ -20,7 +20,9 @@ if ($view_env !== 'sandbox') {
     $view_env = 'production';
 }
 
-// SQL conditions for environment filtering
+// SQL conditions for environment filtering (strict allowlist of hardcoded clauses).
+// These are safe to interpolate because $view_env is validated above and no user
+// input flows into the SQL fragments — only constant strings are assigned.
 // Production mode: only explicitly production-marked payments
 // Sandbox mode: everything else (sandbox, unknown/NULL, empty)
 if ($view_env === 'sandbox') {
@@ -203,7 +205,7 @@ try {
         FROM portal_invoices i
         LEFT JOIN portal_companies c ON i.company_id = c.id
         LEFT JOIN portal_payments p ON p.invoice_id = i.id
-        WHERE 1=1
+        WHERE $env_sql_inv
     ";
     $params = [];
 

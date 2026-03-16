@@ -28,6 +28,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// Verify CSRF token (check both POST body and X-CSRF-Token header for AJAX)
+$csrfToken = '';
+$input = json_decode(file_get_contents('php://input'), true);
+if (!empty($input['csrf_token'])) {
+    $csrfToken = $input['csrf_token'];
+} elseif (!empty($_SERVER['HTTP_X_CSRF_TOKEN'])) {
+    $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
+}
+
+if (empty($_SESSION['csrf_token']) || empty($csrfToken) || !hash_equals($_SESSION['csrf_token'], $csrfToken)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Invalid or missing CSRF token']);
+    exit;
+}
+
 $user_id = $_SESSION['user_id'];
 
 // Get subscription info

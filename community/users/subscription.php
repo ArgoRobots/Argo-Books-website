@@ -15,6 +15,11 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 // Ensure user is logged in
 require_login();
 
+// Generate CSRF token for retry payment AJAX
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $user_id = $_SESSION['user_id'];
 $user = get_user($user_id);
 
@@ -457,6 +462,7 @@ if ($premium_subscription) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-CSRF-Token': '<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>'
                 },
                 credentials: 'same-origin'
             })

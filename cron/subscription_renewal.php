@@ -4,16 +4,11 @@
  *
  * This script should be run daily via cron to check for and process subscription renewals.
  *
- * RECOMMENDED SCHEDULE: Daily at 3:00 PM (15:00)
- * Add to your crontab with: crontab -e
+ * RECOMMENDED SCHEDULE: Daily at midnight (00:00)
  *
- * Example cron entries:
+ * Example cron entry:
  *
- *   # Run daily at 3:00 PM (recommended)
- *   0 15 * * * /usr/bin/php /path/to/subscription_renewal.php
- *
- *   # Run daily at 2:00 AM (alternative)
- *   0 2 * * * /usr/bin/php /path/to/subscription_renewal.php
+ *   0 0 * * * /usr/bin/php /path/to/subscription_renewal.php
  *
  * The script will:
  *   1. Find active subscriptions due for renewal within 24 hours
@@ -24,10 +19,8 @@
  *   6. Suspend subscriptions after 3 consecutive failures
  *   7. Mark non-auto-renew subscriptions as expired
  *
- * Manual execution options:
- *   - CLI: php subscription_renewal.php
- *   - Web: subscription_renewal.php?key=YOUR_CRON_SECRET
- *   - UI:  Visit /cron/ for the management dashboard
+ * Manual execution:
+ *   php subscription_renewal.php
  *
  * Logs are stored in: /cron/logs/subscription_renewal_YYYY-MM-DD.log
  */
@@ -35,24 +28,21 @@
 // Prevent timeout for long-running process
 set_time_limit(300);
 
+// Only allow CLI execution — web-based triggering (e.g. via X-Cron-Key header)
+// is intentionally not supported; use system cron instead.
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI.');
+}
+
 // Load environment variables
 require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 require_once __DIR__ . '/../config/pricing.php';
 
-// Only allow CLI or authenticated web requests
-$isCli = php_sapi_name() === 'cli';
-$isAuthenticated = isset($_GET['key']) && $_GET['key'] === ($_ENV['CRON_SECRET'] ?? '');
-
-if (!$isCli && !$isAuthenticated) {
-    http_response_code(403);
-    die('Access denied');
-}
-
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
-require_once __DIR__ . '/../vendor/autoload.php';
 
 // Configure logging
 function logMessage($message, $type = 'INFO') {
@@ -64,7 +54,7 @@ function logMessage($message, $type = 'INFO') {
     if (!is_dir(__DIR__ . '/logs')) {
         mkdir(__DIR__ . '/logs', 0755, true);
     }
-    file_put_contents($logFile, $logEntry, FILE_APPEND);
+    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
 
     // Also output to CLI
     if (php_sapi_name() === 'cli') {

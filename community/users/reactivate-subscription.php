@@ -12,6 +12,11 @@ require_once __DIR__ . '/../../resources/icons.php';
 // Ensure user is logged in
 require_login();
 
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $user_id = $_SESSION['user_id'];
 
 // Get subscription info
@@ -27,62 +32,67 @@ $error_message = '';
 
 // Handle reactivation confirmation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])) {
-    // For cancelled PayPal subscriptions, redirect to checkout to create a new subscription
-    if ($is_cancelled_paypal) {
-        header('Location: ../../pricing/premium/checkout/?method=paypal&billing=' . ($premium_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
-        exit;
-    }
-
-    try {
-        // For PayPal subscriptions that are suspended (payment_failed), try to reactivate on PayPal's side
-        $paypalReactivated = true;
-        if ($premium_subscription['payment_method'] === 'paypal'
-            && !empty($premium_subscription['paypal_subscription_id'])
-            && $premium_subscription['status'] === 'payment_failed') {
-            try {
-                $paypalReactivated = activatePayPalSubscription(
-                    $premium_subscription['paypal_subscription_id'],
-                    'Reactivated by user from account settings'
-                );
-            } catch (Exception $e) {
-                error_log("Failed to reactivate PayPal subscription: " . $e->getMessage());
-                $paypalReactivated = false;
-            }
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_message = 'Invalid request. Please try again.';
+    } else {
+        // For cancelled PayPal subscriptions, redirect to checkout to create a new subscription
+        if ($is_cancelled_paypal) {
+            header('Location: ../../pricing/premium/checkout/?method=paypal&billing=' . ($premium_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
+            exit;
         }
 
-        $stmt = $pdo->prepare("
-            UPDATE premium_subscriptions
-            SET status = 'active', auto_renew = 1, cancelled_at = NULL, updated_at = NOW()
-            WHERE user_id = ? AND status IN ('cancelled', 'payment_failed')
-            AND end_date > NOW()
-        ");
-        $stmt->execute([$user_id]);
-
-        if ($stmt->rowCount() > 0) {
-            // Send reactivation email
-            try {
-                send_premium_subscription_reactivated_email(
-                    $premium_subscription['email'],
-                    $premium_subscription['subscription_id'],
-                    $premium_subscription['end_date'],
-                    $premium_subscription['billing_cycle'] ?? 'monthly'
-                );
-            } catch (Exception $e) {
-                error_log("Failed to send reactivation email: " . $e->getMessage());
+        try {
+            // For PayPal subscriptions that are suspended (payment_failed), try to reactivate on PayPal's side
+            $paypalReactivated = true;
+            if ($premium_subscription['payment_method'] === 'paypal'
+                && !empty($premium_subscription['paypal_subscription_id'])
+                && $premium_subscription['status'] === 'payment_failed') {
+                try {
+                    $paypalReactivated = activatePayPalSubscription(
+                        $premium_subscription['paypal_subscription_id'],
+                        'Reactivated by user from account settings'
+                    );
+                } catch (Exception $e) {
+                    error_log("Failed to reactivate PayPal subscription: " . $e->getMessage());
+                    $paypalReactivated = false;
+                }
             }
 
-            $successMsg = 'Your subscription has been reactivated! Premium features are now available.';
-            if (!$paypalReactivated) {
-                $successMsg .= ' Note: We could not automatically reactivate your PayPal subscription. You may need to update your payment method if the next renewal fails.';
+            $stmt = $pdo->prepare("
+                UPDATE premium_subscriptions
+                SET status = 'active', auto_renew = 1, cancelled_at = NULL, updated_at = NOW()
+                WHERE user_id = ? AND status IN ('cancelled', 'payment_failed')
+                AND end_date > NOW()
+            ");
+            $stmt->execute([$user_id]);
+
+            if ($stmt->rowCount() > 0) {
+                // Send reactivation email
+                try {
+                    send_premium_subscription_reactivated_email(
+                        $premium_subscription['email'],
+                        $premium_subscription['subscription_id'],
+                        $premium_subscription['end_date'],
+                        $premium_subscription['billing_cycle'] ?? 'monthly'
+                    );
+                } catch (Exception $e) {
+                    error_log("Failed to send reactivation email: " . $e->getMessage());
+                }
+
+                $successMsg = 'Your subscription has been reactivated! Premium features are now available.';
+                if (!$paypalReactivated) {
+                    $successMsg .= ' Note: We could not automatically reactivate your PayPal subscription. You may need to update your payment method if the next renewal fails.';
+                }
+                $_SESSION['subscription_success'] = $successMsg;
+            } else {
+                $_SESSION['subscription_error'] = 'Could not reactivate subscription. It may have expired.';
             }
-            $_SESSION['subscription_success'] = $successMsg;
-        } else {
-            $_SESSION['subscription_error'] = 'Could not reactivate subscription. It may have expired.';
+            header('Location: subscription.php');
+            exit;
+        } catch (PDOException $e) {
+            $error_message = 'Failed to reactivate subscription. Please contact support.';
         }
-        header('Location: subscription.php');
-        exit;
-    } catch (PDOException $e) {
-        $error_message = 'Failed to reactivate subscription. Please contact support.';
     }
 }
 
@@ -182,6 +192,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
 
             <div class="confirm-actions">
                 <form method="post" id="reactivate-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="confirm_reactivate" value="1">
                     <button type="submit" id="reactivate-btn" class="btn btn-purple">Reactivate with <?php echo $payment_method; ?> (<?php echo ucfirst($billing_cycle); ?>)</button>
                 </form>

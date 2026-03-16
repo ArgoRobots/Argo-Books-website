@@ -137,18 +137,9 @@ This will check for subscriptions due within 24 hours and process their renewals
 
 ### Manual Execution
 
-**Via CLI:**
 ```bash
 php /home/argorobots/public_html/cron/subscription_renewal.php
 ```
-
-**Via Web (with secret key):**
-```
-https://argorobots.com/cron/subscription_renewal.php?key=YOUR_CRON_SECRET
-```
-
-**Via Management UI:**
-Visit `/cron/` and authenticate with TOTP to access the renewal management dashboard.
 
 ### Logs
 

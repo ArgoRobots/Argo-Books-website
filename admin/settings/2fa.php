@@ -38,10 +38,15 @@ function save_2fa_secret($username, $secret)
         $db = get_db_connection();
         $stmt = $db->prepare('UPDATE admin_users SET two_factor_secret = ?, two_factor_enabled = 1 WHERE username = ?');
         $stmt->bind_param('ss', $encrypted_secret, $user['username']);
-        $success = $stmt->execute() && $stmt->affected_rows > 0;
+        if (!$stmt->execute()) {
+            error_log("2FA setup failed: DB update error - " . $stmt->error);
+            $stmt->close();
+            return false;
+        }
         $stmt->close();
-        return $success;
+        return true;
     } catch (Exception $e) {
+        error_log("2FA setup failed: " . $e->getMessage());
         return false;
     }
 }
@@ -80,7 +85,7 @@ function get_2fa_secret($username)
     try {
         $user = get_user_by_username($username);
         if (!$user || empty($user['two_factor_secret'])) return null;
-        // Decrypt the stored 2FA secret
+        // Decrypt the 2FA secret from storage
         return portal_decrypt($user['two_factor_secret']);
     } catch (Exception $e) {
         return null;

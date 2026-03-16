@@ -101,17 +101,17 @@
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Security improvements</strong> &mdash; Strengthened security across the application, including better protection for password and payment portal settings.</li>
+                                <li><strong>Security improvements</strong> &mdash; Strengthened security across the application, including password protection for the payment portal settings.</li>
                                 <li><strong>Smarter receipt scanning</strong> &mdash; AI category suggestions are now more accurate and specific.</li>
-                                <li><strong>Google Sheets export</strong> &mdash; Added a cancel button during export and fixed issues with the All Time date range.</li>
+                                <li><strong>Google Sheets export</strong> &mdash; Added a cancel button during export..</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li>Fixed an issue where saving could fail under certain conditions.</li>
                                 <li>Fixed receipt scanner layout and input issues.</li>
                                 <li>Various bug fixes and stability improvements.</li>
+                                <li>Fixed an issue with API services not working.</li>
                             </ul>
                         </div>
                     </div>

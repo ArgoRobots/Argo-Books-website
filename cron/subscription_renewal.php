@@ -22,7 +22,6 @@
  * Manual execution options:
  *   - CLI: php subscription_renewal.php
  *   - Web: subscription_renewal.php?key=YOUR_CRON_SECRET
- *   - UI:  Visit /admin/cron/ for the management dashboard
  *
  * Logs are stored in: /cron/logs/subscription_renewal_YYYY-MM-DD.log
  */

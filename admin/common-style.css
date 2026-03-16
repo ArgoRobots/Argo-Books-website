@@ -1355,6 +1355,12 @@ tbody tr:hover {
   background: #4b5563;
 }
 
+[data-theme="dark"] .period-btn.active {
+  background: #4b5563;
+  color: #f1f5f9;
+  border-color: #6b7280;
+}
+
 /* Dark theme - Login */
 [data-theme="dark"] .login-container {
   background: #1f2937;

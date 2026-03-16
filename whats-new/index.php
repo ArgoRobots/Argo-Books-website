@@ -86,6 +86,38 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.3 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.3</span>
+                        <span class="date-tag">March 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Security improvements</strong> &mdash; Strengthened security across the application, including better protection for password and payment portal settings.</li>
+                                <li><strong>Smarter receipt scanning</strong> &mdash; AI category suggestions are now more accurate and specific.</li>
+                                <li><strong>Google Sheets export</strong> &mdash; Added a cancel button during export and fixed issues with the All Time date range.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Fixed an issue where saving could fail under certain conditions.</li>
+                                <li>Fixed receipt scanner layout and input issues.</li>
+                                <li>Various bug fixes and stability improvements.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.2 -->
             <div class="version-card">
                 <div class="version-header">

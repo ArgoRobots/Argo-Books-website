@@ -11,6 +11,18 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+// CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+function verify_csrf_token() {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        return false;
+    }
+    return true;
+}
+
 // Set page variables for the header
 $page_title = "Subscription Administration";
 $page_description = "Manage Premium subscriptions and free subscription keys";
@@ -145,6 +157,11 @@ function get_license_usage($license_keys)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_usage'])) {
     header('Content-Type: application/json');
 
+    if (!verify_csrf_token()) {
+        echo json_encode(['success' => false, 'error' => 'Invalid request']);
+        exit;
+    }
+
     $license_keys = $_POST['license_keys'] ?? [];
     if (!is_array($license_keys)) $license_keys = [$license_keys];
     $license_keys = array_filter(array_map('trim', $license_keys));
@@ -177,6 +194,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_usage'])) {
 $generated_sub_key = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf_token()) {
+        $_SESSION['message'] = "Invalid request. Please try again.";
+        $_SESSION['message_type'] = 'error';
+        header('Location: index.php');
+        exit;
+    }
+
     if (isset($_POST['generate_sub_key'])) {
         $email = !empty($_POST['sub_email']) ? filter_var($_POST['sub_email'], FILTER_VALIDATE_EMAIL) : null;
         $duration = intval($_POST['duration_months'] ?? 1);
@@ -519,6 +543,7 @@ include '../admin_header.php';
                 <p>No Premium subscriptions found.</p>
             <?php else: ?>
                 <form id="subscription-bulk-form" method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="bulk_subscription_action" id="bulk_subscription_action_input" value="give_credit">
                     <input type="hidden" name="credit_amount" id="credit_amount_input">
                     <input type="hidden" name="credit_note" id="credit_note_input">
@@ -647,6 +672,7 @@ include '../admin_header.php';
             <?php endif; ?>
 
             <form method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div class="generate-form-grid">
                     <div class="form-group">
                         <label for="sub_email">Recipient Email</label>
@@ -693,6 +719,7 @@ include '../admin_header.php';
                 <p>No free subscription keys generated yet.</p>
             <?php else: ?>
                 <form id="sub-key-bulk-form" method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="bulk_sub_key_action" id="bulk_sub_key_action_input">
                     <div class="table-responsive">
                         <table>
@@ -1028,6 +1055,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const formData = new FormData();
         formData.append('reset_usage', '1');
+        formData.append('csrf_token', '<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>');
         checked.forEach(cb => formData.append('license_keys[]', cb.dataset.licenseKey));
 
         fetch('index.php', { method: 'POST', body: formData })

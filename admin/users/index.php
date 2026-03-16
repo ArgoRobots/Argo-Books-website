@@ -212,14 +212,6 @@ $db = get_db_connection();
 // Total users
 $total_users = count($users);
 
-// Verified users count
-$verified_count = 0;
-foreach ($users as $user) {
-    if ($user['email_verified']) {
-        $verified_count++;
-    }
-}
-
 // Admin users count
 $admin_count = 0;
 foreach ($users as $user) {
@@ -259,10 +251,6 @@ include '../admin_header.php';
         <div class="stat-card">
             <h3>Total Users</h3>
             <div class="stat-value"><?php echo $total_users; ?></div>
-        </div>
-        <div class="stat-card">
-            <h3>Verified Users</h3>
-            <div class="stat-value"><?php echo $verified_count; ?></div>
         </div>
         <div class="stat-card">
             <h3>Admin Users</h3>
@@ -391,7 +379,6 @@ include '../admin_header.php';
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
-                                <th>Verified</th>
                                 <th>Banned</th>
                                 <th>Created</th>
                                 <th>Last Login</th>
@@ -417,13 +404,6 @@ include '../admin_header.php';
                                         <span class="badge badge-<?php echo $user['role'] === 'admin' ? 'admin' : 'user'; ?>">
                                             <?php echo htmlspecialchars(ucfirst($user['role'])); ?>
                                         </span>
-                                    </td>
-                                    <td>
-                                        <?php if ($user['email_verified']): ?>
-                                            <span class="badge badge-success">Verified</span>
-                                        <?php else: ?>
-                                            <span class="badge badge-pending">Pending</span>
-                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if ($user['is_banned']): ?>

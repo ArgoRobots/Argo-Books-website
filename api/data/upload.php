@@ -22,12 +22,12 @@ define('MAX_UPLOADS_PER_HOUR', 100); // Rate limiting
 define('MAX_FILENAME_LENGTH', 255);
 
 // Rate limiting check (enhanced with authentication)
-function checkRateLimit()
+function checkRateLimit($authIdentifier = null)
 {
-    // Use API key in rate limiting to prevent API key sharing abuse
-    $api_key = $_SERVER['HTTP_X_API_KEY'] ?? 'unknown';
+    // Use auth identifier in rate limiting to prevent key sharing abuse
+    $api_key = $authIdentifier ?? $_SERVER['HTTP_X_API_KEY'] ?? 'unknown';
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $rate_key = md5($api_key . $ip); // Combine API key and IP for rate limiting
+    $rate_key = md5($api_key . $ip); // Combine auth identifier and IP for rate limiting
     $rate_file = sys_get_temp_dir() . '/upload_rate_' . $rate_key;
 
     $current_time = time();
@@ -143,8 +143,9 @@ try {
         exit;
     }
 
-    // Rate limiting check
-    if (!checkRateLimit()) {
+    // Rate limiting check — use company ID so Bearer-auth requests get a proper bucket
+    $companyId = is_array($company) ? ($company['id'] ?? null) : null;
+    if (!checkRateLimit($companyId ? 'company:' . $companyId : null)) {
         http_response_code(429);
         echo json_encode(['error' => 'Rate limit exceeded']);
         logSecurityEvent('rate_limit_exceeded');

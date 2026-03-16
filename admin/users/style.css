@@ -60,6 +60,8 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .search-input {
@@ -116,21 +118,7 @@
   color: var(--gray-700);
 }
 
-/* Filter Section */
-.filter-section {
-  padding: 1rem 1.5rem;
-  background: var(--gray-50);
-  border-bottom: 1px solid var(--gray-border);
-}
-
-.filter-form {
-  display: flex;
-  gap: 1rem;
-  align-items: end;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
+/* Filter Groups (inline with search) */
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -166,6 +154,9 @@
   display: flex;
   gap: 1rem;
   align-items: end;
+  width: 100%;
+  justify-content: center;
+  padding-top: 0.5rem;
 }
 
 .apply-button {
@@ -300,9 +291,8 @@
     justify-content: center;
   }
 
-  .filter-form {
-    flex-direction: column;
-    align-items: stretch;
+  .filter-group {
+    width: 100%;
   }
 
   .filter-group select,

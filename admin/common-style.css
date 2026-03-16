@@ -1802,11 +1802,6 @@ tbody tr:hover {
   color: #94a3b8;
 }
 
-/* Dark theme - Filter section (users) */
-[data-theme="dark"] .filter-section {
-  background: #1e293b;
-  border-bottom-color: #374151;
-}
 
 /* Dark theme - Card (users) */
 [data-theme="dark"] .card {

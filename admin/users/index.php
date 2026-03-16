@@ -551,13 +551,8 @@ include '../admin_header.php';
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 if (this.value.trim() === '') {
-                    const datePreset = document.getElementById('date_preset').value;
-                    const banStatus = document.getElementById('ban_status').value;
-
-                    if (!datePreset && banStatus === 'all') {
-                        sessionStorage.setItem('scrollPosition', window.scrollY);
-                        window.location.href = 'index.php';
-                    }
+                    sessionStorage.setItem('scrollPosition', window.scrollY);
+                    this.form.submit();
                 }
             });
 
@@ -565,12 +560,7 @@ include '../admin_header.php';
                 if (e.key === 'Escape') {
                     sessionStorage.setItem('scrollPosition', window.scrollY);
                     this.value = '';
-                    const datePreset = document.getElementById('date_preset').value;
-                    const banStatus = document.getElementById('ban_status').value;
-
-                    if (!datePreset && banStatus === 'all') {
-                        window.location.href = 'index.php';
-                    }
+                    this.form.submit();
                 }
             });
         }

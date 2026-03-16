@@ -66,8 +66,10 @@
   border: 1px solid var(--gray-input-border);
   border-radius: 6px;
   font-size: 0.875rem;
-  flex: 1;
-  min-width: 200px;
+  flex: 2;
+  min-width: 250px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -89,6 +91,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .search-button:hover {
@@ -109,6 +113,10 @@
   font-size: 0.875rem;
   font-weight: 500;
   transition: background 0.2s;
+  height: 38px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
 }
 
 .clear-button:hover {
@@ -139,6 +147,8 @@
   font-size: 0.875rem;
   background: var(--white);
   min-width: 150px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .filter-group select:focus,

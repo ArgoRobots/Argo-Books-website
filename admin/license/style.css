@@ -199,3 +199,29 @@ table th {
 .modal-footer .btn {
     padding: 10px 20px;
 }
+/* Usage display */
+.usage-count {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700, #374151);
+    white-space: nowrap;
+}
+.usage-maxed {
+    color: var(--red-500, #ef4444);
+    font-weight: 600;
+}
+.usage-na {
+    color: var(--gray-400, #9ca3af);
+}
+.btn-reset-usage {
+    background-color: var(--primary-blue, #3b82f6);
+    color: white;
+    border: none;
+}
+.btn-reset-usage:not(:disabled):hover {
+    background-color: var(--blue-600, #2563eb);
+}
+.btn-reset-usage:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

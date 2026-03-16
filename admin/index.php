@@ -39,18 +39,23 @@ try {
     }
 
     // --- Active vs Inactive license counts per month (last 12 months) ---
-    // For each month, count subscriptions that were active at end of that month
+    // For each month, count subscriptions that were active at end of that month using date-based logic
     $stmt = $pdo->query("
         SELECT
             DATE_FORMAT(months.month_date, '%Y-%m') as month,
             COALESCE(SUM(CASE
-                WHEN s.status = 'active' AND s.created_at <= LAST_DAY(months.month_date)
-                     AND (s.end_date >= months.month_date OR s.end_date IS NULL)
+                WHEN s.created_at <= LAST_DAY(months.month_date)
+                     AND (s.end_date IS NULL OR s.end_date > LAST_DAY(months.month_date))
+                     AND (s.cancelled_at IS NULL OR s.cancelled_at > LAST_DAY(months.month_date))
                      AND s.payment_method != 'free_key'
                 THEN 1 ELSE 0 END), 0) as active_count,
             COALESCE(SUM(CASE
-                WHEN s.status != 'active' AND s.created_at <= LAST_DAY(months.month_date)
+                WHEN s.created_at <= LAST_DAY(months.month_date)
                      AND s.payment_method != 'free_key'
+                     AND (
+                         (s.end_date IS NOT NULL AND s.end_date <= LAST_DAY(months.month_date))
+                         OR (s.cancelled_at IS NOT NULL AND s.cancelled_at <= LAST_DAY(months.month_date))
+                     )
                 THEN 1 ELSE 0 END), 0) as inactive_count
         FROM (
             SELECT DATE_SUB(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL n MONTH) as month_date

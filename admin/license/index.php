@@ -3,11 +3,24 @@ session_start();
 require_once '../../db_connect.php';
 require_once '../../email_sender.php';
 require_once '../../license_functions.php';
+require_once '../../config/pricing.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
     exit;
+}
+
+// CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+function verify_csrf_token() {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        return false;
+    }
+    return true;
 }
 
 // Set page variables for the header
@@ -110,10 +123,84 @@ function get_subscription_chart_data()
     return $data;
 }
 
+// Get usage data for a list of license keys
+function get_license_usage($license_keys)
+{
+    global $pdo;
+    $usage = [];
+    if (empty($license_keys)) return $usage;
+
+    $usage_month = date('Y-m-01');
+    $placeholders = implode(',', array_fill(0, count($license_keys), '?'));
+
+    try {
+        $stmt = $pdo->prepare("SELECT license_key, scan_count FROM receipt_scan_usage WHERE license_key IN ($placeholders) AND usage_month = ?");
+        $stmt->execute(array_merge($license_keys, [$usage_month]));
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $usage[$row['license_key']]['receipt_scans'] = (int)$row['scan_count'];
+        }
+
+        $stmt = $pdo->prepare("SELECT license_key, scan_count FROM ai_import_usage WHERE license_key IN ($placeholders) AND usage_month = ?");
+        $stmt->execute(array_merge($license_keys, [$usage_month]));
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (!isset($usage[$row['license_key']])) $usage[$row['license_key']] = ['receipt_scans' => 0];
+            $usage[$row['license_key']]['ai_imports'] = (int)$row['scan_count'];
+        }
+    } catch (PDOException $e) {
+        error_log("Error fetching license usage: " . $e->getMessage());
+    }
+
+    return $usage;
+}
+
+// Handle usage reset via AJAX
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_usage'])) {
+    header('Content-Type: application/json');
+
+    if (!verify_csrf_token()) {
+        echo json_encode(['success' => false, 'error' => 'Invalid request']);
+        exit;
+    }
+
+    $license_keys = $_POST['license_keys'] ?? [];
+    if (!is_array($license_keys)) $license_keys = [$license_keys];
+    $license_keys = array_filter(array_map('trim', $license_keys));
+
+    if (empty($license_keys)) {
+        echo json_encode(['success' => false, 'error' => 'No license keys provided']);
+        exit;
+    }
+
+    $usage_month = date('Y-m-01');
+    $placeholders = implode(',', array_fill(0, count($license_keys), '?'));
+    $params = array_merge($license_keys, [$usage_month]);
+
+    try {
+        $stmt = $pdo->prepare("UPDATE receipt_scan_usage SET scan_count = 0 WHERE license_key IN ($placeholders) AND usage_month = ?");
+        $stmt->execute($params);
+
+        $stmt = $pdo->prepare("UPDATE ai_import_usage SET scan_count = 0 WHERE license_key IN ($placeholders) AND usage_month = ?");
+        $stmt->execute($params);
+
+        echo json_encode(['success' => true]);
+    } catch (PDOException $e) {
+        error_log("Usage reset error: " . $e->getMessage());
+        echo json_encode(['success' => false, 'error' => 'Database error']);
+    }
+    exit;
+}
+
 // Handle form submissions
 $generated_sub_key = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verify_csrf_token()) {
+        $_SESSION['message'] = "Invalid request. Please try again.";
+        $_SESSION['message_type'] = 'error';
+        header('Location: index.php');
+        exit;
+    }
+
     if (isset($_POST['generate_sub_key'])) {
         $email = !empty($_POST['sub_email']) ? filter_var($_POST['sub_email'], FILTER_VALIDATE_EMAIL) : null;
         $duration = intval($_POST['duration_months'] ?? 1);
@@ -173,6 +260,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 } catch (PDOException $e) {
                     $_SESSION['message'] = "Error deleting keys.";
+                    $_SESSION['message_type'] = 'error';
+                }
+            } elseif ($action === 'resend_email') {
+                try {
+                    $stmt = $pdo->prepare("SELECT * FROM premium_subscription_keys WHERE id IN ($placeholders)");
+                    $stmt->execute($key_ids);
+                    $keys_to_resend = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    $sent = 0;
+                    $skipped = 0;
+                    foreach ($keys_to_resend as $k) {
+                        if (empty($k['email'])) {
+                            $skipped++;
+                            continue;
+                        }
+                        if (send_free_subscription_key_email($k['email'], $k['subscription_key'], $k['duration_months'], $k['notes'] ?? '')) {
+                            $sent++;
+                        }
+                    }
+
+                    $msg = "$sent email(s) resent successfully.";
+                    if ($skipped > 0) {
+                        $msg .= " $skipped key(s) skipped (no email address).";
+                    }
+                    $_SESSION['message'] = $msg;
+                    $_SESSION['message_type'] = $sent > 0 ? 'success' : 'error';
+                } catch (PDOException $e) {
+                    error_log("Error resending license emails: " . $e->getMessage());
+                    $_SESSION['message'] = "Error resending emails.";
                     $_SESSION['message_type'] = 'error';
                 }
             }
@@ -237,6 +353,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             header('Location: index.php#premium-subscriptions');
             exit;
+        } elseif (!empty($subscription_ids) && $action === 'resend_email') {
+            $count = count($subscription_ids);
+            $placeholders = implode(',', array_fill(0, $count, '?'));
+
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT email, subscription_id, billing_cycle, end_date
+                    FROM premium_subscriptions
+                    WHERE id IN ($placeholders)
+                ");
+                $stmt->execute($subscription_ids);
+                $subscriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $sent = 0;
+                foreach ($subscriptions as $sub) {
+                    if (resend_subscription_id_email($sub['email'], $sub['subscription_id'], $sub['billing_cycle'], $sub['end_date'])) {
+                        $sent++;
+                    }
+                }
+
+                $_SESSION['message'] = "Subscription ID email resent to $sent of $count recipient(s).";
+                $_SESSION['message_type'] = $sent > 0 ? 'success' : 'error';
+            } catch (PDOException $e) {
+                error_log("Error resending subscription emails: " . $e->getMessage());
+                $_SESSION['message'] = "Error resending emails.";
+                $_SESSION['message_type'] = 'error';
+            }
+
+            header('Location: index.php#premium-subscriptions');
+            exit;
         } else {
             $_SESSION['message'] = "Please select subscriptions and enter a valid credit amount.";
             $_SESSION['message_type'] = 'error';
@@ -263,6 +409,15 @@ $sub_search = isset($_GET['sub_search']) ? trim($_GET['sub_search']) : '';
 $premium_subscriptions = get_premium_subscriptions($sub_search);
 $premium_subscription_keys = get_premium_subscription_keys();
 $subscription_chart_data = get_subscription_chart_data();
+
+// Get usage data and limits
+$pricing_config = get_pricing_config();
+$receipt_limit = $pricing_config['receipt_scan_monthly_limit'];
+$ai_import_limit = $pricing_config['ai_import_monthly_limit'];
+
+$all_sub_ids = array_column($premium_subscriptions, 'subscription_id');
+$all_key_ids = array_column($premium_subscription_keys, 'subscription_key');
+$usage_data = get_license_usage(array_merge($all_sub_ids, $all_key_ids));
 
 $active_ai_subs = 0;
 foreach ($premium_subscriptions as $sub) {
@@ -375,6 +530,12 @@ include '../admin_header.php';
                     <button type="button" class="btn btn-bulk btn-purple" id="open-credit-modal" disabled>
                         Give Credit
                     </button>
+                    <button type="button" class="btn btn-bulk btn-blue" id="subscription-bulk-resend" disabled>
+                        Resend Email
+                    </button>
+                    <button type="button" class="btn btn-bulk btn-reset-usage" id="subscription-bulk-reset-usage" disabled>
+                        Reset Usage
+                    </button>
                 </div>
             </div>
 
@@ -382,6 +543,7 @@ include '../admin_header.php';
                 <p>No Premium subscriptions found.</p>
             <?php else: ?>
                 <form id="subscription-bulk-form" method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="bulk_subscription_action" id="bulk_subscription_action_input" value="give_credit">
                     <input type="hidden" name="credit_amount" id="credit_amount_input">
                     <input type="hidden" name="credit_note" id="credit_note_input">
@@ -403,6 +565,8 @@ include '../admin_header.php';
                                     <th>Status</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
+                                    <th>Receipt Scans</th>
+                                    <th>AI Imports</th>
                                     <th>Credit</th>
                                 </tr>
                             </thead>
@@ -411,7 +575,7 @@ include '../admin_header.php';
                                     <tr>
                                         <td class="checkbox-column">
                                             <div class="checkbox">
-                                                <input type="checkbox" name="selected_subscriptions[]" value="<?php echo $sub['id']; ?>" class="subscription-checkbox" id="sub-<?php echo $sub['id']; ?>">
+                                                <input type="checkbox" name="selected_subscriptions[]" value="<?php echo $sub['id']; ?>" class="subscription-checkbox" id="sub-<?php echo $sub['id']; ?>" data-license-key="<?php echo htmlspecialchars($sub['subscription_id']); ?>">
                                                 <label for="sub-<?php echo $sub['id']; ?>"></label>
                                             </div>
                                         </td>
@@ -436,6 +600,13 @@ include '../admin_header.php';
                                         </td>
                                         <td><?php echo date('M j, Y', strtotime($sub['start_date'])); ?></td>
                                         <td><?php echo date('M j, Y', strtotime($sub['end_date'])); ?></td>
+                                        <?php
+                                            $sub_key = $sub['subscription_id'];
+                                            $scans = $usage_data[$sub_key]['receipt_scans'] ?? 0;
+                                            $imports = $usage_data[$sub_key]['ai_imports'] ?? 0;
+                                        ?>
+                                        <td><span class="usage-count <?php echo $scans >= $receipt_limit ? 'usage-maxed' : ''; ?>"><?php echo $scans; ?> / <?php echo $receipt_limit; ?></span></td>
+                                        <td><span class="usage-count <?php echo $imports >= $ai_import_limit ? 'usage-maxed' : ''; ?>"><?php echo $imports; ?> / <?php echo $ai_import_limit; ?></span></td>
                                         <td>$<?php echo number_format($sub['credit_balance'] ?? 0, 2); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -501,6 +672,7 @@ include '../admin_header.php';
             <?php endif; ?>
 
             <form method="post">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div class="generate-form-grid">
                     <div class="form-group">
                         <label for="sub_email">Recipient Email</label>
@@ -537,6 +709,8 @@ include '../admin_header.php';
                     <span id="sub-key-selected-count">0</span> selected
                 </div>
                 <div class="bulk-buttons">
+                    <button type="button" class="btn btn-bulk btn-purple" id="sub-key-bulk-resend" disabled>Resend Email</button>
+                    <button type="button" class="btn btn-bulk btn-reset-usage" id="sub-key-bulk-reset-usage" disabled>Reset Usage</button>
                     <button type="button" class="btn btn-bulk btn-delete" id="sub-key-bulk-delete" data-action="delete" disabled>Delete Selected</button>
                 </div>
             </div>
@@ -545,6 +719,7 @@ include '../admin_header.php';
                 <p>No free subscription keys generated yet.</p>
             <?php else: ?>
                 <form id="sub-key-bulk-form" method="post">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="bulk_sub_key_action" id="bulk_sub_key_action_input">
                     <div class="table-responsive">
                         <table>
@@ -560,6 +735,8 @@ include '../admin_header.php';
                                     <th>Duration</th>
                                     <th>Email</th>
                                     <th>Status</th>
+                                    <th>Receipt Scans</th>
+                                    <th>AI Imports</th>
                                     <th>Created</th>
                                     <th>Notes</th>
                                 </tr>
@@ -569,7 +746,7 @@ include '../admin_header.php';
                                     <tr class="<?php echo $key['redeemed_at'] ? 'redeemed-row' : ''; ?>">
                                         <td class="checkbox-column">
                                             <div class="checkbox">
-                                                <input type="checkbox" name="selected_sub_keys[]" value="<?php echo $key['id']; ?>" class="sub-key-checkbox" id="sub-key-<?php echo $key['id']; ?>">
+                                                <input type="checkbox" name="selected_sub_keys[]" value="<?php echo $key['id']; ?>" class="sub-key-checkbox" id="sub-key-<?php echo $key['id']; ?>" data-license-key="<?php echo htmlspecialchars($key['subscription_key']); ?>">
                                                 <label for="sub-key-<?php echo $key['id']; ?>"></label>
                                             </div>
                                         </td>
@@ -584,6 +761,26 @@ include '../admin_header.php';
                                                 <span class="badge badge-redeemed">Redeemed</span>
                                             <?php else: ?>
                                                 <span class="badge badge-free">Available</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php
+                                            $fk = $key['subscription_key'];
+                                            $fk_scans = $usage_data[$fk]['receipt_scans'] ?? 0;
+                                            $fk_imports = $usage_data[$fk]['ai_imports'] ?? 0;
+                                            $fk_redeemed = !empty($key['redeemed_at']);
+                                        ?>
+                                        <td>
+                                            <?php if ($fk_redeemed): ?>
+                                                <span class="usage-count <?php echo $fk_scans >= $receipt_limit ? 'usage-maxed' : ''; ?>"><?php echo $fk_scans; ?> / <?php echo $receipt_limit; ?></span>
+                                            <?php else: ?>
+                                                <span class="usage-na">&mdash;</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($fk_redeemed): ?>
+                                                <span class="usage-count <?php echo $fk_imports >= $ai_import_limit ? 'usage-maxed' : ''; ?>"><?php echo $fk_imports; ?> / <?php echo $ai_import_limit; ?></span>
+                                            <?php else: ?>
+                                                <span class="usage-na">&mdash;</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo date('M j, Y', strtotime($key['created_at'])); ?></td>
@@ -649,6 +846,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const subKeyCheckboxes = document.querySelectorAll('.sub-key-checkbox');
     const subKeySelectedCount = document.getElementById('sub-key-selected-count');
     const subKeyBulkDelete = document.getElementById('sub-key-bulk-delete');
+    const subKeyBulkResend = document.getElementById('sub-key-bulk-resend');
+    const subKeyBulkResetUsage = document.getElementById('sub-key-bulk-reset-usage');
     const subKeyBulkForm = document.getElementById('sub-key-bulk-form');
     const subKeyBulkActionInput = document.getElementById('bulk_sub_key_action_input');
 
@@ -657,6 +856,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const count = checked.length;
         subKeySelectedCount.textContent = count;
         subKeyBulkDelete.disabled = count === 0;
+        if (subKeyBulkResend) subKeyBulkResend.disabled = count === 0;
+        if (subKeyBulkResetUsage) subKeyBulkResetUsage.disabled = count === 0;
     }
 
     if (subKeySelectAll) {
@@ -689,12 +890,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    if (subKeyBulkResend) {
+        subKeyBulkResend.addEventListener('click', function() {
+            const checked = document.querySelectorAll('.sub-key-checkbox:checked');
+            if (checked.length === 0) return;
+
+            if (confirm(`Resend license key email to ${checked.length} recipient(s)?`)) {
+                subKeyBulkActionInput.value = 'resend_email';
+                subKeyBulkForm.submit();
+            }
+        });
+    }
+
     // Premium Subscription Bulk Selection
     const subscriptionSelectAll = document.getElementById('subscription-select-all');
     const subscriptionCheckboxes = document.querySelectorAll('.subscription-checkbox');
     const subscriptionSelectedCount = document.getElementById('subscription-selected-count');
     const openCreditModalBtn = document.getElementById('open-credit-modal');
+    const subscriptionBulkResend = document.getElementById('subscription-bulk-resend');
+    const subscriptionBulkResetUsage = document.getElementById('subscription-bulk-reset-usage');
     const subscriptionBulkForm = document.getElementById('subscription-bulk-form');
+    const bulkSubscriptionActionInput = document.getElementById('bulk_subscription_action_input');
     const creditAmountInput = document.getElementById('credit_amount_input');
     const creditNoteInput = document.getElementById('credit_note_input');
 
@@ -713,6 +929,12 @@ document.addEventListener('DOMContentLoaded', function() {
         subscriptionSelectedCount.textContent = count;
         if (openCreditModalBtn) {
             openCreditModalBtn.disabled = count === 0;
+        }
+        if (subscriptionBulkResend) {
+            subscriptionBulkResend.disabled = count === 0;
+        }
+        if (subscriptionBulkResetUsage) {
+            subscriptionBulkResetUsage.disabled = count === 0;
         }
     }
 
@@ -755,6 +977,19 @@ document.addEventListener('DOMContentLoaded', function() {
         openCreditModalBtn.addEventListener('click', openModal);
     }
 
+    if (subscriptionBulkResend) {
+        subscriptionBulkResend.addEventListener('click', function() {
+            const checked = document.querySelectorAll('.subscription-checkbox:checked');
+            if (checked.length === 0) return;
+
+            if (confirm(`Resend subscription ID email to ${checked.length} recipient(s)?`)) {
+                bulkSubscriptionActionInput.value = 'resend_email';
+                creditAmountInput.value = '0';
+                subscriptionBulkForm.submit();
+            }
+        });
+    }
+
     if (closeCreditModalBtn) {
         closeCreditModalBtn.addEventListener('click', closeModal);
     }
@@ -793,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (confirm(`Are you sure you want to give $${amount.toFixed(2)} credit to ${checkedCount} subscription(s)?`)) {
+                bulkSubscriptionActionInput.value = 'give_credit';
                 creditAmountInput.value = amount;
                 creditNoteInput.value = note;
                 subscriptionBulkForm.submit();
@@ -808,6 +1044,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 confirmGiveCreditBtn.click();
             }
         });
+    }
+
+    // Reset Usage helper
+    function resetUsage(checkboxSelector) {
+        const checked = document.querySelectorAll(checkboxSelector + ':checked');
+        if (checked.length === 0) return;
+
+        if (!confirm(`Reset usage for ${checked.length} selected license(s)? This resets the current month's receipt scan and AI import counts to 0.`)) return;
+
+        const formData = new FormData();
+        formData.append('reset_usage', '1');
+        formData.append('csrf_token', '<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>');
+        checked.forEach(cb => formData.append('license_keys[]', cb.dataset.licenseKey));
+
+        fetch('index.php', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(() => alert('Network error resetting usage.'));
+    }
+
+    if (subscriptionBulkResetUsage) {
+        subscriptionBulkResetUsage.addEventListener('click', () => resetUsage('.subscription-checkbox'));
+    }
+
+    if (subKeyBulkResetUsage) {
+        subKeyBulkResetUsage.addEventListener('click', () => resetUsage('.sub-key-checkbox'));
     }
 });
 </script>

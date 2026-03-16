@@ -1,39 +1,6 @@
-body {
-    background: #f3f4f6;
-    min-height: 100vh;
-}
-
-.cron-container {
+.cron-dashboard {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
-}
-
-.cron-header {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: white;
-    padding: 30px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.cron-header h1 {
-    color: white;
-    margin: 0;
-    font-size: 1.75rem;
-}
-
-.cron-header p {
-    margin: 5px 0 0;
-    opacity: 0.9;
-}
-
-.header-actions {
-    display: flex;
-    gap: 10px;
 }
 
 .stats-grid {
@@ -260,62 +227,4 @@ body {
 
 .full-width {
     grid-column: 1 / -1;
-}
-
-/* Login styles */
-.login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.login-box {
-    background: white;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    max-width: 400px;
-    width: 100%;
-    text-align: center;
-}
-
-.login-box h1 {
-    color: #7c3aed;
-    margin-bottom: 10px;
-}
-
-.login-box p {
-    color: #6b7280;
-    margin-bottom: 30px;
-}
-
-.totp-input {
-    width: 200px;
-    padding: 15px;
-    font-size: 24px;
-    text-align: center;
-    letter-spacing: 0.5em;
-    border: 2px solid #d1d5db;
-    border-radius: 8px;
-    margin: 0 auto 20px;
-    display: block;
-    font-family: monospace;
-}
-
-.totp-input:focus {
-    outline: none;
-    border-color: #7c3aed;
-}
-
-.back-link {
-    margin-top: 20px;
-    display: block;
-    color: #6b7280;
-    text-decoration: none;
-}
-
-.back-link:hover {
-    color: #374151;
 }

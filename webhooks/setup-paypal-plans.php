@@ -29,9 +29,6 @@ $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 
-// Output as text
-header('Content-Type: text/plain');
-
 echo "=== PayPal Subscription Plans Setup ===\n\n";
 
 // Configuration

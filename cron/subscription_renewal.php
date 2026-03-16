@@ -42,7 +42,6 @@ require_once __DIR__ . '/../config/pricing.php';
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
-require_once __DIR__ . '/../vendor/autoload.php';
 
 // Configure logging
 function logMessage($message, $type = 'INFO') {

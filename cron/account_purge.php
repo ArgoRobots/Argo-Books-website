@@ -34,7 +34,7 @@ function logPurge($message, $type = 'INFO') {
     if (!is_dir(__DIR__ . '/logs')) {
         mkdir(__DIR__ . '/logs', 0755, true);
     }
-    file_put_contents($logFile, $logEntry, FILE_APPEND);
+    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
 
     if (php_sapi_name() === 'cli') {
         echo $logEntry;

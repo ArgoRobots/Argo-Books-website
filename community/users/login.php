@@ -73,6 +73,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Handle "Stay logged in" option
             if ($remember_me) {
+                // Determine if the current request is over HTTPS
+                $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                            || (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
+
                 // Set session cookie to last 30 days instead of browser close
                 setcookie(
                     session_name(),
@@ -80,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     [
                         'expires' => time() + (30 * 24 * 60 * 60), // 30 days
                         'path' => '/',
-                        'secure' => true,
+                        'secure' => $isSecure,
                         'httponly' => true,
                         'samesite' => 'Lax'
                     ]
@@ -95,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         [
                             'expires' => time() + (30 * 24 * 60 * 60), // 30 days
                             'path' => '/',
-                            'secure' => true,
+                            'secure' => $isSecure,
                             'httponly' => true,
                             'samesite' => 'Lax'
                         ]

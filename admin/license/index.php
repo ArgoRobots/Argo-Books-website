@@ -175,6 +175,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['message'] = "Error deleting keys.";
                     $_SESSION['message_type'] = 'error';
                 }
+            } elseif ($action === 'resend_email') {
+                try {
+                    $stmt = $pdo->prepare("SELECT * FROM premium_subscription_keys WHERE id IN ($placeholders)");
+                    $stmt->execute($key_ids);
+                    $keys_to_resend = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    $sent = 0;
+                    $skipped = 0;
+                    foreach ($keys_to_resend as $k) {
+                        if (empty($k['email'])) {
+                            $skipped++;
+                            continue;
+                        }
+                        if (send_free_subscription_key_email($k['email'], $k['subscription_key'], $k['duration_months'], $k['notes'] ?? '')) {
+                            $sent++;
+                        }
+                    }
+
+                    $msg = "$sent email(s) resent successfully.";
+                    if ($skipped > 0) {
+                        $msg .= " $skipped key(s) skipped (no email address).";
+                    }
+                    $_SESSION['message'] = $msg;
+                    $_SESSION['message_type'] = $sent > 0 ? 'success' : 'error';
+                } catch (PDOException $e) {
+                    error_log("Error resending license emails: " . $e->getMessage());
+                    $_SESSION['message'] = "Error resending emails.";
+                    $_SESSION['message_type'] = 'error';
+                }
             }
 
             header('Location: index.php#free-sub-keys');
@@ -537,6 +566,7 @@ include '../admin_header.php';
                     <span id="sub-key-selected-count">0</span> selected
                 </div>
                 <div class="bulk-buttons">
+                    <button type="button" class="btn btn-bulk btn-purple" id="sub-key-bulk-resend" disabled>Resend Email</button>
                     <button type="button" class="btn btn-bulk btn-delete" id="sub-key-bulk-delete" data-action="delete" disabled>Delete Selected</button>
                 </div>
             </div>
@@ -649,6 +679,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const subKeyCheckboxes = document.querySelectorAll('.sub-key-checkbox');
     const subKeySelectedCount = document.getElementById('sub-key-selected-count');
     const subKeyBulkDelete = document.getElementById('sub-key-bulk-delete');
+    const subKeyBulkResend = document.getElementById('sub-key-bulk-resend');
     const subKeyBulkForm = document.getElementById('sub-key-bulk-form');
     const subKeyBulkActionInput = document.getElementById('bulk_sub_key_action_input');
 
@@ -657,6 +688,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const count = checked.length;
         subKeySelectedCount.textContent = count;
         subKeyBulkDelete.disabled = count === 0;
+        if (subKeyBulkResend) subKeyBulkResend.disabled = count === 0;
     }
 
     if (subKeySelectAll) {
@@ -684,6 +716,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (confirm(`Are you sure you want to delete ${checked.length} subscription key(s)?`)) {
                 subKeyBulkActionInput.value = 'delete';
+                subKeyBulkForm.submit();
+            }
+        });
+    }
+
+    if (subKeyBulkResend) {
+        subKeyBulkResend.addEventListener('click', function() {
+            const checked = document.querySelectorAll('.sub-key-checkbox:checked');
+            if (checked.length === 0) return;
+
+            if (confirm(`Resend license key email to ${checked.length} recipient(s)?`)) {
+                subKeyBulkActionInput.value = 'resend_email';
                 subKeyBulkForm.submit();
             }
         });

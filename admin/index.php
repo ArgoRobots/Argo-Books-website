@@ -203,29 +203,6 @@ include 'admin_header.php';
         </div>
     </div>
 
-    <!-- Navigation Cards -->
-    <div class="nav-cards">
-        <a href="license/" class="nav-card">
-            <div class="nav-card-icon"><?= svg_icon('shield-filled', 24) ?></div>
-            <div class="nav-card-title">Subscriptions</div>
-            <div class="nav-card-description">Manage Premium subscriptions and keys</div>
-        </a>
-        <a href="payments/" class="nav-card">
-            <div class="nav-card-icon"><?= svg_icon('credit-card-filled', 24) ?></div>
-            <div class="nav-card-title">Payment Portal</div>
-            <div class="nav-card-description">Monitor portal payments and invoices</div>
-        </a>
-        <a href="app-stats/" class="nav-card">
-            <div class="nav-card-icon"><?= svg_icon('bar-chart-filled', 24) ?></div>
-            <div class="nav-card-title">App Statistics</div>
-            <div class="nav-card-description">View application analytics and metrics</div>
-        </a>
-        <a href="website-stats/" class="nav-card">
-            <div class="nav-card-icon"><?= svg_icon('globe-filled', 24) ?></div>
-            <div class="nav-card-title">Website Stats</div>
-            <div class="nav-card-description">View website analytics and downloads</div>
-        </a>
-    </div>
 </div>
 
 <script>

@@ -3,13 +3,14 @@
  * Cron Management UI
  *
  * A secure interface for managing subscription renewals with:
- * - TOTP authentication (uses admin 2FA system)
+ * - Admin login + 2FA authentication (same as admin panel)
  * - Dashboard showing subscriptions due for renewal
  * - Manual renewal execution
  * - Log viewer
  */
 
-require_once __DIR__ . '/auth.php';
+session_start();
+require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../resources/icons.php';
 
 // Load environment variables
@@ -17,41 +18,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
-$error = '';
-$success = '';
-
-// Handle logout
-if (isset($_GET['logout'])) {
-    clear_cron_authentication();
-    header('Location: index.php');
+// Require admin login (includes 2FA if enabled)
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    header('Location: ../admin/login.php');
     exit;
 }
 
-// Check if session expired
-if (is_cron_authenticated() && is_cron_auth_expired()) {
-    clear_cron_authentication();
-    $error = 'Session expired. Please authenticate again.';
-}
-
-// Handle TOTP verification
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_totp'])) {
-    $code = trim($_POST['totp_code'] ?? '');
-
-    if (empty($code)) {
-        $error = 'Please enter the verification code.';
-    } elseif (!preg_match('/^\d{6}$/', $code)) {
-        $error = 'Invalid code format. Please enter a 6-digit code.';
-    } elseif (verify_cron_totp($code)) {
-        set_cron_authenticated(true);
-        header('Location: index.php');
-        exit;
-    } else {
-        $error = 'Invalid verification code. Please try again.';
-    }
-}
+$error = '';
+$success = '';
 
 // Handle manual renewal execution
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_renewal']) && is_cron_authenticated()) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['run_renewal'])) {
     // Execute the renewal script
     $cronSecret = $_ENV['CRON_SECRET'] ?? '';
     $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
@@ -89,67 +66,64 @@ if (isset($_SESSION['cron_error'])) {
     unset($_SESSION['cron_error']);
 }
 
-// Get subscriptions data if authenticated
+// Get subscriptions data
 $pendingRenewals = [];
 $recentPayments = [];
 $stats = [];
 
-if (is_cron_authenticated()) {
-    try {
-        // Get subscriptions due for renewal (within next 7 days)
-        $stmt = $pdo->prepare("
-            SELECT
-                s.*,
-                u.username,
-                u.email as user_email,
-                DATEDIFF(s.end_date, NOW()) as days_until_renewal
-            FROM premium_subscriptions s
-            JOIN community_users u ON s.user_id = u.id
-            WHERE s.status = 'active'
-            AND s.end_date <= DATE_ADD(NOW(), INTERVAL 7 DAY)
-            AND s.auto_renew = 1
-            ORDER BY s.end_date ASC
-        ");
-        $stmt->execute();
-        $pendingRenewals = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    // Get subscriptions due for renewal (within next 7 days)
+    $stmt = $pdo->prepare("
+        SELECT
+            s.*,
+            u.username,
+            u.email as user_email,
+            DATEDIFF(s.end_date, NOW()) as days_until_renewal
+        FROM premium_subscriptions s
+        JOIN community_users u ON s.user_id = u.id
+        WHERE s.status = 'active'
+        AND s.end_date <= DATE_ADD(NOW(), INTERVAL 7 DAY)
+        AND s.auto_renew = 1
+        ORDER BY s.end_date ASC
+    ");
+    $stmt->execute();
+    $pendingRenewals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Get recent payment history
-        $stmt = $pdo->prepare("
-            SELECT
-                p.*,
-                s.email,
-                u.username
-            FROM premium_subscription_payments p
-            JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
-            JOIN community_users u ON s.user_id = u.id
-            ORDER BY p.created_at DESC
-            LIMIT 20
-        ");
-        $stmt->execute();
-        $recentPayments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Get recent payment history
+    $stmt = $pdo->prepare("
+        SELECT
+            p.*,
+            s.email,
+            u.username
+        FROM premium_subscription_payments p
+        JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
+        JOIN community_users u ON s.user_id = u.id
+        ORDER BY p.created_at DESC
+        LIMIT 20
+    ");
+    $stmt->execute();
+    $recentPayments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Get stats
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
-        $stats['active_subscriptions'] = $stmt->fetch()['count'];
+    // Get stats
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
+    $stats['active_subscriptions'] = $stmt->fetch()['count'];
 
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active' AND end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) AND auto_renew = 1");
-        $stats['due_today'] = $stmt->fetch()['count'];
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active' AND end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) AND auto_renew = 1");
+    $stats['due_today'] = $stmt->fetch()['count'];
 
-        $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscription_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
-        $stats['successful_30d'] = $stmt->fetch()['count'];
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscription_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stats['successful_30d'] = $stmt->fetch()['count'];
 
-        $stmt = $pdo->query("
-            SELECT COUNT(DISTINCT subscription_id) AS count
-            FROM premium_subscription_payments
-            WHERE status = 'failed'
-            AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-        ");
-        $stats['failed_30d'] = $stmt->fetch()['count'];
+    $stmt = $pdo->query("
+        SELECT COUNT(DISTINCT subscription_id) AS count
+        FROM premium_subscription_payments
+        WHERE status = 'failed'
+        AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+    ");
+    $stats['failed_30d'] = $stmt->fetch()['count'];
 
-
-    } catch (PDOException $e) {
-        $error = 'Database error: ' . $e->getMessage();
-    }
+} catch (PDOException $e) {
+    $error = 'Database error: ' . $e->getMessage();
 }
 
 // Get available log files
@@ -164,7 +138,7 @@ if (is_dir($logsDir)) {
 // Handle log viewing
 $selectedLog = '';
 $logContent = '';
-if (isset($_GET['view_log']) && is_cron_authenticated()) {
+if (isset($_GET['view_log'])) {
     $requestedLog = basename($_GET['view_log']);
     $logPath = $logsDir . '/' . $requestedLog;
     if (file_exists($logPath) && strpos($requestedLog, 'subscription_renewal_') === 0) {
@@ -187,48 +161,6 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
 </head>
 <body>
-<?php if (!is_cron_authenticated()): ?>
-    <!-- TOTP Login Form -->
-    <div class="login-wrapper">
-        <div class="login-box">
-            <h1>Subscription Renewal</h1>
-            <p>Enter your authenticator code to access the renewal management dashboard</p>
-
-            <?php if ($error): ?>
-                <div class="error-message" style="margin-bottom: 20px;">
-                    <?php echo htmlspecialchars($error); ?>
-                </div>
-            <?php endif; ?>
-
-            <form method="post">
-                <input type="number"
-                       name="totp_code"
-                       class="totp-input"
-                       placeholder="000000"
-                       maxlength="6"
-                       autofocus
-                       required>
-
-                <input type="hidden" name="verify_totp" value="1">
-
-                <button type="submit" class="btn btn-blue" style="width: 100%;">Verify</button>
-            </form>
-
-            <a href="../admin/" class="back-link">Back to Admin</a>
-        </div>
-    </div>
-
-    <script>
-        // Auto-submit when 6 digits entered
-        document.querySelector('.totp-input').addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '');
-            if (this.value.length === 6) {
-                setTimeout(() => this.form.submit(), 300);
-            }
-        });
-    </script>
-
-<?php else: ?>
     <!-- Main Dashboard -->
     <div class="cron-container">
         <div class="cron-header">
@@ -237,7 +169,7 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
                 <p>Monitor and manage Premium subscription renewals</p>
             </div>
             <div class="header-actions">
-                <a href="?logout=1" class="btn btn-small btn-red">Logout</a>
+                <a href="../admin/logout.php" class="btn btn-small btn-red">Logout</a>
             </div>
         </div>
 
@@ -418,6 +350,5 @@ if (isset($_GET['view_log']) && is_cron_authenticated()) {
             </div>
         </div>
     </div>
-<?php endif; ?>
 </body>
 </html>

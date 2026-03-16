@@ -19,9 +19,8 @@
  *   6. Suspend subscriptions after 3 consecutive failures
  *   7. Mark non-auto-renew subscriptions as expired
  *
- * Manual execution options:
- *   - CLI: php subscription_renewal.php
- *   - Web: subscription_renewal.php?key=YOUR_CRON_SECRET
+ * Manual execution:
+ *   php subscription_renewal.php
  *
  * Logs are stored in: /cron/logs/subscription_renewal_YYYY-MM-DD.log
  */
@@ -29,23 +28,17 @@
 // Prevent timeout for long-running process
 set_time_limit(300);
 
+// Only allow CLI execution
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI.');
+}
+
 // Load environment variables
 require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 require_once __DIR__ . '/../config/pricing.php';
-
-// Only allow CLI or authenticated web requests
-$isCli = php_sapi_name() === 'cli';
-$cronSecret = $_ENV['CRON_SECRET'] ?? '';
-// Support both query parameter and Authorization header (header preferred to avoid logging secrets in URLs)
-$providedKey = $_SERVER['HTTP_X_CRON_KEY'] ?? $_GET['key'] ?? '';
-$isAuthenticated = !empty($cronSecret) && !empty($providedKey) && hash_equals($cronSecret, $providedKey);
-
-if (!$isCli && !$isAuthenticated) {
-    http_response_code(403);
-    die('Access denied');
-}
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';

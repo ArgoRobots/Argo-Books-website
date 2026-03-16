@@ -6,14 +6,19 @@
  * After running, copy the Plan IDs to your .env file.
  *
  * Usage:
- *   CLI: php setup-paypal-plans.php
- *   Web: setup-paypal-plans.php?key=YOUR_CRON_SECRET
+ *   php setup-paypal-plans.php
  *
  * This will create:
  *   1. A Product (Argo Premium Subscription)
  *   2. A Monthly Plan (configured in pricing.php)
  *   3. A Yearly Plan (configured in pricing.php)
  */
+
+// Only allow CLI execution
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI.');
+}
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/pricing.php';
@@ -23,15 +28,6 @@ $dotenv->load();
 $pricing = get_pricing_config();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
-
-// Security check
-$isCli = php_sapi_name() === 'cli';
-$isAuthenticated = isset($_GET['key']) && $_GET['key'] === ($_ENV['CRON_SECRET'] ?? '');
-
-if (!$isCli && !$isAuthenticated) {
-    http_response_code(403);
-    die('Access denied. Use CLI or add ?key=YOUR_CRON_SECRET');
-}
 
 // Output as text
 header('Content-Type: text/plain');

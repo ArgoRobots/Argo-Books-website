@@ -9,26 +9,20 @@
  *   0 4 * * * /usr/bin/php /path/to/account_purge.php
  *
  * Manual execution:
- *   - CLI: php account_purge.php
- *   - Web: account_purge.php?key=YOUR_CRON_SECRET
+ *   php account_purge.php
  */
 
 set_time_limit(120);
 
+// Only allow CLI execution
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI.');
+}
+
 require_once __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
-
-// Only allow CLI or authenticated web requests
-$isCli = php_sapi_name() === 'cli';
-$cronSecret = $_ENV['CRON_SECRET'] ?? '';
-$providedKey = $_SERVER['HTTP_X_CRON_KEY'] ?? $_GET['key'] ?? '';
-$isAuthenticated = !empty($cronSecret) && !empty($providedKey) && hash_equals($cronSecret, $providedKey);
-
-if (!$isCli && !$isAuthenticated) {
-    http_response_code(403);
-    die('Access denied');
-}
 
 require_once __DIR__ . '/../db_connect.php';
 

@@ -4,7 +4,9 @@
  * Handles subscription creation with recurring billing support
  */
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 header('Content-Type: application/json');
 
 require_once '../../../db_connect.php';

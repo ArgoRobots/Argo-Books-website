@@ -28,7 +28,8 @@
 // Prevent timeout for long-running process
 set_time_limit(300);
 
-// Only allow CLI execution
+// Only allow CLI execution — web-based triggering (e.g. via X-Cron-Key header)
+// is intentionally not supported; use system cron instead.
 if (php_sapi_name() !== 'cli') {
     http_response_code(403);
     die('Access denied. This script can only be run via CLI.');

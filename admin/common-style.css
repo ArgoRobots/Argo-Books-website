@@ -1473,68 +1473,6 @@ tbody tr:hover {
   color: #e2e8f0;
 }
 
-/* Dark theme - Panels (cron) */
-[data-theme="dark"] .panel {
-  background: #1f2937;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .panel-header {
-  background: #1e293b;
-  border-bottom-color: #374151;
-}
-
-[data-theme="dark"] .panel-header h2 {
-  color: #e2e8f0;
-}
-
-[data-theme="dark"] .renewal-item {
-  border-bottom-color: #374151;
-}
-
-[data-theme="dark"] .renewal-info p {
-  color: #94a3b8;
-}
-
-[data-theme="dark"] .payment-item {
-  border-bottom-color: #374151;
-}
-
-[data-theme="dark"] .log-selector select {
-  background: #374151;
-  border-color: #4b5563;
-  color: #e2e8f0;
-}
-
-[data-theme="dark"] .action-panel {
-  background: #1f2937;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-[data-theme="dark"] .action-info h3 {
-  color: #e2e8f0;
-}
-
-[data-theme="dark"] .action-info p {
-  color: #94a3b8;
-}
-
-/* Dark theme - Cron badges */
-[data-theme="dark"] .badge-due-now {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-}
-
-[data-theme="dark"] .badge-due-soon {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-}
-
-[data-theme="dark"] .badge-upcoming {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-}
-
 /* Dark theme - Payment status badges */
 [data-theme="dark"] .status-completed,
 [data-theme="dark"] .badge-completed {
@@ -1917,5 +1855,61 @@ tbody tr:hover {
 
 /* Dark theme - Search results */
 [data-theme="dark"] .search-results {
+  color: #94a3b8;
+}
+
+/* Dark theme - Dashboard hero */
+[data-theme="dark"] .hero-section h1 {
+  color: #f1f5f9;
+}
+
+/* Dark theme - Env toggle production/sandbox */
+[data-theme="dark"] .env-toggle-production.active {
+  color: #34d399;
+}
+
+[data-theme="dark"] .env-toggle-sandbox.active {
+  color: #fbbf24;
+}
+
+/* Dark theme - Bulk actions container (license, search) */
+[data-theme="dark"] .bulk-actions-container {
+  background: #1e293b;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .bulk-actions-container .selection-info {
+  color: #94a3b8;
+}
+
+/* Dark theme - App stats inline styles */
+[data-theme="dark"] .section-title {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .error-details-table {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .error-details-table th {
+  background: #1e293b;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .error-details-table td {
+  border-bottom-color: #374151;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .error-details-table tr:hover {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .error-details-table td.error-code {
+  color: #f87171;
+}
+
+[data-theme="dark"] .error-details-table td.error-source {
   color: #94a3b8;
 }

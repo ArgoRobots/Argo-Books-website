@@ -84,9 +84,6 @@ $base_path = $in_subdir ? '../' : '';
                     <a href="<?php echo $base_path; ?>settings/" class="header-link <?php echo $current_dir === 'settings' ? 'active' : ''; ?>">
                         2FA Settings
                     </a>
-                    <a href="<?php echo $base_path; ?>cron/" class="header-link <?php echo $current_dir === 'cron' ? 'active' : ''; ?>">
-                        Cron Jobs
-                    </a>
                 </nav>
 
                 <!-- Right: Desktop Actions (Logout) -->
@@ -127,7 +124,6 @@ $base_path = $in_subdir ? '../' : '';
                     <li><a href="<?php echo $base_path; ?>users/" class="<?php echo $current_dir === 'users' ? 'active' : ''; ?>">Users</a></li>
                     <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
                     <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA Settings</a></li>
-                    <li><a href="<?php echo $base_path; ?>cron/" class="<?php echo $current_dir === 'cron' ? 'active' : ''; ?>">Cron Jobs</a></li>
                     <li><a href="<?php echo $base_path; ?>logout.php" class="logout-link">Logout</a></li>
                 </ul>
             </div>

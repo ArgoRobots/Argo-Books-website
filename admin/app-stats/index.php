@@ -406,9 +406,10 @@ include '../admin_header.php';
 
 <div class="container">
     <?php if ($errorMessage): ?>
-        <div class="error-message">
-            <strong>Error:</strong> <?= htmlspecialchars($errorMessage) ?>
-            <br><small>Make sure the data directory exists and contains valid JSON files.</small>
+        <div class="no-data">
+            <h3>No Data Available</h3>
+            <p><?= htmlspecialchars($errorMessage) ?></p>
+            <p><small>Make sure the data directory exists and contains valid JSON files at: <code>admin/data-logs/</code></small></p>
         </div>
     <?php elseif (
         empty($aggregatedData['dataPoints']) ||

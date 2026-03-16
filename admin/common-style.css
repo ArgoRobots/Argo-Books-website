@@ -1860,8 +1860,17 @@ tbody tr:hover {
 }
 
 /* Dark theme - Checkboxes */
-[data-theme="dark"] input[type="checkbox"] {
-  accent-color: #6366f1;
+[data-theme="dark"] .checkbox input[type="checkbox"] {
+  background-color: #1f2937;
+  border-color: #6366f1;
+}
+
+[data-theme="dark"] .checkbox input[type="checkbox"]:checked {
+  background-color: #6366f1;
+}
+
+[data-theme="dark"] .checkbox input[type="checkbox"]:hover {
+  border-color: #818cf8;
 }
 
 /* Dark theme - Dashboard hero */

@@ -203,7 +203,7 @@ try {
         FROM portal_invoices i
         LEFT JOIN portal_companies c ON i.company_id = c.id
         LEFT JOIN portal_payments p ON p.invoice_id = i.id
-        WHERE 1=1
+        WHERE $env_sql_inv
     ";
     $params = [];
 

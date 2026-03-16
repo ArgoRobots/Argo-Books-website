@@ -24,13 +24,13 @@ if (!$license) {
     send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
 }
 
-// Rate limiting: 60 requests per 15 minutes per license
-$ip = get_client_ip();
-$rateLimitKey = 'ai_' . substr($license['license_key_hash'], 0, 16);
-if (is_rate_limited($ip, 60, 900, $rateLimitKey)) {
+// Rate limiting: 60 requests per 15 minutes per license (global per license, not per IP)
+$rateLimitId = substr($license['license_key_hash'], 0, 16);
+$rateLimitKey = 'ai_license';
+if (is_rate_limited($rateLimitId, 60, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, $rateLimitKey);
+record_rate_limit_attempt($rateLimitId, $rateLimitKey);
 
 // Validate server configuration
 $openaiKey = $_ENV['OPENAI_API_KEY'] ?? '';

@@ -27,13 +27,13 @@ if (!$license) {
     send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
 }
 
-// Rate limiting: 120 requests per 15 minutes per license
-$ip = get_client_ip();
-$rateLimitKey = 'rates_' . substr($license['license_key_hash'], 0, 16);
-if (is_rate_limited($ip, 120, 900, $rateLimitKey)) {
+// Rate limiting: 120 requests per 15 minutes per license (global per license, not per IP)
+$rateLimitId = substr($license['license_key_hash'], 0, 16);
+$rateLimitKey = 'rates_' . $rateLimitId;
+if (is_rate_limited($rateLimitId, 120, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, $rateLimitKey);
+record_rate_limit_attempt($rateLimitId, $rateLimitKey);
 
 // Validate server configuration
 $apiKey = $_ENV['OPENEXCHANGERATES_API_KEY'] ?? '';
@@ -53,8 +53,7 @@ if (!empty($date) && !$isLatest) {
     }
     // Don't allow future dates
     if ($parsed > new DateTime()) {
-        $date = date('Y-m-d');
-        $isLatest = true;
+        send_error_response(400, 'Date cannot be in the future.', 'INVALID_DATE');
     }
 }
 

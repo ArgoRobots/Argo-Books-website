@@ -30,12 +30,13 @@ if (!$license) {
 }
 
 // Rate limiting: 30 scans per 15 minutes per license key
-$rateLimitKey = 'receipt_' . substr($license['license_key_hash'], 0, 32);
-$ip = get_client_ip();
-if (is_rate_limited($ip, 30, 900, $rateLimitKey)) {
+// Key by license hash (not IP) so the limit is truly per-license
+$rateLimitIdentifier = substr($license['license_key_hash'], 0, 32);
+$rateLimitKey = 'receipt_' . $rateLimitIdentifier;
+if (is_rate_limited($rateLimitIdentifier, 30, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
-record_rate_limit_attempt($ip, $rateLimitKey);
+record_rate_limit_attempt($rateLimitIdentifier, $rateLimitKey);
 
 // Validate server configuration
 $azureEndpoint = $_ENV['AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT'] ?? '';

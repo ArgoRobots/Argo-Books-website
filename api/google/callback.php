@@ -5,7 +5,7 @@
  * GET /api/google/callback - Handle Google OAuth redirect after user authorization
  *
  * Exchanges the authorization code for access/refresh tokens and stores them
- * (encrypted) in the portal_companies table.
+ * (encrypted) in the google_oauth_tokens table.
  */
 
 require_once __DIR__ . '/google-helper.php';

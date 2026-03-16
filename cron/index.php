@@ -82,6 +82,7 @@ try {
         FROM premium_subscriptions s
         JOIN community_users u ON s.user_id = u.id
         WHERE s.status = 'active'
+        AND s.payment_method != 'free_key'
         AND s.end_date <= DATE_ADD(NOW(), INTERVAL 7 DAY)
         AND s.auto_renew = 1
         ORDER BY s.end_date ASC
@@ -98,6 +99,7 @@ try {
         FROM premium_subscription_payments p
         JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
         JOIN community_users u ON s.user_id = u.id
+        WHERE s.payment_method != 'free_key'
         ORDER BY p.created_at DESC
         LIMIT 20
     ");
@@ -105,20 +107,22 @@ try {
     $recentPayments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Get stats
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active'");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active' AND payment_method != 'free_key'");
     $stats['active_subscriptions'] = $stmt->fetch()['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active' AND end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) AND auto_renew = 1");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscriptions WHERE status = 'active' AND payment_method != 'free_key' AND end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY) AND auto_renew = 1");
     $stats['due_today'] = $stmt->fetch()['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscription_payments WHERE status = 'completed' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM premium_subscription_payments p JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id WHERE p.status = 'completed' AND s.payment_method != 'free_key' AND p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
     $stats['successful_30d'] = $stmt->fetch()['count'];
 
     $stmt = $pdo->query("
-        SELECT COUNT(DISTINCT subscription_id) AS count
-        FROM premium_subscription_payments
-        WHERE status = 'failed'
-        AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        SELECT COUNT(DISTINCT p.subscription_id) AS count
+        FROM premium_subscription_payments p
+        JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
+        WHERE p.status = 'failed'
+        AND s.payment_method != 'free_key'
+        AND p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
     ");
     $stats['failed_30d'] = $stmt->fetch()['count'];
 

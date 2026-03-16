@@ -108,11 +108,14 @@ namespace {
     {
         $db = get_db_connection();
 
-        // Check if login is email or username
+        // Check if login is email or username - use whitelist to prevent any injection
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
 
-        // Find user by login
-        $stmt = $db->prepare("SELECT * FROM community_users WHERE $field = ?");
+        // Find user by login (field is safe: always 'email' or 'username' from whitelist above)
+        $sql = ($field === 'email')
+            ? 'SELECT * FROM community_users WHERE email = ?'
+            : 'SELECT * FROM community_users WHERE username = ?';
+        $stmt = $db->prepare($sql);
         $stmt->bind_param('s', $login);
         $stmt->execute();
         $result = $stmt->get_result();

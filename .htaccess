@@ -37,15 +37,22 @@ Order allow,deny
 Deny from all
 </Files>
 
+<Files "error_log.txt">
+Order allow,deny
+Deny from all
+</Files>
+
 <Files "rate_limits.json">
 Order allow,deny
 Deny from all
 </Files>
 
-# Protect database directory
+# Protect database directory and vendor/cron internals
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^database/ - [F,L]
+    RewriteRule ^vendor/ - [F,L]
+    RewriteRule ^cron/logs/ - [F,L]
 </IfModule>
 
 # Prevent directory listing

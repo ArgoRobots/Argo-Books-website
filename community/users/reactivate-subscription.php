@@ -12,6 +12,11 @@ require_once __DIR__ . '/../../resources/icons.php';
 // Ensure user is logged in
 require_login();
 
+// Generate CSRF token
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 $user_id = $_SESSION['user_id'];
 
 // Get subscription info
@@ -27,6 +32,10 @@ $error_message = '';
 
 // Handle reactivation confirmation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])) {
+    // Verify CSRF token
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_message = 'Invalid request. Please try again.';
+    } else {
     // For cancelled PayPal subscriptions, redirect to checkout to create a new subscription
     if ($is_cancelled_paypal) {
         header('Location: ../../pricing/premium/checkout/?method=paypal&billing=' . ($premium_subscription['billing_cycle'] ?? 'monthly') . '&change_method=1');
@@ -84,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_reactivate'])
     } catch (PDOException $e) {
         $error_message = 'Failed to reactivate subscription. Please contact support.';
     }
+    } // end CSRF else
 }
 
 $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
@@ -182,6 +192,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
 
             <div class="confirm-actions">
                 <form method="post" id="reactivate-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="confirm_reactivate" value="1">
                     <button type="submit" id="reactivate-btn" class="btn btn-purple">Reactivate with <?php echo $payment_method; ?> (<?php echo ucfirst($billing_cycle); ?>)</button>
                 </form>

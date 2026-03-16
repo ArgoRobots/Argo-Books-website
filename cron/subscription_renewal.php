@@ -43,7 +43,10 @@ require_once __DIR__ . '/../config/pricing.php';
 
 // Only allow CLI or authenticated web requests
 $isCli = php_sapi_name() === 'cli';
-$isAuthenticated = isset($_GET['key']) && $_GET['key'] === ($_ENV['CRON_SECRET'] ?? '');
+$cronSecret = $_ENV['CRON_SECRET'] ?? '';
+// Support both query parameter and Authorization header (header preferred to avoid logging secrets in URLs)
+$providedKey = $_SERVER['HTTP_X_CRON_KEY'] ?? $_GET['key'] ?? '';
+$isAuthenticated = !empty($cronSecret) && !empty($providedKey) && hash_equals($cronSecret, $providedKey);
 
 if (!$isCli && !$isAuthenticated) {
     http_response_code(403);

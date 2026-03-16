@@ -83,7 +83,8 @@ function get_db_connection()
     // Check connection
     if ($db->connect_error) {
         error_log("Database connection error: " . $db->connect_error);
-        die("Database connection failed. Please try again later.");
+        http_response_code(503);
+        die("Service temporarily unavailable. Please try again later.");
     }
 
     // Set character set

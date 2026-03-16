@@ -74,15 +74,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Handle "Stay logged in" option
             if ($remember_me) {
                 // Set session cookie to last 30 days instead of browser close
-                $cookie_params = session_get_cookie_params();
                 setcookie(
                     session_name(),
                     session_id(),
-                    time() + (30 * 24 * 60 * 60), // 30 days
-                    $cookie_params['path'],
-                    $cookie_params['domain'],
-                    $cookie_params['secure'],
-                    $cookie_params['httponly']
+                    [
+                        'expires' => time() + (30 * 24 * 60 * 60), // 30 days
+                        'path' => '/',
+                        'secure' => true,
+                        'httponly' => true,
+                        'samesite' => 'Lax'
+                    ]
                 );
 
                 // Store remember me token in database and set cookie

@@ -432,6 +432,28 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     INDEX idx_is_active (is_active)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Google OAuth tokens (free feature, keyed by device ID)
+CREATE TABLE IF NOT EXISTS google_oauth_tokens (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    device_id_hash VARCHAR(64) NOT NULL UNIQUE COMMENT 'SHA-256 hash of the device ID',
+    google_refresh_token TEXT DEFAULT NULL,
+    google_access_token TEXT DEFAULT NULL,
+    google_token_expires DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Google OAuth state tokens for CSRF protection during Google auth flow
+CREATE TABLE IF NOT EXISTS google_oauth_states (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    state_token VARCHAR(255) NOT NULL UNIQUE,
+    device_id_hash VARCHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_device_id_hash (device_id_hash),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- OAuth state tokens for CSRF protection during provider connect flows
 CREATE TABLE IF NOT EXISTS portal_oauth_states (
     id INT PRIMARY KEY AUTO_INCREMENT,

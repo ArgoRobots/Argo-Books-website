@@ -5,40 +5,22 @@
  * POST /api/portal/register - Register a new company for the payment portal
  *
  * Called from Argo Books when a user sets up the payment portal feature.
- * Generates an API key and returns connection details.
- *
- * Requires the master portal registration key (set in .env).
+ * Validates the user's license key and device ID, then generates
+ * a portal API key and returns connection details.
  */
 
 require_once __DIR__ . '/portal-helper.php';
+require_once __DIR__ . '/../../license_functions.php';
 
 set_portal_headers();
 require_method(['POST']);
 
-// Load environment variables
-require_once __DIR__ . '/../../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
-$dotenv->safeLoad();
-
-// Verify master registration key
-$masterKey = $_ENV['PORTAL_REGISTRATION_KEY'] ?? '';
-if (empty($masterKey)) {
-    send_error_response(500, 'Portal registration not configured.', 'CONFIG_ERROR');
+// Rate limiting: 10 registration attempts per 15 minutes per IP
+$ip = get_client_ip();
+if (is_rate_limited($ip, 10, 900, 'register')) {
+    send_error_response(429, 'Too many registration attempts. Please try again later.', 'RATE_LIMITED');
 }
-
-$providedKey = '';
-if (!empty($_SERVER['HTTP_X_API_KEY'])) {
-    $providedKey = $_SERVER['HTTP_X_API_KEY'];
-} elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-    if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
-        $providedKey = $matches[1];
-    }
-}
-
-if (empty($providedKey) || !hash_equals($masterKey, $providedKey)) {
-    send_error_response(401, 'Invalid or missing registration key.', 'UNAUTHORIZED');
-}
+record_rate_limit_attempt($ip, 'register');
 
 // Parse request body
 $input = file_get_contents('php://input');
@@ -49,8 +31,30 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 
 // Validate required fields
+if (empty($data['licenseKey'])) {
+    send_error_response(400, 'Missing required field: licenseKey', 'MISSING_FIELDS');
+}
+if (empty($data['deviceId'])) {
+    send_error_response(400, 'Missing required field: deviceId', 'MISSING_FIELDS');
+}
 if (empty($data['companyName'])) {
     send_error_response(400, 'Missing required field: companyName', 'MISSING_FIELDS');
+}
+
+$licenseKey = trim($data['licenseKey']);
+$deviceId = trim($data['deviceId']);
+
+// Validate license key using existing license validation
+global $pdo;
+if ($pdo === null) {
+    error_log('Portal registration failed: database connection unavailable');
+    send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_UNAVAILABLE');
+}
+$licenseResult = validate_license($licenseKey, $deviceId);
+if (!($licenseResult['success'] ?? false)) {
+    $message = $licenseResult['message'] ?? 'Invalid license key.';
+    $status = $licenseResult['status'] ?? 'invalid_key';
+    send_error_response(401, $message, strtoupper($status));
 }
 
 $db = get_db_connection();

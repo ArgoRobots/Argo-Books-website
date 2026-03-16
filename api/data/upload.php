@@ -3,6 +3,7 @@ session_start();
 
 // Load environment variables from .env file
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../portal/portal-helper.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
@@ -20,37 +21,13 @@ define('DATA_DIR', __DIR__ . '/../../admin/data-logs');
 define('MAX_UPLOADS_PER_HOUR', 100); // Rate limiting
 define('MAX_FILENAME_LENGTH', 255);
 
-// Authentication configuration
-define('API_KEY', $_ENV['UPLOAD_API_KEY']);
-define('ALLOWED_USER_AGENT', 'ArgoSalesTracker'); // Expected User-Agent prefix
-
-// Authenticate request
-function authenticateRequest()
-{
-    // Check API key in header
-    $provided_key = $_SERVER['HTTP_X_API_KEY'] ?? '';
-    if (empty($provided_key) || !hash_equals(API_KEY, $provided_key)) {
-        logSecurityEvent('invalid_api_key', $provided_key);
-        return false;
-    }
-
-    // Check User-Agent
-    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    if (strpos($user_agent, ALLOWED_USER_AGENT) !== 0) {
-        logSecurityEvent('invalid_user_agent', $user_agent);
-        return false;
-    }
-
-    return true;
-}
-
 // Rate limiting check (enhanced with authentication)
-function checkRateLimit()
+function checkRateLimit($authIdentifier = null)
 {
-    // Use API key in rate limiting to prevent API key sharing abuse
-    $api_key = $_SERVER['HTTP_X_API_KEY'] ?? 'unknown';
+    // Use auth identifier in rate limiting to prevent key sharing abuse
+    $api_key = $authIdentifier ?? $_SERVER['HTTP_X_API_KEY'] ?? 'unknown';
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $rate_key = md5($api_key . $ip); // Combine API key and IP for rate limiting
+    $rate_key = md5($api_key . $ip); // Combine auth identifier and IP for rate limiting
     $rate_file = sys_get_temp_dir() . '/upload_rate_' . $rate_key;
 
     $current_time = time();
@@ -157,15 +134,18 @@ try {
         exit;
     }
 
-    // Authenticate request FIRST
-    if (!authenticateRequest()) {
+    // Authenticate request FIRST (using portal API key)
+    $company = authenticate_portal_request();
+    if (!$company) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized']);
+        logSecurityEvent('invalid_api_key');
         exit;
     }
 
-    // Rate limiting check
-    if (!checkRateLimit()) {
+    // Rate limiting check — use company ID so Bearer-auth requests get a proper bucket
+    $companyId = is_array($company) ? ($company['id'] ?? null) : null;
+    if (!checkRateLimit($companyId ? 'company:' . $companyId : null)) {
         http_response_code(429);
         echo json_encode(['error' => 'Rate limit exceeded']);
         logSecurityEvent('rate_limit_exceeded');

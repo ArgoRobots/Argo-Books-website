@@ -66,6 +66,90 @@ function authenticate_portal_request(): ?array
 }
 
 /**
+ * Authenticate an API request using a premium license key.
+ * Supports X-License-Key header and Authorization: Bearer header.
+ *
+ * @return array|null Returns ['license_key_hash' => string, 'subscription_id' => string] if valid, null otherwise
+ */
+function authenticate_license_request(): ?array
+{
+    $licenseKey = '';
+    if (!empty($_SERVER['HTTP_X_LICENSE_KEY'])) {
+        $licenseKey = $_SERVER['HTTP_X_LICENSE_KEY'];
+    } elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+        if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
+            $licenseKey = $matches[1];
+        }
+    }
+
+    if (empty($licenseKey)) {
+        return null;
+    }
+
+    global $pdo;
+    if ($pdo === null) {
+        error_log("License authentication failed: database connection unavailable");
+        return null;
+    }
+    try {
+        $stmt = $pdo->prepare("
+            SELECT subscription_key, subscription_id, redeemed_at
+            FROM premium_subscription_keys
+            WHERE subscription_key = ?
+        ");
+        $stmt->execute([$licenseKey]);
+        $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$premiumKey || $premiumKey['redeemed_at'] === null) {
+            return null;
+        }
+
+        $stmt = $pdo->prepare("
+            SELECT status, end_date
+            FROM premium_subscriptions
+            WHERE subscription_id = ?
+        ");
+        $stmt->execute([$premiumKey['subscription_id']]);
+        $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$subscription) {
+            return null;
+        }
+
+        $now = new DateTime();
+        $endDate = new DateTime($subscription['end_date']);
+
+        if (!in_array($subscription['status'], ['active', 'cancelled']) || $endDate <= $now) {
+            return null;
+        }
+
+        return [
+            'license_key_hash' => hash('sha256', $licenseKey),
+            'subscription_id' => $premiumKey['subscription_id'],
+        ];
+    } catch (PDOException $e) {
+        error_log("License authentication error: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Authenticate a request using a device ID (for free features like Google Sheets).
+ * Uses X-Device-Id header.
+ *
+ * @return string|null Device ID hash if present, null otherwise
+ */
+function authenticate_device_request(): ?string
+{
+    $deviceId = $_SERVER['HTTP_X_DEVICE_ID'] ?? '';
+    if (empty($deviceId)) {
+        return null;
+    }
+    return hash('sha256', $deviceId);
+}
+
+/**
  * Read rate limits file with exclusive lock to prevent TOCTOU race conditions.
  * Returns the parsed array and keeps the file handle open for atomic updates.
  *
@@ -322,67 +406,6 @@ function get_invoices_by_customer_token(string $customerToken): array
 }
 
 /**
- * Get payment history for a customer token
- *
- * @param string $customerToken Customer portal token
- * @return array Array of payment records
- */
-function get_payments_by_customer_token(string $customerToken): array
-{
-    $db = get_db_connection();
-
-    // First get all invoice_ids for this customer
-    $stmt = $db->prepare(
-        'SELECT pi.invoice_id, pi.company_id
-         FROM portal_invoices pi
-         WHERE pi.customer_token = ?'
-    );
-    $stmt->bind_param('s', $customerToken);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $invoiceIds = [];
-    $companyId = null;
-    while ($row = $result->fetch_assoc()) {
-        $invoiceIds[] = $row['invoice_id'];
-        $companyId = $row['company_id'];
-    }
-    $stmt->close();
-
-    if (empty($invoiceIds) || !$companyId) {
-        $db->close();
-        return [];
-    }
-
-    // Get payments for those invoices
-    $placeholders = implode(',', array_fill(0, count($invoiceIds), '?'));
-    $types = str_repeat('s', count($invoiceIds));
-
-    $stmt = $db->prepare(
-        "SELECT pp.*
-         FROM portal_payments pp
-         WHERE pp.company_id = ?
-           AND pp.invoice_id IN ({$placeholders})
-         ORDER BY pp.created_at DESC"
-    );
-
-    $params = array_merge([$companyId], $invoiceIds);
-    $types = 'i' . $types;
-    $stmt->bind_param($types, ...$params);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    $payments = [];
-    while ($row = $result->fetch_assoc()) {
-        $payments[] = $row;
-    }
-    $stmt->close();
-    $db->close();
-
-    return $payments;
-}
-
-/**
  * Record a portal payment and update the invoice balance
  *
  * @param array $params Payment parameters
@@ -551,7 +574,7 @@ function require_method($allowed): void
         $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
         header('Access-Control-Allow-Origin: ' . $allowedOrigin);
         header('Access-Control-Allow-Methods: ' . implode(', ', $allowed) . ', OPTIONS');
-        header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
+        header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
         http_response_code(204);
         exit;
     }
@@ -569,7 +592,7 @@ function set_portal_headers(): void
     $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);
     header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
-    header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
+    header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
     header('X-Content-Type-Options: nosniff');
 }
 

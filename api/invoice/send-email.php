@@ -6,22 +6,16 @@
  * Configuration is loaded from environment variables.
  */
 
-// Load environment variables
+// Load environment variables and portal helper
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../portal/portal-helper.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->safeLoad();
 
 // Set headers
 header('Content-Type: application/json; charset=utf-8');
-
-// Set CORS to the specific allowed origin from environment if configured
-$allowed_origin = $_ENV['INVOICE_API_ALLOWED_ORIGIN'] ?? '';
-if (!empty($allowed_origin)) {
-    header('Access-Control-Allow-Origin: ' . $allowed_origin);
-}
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, Authorization');
+set_portal_headers();
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -41,37 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Get API key from environment
-$configuredApiKey = $_ENV['INVOICE_EMAIL_API_KEY'] ?? getenv('INVOICE_EMAIL_API_KEY') ?? '';
-
-if (empty($configuredApiKey)) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Server configuration error: API key not configured.',
-        'messageId' => null,
-        'errorCode' => 'CONFIG_ERROR',
-        'timestamp' => date('c')
-    ]);
-    exit;
-}
-
-// Verify API key (support both X-Api-Key and Authorization: Bearer headers)
-$providedApiKey = '';
-if (!empty($_SERVER['HTTP_X_API_KEY'])) {
-    $providedApiKey = $_SERVER['HTTP_X_API_KEY'];
-} elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
-    $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-    if (preg_match('/Bearer\s+(.+)/i', $authHeader, $matches)) {
-        $providedApiKey = $matches[1];
-    }
-}
-
-if (empty($providedApiKey) || !hash_equals($configuredApiKey, $providedApiKey)) {
+// Authenticate using license key
+$license = authenticate_license_request();
+if (!$license) {
     http_response_code(401);
     echo json_encode([
         'success' => false,
-        'message' => 'Invalid or missing API key.',
+        'message' => 'Invalid or missing license key.',
         'messageId' => null,
         'errorCode' => 'UNAUTHORIZED',
         'timestamp' => date('c')

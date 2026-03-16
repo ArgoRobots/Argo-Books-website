@@ -148,7 +148,7 @@ for ($i = 11; $i >= 0; $i--) {
     $mrr = $mrr_by_month[$month_key] ?? 0;
     $mrr_data[] = $mrr;
 
-    // Cumulative revenue
+    // Cumulative normalized MRR (running sum of MRR; not actual cash revenue)
     $running_total += $mrr;
     $cumulative_data[] = round($running_total, 2);
 
@@ -183,9 +183,9 @@ include 'admin_header.php';
             </div>
         </div>
 
-        <!-- Cumulative Revenue Chart -->
+        <!-- Cumulative MRR Chart -->
         <div class="chart-card">
-            <h2 class="chart-card-title">Cumulative Revenue</h2>
+            <h2 class="chart-card-title">Cumulative MRR</h2>
             <div class="chart-card-container">
                 <canvas id="cumulativeChart"></canvas>
             </div>
@@ -267,13 +267,13 @@ new Chart(document.getElementById('mrrChart').getContext('2d'), {
     }
 });
 
-// 2. Cumulative Revenue Area Chart
+// 2. Cumulative MRR Area Chart
 new Chart(document.getElementById('cumulativeChart').getContext('2d'), {
     type: 'line',
     data: {
         labels: chartLabels,
         datasets: [{
-            label: 'Cumulative Revenue',
+            label: 'Cumulative MRR',
             data: <?php echo json_encode($cumulative_data); ?>,
             borderColor: '#8b5cf6',
             backgroundColor: 'rgba(139, 92, 246, 0.15)',

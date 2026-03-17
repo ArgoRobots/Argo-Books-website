@@ -318,26 +318,34 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                 </div>
                                                 <div class="receipt-preview">
                                                     <div class="receipt-header">
-                                                        <div class="skeleton-text w-60"></div>
-                                                        <div class="skeleton-text w-40"></div>
+                                                        <div class="receipt-store-name scan-text">Office Depot #1284</div>
+                                                        <div class="receipt-date scan-text">Mar 14, 2026 &nbsp; 2:47 PM</div>
                                                     </div>
                                                     <div class="receipt-items">
-                                                        <div class="receipt-item">
-                                                            <div class="skeleton-text w-70"></div>
-                                                            <div class="skeleton-text w-20"></div>
+                                                        <div class="receipt-item scan-text">
+                                                            <span>Copy Paper (5 ream)</span>
+                                                            <span>$42.99</span>
                                                         </div>
-                                                        <div class="receipt-item">
-                                                            <div class="skeleton-text w-50"></div>
-                                                            <div class="skeleton-text w-20"></div>
+                                                        <div class="receipt-item scan-text">
+                                                            <span>Ink Cartridge BK</span>
+                                                            <span>$34.99</span>
                                                         </div>
-                                                        <div class="receipt-item">
-                                                            <div class="skeleton-text w-60"></div>
-                                                            <div class="skeleton-text w-20"></div>
+                                                        <div class="receipt-item scan-text">
+                                                            <span>Desk Organizer</span>
+                                                            <span>$24.49</span>
+                                                        </div>
+                                                        <div class="receipt-item scan-text">
+                                                            <span>Sticky Notes (12pk)</span>
+                                                            <span>$8.99</span>
+                                                        </div>
+                                                        <div class="receipt-item receipt-tax scan-text">
+                                                            <span>Tax</span>
+                                                            <span>$8.89</span>
                                                         </div>
                                                     </div>
-                                                    <div class="receipt-total">
+                                                    <div class="receipt-total scan-text">
                                                         <span>Total</span>
-                                                        <span>$127.43</span>
+                                                        <span>$120.35</span>
                                                     </div>
                                                 </div>
                                                 <div class="ai-badge" id="aiBadge">
@@ -1448,29 +1456,61 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         const scanAnimation = document.getElementById('receiptScanAnimation');
         const aiBadge = document.getElementById('aiBadge');
         const scanLine = scanAnimation ? scanAnimation.querySelector('.scan-line') : null;
+        const scanTexts = scanAnimation ? scanAnimation.parentElement.querySelectorAll('.scan-text') : [];
+        let scanTimeouts = [];
+
+        function clearScanTimeouts() {
+            scanTimeouts.forEach(t => clearTimeout(t));
+            scanTimeouts = [];
+        }
 
         function runScanCycle() {
             if (!scanAnimation || !aiBadge || !scanLine) return;
+            clearScanTimeouts();
 
-            // Reset to scanning state
+            // Reset all states
             scanAnimation.classList.remove('scan-complete');
             aiBadge.classList.remove('complete');
+            scanTexts.forEach(el => {
+                el.classList.remove('highlighted', 'extracted');
+            });
 
-            // Reset scan line animation
+            // Run single scan pass
             scanLine.style.animation = 'none';
-            scanLine.offsetHeight; // Trigger reflow
-            scanLine.style.animation = 'scanLine 1.5s ease-in-out 3';
+            scanLine.offsetHeight;
+            scanLine.style.animation = 'scanLine 2.5s ease-in-out 1';
 
-            // After 3 scans (4.5 seconds), show complete state
-            setTimeout(() => {
+            // Highlight each text line as scan passes over it
+            const scanDuration = 2500;
+            const lineCount = scanTexts.length;
+            scanTexts.forEach((el, i) => {
+                const highlightAt = (scanDuration / (lineCount + 1)) * (i + 1);
+                scanTimeouts.push(setTimeout(() => {
+                    el.classList.add('highlighted');
+                }, highlightAt));
+            });
+
+            // After scan completes, transition highlights to extracted (green)
+            scanTimeouts.push(setTimeout(() => {
+                scanTexts.forEach((el, i) => {
+                    scanTimeouts.push(setTimeout(() => {
+                        el.classList.remove('highlighted');
+                        el.classList.add('extracted');
+                    }, i * 80));
+                });
+            }, scanDuration + 200));
+
+            // Show complete state
+            const completeAt = scanDuration + 200 + (scanTexts.length * 80) + 300;
+            scanTimeouts.push(setTimeout(() => {
                 scanAnimation.classList.add('scan-complete');
                 aiBadge.classList.add('complete');
 
-                // After showing complete for 3 seconds, restart the cycle
-                setTimeout(() => {
+                // Restart cycle after showing complete
+                scanTimeouts.push(setTimeout(() => {
                     runScanCycle();
-                }, 3000);
-            }, 4500);
+                }, 3000));
+            }, completeAt));
         }
 
         // Start the scan animation cycle

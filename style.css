@@ -974,9 +974,10 @@ a {
     position: absolute;
     left: 0;
     right: 0;
-    height: 2px;
+    height: 3px;
     background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-    animation: scanLine 1.5s ease-in-out 3;
+    box-shadow: 0 0 12px 3px rgba(59, 130, 246, 0.3);
+    animation: scanLine 2.5s ease-in-out 1;
     opacity: 1;
     transition: opacity 0.3s ease;
 }
@@ -1028,45 +1029,72 @@ a {
 .receipt-preview {
     position: relative;
     z-index: 2;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.78rem;
+    color: #334155;
 }
 
 .receipt-header {
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 1px dashed #e2e8f0;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #cbd5e1;
+    text-align: center;
 }
 
-.skeleton-text {
-    height: 12px;
-    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 4px;
-    margin-bottom: 8px;
+.receipt-store-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #0f172a;
+    margin-bottom: 2px;
 }
 
-.skeleton-text.w-60 { width: 60%; }
-.skeleton-text.w-50 { width: 50%; }
-.skeleton-text.w-40 { width: 40%; }
-.skeleton-text.w-70 { width: 70%; }
-.skeleton-text.w-20 { width: 20%; }
+.receipt-date {
+    font-size: 0.7rem;
+    color: #64748b;
+}
 
 .receipt-items {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .receipt-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
+    padding: 2px 0;
+}
+
+.receipt-item.receipt-tax {
+    padding-top: 8px;
+    border-top: 1px dashed #cbd5e1;
+    color: #64748b;
+    font-size: 0.72rem;
 }
 
 .receipt-total {
     display: flex;
     justify-content: space-between;
-    padding-top: 16px;
+    padding-top: 12px;
     border-top: 2px solid #0f172a;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #0f172a;
+}
+
+.scan-text {
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease, color 0.15s ease;
+}
+
+.scan-text.highlighted {
+    background-color: rgba(59, 130, 246, 0.12);
+    color: #1e40af;
+}
+
+.scan-text.extracted {
+    background-color: rgba(16, 185, 129, 0.10);
+    color: #065f46;
 }
 
 .ai-badge {

@@ -31,9 +31,6 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 
 // Validate required fields
-if (empty($data['licenseKey'])) {
-    send_error_response(400, 'Missing required field: licenseKey', 'MISSING_FIELDS');
-}
 if (empty($data['deviceId'])) {
     send_error_response(400, 'Missing required field: deviceId', 'MISSING_FIELDS');
 }
@@ -41,21 +38,26 @@ if (empty($data['companyName'])) {
     send_error_response(400, 'Missing required field: companyName', 'MISSING_FIELDS');
 }
 
-$licenseKey = trim($data['licenseKey']);
+$licenseKey = trim($data['licenseKey'] ?? '');
 $deviceId = trim($data['deviceId']);
 
-// Validate license key using existing license validation
+// Validate identity: premium users use license key, free users use device ID
 global $pdo;
 if ($pdo === null) {
     error_log('Portal registration failed: database connection unavailable');
     send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_UNAVAILABLE');
 }
-$licenseResult = validate_license($licenseKey, $deviceId);
-if (!($licenseResult['success'] ?? false)) {
-    $message = $licenseResult['message'] ?? 'Invalid license key.';
-    $status = $licenseResult['status'] ?? 'invalid_key';
-    send_error_response(401, $message, strtoupper($status));
+
+if (!empty($licenseKey)) {
+    // Premium path: validate license key
+    $licenseResult = validate_license($licenseKey, $deviceId);
+    if (!($licenseResult['success'] ?? false)) {
+        $message = $licenseResult['message'] ?? 'Invalid license key.';
+        $status = $licenseResult['status'] ?? 'invalid_key';
+        send_error_response(401, $message, strtoupper($status));
+    }
 }
+// Free path: no license key, device ID is the sole identifier (already validated as non-empty)
 
 $db = get_db_connection();
 

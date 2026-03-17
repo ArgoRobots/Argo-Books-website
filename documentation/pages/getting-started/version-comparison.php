@@ -156,8 +156,8 @@ include '../../docs-header.php';
                         </tr>
                         <tr>
                             <td>Invoices & Payments</td>
-                            <td>—</td>
-                            <td>✓</td>
+                            <td>5/month</td>
+                            <td>Unlimited</td>
                         </tr>
                         <tr>
                             <td>AI Receipt Scanning</td>

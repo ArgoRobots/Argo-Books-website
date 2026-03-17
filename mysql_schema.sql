@@ -520,3 +520,15 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Invoice send usage tracking for free-tier limits
+CREATE TABLE IF NOT EXISTS invoice_send_usage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    license_key VARCHAR(255) NOT NULL COMMENT 'License key or device_<hash> for free users',
+    usage_month DATE NOT NULL,
+    send_count INT NOT NULL DEFAULT 0,
+    monthly_limit INT NOT NULL DEFAULT 5,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_license_month (license_key, usage_month)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

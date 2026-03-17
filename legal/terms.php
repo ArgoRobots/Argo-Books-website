@@ -92,7 +92,7 @@
                     require_once __DIR__ . '/../config/pricing.php';
                     $pricing = get_pricing_config();
                 ?>
-                <li><strong>Billing</strong>: Subscriptions are billed monthly ($<?php echo number_format($pricing['premium_monthly_price'], 0); ?> CAD) or yearly ($<?php echo number_format($pricing['premium_yearly_price'], 0); ?> CAD). Standard license holders receive a $<?php echo number_format($pricing['premium_discount'], 0); ?> discount.</li>
+                <li><strong>Billing</strong>: Subscriptions are billed monthly ($<?php echo number_format($pricing['premium_monthly_price'], 0); ?> CAD) or yearly ($<?php echo number_format($pricing['premium_yearly_price'], 0); ?> CAD).</li>
                 <li><strong>Auto-Renewal</strong>: Subscriptions automatically renew unless cancelled before the billing date.</li>
                 <li><strong>Cancellation</strong>: You may cancel at any time. Access continues until the end of your billing period.</li>
                 <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square.</li>

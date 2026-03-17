@@ -65,16 +65,13 @@
                     provider.</li>
             </ol>
 
-            <h2>Cancellations</h2>
-            <p>If you change your mind about your subscription, you can cancel at any time from your account settings.
-                After cancellation, you retain access until the end of your current billing period. No partial refunds
-                are issued for unused time.</p>
-
             <h2>Technical Issues</h2>
             <p>If you are experiencing technical issues with Argo Books, we encourage you to:</p>
             <ol>
                 <li>Review our <a class="link" href="../documentation/">Documentation</a> for troubleshooting
                     guides and frequently asked questions</li>
+                <li>Visit our <a class="link" href="../community/">Community Page</a> to see if other people
+                    have the same problem, and if they've found a solution</li>
                 <li>Contact our technical support team through our <a class="link"
                         href="../contact-us/">Contact Us Page</a> or by email</li>
             </ol>
@@ -94,7 +91,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: November 24, 2025</p>
+            <p class="last-updated">Last updated: March 16, 2026</p>
         </div>
     </div>
 

@@ -227,7 +227,7 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
-                <h2>Both free to start — here's how they compare</h2>
+                <h2>Both are free to start — here's how they compare</h2>
                 <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports and AI receipt scanning. Argo Books Premium is $10 CAD/month with inventory, AI, and more.</p>
             </div>
             <div class="pricing-grid">
@@ -387,7 +387,7 @@
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download Free</span>
+                            <span>Download for Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
                         <a href="../../pricing/" class="btn-cta btn-cta-ghost">

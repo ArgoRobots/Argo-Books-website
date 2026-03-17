@@ -86,7 +86,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
                 <h2>Same simplicity, more features, lower price</h2>
-                <p class="section-desc">ZipBooks and Argo Books share a similar philosophy — simple, no double-entry accounting, free tier included. But Argo Books offers AI receipt scanning, predictive analytics, and local data storage at a lower premium price.</p>
+                <p class="section-desc">ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and has seen limited development since. Argo Books offers AI receipt scanning, predictive analytics, and local data storage at a lower price — with active support and development.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
@@ -204,12 +204,6 @@
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
-                        <tr>
-                            <td>Time tracking</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -310,8 +304,8 @@
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>An honest take</h3>
-                <p>ZipBooks is the closest competitor to Argo Books — it's simple, avoids double-entry jargon, and has a generous free tier. If you're already using ZipBooks and happy with it, it's a solid tool.</p>
-                <p>But Argo Books offers AI receipt scanning, predictive analytics, inventory management, and local data storage at a lower premium price — plus offline access so you're never locked out of your own data.</p>
+                <p>ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and since the acquisitions, the product appears to have little active development or support. Users have reported issues with bugs, missing features, and difficulty reaching customer service — raising concerns about the long-term viability of the platform.</p>
+                <p>If you're looking for a simple bookkeeping tool that's actively maintained, Argo Books offers AI receipt scanning, predictive analytics, inventory management, and local data storage at a lower premium price — plus offline access so you're never locked out of your own data.</p>
             </div>
         </div>
     </section>
@@ -390,7 +384,7 @@
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download Free</span>
+                            <span>Download for Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
                         <a href="../../pricing/" class="btn-cta btn-cta-ghost">

@@ -86,7 +86,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
                 <h2>Built for business owners, not accountants</h2>
-                <p class="section-desc">Xero is polished and globally popular, but it's cloud-only, designed for businesses that already have an accountant, and its Starter plan caps you at just 20 invoices per month. Argo Books is built for non-accountants who want simplicity, privacy, and affordable pricing.</p>
+                <p class="section-desc">Xero is polished and globally popular, but it's cloud-only, designed for businesses that already have an accountant, and its $25/month Starter plan caps you at just 20 invoices per month. Argo Books is built for non-accountants who want simplicity, privacy, and affordable pricing.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
@@ -234,7 +234,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">Xero charges $25 to $75 CAD/month depending on the plan — and the Starter plan's 20-invoice cap means most businesses end up on the $55/month Standard plan. Argo Books keeps it simple with predictable pricing and no caps.</p>
+                <p class="section-desc">Xero charges $25 to $75 CAD/month depending on the plan — and the Starter plan's 20-invoice cap means most businesses end up on the $55/month plan. Argo Books keeps it simple with affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -322,8 +322,8 @@
                     <?= svg_icon('info', 28) ?>
                 </div>
                 <h3>An honest take</h3>
-                <p>Xero is a polished, globally popular platform with strong app integrations, unlimited users on every plan, and a clean UI. If your business already works with an accountant or needs multi-currency support, Xero is a solid choice.</p>
-                <p>But if you're a small business owner who wants offline access, local data storage, and straightforward finance management without paying $55+/month for unlimited invoices — Argo Books is built for you.</p>
+                <p>Xero is a polished, globally popular platform with strong app integrations, unlimited users on every plan, and a clean UI. If your business already works with an accountant or needs deep third-party integrations, Xero is a solid choice.</p>
+                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $55+/month for unlimited invoices — Argo Books is built for you.</p>
             </div>
         </div>
     </section>
@@ -402,7 +402,7 @@
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download Free</span>
+                            <span>Download for Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
                         <a href="../../pricing/" class="btn-cta btn-cta-ghost">

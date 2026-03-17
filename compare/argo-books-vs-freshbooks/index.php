@@ -86,7 +86,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
                 <h2>Everything you need, nothing you don't</h2>
-                <p class="section-desc">FreshBooks is built around invoicing and time tracking for freelancers. Argo Books is built for small businesses that need straightforward finance and inventory management.</p>
+                <p class="section-desc">Both tools work for small businesses, but they focus on different things. FreshBooks shines at invoicing and time tracking — Argo Books focuses on simplicity, offline access, and inventory.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
@@ -396,7 +396,7 @@
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download Free</span>
+                            <span>Download for Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
                         <a href="../../pricing/" class="btn-cta btn-cta-ghost">

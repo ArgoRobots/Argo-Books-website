@@ -45,6 +45,7 @@
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/faq.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
@@ -228,7 +229,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $28 to $160 CAD/month depending on the plan — and those prices keep climbing year over year. Argo Books keeps it simple with predictable, affordable pricing.</p>
+                <p class="section-desc">QuickBooks charges $28 to $160 CAD/month depending on the plan — and those prices keep climbing every year. Argo Books keeps it simple with predictable, affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -305,16 +306,27 @@
         </div>
     </section>
 
-    <!-- Honest Take -->
+    <!-- Confusion Stats -->
     <section class="honest-take">
         <div class="container">
             <div class="honest-card animate-on-scroll">
                 <div class="honest-icon">
-                    <?= svg_icon('info', 28) ?>
+                    <?= svg_icon('help-circle', 28) ?>
                 </div>
-                <h3>An honest take</h3>
-                <p>QuickBooks is a powerful, mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, QuickBooks is a solid choice.</p>
-                <p>But if you're tired of rising prices, aggressive feature gating, and complexity you don't need — Argo Books is built for you. Simple pricing, no upsells, and every feature included in one plan.</p>
+                <h3>The most confusing office tool in America</h3>
+                <p>According to a <a class="link" href="https://www.digitaljournal.com/tech-science/the-most-puzzling-office-apps-in-the-u-s-revealed/article" target="_blank" rel="noopener noreferrer">study by Digital Adoption</a>, QuickBooks is the most confusing office application in the U.S. — generating over 68,000 support-related Google searches every month. The most common query? "QuickBooks customer service," searched 19,000 times per month in the U.S. alone.</p>
+                <p>Argo Books takes the opposite approach. No accounting jargon, no double-entry complexity — just a clean, intuitive interface designed for business owners, not accountants.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Honest Take -->
+    <section class="honest-take-alt">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">An Honest Take</span>
+                <h2>QuickBooks is powerful — but is it right for you?</h2>
+                <p class="section-desc">QuickBooks is a mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, it's a solid choice. But as a publicly traded company, Intuit's priorities don't always align with small business owners — and it shows in the rising prices, aggressive feature gating, and complexity you don't need. Argo Books is built for you. Simple pricing, no upsells, and every feature included in one plan.</p>
             </div>
         </div>
     </section>
@@ -393,7 +405,7 @@
                     <p>Download Argo Books for free and see the difference for yourself.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
-                            <span>Download Free</span>
+                            <span>Download for Free</span>
                             <?= svg_icon('arrow-right', 18) ?>
                         </a>
                         <a href="../../pricing/" class="btn-cta btn-cta-ghost">

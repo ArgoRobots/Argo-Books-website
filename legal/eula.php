@@ -80,21 +80,21 @@
 
             <h2>4. Anonymous Data Collection</h2>
 
-            <h3>4.1 Usage Data</h3>
-            <p>The Software collects anonymous usage statistics and geographic information to help improve the quality
-                and performance of the Software. This data collection is enabled by default but can be disabled in the
-                Settings panel. Data collected includes:</p>
+            <h3>4.1 Error & Crash Reporting</h3>
+            <p>The primary purpose of anonymous data collection is to identify and fix errors, crashes, and
+                performance issues that users encounter. When something goes wrong, the Software captures diagnostic
+                information so we can reproduce and resolve the problem. This data collection is enabled by default
+                but can be disabled in the Settings panel. Data collected includes:</p>
             <ul>
-                <li>Export operations (type, duration, file size)</li>
-                <li>API usage (type, duration, tokens)</li>
-                <li>Error tracking (error category, error code, timestamp, and anonymous context information)</li>
-                <li>Session data (start/end times, duration, application version)</li>
-                <li>Geographic information (country, region, city, timezone)</li>
+                <li>Error and crash reports (error category, error code, stack trace, timestamp, and anonymous context information)</li>
+                <li>Performance diagnostics (slow operations, failed exports, API timeouts)</li>
+                <li>Session data (application version, session duration) to help us identify version-specific issues</li>
+                <li>Geographic information (country, region, city, timezone) to detect region-specific problems</li>
                 <li>Hashed IP addresses (one-way encrypted, cannot be used to identify you)</li>
             </ul>
 
             <h3>4.2 Storage and Control</h3>
-            <p>All anonymous data is stored locally on your device. No data is sent to our servers without your explicit
+            <p>All anonymous data is stored locally on your device. No data is sent to our servers without your
                 permission. You can export and delete this data at any time through the Settings panel. Geographic data
                 helps us understand our global user base and optimize the Software for different regions.</p>
 
@@ -147,7 +147,7 @@
                 <li>Email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: February 17, 2026</p>
+            <p class="last-updated">Last updated: March 17, 2026</p>
         </div>
     </div>
 

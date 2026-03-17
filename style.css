@@ -196,13 +196,13 @@ a {
     opacity: 1;
     stroke-dasharray: 5, 5;
     clip-path: inset(0 100% 0 0);
-    animation: revealDashed 0.8s ease-out 1.85s forwards;
+    animation: revealDashed 0.8s ease-out 1.2s forwards;
 }
 @keyframes revealDashed {
     to { clip-path: inset(0 0 0 0); }
 }
 .chart-mockup.animating .forecast-chart circle.draw-dot {
-    animation: fillGradient 0.3s ease-out 1.8s forwards;
+    animation: fillGradient 0.3s ease-out 1.2s forwards;
 }
 .chart-mockup.animating .prediction-badge {
     opacity: 0;
@@ -1879,7 +1879,7 @@ a {
     color: #1e293b;
     font-weight: 600;
     background: white;
-    padding: 8px 16px;
+    padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
 }

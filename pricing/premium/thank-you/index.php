@@ -64,7 +64,7 @@
         <div class="features-list">
             <div class="feature-item">
                 <?= svg_icon('document') ?>
-                <span>Invoices & Payments</span>
+                <span>Unlimited Invoices & Payments</span>
             </div>
             <div class="feature-item">
                 <?= svg_icon('calendar') ?>

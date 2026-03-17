@@ -156,7 +156,7 @@ include '../../docs-header.php';
                         </tr>
                         <tr>
                             <td>Invoices & Payments</td>
-                            <td>5/month</td>
+                            <td>5 invoices / month</td>
                             <td>Unlimited</td>
                         </tr>
                         <tr>

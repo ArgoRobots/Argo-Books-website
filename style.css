@@ -1133,6 +1133,8 @@ a {
 
 .ai-badge.complete .badge-text-complete {
     display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Chart Mockup */

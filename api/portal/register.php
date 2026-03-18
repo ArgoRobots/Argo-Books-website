@@ -95,19 +95,20 @@ if ($squareAccessToken !== null && $squareAccessToken !== '') {
     $squareAccessToken = portal_encrypt($squareAccessToken);
 }
 $squareLocationId = $data['squareLocationId'] ?? null;
+$environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
 
 $stmt = $db->prepare(
     'INSERT INTO portal_companies
      (api_key, company_name, company_logo_url, stripe_account_id,
       paypal_merchant_id, square_merchant_id, square_access_token,
-      square_location_id, owner_email, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+      square_location_id, owner_email, environment, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
 );
 $stmt->bind_param(
-    'sssssssss',
+    'ssssssssss',
     $apiKey, $companyName, $companyLogoUrl, $stripeAccountId,
     $paypalMerchantId, $squareMerchantId, $squareAccessToken,
-    $squareLocationId, $ownerEmail
+    $squareLocationId, $ownerEmail, $environment
 );
 
 if (!$stmt->execute()) {

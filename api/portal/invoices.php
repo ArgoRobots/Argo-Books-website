@@ -107,19 +107,21 @@ function handle_publish_invoice(): void
         );
     } else {
         // Create new invoice
+        $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
         $stmt = $db->prepare(
             'INSERT INTO portal_invoices
              (company_id, invoice_id, invoice_token, customer_token,
               customer_name, customer_email, invoice_data,
               status, total_amount, balance_due, currency, due_date,
-              created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+              environment, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
         );
         $stmt->bind_param(
-            'isssssssddss',
+            'isssssssddsss',
             $companyId, $invoiceId, $invoiceToken, $customerToken,
             $customerName, $customerEmail, $invoiceData,
-            $status, $totalAmount, $balanceDue, $currency, $dueDate
+            $status, $totalAmount, $balanceDue, $currency, $dueDate,
+            $environment
         );
     }
 

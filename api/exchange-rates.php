@@ -21,14 +21,15 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['GET']);
 
-// Authenticate using license key
+// Authenticate using license key (optional — exchange rates are available to all users)
 $license = authenticate_license_request();
-if (!$license) {
-    send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
-}
 
-// Rate limiting: 120 requests per 15 minutes per license (global per license, not per IP)
-$rateLimitId = substr($license['license_key_hash'], 0, 16);
+// Rate limiting: use license hash if authenticated, otherwise use IP address
+if ($license) {
+    $rateLimitId = substr($license['license_key_hash'], 0, 16);
+} else {
+    $rateLimitId = 'ip_' . substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 16);
+}
 $rateLimitKey = 'rates_' . $rateLimitId;
 if (is_rate_limited($rateLimitId, 120, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');

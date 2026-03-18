@@ -33,12 +33,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 function handle_pull_payments(int $companyId): void
 {
     $since = $_GET['since'] ?? null;
+    $force = ($_GET['force'] ?? '0') === '1';
 
-    error_log("Portal sync GET: company=$companyId, since=" . ($since ?: 'null'));
+    error_log("Portal sync GET: company=$companyId, since=" . ($since ?: 'null') . ", force=" . ($force ? '1' : '0'));
 
     $db = get_db_connection();
 
-    if ($since) {
+    if ($force) {
+        // Force re-sync: return ALL payments regardless of synced_to_argo flag.
+        // Used to recover payments that were confirmed but not saved locally.
+        $stmt = $db->prepare(
+            'SELECT pp.*, pi.invoice_token, pi.customer_token
+             FROM portal_payments pp
+             LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
+             WHERE pp.company_id = ?
+             ORDER BY pp.created_at ASC'
+        );
+        $stmt->bind_param('i', $companyId);
+    } elseif ($since) {
         // Get payments created after the given timestamp
         $stmt = $db->prepare(
             'SELECT pp.*, pi.invoice_token, pi.customer_token

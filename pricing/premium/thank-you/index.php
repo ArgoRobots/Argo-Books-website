@@ -63,16 +63,32 @@
 
         <div class="features-list">
             <div class="feature-item">
-                <?= svg_icon('document') ?>
-                <span>Unlimited Invoices & Payments</span>
+                <?= svg_icon('check-pricing') ?>
+                <span>Everything in Free</span>
             </div>
             <div class="feature-item">
-                <?= svg_icon('calendar') ?>
-                <span>AI Receipt Scanning <span>(500/month)</span></span>
+                <?= svg_icon('check-pricing') ?>
+                <span>Unlimited products</span>
             </div>
             <div class="feature-item">
-                <?= svg_icon('package') ?>
-                <span>predictive analytics</span>
+                <?= svg_icon('check-pricing') ?>
+                <span>Biometric login security</span>
+            </div>
+            <div class="feature-item">
+                <?= svg_icon('check-pricing') ?>
+                <span>Unlimited invoices & payments</span>
+            </div>
+            <div class="feature-item">
+                <?= svg_icon('check-pricing') ?>
+                <span>AI receipt scanning <span>(500/month)</span></span>
+            </div>
+            <div class="feature-item">
+                <?= svg_icon('check-pricing') ?>
+                <span>Predictive analytics</span>
+            </div>
+            <div class="feature-item">
+                <?= svg_icon('check-pricing') ?>
+                <span>Priority support</span>
             </div>
         </div>
 

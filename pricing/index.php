@@ -96,19 +96,19 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Expense & revenue tracking</span>
+                                <span>Unlimited transactions</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Financial reports</span>
+                                <span>Real-time analytics</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Receipt management</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
                                 <span>5 invoices / month</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Cross-platform desktop app</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
@@ -135,6 +135,10 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <p class="price-note">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
 
                         <ul class="card-features">
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>Everything in Free</span>
+                            </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
                                 <span>Unlimited products</span>

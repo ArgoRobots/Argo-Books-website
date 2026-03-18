@@ -206,13 +206,24 @@ try {
             exit();
         }
 
+        // Atomic conditional update to prevent concurrent requests exceeding the limit
         $usage_month = date('Y-m-01');
         $stmt = $pdo->prepare("
             UPDATE invoice_send_usage
             SET send_count = send_count + 1
-            WHERE license_key = ? AND usage_month = ?
+            WHERE license_key = ? AND usage_month = ? AND send_count < ?
         ");
-        $stmt->execute([$identifier, $usage_month]);
+        $stmt->execute([$identifier, $usage_month, $monthly_limit]);
+
+        if ($stmt->rowCount() === 0) {
+            // Another request incremented past the limit concurrently
+            $response = buildResponse($send_count, $monthly_limit, $tier, false);
+            $response['success'] = false;
+            $response['error'] = 'Monthly invoice send limit reached';
+            http_response_code(429);
+            echo json_encode($response);
+            exit();
+        }
 
         $new_send_count = $send_count + 1;
         echo json_encode(buildResponse($new_send_count, $monthly_limit, $tier));

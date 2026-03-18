@@ -123,10 +123,20 @@ function getOrCreateUsageRecord($pdo, $identifier, $monthly_limit) {
     $stmt = $pdo->prepare("
         INSERT INTO invoice_send_usage (license_key, usage_month, send_count, monthly_limit)
         VALUES (?, ?, 0, ?)
+        ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)
     ");
     $stmt->execute([$identifier, $usage_month, $monthly_limit]);
 
-    return [
+    // Re-select to get the actual row (handles concurrent insert race)
+    $stmt = $pdo->prepare("
+        SELECT id, send_count, monthly_limit
+        FROM invoice_send_usage
+        WHERE license_key = ? AND usage_month = ?
+    ");
+    $stmt->execute([$identifier, $usage_month]);
+    $record = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $record ?: [
         'id' => $pdo->lastInsertId(),
         'send_count' => 0,
         'monthly_limit' => $monthly_limit

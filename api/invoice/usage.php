@@ -169,6 +169,12 @@ function buildResponse($send_count, $monthly_limit, $tier, $can_send = null) {
 }
 
 try {
+    if ($pdo === null) {
+        http_response_code(503);
+        echo json_encode(['success' => false, 'error' => 'Service temporarily unavailable']);
+        exit();
+    }
+
     $tierInfo = validateAndGetTier($pdo, $license_key, $device_id);
 
     if (!$tierInfo) {
@@ -230,7 +236,7 @@ try {
         exit();
     }
 
-} catch (PDOException $e) {
+} catch (Throwable $e) {
     error_log("Invoice send usage API error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database error']);

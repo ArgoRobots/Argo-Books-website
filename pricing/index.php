@@ -104,6 +104,10 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
+                                <span>5 invoices / month</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>Cross-platform desktop app</span>
                             </li>
                             <li>
@@ -141,7 +145,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Invoices & payments</span>
+                                <span>Unlimited invoices & payments</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>

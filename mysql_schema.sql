@@ -536,8 +536,3 @@ CREATE TABLE IF NOT EXISTS invoice_send_usage (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_license_month (license_key, usage_month)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Migration: Add environment column to portal_companies and portal_invoices
--- Run these on existing databases that were created before this column existed:
--- ALTER TABLE portal_companies ADD COLUMN environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production' AFTER square_email, ADD INDEX idx_environment (environment);
--- ALTER TABLE portal_invoices ADD COLUMN environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production' AFTER due_date, ADD INDEX idx_environment (environment);

@@ -60,21 +60,28 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
     if (!empty($license_key)) {
         // Check if it's a Premium key (starts with PREM-)
         if (strpos($license_key, 'PREM-') === 0) {
-            $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
-            $stmt->execute([$license_key]);
-            if ($stmt->fetch()) {
-                return ['tier' => 'premium', 'limit' => PHP_INT_MAX, 'identifier' => $license_key];
-            }
-
+            // Look up the key and verify it has been redeemed
             $stmt = $pdo->prepare("
-                SELECT id FROM premium_subscriptions
-                WHERE subscription_id = ?
-                AND status IN ('active', 'cancelled')
-                AND end_date > NOW()
+                SELECT subscription_key, subscription_id, redeemed_at
+                FROM premium_subscription_keys
+                WHERE subscription_key = ?
             ");
             $stmt->execute([$license_key]);
-            if ($stmt->fetch()) {
-                return ['tier' => 'premium', 'limit' => PHP_INT_MAX, 'identifier' => $license_key];
+            $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($premiumKey && $premiumKey['redeemed_at'] !== null) {
+                // Verify the linked subscription is active and not expired
+                $stmt = $pdo->prepare("
+                    SELECT status, end_date
+                    FROM premium_subscriptions
+                    WHERE subscription_id = ?
+                    AND status IN ('active', 'cancelled')
+                    AND end_date > NOW()
+                ");
+                $stmt->execute([$premiumKey['subscription_id']]);
+                if ($stmt->fetch()) {
+                    return ['tier' => 'premium', 'limit' => PHP_INT_MAX, 'identifier' => $license_key];
+                }
             }
         }
 

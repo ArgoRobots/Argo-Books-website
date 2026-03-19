@@ -13,153 +13,61 @@ if (!isset($currentPage)) {
     $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 }
 
-// Define sidebar navigation structure with category folders and icons
+// Define sidebar navigation structure with category folders
 $sidebarSections = [
     'Getting Started' => [
         'folder' => 'pages/getting-started',
         'pages' => [
-            'system-requirements' => [
-                'title' => 'System Requirements',
-                'icon' => svg_icon('monitor', 18)
-            ],
-            'installation' => [
-                'title' => 'Installation Guide',
-                'icon' => svg_icon('download', 18)
-            ],
-            'quick-start' => [
-                'title' => 'Quick Start Tutorial',
-                'icon' => svg_icon('play', 18)
-            ],
-            'version-comparison' => [
-                'title' => 'Free vs. Paid Version',
-                'icon' => svg_icon('table', 18)
-            ]
+            'system-requirements' => ['title' => 'System Requirements'],
+            'installation' => ['title' => 'Installation Guide'],
+            'quick-start' => ['title' => 'Quick Start Tutorial'],
+            'version-comparison' => ['title' => 'Free vs. Paid Version']
         ]
     ],
     'Core Features' => [
         'folder' => 'pages/features',
         'pages' => [
-            'dashboard' => [
-                'title' => 'Dashboard',
-                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>'
-            ],
-            'analytics' => [
-                'title' => 'Analytics',
-                'icon' => svg_icon('analytics', 18)
-            ],
-            'predictive-analytics' => [
-                'title' => 'Predictive Analytics',
-                'icon' => svg_icon('analytics', 18)
-            ],
-            'report-generator' => [
-                'title' => 'Report Generator',
-                'icon' => svg_icon('document-lines', 18)
-            ],
-            'sales-tracking' => [
-                'title' => 'Expense/Revenue Tracking',
-                'icon' => svg_icon('trending-up', 18)
-            ],
-            'invoicing' => [
-                'title' => 'Invoicing & Payments',
-                'icon' => svg_icon('document', 18)
-            ],
-            'rental' => [
-                'title' => 'Rental Management',
-                'icon' => svg_icon('calendar', 18)
-            ],
-            'customers' => [
-                'title' => 'Customer Management',
-                'icon' => svg_icon('users', 18)
-            ],
-            'product-management' => [
-                'title' => 'Product Management',
-                'icon' => svg_icon('package', 18)
-            ],
-            'suppliers' => [
-                'title' => 'Supplier Management',
-                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
-            ],
-            'inventory' => [
-                'title' => 'Inventory Management',
-                'icon' => svg_icon('package', 18)
-            ],
-            'purchase-orders' => [
-                'title' => 'Purchase Orders',
-                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15l3-3 3 3"/></svg>'
-            ],
-            'returns' => [
-                'title' => 'Returns',
-                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'
-            ],
-            'receipts' => [
-                'title' => 'Receipt Management',
-                'icon' => svg_icon('receipt', 18)
-            ],
-            'receipt-scanning' => [
-                'title' => 'AI Receipt Scanning',
-                'icon' => svg_icon('receipt-scan', 18)
-            ],
-            'spreadsheet-import' => [
-                'title' => 'AI Spreadsheet Import',
-                'icon' => svg_icon('document-upload', 18)
-            ],
-            'spreadsheet-export' => [
-                'title' => 'Spreadsheet Export',
-                'icon' => svg_icon('document-download', 18)
-            ],
-            'history-modal' => [
-                'title' => 'Version History',
-                'icon' => svg_icon('clock', 18)
-            ]
+            'dashboard' => ['title' => 'Dashboard'],
+            'analytics' => ['title' => 'Analytics'],
+            'predictive-analytics' => ['title' => 'Predictive Analytics'],
+            'report-generator' => ['title' => 'Report Generator'],
+            'sales-tracking' => ['title' => 'Expense/Revenue Tracking'],
+            'invoicing' => ['title' => 'Invoicing & Payments'],
+            'rental' => ['title' => 'Rental Management'],
+            'customers' => ['title' => 'Customer Management'],
+            'product-management' => ['title' => 'Product Management'],
+            'suppliers' => ['title' => 'Supplier Management'],
+            'inventory' => ['title' => 'Inventory Management'],
+            'purchase-orders' => ['title' => 'Purchase Orders'],
+            'returns' => ['title' => 'Returns'],
+            'receipts' => ['title' => 'Receipt Management'],
+            'receipt-scanning' => ['title' => 'AI Receipt Scanning'],
+            'spreadsheet-import' => ['title' => 'AI Spreadsheet Import'],
+            'spreadsheet-export' => ['title' => 'Spreadsheet Export'],
+            'history-modal' => ['title' => 'Version History']
         ]
     ],
     'Reference' => [
         'folder' => 'pages/reference',
         'pages' => [
-            'accepted-countries' => [
-                'title' => 'Accepted Countries',
-                'icon' => svg_icon('globe', 18)
-            ],
-            'supported-currencies' => [
-                'title' => 'Supported Currencies',
-                'icon' => svg_icon('dollar', 18)
-            ],
-            'supported-languages' => [
-                'title' => 'Supported Languages',
-                'icon' => svg_icon('translate', 18)
-            ],
-            'keyboard_shortcuts' => [
-                'title' => 'Keyboard Shortcuts',
-                'icon' => '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>'
-            ]
+            'accepted-countries' => ['title' => 'Accepted Countries'],
+            'supported-currencies' => ['title' => 'Supported Currencies'],
+            'supported-languages' => ['title' => 'Supported Languages'],
+            'keyboard_shortcuts' => ['title' => 'Keyboard Shortcuts']
         ]
     ],
     'Security' => [
         'folder' => 'pages/security',
         'pages' => [
-            'encryption' => [
-                'title' => 'Encryption',
-                'icon' => svg_icon('lock', 18)
-            ],
-            'password' => [
-                'title' => 'Password Protection',
-                'icon' => svg_icon('key', 18)
-            ],
-            'backups' => [
-                'title' => 'Regular Backups',
-                'icon' => svg_icon('database', 18)
-            ],
-            'anonymous-data' => [
-                'title' => 'Anonymous Usage Data',
-                'icon' => svg_icon('eye-off', 18)
-            ]
+            'encryption' => ['title' => 'Encryption'],
+            'password' => ['title' => 'Password Protection'],
+            'backups' => ['title' => 'Regular Backups'],
+            'anonymous-data' => ['title' => 'Anonymous Usage Data']
         ]
     ]
 ];
 
 // Determine base path based on current file location
-// From index.php: folders already include 'pages/' prefix, so no base needed
-// From subpages: need '../../' to go up from pages/category/ to documentation/
 $docBasePath = isset($pageCategory) ? '../../' : '';
 
 // Function to check if a page is active
@@ -176,25 +84,44 @@ function isActivePage($page, $currentPage) {
 </button>
 
 <!-- Sidebar Navigation -->
-<aside class="sidebar">
+<aside class="sidebar" id="docsSidebar">
     <nav class="sidebar-nav">
-        <!-- Home Button -->
-        <a href="<?php echo $docBasePath; ?>index.php" class="sidebar-home-btn">
-            <?= svg_icon('house', 18) ?>
-            <span>Documentation Home</span>
-        </a>
+        <!-- Search -->
+        <div class="sidebar-search search-container">
+            <div class="search-input-wrapper">
+                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.3-4.3"></path>
+                </svg>
+                <input type="text" id="docSearchInput" placeholder="Search docs..." aria-label="Search documentation" data-base-path="<?php echo $docBasePath; ?>">
+                <kbd class="search-shortcut">Ctrl+K</kbd>
+            </div>
+            <div id="searchResults" class="search-results"></div>
+        </div>
 
         <?php foreach ($sidebarSections as $sectionTitle => $section): ?>
-        <div class="nav-section">
-            <h3><?php echo htmlspecialchars($sectionTitle); ?></h3>
+        <?php
+            $isSectionActive = false;
+            foreach ($section['pages'] as $pageSlug => $pageData) {
+                if (isActivePage($pageSlug, $currentPage)) {
+                    $isSectionActive = true;
+                    break;
+                }
+            }
+        ?>
+        <div class="nav-section <?php echo $isSectionActive ? 'expanded' : ''; ?>">
+            <button class="nav-section-toggle" type="button" aria-expanded="<?php echo $isSectionActive ? 'true' : 'false'; ?>">
+                <span><?php echo htmlspecialchars($sectionTitle); ?></span>
+                <svg class="nav-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+            </button>
             <ul class="nav-links">
                 <?php foreach ($section['pages'] as $pageSlug => $pageData): ?>
                 <li>
                     <a href="<?php echo $docBasePath . $section['folder'] . '/' . $pageSlug; ?>.php"
-                       class="<?php echo isActivePage($pageSlug, $currentPage) ? 'active' : ''; ?>"
-                       title="<?php echo htmlspecialchars($pageData['title']); ?>">
-                        <span class="nav-icon"><?php echo $pageData['icon']; ?></span>
-                        <span class="nav-text"><?php echo htmlspecialchars($pageData['title']); ?></span>
+                       class="<?php echo isActivePage($pageSlug, $currentPage) ? 'active' : ''; ?>">
+                        <?php echo htmlspecialchars($pageData['title']); ?>
                     </a>
                 </li>
                 <?php endforeach; ?>

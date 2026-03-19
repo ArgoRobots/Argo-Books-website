@@ -513,7 +513,7 @@ body.docs-page {
    ========================================== */
 .docs-layout {
   display: flex;
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   min-height: calc(100vh - 50px);
 }
@@ -522,20 +522,20 @@ body.docs-page {
    LEFT SIDEBAR
    ========================================== */
 .sidebar {
-  width: 260px;
+  width: 220px;
   flex-shrink: 0;
   position: sticky;
   top: 50px;
   height: calc(100vh - 50px);
   overflow-y: auto;
   border-right: 1px solid var(--gray-200);
-  padding: 24px 0;
-  background: var(--white);
+  padding: 16px 0;
+  background: #f7f7f8;
   z-index: 50;
 }
 
 .sidebar-nav {
-  padding: 0 16px;
+  padding: 0 8px;
 }
 
 /* Sidebar scrollbar */
@@ -548,80 +548,24 @@ body.docs-page {
 }
 
 .sidebar::-webkit-scrollbar-thumb {
-  background: var(--gray-200);
+  background: var(--gray-300);
   border-radius: 4px;
 }
 
 .sidebar::-webkit-scrollbar-thumb:hover {
-  background: var(--gray-300);
+  background: var(--gray-400);
 }
 
 /* Sidebar Search */
 .sidebar-search {
-  position: relative;
-  margin-bottom: 20px;
-}
-
-.sidebar-search .search-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.sidebar-search .search-icon {
-  position: absolute;
-  left: 10px;
-  color: var(--gray-400);
-  pointer-events: none;
-}
-
-.sidebar-search input {
-  width: 100%;
-  padding: 8px 60px 8px 32px;
-  font-size: 0.8125rem;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  background: var(--gray-50);
-  color: var(--gray-900);
-  transition: all 0.15s ease;
-}
-
-.sidebar-search input::placeholder {
-  color: var(--gray-400);
-}
-
-.sidebar-search input:focus {
-  outline: none;
-  background: var(--white);
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.sidebar-search .search-shortcut {
-  position: absolute;
-  right: 8px;
-  background: var(--white);
-  color: var(--gray-400);
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.625rem;
-  font-family: inherit;
-  border: 1px solid var(--gray-200);
-}
-
-.sidebar-search .search-results {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: -16px;
-  right: -16px;
-  z-index: 1000;
+  display: none;
 }
 
 /* ==========================================
    SIDEBAR NAVIGATION SECTIONS
    ========================================== */
 .nav-section {
-  margin-bottom: 4px;
+  margin-bottom: 0;
 }
 
 .nav-section-toggle {
@@ -629,20 +573,20 @@ body.docs-page {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 8px 12px;
+  padding: 7px 12px;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: var(--gray-700);
+  color: var(--gray-800);
   border-radius: 6px;
   transition: all 0.15s ease;
   text-align: left;
 }
 
 .nav-section-toggle:hover {
-  background: var(--gray-50);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--gray-900);
 }
 
@@ -650,6 +594,8 @@ body.docs-page {
   flex-shrink: 0;
   color: var(--gray-400);
   transition: transform 0.2s ease;
+  width: 14px;
+  height: 14px;
 }
 
 .nav-section.expanded .nav-chevron {
@@ -676,26 +622,38 @@ body.docs-page {
 
 .nav-links a {
   display: block;
-  padding: 6px 12px 6px 24px;
+  padding: 5px 12px 5px 28px;
   color: var(--gray-600);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   border-radius: 6px;
   transition: all 0.15s ease;
-  border-left: 2px solid transparent;
-  margin-left: 8px;
+  border-left: none;
+  margin-left: 0;
 }
 
 .nav-links a:hover {
   color: var(--gray-900);
-  background: var(--gray-50);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .nav-links a.active {
   color: var(--primary-blue);
   font-weight: 500;
-  background: var(--blue-50);
-  border-left-color: var(--primary-blue);
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 6px;
+  position: relative;
+}
+
+.nav-links a.active::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--primary-blue);
+  border-radius: 2px;
 }
 
 /* ==========================================
@@ -704,18 +662,18 @@ body.docs-page {
 .docs-main-content {
   flex: 1;
   min-width: 0;
-  max-width: 860px;
-  padding: 32px 56px 60px;
+  max-width: 780px;
+  padding: 48px 64px 60px;
 }
 
 /* Page Title */
 .docs-page-title {
-  font-size: 2.25rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 600;
   color: var(--gray-900);
   margin: 0 0 8px;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
 }
 
 /* Hide old page header elements */
@@ -737,14 +695,14 @@ body.docs-page {
 }
 
 .docs-content > p:first-child {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   color: var(--gray-600);
   line-height: 1.7;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .docs-content h2 {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 600;
   color: var(--gray-900);
   margin: 40px 0 16px;
@@ -760,7 +718,7 @@ body.docs-page {
 }
 
 .docs-content h3 {
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   font-weight: 600;
   color: var(--gray-800);
   margin: 28px 0 12px;
@@ -771,6 +729,7 @@ body.docs-page {
   color: var(--gray-700);
   line-height: 1.7;
   margin-bottom: 16px;
+  font-size: 0.9375rem;
 }
 
 .docs-content ul,
@@ -782,6 +741,7 @@ body.docs-page {
 .docs-content li {
   margin-bottom: 6px;
   line-height: 1.6;
+  font-size: 0.9375rem;
 }
 
 .docs-content img {
@@ -804,18 +764,18 @@ body.docs-page {
    ON THIS PAGE - RIGHT SIDEBAR (TOC)
    ========================================== */
 .toc-sidebar {
-  width: 220px;
+  width: 240px;
   flex-shrink: 0;
   position: sticky;
   top: 50px;
   height: calc(100vh - 50px);
   overflow-y: auto;
-  padding: 32px 16px 32px 0;
+  padding: 48px 24px 32px 0;
 }
 
 .toc-container {
-  border-left: 1px solid var(--gray-200);
-  padding-left: 16px;
+  padding-left: 0;
+  border-left: none;
 }
 
 .toc-heading {
@@ -824,13 +784,14 @@ body.docs-page {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--gray-500);
-  margin: 0 0 12px;
+  margin: 0 0 16px;
 }
 
 .toc-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  border-left: 1px solid var(--gray-200);
 }
 
 .toc-item {
@@ -843,12 +804,14 @@ body.docs-page {
 
 .toc-link {
   display: block;
-  padding: 4px 0;
+  padding: 4px 0 4px 16px;
   font-size: 0.8125rem;
   color: var(--gray-500);
   text-decoration: none;
   line-height: 1.5;
   transition: color 0.15s ease;
+  border-left: 2px solid transparent;
+  margin-left: -1px;
 }
 
 .toc-link:hover {
@@ -858,6 +821,7 @@ body.docs-page {
 .toc-link.active {
   color: var(--gray-900);
   font-weight: 500;
+  border-left-color: var(--gray-900);
 }
 
 /* TOC scrollbar */
@@ -878,30 +842,36 @@ body.docs-page {
    INFO & WARNING BOXES
    ========================================== */
 .info-box {
-  position: relative;
   background: var(--blue-50);
   border: 1px solid var(--blue-200);
-  padding: 16px 20px 16px 48px;
+  padding: 16px 20px;
   margin: 24px 0;
   border-radius: 12px;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 0.9375rem;
+  color: var(--gray-700);
 }
 
-.info-box::before {
-  content: "ℹ";
-  position: absolute;
-  left: 16px;
-  top: 16px;
+/* Make the label (Tip:/Note:/Info:) appear on its own line with outlined icon */
+.info-box > strong:first-child,
+.info-box > p:first-child > strong:first-child {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  background: var(--primary-blue);
-  color: var(--white);
-  border-radius: 50%;
-  font-size: 0.7rem;
-  font-weight: 700;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--gray-900);
+}
+
+.info-box > strong:first-child::before,
+.info-box > p:first-child > strong:first-child::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='12' y1='16' x2='12' y2='12'/%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .info-box p {
@@ -911,21 +881,35 @@ body.docs-page {
 }
 
 .warning-box {
-  position: relative;
   background: var(--amber-50);
   border: 1px solid var(--amber-300);
-  padding: 16px 20px 16px 48px;
+  padding: 16px 20px;
   margin: 24px 0;
   border-radius: 12px;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 0.9375rem;
+  color: var(--gray-700);
 }
 
-.warning-box::before {
-  content: "⚠";
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  font-size: 0.875rem;
+.warning-box > strong:first-child,
+.warning-box > p:first-child > strong:first-child {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: var(--gray-900);
+}
+
+.warning-box > strong:first-child::before,
+.warning-box > p:first-child > strong:first-child::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z'/%3E%3Cline x1='12' y1='9' x2='12' y2='13'/%3E%3Cline x1='12' y1='17' x2='12.01' y2='17'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 /* ==========================================
@@ -1327,7 +1311,7 @@ body.docs-page {
     position: fixed;
     top: 0;
     left: 0;
-    width: 280px;
+    width: 260px;
     height: 100vh;
     max-height: 100vh;
     z-index: 1000;
@@ -1342,7 +1326,7 @@ body.docs-page {
   }
 
   .sidebar-nav {
-    padding: 24px 16px;
+    padding: 24px 12px;
     padding-top: 32px;
   }
 
@@ -1357,8 +1341,8 @@ body.docs-page {
     content: '';
     position: fixed;
     top: 0;
-    left: 280px;
-    width: calc(100vw - 280px);
+    left: 260px;
+    width: calc(100vw - 260px);
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
@@ -1374,15 +1358,11 @@ body.docs-page {
 
 @media (max-width: 768px) {
   .docs-page-title {
-    font-size: 1.875rem;
+    font-size: 1.75rem;
   }
 
   .docs-main-content {
     padding: 20px 16px 40px;
-  }
-
-  .sidebar-search .search-shortcut {
-    display: none;
   }
 
   .version-cards {
@@ -1439,6 +1419,76 @@ body.docs-page {
   .version-cards.three-column {
     grid-template-columns: 1fr;
   }
+}
+
+/* ==========================================
+   SEARCH OVERLAY
+   ========================================== */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 120px;
+}
+
+.search-overlay.active {
+  display: flex;
+}
+
+.search-overlay-container {
+  width: 100%;
+  max-width: 560px;
+  position: relative;
+}
+
+.search-overlay .search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-overlay .search-icon {
+  position: absolute;
+  left: 16px;
+  color: var(--gray-400);
+  pointer-events: none;
+}
+
+.search-overlay input {
+  width: 100%;
+  padding: 16px 70px 16px 48px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px 12px 0 0;
+  background: var(--white);
+  color: var(--gray-900);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.search-overlay input:focus {
+  outline: none;
+}
+
+.search-overlay .search-shortcut {
+  position: absolute;
+  right: 12px;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-family: inherit;
+  border: 1px solid var(--gray-200);
+}
+
+.search-overlay .search-results {
+  border-radius: 0 0 12px 12px;
+  border-top: 1px solid var(--gray-200);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 /* Footer override for sub-pages */

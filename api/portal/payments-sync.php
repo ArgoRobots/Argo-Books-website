@@ -35,8 +35,6 @@ function handle_pull_payments(int $companyId): void
     $since = $_GET['since'] ?? null;
     $force = ($_GET['force'] ?? '0') === '1';
 
-    error_log("Portal sync GET: company=$companyId, since=" . ($since ?: 'null') . ", force=" . ($force ? '1' : '0'));
-
     $db = get_db_connection();
 
     if ($force) {
@@ -97,7 +95,6 @@ function handle_pull_payments(int $companyId): void
     $stmt->close();
     $db->close();
 
-    error_log("Portal sync GET: returning " . count($payments) . " payments for company=$companyId");
 
     send_json_response(200, [
         'success' => true,

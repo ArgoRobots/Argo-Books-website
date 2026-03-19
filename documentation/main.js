@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const STORAGE_KEY_SECTIONS = "docs-sidebar-sections";
+  const STORAGE_KEY_SCROLL = "docs-sidebar-scroll";
+
   // ===== Sidebar Mobile Toggle =====
   const sidebarToggle = document.getElementById("sidebarToggle");
   const sidebar = document.getElementById("docsSidebar");
@@ -46,6 +49,88 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // ===== Sidebar State Persistence =====
+  const sections = document.querySelectorAll(".nav-section");
+
+  // Get section names for storage keys
+  function getSectionName(section) {
+    const toggle = section.querySelector(".nav-section-toggle span");
+    return toggle ? toggle.textContent.trim() : "";
+  }
+
+  // Save which sections are expanded to localStorage
+  function saveSectionState() {
+    const expanded = [];
+    sections.forEach((section) => {
+      if (section.classList.contains("expanded")) {
+        expanded.push(getSectionName(section));
+      }
+    });
+    try {
+      localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(expanded));
+    } catch (e) {
+      // localStorage unavailable
+    }
+  }
+
+  // Save sidebar scroll position to sessionStorage
+  function saveScrollPosition() {
+    if (sidebar) {
+      try {
+        sessionStorage.setItem(STORAGE_KEY_SCROLL, sidebar.scrollTop);
+      } catch (e) {
+        // sessionStorage unavailable
+      }
+    }
+  }
+
+  // Restore section expanded/collapsed state from localStorage
+  function restoreSectionState() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_SECTIONS);
+      if (stored) {
+        const expanded = JSON.parse(stored);
+        sections.forEach((section) => {
+          const name = getSectionName(section);
+          const toggle = section.querySelector(".nav-section-toggle");
+          // Check if this section contains the active page
+          const hasActivePage = section.querySelector(".nav-links a.active");
+
+          if (expanded.includes(name) || hasActivePage) {
+            section.classList.add("expanded");
+            if (toggle) toggle.setAttribute("aria-expanded", "true");
+          } else {
+            section.classList.remove("expanded");
+            if (toggle) toggle.setAttribute("aria-expanded", "false");
+          }
+        });
+      }
+    } catch (e) {
+      // localStorage unavailable, fall back to PHP-set defaults
+    }
+  }
+
+  // Restore sidebar scroll position from sessionStorage
+  function restoreScrollPosition() {
+    if (sidebar) {
+      try {
+        const scrollPos = sessionStorage.getItem(STORAGE_KEY_SCROLL);
+        if (scrollPos !== null) {
+          sidebar.scrollTop = parseInt(scrollPos, 10);
+        }
+      } catch (e) {
+        // sessionStorage unavailable
+      }
+    }
+  }
+
+  // Restore state on page load
+  restoreSectionState();
+  restoreScrollPosition();
+
+  // Save scroll position before navigating away
+  window.addEventListener("beforeunload", saveScrollPosition);
+
   // ===== Sidebar Section Toggle =====
   const sectionToggles = document.querySelectorAll(".nav-section-toggle");
   sectionToggles.forEach((toggle) => {
@@ -56,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "aria-expanded",
         section.classList.contains("expanded")
       );
+      saveSectionState();
     });
   });
 
@@ -105,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const tocLinks = tocNav.querySelectorAll(".toc-link");
 
       const updateActiveLink = () => {
-        const scrollPos = window.scrollY + 120;
+        const scrollPos = window.scrollY + 70;
         let activeIndex = 0;
 
         headings.forEach((heading, index) => {

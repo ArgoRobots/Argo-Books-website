@@ -36,7 +36,6 @@ class DocumentationSearch {
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
 
             // Reference
-            { id: 'accepted-countries', title: 'Accepted Countries', category: 'Reference', folder: 'reference', keywords: 'country countries iso code variant name import us usa uk germany' },
             { id: 'supported-currencies', title: 'Supported Currencies', category: 'Reference', folder: 'reference', keywords: 'currency currencies usd eur gbp cad jpy cny exchange rate convert' },
             { id: 'supported-languages', title: 'Supported Languages', category: 'Reference', folder: 'reference', keywords: 'language languages english spanish french german chinese arabic localization translation' },
 

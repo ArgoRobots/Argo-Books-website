@@ -50,7 +50,6 @@ $sidebarSections = [
     'Reference' => [
         'folder' => 'pages/reference',
         'pages' => [
-            'accepted-countries' => ['title' => 'Accepted Countries'],
             'supported-currencies' => ['title' => 'Supported Currencies'],
             'supported-languages' => ['title' => 'Supported Languages'],
             'keyboard_shortcuts' => ['title' => 'Keyboard Shortcuts']

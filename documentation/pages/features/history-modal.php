@@ -38,9 +38,9 @@ include '../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Spreadsheet Export</span>
                 </a>
-                <a href="../reference/accepted-countries.php" class="nav-button next">
+                <a href="../reference/supported-currencies.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Accepted Countries &rarr;</span>
+                    <span class="nav-title">Supported Currencies &rarr;</span>
                 </a>
             </div>
         </div>

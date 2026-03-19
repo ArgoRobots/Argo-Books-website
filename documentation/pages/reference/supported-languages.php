@@ -81,8 +81,6 @@ include '../../docs-header.php';
                 </ul>
             </div>
 
-            <p><a class="link" href="supported_languages.php">View complete list with native language names</a></p>
-
             <div class="info-box">
                 <strong>Note:</strong> Translations are downloaded and cached automatically when you select a language. An internet connection is required the first time you switch to a new language.
             </div>

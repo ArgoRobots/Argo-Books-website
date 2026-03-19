@@ -316,13 +316,6 @@ $isDocsLanding = true;
                 </div>
             </div>
             <div class="category-cards compact">
-                <a href="pages/reference/accepted-countries.php" class="doc-card">
-                    <div class="card-icon">
-                        <?= svg_icon('globe', 20) ?>
-                    </div>
-                    <h3>Accepted Countries</h3>
-                    <p>Country names for import</p>
-                </a>
                 <a href="pages/reference/supported-currencies.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('dollar', 20) ?>

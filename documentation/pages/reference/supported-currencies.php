@@ -53,8 +53,6 @@ include '../../docs-header.php';
                 </table>
             </div>
 
-            <p><a class="link" href="supported_currencies.php">View full list with additional details</a></p>
-
             <h2>How Currency Conversion Works</h2>
             <ul>
                 <li><strong>Real-time rates:</strong> Exchange rates are fetched automatically when needed</li>
@@ -67,9 +65,9 @@ include '../../docs-header.php';
             </div>
 
             <div class="page-navigation">
-                <a href="accepted-countries.php" class="nav-button prev">
+                <a href="../features/spreadsheet-export.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Accepted Countries</span>
+                    <span class="nav-title">&larr; Spreadsheet Export</span>
                 </a>
                 <a href="supported-languages.php" class="nav-button next">
                     <span class="nav-label">Next</span>

@@ -69,49 +69,34 @@ jobs:
             cat /tmp/deleted_files.txt
           fi
 
-      - name: Deploy to production (full mirror)
+      - name: Deploy (full mirror)
         if: steps.changes.outputs.mode == 'full'
         run: |
-          lftp -u "${{ secrets.FTP_USERNAME }}," \
-            -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
-                mirror --reverse --delete --verbose --no-perms \
-                  --exclude ^\.git/$ \
-                  --exclude ^\.github/$ \
-                  --exclude ^\.gitignore$ \
-                  --exclude ^README\.md$ \
-                  --exclude ^read-me/$ \
-                  --exclude ^composer\.json$ \
-                  --exclude ^composer\.lock$ \
-                  --exclude ^mysql_schema\.sql$ \
-                  --exclude ^\.ftp-deploy-sync-state\.json$ \
-                  ./ ${{ secrets.FTP_SERVER_DIR }}; \
-                bye" \
-            sftp://${{ secrets.FTP_SERVER }}
+          DEPLOY_TARGETS="${{ secrets.FTP_SERVER_DIR }} ${{ secrets.FTP_DEV_SERVER_DIR }}"
 
-      - name: Deploy to dev subdomain (full mirror)
-        if: steps.changes.outputs.mode == 'full'
-        run: |
-          lftp -u "${{ secrets.FTP_USERNAME }}," \
-            -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
-                mirror --reverse --delete --verbose --no-perms \
-                  --exclude ^\.git/$ \
-                  --exclude ^\.github/$ \
-                  --exclude ^\.gitignore$ \
-                  --exclude ^README\.md$ \
-                  --exclude ^read-me/$ \
-                  --exclude ^composer\.json$ \
-                  --exclude ^composer\.lock$ \
-                  --exclude ^mysql_schema\.sql$ \
-                  --exclude ^\.ftp-deploy-sync-state\.json$ \
-                  ./ ${{ secrets.FTP_DEV_SERVER_DIR }}; \
-                bye" \
-            sftp://${{ secrets.FTP_SERVER }}
+          for REMOTE_DIR in $DEPLOY_TARGETS; do
+            echo "=== Full mirror deploy to ${REMOTE_DIR} ==="
+            lftp -u "${{ secrets.FTP_USERNAME }}," \
+              -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts'; \
+                  mirror --reverse --delete --verbose --no-perms \
+                    --exclude ^\.git/$ \
+                    --exclude ^\.github/$ \
+                    --exclude ^\.gitignore$ \
+                    --exclude ^README\.md$ \
+                    --exclude ^read-me/$ \
+                    --exclude ^composer\.json$ \
+                    --exclude ^composer\.lock$ \
+                    --exclude ^mysql_schema\.sql$ \
+                    --exclude ^\.ftp-deploy-sync-state\.json$ \
+                    ./ ${REMOTE_DIR}; \
+                  bye" \
+              sftp://${{ secrets.FTP_SERVER }}
+          done
 
-      - name: Deploy to production (incremental)
+      - name: Deploy (incremental)
         if: steps.changes.outputs.mode == 'incremental'
         run: |
-          REMOTE_DIR="${{ secrets.FTP_SERVER_DIR }}"
-          LFTP_CMDS=""
+          DEPLOY_TARGETS="${{ secrets.FTP_SERVER_DIR }} ${{ secrets.FTP_DEV_SERVER_DIR }}"
 
           # Function to check if a file should be excluded
           is_excluded() {
@@ -121,98 +106,57 @@ jobs:
             esac
           }
 
-          # Upload changed files
-          while IFS= read -r file; do
-            [ -z "$file" ] && continue
-            is_excluded "$file" && continue
-            [ ! -f "$file" ] && continue
-            dir=$(dirname "$file")
-            if [ "$dir" != "." ]; then
-              LFTP_CMDS="${LFTP_CMDS}mkdir -p -f ${REMOTE_DIR}/${dir}; "
-              LFTP_CMDS="${LFTP_CMDS}put ./${file} -o ${REMOTE_DIR}/${file}; "
-            else
-              LFTP_CMDS="${LFTP_CMDS}put ./${file} -o ${REMOTE_DIR}/${file}; "
+          for REMOTE_DIR in $DEPLOY_TARGETS; do
+            echo "=== Incremental deploy to ${REMOTE_DIR} ==="
+
+            # Write lftp commands to a script file to avoid quoting/escaping issues
+            SCRIPT_FILE=$(mktemp /tmp/lftp_script.XXXXXX)
+            HAS_COMMANDS=false
+
+            # Upload changed files
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              is_excluded "$file" && continue
+              [ ! -f "$file" ] && continue
+              dir=$(dirname "$file")
+              if [ "$dir" != "." ]; then
+                printf 'mkdir -p -f "%s/%s"\n' "${REMOTE_DIR}" "${dir}" >> "$SCRIPT_FILE"
+              fi
+              printf 'put "./%s" -o "%s/%s"\n' "${file}" "${REMOTE_DIR}" "${file}" >> "$SCRIPT_FILE"
+              HAS_COMMANDS=true
+            done < /tmp/changed_files.txt
+
+            # Delete removed files from remote
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              is_excluded "$file" && continue
+              printf 'rm -f "%s/%s"\n' "${REMOTE_DIR}" "${file}" >> "$SCRIPT_FILE"
+              HAS_COMMANDS=true
+            done < /tmp/deleted_files.txt
+
+            # If composer deps changed, mirror the entire vendor/ directory
+            if [ "${{ steps.changes.outputs.composer_changed }}" = "true" ]; then
+              echo "Composer files changed, re-uploading vendor/"
+              printf 'mirror --reverse --delete --verbose --no-perms vendor/ "%s/vendor/"\n' "${REMOTE_DIR}" >> "$SCRIPT_FILE"
+              HAS_COMMANDS=true
             fi
-          done < /tmp/changed_files.txt
 
-          # Delete removed files from remote
-          while IFS= read -r file; do
-            [ -z "$file" ] && continue
-            is_excluded "$file" && continue
-            LFTP_CMDS="${LFTP_CMDS}rm -f ${REMOTE_DIR}/${file}; "
-          done < /tmp/deleted_files.txt
-
-          # If composer deps changed, mirror the entire vendor/ directory
-          if [ "${{ steps.changes.outputs.composer_changed }}" = "true" ]; then
-            echo "Composer files changed, re-uploading vendor/"
-            LFTP_CMDS="${LFTP_CMDS}mirror --reverse --delete --verbose --no-perms vendor/ ${REMOTE_DIR}/vendor/; "
-          fi
-
-          if [ -z "$LFTP_CMDS" ]; then
-            echo "No files to deploy to production"
-            exit 0
-          fi
-
-          echo "Deploying changed files to production..."
-          echo "Commands: $LFTP_CMDS"
-
-          lftp -u "${{ secrets.FTP_USERNAME }}," \
-            -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
-                ${LFTP_CMDS} \
-                bye" \
-            sftp://${{ secrets.FTP_SERVER }}
-
-      - name: Deploy to dev subdomain (incremental)
-        if: steps.changes.outputs.mode == 'incremental'
-        run: |
-          REMOTE_DIR="${{ secrets.FTP_DEV_SERVER_DIR }}"
-          LFTP_CMDS=""
-
-          # Function to check if a file should be excluded
-          is_excluded() {
-            case "$1" in
-              .git/*|.github/*|.gitignore|README.md|read-me/*|composer.json|composer.lock|mysql_schema.sql|.ftp-deploy-sync-state.json) return 0 ;;
-              *) return 1 ;;
-            esac
-          }
-
-          # Upload changed files
-          while IFS= read -r file; do
-            [ -z "$file" ] && continue
-            is_excluded "$file" && continue
-            [ ! -f "$file" ] && continue
-            dir=$(dirname "$file")
-            if [ "$dir" != "." ]; then
-              LFTP_CMDS="${LFTP_CMDS}mkdir -p -f ${REMOTE_DIR}/${dir}; "
-              LFTP_CMDS="${LFTP_CMDS}put ./${file} -o ${REMOTE_DIR}/${file}; "
-            else
-              LFTP_CMDS="${LFTP_CMDS}put ./${file} -o ${REMOTE_DIR}/${file}; "
+            if [ "$HAS_COMMANDS" = "false" ]; then
+              echo "No files to deploy to ${REMOTE_DIR}"
+              rm -f "$SCRIPT_FILE"
+              continue
             fi
-          done < /tmp/changed_files.txt
 
-          # Delete removed files from remote
-          while IFS= read -r file; do
-            [ -z "$file" ] && continue
-            is_excluded "$file" && continue
-            LFTP_CMDS="${LFTP_CMDS}rm -f ${REMOTE_DIR}/${file}; "
-          done < /tmp/deleted_files.txt
+            echo "Deploying changed files to ${REMOTE_DIR}..."
+            echo "=== lftp script ==="
+            cat "$SCRIPT_FILE"
+            echo "==================="
 
-          # If composer deps changed, mirror the entire vendor/ directory
-          if [ "${{ steps.changes.outputs.composer_changed }}" = "true" ]; then
-            echo "Composer files changed, re-uploading vendor/"
-            LFTP_CMDS="${LFTP_CMDS}mirror --reverse --delete --verbose --no-perms vendor/ ${REMOTE_DIR}/vendor/; "
-          fi
+            lftp -u "${{ secrets.FTP_USERNAME }}," \
+              -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts'; \
+                  source ${SCRIPT_FILE}; \
+                  bye" \
+              sftp://${{ secrets.FTP_SERVER }}
 
-          if [ -z "$LFTP_CMDS" ]; then
-            echo "No files to deploy to dev subdomain"
-            exit 0
-          fi
-
-          echo "Deploying changed files to dev subdomain..."
-          echo "Commands: $LFTP_CMDS"
-
-          lftp -u "${{ secrets.FTP_USERNAME }}," \
-            -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no'; \
-                ${LFTP_CMDS} \
-                bye" \
-            sftp://${{ secrets.FTP_SERVER }}
+            rm -f "$SCRIPT_FILE"
+          done

@@ -23,18 +23,18 @@ if ($view_env !== 'sandbox') {
 // SQL conditions for environment filtering (strict allowlist of hardcoded clauses).
 // These are safe to interpolate because $view_env is validated above and no user
 // input flows into the SQL fragments — only constant strings are assigned.
-// Production mode: only explicitly production-marked payments
+// Production mode: only explicitly production-marked records
 // Sandbox mode: everything else (sandbox, unknown/NULL, empty)
 if ($view_env === 'sandbox') {
     $env_sql = "(payment_environment IS NULL OR payment_environment != 'production')";
     $env_sql_p = "(p.payment_environment IS NULL OR p.payment_environment != 'production')";
-    // For invoices: show invoices that have a non-production payment
-    $env_sql_inv = "(p.id IS NOT NULL AND (p.payment_environment IS NULL OR p.payment_environment != 'production'))";
+    $env_sql_c = "(c.environment IS NULL OR c.environment != 'production')";
+    $env_sql_i = "(i.environment IS NULL OR i.environment != 'production')";
 } else {
     $env_sql = "(payment_environment = 'production')";
     $env_sql_p = "(p.payment_environment = 'production')";
-    // For invoices: show invoices with a production payment, or unpaid invoices
-    $env_sql_inv = "(p.id IS NULL OR p.payment_environment = 'production')";
+    $env_sql_c = "(c.environment = 'production')";
+    $env_sql_i = "(i.environment = 'production')";
 }
 
 // ============================================================
@@ -59,13 +59,13 @@ try {
     $stmt = $pdo->query("SELECT COALESCE(SUM(processing_fee), 0) as total FROM portal_payments WHERE status = 'completed' AND $env_sql");
     $total_fees = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_companies");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_companies c WHERE $env_sql_c");
     $active_companies = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(DISTINCT i.id) as count FROM portal_invoices i LEFT JOIN portal_payments p ON p.invoice_id = i.id WHERE $env_sql_inv");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_invoices i WHERE $env_sql_i");
     $total_invoices = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-    $stmt = $pdo->query("SELECT COUNT(DISTINCT i.id) as count FROM portal_invoices i LEFT JOIN portal_payments p ON p.invoice_id = i.id WHERE i.status = 'overdue' AND $env_sql_inv");
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_invoices i WHERE i.status = 'overdue' AND $env_sql_i");
     $overdue_invoices = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 } catch (PDOException $e) {
     error_log("Payment stats error: " . $e->getMessage());
@@ -104,10 +104,9 @@ try {
 $invoice_statuses = [];
 try {
     $stmt = $pdo->query("
-        SELECT i.status, COUNT(DISTINCT i.id) as count
+        SELECT i.status, COUNT(*) as count
         FROM portal_invoices i
-        LEFT JOIN portal_payments p ON p.invoice_id = i.id
-        WHERE $env_sql_inv
+        WHERE $env_sql_i
         GROUP BY i.status
     ");
     $invoice_statuses = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -184,6 +183,7 @@ try {
                MAX(CASE WHEN $env_sql_p THEN p.created_at ELSE NULL END) as last_payment_date
         FROM portal_companies c
         LEFT JOIN portal_payments p ON p.company_id = c.id
+        WHERE $env_sql_c
         GROUP BY c.id
         ORDER BY total_revenue DESC
     ");
@@ -205,7 +205,7 @@ try {
         FROM portal_invoices i
         LEFT JOIN portal_companies c ON i.company_id = c.id
         LEFT JOIN portal_payments p ON p.invoice_id = i.id
-        WHERE $env_sql_inv
+        WHERE $env_sql_i
     ";
     $params = [];
 
@@ -355,7 +355,7 @@ try {
 // --- Company list for filter dropdowns ---
 $company_options = [];
 try {
-    $stmt = $pdo->query("SELECT id, company_name FROM portal_companies ORDER BY company_name ASC");
+    $stmt = $pdo->query("SELECT id, company_name FROM portal_companies c WHERE $env_sql_c ORDER BY company_name ASC");
     $company_options = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Company options error: " . $e->getMessage());

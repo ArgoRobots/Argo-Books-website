@@ -51,11 +51,11 @@ include '../../docs-header.php';
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Basic password protection</span>
+                            <span class="feature-text">5 invoices / month</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Core features</span>
+                            <span class="feature-text">AI spreadsheet import <span>(100/month)</span></span>
                         </li>
                     </ul>
                     <a href="../../../downloads/" class="btn btn-gray">Get Started for Free</a>
@@ -84,11 +84,11 @@ include '../../docs-header.php';
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Invoices & payments</span>
+                            <span class="feature-text">Unlimited invoices & payments</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">AI receipt scanning <span>(500 receipts / month)</span></span>
+                            <span class="feature-text">AI receipt scanning <span>(500/month)</span></span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
@@ -156,8 +156,8 @@ include '../../docs-header.php';
                         </tr>
                         <tr>
                             <td>Invoices & Payments</td>
-                            <td>—</td>
-                            <td>✓</td>
+                            <td>5 invoices / month</td>
+                            <td>Unlimited</td>
                         </tr>
                         <tr>
                             <td>AI Receipt Scanning</td>

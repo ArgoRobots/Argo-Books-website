@@ -13,6 +13,7 @@
  *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
  *   RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for premium tier (default: 500)
  *   AI_IMPORT_MONTHLY_LIMIT     - Monthly AI import limit for all users (default: 100)
+ *   FREE_INVOICE_MONTHLY_LIMIT  - Monthly invoice send limit for free tier (default: 5)
  */
 
 /**
@@ -40,6 +41,7 @@ function get_pricing_config() {
         'processing_fee_fixed'   => _pricing_parse_env('PROCESSING_FEE_FIXED', 0.30),
         'receipt_scan_monthly_limit' => _pricing_parse_int_env('RECEIPT_SCAN_MONTHLY_LIMIT', 500),
         'ai_import_monthly_limit'    => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 100),
+        'free_invoice_monthly_limit' => _pricing_parse_int_env('FREE_INVOICE_MONTHLY_LIMIT', 5),
         'currency'              => 'CAD',
     ];
 

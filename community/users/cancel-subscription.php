@@ -160,9 +160,12 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
             <div class="info-box features-box">
                 <h3>Features you'll lose access to:</h3>
                 <ul>
-                    <li>Invoices & payments</li>
-                    <li>AI-powered receipt scanning</li>
-                    <li>predictive analytics</li>
+                    <li>Unlimited products</li>
+                    <li>Biometric login security</li>
+                    <li>Unlimited invoices & payments</li>
+                    <li>AI receipt scanning (500/month)</li>
+                    <li>Predictive analytics</li>
+                    <li>Priority support</li>
                 </ul>
             </div>
 

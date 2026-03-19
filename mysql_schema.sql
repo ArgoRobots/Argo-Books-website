@@ -425,11 +425,13 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     square_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected Square account',
     -- Metadata
     owner_email VARCHAR(100) DEFAULT NULL,
+    environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production',
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_api_key (api_key),
-    INDEX idx_is_active (is_active)
+    INDEX idx_is_active (is_active),
+    INDEX idx_environment (environment)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Google OAuth tokens (free feature, keyed by device ID)
@@ -482,6 +484,7 @@ CREATE TABLE IF NOT EXISTS portal_invoices (
     balance_due DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     due_date DATE DEFAULT NULL,
+    environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_company_invoice (company_id, invoice_id),
@@ -491,6 +494,7 @@ CREATE TABLE IF NOT EXISTS portal_invoices (
     INDEX idx_status (status),
     INDEX idx_customer_email (customer_email),
     INDEX idx_due_date (due_date),
+    INDEX idx_environment (environment),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -519,4 +523,16 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_synced (synced_to_argo),
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Invoice send usage tracking for free-tier limits
+CREATE TABLE IF NOT EXISTS invoice_send_usage (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    license_key VARCHAR(255) NOT NULL COMMENT 'License key or device_<hash> for free users',
+    usage_month DATE NOT NULL,
+    send_count INT NOT NULL DEFAULT 0,
+    monthly_limit INT NOT NULL DEFAULT 5,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_license_month (license_key, usage_month)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

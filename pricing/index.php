@@ -96,15 +96,19 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Expense & revenue tracking</span>
+                                <span>Unlimited transactions</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Financial reports</span>
+                                <span>Real-time analytics</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Cross-platform desktop app</span>
+                                <span>Receipt management</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
+                                <span>5 invoices / month</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
@@ -133,6 +137,10 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <ul class="card-features">
                             <li>
                                 <?= svg_icon('check-pricing') ?>
+                                <span>Everything in Free</span>
+                            </li>
+                            <li>
+                                <?= svg_icon('check-pricing') ?>
                                 <span>Unlimited products</span>
                             </li>
                             <li>
@@ -141,7 +149,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Invoices & payments</span>
+                                <span>Unlimited invoices & payments</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>

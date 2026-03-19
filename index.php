@@ -1118,11 +1118,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>AI spreadsheet import <span>(100/month)</span></span>
+                            <span>5 invoices / month</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Core features</span>
+                            <span>AI spreadsheet import <span>(100/month)</span></span>
                         </li>
                     </ul>
                     <a href="downloads" class="btn btn-secondary btn-block">Get Started Free</a>
@@ -1155,7 +1155,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Invoices & payments</span>
+                            <span>Unlimited invoices & payments</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>

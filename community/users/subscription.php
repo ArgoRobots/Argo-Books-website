@@ -236,16 +236,32 @@ if ($premium_subscription) {
                     <h3>Features Included</h3>
                     <div class="features-grid">
                         <div class="feature-item">
-                            <?= svg_icon('document') ?>
-                            <span>Invoices & Payments</span>
+                            <?= svg_icon('check-pricing') ?>
+                            <span>Everything in Free</span>
                         </div>
                         <div class="feature-item">
-                            <?= svg_icon('calendar') ?>
-                            <span>AI Receipt Scanning <span>(500/month)</span></span>
+                            <?= svg_icon('check-pricing') ?>
+                            <span>Unlimited products</span>
                         </div>
                         <div class="feature-item">
-                            <?= svg_icon('package') ?>
-                            <span>predictive analytics</span>
+                            <?= svg_icon('check-pricing') ?>
+                            <span>Biometric login security</span>
+                        </div>
+                        <div class="feature-item">
+                            <?= svg_icon('check-pricing') ?>
+                            <span>Unlimited invoices & payments</span>
+                        </div>
+                        <div class="feature-item">
+                            <?= svg_icon('check-pricing') ?>
+                            <span>AI receipt scanning <span>(500/month)</span></span>
+                        </div>
+                        <div class="feature-item">
+                            <?= svg_icon('check-pricing') ?>
+                            <span>Predictive analytics</span>
+                        </div>
+                        <div class="feature-item">
+                            <?= svg_icon('check-pricing') ?>
+                            <span>Priority support</span>
                         </div>
                     </div>
                 </div>
@@ -256,7 +272,7 @@ if ($premium_subscription) {
                         <?= svg_icon('subscription', 48, '', 1.5) ?>
                     </div>
                     <h3>No Active Subscription</h3>
-                    <p>Get access to invoices & payments and AI-powered features like receipt scanning, and predictive analytics.</p>
+                    <p>Get unlimited invoices & payments and AI-powered features like receipt scanning, and predictive analytics.</p>
                     <div class="pricing-preview">
                         <span class="price">$<?php echo number_format($monthlyPrice, 0); ?></span>
                         <span class="period">CAD/month</span>

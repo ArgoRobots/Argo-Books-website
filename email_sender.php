@@ -1041,10 +1041,13 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
 
                     <h3>What's Included:</h3>
                     <ul class="feature-list">
-                        <li>✓ Invoices & payments</li>
-                        <li>✓ AI-powered receipt scanning</li>
-                        <li>✓ predictive analytics</li>
-                        <li>✓ Natural language AI search</li>
+                        <li>✓ Everything in Free</li>
+                        <li>✓ Unlimited products</li>
+                        <li>✓ Biometric login security</li>
+                        <li>✓ Unlimited invoices & payments</li>
+                        <li>✓ AI receipt scanning (500/month)</li>
+                        <li>✓ Predictive analytics</li>
+                        <li>✓ Priority support</li>
                     </ul>
 
                     <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
@@ -1111,7 +1114,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
                         <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
                     </div>
 
-                    <p>After this date, Premium features including invoices & payments, receipt scanning, predictive analytics, and AI insights will no longer be available.</p>
+                    <p>After this date, Premium features including unlimited products, biometric login security, unlimited invoices & payments, AI receipt scanning, predictive analytics, and priority support will no longer be available.</p>
 
                     <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
@@ -1207,9 +1210,13 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 
                     <p>Features now available:</p>
                     <ul class="styled-list">
-                        <li>Invoices & payments</li>
-                        <li>AI-powered receipt scanning</li>
-                        <li>predictive analytics</li>
+                        <li>Everything in Free</li>
+                        <li>Unlimited products</li>
+                        <li>Biometric login security</li>
+                        <li>Unlimited invoices & payments</li>
+                        <li>AI receipt scanning (500/month)</li>
+                        <li>Predictive analytics</li>
+                        <li>Priority support</li>
                     </ul>
 
                     <div class="button-container">
@@ -1280,10 +1287,13 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 
         <h2>What's Included:</h2>
         <ul>
-            <li>Invoices & payments</li>
-            <li>AI-powered receipt scanning</li>
-            <li>predictive analytics</li>
-            <li>Natural language AI search</li>
+            <li>Everything in Free</li>
+            <li>Unlimited products</li>
+            <li>Biometric login security</li>
+            <li>Unlimited invoices & payments</li>
+            <li>AI receipt scanning (500/month)</li>
+            <li>Predictive analytics</li>
+            <li>Priority support</li>
         </ul>
 
         <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>

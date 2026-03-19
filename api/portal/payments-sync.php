@@ -95,7 +95,6 @@ function handle_pull_payments(int $companyId): void
     $stmt->close();
     $db->close();
 
-
     send_json_response(200, [
         'success' => true,
         'payments' => $payments,

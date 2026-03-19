@@ -36,12 +36,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="returns.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Returns
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Returns</span>
                 </a>
                 <a href="receipt-scanning.php" class="nav-button next">
-                    Next: AI Receipt Scanning
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">AI Receipt Scanning &rarr;</span>
                 </a>
             </div>
         </div>

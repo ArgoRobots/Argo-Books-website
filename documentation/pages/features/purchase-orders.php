@@ -59,12 +59,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="inventory.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Inventory Management
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Inventory Management</span>
                 </a>
                 <a href="returns.php" class="nav-button next">
-                    Next: Returns
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Returns &rarr;</span>
                 </a>
             </div>
         </div>

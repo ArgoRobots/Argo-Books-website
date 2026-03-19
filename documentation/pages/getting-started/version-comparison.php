@@ -180,12 +180,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="quick-start.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Quick Start Tutorial
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Quick Start Tutorial</span>
                 </a>
                 <a href="../features/dashboard.php" class="nav-button next">
-                    Next: Dashboard
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Dashboard &rarr;</span>
                 </a>
             </div>
         </div>

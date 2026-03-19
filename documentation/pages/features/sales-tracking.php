@@ -47,12 +47,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="report-generator.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Report Generator
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Report Generator</span>
                 </a>
                 <a href="invoicing.php" class="nav-button next">
-                    Next: Invoicing & Payments
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Invoicing & Payments &rarr;</span>
                 </a>
             </div>
         </div>

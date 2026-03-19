@@ -79,12 +79,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="analytics.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Analytics
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Analytics</span>
                 </a>
                 <a href="report-generator.php" class="nav-button next">
-                    Next: Report Generator
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Report Generator &rarr;</span>
                 </a>
             </div>
         </div>

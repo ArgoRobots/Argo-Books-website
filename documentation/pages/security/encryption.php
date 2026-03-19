@@ -43,12 +43,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="../reference/keyboard_shortcuts.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Keyboard Shortcuts
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Keyboard Shortcuts</span>
                 </a>
                 <a href="password.php" class="nav-button next">
-                    Next: Password Protection
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Password Protection &rarr;</span>
                 </a>
             </div>
         </div>

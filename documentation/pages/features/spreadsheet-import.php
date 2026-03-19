@@ -85,12 +85,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="receipt-scanning.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: AI Receipt Scanning
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; AI Receipt Scanning</span>
                 </a>
                 <a href="spreadsheet-export.php" class="nav-button next">
-                    Next: Spreadsheet Export
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Spreadsheet Export &rarr;</span>
                 </a>
             </div>
         </div>

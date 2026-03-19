@@ -101,12 +101,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="supported-languages.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Supported Languages
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Supported Languages</span>
                 </a>
                 <a href="../security/encryption.php" class="nav-button next">
-                    Next: Encryption
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Encryption &rarr;</span>
                 </a>
             </div>
         </div>

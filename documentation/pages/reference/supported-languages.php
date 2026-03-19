@@ -81,20 +81,18 @@ include '../../docs-header.php';
                 </ul>
             </div>
 
-            <p><a class="link" href="supported_languages.php">View complete list with native language names</a></p>
-
             <div class="info-box">
                 <strong>Note:</strong> Translations are downloaded and cached automatically when you select a language. An internet connection is required the first time you switch to a new language.
             </div>
 
             <div class="page-navigation">
                 <a href="supported-currencies.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Supported Currencies
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Supported Currencies</span>
                 </a>
                 <a href="keyboard_shortcuts.php" class="nav-button next">
-                    Next: Keyboard Shortcuts
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Keyboard Shortcuts &rarr;</span>
                 </a>
             </div>
         </div>

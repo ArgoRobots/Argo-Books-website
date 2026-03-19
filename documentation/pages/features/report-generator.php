@@ -72,12 +72,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="predictive-analytics.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Predictive Analytics
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Predictive Analytics</span>
                 </a>
                 <a href="sales-tracking.php" class="nav-button next">
-                    Next: Expense/Revenue Tracking
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Expense/Revenue Tracking &rarr;</span>
                 </a>
             </div>
         </div>

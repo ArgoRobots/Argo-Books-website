@@ -37,12 +37,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="purchase-orders.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Purchase Orders
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Purchase Orders</span>
                 </a>
                 <a href="receipts.php" class="nav-button next">
-                    Next: Receipt Management
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Receipt Management &rarr;</span>
                 </a>
             </div>
         </div>

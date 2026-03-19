@@ -42,12 +42,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="rental.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Rental Management
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Rental Management</span>
                 </a>
                 <a href="product-management.php" class="nav-button next">
-                    Next: Product Management
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Product Management &rarr;</span>
                 </a>
             </div>
         </div>

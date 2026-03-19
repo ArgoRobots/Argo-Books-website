@@ -67,7 +67,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/levenshtein.js"></script>
     <script src="<?php echo $docsPath; ?>search.js"></script>
-    <script src="<?php echo $docsPath; ?>main.js"></script>
+    <script src="<?php echo $docsPath; ?>main.js" defer></script>
 
     <link rel="stylesheet" href="<?php echo $docsPath; ?>style.css">
     <link rel="stylesheet" href="<?php echo $docsPath; ?>search.css">
@@ -83,39 +83,11 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
         <div id="includeHeader"></div>
     </header>
 
-    <!-- Sub-page Hero with Search -->
-    <div class="docs-subpage-hero">
-        <div class="subpage-hero-content">
-            <!-- Breadcrumb -->
-            <nav class="docs-breadcrumb">
-                <a href="<?php echo $docsPath; ?>">Documentation</a>
-                <?= svg_icon('chevron-right', 16) ?>
-                <a href="<?php echo $docsPath; ?>#<?php echo $pageCategory; ?>"><?php echo $currentCategory['name']; ?></a>
-                <?= svg_icon('chevron-right', 16) ?>
-                <span><?php echo htmlspecialchars($pageTitle); ?></span>
-            </nav>
-
-            <!-- Search Bar -->
-            <div class="subpage-search">
-                <div class="search-input-wrapper">
-                    <?= svg_icon('search', 18, 'search-icon') ?>
-                    <input type="text" id="docSearchInput" placeholder="Search documentation..." aria-label="Search documentation" data-base-path="<?php echo $docsPath; ?>">
-                    <kbd class="search-shortcut">Ctrl+K</kbd>
-                </div>
-                <div id="searchResults" class="search-results"></div>
-            </div>
-        </div>
-    </div>
-
     <div class="docs-layout">
         <!-- Sidebar -->
         <?php include $docsPath . 'sidebar.php'; ?>
 
         <!-- Main Content -->
         <main class="docs-main-content">
-            <!-- Page Header -->
-            <div class="docs-page-header">
-                <span class="docs-category-badge <?php echo $currentCategory['color']; ?>"><?php echo $currentCategory['name']; ?></span>
-                <h1><?php echo htmlspecialchars($pageTitle); ?></h1>
-            </div>
-
+            <!-- Page Title -->
+            <h1 class="docs-page-title"><?php echo htmlspecialchars($pageTitle); ?></h1>

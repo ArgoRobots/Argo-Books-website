@@ -9,21 +9,20 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <div class="info-box">
-                <p><strong>Premium Feature:</strong> Invoicing & Payments is available with the Premium plan.
-                <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
-            </div>
-
             <p>Create professional invoices in seconds, track payment status, and get paid faster with
             integrated payment processing. Argo Books makes invoicing simple and efficient.</p>
+
+            <div class="info-box">
+                <p><strong>Note:</strong> The free version includes up to 5 invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
+            </div>
 
             <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
             <h2>Creating Invoices</h2>
             <p>Generate professional invoices with just a few clicks:</p>
             <ol class="steps-list">
-                <li>Navigate to the Invoices section</li>
-                <li>Click "New Invoice"</li>
+                <li>Go to "Invoices" in the navigation menu (under Transactions)</li>
+                <li>Click "Create Invoice"</li>
                 <li>Select a customer or create a new one</li>
                 <li>Add line items from your product catalog</li>
                 <li>Set payment terms and due date</li>
@@ -52,8 +51,8 @@ include '../../docs-header.php';
 
             <h2>Setting Up Payment Integration</h2>
             <ol class="steps-list">
-                <li>Go to Settings > Payment Providers</li>
-                <li>Select your preferred payment providers</li>
+                <li>Go to Settings > Payment Portal</li>
+                <li>Under "Connected Payment Providers", select your preferred provider</li>
                 <li>Click "Connect" to link your existing account (or create a new one)</li>
                 <li>Authorize Argo Books to process payments on your behalf</li>
             </ol>

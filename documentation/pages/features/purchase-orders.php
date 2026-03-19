@@ -13,7 +13,7 @@ include '../../docs-header.php';
 
             <h2>Creating a Purchase Order</h2>
             <ol class="steps-list">
-                <li>Go to "Purchase Orders" in the navigation menu (under Transactions)</li>
+                <li>Go to "Purchase Orders" in the navigation menu (under Inventory)</li>
                 <li>Click "Add Purchase Order"</li>
                 <li>Select a supplier</li>
                 <li>Add line items by selecting products and entering quantities and unit costs</li>

@@ -12,7 +12,12 @@ include '../../docs-header.php';
             <p>Get up and running with Argo Books in just a few steps. When you first open the application, a setup checklist will guide you through the initial configuration.</p>
 
             <h2>1. Create Your First Company</h2>
-            <p>When you launch Argo Books for the first time, you'll be prompted to create a company. Choose your default currency and enter your company name. Each company's data is stored in a single <strong>.argo</strong> file that you can back up, copy, or move between computers.</p>
+            <p>When you launch Argo Books for the first time, you'll see the Welcome Screen. Click "Create New Company" to open the setup wizard:</p>
+            <ol class="steps-list">
+                <li><strong>Step 1 – Company Information:</strong> Enter your company name, select your country and default currency. You can also fill in optional details like business type, industry, phone, email, and address.</li>
+                <li><strong>Step 2 – Security & Branding:</strong> Optionally upload a company logo and set a password to protect your file.</li>
+            </ol>
+            <p>Each company's data is stored in a single <strong>.argo</strong> file that you can back up, copy, or move between computers.</p>
 
             <div class="info-box">
                 <strong>Tip:</strong> Want to explore the app first? You can open the <strong>Sample Company</strong> from the welcome screen to see Argo Books populated with example data before setting up your own.
@@ -25,7 +30,7 @@ include '../../docs-header.php';
             <p>Go to "Categories" under Management to create categories for organizing your products and transactions. Categories help you group similar items together, making it easier to track spending and generate meaningful reports. For example, you might create categories like "Office Supplies," "Electronics," or "Raw Materials."</p>
 
             <h2>4. Add Your Products</h2>
-            <p>Navigate to "Products/Services" under Management. Add the items your business sells or uses, assigning each one to a category. You can set pricing, supplier, and other details for each product.</p>
+            <p>Navigate to "Products / Services" under Management. Add the items your business sells or uses, assigning each one to a category. You can set pricing, supplier, and other details for each product.</p>
 
             <div class="info-box">
                 <strong>Note:</strong> The free version supports up to 10 products. <a class="link" href="../../../pricing/">Upgrade to Premium</a> for unlimited products.

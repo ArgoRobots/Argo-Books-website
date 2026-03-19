@@ -23,15 +23,25 @@ include '../../docs-header.php';
             </ul>
 
             <h2>Quick Actions</h2>
-            <p>Below the metrics, a row of Quick Action buttons lets you jump straight into common tasks without navigating through the sidebar:</p>
+            <p>Below the metrics, a row of Quick Action buttons lets you jump straight into common tasks without navigating through the sidebar. The following actions are available:</p>
             <ul>
                 <li>New Invoice</li>
                 <li>New Expense</li>
                 <li>New Revenue</li>
-                <li>Scan Receipt</li>
+                <li>Scan Receipt (Premium)</li>
+                <li>New Customer</li>
+                <li>New Supplier</li>
+                <li>New Product</li>
+                <li>Record Payment</li>
+                <li>New Rental Item</li>
                 <li>New Rental</li>
+                <li>New Category</li>
+                <li>New Department</li>
+                <li>New Location</li>
+                <li>Purchase Order</li>
+                <li>Stock Adjustment</li>
             </ul>
-            <p>You can customize which actions appear here by clicking the settings icon next to the Quick Actions bar.</p>
+            <p>You can customize which actions appear here by clicking the settings icon next to the Quick Actions heading.</p>
 
             <h2>Charts</h2>
             <p>The Dashboard includes two interactive charts:</p>

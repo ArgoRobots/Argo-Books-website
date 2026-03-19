@@ -30,7 +30,7 @@ include '../../docs-header.php';
             <p>To change an existing password:</p>
             <ol class="steps-list">
                 <li>Go to "Settings > Security"</li>
-                <li>Click "Change Password"</li>
+                <li>Click the "Change" button next to the Password section</li>
                 <li>Enter your current password, then set a new one</li>
             </ol>
 
@@ -45,7 +45,7 @@ include '../../docs-header.php';
             <h3>Enabling Biometric Login</h3>
             <ol class="steps-list">
                 <li>First, set up a password (see above)</li>
-                <li>In Settings > Security, a biometric toggle will appear below the password section</li>
+                <li>In Settings > Security, the "Windows Hello" toggle (on Windows) or "Touch ID" toggle (on macOS) will appear below the password section</li>
                 <li>Enable the toggle and verify your identity when prompted by your operating system</li>
                 <li>Next time you open your company file, a biometric login button will appear alongside the password field</li>
             </ol>
@@ -58,8 +58,7 @@ include '../../docs-header.php';
             </ul>
 
             <div class="info-box">
-                <strong>Note:</strong> Biometric login requires compatible hardware and proper configuration in your operating system settings. If your device does not have biometric hardware, the biometric button will not appear on the password prompt when opening a file.
-            </div>
+                <strong>Note:</strong> Biometric login requires a password to be set first, and compatible hardware configured in your operating system settings. If your device does not have biometric hardware, the biometric option will not appear in Settings.</div>
 
             <h2>Auto-Lock</h2>
             <p>When a password is set, Argo Books can automatically lock your company file after a period of inactivity. This protects your data if you step away from your computer. You can configure the auto-lock timeout in Settings > Security.</p>

@@ -9,9 +9,32 @@ include '../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Speed up your workflow in the Report Generator with these keyboard shortcuts. These shortcuts are available when working in the layout designer (Step 2) of the Report Generator.</p>
 
-            <h2>General Actions</h2>
+            <h2>Application Shortcuts</h2>
+            <p>These shortcuts are available throughout the application:</p>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Shortcut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Ctrl + S</strong></td><td>Save</td></tr>
+                        <tr><td><strong>Ctrl + Shift + S</strong></td><td>Save As</td></tr>
+                        <tr><td><strong>Ctrl + K</strong></td><td>Open search / quick actions</td></tr>
+                        <tr><td><strong>Ctrl + Z</strong></td><td>Undo</td></tr>
+                        <tr><td><strong>Ctrl + Y</strong></td><td>Redo</td></tr>
+                        <tr><td><strong>Esc</strong></td><td>Close dialog or panel</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Report Generator Layout Designer</h2>
+            <p>The following shortcuts are available when working in the layout designer (Step 2) of the Report Generator.</p>
+
+            <h3>General Actions</h3>
             <div class="comparison-table-wrapper">
                 <table class="comparison-table">
                     <thead>

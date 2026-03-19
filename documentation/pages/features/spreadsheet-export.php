@@ -13,8 +13,8 @@ include '../../docs-header.php';
 
             <h2>Exporting Your Data</h2>
             <ol class="steps-list">
-                <li>Click "File > Export as"</li>
-                <li>Select the "Spreadsheet" tab</li>
+                <li>Click "File > Export As..."</li>
+                <li>Select the "Spreadsheet (XLSX)" tab</li>
                 <li>Set a date range to filter which records to include</li>
                 <li>Select which data categories to export</li>
                 <li>Choose your preferred currency for the export</li>

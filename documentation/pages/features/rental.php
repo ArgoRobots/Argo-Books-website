@@ -68,13 +68,22 @@ include '../../docs-header.php';
                 <li>Return it to "Active" status when service is complete</li>
             </ul>
 
-            <h2>Rental Dashboard</h2>
-            <p>Monitor your rental operations with key metrics:</p>
+            <h2>Rental Inventory Dashboard</h2>
+            <p>The Rental Inventory page displays four summary cards:</p>
+            <ul>
+                <li><strong>Total Items:</strong> Total rental item types in your inventory</li>
+                <li><strong>Available:</strong> Units ready to rent</li>
+                <li><strong>Rented Out:</strong> Units currently with customers</li>
+                <li><strong>In Maintenance:</strong> Units temporarily unavailable for service</li>
+            </ul>
+
+            <h2>Rental Records Dashboard</h2>
+            <p>The Rental Records page displays four summary cards:</p>
             <ul>
                 <li><strong>Total Rentals:</strong> All rental records</li>
-                <li><strong>Active Rentals:</strong> Currently rented out</li>
+                <li><strong>Active:</strong> Currently rented out</li>
                 <li><strong>Overdue:</strong> Rentals past their return date</li>
-                <li><strong>Revenue:</strong> Total revenue from returned rentals</li>
+                <li><strong>Total Revenue:</strong> Revenue from completed rentals</li>
             </ul>
 
             <div class="page-navigation">

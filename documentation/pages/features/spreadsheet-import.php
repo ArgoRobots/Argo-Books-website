@@ -14,7 +14,7 @@ include '../../docs-header.php';
             <h2>How AI Import Works</h2>
             <p>The AI importer analyzes your spreadsheet and figures out the rest. Here's what happens when you import a file:</p>
             <ol class="steps-list">
-                <li>Click <strong>File &gt; Import</strong> and select your Excel or CSV file</li>
+                <li>Click <strong>File &gt; Import...</strong>, select "Excel or CSV", then choose your file</li>
                 <li>AI analyzes each sheet, detects the data type (customers, products, expenses, etc.), and maps your columns to Argo Books fields</li>
                 <li>Review the mapping — you'll see confidence scores for each match, and can adjust anything that doesn't look right</li>
                 <li>Click <strong>Import</strong> to bring everything in</li>

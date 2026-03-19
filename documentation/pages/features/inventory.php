@@ -20,12 +20,13 @@ include '../../docs-header.php';
 
             <h2>Setting Up Inventory</h2>
             <ol class="steps-list">
-                <li>Navigate to "Products" in the main menu</li>
+                <li>Navigate to "Products / Services" under the Management section in the sidebar</li>
                 <li>Select a product or create a new one</li>
                 <li>Enable inventory tracking in the product settings</li>
                 <li>Enter your current stock quantity</li>
                 <li>Set your minimum stock level (reorder point)</li>
             </ol>
+            <p>Once inventory tracking is enabled, you can monitor stock levels from the "Stock Levels" page and make manual adjustments from the "Adjustments" page, both under the Inventory section in the sidebar.</p>
 
             <h2>Reorder Points</h2>
             <p>Set stock thresholds to stay on top of your inventory:</p>

@@ -11,6 +11,24 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>Track all your business transactions with Argo Books. The Expenses and Revenue pages let you record, organize, and review every financial transaction in your business.</p>
 
+            <h2>Expenses Overview</h2>
+            <p>The Expenses page displays four summary cards at the top:</p>
+            <ul>
+                <li><strong>Monthly Expenses:</strong> Total spending for the current month</li>
+                <li><strong>Transactions:</strong> Number of expense transactions</li>
+                <li><strong>Receipts on File:</strong> Number of receipts attached to expenses</li>
+                <li><strong>Returns:</strong> Number of expense returns</li>
+            </ul>
+
+            <h2>Revenue Overview</h2>
+            <p>The Revenue page displays four summary cards at the top:</p>
+            <ul>
+                <li><strong>Monthly Revenue:</strong> Total income for the current month</li>
+                <li><strong>Transactions:</strong> Number of revenue transactions</li>
+                <li><strong>Unique Customers:</strong> Number of distinct customers</li>
+                <li><strong>Returns:</strong> Number of customer returns</li>
+            </ul>
+
             <h2>Adding a Transaction</h2>
             <ol class="steps-list">
                 <li>Go to "Expenses" or "Revenue" in the navigation menu (under Transactions)</li>

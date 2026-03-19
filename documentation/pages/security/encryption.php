@@ -29,17 +29,8 @@ include '../../docs-header.php';
                 <li>Attached receipts and documents</li>
             </ul>
 
-            <h2>Managing Encryption</h2>
-            <p>Encryption is enabled by default and requires no additional setup. If needed, you can manage encryption settings:</p>
-            <ol class="steps-list">
-                <li>Go to "Settings"</li>
-                <li>Select the "Security" tab</li>
-                <li>Toggle the encryption setting on or off</li>
-            </ol>
-
-            <div class="warning-box">
-                <strong>Important:</strong> Disabling encryption means your company file data will be stored in plain text. We strongly recommend keeping encryption enabled for the security of your business data.
-            </div>
+            <h2>Always-On Protection</h2>
+            <p>Encryption is always enabled and requires no setup or configuration. All company files are automatically encrypted using AES-256-GCM, ensuring your business data is always protected at rest.</p>
 
             <div class="page-navigation">
                 <a href="../reference/keyboard_shortcuts.php" class="nav-button prev">

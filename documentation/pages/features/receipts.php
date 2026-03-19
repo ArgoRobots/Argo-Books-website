@@ -28,16 +28,16 @@ include '../../docs-header.php';
 
             <h2>Exporting Receipts from the Receipts page</h2>
             <ol class="steps-list">
-                <li>Go to "Receipts" in the navigation menu (at the very bottom)</li>
+                <li>Go to "Receipts" in the navigation menu (under Tracking)</li>
                 <li>Filter the receipts you want to export (optional)</li>
                 <li>Select the receipts you want to export</li>
                 <li>Click the "Export Selected" button and choose the location that you want to save the files</li>
             </ol>
 
             <div class="page-navigation">
-                <a href="returns.php" class="nav-button prev">
+                <a href="lost-damaged.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Returns</span>
+                    <span class="nav-title">&larr; Lost & Damaged Inventory</span>
                 </a>
                 <a href="receipt-scanning.php" class="nav-button next">
                     <span class="nav-label">Next</span>

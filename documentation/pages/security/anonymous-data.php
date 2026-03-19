@@ -14,7 +14,7 @@ include '../../docs-header.php';
             <h2>Managing Anonymous Data Collection</h2>
             <ol class="steps-list">
                 <li>Go to "Settings > General" in the desktop application</li>
-                <li>Find the "Anonymous Usage Data" setting</li>
+                <li>Scroll to the Privacy section and find the "Anonymous Data Collection" toggle</li>
                 <li>Toggle the switch to disable data collection if desired</li>
             </ol>
 
@@ -31,14 +31,12 @@ include '../../docs-header.php';
 
             <p><strong>No personal information or business data is ever collected.</strong></p>
 
-            <h2>Exporting Your Anonymous Data</h2>
-            <p>You can export and review all the anonymous data stored on your device:</p>
-            <ol class="steps-list">
-                <li>Go to "Settings > General" in the desktop application</li>
-                <li>Next to the "Anonymous Usage Data" setting, click "Export Data"</li>
-                <li>Choose a location to save the JSON file</li>
-                <li>Open the file with any text editor to review its contents</li>
-            </ol>
+            <h2>Viewing and Deleting Your Data</h2>
+            <p>When data collection is enabled, two buttons appear below the toggle:</p>
+            <ul>
+                <li><strong>View Data:</strong> Opens the folder where anonymous telemetry files are stored on your device, so you can review them directly.</li>
+                <li><strong>Delete All Data:</strong> Permanently removes all collected anonymous data from your device.</li>
+            </ul>
 
             <div class="page-navigation">
                 <a href="backups.php" class="nav-button prev">

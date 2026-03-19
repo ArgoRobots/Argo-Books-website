@@ -14,23 +14,25 @@ include '../../docs-header.php';
             <h2>Creating a Backup</h2>
             <ol class="steps-list">
                 <li>Open your company file in Argo Books</li>
-                <li>Click "File" in the top menu, then select "Export as..."</li>
-                <li>Make sure you're in the "Backup" tab</li>
+                <li>Click "File" in the header, then select "Export As..."</li>
+                <li>Make sure you're in the "Backup File" tab</li>
                 <li>Choose a location to save the backup file</li>
                 <li>Click "Save" to create the backup</li>
             </ol>
+            <p>Backup files are saved with the <strong>.argobk</strong> extension.</p>
 
             <h2>Restoring from a Backup</h2>
             <p>To restore your data from a backup file:</p>
             <ol class="steps-list">
                 <li>Open Argo Books</li>
-                <li>Click "File" and select "Open"</li>
+                <li>Click "File" and select "Import..."</li>
+                <li>Select "Backup File (.argobk)"</li>
                 <li>Navigate to your backup file and open it</li>
-                <li>Your data will be loaded from the backup</li>
+                <li>Your data will be loaded as a new company from the backup</li>
             </ol>
 
             <div class="info-box">
-                <strong>Tip:</strong> Argo Books stores all your company data in a single <strong>.argo</strong> file. This means you can also back up simply by copying the file to another location.
+                <strong>Tip:</strong> Argo Books stores all your company data in a single <strong>.argo</strong> file. You can also back up simply by copying this file to another location. To reopen a copied <strong>.argo</strong> file, use File &gt; "Open Company..."
             </div>
 
             <h2>Backup Best Practices</h2>

@@ -34,7 +34,7 @@ include '../../docs-header.php';
 
             <h2>Adding Products</h2>
             <ol class="steps-list">
-                <li>Go to "Products/Services" in the navigation menu (under Management)</li>
+                <li>Go to "Products / Services" in the navigation menu (under Management)</li>
                 <li>Click "Add Product"</li>
                 <li>Enter the product name</li>
                 <li>Select a category</li>
@@ -55,7 +55,7 @@ include '../../docs-header.php';
             </ul>
 
             <h2>Managing Existing Products</h2>
-            <p>From the Products/Services page, you can edit or delete any product using the action buttons. Changes to a product's details (like category or description) apply going forward and do not modify past transactions.</p>
+            <p>From the Products / Services page, you can edit or delete any product using the action buttons. Changes to a product's details (like category or description) apply going forward and do not modify past transactions.</p>
 
             <div class="warning-box">
                 <strong>Important:</strong> Free version users are limited to 10 products. <a class="link" href="../../../pricing/">Upgrade to the paid version</a> for unlimited products.

@@ -40,6 +40,7 @@ $sidebarSections = [
             'inventory' => ['title' => 'Inventory Management'],
             'purchase-orders' => ['title' => 'Purchase Orders'],
             'returns' => ['title' => 'Returns'],
+            'lost-damaged' => ['title' => 'Lost & Damaged Inventory'],
             'receipts' => ['title' => 'Receipt Management'],
             'receipt-scanning' => ['title' => 'AI Receipt Scanning'],
             'spreadsheet-import' => ['title' => 'AI Spreadsheet Import'],

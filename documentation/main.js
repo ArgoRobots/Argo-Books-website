@@ -52,13 +52,11 @@ document.addEventListener("DOMContentLoaded", function () {
   // ===== Sidebar State Persistence =====
   const sections = document.querySelectorAll(".nav-section");
 
-  // Get section names for storage keys
   function getSectionName(section) {
     const toggle = section.querySelector(".nav-section-toggle span");
     return toggle ? toggle.textContent.trim() : "";
   }
 
-  // Save which sections are expanded to localStorage
   function saveSectionState() {
     const expanded = [];
     sections.forEach((section) => {
@@ -68,19 +66,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     try {
       localStorage.setItem(STORAGE_KEY_SECTIONS, JSON.stringify(expanded));
-    } catch (e) {
-      // localStorage unavailable
-    }
+    } catch (e) {}
   }
 
-  // Save sidebar scroll position to sessionStorage
   function saveScrollPosition() {
     if (sidebar) {
       try {
-        sessionStorage.setItem(STORAGE_KEY_SCROLL, sidebar.scrollTop);
-      } catch (e) {
-        // sessionStorage unavailable
-      }
+        sessionStorage.setItem(STORAGE_KEY_SCROLL, String(sidebar.scrollTop));
+      } catch (e) {}
     }
   }
 
@@ -93,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
         sections.forEach((section) => {
           const name = getSectionName(section);
           const toggle = section.querySelector(".nav-section-toggle");
-          // Check if this section contains the active page
           const hasActivePage = section.querySelector(".nav-links a.active");
 
           if (expanded.includes(name) || hasActivePage) {
@@ -105,9 +97,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
       }
-    } catch (e) {
-      // localStorage unavailable, fall back to PHP-set defaults
-    }
+    } catch (e) {}
   }
 
   // Restore sidebar scroll position from sessionStorage
@@ -118,18 +108,36 @@ document.addEventListener("DOMContentLoaded", function () {
         if (scrollPos !== null) {
           sidebar.scrollTop = parseInt(scrollPos, 10);
         }
-      } catch (e) {
-        // sessionStorage unavailable
-      }
+      } catch (e) {}
     }
   }
 
-  // Restore state on page load
+  // Disable transitions, restore state, then re-enable transitions
+  if (sidebar) {
+    sidebar.classList.add("no-transition");
+  }
   restoreSectionState();
+
+  // Force layout recalc so expanded sections have full height before restoring scroll
+  if (sidebar) {
+    void sidebar.offsetHeight;
+  }
   restoreScrollPosition();
+
+  // Re-enable transitions after a frame
+  requestAnimationFrame(() => {
+    if (sidebar) {
+      sidebar.classList.remove("no-transition");
+    }
+  });
 
   // Save scroll position before navigating away
   window.addEventListener("beforeunload", saveScrollPosition);
+
+  // Also save scroll on every nav link click (backup for beforeunload)
+  navLinks.forEach((link) => {
+    link.addEventListener("click", saveScrollPosition);
+  });
 
   // ===== Sidebar Section Toggle =====
   const sectionToggles = document.querySelectorAll(".nav-section-toggle");
@@ -157,7 +165,6 @@ document.addEventListener("DOMContentLoaded", function () {
       tocList.className = "toc-list";
 
       headings.forEach((heading) => {
-        // Generate ID from heading text
         if (!heading.id) {
           heading.id = heading.textContent
             .trim()
@@ -208,7 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
       window.addEventListener("scroll", updateActiveLink);
       updateActiveLink();
     } else {
-      // Hide TOC sidebar if no headings
       const tocSidebar = document.getElementById("tocSidebar");
       if (tocSidebar) tocSidebar.style.display = "none";
     }

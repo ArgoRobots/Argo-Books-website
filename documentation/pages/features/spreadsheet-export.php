@@ -43,12 +43,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="spreadsheet-import.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Spreadsheet Import
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Spreadsheet Import</span>
                 </a>
                 <a href="history-modal.php" class="nav-button next">
-                    Next: Version History
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Version History &rarr;</span>
                 </a>
             </div>
         </div>

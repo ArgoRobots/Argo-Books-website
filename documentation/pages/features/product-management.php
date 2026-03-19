@@ -63,12 +63,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="customers.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Customer Management
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Customer Management</span>
                 </a>
                 <a href="suppliers.php" class="nav-button next">
-                    Next: Supplier Management
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Supplier Management &rarr;</span>
                 </a>
             </div>
         </div>

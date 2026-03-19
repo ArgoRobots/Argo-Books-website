@@ -42,8 +42,8 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="backups.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Regular Backups
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Regular Backups</span>
                 </a>
             </div>
         </div>

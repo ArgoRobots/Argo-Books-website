@@ -102,12 +102,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="sales-tracking.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Expense/Revenue Tracking
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Expense/Revenue Tracking</span>
                 </a>
                 <a href="rental.php" class="nav-button next">
-                    Next: Rental Management
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Rental Management &rarr;</span>
                 </a>
             </div>
         </div>

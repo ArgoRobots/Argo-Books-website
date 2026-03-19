@@ -51,12 +51,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="system-requirements.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: System Requirements
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; System Requirements</span>
                 </a>
                 <a href="quick-start.php" class="nav-button next">
-                    Next: Quick Start Tutorial
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Quick Start Tutorial &rarr;</span>
                 </a>
             </div>
         </div>

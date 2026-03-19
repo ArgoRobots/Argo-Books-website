@@ -55,12 +55,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="../features/spreadsheet-export.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Spreadsheet Export
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Spreadsheet Export</span>
                 </a>
                 <a href="supported-currencies.php" class="nav-button next">
-                    Next: Supported Currencies
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Supported Currencies &rarr;</span>
                 </a>
             </div>
         </div>

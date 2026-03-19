@@ -70,12 +70,12 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="suppliers.php" class="nav-button prev">
-                    <?= svg_icon('chevron-left', 16) ?>
-                    Previous: Supplier Management
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Supplier Management</span>
                 </a>
                 <a href="purchase-orders.php" class="nav-button next">
-                    Next: Purchase Orders
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Purchase Orders &rarr;</span>
                 </a>
             </div>
         </div>

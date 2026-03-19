@@ -55,8 +55,8 @@ include '../../docs-header.php';
 
             <div class="page-navigation">
                 <a href="installation.php" class="nav-button next">
-                    Next: Installation Guide
-                    <?= svg_icon('chevron-right', 16) ?>
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Installation Guide &rarr;</span>
                 </a>
             </div>
         </div>

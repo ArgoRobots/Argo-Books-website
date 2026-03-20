@@ -21,12 +21,11 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['GET']);
 
-// Authenticate using license key (optional — exchange rates are available to all users)
-$license = authenticate_license_request();
-
-// Rate limiting: use license hash if authenticated, otherwise use IP address
-if ($license) {
-    $rateLimitId = substr($license['license_key_hash'], 0, 16);
+// Exchange rates are a free feature available to all users — no license key required.
+// Rate limiting uses device ID if provided, otherwise falls back to IP address.
+$deviceId = authenticate_device_request();
+if ($deviceId) {
+    $rateLimitId = 'dev_' . substr($deviceId, 0, 16);
 } else {
     $rateLimitId = 'ip_' . substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 16);
 }

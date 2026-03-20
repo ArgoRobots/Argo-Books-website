@@ -5,7 +5,8 @@
  * GET /api/exchange-rates - Proxy OpenExchangeRates API calls
  *
  * Fetches exchange rates from OpenExchangeRates using server-side API key.
- * Implements server-side file caching to reduce upstream API calls.
+ * Implements persistent MySQL caching — historical rates are stored permanently
+ * (they never change), today's rate is refreshed every hour.
  *
  * Query parameters:
  *   - date: Optional date (YYYY-MM-DD). If omitted or today, fetches latest rates.
@@ -57,27 +58,38 @@ if (!empty($date) && !$isLatest) {
     }
 }
 
-// Check server-side cache
-$cacheDir = sys_get_temp_dir() . '/argo_exchange_rates';
-if (!is_dir($cacheDir)) {
-    mkdir($cacheDir, 0755, true);
-}
+$lookupDate = $isLatest ? date('Y-m-d') : $date;
 
-$cacheKey = $isLatest ? 'latest' : $date;
-$cacheFile = $cacheDir . '/' . $cacheKey . '.json';
-$cacheTtl = $isLatest ? 3600 : 86400; // 1 hour for latest, 24 hours for historical
+// Check MySQL cache
+require_once __DIR__ . '/../db_connect.php';
+if ($pdo) {
+    // Ensure table exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS exchange_rates (
+        rate_date DATE NOT NULL,
+        rates JSON NOT NULL,
+        fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (rate_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
-if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTtl) {
-    $cached = json_decode(file_get_contents($cacheFile), true);
-    if ($cached !== null) {
-        send_json_response(200, [
-            'success' => true,
-            'base' => 'USD',
-            'date' => $cached['date'] ?? $date,
-            'rates' => $cached['rates'] ?? [],
-            'cached' => true,
-            'timestamp' => date('c'),
-        ]);
+    $stmt = $pdo->prepare("SELECT rates, fetched_at FROM exchange_rates WHERE rate_date = ?");
+    $stmt->execute([$lookupDate]);
+    $cached = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($cached) {
+        $rates = json_decode($cached['rates'], true);
+        // Historical rates never expire; today's rate has 1hr TTL
+        $isStale = $isLatest && (strtotime($cached['fetched_at']) < time() - 3600);
+
+        if ($rates !== null && !$isStale) {
+            send_json_response(200, [
+                'success' => true,
+                'base' => 'USD',
+                'date' => $lookupDate,
+                'rates' => $rates,
+                'cached' => true,
+                'timestamp' => date('c'),
+            ]);
+        }
     }
 }
 
@@ -85,7 +97,7 @@ if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTtl) {
 if ($isLatest) {
     $url = "https://openexchangerates.org/api/latest.json?app_id={$apiKey}&base=USD";
 } else {
-    $url = "https://openexchangerates.org/api/historical/{$date}.json?app_id={$apiKey}&base=USD";
+    $url = "https://openexchangerates.org/api/historical/{$lookupDate}.json?app_id={$apiKey}&base=USD";
 }
 
 $ch = curl_init($url);
@@ -115,18 +127,19 @@ if ($data === null || !isset($data['rates'])) {
     send_error_response(502, 'Invalid response from exchange rate service.', 'UPSTREAM_ERROR');
 }
 
-// Cache the response
-$cacheData = [
-    'date' => $isLatest ? date('Y-m-d') : $date,
-    'rates' => $data['rates'],
-    'fetched_at' => time(),
-];
-file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
+// Store in MySQL cache
+if ($pdo) {
+    $stmt = $pdo->prepare(
+        "INSERT INTO exchange_rates (rate_date, rates, fetched_at) VALUES (?, ?, NOW())
+         ON DUPLICATE KEY UPDATE rates = VALUES(rates), fetched_at = NOW()"
+    );
+    $stmt->execute([$lookupDate, json_encode($data['rates'])]);
+}
 
 send_json_response(200, [
     'success' => true,
     'base' => 'USD',
-    'date' => $cacheData['date'],
+    'date' => $lookupDate,
     'rates' => $data['rates'],
     'cached' => false,
     'timestamp' => date('c'),

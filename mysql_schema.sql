@@ -536,3 +536,11 @@ CREATE TABLE IF NOT EXISTS invoice_send_usage (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_license_month (license_key, usage_month)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Exchange rates cache (persistent — historical rates never change)
+CREATE TABLE IF NOT EXISTS exchange_rates (
+    rate_date DATE NOT NULL,
+    rates JSON NOT NULL COMMENT 'All currency rates relative to USD for this date',
+    fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (rate_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

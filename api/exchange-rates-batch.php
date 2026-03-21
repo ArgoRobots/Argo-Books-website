@@ -65,7 +65,7 @@ foreach ($requestedDates as $date) {
     if ($parsed > new DateTime()) continue; // skip future dates
     $validDates[] = $date;
 }
-$validDates = array_unique($validDates);
+$validDates = array_values(array_unique($validDates));
 
 if (empty($validDates)) {
     send_json_response(200, [

@@ -29,6 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
     childList: true,
     subtree: true,
   });
+
+  // Clean up observer when navigating away
+  window.addEventListener("beforeunload", function () {
+    observer.disconnect();
+  });
 });
 
 /**

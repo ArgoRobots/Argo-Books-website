@@ -705,12 +705,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 const commentsHeading = document.querySelector(
                   ".comments-section h3"
                 );
-                // Extract just the number from the heading text
-                const currentText = commentsHeading.textContent;
-                const currentCount = parseInt(currentText);
-                if (!isNaN(currentCount)) {
-                  const newCount = currentCount - 1;
-                  commentsHeading.textContent = `${newCount} Comments`;
+                if (commentsHeading) {
+                  // Extract just the number from the heading text
+                  const currentText = commentsHeading.textContent;
+                  const currentCount = parseInt(currentText);
+                  if (!isNaN(currentCount)) {
+                    const newCount = currentCount - 1;
+                    commentsHeading.textContent = `${newCount} Comments`;
+                  }
                 }
               } else {
                 alert("Error deleting comment: " + data.message);

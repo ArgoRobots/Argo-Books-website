@@ -125,24 +125,6 @@ function update_post_status($post_id, $status)
 }
 
 /**
- * Delete a post
- * 
- * @param int $post_id Post ID
- * @return bool Success status
- */
-function delete_post($post_id)
-{
-    $db = get_db_connection();
-
-    $stmt = $db->prepare('DELETE FROM community_posts WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
-    $result = $stmt->execute();
-
-    $stmt->close();
-    return $result;
-}
-
-/**
  * Get all comments for a post
  * 
  * @param int $post_id Post ID

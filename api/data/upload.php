@@ -94,23 +94,6 @@ function validateJsonContent($content)
     return true;
 }
 
-// Sanitize filename
-function sanitizeFilename($filename)
-{
-    // Remove any path traversal attempts
-    $filename = basename($filename);
-
-    // Remove dangerous characters
-    $filename = preg_replace('/[^a-zA-Z0-9._-]/', '', $filename);
-
-    // Limit length
-    if (strlen($filename) > MAX_FILENAME_LENGTH) {
-        $filename = substr($filename, 0, MAX_FILENAME_LENGTH);
-    }
-
-    return $filename;
-}
-
 // Log security events
 function logSecurityEvent($event, $details = '')
 {

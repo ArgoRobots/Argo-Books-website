@@ -701,7 +701,7 @@ Rules:
 - Include a link to the website: https://argorobots.com/
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
-- Always sign the email as: Evan, Argo Books
+- Always sign off with three separate lines: \"Best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}

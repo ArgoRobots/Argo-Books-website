@@ -598,21 +598,6 @@ function copyDraft() {
 }
 
 // ─── AI Enrichment ───
-async function summarizeBusiness() {
-    if (!currentLeadId) return;
-    const result = await api('summarize_business', { method: 'POST', body: { id: currentLeadId } });
-    if (result.success) {
-        document.getElementById('detailFeedback').value = result.summary;
-        if (result.tags && result.tags.length) {
-            notify('Summary: ' + result.tags.join(', '), 'success');
-        } else {
-            notify('Summary generated', 'success');
-        }
-    } else {
-        notify(result.message, 'error');
-    }
-}
-
 // ─── Activity ───
 async function loadActivity(id) {
     const data = await api('get_activity', { params: { id } });

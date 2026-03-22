@@ -71,11 +71,6 @@ switch ($action) {
         import_csv($pdo);
         break;
 
-    // AI enrichment
-    case 'summarize_business':
-        summarize_business($pdo);
-        break;
-
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action']);
 }
@@ -954,46 +949,3 @@ function import_csv($pdo)
 
 // ─── AI Enrichment ───
 
-function summarize_business($pdo)
-{
-    $data = json_decode(file_get_contents('php://input'), true);
-    $id = (int)($data['id'] ?? 0);
-
-    $stmt = $pdo->prepare("SELECT * FROM outreach_leads WHERE id = ?");
-    $stmt->execute([$id]);
-    $lead = $stmt->fetch();
-
-    if (!$lead) {
-        json_response(['success' => false, 'message' => 'Lead not found'], 404);
-    }
-
-    $systemPrompt = "Summarize what this business likely does based on the information provided. Keep it to 1-2 sentences. If very limited info is available, say so briefly. Also suggest 1-2 relevant tags from this list: price concern, interested in demo, wants follow-up later, bookkeeping needs, invoicing needs, new business, established business.
-
-Return JSON: {\"summary\": \"...\", \"tags\": [\"...\"]}
-Return ONLY the JSON.";
-
-    $details = "Business: {$lead['business_name']}";
-    if ($lead['category']) $details .= "\nCategory: {$lead['category']}";
-    if ($lead['city']) $details .= "\nCity: {$lead['city']}";
-    if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
-
-    $result = call_openai($systemPrompt, $details);
-
-    if (isset($result['error'])) {
-        json_response(['success' => false, 'message' => $result['error']], 500);
-    }
-
-    $content = trim($result['content']);
-    $content = preg_replace('/^```json\s*/i', '', $content);
-    $content = preg_replace('/\s*```$/', '', $content);
-    $parsed = json_decode($content, true);
-
-    $summary = $parsed['summary'] ?? $content;
-
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET feedback_summary = ? WHERE id = ?");
-    $stmt->execute([$summary, $id]);
-
-    log_activity($pdo, $id, 'business_summarized', 'AI summary generated');
-
-    json_response(['success' => true, 'summary' => $summary, 'tags' => $parsed['tags'] ?? []]);
-}

@@ -332,7 +332,6 @@ include '../admin_header.php';
                 <div class="detail-meta" id="detailMeta"></div>
                 <div class="detail-actions">
                     <button class="btn btn-blue" onclick="saveLeadDetails()">Save Changes</button>
-                    <button class="btn btn-blue" onclick="summarizeBusiness()">AI Summarize</button>
                     <button class="btn btn-red" onclick="deleteCurrentLead()">Delete Lead</button>
                 </div>
             </div>

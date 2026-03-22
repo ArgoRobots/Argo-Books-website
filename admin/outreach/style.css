@@ -191,6 +191,7 @@
 /* ─── Data Tables ─── */
 .data-table {
     width: 100%;
+    min-width: 900px;
     border-collapse: collapse;
     font-size: 14px;
 }
@@ -233,6 +234,7 @@
     display: flex;
     gap: 4px;
     white-space: nowrap;
+    flex-wrap: nowrap;
 }
 
 .actions-cell .btn-small {
@@ -379,6 +381,7 @@
 
 .modal-body {
     padding: 16px 20px;
+    min-height: 450px;
 }
 
 .modal-footer {

@@ -126,6 +126,7 @@ function ensure_outreach_tables($pdo)
         sent_at DATETIME DEFAULT NULL,
         contact_page_url VARCHAR(500) DEFAULT NULL,
         places_id VARCHAR(255) DEFAULT NULL,
+        business_summary TEXT DEFAULT NULL,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_outreach_status (status),
         INDEX idx_outreach_city (city),
@@ -159,6 +160,7 @@ function ensure_outreach_tables($pdo)
         "ALTER TABLE outreach_leads ADD COLUMN contact_name VARCHAR(255) DEFAULT NULL",
         "ALTER TABLE outreach_leads ADD COLUMN source VARCHAR(100) DEFAULT 'manual'",
         "ALTER TABLE outreach_leads ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
+        "ALTER TABLE outreach_leads ADD COLUMN business_summary TEXT DEFAULT NULL",
     ];
     foreach ($migrations as $sql) {
         try { $pdo->exec($sql); } catch (\PDOException $e) {
@@ -756,6 +758,40 @@ function call_openai($systemPrompt, $userPrompt)
     return ['content' => $result['choices'][0]['message']['content'] ?? ''];
 }
 
+function summarize_business($website)
+{
+    if (empty($website)) return null;
+
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 5,
+            'user_agent' => 'Mozilla/5.0',
+            'follow_location' => true,
+            'max_redirects' => 3,
+        ],
+        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
+    ]);
+
+    $html = @file_get_contents($website, false, $context);
+    if (!$html) return null;
+
+    // Strip scripts, styles, and tags to get readable text
+    $text = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $html);
+    $text = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $html);
+    $text = strip_tags($text);
+    $text = preg_replace('/\s+/', ' ', $text);
+    $text = trim(mb_substr($text, 0, 3000)); // Cap at 3000 chars
+
+    if (strlen($text) < 50) return null;
+
+    $result = call_openai(
+        "You summarize businesses based on their website content. Respond with ONLY a 1-2 sentence summary describing what the business does, what services or products they offer, and who their customers are. Be specific and factual. Do not include any other text.",
+        "Website content from $website:\n\n$text"
+    );
+
+    return $result['content'] ?? null;
+}
+
 function generate_draft($pdo)
 {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -769,18 +805,35 @@ function generate_draft($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
+    // Generate business summary if we don't have one yet
+    $summary = $lead['business_summary'] ?? null;
+    if (empty($summary) && !empty($lead['website'])) {
+        $summary = summarize_business($lead['website']);
+        if ($summary) {
+            $stmt = $pdo->prepare("UPDATE outreach_leads SET business_summary = ? WHERE id = ?");
+            $stmt->execute([$summary, $id]);
+        }
+    }
+
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
+
+About Argo Books:
+- It is like QuickBooks but way simpler, designed so you do not need any accounting knowledge at all
+- Built specifically for small businesses, not a bloated enterprise tool
+- Features include invoicing, expense tracking, and simple bookkeeping
+- Evan is a local independent developer based in Saskatoon building this specifically for small businesses
 
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
+- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - The sender's name is Evan, he is a local independent developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon developer in the email body
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
 - Mention you are looking for honest feedback from real business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
-- Personalize based on the business category and city if possible, but only reference specific concrete details you actually have - never use generic compliments
+- If a business summary is provided, use it to personalize the email. For example if they likely send invoices, mention the invoicing feature. If they do services, mention expense tracking. Only reference features that are relevant to their business
 - Do NOT invent details about the business you do not have
 - If limited info is available, keep it more general rather than making up praise
 - Use a casual but professional tone
@@ -788,6 +841,7 @@ Rules:
 - Include a link to the website: https://argorobots.com/
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
+- End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
 - Always sign off with three separate lines: \"Best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
 Return your response as JSON with two fields:
@@ -800,6 +854,7 @@ Return ONLY the JSON, no other text.";
     if ($lead['city']) $details .= "\nCity: {$lead['city']}";
     if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
     if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
+    if ($summary) $details .= "\nBusiness summary: $summary";
 
     $result = call_openai($systemPrompt, $details);
 

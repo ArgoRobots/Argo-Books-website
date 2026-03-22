@@ -20,12 +20,15 @@ async function api(action, options = {}) {
     }
 
     const fetchOptions = { method };
-    if (body && method !== 'GET') {
+    if (method !== 'GET') {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
         if (body instanceof FormData) {
+            body.append('csrf_token', csrfToken);
             fetchOptions.body = body;
         } else {
+            const payload = Object.assign({}, body || {}, { csrf_token: csrfToken });
             fetchOptions.headers = { 'Content-Type': 'application/json' };
-            fetchOptions.body = JSON.stringify(body);
+            fetchOptions.body = JSON.stringify(payload);
         }
     }
 
@@ -292,8 +295,15 @@ function updateDraftStatus(lead) {
 }
 
 function openWebsite() {
-    const url = document.getElementById('detailWebsite').value.trim();
-    if (url) window.open(url, '_blank');
+    let url = document.getElementById('detailWebsite').value.trim();
+    if (!url) return;
+    try {
+        if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url)) url = 'https://' + url;
+        const parsed = new URL(url);
+        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+            window.open(parsed.href, '_blank', 'noopener,noreferrer');
+        }
+    } catch (e) { /* invalid URL */ }
 }
 
 async function saveLeadDetails() {
@@ -423,7 +433,7 @@ function renderDiscoveryResults() {
             <td>${esc(biz.business_name)}</td>
             <td>${biz.email ? esc(biz.email) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.phone ? esc(biz.phone) : '<span class="text-muted">—</span>'}</td>
-            <td>${biz.website ? '<a href="' + esc(biz.website) + '" target="_blank" class="link">Link</a>' : '<span class="text-muted">—</span>'}</td>
+            <td>${biz.website ? '<a href="' + esc(biz.website) + '" target="_blank" rel="noopener noreferrer" class="link">Link</a>' : '<span class="text-muted">—</span>'}</td>
             <td>${esc(biz.address || '')}</td>
             <td>${esc(biz.category || '')}</td>
         </tr>

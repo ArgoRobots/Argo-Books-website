@@ -8,6 +8,11 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+// Ensure CSRF token exists
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Set page variables for the header
 $page_title = "Business Outreach";
 $page_description = "Find local businesses, generate outreach emails, and track leads";
@@ -16,6 +21,7 @@ $page_description = "Find local businesses, generate outreach emails, and track 
 include '../admin_header.php';
 ?>
 
+<meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
 

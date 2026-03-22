@@ -561,13 +561,12 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     category VARCHAR(100) DEFAULT NULL,
     city VARCHAR(100) DEFAULT NULL,
     source VARCHAR(100) DEFAULT 'manual',
-    status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','follow_up_needed','onboarded') DEFAULT 'new',
+    status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
     response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
     approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
     date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
     first_contact_date DATETIME DEFAULT NULL,
     last_contact_date DATETIME DEFAULT NULL,
-    follow_up_date DATE DEFAULT NULL,
     offer_sent TINYINT(1) DEFAULT 0,
     notes TEXT DEFAULT NULL,
     feedback_summary TEXT DEFAULT NULL,
@@ -581,7 +580,6 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_outreach_status (status),
     INDEX idx_outreach_city (city),
-    INDEX idx_outreach_follow_up (follow_up_date),
     INDEX idx_outreach_approval (approval_status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

@@ -12,6 +12,21 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 header('Content-Type: application/json');
 
+// CSRF protection for state-changing (non-GET) requests
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    $csrfSession = $_SESSION['csrf_token'] ?? null;
+    $csrfRequest = $_POST['csrf_token'] ?? '';
+    if (empty($csrfRequest)) {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $csrfRequest = $input['csrf_token'] ?? '';
+    }
+    if (!$csrfSession || !$csrfRequest || !hash_equals($csrfSession, $csrfRequest)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
+        exit;
+    }
+}
+
 // Ensure tables exist
 ensure_outreach_tables($pdo);
 
@@ -363,7 +378,7 @@ function scrape_email_from_website($url)
             'follow_location' => true,
             'max_redirects' => 3,
         ],
-        'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
+        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
     ]);
 
     $falsePositives = ['example.com', 'sentry.io', 'wixpress.com', 'wordpress.org', 'w3.org', 'schema.org', 'googleapis.com', 'gravatar.com'];

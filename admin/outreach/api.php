@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 // Ensure tables exist
-ensure_outreach_tables($pdo);
+
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
@@ -91,86 +91,6 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Unknown action']);
 }
 
-// ─── Table initialization ───
-
-function ensure_outreach_tables($pdo)
-{
-    static $checked = false;
-    if ($checked) return;
-    $checked = true;
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_leads (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        business_name VARCHAR(255) NOT NULL,
-        contact_name VARCHAR(255) DEFAULT NULL,
-        email VARCHAR(255) DEFAULT NULL,
-        phone VARCHAR(50) DEFAULT NULL,
-        website VARCHAR(500) DEFAULT NULL,
-        address VARCHAR(500) DEFAULT NULL,
-        category VARCHAR(100) DEFAULT NULL,
-        city VARCHAR(100) DEFAULT NULL,
-        source VARCHAR(100) DEFAULT 'manual',
-        status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
-        response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
-        approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
-        date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
-        first_contact_date DATETIME DEFAULT NULL,
-        last_contact_date DATETIME DEFAULT NULL,
-        offer_sent TINYINT(1) DEFAULT 0,
-        notes TEXT DEFAULT NULL,
-        feedback_summary TEXT DEFAULT NULL,
-        draft_subject VARCHAR(500) DEFAULT NULL,
-        draft_body TEXT DEFAULT NULL,
-        drafted_at DATETIME DEFAULT NULL,
-        approved_at DATETIME DEFAULT NULL,
-        sent_at DATETIME DEFAULT NULL,
-        contact_page_url VARCHAR(500) DEFAULT NULL,
-        places_id VARCHAR(255) DEFAULT NULL,
-        business_summary TEXT DEFAULT NULL,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_outreach_status (status),
-        INDEX idx_outreach_city (city),
-        INDEX idx_outreach_approval (approval_status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_activity_log (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        lead_id INT NOT NULL,
-        action_type VARCHAR(50) NOT NULL,
-        details TEXT DEFAULT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_outreach_activity_lead (lead_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    // Add columns that may be missing if table was created before they were added to schema
-    $migrations = [
-        "ALTER TABLE outreach_leads ADD COLUMN places_id VARCHAR(255) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN contact_page_url VARCHAR(500) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN feedback_summary TEXT DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN draft_subject VARCHAR(500) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN draft_body TEXT DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN drafted_at DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN approved_at DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN sent_at DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted'",
-        "ALTER TABLE outreach_leads ADD COLUMN response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response'",
-        "ALTER TABLE outreach_leads ADD COLUMN offer_sent TINYINT(1) DEFAULT 0",
-        "ALTER TABLE outreach_leads ADD COLUMN first_contact_date DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN last_contact_date DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN contact_name VARCHAR(255) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN source VARCHAR(100) DEFAULT 'manual'",
-        "ALTER TABLE outreach_leads ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
-        "ALTER TABLE outreach_leads ADD COLUMN business_summary TEXT DEFAULT NULL",
-    ];
-    foreach ($migrations as $sql) {
-        try { $pdo->exec($sql); } catch (\PDOException $e) {
-            // Column already exists — ignore error 1060
-            if ($e->getCode() != '42S21' && strpos($e->getMessage(), 'Duplicate column') === false) {
-                throw $e;
-            }
-        }
-    }
-}
 
 // ─── Activity logging helper ───
 

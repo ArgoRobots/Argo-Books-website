@@ -687,7 +687,7 @@ function generate_draft($pdo)
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
-- The sender's name is Evan, he is a local independent developer building software for small businesses
+- The sender's name is Evan, he is a local independent developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon developer in the email body
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)

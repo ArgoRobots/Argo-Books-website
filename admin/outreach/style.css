@@ -308,6 +308,7 @@
 
 .filter-group:first-child {
     flex: 1;
+    max-width: 350px;
 }
 
 .filter-group label {

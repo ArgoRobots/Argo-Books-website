@@ -190,7 +190,7 @@ async function loadLeads() {
             <td>${esc(lead.city || '')}</td>
             <td>${esc(lead.category || '')}</td>
             <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
-            <td><span class="badge badge-approval-${lead.approval_status || 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
+            <td><span class="badge badge-approval-${lead.approval_status && lead.approval_status !== 'none' ? lead.approval_status : 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
 
             <td onclick="event.stopPropagation()">
                 <div class="actions-cell">

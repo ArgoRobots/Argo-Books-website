@@ -107,12 +107,3 @@ function calculate_processing_fee($subtotal) {
     return round(($subtotal * $config['processing_fee_percent'] / 100) + $config['processing_fee_fixed'], 2);
 }
 
-/**
- * Convert a dollar amount to cents safely (avoids floating-point precision issues).
- *
- * @param float $amount Dollar amount
- * @return int Amount in cents
- */
-function price_to_cents($amount) {
-    return (int) round($amount * 100);
-}

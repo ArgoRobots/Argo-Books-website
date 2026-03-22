@@ -156,48 +156,6 @@ function isValidPayPalResourceId(string $id): bool
 }
 
 /**
- * Get PayPal subscription details
- *
- * @param string $subscriptionId The PayPal subscription ID
- * @return array|false The subscription details or false on failure
- */
-function getPayPalSubscriptionDetails($subscriptionId) {
-    if (!isValidPayPalResourceId($subscriptionId)) {
-        error_log("Invalid PayPal subscription ID format: " . substr($subscriptionId, 0, 50));
-        return false;
-    }
-
-    $accessToken = getPayPalAccessToken();
-    if (!$accessToken) {
-        return false;
-    }
-
-    $baseUrl = getPayPalApiBaseUrl();
-
-    $ch = curl_init("$baseUrl/v1/billing/subscriptions/$subscriptionId");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            "Authorization: Bearer $accessToken"
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode !== 200) {
-        error_log("Failed to get PayPal subscription details. HTTP Code: $httpCode");
-        return false;
-    }
-
-    return json_decode($response, true);
-}
-
-/**
  * Cancel a PayPal subscription
  *
  * @param string $subscriptionId The PayPal subscription ID
@@ -245,46 +203,6 @@ function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user'
 }
 
 /**
- * Suspend a PayPal subscription
- *
- * @param string $subscriptionId The PayPal subscription ID
- * @param string $reason The suspension reason
- * @return bool True if suspension was successful
- */
-function suspendPayPalSubscription($subscriptionId, $reason = 'Payment failed') {
-    if (!isValidPayPalResourceId($subscriptionId)) {
-        error_log("Invalid PayPal subscription ID format for suspension");
-        return false;
-    }
-
-    $accessToken = getPayPalAccessToken();
-    if (!$accessToken) {
-        return false;
-    }
-
-    $baseUrl = getPayPalApiBaseUrl();
-
-    $ch = curl_init("$baseUrl/v1/billing/subscriptions/$subscriptionId/suspend");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode(['reason' => $reason]),
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            "Authorization: Bearer $accessToken"
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-
-    curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    return $httpCode === 204;
-}
-
-/**
  * Activate a PayPal subscription
  *
  * @param string $subscriptionId The PayPal subscription ID
@@ -322,47 +240,6 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
     curl_close($ch);
 
     return $httpCode === 204;
-}
-
-/**
- * Get PayPal transaction details from a sale/payment
- *
- * @param string $captureId The capture/sale ID
- * @return array|false The transaction details or false on failure
- */
-function getPayPalCaptureDetails($captureId) {
-    if (!isValidPayPalResourceId($captureId)) {
-        error_log("Invalid PayPal capture ID format");
-        return false;
-    }
-
-    $accessToken = getPayPalAccessToken();
-    if (!$accessToken) {
-        return false;
-    }
-
-    $baseUrl = getPayPalApiBaseUrl();
-
-    $ch = curl_init("$baseUrl/v2/payments/captures/$captureId");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            "Authorization: Bearer $accessToken"
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode !== 200) {
-        return false;
-    }
-
-    return json_decode($response, true);
 }
 
 /**

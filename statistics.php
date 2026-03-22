@@ -161,28 +161,3 @@ function track_referral_visit($source_code, $page_url = '')
     return $result;
 }
 
-/**
- * Mark a referral visit as converted (when a license is purchased)
- *
- * @param string $license_key The purchased license key
- * @return bool Success status
- */
-function mark_referral_conversion($license_key)
-{
-    // Check if there's a referral source in the session
-    if (!isset($_SESSION['referral_source'])) {
-        return false;
-    }
-
-    $db = get_db_connection();
-    $source_code = $_SESSION['referral_source'];
-    $ip_address = $_SERVER['REMOTE_ADDR'];
-
-    // Update the most recent visit from this IP and source to mark it as converted
-    $stmt = $db->prepare('UPDATE referral_visits SET converted = 1, license_key = ? WHERE source_code = ? AND ip_address = ? AND converted = 0 ORDER BY visited_at DESC LIMIT 1');
-    $stmt->bind_param('sss', $license_key, $source_code, $ip_address);
-    $result = $stmt->execute();
-    $stmt->close();
-
-    return $result;
-}

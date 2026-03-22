@@ -403,10 +403,8 @@ $sub_key_email = $_SESSION['sub_key_email'] ?? '';
 unset($_SESSION['sub_key_email']);
 
 // Get filter parameters
-$sub_search = isset($_GET['sub_search']) ? trim($_GET['sub_search']) : '';
-
 // Get data
-$premium_subscriptions = get_premium_subscriptions($sub_search);
+$premium_subscriptions = get_premium_subscriptions();
 $premium_subscription_keys = get_premium_subscription_keys();
 $subscription_chart_data = get_subscription_chart_data();
 
@@ -514,12 +512,9 @@ include '../admin_header.php';
         <div class="table-container">
             <h2>Premium Subscriptions</h2>
 
-            <form method="get" action="index.php" style="margin-bottom: 20px;">
-                <div class="input-button-wrapper">
-                    <input type="text" name="sub_search" placeholder="Search by email, ID, or username..." value="<?php echo htmlspecialchars($sub_search); ?>">
-                    <button type="submit" class="btn btn-blue">Search</button>
-                </div>
-            </form>
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="subscriptionSearch" placeholder="Search by email, ID, or username..." oninput="filterTable(this, 'subscription-table-body')">
+            </div>
 
             <!-- Bulk Actions for Premium Subscriptions -->
             <div class="bulk-actions-container" id="subscription-bulk-actions">
@@ -570,7 +565,7 @@ include '../admin_header.php';
                                     <th>Credit</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="subscription-table-body">
                                 <?php foreach ($premium_subscriptions as $sub): ?>
                                     <tr>
                                         <td class="checkbox-column">
@@ -715,6 +710,10 @@ include '../admin_header.php';
                 </div>
             </div>
 
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')">
+            </div>
+
             <?php if (empty($premium_subscription_keys)): ?>
                 <p>No free subscription keys generated yet.</p>
             <?php else: ?>
@@ -741,7 +740,7 @@ include '../admin_header.php';
                                     <th>Notes</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="free-keys-table-body">
                                 <?php foreach ($premium_subscription_keys as $key): ?>
                                     <tr class="<?php echo $key['redeemed_at'] ? 'redeemed-row' : ''; ?>">
                                         <td class="checkbox-column">
@@ -1078,4 +1077,13 @@ document.addEventListener('DOMContentLoaded', function() {
         subKeyBulkResetUsage.addEventListener('click', () => resetUsage('.sub-key-checkbox'));
     }
 });
+
+function filterTable(input, tbodyId) {
+    const filter = input.value.toLowerCase();
+    const rows = document.getElementById(tbodyId).querySelectorAll('tr');
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+}
 </script>

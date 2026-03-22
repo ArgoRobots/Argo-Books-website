@@ -685,10 +685,12 @@ function generate_draft($pdo)
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 Rules:
-- Keep it short (3-5 short paragraphs max)
+- Keep it short (3-4 short paragraphs max)
 - Sound human, friendly, and genuine, not like marketing spam
 - The sender's name is Evan, he is a local independent developer building software for small businesses
 - Do NOT refer to a \"team\", Evan is a solo developer
+- Lead with something about the recipient's business first, not about Evan or Argo Books
+- Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
 - Mention you are looking for honest feedback from real business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - Personalize based on the business category and city if possible
@@ -698,6 +700,7 @@ Rules:
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - Include a link to the website: https://argorobots.com/
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
+- The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
 - Always sign the email as: Evan, Argo Books
 
 Return your response as JSON with two fields:

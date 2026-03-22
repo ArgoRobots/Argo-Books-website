@@ -470,6 +470,20 @@ include '../admin_header.php';
     color: #065f46;
     border-color: #6ee7b7;
 }
+[data-theme="dark"] .btn-copy {
+    background: #1e293b;
+    color: #94a3b8;
+    border-color: #334155;
+}
+[data-theme="dark"] .btn-copy:hover {
+    background: #334155;
+    color: #e2e8f0;
+}
+[data-theme="dark"] .btn-copy.copied {
+    background: #064e3b;
+    color: #6ee7b7;
+    border-color: #065f46;
+}
 </style>
 
 <script>

@@ -61,7 +61,7 @@ $base_path = $in_subdir ? '../' : '';
                 <!-- Center: Desktop Navigation -->
                 <nav class="header-nav desktop-nav">
                     <a href="<?php echo $base_path; ?>license/" class="header-link <?php echo $current_dir === 'license' ? 'active' : ''; ?>">
-                        License Keys
+                        Licenses
                     </a>
                     <a href="<?php echo $base_path; ?>payments/" class="header-link <?php echo $current_dir === 'payments' ? 'active' : ''; ?>">
                         Payment Portal
@@ -73,7 +73,7 @@ $base_path = $in_subdir ? '../' : '';
                         Website Stats
                     </a>
                     <a href="<?php echo $base_path; ?>referral-links/" class="header-link <?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">
-                        Referral Links
+                        Referrals
                     </a>
                     <a href="<?php echo $base_path; ?>users/" class="header-link <?php echo $current_dir === 'users' ? 'active' : ''; ?>">
                         Users
@@ -85,7 +85,7 @@ $base_path = $in_subdir ? '../' : '';
                         Outreach
                     </a>
                     <a href="<?php echo $base_path; ?>settings/" class="header-link <?php echo $current_dir === 'settings' ? 'active' : ''; ?>">
-                        2FA Settings
+                        2FA
                     </a>
                 </nav>
 
@@ -119,15 +119,15 @@ $base_path = $in_subdir ? '../' : '';
                         </a>
                     </li>
                     <li><a href="<?php echo $base_path; ?>index.php" class="<?php echo $current_dir === 'admin' ? 'active' : ''; ?>">Dashboard</a></li>
-                    <li><a href="<?php echo $base_path; ?>license/" class="<?php echo $current_dir === 'license' ? 'active' : ''; ?>">License Keys</a></li>
+                    <li><a href="<?php echo $base_path; ?>license/" class="<?php echo $current_dir === 'license' ? 'active' : ''; ?>">Licenses</a></li>
                     <li><a href="<?php echo $base_path; ?>payments/" class="<?php echo $current_dir === 'payments' ? 'active' : ''; ?>">Payment Portal</a></li>
                     <li><a href="<?php echo $base_path; ?>app-stats/" class="<?php echo $current_dir === 'app-stats' ? 'active' : ''; ?>">App Stats</a></li>
                     <li><a href="<?php echo $base_path; ?>website-stats/" class="<?php echo $current_dir === 'website-stats' ? 'active' : ''; ?>">Website Stats</a></li>
-                    <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referral Links</a></li>
+                    <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referrals</a></li>
                     <li><a href="<?php echo $base_path; ?>users/" class="<?php echo $current_dir === 'users' ? 'active' : ''; ?>">Users</a></li>
                     <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
                     <li><a href="<?php echo $base_path; ?>outreach/" class="<?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">Outreach</a></li>
-                    <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA Settings</a></li>
+                    <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA</a></li>
                     <li><a href="<?php echo $base_path; ?>logout.php" class="logout-link">Logout</a></li>
                 </ul>
             </div>

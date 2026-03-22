@@ -1,10 +1,9 @@
 /* ─── Stats Row ─── */
 .stats-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
     margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 
 .stat-card {

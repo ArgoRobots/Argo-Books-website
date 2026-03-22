@@ -141,6 +141,20 @@ function ensure_outreach_tables($pdo)
         "ALTER TABLE outreach_leads ADD COLUMN places_id VARCHAR(255) DEFAULT NULL",
         "ALTER TABLE outreach_leads ADD COLUMN contact_page_url VARCHAR(500) DEFAULT NULL",
         "ALTER TABLE outreach_leads ADD COLUMN feedback_summary TEXT DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN draft_subject VARCHAR(500) DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN draft_body TEXT DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN drafted_at DATETIME DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN approved_at DATETIME DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN sent_at DATETIME DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted'",
+        "ALTER TABLE outreach_leads ADD COLUMN response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response'",
+        "ALTER TABLE outreach_leads ADD COLUMN follow_up_date DATE DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN offer_sent TINYINT(1) DEFAULT 0",
+        "ALTER TABLE outreach_leads ADD COLUMN first_contact_date DATETIME DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN last_contact_date DATETIME DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN contact_name VARCHAR(255) DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN source VARCHAR(100) DEFAULT 'manual'",
+        "ALTER TABLE outreach_leads ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     ];
     foreach ($migrations as $sql) {
         try { $pdo->exec($sql); } catch (\PDOException $e) {

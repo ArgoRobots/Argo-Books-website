@@ -191,10 +191,12 @@ function json_response($data, $code = 200)
 
 function outreach_log($message)
 {
-    $logFile = __DIR__ . '/error_log.txt';
+    // Sanitize message to avoid log injection (strip newlines)
+    $sanitizedMessage = preg_replace('/[\r\n]+/', ' ', (string) $message);
     $timestamp = date('Y-m-d H:i:s');
-    $entry = "[$timestamp] $message" . PHP_EOL;
-    file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
+    $entry = "[outreach][$timestamp] " . $sanitizedMessage;
+    // Use PHP's error_log to avoid writing to web-accessible directory
+    @error_log($entry);
 }
 
 // ─── Lead CRUD ───
@@ -503,7 +505,7 @@ function search_businesses()
     $city = trim($_GET['city'] ?? '');
     $province = trim($_GET['province'] ?? '');
     $category = trim($_GET['category'] ?? '');
-    $limit = min(200, max(1, (int)($_GET['limit'] ?? 20)));
+    $limit = min(100, max(1, (int)($_GET['limit'] ?? 20)));
 
     if (empty($city)) {
         json_response(['success' => false, 'message' => 'City is required'], 400);
@@ -518,6 +520,13 @@ function search_businesses()
     $businesses = [];
     $seenPlaceIds = [];
     $maxRounds = 5;
+    $roundsUsed = 0;
+
+    // Stream context with timeouts for all Google API calls
+    $httpContext = stream_context_create(['http' => [
+        'timeout' => 10,
+        'ignore_errors' => true,
+    ]]);
 
     // Build query variations to search across multiple rounds
     $queries = [];
@@ -538,6 +547,7 @@ function search_businesses()
     for ($round = 0; $round < $maxRounds && count($businesses) < $limit; $round++) {
         $query = $queries[$round] ?? null;
         if (!$query) break;
+        $roundsUsed++;
 
         // Initial search for this round
         $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
@@ -545,9 +555,9 @@ function search_businesses()
             'key' => $apiKey,
         ]);
 
-        $resp = @file_get_contents($url);
+        $resp = @file_get_contents($url, false, $httpContext);
         if ($resp === false) {
-            if ($round === 0) {
+            if ($roundsUsed === 1) {
                 json_response(['success' => false, 'message' => 'Failed to connect to Google Places API'], 502);
             }
             break;
@@ -556,7 +566,7 @@ function search_businesses()
         $data = json_decode($resp, true);
         $status = $data['status'] ?? '';
         if ($status !== 'OK' && $status !== 'ZERO_RESULTS') {
-            if ($round === 0) {
+            if ($roundsUsed === 1) {
                 $errorMsg = $data['error_message'] ?? $status ?? 'Unknown error';
                 json_response(['success' => false, 'message' => 'Google Places API error: ' . $errorMsg], 502);
             }
@@ -596,7 +606,7 @@ function search_businesses()
                         'fields' => 'formatted_phone_number,website,url',
                         'key' => $apiKey,
                     ]);
-                    $detailResp = @file_get_contents($detailUrl);
+                    $detailResp = @file_get_contents($detailUrl, false, $httpContext);
                     if ($detailResp) {
                         $detail = json_decode($detailResp, true);
                         $r = $detail['result'] ?? [];
@@ -628,7 +638,7 @@ function search_businesses()
                 'pagetoken' => $nextPageToken,
                 'key' => $apiKey,
             ]);
-            $nextResp = @file_get_contents($nextUrl);
+            $nextResp = @file_get_contents($nextUrl, false, $httpContext);
             if (!$nextResp) break;
 
             $nextData = json_decode($nextResp, true);
@@ -640,9 +650,9 @@ function search_businesses()
         }
     }
 
-    $response = ['success' => true, 'businesses' => $businesses, 'count' => count($businesses), 'rounds' => $round];
+    $response = ['success' => true, 'businesses' => $businesses, 'count' => count($businesses), 'rounds' => $roundsUsed];
     if (count($businesses) < $limit) {
-        $response['note'] = "Found " . count($businesses) . " of $limit requested after searching $round round(s). Only businesses with a website and scrapeable email are included.";
+        $response['note'] = "Found " . count($businesses) . " of $limit requested after searching $roundsUsed round(s). Only businesses with a website and scrapeable email are included.";
     }
     json_response($response);
 }

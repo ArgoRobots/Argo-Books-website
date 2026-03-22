@@ -485,8 +485,14 @@
 .draft-actions {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-top: 12px;
+}
+
+.draft-actions .btn {
+    flex: 1 1 0;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .draft-preview {

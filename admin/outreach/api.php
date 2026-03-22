@@ -495,7 +495,7 @@ function search_businesses()
     $city = trim($_GET['city'] ?? '');
     $province = trim($_GET['province'] ?? '');
     $category = trim($_GET['category'] ?? '');
-    $limit = min(100, max(1, (int)($_GET['limit'] ?? 20)));
+    $limit = min(200, max(1, (int)($_GET['limit'] ?? 20)));
 
     if (empty($city)) {
         json_response(['success' => false, 'message' => 'City is required'], 400);
@@ -506,103 +506,135 @@ function search_businesses()
         json_response(['success' => false, 'message' => 'Google Places API key not configured. Set GOOGLE_PLACES_API_KEY in .env'], 500);
     }
 
-    $query = $category ? "$category in $city" : "businesses in $city";
-    if ($province) $query .= ", $province";
-
-    // Text Search
-    $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
-        'query' => $query,
-        'key' => $apiKey,
-    ]);
-
-    $response = file_get_contents($url);
-    if ($response === false) {
-        json_response(['success' => false, 'message' => 'Failed to connect to Google Places API'], 502);
-    }
-
-    $data = json_decode($response, true);
-    if (($data['status'] ?? '') !== 'OK' && ($data['status'] ?? '') !== 'ZERO_RESULTS') {
-        $errorMsg = $data['error_message'] ?? $data['status'] ?? 'Unknown error';
-        json_response(['success' => false, 'message' => 'Google Places API error: ' . $errorMsg], 502);
-    }
-
-    $results = $data['results'] ?? [];
-    $nextPageToken = $data['next_page_token'] ?? null;
+    $location = $province ? "$city, $province" : $city;
     $businesses = [];
+    $seenPlaceIds = [];
+    $maxRounds = 5;
 
-    // We need $limit businesses WITH emails, so keep fetching pages until we have enough
-    $candidates = $results;
-    $maxPages = 3; // Google allows up to 3 pages (60 results)
-    $pagesUsed = 1;
+    // Build query variations to search across multiple rounds
+    $queries = [];
+    if ($category) {
+        $queries[] = "$category in $location";
+        $queries[] = "$category near $location";
+        $queries[] = "$category services in $location";
+        $queries[] = "$category companies in $location";
+        $queries[] = "best $category in $location";
+    } else {
+        $queries[] = "businesses in $location";
+        $queries[] = "services in $location";
+        $queries[] = "companies in $location";
+        $queries[] = "local businesses near $location";
+        $queries[] = "shops and services in $location";
+    }
 
-    while (count($businesses) < $limit) {
-        foreach ($candidates as $place) {
-            if (count($businesses) >= $limit) break;
+    for ($round = 0; $round < $maxRounds && count($businesses) < $limit; $round++) {
+        $query = $queries[$round] ?? null;
+        if (!$query) break;
 
-            $business = [
-                'places_id' => $place['place_id'] ?? '',
-                'business_name' => $place['name'] ?? '',
-                'address' => $place['formatted_address'] ?? '',
-                'category' => $category ?: (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : ''),
-                'city' => $city,
-                'phone' => null,
-                'website' => null,
-                'email' => null,
-            ];
-
-            // Fetch place details for phone and website
-            if (!empty($place['place_id'])) {
-                $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?' . http_build_query([
-                    'place_id' => $place['place_id'],
-                    'fields' => 'formatted_phone_number,website,url',
-                    'key' => $apiKey,
-                ]);
-                $detailResp = @file_get_contents($detailUrl);
-                if ($detailResp) {
-                    $detail = json_decode($detailResp, true);
-                    $r = $detail['result'] ?? [];
-                    $business['phone'] = $r['formatted_phone_number'] ?? null;
-                    $business['website'] = $r['website'] ?? null;
-                    $business['contact_page_url'] = $r['url'] ?? null;
-                }
-            }
-
-            // Skip businesses without a website
-            if (empty($business['website'])) continue;
-
-            // Scrape email from business website
-            $business['email'] = scrape_email_from_website($business['website']);
-
-            // Skip businesses where we couldn't find an email
-            if (empty($business['email'])) continue;
-
-            $businesses[] = $business;
-        }
-
-        // If we have enough or no more pages, stop
-        if (count($businesses) >= $limit || empty($nextPageToken) || $pagesUsed >= $maxPages) break;
-
-        // Google requires a short delay before next_page_token is valid
-        sleep(2);
-
-        $nextUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
-            'pagetoken' => $nextPageToken,
+        // Initial search for this round
+        $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
+            'query' => $query,
             'key' => $apiKey,
         ]);
-        $nextResp = @file_get_contents($nextUrl);
-        if (!$nextResp) break;
 
-        $nextData = json_decode($nextResp, true);
-        if (($nextData['status'] ?? '') !== 'OK') break;
+        $resp = @file_get_contents($url);
+        if ($resp === false) {
+            if ($round === 0) {
+                json_response(['success' => false, 'message' => 'Failed to connect to Google Places API'], 502);
+            }
+            break;
+        }
 
-        $candidates = $nextData['results'] ?? [];
-        $nextPageToken = $nextData['next_page_token'] ?? null;
-        $pagesUsed++;
+        $data = json_decode($resp, true);
+        $status = $data['status'] ?? '';
+        if ($status !== 'OK' && $status !== 'ZERO_RESULTS') {
+            if ($round === 0) {
+                $errorMsg = $data['error_message'] ?? $status ?? 'Unknown error';
+                json_response(['success' => false, 'message' => 'Google Places API error: ' . $errorMsg], 502);
+            }
+            break;
+        }
+
+        $candidates = $data['results'] ?? [];
+        $nextPageToken = $data['next_page_token'] ?? null;
+        $maxPages = 3;
+        $pagesUsed = 1;
+
+        // Process candidates from this round, paging through Google results
+        while (count($businesses) < $limit) {
+            foreach ($candidates as $place) {
+                if (count($businesses) >= $limit) break;
+
+                $placeId = $place['place_id'] ?? '';
+                // Skip duplicates across rounds
+                if ($placeId && isset($seenPlaceIds[$placeId])) continue;
+                if ($placeId) $seenPlaceIds[$placeId] = true;
+
+                $business = [
+                    'places_id' => $placeId,
+                    'business_name' => $place['name'] ?? '',
+                    'address' => $place['formatted_address'] ?? '',
+                    'category' => $category ?: (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : ''),
+                    'city' => $city,
+                    'phone' => null,
+                    'website' => null,
+                    'email' => null,
+                ];
+
+                // Fetch place details for phone and website
+                if (!empty($placeId)) {
+                    $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?' . http_build_query([
+                        'place_id' => $placeId,
+                        'fields' => 'formatted_phone_number,website,url',
+                        'key' => $apiKey,
+                    ]);
+                    $detailResp = @file_get_contents($detailUrl);
+                    if ($detailResp) {
+                        $detail = json_decode($detailResp, true);
+                        $r = $detail['result'] ?? [];
+                        $business['phone'] = $r['formatted_phone_number'] ?? null;
+                        $business['website'] = $r['website'] ?? null;
+                        $business['contact_page_url'] = $r['url'] ?? null;
+                    }
+                }
+
+                // Skip businesses without a website
+                if (empty($business['website'])) continue;
+
+                // Scrape email from business website
+                $business['email'] = scrape_email_from_website($business['website']);
+
+                // Skip businesses where we couldn't find an email
+                if (empty($business['email'])) continue;
+
+                $businesses[] = $business;
+            }
+
+            // If we have enough or no more pages, stop paging
+            if (count($businesses) >= $limit || empty($nextPageToken) || $pagesUsed >= $maxPages) break;
+
+            // Google requires a short delay before next_page_token is valid
+            sleep(2);
+
+            $nextUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
+                'pagetoken' => $nextPageToken,
+                'key' => $apiKey,
+            ]);
+            $nextResp = @file_get_contents($nextUrl);
+            if (!$nextResp) break;
+
+            $nextData = json_decode($nextResp, true);
+            if (($nextData['status'] ?? '') !== 'OK') break;
+
+            $candidates = $nextData['results'] ?? [];
+            $nextPageToken = $nextData['next_page_token'] ?? null;
+            $pagesUsed++;
+        }
     }
 
-    $response = ['success' => true, 'businesses' => $businesses, 'count' => count($businesses)];
+    $response = ['success' => true, 'businesses' => $businesses, 'count' => count($businesses), 'rounds' => $round];
     if (count($businesses) < $limit) {
-        $response['note'] = "Found " . count($businesses) . " of $limit requested. Google Places returned limited results and only businesses with a website and scrapeable email are included.";
+        $response['note'] = "Found " . count($businesses) . " of $limit requested after searching $round round(s). Only businesses with a website and scrapeable email are included.";
     }
     json_response($response);
 }

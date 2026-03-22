@@ -499,44 +499,78 @@ function search_businesses()
         json_response(['success' => false, 'message' => 'Google Places API error: ' . $errorMsg], 502);
     }
 
-    $results = array_slice($data['results'] ?? [], 0, $limit);
+    $results = $data['results'] ?? [];
+    $nextPageToken = $data['next_page_token'] ?? null;
     $businesses = [];
 
-    foreach ($results as $place) {
-        $business = [
-            'places_id' => $place['place_id'] ?? '',
-            'business_name' => $place['name'] ?? '',
-            'address' => $place['formatted_address'] ?? '',
-            'category' => $category ?: (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : ''),
-            'city' => $city,
-            'phone' => null,
-            'website' => null,
-            'email' => null,
-        ];
+    // We need $limit businesses WITH emails, so keep fetching pages until we have enough
+    $candidates = $results;
+    $maxPages = 3; // Google allows up to 3 pages (60 results)
+    $pagesUsed = 1;
 
-        // Fetch place details for phone and website
-        if (!empty($place['place_id'])) {
-            $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?' . http_build_query([
-                'place_id' => $place['place_id'],
-                'fields' => 'formatted_phone_number,website,url',
-                'key' => $apiKey,
-            ]);
-            $detailResp = @file_get_contents($detailUrl);
-            if ($detailResp) {
-                $detail = json_decode($detailResp, true);
-                $r = $detail['result'] ?? [];
-                $business['phone'] = $r['formatted_phone_number'] ?? null;
-                $business['website'] = $r['website'] ?? null;
-                $business['contact_page_url'] = $r['url'] ?? null;
+    while (count($businesses) < $limit) {
+        foreach ($candidates as $place) {
+            if (count($businesses) >= $limit) break;
+
+            $business = [
+                'places_id' => $place['place_id'] ?? '',
+                'business_name' => $place['name'] ?? '',
+                'address' => $place['formatted_address'] ?? '',
+                'category' => $category ?: (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : ''),
+                'city' => $city,
+                'phone' => null,
+                'website' => null,
+                'email' => null,
+            ];
+
+            // Fetch place details for phone and website
+            if (!empty($place['place_id'])) {
+                $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?' . http_build_query([
+                    'place_id' => $place['place_id'],
+                    'fields' => 'formatted_phone_number,website,url',
+                    'key' => $apiKey,
+                ]);
+                $detailResp = @file_get_contents($detailUrl);
+                if ($detailResp) {
+                    $detail = json_decode($detailResp, true);
+                    $r = $detail['result'] ?? [];
+                    $business['phone'] = $r['formatted_phone_number'] ?? null;
+                    $business['website'] = $r['website'] ?? null;
+                    $business['contact_page_url'] = $r['url'] ?? null;
+                }
             }
-        }
 
-        // Scrape email from business website
-        if (!empty($business['website'])) {
+            // Skip businesses without a website
+            if (empty($business['website'])) continue;
+
+            // Scrape email from business website
             $business['email'] = scrape_email_from_website($business['website']);
+
+            // Skip businesses where we couldn't find an email
+            if (empty($business['email'])) continue;
+
+            $businesses[] = $business;
         }
 
-        $businesses[] = $business;
+        // If we have enough or no more pages, stop
+        if (count($businesses) >= $limit || empty($nextPageToken) || $pagesUsed >= $maxPages) break;
+
+        // Google requires a short delay before next_page_token is valid
+        sleep(2);
+
+        $nextUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
+            'pagetoken' => $nextPageToken,
+            'key' => $apiKey,
+        ]);
+        $nextResp = @file_get_contents($nextUrl);
+        if (!$nextResp) break;
+
+        $nextData = json_decode($nextResp, true);
+        if (($nextData['status'] ?? '') !== 'OK') break;
+
+        $candidates = $nextData['results'] ?? [];
+        $nextPageToken = $nextData['next_page_token'] ?? null;
+        $pagesUsed++;
     }
 
     json_response(['success' => true, 'businesses' => $businesses, 'count' => count($businesses)]);

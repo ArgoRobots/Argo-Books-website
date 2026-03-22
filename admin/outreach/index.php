@@ -128,7 +128,7 @@ include '../admin_header.php';
         <div class="panel-actions">
             <button class="btn btn-small btn-blue" onclick="showAddLeadModal()">+ Add Lead</button>
             <button class="btn btn-small btn-blue" onclick="showImportCSVModal()">Import CSV</button>
-            <a href="api.php?action=export_csv" class="btn btn-small btn-blue" target="_blank">Export CSV</a>
+            <button class="btn btn-small btn-blue" onclick="window.open('api.php?action=export_csv', '_blank')">Export CSV</button>
         </div>
     </div>
 

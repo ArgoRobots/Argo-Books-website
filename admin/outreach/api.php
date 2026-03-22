@@ -686,9 +686,9 @@ function generate_draft($pdo)
 
 Rules:
 - Keep it short (3-5 short paragraphs max)
-- Sound human, friendly, and genuine — not like marketing spam
-- The sender's name is Evan — he is a local independent developer building software for small businesses
-- Do NOT refer to a \"team\" — Evan is a solo developer
+- Sound human, friendly, and genuine, not like marketing spam
+- The sender's name is Evan, he is a local independent developer building software for small businesses
+- Do NOT refer to a \"team\", Evan is a solo developer
 - Mention you are looking for honest feedback from real business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - Personalize based on the business category and city if possible
@@ -696,7 +696,9 @@ Rules:
 - If limited info is available, keep it more general
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
-- Always sign the email as: Evan — Argo Books
+- Include a link to the website: https://argorobots.com/
+- NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
+- Always sign the email as: Evan, Argo Books
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}

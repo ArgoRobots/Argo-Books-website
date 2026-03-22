@@ -78,10 +78,6 @@
     align-items: center;
 }
 
-.panel-actions a.btn {
-    box-sizing: border-box;
-}
-
 .panel-content {
     padding: 16px 20px;
 }

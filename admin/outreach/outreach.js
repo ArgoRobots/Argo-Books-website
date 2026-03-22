@@ -477,26 +477,6 @@ async function generateDraft() {
     }
 }
 
-async function generateFollowup() {
-    if (!currentLeadId) return;
-    const btn = document.getElementById('btnFollowup');
-    btn.disabled = true;
-    btn.textContent = 'Generating...';
-
-    const data = await api('generate_followup', { method: 'POST', body: { id: currentLeadId } });
-    btn.disabled = false;
-    btn.textContent = 'Generate Follow-up';
-
-    if (data.success) {
-        document.getElementById('draftSubject').value = data.subject;
-        document.getElementById('draftBody').value = data.body;
-        openLeadDetail(currentLeadId);
-        notify('Follow-up draft generated', 'success');
-    } else {
-        notify(data.message, 'error');
-    }
-}
-
 async function quickGenerateDraft(id, btn) {
     if (btn) {
         btn.disabled = true;

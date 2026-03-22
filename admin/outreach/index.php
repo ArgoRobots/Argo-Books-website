@@ -350,7 +350,6 @@ include '../admin_header.php';
                     </div>
                     <div class="draft-actions">
                         <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
-                        <button class="btn btn-blue" onclick="generateFollowup()" id="btnFollowup">Generate Follow-up</button>
                         <button class="btn btn-blue" onclick="togglePreview()">Preview</button>
                         <button class="btn btn-blue" onclick="copyDraft()">Copy</button>
                         <button class="btn btn-blue" onclick="approveDraft()" id="btnApprove">Approve</button>

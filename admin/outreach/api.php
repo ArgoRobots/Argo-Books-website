@@ -50,10 +50,6 @@ switch ($action) {
     case 'generate_draft':
         generate_draft($pdo);
         break;
-    case 'generate_followup':
-        generate_followup($pdo);
-        break;
-
     // Email workflow
     case 'approve_draft':
         approve_draft($pdo);
@@ -601,13 +597,13 @@ function generate_draft($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
-    $systemPrompt = "You are helping write a brief, personal outreach email from Argo Robots (a solo developer) to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
+    $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 Rules:
 - Keep it short (3-5 short paragraphs max)
 - Sound human, friendly, and genuine — not like marketing spam
-- Mention that Argo Robots is a local independent developer building software for small businesses
-- Do NOT refer to a \"team\" — this is a solo developer
+- The sender's name is Evan — he is a local independent developer building software for small businesses
+- Do NOT refer to a \"team\" — Evan is a solo developer
 - Mention you are looking for honest feedback from real business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - Personalize based on the business category and city if possible
@@ -615,7 +611,7 @@ Rules:
 - If limited info is available, keep it more general
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
-- Always sign the email as: Argo Robots
+- Always sign the email as: Evan — Argo Books
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
@@ -654,66 +650,6 @@ Return ONLY the JSON, no other text.";
     $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
 
     log_activity($pdo, $id, 'draft_generated', 'AI draft generated');
-
-    json_response(['success' => true, 'subject' => $parsed['subject'], 'body' => $parsed['body']]);
-}
-
-function generate_followup($pdo)
-{
-    $data = json_decode(file_get_contents('php://input'), true);
-    $id = (int)($data['id'] ?? 0);
-
-    $stmt = $pdo->prepare("SELECT * FROM outreach_leads WHERE id = ?");
-    $stmt->execute([$id]);
-    $lead = $stmt->fetch();
-
-    if (!$lead) {
-        json_response(['success' => false, 'message' => 'Lead not found'], 404);
-    }
-
-    $systemPrompt = "You are helping write a brief follow-up email from the Argo Robots Team to a small business they previously reached out to.
-
-Rules:
-- Keep it very short (2-3 paragraphs max)
-- Reference that you previously reached out
-- Be polite and not pushy
-- Reiterate the offer briefly (free 1-year premium license for feedback)
-- Sound human and genuine
-- NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
-- Always sign the email as: Argo Robots Team
-
-Return your response as JSON with two fields:
-{\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
-
-Return ONLY the JSON, no other text.";
-
-    $details = "Business: {$lead['business_name']}";
-    if ($lead['category']) $details .= "\nCategory: {$lead['category']}";
-    if ($lead['city']) $details .= "\nCity: {$lead['city']}";
-    if ($lead['draft_subject']) $details .= "\nPrevious email subject: {$lead['draft_subject']}";
-
-    $result = call_openai($systemPrompt, $details);
-
-    if (isset($result['error'])) {
-        json_response(['success' => false, 'message' => $result['error']], 500);
-    }
-
-    $content = trim($result['content']);
-    $content = preg_replace('/^```json\s*/i', '', $content);
-    $content = preg_replace('/\s*```$/', '', $content);
-    $parsed = json_decode($content, true);
-
-    if (!$parsed || !isset($parsed['subject']) || !isset($parsed['body'])) {
-        $parsed = [
-            'subject' => "Following up - {$lead['business_name']}",
-            'body' => $content,
-        ];
-    }
-
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), approval_status = 'draft_ready' WHERE id = ?");
-    $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
-
-    log_activity($pdo, $id, 'followup_draft_generated', 'Follow-up draft generated');
 
     json_response(['success' => true, 'subject' => $parsed['subject'], 'body' => $parsed['body']]);
 }

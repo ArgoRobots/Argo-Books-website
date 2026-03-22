@@ -513,7 +513,7 @@ include '../admin_header.php';
             <h2>Premium Subscriptions</h2>
 
             <div style="margin-bottom: 12px;">
-                <input type="text" id="subscriptionSearch" placeholder="Search by email, ID, or username..." oninput="filterTable(this, 'subscription-table-body')">
+                <input type="text" id="subscriptionSearch" placeholder="Search by email, ID, or username..." oninput="filterTable(this, 'subscription-table-body')" style="max-width: 350px;">
             </div>
 
             <!-- Bulk Actions for Premium Subscriptions -->
@@ -711,7 +711,7 @@ include '../admin_header.php';
             </div>
 
             <div style="margin-bottom: 12px;">
-                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')">
+                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')" style="max-width: 350px;">
             </div>
 
             <?php if (empty($premium_subscription_keys)): ?>

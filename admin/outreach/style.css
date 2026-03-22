@@ -191,7 +191,6 @@
 /* ─── Data Tables ─── */
 .data-table {
     width: 100%;
-    min-width: 900px;
     border-collapse: collapse;
     font-size: 14px;
 }
@@ -381,7 +380,6 @@
 
 .modal-body {
     padding: 16px 20px;
-    min-height: 450px;
 }
 
 .modal-footer {
@@ -424,6 +422,7 @@
 
 .tab-content {
     display: none;
+    min-height: 500px;
 }
 
 .tab-content.active {

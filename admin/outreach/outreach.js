@@ -110,9 +110,11 @@ async function loadLeads() {
             <td><span class="badge badge-status-${lead.status}">${formatStatus(lead.status)}</span></td>
             <td><span class="badge badge-approval-${lead.approval_status}">${formatApproval(lead.approval_status)}</span></td>
             <td>${lead.follow_up_date ? formatDate(lead.follow_up_date) : '<span class="text-muted">—</span>'}</td>
-            <td class="actions-cell" onclick="event.stopPropagation()">
-                <button class="btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                <button class="btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>
+            <td onclick="event.stopPropagation()">
+                <div class="actions-cell">
+                    <button class="btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                    <button class="btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>
+                </div>
             </td>
         </tr>
     `).join('');

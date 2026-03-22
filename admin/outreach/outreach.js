@@ -263,7 +263,7 @@ function updateDraftStatus(lead) {
         sendBtn.disabled = true;
         approveBtn.disabled = false;
     } else {
-        statusHtml = '<span class="badge badge-approval-not_drafted">Not Drafted</span>';
+        statusHtml = '<span class="badge badge-approval-not_drafted">None</span>';
         sendBtn.disabled = true;
         approveBtn.disabled = true;
     }
@@ -717,6 +717,7 @@ function formatStatus(status) {
 }
 
 function formatApproval(status) {
+    if (status === 'not_drafted' || status === 'none') return 'None';
     return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 

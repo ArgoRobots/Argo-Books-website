@@ -105,6 +105,7 @@ include '../admin_header.php';
                         <tr>
                             <th><input type="checkbox" id="discSelectAll" onchange="toggleDiscoveryCheckboxes(this)"></th>
                             <th>Business Name</th>
+                            <th>Email</th>
                             <th>Phone</th>
                             <th>Website</th>
                             <th>Address</th>

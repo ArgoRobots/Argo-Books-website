@@ -369,6 +369,46 @@ function get_stats($pdo)
     json_response(['success' => true, 'stats' => $rows]);
 }
 
+// ─── Email Scraping Helper ───
+
+function scrape_email_from_website($url)
+{
+    if (empty($url)) return null;
+
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 5,
+            'user_agent' => 'Mozilla/5.0',
+            'follow_location' => true,
+            'max_redirects' => 3,
+        ],
+        'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
+    ]);
+
+    $pages = [$url, rtrim($url, '/') . '/contact'];
+
+    foreach ($pages as $pageUrl) {
+        $html = @file_get_contents($pageUrl, false, $context);
+        if (!$html) continue;
+
+        // Look for mailto: links first (most reliable)
+        if (preg_match_all('/mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $html, $matches)) {
+            return $matches[1][0];
+        }
+
+        // Fallback: look for email patterns in text
+        if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $html, $matches)) {
+            foreach ($matches[0] as $email) {
+                $lower = strtolower($email);
+                if (str_contains($lower, 'example.com') || str_contains($lower, 'sentry.io') || str_contains($lower, 'wixpress.com')) continue;
+                return $email;
+            }
+        }
+    }
+
+    return null;
+}
+
 // ─── Business Discovery (Google Places API) ───
 
 function search_businesses()
@@ -437,6 +477,11 @@ function search_businesses()
                 $business['website'] = $r['website'] ?? null;
                 $business['contact_page_url'] = $r['url'] ?? null;
             }
+        }
+
+        // Scrape email from business website
+        if (!empty($business['website'])) {
+            $business['email'] = scrape_email_from_website($business['website']);
         }
 
         $businesses[] = $business;

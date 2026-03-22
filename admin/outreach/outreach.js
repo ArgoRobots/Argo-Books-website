@@ -108,7 +108,7 @@ async function loadLeads() {
             <td>${lead.follow_up_date ? formatDate(lead.follow_up_date) : '<span class="text-muted">—</span>'}</td>
             <td class="actions-cell" onclick="event.stopPropagation()">
                 <button class="btn-small btn-outline" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                <button class="btn-small btn-outline" onclick="quickGenerateDraft(${lead.id})" title="Generate Draft">Draft</button>
+                <button class="btn-small btn-outline" onclick="quickGenerateDraft(${lead.id})" title="Generate Draft" ${lead.draft_subject ? 'disabled' : ''}>Draft</button>
             </td>
         </tr>
     `).join('');
@@ -195,6 +195,9 @@ function updateDraftStatus(lead) {
     }
 
     bar.innerHTML = statusHtml;
+
+    // Disable Generate Draft button if draft already exists
+    document.getElementById('btnGenerate').disabled = !!(lead.draft_subject || lead.draft_body);
 
     // Info section
     let info = '';
@@ -315,7 +318,7 @@ async function searchBusinesses() {
 
     const tbody = document.getElementById('discoveryTableBody');
     if (!discoveryResults.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No businesses found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No businesses found</td></tr>';
         return;
     }
 
@@ -323,6 +326,7 @@ async function searchBusinesses() {
         <tr>
             <td><input type="checkbox" class="disc-check" data-index="${i}" checked></td>
             <td>${esc(biz.business_name)}</td>
+            <td>${biz.email ? esc(biz.email) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.phone ? esc(biz.phone) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.website ? '<a href="' + esc(biz.website) + '" target="_blank" class="link">Link</a>' : '<span class="text-muted">—</span>'}</td>
             <td>${esc(biz.address || '')}</td>

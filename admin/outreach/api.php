@@ -411,15 +411,30 @@ function scrape_email_from_website($url)
         if ($email) return $email;
 
         // Find contact page links in the HTML
-        $base = rtrim($url, '/');
+        // Parse base URL properly for resolving relative links
+        $parsed = parse_url($url);
+        $origin = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
+        $basePath = rtrim($url, '/');
         $contactPaths = [];
-        if (preg_match_all('/href=["\']([^"\']*(?:contact|about|about-us|contact-us|connect|get-in-touch|reach-us)[^"\']*)["\'](?:[^>]*>([^<]*))?/i', $html, $linkMatches, PREG_SET_ORDER)) {
+
+        // Match all <a> tags - check both href path AND link text for contact-related keywords
+        $contactKeywords = 'contact|about|about-us|contact-us|connect|get-in-touch|reach-us|reach out';
+        if (preg_match_all('/<a\s[^>]*href=["\']([^"\'#][^"\']*)["\'][^>]*>(.*?)<\/a>/is', $html, $linkMatches, PREG_SET_ORDER)) {
             foreach ($linkMatches as $m) {
                 $href = $m[1];
+                $text = strip_tags($m[2]);
+                // Match if href OR link text contains contact keywords
+                if (!preg_match('/' . $contactKeywords . '/i', $href) && !preg_match('/' . $contactKeywords . '/i', $text)) continue;
+                // Skip mailto/tel/javascript
+                if (preg_match('/^(mailto:|tel:|javascript:)/i', $href)) continue;
+
+                // Resolve relative URLs
                 if (str_starts_with($href, 'http')) {
                     $contactPaths[] = $href;
                 } elseif (str_starts_with($href, '/')) {
-                    $contactPaths[] = $base . $href;
+                    $contactPaths[] = $origin . $href;
+                } else {
+                    $contactPaths[] = $basePath . '/' . $href;
                 }
             }
         }
@@ -427,9 +442,9 @@ function scrape_email_from_website($url)
         // Fallback: try common paths if none found in links
         if (empty($contactPaths)) {
             $contactPaths = [
-                $base . '/contact',
-                $base . '/contact-us',
-                $base . '/about',
+                $basePath . '/contact',
+                $basePath . '/contact-us',
+                $basePath . '/about',
             ];
         }
 

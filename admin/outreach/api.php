@@ -556,18 +556,20 @@ function generate_draft($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
-    $systemPrompt = "You are helping a local software developer (from Argo Robots / Argo Books) write a brief, personal outreach email to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
+    $systemPrompt = "You are helping write a brief, personal outreach email from the Argo Robots Team to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 Rules:
 - Keep it short (3-5 short paragraphs max)
 - Sound human, friendly, and genuine — not like marketing spam
-- Mention that you are a local developer building software for small businesses
+- Mention that the Argo Robots team is a local developer team building software for small businesses
 - Mention you are looking for honest feedback from real business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - Personalize based on the business category and city if possible
 - Do NOT invent details about the business you do not have
 - If limited info is available, keep it more general
 - Use a casual but professional tone
+- NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
+- Always sign the email as: Argo Robots Team
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
@@ -623,7 +625,7 @@ function generate_followup($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
-    $systemPrompt = "You are helping a local software developer (from Argo Robots / Argo Books) write a brief follow-up email to a small business they previously reached out to.
+    $systemPrompt = "You are helping write a brief follow-up email from the Argo Robots Team to a small business they previously reached out to.
 
 Rules:
 - Keep it very short (2-3 paragraphs max)
@@ -631,6 +633,8 @@ Rules:
 - Be polite and not pushy
 - Reiterate the offer briefly (free 1-year premium license for feedback)
 - Sound human and genuine
+- NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
+- Always sign the email as: Argo Robots Team
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}

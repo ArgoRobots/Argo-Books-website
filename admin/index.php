@@ -121,12 +121,49 @@ try {
         $active_start_by_month[$row['month']] = (int)$row['active_start'];
     }
 
+    // --- Summary stat cards ---
+    // Total paid licenses (active, not free)
+    $stmt = $pdo->query("
+        SELECT COUNT(*) as cnt FROM premium_subscriptions
+        WHERE payment_method != 'free_key'
+        AND (cancelled_at IS NULL)
+        AND (end_date IS NULL OR end_date > NOW())
+    ");
+    $total_paid_licenses = (int)$stmt->fetch(PDO::FETCH_ASSOC)['cnt'];
+
+    // Revenue last 30 days
+    $stmt = $pdo->query("
+        SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
+        WHERE status = 'completed'
+        AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+    ");
+    $revenue_30d = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
+
+    // Revenue last 365 days
+    $stmt = $pdo->query("
+        SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
+        WHERE status = 'completed'
+        AND created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
+    ");
+    $revenue_365d = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
+
+    // Revenue all time
+    $stmt = $pdo->query("
+        SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
+        WHERE status = 'completed'
+    ");
+    $revenue_all = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
+
 } catch (Exception $e) {
     error_log("Error fetching subscription stats: " . $e->getMessage());
     $mrr_by_month = [];
     $license_by_month = [];
     $cancelled_by_month = [];
     $active_start_by_month = [];
+    $total_paid_licenses = 0;
+    $revenue_30d = 0;
+    $revenue_365d = 0;
+    $revenue_all = 0;
 }
 
 // Build arrays for last 12 months
@@ -171,6 +208,26 @@ include 'admin_header.php';
     <!-- Hero Section -->
     <div class="hero-section">
         <h1>Admin Dashboard</h1>
+    </div>
+
+    <!-- Summary Stat Cards -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-card-label">Paid Licenses</div>
+            <div class="summary-card-value"><?php echo $total_paid_licenses; ?></div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-card-label">Revenue (30 days)</div>
+            <div class="summary-card-value">$<?php echo number_format($revenue_30d, 2); ?></div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-card-label">Revenue (1 year)</div>
+            <div class="summary-card-value">$<?php echo number_format($revenue_365d, 2); ?></div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-card-label">Revenue (All Time)</div>
+            <div class="summary-card-value">$<?php echo number_format($revenue_all, 2); ?></div>
+        </div>
     </div>
 
     <!-- Charts Grid (replaces stat cards) -->

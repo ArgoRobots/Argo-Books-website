@@ -93,10 +93,10 @@ include '../admin_header.php';
             <div class="discovery-actions">
                 <span id="discoveryCount">0 results</span>
                 <div>
-                    <button class="btn btn-small btn-outline" onclick="selectAllDiscovery()">Select All</button>
-                    <button class="btn btn-small btn-outline" onclick="deselectAllDiscovery()">Deselect All</button>
+                    <button class="btn btn-small btn-blue" onclick="selectAllDiscovery()">Select All</button>
+                    <button class="btn btn-small btn-blue" onclick="deselectAllDiscovery()">Deselect All</button>
                     <button class="btn btn-small btn-blue" onclick="importSelected()">Import Selected</button>
-                    <button class="btn btn-small btn-outline" onclick="importAll()">Import All</button>
+                    <button class="btn btn-small btn-blue" onclick="importAll()">Import All</button>
                 </div>
             </div>
             <div class="discovery-table-wrapper">
@@ -125,8 +125,8 @@ include '../admin_header.php';
         <h2>Leads</h2>
         <div class="panel-actions">
             <button class="btn btn-small btn-blue" onclick="showAddLeadModal()">+ Add Lead</button>
-            <button class="btn btn-small btn-outline" onclick="showImportCSVModal()">Import CSV</button>
-            <a href="api.php?action=export_csv" class="btn btn-small btn-outline" target="_blank">Export CSV</a>
+            <button class="btn btn-small btn-blue" onclick="showImportCSVModal()">Import CSV</button>
+            <a href="api.php?action=export_csv" class="btn btn-small btn-blue" target="_blank">Export CSV</a>
         </div>
     </div>
 
@@ -189,11 +189,19 @@ include '../admin_header.php';
         </div>
     </div>
 
+    <!-- Bulk Actions -->
+    <div class="bulk-actions-bar" id="bulkActionsBar" style="display:none;">
+        <span><strong id="selectedCount">0</strong> selected</span>
+        <button class="btn btn-small btn-blue" onclick="bulkGenerateDrafts()">Draft Selected</button>
+        <button class="btn btn-small btn-blue" onclick="bulkDeleteLeads()">Delete Selected</button>
+    </div>
+
     <!-- Leads Table -->
     <div class="leads-table-wrapper">
         <table class="data-table leads-table">
             <thead>
                 <tr>
+                    <th class="checkbox-column"><input type="checkbox" id="leadsSelectAll" onchange="toggleLeadCheckboxes(this)"></th>
                     <th>Business</th>
                     <th>Email</th>
                     <th>Phone</th>
@@ -206,7 +214,7 @@ include '../admin_header.php';
                 </tr>
             </thead>
             <tbody id="leadsTableBody">
-                <tr><td colspan="9" class="empty-state">Loading...</td></tr>
+                <tr><td colspan="10" class="empty-state">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -319,7 +327,7 @@ include '../admin_header.php';
                 <div class="detail-meta" id="detailMeta"></div>
                 <div class="detail-actions">
                     <button class="btn btn-blue" onclick="saveLeadDetails()">Save Changes</button>
-                    <button class="btn btn-outline" onclick="summarizeBusiness()">AI Summarize</button>
+                    <button class="btn btn-blue" onclick="summarizeBusiness()">AI Summarize</button>
                     <button class="btn btn-red" onclick="deleteCurrentLead()">Delete Lead</button>
                 </div>
             </div>
@@ -341,10 +349,10 @@ include '../admin_header.php';
                         <div id="draftPreviewContent"></div>
                     </div>
                     <div class="draft-actions">
-                        <button class="btn btn-outline" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
-                        <button class="btn btn-outline" onclick="generateFollowup()" id="btnFollowup">Generate Follow-up</button>
-                        <button class="btn btn-outline" onclick="togglePreview()">Preview</button>
-                        <button class="btn btn-outline" onclick="copyDraft()">Copy</button>
+                        <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
+                        <button class="btn btn-blue" onclick="generateFollowup()" id="btnFollowup">Generate Follow-up</button>
+                        <button class="btn btn-blue" onclick="togglePreview()">Preview</button>
+                        <button class="btn btn-blue" onclick="copyDraft()">Copy</button>
                         <button class="btn btn-blue" onclick="approveDraft()" id="btnApprove">Approve</button>
                         <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
                     </div>
@@ -410,7 +418,7 @@ include '../admin_header.php';
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-outline" onclick="closeModal('addLeadModal')">Cancel</button>
+            <button class="btn btn-blue" onclick="closeModal('addLeadModal')">Cancel</button>
             <button class="btn btn-blue" onclick="createLead()">Add Lead</button>
         </div>
     </div>
@@ -431,7 +439,7 @@ include '../admin_header.php';
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-outline" onclick="closeModal('csvImportModal')">Cancel</button>
+            <button class="btn btn-blue" onclick="closeModal('csvImportModal')">Cancel</button>
             <button class="btn btn-blue" onclick="importCSV()">Import</button>
         </div>
     </div>

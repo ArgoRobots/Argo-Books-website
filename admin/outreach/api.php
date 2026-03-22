@@ -601,12 +601,13 @@ function generate_draft($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
-    $systemPrompt = "You are helping write a brief, personal outreach email from the Argo Robots Team to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
+    $systemPrompt = "You are helping write a brief, personal outreach email from Argo Robots (a solo developer) to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 Rules:
 - Keep it short (3-5 short paragraphs max)
 - Sound human, friendly, and genuine — not like marketing spam
-- Mention that the Argo Robots team is a local developer team building software for small businesses
+- Mention that Argo Robots is a local independent developer building software for small businesses
+- Do NOT refer to a \"team\" — this is a solo developer
 - Mention you are looking for honest feedback from real business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - Personalize based on the business category and city if possible
@@ -614,7 +615,7 @@ Rules:
 - If limited info is available, keep it more general
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
-- Always sign the email as: Argo Robots Team
+- Always sign the email as: Argo Robots
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}

@@ -89,12 +89,16 @@ async function loadLeads() {
     const tbody = document.getElementById('leadsTableBody');
 
     if (!data.success || !data.leads.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No leads found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No leads found</td></tr>';
+        updateBulkBar();
         return;
     }
 
     tbody.innerHTML = data.leads.map(lead => `
         <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
+            <td class="checkbox-column" onclick="event.stopPropagation()">
+                <input type="checkbox" class="lead-check" value="${lead.id}" onchange="updateBulkBar()">
+            </td>
             <td>
                 <strong>${esc(lead.business_name)}</strong>
                 ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
@@ -107,11 +111,86 @@ async function loadLeads() {
             <td><span class="badge badge-approval-${lead.approval_status}">${formatApproval(lead.approval_status)}</span></td>
             <td>${lead.follow_up_date ? formatDate(lead.follow_up_date) : '<span class="text-muted">—</span>'}</td>
             <td class="actions-cell" onclick="event.stopPropagation()">
-                <button class="btn-small btn-outline" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                <button class="btn-small btn-outline" onclick="quickGenerateDraft(${lead.id})" title="Generate Draft" ${lead.draft_subject ? 'disabled' : ''}>Draft</button>
+                <button class="btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                <button class="btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>
             </td>
         </tr>
     `).join('');
+
+    // Reset select-all checkbox
+    const selectAll = document.getElementById('leadsSelectAll');
+    if (selectAll) selectAll.checked = false;
+    updateBulkBar();
+}
+
+// ─── Bulk Select ───
+function toggleLeadCheckboxes(master) {
+    document.querySelectorAll('.lead-check').forEach(cb => cb.checked = master.checked);
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const checked = document.querySelectorAll('.lead-check:checked');
+    const bar = document.getElementById('bulkActionsBar');
+    const count = document.getElementById('selectedCount');
+    const selectAll = document.getElementById('leadsSelectAll');
+    const allBoxes = document.querySelectorAll('.lead-check');
+
+    if (bar) bar.style.display = checked.length ? 'flex' : 'none';
+    if (count) count.textContent = checked.length;
+
+    // Update select-all indeterminate state
+    if (selectAll && allBoxes.length) {
+        if (checked.length === 0) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+        } else if (checked.length === allBoxes.length) {
+            selectAll.checked = true;
+            selectAll.indeterminate = false;
+        } else {
+            selectAll.checked = false;
+            selectAll.indeterminate = true;
+        }
+    }
+}
+
+function getSelectedLeadIds() {
+    return Array.from(document.querySelectorAll('.lead-check:checked')).map(cb => parseInt(cb.value));
+}
+
+async function bulkGenerateDrafts() {
+    const ids = getSelectedLeadIds();
+    if (!ids.length) return;
+    if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
+
+    notify(`Generating ${ids.length} draft(s)...`, 'info');
+    let success = 0, fail = 0;
+    for (const id of ids) {
+        try {
+            const result = await api('generate_draft', { method: 'POST', body: { id } });
+            if (result.success) success++; else fail++;
+        } catch { fail++; }
+    }
+    notify(`Drafted: ${success}, Failed: ${fail}`, success ? 'success' : 'error');
+    loadLeads();
+    loadStats();
+}
+
+async function bulkDeleteLeads() {
+    const ids = getSelectedLeadIds();
+    if (!ids.length) return;
+    if (!confirm(`Delete ${ids.length} lead(s)? This cannot be undone.`)) return;
+
+    let success = 0, fail = 0;
+    for (const id of ids) {
+        try {
+            const result = await api('delete_lead', { method: 'POST', body: { id } });
+            if (result.success) success++; else fail++;
+        } catch { fail++; }
+    }
+    notify(`Deleted: ${success}, Failed: ${fail}`, success ? 'success' : 'error');
+    loadLeads();
+    loadStats();
 }
 
 // ─── Lead Detail Modal ───
@@ -418,14 +497,24 @@ async function generateFollowup() {
     }
 }
 
-async function quickGenerateDraft(id) {
-    const result = await api('generate_draft', { method: 'POST', body: { id } });
-    if (result.success) {
-        notify('Draft generated', 'success');
-        loadLeads();
-        loadStats();
-    } else {
-        notify(result.message, 'error');
+async function quickGenerateDraft(id, btn) {
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Drafting...';
+    }
+    try {
+        const result = await api('generate_draft', { method: 'POST', body: { id } });
+        if (result.success) {
+            notify('Draft generated', 'success');
+            loadLeads();
+            loadStats();
+        } else {
+            notify(result.message, 'error');
+            if (btn) { btn.disabled = false; btn.textContent = 'Draft'; }
+        }
+    } catch (err) {
+        notify('Draft failed: ' + err.message, 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Draft'; }
     }
 }
 

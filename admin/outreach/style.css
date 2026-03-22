@@ -147,6 +147,26 @@
     color: var(--red);
 }
 
+/* ─── Bulk Actions ─── */
+.bulk-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background: var(--blue-50, #eff6ff);
+    border-bottom: 1px solid var(--gray-border);
+    font-size: 14px;
+}
+
+[data-theme="dark"] .bulk-actions-bar {
+    background: #1e3a5f;
+}
+
+.checkbox-column {
+    width: 36px;
+    text-align: center;
+}
+
 /* ─── Discovery Results ─── */
 .discovery-actions {
     display: flex;

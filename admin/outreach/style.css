@@ -235,6 +235,10 @@
     white-space: nowrap;
 }
 
+.actions-cell .btn-small {
+    border: none;
+}
+
 .empty-state {
     text-align: center;
     padding: 30px;

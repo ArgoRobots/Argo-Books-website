@@ -392,10 +392,14 @@ async function searchBusinesses() {
     }
 
     discoveryResults = data.businesses;
-    document.getElementById('discoveryCount').textContent = `${data.count} results`;
     document.getElementById('discoveryResults').style.display = 'block';
+    renderDiscoveryResults();
+}
 
+function renderDiscoveryResults() {
+    document.getElementById('discoveryCount').textContent = `${discoveryResults.length} results`;
     const tbody = document.getElementById('discoveryTableBody');
+
     if (!discoveryResults.length) {
         tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No businesses found</td></tr>';
         return;
@@ -412,6 +416,9 @@ async function searchBusinesses() {
             <td>${esc(biz.category || '')}</td>
         </tr>
     `).join('');
+
+    const selectAll = document.getElementById('discSelectAll');
+    if (selectAll) selectAll.checked = true;
 }
 
 function toggleDiscoveryCheckboxes(master) {
@@ -429,17 +436,27 @@ function deselectAllDiscovery() {
 }
 
 async function importSelected() {
-    const selected = [];
+    const selectedIndexes = [];
     document.querySelectorAll('.disc-check:checked').forEach(cb => {
-        selected.push(discoveryResults[parseInt(cb.dataset.index)]);
+        selectedIndexes.push(parseInt(cb.dataset.index));
     });
-    if (!selected.length) { notify('No businesses selected', 'error'); return; }
-    await doImport(selected);
+    if (!selectedIndexes.length) { notify('No businesses selected', 'error'); return; }
+    const selected = selectedIndexes.map(i => discoveryResults[i]);
+    const success = await doImport(selected);
+    if (success) {
+        // Remove imported businesses from discovery results
+        discoveryResults = discoveryResults.filter((_, i) => !selectedIndexes.includes(i));
+        renderDiscoveryResults();
+    }
 }
 
 async function importAll() {
     if (!discoveryResults.length) return;
-    await doImport(discoveryResults);
+    const success = await doImport(discoveryResults);
+    if (success) {
+        discoveryResults = [];
+        renderDiscoveryResults();
+    }
 }
 
 async function doImport(businesses) {
@@ -449,10 +466,12 @@ async function doImport(businesses) {
         if (result.success) {
             loadLeads();
             loadStats();
+            return true;
         }
     } catch (err) {
         notify('Import failed: ' + err.message, 'error');
     }
+    return false;
 }
 
 // ─── Draft Generation ───
@@ -471,7 +490,6 @@ async function generateDraft() {
         document.getElementById('draftBody').value = data.body;
         // Refresh lead to update status
         openLeadDetail(currentLeadId);
-        notify('Draft generated', 'success');
     } else {
         notify(data.message, 'error');
     }
@@ -485,7 +503,6 @@ async function quickGenerateDraft(id, btn) {
     try {
         const result = await api('generate_draft', { method: 'POST', body: { id } });
         if (result.success) {
-            notify('Draft generated', 'success');
             loadLeads();
             loadStats();
         } else {

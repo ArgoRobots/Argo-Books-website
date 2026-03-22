@@ -32,8 +32,13 @@ async function api(action, options = {}) {
     const res = await fetch(url, fetchOptions);
     if (action === 'export_csv') return res;
 
-    const data = await res.json();
-    return data;
+    if (!res.ok) {
+        let msg = `Server error (${res.status})`;
+        try { const err = await res.json(); msg = err.message || msg; } catch(e) {}
+        throw new Error(msg);
+    }
+
+    return await res.json();
 }
 
 function notify(message, type = 'success') {
@@ -355,11 +360,15 @@ async function importAll() {
 }
 
 async function doImport(businesses) {
-    const result = await api('import_leads', { method: 'POST', body: { businesses } });
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        loadLeads();
-        loadStats();
+    try {
+        const result = await api('import_leads', { method: 'POST', body: { businesses } });
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            loadLeads();
+            loadStats();
+        }
+    } catch (err) {
+        notify('Import failed: ' + err.message, 'error');
     }
 }
 

@@ -135,6 +135,21 @@ function ensure_outreach_tables($pdo)
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         INDEX idx_outreach_activity_lead (lead_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    // Add columns that may be missing if table was created before they were added to schema
+    $migrations = [
+        "ALTER TABLE outreach_leads ADD COLUMN places_id VARCHAR(255) DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN contact_page_url VARCHAR(500) DEFAULT NULL",
+        "ALTER TABLE outreach_leads ADD COLUMN feedback_summary TEXT DEFAULT NULL",
+    ];
+    foreach ($migrations as $sql) {
+        try { $pdo->exec($sql); } catch (\PDOException $e) {
+            // Column already exists — ignore error 1060
+            if ($e->getCode() != '42S21' && strpos($e->getMessage(), 'Duplicate column') === false) {
+                throw $e;
+            }
+        }
+    }
 }
 
 // ─── Activity logging helper ───
@@ -425,41 +440,45 @@ function import_leads($pdo)
         json_response(['success' => false, 'message' => 'No businesses to import'], 400);
     }
 
-    $imported = 0;
-    $skipped = 0;
+    try {
+        $imported = 0;
+        $skipped = 0;
 
-    foreach ($businesses as $biz) {
-        // Deduplicate by places_id
-        if (!empty($biz['places_id'])) {
-            $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE places_id = ?");
-            $check->execute([$biz['places_id']]);
-            if ($check->fetch()) {
-                $skipped++;
-                continue;
+        foreach ($businesses as $biz) {
+            // Deduplicate by places_id
+            if (!empty($biz['places_id'])) {
+                $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE places_id = ?");
+                $check->execute([$biz['places_id']]);
+                if ($check->fetch()) {
+                    $skipped++;
+                    continue;
+                }
             }
+
+            $stmt = $pdo->prepare("INSERT INTO outreach_leads
+                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
+                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?)");
+            $stmt->execute([
+                $biz['business_name'] ?? 'Unknown',
+                $biz['phone'] ?? null,
+                $biz['website'] ?? null,
+                $biz['address'] ?? null,
+                $biz['category'] ?? null,
+                $biz['city'] ?? null,
+                $biz['places_id'] ?? null,
+                $biz['contact_page_url'] ?? null,
+                $biz['email'] ?? null,
+            ]);
+
+            $id = $pdo->lastInsertId();
+            log_activity($pdo, $id, 'lead_created', 'Imported from Google Places: ' . ($biz['business_name'] ?? 'Unknown'));
+            $imported++;
         }
 
-        $stmt = $pdo->prepare("INSERT INTO outreach_leads
-            (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
-            VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?)");
-        $stmt->execute([
-            $biz['business_name'] ?? 'Unknown',
-            $biz['phone'] ?? null,
-            $biz['website'] ?? null,
-            $biz['address'] ?? null,
-            $biz['category'] ?? null,
-            $biz['city'] ?? null,
-            $biz['places_id'] ?? null,
-            $biz['contact_page_url'] ?? null,
-            $biz['email'] ?? null,
-        ]);
-
-        $id = $pdo->lastInsertId();
-        log_activity($pdo, $id, 'lead_created', 'Imported from Google Places: ' . ($biz['business_name'] ?? 'Unknown'));
-        $imported++;
+        json_response(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'message' => "Imported $imported leads, skipped $skipped duplicates"]);
+    } catch (Exception $e) {
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
     }
-
-    json_response(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'message' => "Imported $imported leads, skipped $skipped duplicates"]);
 }
 
 // ─── AI Draft Generation ───

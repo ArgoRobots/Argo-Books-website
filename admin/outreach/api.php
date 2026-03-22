@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         $csrfRequest = $input['csrf_token'] ?? '';
     }
     if (!$csrfSession || !$csrfRequest || !hash_equals($csrfSession, $csrfRequest)) {
+        outreach_log("CSRF token validation failed for action: " . ($_GET['action'] ?? 'unknown'));
         http_response_code(403);
         echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
         exit;
@@ -186,6 +187,16 @@ function json_response($data, $code = 200)
     exit;
 }
 
+// ─── File-based error logging ───
+
+function outreach_log($message)
+{
+    $logFile = __DIR__ . '/error_log.txt';
+    $timestamp = date('Y-m-d H:i:s');
+    $entry = "[$timestamp] $message" . PHP_EOL;
+    file_put_contents($logFile, $entry, FILE_APPEND | LOCK_EX);
+}
+
 // ─── Lead CRUD ───
 
 function get_leads($pdo)
@@ -340,13 +351,29 @@ function delete_lead($pdo)
     $id = (int)($data['id'] ?? 0);
 
     if (!$id) {
+        outreach_log("Delete failed: no lead ID provided");
         json_response(['success' => false, 'message' => 'Lead ID is required'], 400);
     }
 
-    $stmt = $pdo->prepare("DELETE FROM outreach_leads WHERE id = ?");
-    $stmt->execute([$id]);
+    try {
+        // Delete activity log entries first
+        $stmt = $pdo->prepare("DELETE FROM outreach_activity_log WHERE lead_id = ?");
+        $stmt->execute([$id]);
 
-    json_response(['success' => true, 'message' => 'Lead deleted']);
+        // Delete the lead
+        $stmt = $pdo->prepare("DELETE FROM outreach_leads WHERE id = ?");
+        $stmt->execute([$id]);
+
+        if ($stmt->rowCount() === 0) {
+            outreach_log("Delete failed: lead ID $id not found");
+            json_response(['success' => false, 'message' => 'Lead not found'], 404);
+        }
+
+        json_response(['success' => true, 'message' => 'Lead deleted']);
+    } catch (Exception $e) {
+        outreach_log("Delete failed for lead ID $id: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Failed to delete lead'], 500);
+    }
 }
 
 function get_stats($pdo)
@@ -573,7 +600,11 @@ function search_businesses()
         $pagesUsed++;
     }
 
-    json_response(['success' => true, 'businesses' => $businesses, 'count' => count($businesses)]);
+    $response = ['success' => true, 'businesses' => $businesses, 'count' => count($businesses)];
+    if (count($businesses) < $limit) {
+        $response['note'] = "Found " . count($businesses) . " of $limit requested. Google Places returned limited results and only businesses with a website and scrapeable email are included.";
+    }
+    json_response($response);
 }
 
 function import_leads($pdo)
@@ -622,6 +653,7 @@ function import_leads($pdo)
 
         json_response(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'message' => "Imported $imported leads, skipped $skipped duplicates"]);
     } catch (Exception $e) {
+        outreach_log("Import failed: " . $e->getMessage());
         json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
     }
 }

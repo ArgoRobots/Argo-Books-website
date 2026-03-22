@@ -3,8 +3,78 @@ let currentLeadId = null;
 let discoveryResults = [];
 let debounceTimer = null;
 
+// ─── URL Param Helpers ───
+function getFilterParams() {
+    return new URLSearchParams(window.location.search);
+}
+
+function updateUrlParams() {
+    const params = new URLSearchParams();
+    const search = document.getElementById('filterSearch').value.trim();
+    const status = document.getElementById('filterStatus').value;
+    const response = document.getElementById('filterResponse').value;
+    const approval = document.getElementById('filterApproval').value;
+    const sort = document.getElementById('filterSort').value;
+
+    if (search) params.set('search', search);
+    if (status) params.set('status', status);
+    if (response) params.set('response', response);
+    if (approval) params.set('approval', approval);
+    if (sort && sort !== 'date_added_desc') params.set('sort', sort);
+
+    const newUrl = params.toString()
+        ? window.location.pathname + '?' + params.toString()
+        : window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+}
+
+function restoreFiltersFromUrl() {
+    const params = getFilterParams();
+    if (params.has('search')) document.getElementById('filterSearch').value = params.get('search');
+    if (params.has('status')) document.getElementById('filterStatus').value = params.get('status');
+    if (params.has('response')) document.getElementById('filterResponse').value = params.get('response');
+    if (params.has('approval')) document.getElementById('filterApproval').value = params.get('approval');
+    if (params.has('sort')) document.getElementById('filterSort').value = params.get('sort');
+}
+
+// ─── Discovery SessionStorage ───
+function saveDiscoveryToSession() {
+    try {
+        sessionStorage.setItem('outreach_discovery', JSON.stringify(discoveryResults));
+        // Save discovery form values
+        sessionStorage.setItem('outreach_disc_city', document.getElementById('discCity').value);
+        sessionStorage.setItem('outreach_disc_province', document.getElementById('discProvince').value);
+        sessionStorage.setItem('outreach_disc_category', document.getElementById('discCategory').value);
+        sessionStorage.setItem('outreach_disc_limit', document.getElementById('discLimit').value);
+    } catch (e) { /* storage full or unavailable */ }
+}
+
+function restoreDiscoveryFromSession() {
+    try {
+        const saved = sessionStorage.getItem('outreach_discovery');
+        if (saved) {
+            discoveryResults = JSON.parse(saved);
+            if (discoveryResults.length) {
+                document.getElementById('discoveryResults').style.display = 'block';
+                renderDiscoveryResults();
+            }
+        }
+        // Restore form values
+        const city = sessionStorage.getItem('outreach_disc_city');
+        const province = sessionStorage.getItem('outreach_disc_province');
+        const category = sessionStorage.getItem('outreach_disc_category');
+        const limit = sessionStorage.getItem('outreach_disc_limit');
+        if (city) document.getElementById('discCity').value = city;
+        if (province) document.getElementById('discProvince').value = province;
+        if (category) document.getElementById('discCategory').value = category;
+        if (limit) document.getElementById('discLimit').value = limit;
+    } catch (e) { /* storage unavailable */ }
+}
+
 // ─── Init ───
 document.addEventListener('DOMContentLoaded', function () {
+    restoreFiltersFromUrl();
+    restoreDiscoveryFromSession();
     loadStats();
     loadLeads();
 });
@@ -87,6 +157,9 @@ async function loadLeads() {
     if (response) params.response_status = response;
     if (approval) params.approval_status = approval;
     if (sort) params.sort = sort;
+
+    // Persist filters to URL
+    updateUrlParams();
 
     const data = await api('get_leads', { params });
     const tbody = document.getElementById('leadsTableBody');
@@ -187,13 +260,18 @@ async function bulkDeleteLeads() {
     if (!confirm(`Delete ${ids.length} lead(s)? This cannot be undone.`)) return;
 
     let success = 0, fail = 0;
+    let lastError = '';
     for (const id of ids) {
         try {
             const result = await api('delete_lead', { method: 'POST', body: { id } });
-            if (result.success) success++; else fail++;
-        } catch { fail++; }
+            if (result.success) success++; else { fail++; lastError = result.message || 'Unknown error'; }
+        } catch (err) { fail++; lastError = err.message; }
     }
-    notify(`Deleted: ${success}, Failed: ${fail}`, success ? 'success' : 'error');
+    if (fail > 0) {
+        notify(`Deleted: ${success}, Failed: ${fail}. Last error: ${lastError}`, 'error');
+    } else {
+        notify(`Successfully deleted ${success} lead(s)`, 'success');
+    }
     loadLeads();
     loadStats();
 }
@@ -416,6 +494,11 @@ async function searchBusinesses() {
     discoveryResults = data.businesses;
     document.getElementById('discoveryResults').style.display = 'block';
     renderDiscoveryResults();
+    saveDiscoveryToSession();
+
+    if (data.note) {
+        notify(data.note, 'info');
+    }
 }
 
 function renderDiscoveryResults() {
@@ -469,6 +552,7 @@ async function importSelected() {
         // Remove imported businesses from discovery results
         discoveryResults = discoveryResults.filter((_, i) => !selectedIndexes.includes(i));
         renderDiscoveryResults();
+        saveDiscoveryToSession();
     }
 }
 
@@ -478,6 +562,7 @@ async function importAll() {
     if (success) {
         discoveryResults = [];
         renderDiscoveryResults();
+        saveDiscoveryToSession();
     }
 }
 

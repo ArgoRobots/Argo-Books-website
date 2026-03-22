@@ -48,10 +48,6 @@ include '../admin_header.php';
         <div class="stat-label">Interested</div>
         <div class="stat-value stat-interested" id="statInterested">0</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-label">Follow-up</div>
-        <div class="stat-value stat-followup" id="statFollowUp">0</div>
-    </div>
 </div>
 
 <!-- Business Discovery Panel -->
@@ -153,7 +149,6 @@ include '../admin_header.php';
                     <option value="replied">Replied</option>
                     <option value="interested">Interested</option>
                     <option value="not_interested">Not Interested</option>
-                    <option value="follow_up_needed">Follow-up Needed</option>
                     <option value="onboarded">Onboarded</option>
                 </select>
             </div>
@@ -183,7 +178,7 @@ include '../admin_header.php';
                 <select id="filterSort" onchange="loadLeads()">
                     <option value="date_added_desc">Newest First</option>
                     <option value="date_added_asc">Oldest First</option>
-                    <option value="follow_up_asc">Follow-up (Soonest)</option>
+
                     <option value="last_contact_desc">Last Contacted</option>
                     <option value="business_name_asc">Name A-Z</option>
                 </select>
@@ -211,12 +206,11 @@ include '../admin_header.php';
                     <th>Category</th>
                     <th>Status</th>
                     <th>Approval</th>
-                    <th>Follow-up</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="leadsTableBody">
-                <tr><td colspan="10" class="empty-state">Loading...</td></tr>
+                <tr><td colspan="9" class="empty-state">Loading...</td></tr>
             </tbody>
         </table>
     </div>
@@ -292,7 +286,6 @@ include '../admin_header.php';
                             <option value="replied">Replied</option>
                             <option value="interested">Interested</option>
                             <option value="not_interested">Not Interested</option>
-                            <option value="follow_up_needed">Follow-up Needed</option>
                             <option value="onboarded">Onboarded</option>
                         </select>
                     </div>
@@ -304,10 +297,6 @@ include '../admin_header.php';
                             <option value="neutral">Neutral</option>
                             <option value="negative">Negative</option>
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Follow-up Date</label>
-                        <input type="date" id="detailFollowUp">
                     </div>
                     <div class="form-group">
                         <label>Offer Sent</label>

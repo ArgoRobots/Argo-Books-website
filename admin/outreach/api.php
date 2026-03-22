@@ -94,13 +94,12 @@ function ensure_outreach_tables($pdo)
         category VARCHAR(100) DEFAULT NULL,
         city VARCHAR(100) DEFAULT NULL,
         source VARCHAR(100) DEFAULT 'manual',
-        status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','follow_up_needed','onboarded') DEFAULT 'new',
+        status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
         response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
         approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
         date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
         first_contact_date DATETIME DEFAULT NULL,
         last_contact_date DATETIME DEFAULT NULL,
-        follow_up_date DATE DEFAULT NULL,
         offer_sent TINYINT(1) DEFAULT 0,
         notes TEXT DEFAULT NULL,
         feedback_summary TEXT DEFAULT NULL,
@@ -114,7 +113,6 @@ function ensure_outreach_tables($pdo)
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         INDEX idx_outreach_status (status),
         INDEX idx_outreach_city (city),
-        INDEX idx_outreach_follow_up (follow_up_date),
         INDEX idx_outreach_approval (approval_status)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
@@ -139,7 +137,6 @@ function ensure_outreach_tables($pdo)
         "ALTER TABLE outreach_leads ADD COLUMN sent_at DATETIME DEFAULT NULL",
         "ALTER TABLE outreach_leads ADD COLUMN approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted'",
         "ALTER TABLE outreach_leads ADD COLUMN response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response'",
-        "ALTER TABLE outreach_leads ADD COLUMN follow_up_date DATE DEFAULT NULL",
         "ALTER TABLE outreach_leads ADD COLUMN offer_sent TINYINT(1) DEFAULT 0",
         "ALTER TABLE outreach_leads ADD COLUMN first_contact_date DATETIME DEFAULT NULL",
         "ALTER TABLE outreach_leads ADD COLUMN last_contact_date DATETIME DEFAULT NULL",
@@ -210,8 +207,6 @@ function get_leads($pdo)
     $orderMap = [
         'date_added_desc' => 'date_added DESC',
         'date_added_asc' => 'date_added ASC',
-        'follow_up_asc' => 'follow_up_date ASC',
-        'follow_up_desc' => 'follow_up_date DESC',
         'last_contact_desc' => 'last_contact_date DESC',
         'business_name_asc' => 'business_name ASC',
         'status_asc' => 'status ASC',
@@ -248,8 +243,8 @@ function create_lead($pdo)
     }
 
     $stmt = $pdo->prepare("INSERT INTO outreach_leads
-        (business_name, contact_name, email, phone, website, address, category, city, source, status, notes, follow_up_date, contact_page_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        (business_name, contact_name, email, phone, website, address, category, city, source, status, notes, contact_page_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $stmt->execute([
         $data['business_name'],
@@ -263,7 +258,6 @@ function create_lead($pdo)
         $data['source'] ?? 'manual',
         $data['status'] ?? 'new',
         $data['notes'] ?? null,
-        $data['follow_up_date'] ?? null,
         $data['contact_page_url'] ?? null,
     ]);
 
@@ -285,7 +279,7 @@ function update_lead($pdo)
     $fields = [
         'business_name', 'contact_name', 'email', 'phone', 'website', 'address',
         'category', 'city', 'source', 'status', 'response_status', 'approval_status',
-        'notes', 'feedback_summary', 'follow_up_date', 'offer_sent',
+        'notes', 'feedback_summary', 'offer_sent',
         'draft_subject', 'draft_body', 'contact_page_url',
         'first_contact_date', 'last_contact_date',
     ];
@@ -321,9 +315,6 @@ function update_lead($pdo)
     if (in_array('notes', $changes)) {
         log_activity($pdo, $id, 'notes_updated', 'Notes updated');
     }
-    if (in_array('follow_up_date', $changes)) {
-        log_activity($pdo, $id, 'follow_up_set', 'Follow-up set: ' . ($data['follow_up_date'] ?? 'cleared'));
-    }
 
     json_response(['success' => true, 'message' => 'Lead updated']);
 }
@@ -353,8 +344,7 @@ function get_stats($pdo)
         SUM(approval_status = 'approved') as approved,
         SUM(status = 'contacted') as contacted,
         SUM(status = 'replied') as replied,
-        SUM(status = 'interested') as interested,
-        SUM(status = 'follow_up_needed') as follow_up_needed
+        SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
 
     json_response(['success' => true, 'stats' => $rows]);
@@ -855,7 +845,7 @@ function export_csv($pdo)
 
     $headers = ['ID', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Website', 'Address',
         'Category', 'City', 'Source', 'Status', 'Response Status', 'Approval Status',
-        'Date Added', 'First Contact', 'Last Contact', 'Follow-up Date', 'Offer Sent',
+        'Date Added', 'First Contact', 'Last Contact', 'Offer Sent',
         'Notes', 'Feedback Summary', 'Draft Subject', 'Draft Body'];
     fputcsv($output, $headers);
 
@@ -865,7 +855,7 @@ function export_csv($pdo)
             $lead['phone'], $lead['website'], $lead['address'], $lead['category'],
             $lead['city'], $lead['source'], $lead['status'], $lead['response_status'],
             $lead['approval_status'], $lead['date_added'], $lead['first_contact_date'],
-            $lead['last_contact_date'], $lead['follow_up_date'], $lead['offer_sent'],
+            $lead['last_contact_date'], $lead['offer_sent'],
             $lead['notes'], $lead['feedback_summary'], $lead['draft_subject'], $lead['draft_body'],
         ]);
     }

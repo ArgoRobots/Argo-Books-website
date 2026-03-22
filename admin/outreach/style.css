@@ -37,7 +37,7 @@
 .stat-contacted { color: var(--purple-500); }
 .stat-replied { color: var(--green-600); }
 .stat-interested { color: var(--emerald-700); }
-.stat-followup { color: var(--amber-600); }
+
 
 /* ─── Panels ─── */
 .panel {
@@ -277,7 +277,7 @@
 .badge-status-replied { background: var(--green-100); color: var(--green-700); }
 .badge-status-interested { background: var(--emerald-100); color: var(--emerald-800); }
 .badge-status-not_interested { background: var(--red-100); color: var(--red-700); }
-.badge-status-follow_up_needed { background: var(--amber-100); color: var(--amber-700); }
+
 .badge-status-onboarded { background: var(--green-100); color: var(--green-800); }
 
 /* Approval badges */

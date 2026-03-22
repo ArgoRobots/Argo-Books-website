@@ -61,7 +61,7 @@ async function loadStats() {
         document.getElementById('statContacted').textContent = s.contacted || 0;
         document.getElementById('statReplied').textContent = s.replied || 0;
         document.getElementById('statInterested').textContent = s.interested || 0;
-        document.getElementById('statFollowUp').textContent = s.follow_up_needed || 0;
+
     }
 }
 
@@ -109,7 +109,7 @@ async function loadLeads() {
             <td>${esc(lead.category || '')}</td>
             <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
             <td><span class="badge badge-approval-${lead.approval_status || 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
-            <td>${lead.follow_up_date ? formatDate(lead.follow_up_date) : '<span class="text-muted">—</span>'}</td>
+
             <td onclick="event.stopPropagation()">
                 <div class="actions-cell">
                     <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
@@ -216,7 +216,7 @@ async function openLeadDetail(id) {
     document.getElementById('detailSource').value = lead.source || 'manual';
     document.getElementById('detailStatus').value = lead.status || 'new';
     document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
-    document.getElementById('detailFollowUp').value = lead.follow_up_date || '';
+
     document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
     document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
     document.getElementById('detailNotes').value = lead.notes || '';
@@ -309,7 +309,7 @@ async function saveLeadDetails() {
         city: document.getElementById('detailCity').value,
         status: document.getElementById('detailStatus').value,
         response_status: document.getElementById('detailResponseStatus').value,
-        follow_up_date: document.getElementById('detailFollowUp').value,
+
         offer_sent: document.getElementById('detailOfferSent').value,
         contact_page_url: document.getElementById('detailContactPageUrl').value,
         notes: document.getElementById('detailNotes').value,

@@ -107,8 +107,8 @@ async function loadLeads() {
             <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
             <td>${esc(lead.city || '')}</td>
             <td>${esc(lead.category || '')}</td>
-            <td><span class="badge badge-status-${lead.status}">${formatStatus(lead.status)}</span></td>
-            <td><span class="badge badge-approval-${lead.approval_status}">${formatApproval(lead.approval_status)}</span></td>
+            <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
+            <td><span class="badge badge-approval-${lead.approval_status || 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
             <td>${lead.follow_up_date ? formatDate(lead.follow_up_date) : '<span class="text-muted">—</span>'}</td>
             <td onclick="event.stopPropagation()">
                 <div class="actions-cell">

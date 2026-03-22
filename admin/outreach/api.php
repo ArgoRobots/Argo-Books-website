@@ -356,6 +356,16 @@ function delete_lead($pdo)
     }
 
     try {
+        // Check lead exists before deleting anything
+        $stmt = $pdo->prepare("SELECT id FROM outreach_leads WHERE id = ?");
+        $stmt->execute([$id]);
+        if (!$stmt->fetch()) {
+            outreach_log("Delete failed: lead ID $id not found");
+            json_response(['success' => false, 'message' => 'Lead not found'], 404);
+        }
+
+        $pdo->beginTransaction();
+
         // Delete activity log entries first
         $stmt = $pdo->prepare("DELETE FROM outreach_activity_log WHERE lead_id = ?");
         $stmt->execute([$id]);
@@ -364,13 +374,11 @@ function delete_lead($pdo)
         $stmt = $pdo->prepare("DELETE FROM outreach_leads WHERE id = ?");
         $stmt->execute([$id]);
 
-        if ($stmt->rowCount() === 0) {
-            outreach_log("Delete failed: lead ID $id not found");
-            json_response(['success' => false, 'message' => 'Lead not found'], 404);
-        }
+        $pdo->commit();
 
         json_response(['success' => true, 'message' => 'Lead deleted']);
     } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
         outreach_log("Delete failed for lead ID $id: " . $e->getMessage());
         json_response(['success' => false, 'message' => 'Failed to delete lead'], 500);
     }

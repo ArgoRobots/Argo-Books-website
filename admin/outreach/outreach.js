@@ -105,6 +105,12 @@ async function api(action, options = {}) {
     const res = await fetch(url, fetchOptions);
     if (action === 'export_csv') return res;
 
+    if (res.status === 401) {
+        // Session expired — redirect to login
+        window.location.href = '../login.php';
+        throw new Error('Session expired. Redirecting to login...');
+    }
+
     if (!res.ok) {
         let msg = `Server error (${res.status})`;
         try { const err = await res.json(); msg = err.message || msg; } catch(e) {}

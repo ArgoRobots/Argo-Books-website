@@ -381,23 +381,64 @@ function scrape_email_from_website($url)
         'ssl' => ['verify_peer' => false, 'verify_peer_name' => false],
     ]);
 
-    $pages = [$url, rtrim($url, '/') . '/contact'];
+    $falsePositives = ['example.com', 'sentry.io', 'wixpress.com', 'wordpress.org', 'w3.org', 'schema.org', 'googleapis.com', 'gravatar.com'];
 
-    foreach ($pages as $pageUrl) {
-        $html = @file_get_contents($pageUrl, false, $context);
-        if (!$html) continue;
-
+    // Helper to extract email from HTML
+    $extractEmail = function($html) use ($falsePositives) {
         // Look for mailto: links first (most reliable)
         if (preg_match_all('/mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $html, $matches)) {
-            return $matches[1][0];
+            foreach ($matches[1] as $email) {
+                $dominated = false;
+                foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
+                if (!$dominated) return $email;
+            }
         }
-
-        // Fallback: look for email patterns in text
+        // Fallback: email patterns in text
         if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $html, $matches)) {
             foreach ($matches[0] as $email) {
-                $lower = strtolower($email);
-                if (str_contains($lower, 'example.com') || str_contains($lower, 'sentry.io') || str_contains($lower, 'wixpress.com')) continue;
-                return $email;
+                $dominated = false;
+                foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
+                if (!$dominated) return $email;
+            }
+        }
+        return null;
+    };
+
+    // Try homepage first
+    $html = @file_get_contents($url, false, $context);
+    if ($html) {
+        $email = $extractEmail($html);
+        if ($email) return $email;
+
+        // Find contact page links in the HTML
+        $base = rtrim($url, '/');
+        $contactPaths = [];
+        if (preg_match_all('/href=["\']([^"\']*(?:contact|about|about-us|contact-us|connect|get-in-touch|reach-us)[^"\']*)["\'](?:[^>]*>([^<]*))?/i', $html, $linkMatches, PREG_SET_ORDER)) {
+            foreach ($linkMatches as $m) {
+                $href = $m[1];
+                if (str_starts_with($href, 'http')) {
+                    $contactPaths[] = $href;
+                } elseif (str_starts_with($href, '/')) {
+                    $contactPaths[] = $base . $href;
+                }
+            }
+        }
+
+        // Fallback: try common paths if none found in links
+        if (empty($contactPaths)) {
+            $contactPaths = [
+                $base . '/contact',
+                $base . '/contact-us',
+                $base . '/about',
+            ];
+        }
+
+        // Try each contact page
+        foreach (array_unique(array_slice($contactPaths, 0, 3)) as $contactUrl) {
+            $contactHtml = @file_get_contents($contactUrl, false, $context);
+            if ($contactHtml) {
+                $email = $extractEmail($contactHtml);
+                if ($email) return $email;
             }
         }
     }

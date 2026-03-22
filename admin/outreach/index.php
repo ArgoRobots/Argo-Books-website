@@ -258,7 +258,10 @@ include '../admin_header.php';
                     </div>
                     <div class="form-group">
                         <label>Website</label>
-                        <input type="url" id="detailWebsite">
+                        <div class="input-with-btn">
+                            <input type="url" id="detailWebsite">
+                            <button class="btn btn-small btn-blue" onclick="openWebsite()" title="Open in new tab">Open</button>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Address</label>

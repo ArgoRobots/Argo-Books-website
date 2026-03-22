@@ -427,6 +427,23 @@
     display: block;
 }
 
+/* ─── Input with Button ─── */
+.input-with-btn {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.input-with-btn input {
+    flex: 1;
+}
+
+.input-with-btn .btn-small {
+    border: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 /* ─── Detail Grid ─── */
 .detail-grid {
     display: grid;

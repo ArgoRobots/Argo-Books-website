@@ -284,6 +284,11 @@ function updateDraftStatus(lead) {
     document.getElementById('draftInfo').textContent = info;
 }
 
+function openWebsite() {
+    const url = document.getElementById('detailWebsite').value.trim();
+    if (url) window.open(url, '_blank');
+}
+
 async function saveLeadDetails() {
     const data = {
         id: currentLeadId,

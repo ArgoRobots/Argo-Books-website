@@ -648,6 +648,7 @@
     background: #0f172a;
     border-color: #334155;
     color: #e2e8f0;
+    color-scheme: dark;
 }
 
 [data-theme="dark"] .form-group label,

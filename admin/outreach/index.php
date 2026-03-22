@@ -17,6 +17,7 @@ include '../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="../../resources/styles/checkbox.css">
 
 <!-- Dashboard Stats -->
 <div class="stats-row" id="statsRow">
@@ -101,7 +102,7 @@ include '../admin_header.php';
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th><input type="checkbox" id="discSelectAll" onchange="toggleDiscoveryCheckboxes(this)"></th>
+                            <th><div class="checkbox"><input type="checkbox" id="discSelectAll" onchange="toggleDiscoveryCheckboxes(this)"><label for="discSelectAll"></label></div></th>
                             <th>Business Name</th>
                             <th>Email</th>
                             <th>Phone</th>
@@ -198,7 +199,7 @@ include '../admin_header.php';
         <table class="data-table leads-table">
             <thead>
                 <tr>
-                    <th class="checkbox-column"><input type="checkbox" id="leadsSelectAll" onchange="toggleLeadCheckboxes(this)"></th>
+                    <th class="checkbox-column"><div class="checkbox"><input type="checkbox" id="leadsSelectAll" onchange="toggleLeadCheckboxes(this)"><label for="leadsSelectAll"></label></div></th>
                     <th>Business</th>
                     <th>Email</th>
                     <th>Phone</th>

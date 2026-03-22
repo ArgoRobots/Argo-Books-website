@@ -97,7 +97,7 @@ async function loadLeads() {
     tbody.innerHTML = data.leads.map(lead => `
         <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
             <td class="checkbox-column" onclick="event.stopPropagation()">
-                <input type="checkbox" class="lead-check" value="${lead.id}" onchange="updateBulkBar()">
+                <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
             </td>
             <td>
                 <strong>${esc(lead.business_name)}</strong>
@@ -419,7 +419,7 @@ function renderDiscoveryResults() {
 
     tbody.innerHTML = discoveryResults.map((biz, i) => `
         <tr>
-            <td><input type="checkbox" class="disc-check" data-index="${i}" checked></td>
+            <td><div class="checkbox"><input type="checkbox" class="disc-check" data-index="${i}" id="disc-check-${i}" checked><label for="disc-check-${i}"></label></div></td>
             <td>${esc(biz.business_name)}</td>
             <td>${biz.email ? esc(biz.email) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.phone ? esc(biz.phone) : '<span class="text-muted">—</span>'}</td>

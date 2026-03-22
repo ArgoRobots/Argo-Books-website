@@ -1,0 +1,641 @@
+// ─── State ───
+let currentLeadId = null;
+let discoveryResults = [];
+let debounceTimer = null;
+
+// ─── Init ───
+document.addEventListener('DOMContentLoaded', function () {
+    loadStats();
+    loadLeads();
+});
+
+// ─── API Helper ───
+async function api(action, options = {}) {
+    const { method = 'GET', body = null, params = {} } = options;
+    let url = `api.php?action=${action}`;
+
+    if (method === 'GET' && Object.keys(params).length) {
+        const qs = new URLSearchParams(params).toString();
+        url += '&' + qs;
+    }
+
+    const fetchOptions = { method };
+    if (body && method !== 'GET') {
+        if (body instanceof FormData) {
+            fetchOptions.body = body;
+        } else {
+            fetchOptions.headers = { 'Content-Type': 'application/json' };
+            fetchOptions.body = JSON.stringify(body);
+        }
+    }
+
+    const res = await fetch(url, fetchOptions);
+    if (action === 'export_csv') return res;
+
+    const data = await res.json();
+    return data;
+}
+
+function notify(message, type = 'success') {
+    if (typeof showNotification === 'function') {
+        showNotification(message, type);
+    } else {
+        alert(message);
+    }
+}
+
+// ─── Stats ───
+async function loadStats() {
+    const data = await api('get_stats');
+    if (data.success) {
+        const s = data.stats;
+        document.getElementById('statTotal').textContent = s.total || 0;
+        document.getElementById('statNew').textContent = s.new_leads || 0;
+        document.getElementById('statDraftsPending').textContent = s.drafts_pending || 0;
+        document.getElementById('statApproved').textContent = s.approved || 0;
+        document.getElementById('statContacted').textContent = s.contacted || 0;
+        document.getElementById('statReplied').textContent = s.replied || 0;
+        document.getElementById('statInterested').textContent = s.interested || 0;
+        document.getElementById('statFollowUp').textContent = s.follow_up_needed || 0;
+    }
+}
+
+// ─── Leads Table ───
+function debounceLoadLeads() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadLeads, 300);
+}
+
+async function loadLeads() {
+    const params = {};
+    const search = document.getElementById('filterSearch').value.trim();
+    const status = document.getElementById('filterStatus').value;
+    const response = document.getElementById('filterResponse').value;
+    const approval = document.getElementById('filterApproval').value;
+    const sort = document.getElementById('filterSort').value;
+
+    if (search) params.search = search;
+    if (status) params.status = status;
+    if (response) params.response_status = response;
+    if (approval) params.approval_status = approval;
+    if (sort) params.sort = sort;
+
+    const data = await api('get_leads', { params });
+    const tbody = document.getElementById('leadsTableBody');
+
+    if (!data.success || !data.leads.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No leads found</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.leads.map(lead => `
+        <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
+            <td>
+                <strong>${esc(lead.business_name)}</strong>
+                ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
+            </td>
+            <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
+            <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
+            <td>${esc(lead.city || '')}</td>
+            <td>${esc(lead.category || '')}</td>
+            <td><span class="badge badge-status-${lead.status}">${formatStatus(lead.status)}</span></td>
+            <td><span class="badge badge-approval-${lead.approval_status}">${formatApproval(lead.approval_status)}</span></td>
+            <td>${lead.follow_up_date ? formatDate(lead.follow_up_date) : '<span class="text-muted">—</span>'}</td>
+            <td class="actions-cell" onclick="event.stopPropagation()">
+                <button class="btn-small btn-outline" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                <button class="btn-small btn-outline" onclick="quickGenerateDraft(${lead.id})" title="Generate Draft">Draft</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ─── Lead Detail Modal ───
+async function openLeadDetail(id) {
+    currentLeadId = id;
+    const data = await api('get_lead', { params: { id } });
+    if (!data.success) { notify(data.message, 'error'); return; }
+
+    const lead = data.lead;
+    document.getElementById('detailModalTitle').textContent = lead.business_name;
+
+    // Info tab
+    document.getElementById('detailBusinessName').value = lead.business_name || '';
+    document.getElementById('detailContactName').value = lead.contact_name || '';
+    document.getElementById('detailEmail').value = lead.email || '';
+    document.getElementById('detailPhone').value = lead.phone || '';
+    document.getElementById('detailWebsite').value = lead.website || '';
+    document.getElementById('detailAddress').value = lead.address || '';
+    document.getElementById('detailCategory').value = lead.category || '';
+    document.getElementById('detailCity').value = lead.city || '';
+    document.getElementById('detailSource').value = lead.source || 'manual';
+    document.getElementById('detailStatus').value = lead.status;
+    document.getElementById('detailResponseStatus').value = lead.response_status;
+    document.getElementById('detailFollowUp').value = lead.follow_up_date || '';
+    document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
+    document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
+    document.getElementById('detailNotes').value = lead.notes || '';
+    document.getElementById('detailFeedback').value = lead.feedback_summary || '';
+
+    // Meta info
+    let meta = `Added: ${formatDateTime(lead.date_added)}`;
+    if (lead.first_contact_date) meta += ` | First contact: ${formatDateTime(lead.first_contact_date)}`;
+    if (lead.last_contact_date) meta += ` | Last contact: ${formatDateTime(lead.last_contact_date)}`;
+    if (lead.sent_at) meta += ` | Last sent: ${formatDateTime(lead.sent_at)}`;
+    document.getElementById('detailMeta').textContent = meta;
+
+    // Draft tab
+    document.getElementById('draftSubject').value = lead.draft_subject || '';
+    document.getElementById('draftBody').value = lead.draft_body || '';
+    updateDraftStatus(lead);
+
+    // Reset to info tab
+    switchTab('tabInfo', document.querySelector('.tab'));
+
+    // Load activity
+    loadActivity(id);
+
+    showModal('leadDetailModal');
+}
+
+function updateDraftStatus(lead) {
+    const bar = document.getElementById('draftStatusBar');
+    const sendBtn = document.getElementById('btnSend');
+    const approveBtn = document.getElementById('btnApprove');
+
+    let statusHtml = '';
+    if (lead.approval_status === 'sent') {
+        statusHtml = `<span class="badge badge-approval-sent">Sent</span> on ${formatDateTime(lead.sent_at)}`;
+        sendBtn.disabled = true;
+        approveBtn.disabled = true;
+    } else if (lead.approval_status === 'approved') {
+        statusHtml = '<span class="badge badge-approval-approved">Approved</span> — Ready to send';
+        sendBtn.disabled = !lead.email;
+        approveBtn.disabled = true;
+        if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
+    } else if (lead.draft_subject || lead.draft_body) {
+        statusHtml = '<span class="badge badge-approval-draft_ready">Draft Ready</span> — Review and approve before sending';
+        sendBtn.disabled = true;
+        approveBtn.disabled = false;
+    } else {
+        statusHtml = '<span class="badge badge-approval-not_drafted">Not Drafted</span>';
+        sendBtn.disabled = true;
+        approveBtn.disabled = true;
+    }
+
+    if (lead.drafted_at) {
+        statusHtml += ` | Drafted: ${formatDateTime(lead.drafted_at)}`;
+    }
+    if (lead.approved_at) {
+        statusHtml += ` | Approved: ${formatDateTime(lead.approved_at)}`;
+    }
+
+    bar.innerHTML = statusHtml;
+
+    // Info section
+    let info = '';
+    if (!lead.email) info = 'No email address — email sending is disabled for this lead.';
+    document.getElementById('draftInfo').textContent = info;
+}
+
+async function saveLeadDetails() {
+    const data = {
+        id: currentLeadId,
+        business_name: document.getElementById('detailBusinessName').value,
+        contact_name: document.getElementById('detailContactName').value,
+        email: document.getElementById('detailEmail').value,
+        phone: document.getElementById('detailPhone').value,
+        website: document.getElementById('detailWebsite').value,
+        address: document.getElementById('detailAddress').value,
+        category: document.getElementById('detailCategory').value,
+        city: document.getElementById('detailCity').value,
+        status: document.getElementById('detailStatus').value,
+        response_status: document.getElementById('detailResponseStatus').value,
+        follow_up_date: document.getElementById('detailFollowUp').value,
+        offer_sent: document.getElementById('detailOfferSent').value,
+        contact_page_url: document.getElementById('detailContactPageUrl').value,
+        notes: document.getElementById('detailNotes').value,
+        feedback_summary: document.getElementById('detailFeedback').value,
+    };
+
+    // Also save draft fields if modified
+    data.draft_subject = document.getElementById('draftSubject').value;
+    data.draft_body = document.getElementById('draftBody').value;
+
+    const result = await api('update_lead', { method: 'POST', body: data });
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        loadLeads();
+        loadStats();
+    }
+}
+
+async function deleteCurrentLead() {
+    if (!confirm('Are you sure you want to delete this lead?')) return;
+    const result = await api('delete_lead', { method: 'POST', body: { id: currentLeadId } });
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        closeModal('leadDetailModal');
+        loadLeads();
+        loadStats();
+    }
+}
+
+// ─── Add Lead ───
+function showAddLeadModal() {
+    document.getElementById('addBusinessName').value = '';
+    document.getElementById('addContactName').value = '';
+    document.getElementById('addEmail').value = '';
+    document.getElementById('addPhone').value = '';
+    document.getElementById('addWebsite').value = '';
+    document.getElementById('addAddress').value = '';
+    document.getElementById('addCategory').value = '';
+    document.getElementById('addCity').value = '';
+    document.getElementById('addNotes').value = '';
+    showModal('addLeadModal');
+}
+
+async function createLead() {
+    const name = document.getElementById('addBusinessName').value.trim();
+    if (!name) { notify('Business name is required', 'error'); return; }
+
+    const data = {
+        business_name: name,
+        contact_name: document.getElementById('addContactName').value.trim(),
+        email: document.getElementById('addEmail').value.trim(),
+        phone: document.getElementById('addPhone').value.trim(),
+        website: document.getElementById('addWebsite').value.trim(),
+        address: document.getElementById('addAddress').value.trim(),
+        category: document.getElementById('addCategory').value.trim(),
+        city: document.getElementById('addCity').value.trim(),
+        notes: document.getElementById('addNotes').value.trim(),
+    };
+
+    const result = await api('create_lead', { method: 'POST', body: data });
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        closeModal('addLeadModal');
+        loadLeads();
+        loadStats();
+    }
+}
+
+// ─── Business Discovery ───
+async function searchBusinesses() {
+    const city = document.getElementById('discCity').value.trim();
+    if (!city) { notify('City is required', 'error'); return; }
+
+    const btn = document.getElementById('searchBtn');
+    btn.disabled = true;
+    btn.textContent = 'Searching...';
+
+    const params = {
+        city: city,
+        province: document.getElementById('discProvince').value.trim(),
+        category: document.getElementById('discCategory').value.trim(),
+        limit: document.getElementById('discLimit').value,
+    };
+
+    const data = await api('search_businesses', { params });
+    btn.disabled = false;
+    btn.textContent = 'Search';
+
+    if (!data.success) {
+        notify(data.message, 'error');
+        return;
+    }
+
+    discoveryResults = data.businesses;
+    document.getElementById('discoveryCount').textContent = `${data.count} results`;
+    document.getElementById('discoveryResults').style.display = 'block';
+
+    const tbody = document.getElementById('discoveryTableBody');
+    if (!discoveryResults.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No businesses found</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = discoveryResults.map((biz, i) => `
+        <tr>
+            <td><input type="checkbox" class="disc-check" data-index="${i}" checked></td>
+            <td>${esc(biz.business_name)}</td>
+            <td>${biz.phone ? esc(biz.phone) : '<span class="text-muted">—</span>'}</td>
+            <td>${biz.website ? '<a href="' + esc(biz.website) + '" target="_blank" class="link">Link</a>' : '<span class="text-muted">—</span>'}</td>
+            <td>${esc(biz.address || '')}</td>
+            <td>${esc(biz.category || '')}</td>
+        </tr>
+    `).join('');
+}
+
+function toggleDiscoveryCheckboxes(master) {
+    document.querySelectorAll('.disc-check').forEach(cb => cb.checked = master.checked);
+}
+
+function selectAllDiscovery() {
+    document.querySelectorAll('.disc-check').forEach(cb => cb.checked = true);
+    document.getElementById('discSelectAll').checked = true;
+}
+
+function deselectAllDiscovery() {
+    document.querySelectorAll('.disc-check').forEach(cb => cb.checked = false);
+    document.getElementById('discSelectAll').checked = false;
+}
+
+async function importSelected() {
+    const selected = [];
+    document.querySelectorAll('.disc-check:checked').forEach(cb => {
+        selected.push(discoveryResults[parseInt(cb.dataset.index)]);
+    });
+    if (!selected.length) { notify('No businesses selected', 'error'); return; }
+    await doImport(selected);
+}
+
+async function importAll() {
+    if (!discoveryResults.length) return;
+    await doImport(discoveryResults);
+}
+
+async function doImport(businesses) {
+    const result = await api('import_leads', { method: 'POST', body: { businesses } });
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        loadLeads();
+        loadStats();
+    }
+}
+
+// ─── Draft Generation ───
+async function generateDraft() {
+    if (!currentLeadId) return;
+    const btn = document.getElementById('btnGenerate');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+
+    const data = await api('generate_draft', { method: 'POST', body: { id: currentLeadId } });
+    btn.disabled = false;
+    btn.textContent = 'Generate Draft';
+
+    if (data.success) {
+        document.getElementById('draftSubject').value = data.subject;
+        document.getElementById('draftBody').value = data.body;
+        // Refresh lead to update status
+        openLeadDetail(currentLeadId);
+        notify('Draft generated', 'success');
+    } else {
+        notify(data.message, 'error');
+    }
+}
+
+async function generateFollowup() {
+    if (!currentLeadId) return;
+    const btn = document.getElementById('btnFollowup');
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+
+    const data = await api('generate_followup', { method: 'POST', body: { id: currentLeadId } });
+    btn.disabled = false;
+    btn.textContent = 'Generate Follow-up';
+
+    if (data.success) {
+        document.getElementById('draftSubject').value = data.subject;
+        document.getElementById('draftBody').value = data.body;
+        openLeadDetail(currentLeadId);
+        notify('Follow-up draft generated', 'success');
+    } else {
+        notify(data.message, 'error');
+    }
+}
+
+async function quickGenerateDraft(id) {
+    const result = await api('generate_draft', { method: 'POST', body: { id } });
+    if (result.success) {
+        notify('Draft generated', 'success');
+        loadLeads();
+        loadStats();
+    } else {
+        notify(result.message, 'error');
+    }
+}
+
+// ─── Email Workflow ───
+async function approveDraft() {
+    if (!currentLeadId) return;
+
+    // Save any edits first
+    const subject = document.getElementById('draftSubject').value.trim();
+    const body = document.getElementById('draftBody').value.trim();
+    if (!subject || !body) { notify('Subject and body are required', 'error'); return; }
+
+    // Save draft edits
+    await api('update_lead', {
+        method: 'POST',
+        body: { id: currentLeadId, draft_subject: subject, draft_body: body }
+    });
+
+    const result = await api('approve_draft', { method: 'POST', body: { id: currentLeadId } });
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        openLeadDetail(currentLeadId);
+        loadLeads();
+        loadStats();
+    }
+}
+
+async function sendEmail() {
+    if (!currentLeadId) return;
+    if (!confirm('Send this approved email now?')) return;
+
+    const btn = document.getElementById('btnSend');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
+    btn.textContent = 'Send Email';
+
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        openLeadDetail(currentLeadId);
+        loadLeads();
+        loadStats();
+    } else {
+        btn.disabled = false;
+    }
+}
+
+function togglePreview() {
+    const preview = document.getElementById('draftPreview');
+    if (preview.style.display === 'none') {
+        const subject = document.getElementById('draftSubject').value;
+        const body = document.getElementById('draftBody').value;
+        document.getElementById('draftPreviewContent').innerHTML =
+            '<p><strong>Subject:</strong> ' + esc(subject) + '</p><hr>' +
+            '<p>' + esc(body).replace(/\n/g, '<br>') + '</p>';
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+function copyDraft() {
+    const subject = document.getElementById('draftSubject').value;
+    const body = document.getElementById('draftBody').value;
+    const text = `Subject: ${subject}\n\n${body}`;
+    navigator.clipboard.writeText(text).then(() => {
+        notify('Draft copied to clipboard', 'success');
+    }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        notify('Draft copied to clipboard', 'success');
+    });
+}
+
+// ─── AI Enrichment ───
+async function summarizeBusiness() {
+    if (!currentLeadId) return;
+    const result = await api('summarize_business', { method: 'POST', body: { id: currentLeadId } });
+    if (result.success) {
+        document.getElementById('detailFeedback').value = result.summary;
+        if (result.tags && result.tags.length) {
+            notify('Summary: ' + result.tags.join(', '), 'success');
+        } else {
+            notify('Summary generated', 'success');
+        }
+    } else {
+        notify(result.message, 'error');
+    }
+}
+
+// ─── Activity ───
+async function loadActivity(id) {
+    const data = await api('get_activity', { params: { id } });
+    const container = document.getElementById('activityTimeline');
+
+    if (!data.success || !data.activity.length) {
+        container.innerHTML = '<p class="empty-state-text">No activity yet</p>';
+        return;
+    }
+
+    container.innerHTML = data.activity.map(a => `
+        <div class="activity-item">
+            <div class="activity-dot"></div>
+            <div class="activity-content">
+                <strong>${formatActionType(a.action_type)}</strong>
+                ${a.details ? '<span class="activity-details">' + esc(a.details) + '</span>' : ''}
+                <span class="activity-time">${formatDateTime(a.created_at)}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ─── CSV ───
+function showImportCSVModal() {
+    document.getElementById('csvFile').value = '';
+    showModal('csvImportModal');
+}
+
+async function importCSV() {
+    const fileInput = document.getElementById('csvFile');
+    if (!fileInput.files.length) { notify('Please select a CSV file', 'error'); return; }
+
+    const formData = new FormData();
+    formData.append('csv_file', fileInput.files[0]);
+    formData.append('action', 'import_csv');
+
+    const res = await fetch('api.php?action=import_csv', { method: 'POST', body: formData });
+    const result = await res.json();
+
+    notify(result.message, result.success ? 'success' : 'error');
+    if (result.success) {
+        closeModal('csvImportModal');
+        loadLeads();
+        loadStats();
+    }
+}
+
+// ─── Panel Toggle ───
+function togglePanel(contentId) {
+    const content = document.getElementById(contentId);
+    const toggle = document.getElementById(contentId.replace('Content', 'Toggle'));
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggle.innerHTML = '&#9660;';
+    } else {
+        content.style.display = 'none';
+        toggle.innerHTML = '&#9654;';
+    }
+}
+
+// ─── Modal Helpers ───
+function showModal(id) {
+    document.getElementById(id).style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+// Close modals on backdrop click
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+});
+
+// Close modals on Escape
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(m => {
+            if (m.style.display === 'flex') {
+                m.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+});
+
+// ─── Tab Switching ───
+function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+}
+
+// ─── Formatting Helpers ───
+function esc(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function formatStatus(status) {
+    return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatApproval(status) {
+    return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatActionType(type) {
+    return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+}

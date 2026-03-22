@@ -81,6 +81,9 @@ $base_path = $in_subdir ? '../' : '';
                     <a href="<?php echo $base_path; ?>reports/" class="header-link <?php echo $current_dir === 'reports' ? 'active' : ''; ?>">
                         Reports
                     </a>
+                    <a href="<?php echo $base_path; ?>outreach/" class="header-link <?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">
+                        Outreach
+                    </a>
                     <a href="<?php echo $base_path; ?>settings/" class="header-link <?php echo $current_dir === 'settings' ? 'active' : ''; ?>">
                         2FA Settings
                     </a>
@@ -123,6 +126,7 @@ $base_path = $in_subdir ? '../' : '';
                     <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referral Links</a></li>
                     <li><a href="<?php echo $base_path; ?>users/" class="<?php echo $current_dir === 'users' ? 'active' : ''; ?>">Users</a></li>
                     <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
+                    <li><a href="<?php echo $base_path; ?>outreach/" class="<?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">Outreach</a></li>
                     <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA Settings</a></li>
                     <li><a href="<?php echo $base_path; ?>logout.php" class="logout-link">Logout</a></li>
                 </ul>

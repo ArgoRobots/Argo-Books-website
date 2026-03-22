@@ -64,6 +64,8 @@
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   border: 1px solid var(--gray-200);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .chart-card-title {
@@ -108,7 +110,7 @@
 }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
   .charts-grid {
     grid-template-columns: 1fr;
   }

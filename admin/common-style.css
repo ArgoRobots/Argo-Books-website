@@ -902,7 +902,9 @@ tbody tr:hover {
   }
 
   .mobile-user {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .menu-icon {

@@ -277,8 +277,13 @@ function updateDraftStatus(lead) {
 
     bar.innerHTML = statusHtml;
 
-    // Disable Generate Draft button if draft already exists
-    document.getElementById('btnGenerate').disabled = !!(lead.draft_subject || lead.draft_body);
+    // Update Generate Draft button text based on whether draft exists
+    const genBtn = document.getElementById('btnGenerate');
+    if (lead.draft_subject || lead.draft_body) {
+        genBtn.textContent = 'Regenerate Draft';
+    } else {
+        genBtn.textContent = 'Generate Draft';
+    }
 
     // Info section
     let info = '';
@@ -490,7 +495,7 @@ async function generateDraft() {
 
     const data = await api('generate_draft', { method: 'POST', body: { id: currentLeadId } });
     btn.disabled = false;
-    btn.textContent = 'Generate Draft';
+    btn.textContent = 'Regenerate Draft';
 
     if (data.success) {
         document.getElementById('draftSubject').value = data.subject;

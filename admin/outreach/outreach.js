@@ -278,8 +278,9 @@ async function bulkGenerateDrafts() {
     }
     updateProgress();
 
-    for (const id of ids) {
-        // Update the row's Draft button to show it's in progress
+    // Process drafts concurrently (3 at a time)
+    const CONCURRENCY = 3;
+    async function processDraft(id) {
         const row = document.querySelector(`#lead-check-${id}`)?.closest('tr');
         const draftCellBtn = row?.querySelector('.actions-cell .btn-blue[title="Generate Draft"]');
         if (draftCellBtn) {
@@ -291,7 +292,6 @@ async function bulkGenerateDrafts() {
             const result = await api('generate_draft', { method: 'POST', body: { id } });
             if (result.success) {
                 success++;
-                // Update this row immediately: remove draft button, update status badge
                 if (draftCellBtn) draftCellBtn.remove();
                 if (row) {
                     const badge = row.querySelector('.badge');
@@ -299,7 +299,6 @@ async function bulkGenerateDrafts() {
                         badge.className = 'badge badge-status-draft_generated';
                         badge.textContent = 'Draft Generated';
                     }
-                    // Update checkbox data attribute
                     const cb = row.querySelector('.lead-check');
                     if (cb) cb.dataset.hasDraft = '1';
                 }
@@ -312,6 +311,12 @@ async function bulkGenerateDrafts() {
             if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
         }
         updateProgress();
+    }
+
+    // Run in batches of CONCURRENCY
+    for (let i = 0; i < ids.length; i += CONCURRENCY) {
+        const batch = ids.slice(i, i + CONCURRENCY);
+        await Promise.all(batch.map(id => processDraft(id)));
     }
 
     // Done
@@ -377,11 +382,12 @@ async function openBulkSendModal() {
         // Render all leads
         renderBulkSendList();
 
-        // Auto-generate drafts for leads that don't have one
+        // Auto-generate drafts for leads that don't have one (3 at a time)
         const needsDraft = withEmail.filter(l => !l.draft_subject || !l.draft_body);
         if (needsDraft.length) {
             statusEl.textContent = `Generating drafts for ${needsDraft.length} lead(s)...`;
-            for (const lead of needsDraft) {
+            const CONCURRENCY = 3;
+            async function processSendDraft(lead) {
                 const itemEl = document.getElementById('bulk-send-item-' + lead.id);
                 if (itemEl) {
                     itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-generating">Generating draft...</span>';
@@ -402,6 +408,10 @@ async function openBulkSendModal() {
                         itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-error">Error: ' + esc(e.message) + '</span>';
                     }
                 }
+            }
+            for (let i = 0; i < needsDraft.length; i += CONCURRENCY) {
+                const batch = needsDraft.slice(i, i + CONCURRENCY);
+                await Promise.all(batch.map(lead => processSendDraft(lead)));
             }
         }
 

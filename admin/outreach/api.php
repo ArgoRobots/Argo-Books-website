@@ -875,7 +875,7 @@ PERSONALIZATION (this is critical):
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
-- Include a link to the website: https://argorobots.com/
+- ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off

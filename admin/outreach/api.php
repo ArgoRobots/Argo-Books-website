@@ -363,19 +363,42 @@ function scrape_email_from_website($url)
 
     $falsePositives = ['example.com', 'sentry.io', 'wixpress.com', 'wordpress.org', 'w3.org', 'schema.org', 'googleapis.com', 'gravatar.com'];
 
+    // Clean an extracted email: decode URL encoding, strip non-ASCII and whitespace
+    $cleanEmail = function($email) {
+        $email = urldecode($email);
+        // Strip any non-ASCII characters (emojis, special chars, zero-width spaces, etc.)
+        $email = preg_replace('/[^\x20-\x7E]/', '', $email);
+        $email = trim($email);
+        // Validate it still looks like an email after cleaning
+        if (preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $email)) {
+            return $email;
+        }
+        return null;
+    };
+
     // Helper to extract email from HTML
-    $extractEmail = function($html) use ($falsePositives) {
+    $extractEmail = function($html) use ($falsePositives, $cleanEmail) {
+        // URL-decode the HTML so mailto:%20info@... becomes mailto: info@...
+        $decodedHtml = urldecode($html);
+
         // Look for mailto: links first (most reliable)
-        if (preg_match_all('/mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $html, $matches)) {
-            foreach ($matches[1] as $email) {
+        if (preg_match_all('/mailto:\s*([^\s"\'<>]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $decodedHtml, $matches)) {
+            foreach ($matches[1] as $raw) {
+                $email = $cleanEmail($raw);
+                if (!$email) continue;
                 $dominated = false;
                 foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
                 if (!$dominated) return $email;
             }
         }
-        // Fallback: email patterns in text
-        if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $html, $matches)) {
-            foreach ($matches[0] as $email) {
+        // Fallback: email patterns in text (strip HTML tags first to avoid matching attributes)
+        $text = strip_tags($decodedHtml);
+        // Remove common non-ASCII clutter (emojis, zero-width chars) before matching
+        $text = preg_replace('/[^\x20-\x7E\n\r\t]/', ' ', $text);
+        if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $text, $matches)) {
+            foreach ($matches[0] as $raw) {
+                $email = $cleanEmail($raw);
+                if (!$email) continue;
                 $dominated = false;
                 foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
                 if (!$dominated) return $email;

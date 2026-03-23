@@ -183,7 +183,7 @@ async function loadLeads() {
         }
 
         tbody.innerHTML = data.leads.map(lead => `
-            <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
+            <tr class="lead-row">
                 <td class="checkbox-column" onclick="event.stopPropagation()">
                     <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
                 </td>

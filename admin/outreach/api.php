@@ -751,7 +751,7 @@ Rules:
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
-- Mention you are looking for honest feedback from real business owners
+- Mention you are looking for honest feedback from small business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
 - If a business summary is provided, use it to personalize the email. For example if they likely send invoices, mention the invoicing feature. If they do services, mention expense tracking. Only reference features that are relevant to their business
 - Do NOT invent details about the business you do not have

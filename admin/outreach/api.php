@@ -861,7 +861,7 @@ function send_outreach_email($pdo)
     // Format body for HTML email (convert newlines to <br>)
     $htmlBody = '<p>' . nl2br(htmlspecialchars($lead['draft_body'])) . '</p>';
 
-    $result = send_styled_email($lead['email'], $lead['draft_subject'], $htmlBody);
+    $result = send_styled_email($lead['email'], $lead['draft_subject'], $htmlBody, '', 'contact@argorobots.com', 'Argo Books');
 
     if ($result) {
         $stmt = $pdo->prepare("UPDATE outreach_leads SET

@@ -11,7 +11,7 @@ require_once __DIR__ . '/smtp_mailer.php';
  * @param string $header_style Optional custom header style (default: blue gradient)
  * @return bool True if successful, false otherwise
  */
-function send_styled_email($to_email, $subject, $body_content, $header_style = '')
+function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null)
 {
     $css = file_get_contents(__DIR__ . '/email.css');
 
@@ -58,6 +58,9 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
     $mailer = create_smtp_mailer();
     if ($mailer) {
         try {
+            if ($from_email) {
+                $mailer->setFrom($from_email, $from_name ?? 'Argo Books');
+            }
             $mailer->addAddress($to_email);
             $mailer->addReplyTo('support@argorobots.com');
             $mailer->Subject = $subject;
@@ -70,10 +73,11 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
         }
     }
 
+    $actualFrom = $from_email ? ($from_name ?? 'Argo Books') . " <{$from_email}>" : 'Argo Books <noreply@argorobots.com>';
     $headers = [
         'MIME-Version: 1.0',
         'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
+        'From: ' . $actualFrom,
         'Reply-To: support@argorobots.com',
         'X-Mailer: PHP/' . phpversion()
     ];

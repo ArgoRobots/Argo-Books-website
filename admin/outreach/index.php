@@ -203,6 +203,12 @@ include '../admin_header.php';
         <button class="btn btn-small btn-blue" onclick="bulkDeleteLeads()">Delete Selected</button>
     </div>
 
+    <!-- Bulk Draft Progress -->
+    <div class="bulk-draft-progress" id="bulkDraftProgress" style="display:none;">
+        <span class="bulk-draft-spinner"></span>
+        <span id="bulkDraftProgressText"></span>
+    </div>
+
     <!-- Leads Table -->
     <div class="leads-table-wrapper">
         <table class="data-table leads-table">

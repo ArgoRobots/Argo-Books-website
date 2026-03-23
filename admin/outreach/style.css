@@ -160,6 +160,35 @@
     background: var(--navy-1e3a5f);
 }
 
+.bulk-draft-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px;
+    font-size: 13px;
+    color: var(--gray-500);
+    background: var(--blue-50);
+    border-bottom: 1px solid var(--gray-border);
+}
+
+[data-theme="dark"] .bulk-draft-progress {
+    background: var(--navy-1e3a5f);
+    color: var(--gray-300);
+}
+
+.bulk-draft-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--gray-300);
+    border-top-color: var(--blue-500);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 .checkbox-column {
     width: 36px;
     text-align: center;

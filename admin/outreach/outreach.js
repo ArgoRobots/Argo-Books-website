@@ -262,16 +262,66 @@ async function bulkGenerateDrafts() {
     if (!ids.length) return;
     if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
 
+    const total = ids.length;
     let success = 0, fail = 0;
+    const progressEl = document.getElementById('bulkDraftProgress');
+    const progressText = document.getElementById('bulkDraftProgressText');
+    progressEl.style.display = 'flex';
+
+    // Disable the draft button during processing
+    const draftBtn = document.getElementById('btnDraftSelected');
+    if (draftBtn) draftBtn.disabled = true;
+
+    function updateProgress() {
+        const done = success + fail;
+        progressText.textContent = `Drafting: ${done} of ${total} complete` + (fail ? ` (${fail} failed)` : '');
+    }
+    updateProgress();
+
     for (const id of ids) {
+        // Update the row's Draft button to show it's in progress
+        const row = document.querySelector(`#lead-check-${id}`)?.closest('tr');
+        const draftCellBtn = row?.querySelector('.actions-cell .btn-blue[title="Generate Draft"]');
+        if (draftCellBtn) {
+            draftCellBtn.disabled = true;
+            draftCellBtn.textContent = 'Drafting...';
+        }
+
         try {
             const result = await api('generate_draft', { method: 'POST', body: { id } });
-            if (result.success) success++; else fail++;
-        } catch { fail++; }
+            if (result.success) {
+                success++;
+                // Update this row immediately: remove draft button, update status badge
+                if (draftCellBtn) draftCellBtn.remove();
+                if (row) {
+                    const badge = row.querySelector('.badge');
+                    if (badge && !['contacted','replied','interested','not_interested','onboarded'].includes(badge.textContent.trim().toLowerCase().replace(/\s+/g, '_'))) {
+                        badge.className = 'badge badge-status-draft_generated';
+                        badge.textContent = 'Draft Generated';
+                    }
+                    // Update checkbox data attribute
+                    const cb = row.querySelector('.lead-check');
+                    if (cb) cb.dataset.hasDraft = '1';
+                }
+            } else {
+                fail++;
+                if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
+            }
+        } catch {
+            fail++;
+            if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
+        }
+        updateProgress();
     }
+
+    // Done
+    progressText.textContent = `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
+    setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+
+    if (draftBtn) draftBtn.disabled = false;
     notify(`Drafted: ${success}, Failed: ${fail}`, success ? 'success' : 'error');
-    loadLeads();
     loadStats();
+    updateBulkBar();
 }
 
 async function bulkDeleteLeads() {

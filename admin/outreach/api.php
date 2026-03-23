@@ -480,23 +480,73 @@ function search_businesses()
         $queries[] = "$category companies in $location";
         $queries[] = "best $category in $location";
     } else {
-        $queries[] = "businesses in $location";
-        $queries[] = "services in $location";
-        $queries[] = "companies in $location";
-        $queries[] = "local businesses near $location";
-        $queries[] = "shops and services in $location";
+        // When no category provided, use a wide spread of real business categories
+        // so each round searches a different industry instead of generic synonyms
+        $categoryPool = [
+            'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
+            'accountants', 'real estate agents', 'insurance agents', 'auto repair',
+            'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
+            'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
+            'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
+            'daycare centers', 'tutoring services', 'martial arts studios',
+            'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
+            'printing services', 'moving companies', 'pest control', 'locksmiths',
+            'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
+            'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
+            'wedding planners', 'interior designers', 'architects', 'surveyors',
+            'physiotherapists', 'psychologists', 'counsellors', 'notaries',
+            'bookkeepers', 'IT support', 'web design', 'marketing agencies',
+            'sign shops', 'trophy shops', 'music schools', 'dance studios',
+            'dog groomers', 'boarding kennels', 'farm equipment dealers',
+            'hardware stores', 'building supplies', 'appliance repair',
+            'upholstery services', 'tailors', 'dry cleaners', 'spas',
+            'tanning salons', 'nail salons', 'barber shops', 'optical stores',
+            'hearing aid clinics', 'home inspectors', 'appraisers',
+            'property management', 'storage facilities', 'courier services',
+            'towing services', 'glass repair', 'fencing contractors',
+            'concrete contractors', 'paving contractors', 'tree services',
+            'snow removal', 'pool services', 'septic services',
+            'garage door repair', 'security companies', 'staffing agencies',
+            'travel agencies', 'event venues', 'food trucks',
+        ];
+        shuffle($categoryPool);
+        for ($i = 0; $i < $maxRounds; $i++) {
+            $queries[] = $categoryPool[$i] . " in $location";
+        }
     }
+
+    // Map category keywords to Google Places types for more targeted results
+    $placeTypeMap = [
+        'restaurant' => 'restaurant', 'plumber' => 'plumber',
+        'electrician' => 'electrician', 'dentist' => 'dentist',
+        'lawyer' => 'lawyer', 'accountant' => 'accounting',
+        'gym' => 'gym', 'salon' => 'hair_care', 'veterinarian' => 'veterinary_care',
+        'pharmacy' => 'pharmacy', 'car dealership' => 'car_dealer',
+        'bakery' => 'bakery', 'cafe' => 'cafe', 'coffee' => 'cafe',
+        'spa' => 'spa', 'florist' => 'florist', 'pet store' => 'pet_store',
+        'furniture' => 'furniture_store', 'jewelry' => 'jewelry_store',
+        'hardware' => 'hardware_store', 'barber' => 'hair_care',
+        'locksmith' => 'locksmith', 'storage' => 'storage',
+        'travel agenc' => 'travel_agency', 'insurance' => 'insurance_agency',
+        'real estate' => 'real_estate_agency',
+    ];
 
     for ($round = 0; $round < $maxRounds && count($businesses) < $limit; $round++) {
         $query = $queries[$round] ?? null;
         if (!$query) break;
+        $countBefore = count($businesses);
         $roundsUsed++;
 
         // Initial search for this round
-        $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
-            'query' => $query,
-            'key' => $apiKey,
-        ]);
+        $params = ['query' => $query, 'key' => $apiKey];
+        // Try to match a Google Places type from the query for better results
+        foreach ($placeTypeMap as $keyword => $type) {
+            if (stripos($query, $keyword) !== false) {
+                $params['type'] = $type;
+                break;
+            }
+        }
+        $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query($params);
 
         $resp = @file_get_contents($url, false, $httpContext);
         if ($resp === false) {
@@ -590,6 +640,12 @@ function search_businesses()
             $candidates = $nextData['results'] ?? [];
             $nextPageToken = $nextData['next_page_token'] ?? null;
             $pagesUsed++;
+        }
+
+        // Bail early if this round produced too few new results (diminishing returns)
+        $newThisRound = count($businesses) - $countBefore;
+        if ($newThisRound < 2 && $round > 0) {
+            break;
         }
     }
 

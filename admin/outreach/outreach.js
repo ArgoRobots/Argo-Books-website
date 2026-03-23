@@ -192,7 +192,7 @@ async function loadLeads() {
                 <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                        ${!lead.draft_subject && lead.status !== 'contacted' ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
+                        ${!lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status) ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
                     </div>
                 </td>
             </tr>
@@ -473,7 +473,7 @@ function updateDraftStatus(lead) {
     const genBtn = document.getElementById('btnGenerate');
 
     let statusHtml = '';
-    const isSent = lead.status === 'contacted' || lead.status === 'replied' || lead.status === 'interested';
+    const isSent = ['contacted','replied','interested','not_interested','onboarded'].includes(lead.status);
 
     if (isSent && lead.sent_at) {
         statusHtml = `<span class="badge badge-status-contacted">Sent</span> on ${formatDateTime(lead.sent_at)}`;

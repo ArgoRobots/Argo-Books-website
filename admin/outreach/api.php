@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 // Ensure tables exist
-ensure_outreach_tables($pdo);
+
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
@@ -91,84 +91,6 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Unknown action']);
 }
 
-// ─── Table initialization ───
-
-function ensure_outreach_tables($pdo)
-{
-    static $checked = false;
-    if ($checked) return;
-    $checked = true;
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_leads (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        business_name VARCHAR(255) NOT NULL,
-        contact_name VARCHAR(255) DEFAULT NULL,
-        email VARCHAR(255) DEFAULT NULL,
-        phone VARCHAR(50) DEFAULT NULL,
-        website VARCHAR(500) DEFAULT NULL,
-        address VARCHAR(500) DEFAULT NULL,
-        category VARCHAR(100) DEFAULT NULL,
-        city VARCHAR(100) DEFAULT NULL,
-        source VARCHAR(100) DEFAULT 'manual',
-        status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
-        response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
-        approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
-        date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
-        first_contact_date DATETIME DEFAULT NULL,
-        last_contact_date DATETIME DEFAULT NULL,
-        offer_sent TINYINT(1) DEFAULT 0,
-        notes TEXT DEFAULT NULL,
-        feedback_summary TEXT DEFAULT NULL,
-        draft_subject VARCHAR(500) DEFAULT NULL,
-        draft_body TEXT DEFAULT NULL,
-        drafted_at DATETIME DEFAULT NULL,
-        approved_at DATETIME DEFAULT NULL,
-        sent_at DATETIME DEFAULT NULL,
-        contact_page_url VARCHAR(500) DEFAULT NULL,
-        places_id VARCHAR(255) DEFAULT NULL,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_outreach_status (status),
-        INDEX idx_outreach_city (city),
-        INDEX idx_outreach_approval (approval_status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_activity_log (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        lead_id INT NOT NULL,
-        action_type VARCHAR(50) NOT NULL,
-        details TEXT DEFAULT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        INDEX idx_outreach_activity_lead (lead_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    // Add columns that may be missing if table was created before they were added to schema
-    $migrations = [
-        "ALTER TABLE outreach_leads ADD COLUMN places_id VARCHAR(255) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN contact_page_url VARCHAR(500) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN feedback_summary TEXT DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN draft_subject VARCHAR(500) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN draft_body TEXT DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN drafted_at DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN approved_at DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN sent_at DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted'",
-        "ALTER TABLE outreach_leads ADD COLUMN response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response'",
-        "ALTER TABLE outreach_leads ADD COLUMN offer_sent TINYINT(1) DEFAULT 0",
-        "ALTER TABLE outreach_leads ADD COLUMN first_contact_date DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN last_contact_date DATETIME DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN contact_name VARCHAR(255) DEFAULT NULL",
-        "ALTER TABLE outreach_leads ADD COLUMN source VARCHAR(100) DEFAULT 'manual'",
-        "ALTER TABLE outreach_leads ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
-    ];
-    foreach ($migrations as $sql) {
-        try { $pdo->exec($sql); } catch (\PDOException $e) {
-            // Column already exists — ignore error 1060
-            if ($e->getCode() != '42S21' && strpos($e->getMessage(), 'Duplicate column') === false) {
-                throw $e;
-            }
-        }
-    }
-}
 
 // ─── Activity logging helper ───
 
@@ -756,6 +678,40 @@ function call_openai($systemPrompt, $userPrompt)
     return ['content' => $result['choices'][0]['message']['content'] ?? ''];
 }
 
+function summarize_business($website)
+{
+    if (empty($website)) return null;
+
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 5,
+            'user_agent' => 'Mozilla/5.0',
+            'follow_location' => true,
+            'max_redirects' => 3,
+        ],
+        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
+    ]);
+
+    $html = @file_get_contents($website, false, $context);
+    if (!$html) return null;
+
+    // Strip scripts, styles, and tags to get readable text
+    $text = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $html);
+    $text = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $html);
+    $text = strip_tags($text);
+    $text = preg_replace('/\s+/', ' ', $text);
+    $text = trim(mb_substr($text, 0, 3000)); // Cap at 3000 chars
+
+    if (strlen($text) < 50) return null;
+
+    $result = call_openai(
+        "You summarize businesses based on their website content. Respond with ONLY a 1-2 sentence summary describing what the business does, what services or products they offer, and who their customers are. Be specific and factual. Do not include any other text.",
+        "Website content from $website:\n\n$text"
+    );
+
+    return $result['content'] ?? null;
+}
+
 function generate_draft($pdo)
 {
     $data = json_decode(file_get_contents('php://input'), true);
@@ -769,18 +725,35 @@ function generate_draft($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
+    // Generate business summary if we don't have one yet
+    $summary = $lead['business_summary'] ?? null;
+    if (empty($summary) && !empty($lead['website'])) {
+        $summary = summarize_business($lead['website']);
+        if ($summary) {
+            $stmt = $pdo->prepare("UPDATE outreach_leads SET business_summary = ? WHERE id = ?");
+            $stmt->execute([$summary, $id]);
+        }
+    }
+
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
+
+About Argo Books:
+- It is like QuickBooks but way simpler, designed so you do not need any accounting knowledge at all
+- Built specifically for small businesses, not a bloated enterprise tool
+- Features include invoicing, expense tracking, and simple bookkeeping
+- Evan is a local independent software developer based in Saskatoon building this specifically for small businesses
 
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
-- The sender's name is Evan, he is a local independent developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon developer in the email body
+- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
+- The sender's name is Evan, he is a local independent software developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon software developer in the email body
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
-- Mention you are looking for honest feedback from real business owners
+- Mention you are looking for honest feedback from small business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
-- Personalize based on the business category and city if possible, but only reference specific concrete details you actually have - never use generic compliments
+- If a business summary is provided, use it to personalize the email. For example if they likely send invoices, mention the invoicing feature. If they do services, mention expense tracking. Only reference features that are relevant to their business
 - Do NOT invent details about the business you do not have
 - If limited info is available, keep it more general rather than making up praise
 - Use a casual but professional tone
@@ -788,7 +761,8 @@ Rules:
 - Include a link to the website: https://argorobots.com/
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
-- Always sign off with three separate lines: \"Best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
+- End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
+- Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
@@ -800,6 +774,7 @@ Return ONLY the JSON, no other text.";
     if ($lead['city']) $details .= "\nCity: {$lead['city']}";
     if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
     if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
+    if ($summary) $details .= "\nBusiness summary: $summary";
 
     $result = call_openai($systemPrompt, $details);
 

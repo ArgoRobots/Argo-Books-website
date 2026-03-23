@@ -75,7 +75,7 @@ table th {
     color: var(--green-800);
 }
 .badge-free {
-    background: var(--ede9fe);
+    background: var(--violet-100);
     color: var(--purple-600);
 }
 .badge-redeemed {

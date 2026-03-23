@@ -2500,7 +2500,7 @@ a {
 }
 
 .contact-icon.feedback {
-    background: linear-gradient(135deg, var(--purple-50-alt), var(--ede9fe));
+    background: linear-gradient(135deg, var(--purple-50-alt), var(--violet-100));
 }
 
 .contact-icon.feedback svg {
@@ -2516,7 +2516,7 @@ a {
 }
 
 .contact-icon.docs {
-    background: linear-gradient(135deg, var(--amber-100), var(--fde68a));
+    background: linear-gradient(135deg, var(--amber-100), var(--amber-200));
 }
 
 .contact-icon.docs svg {

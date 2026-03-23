@@ -67,9 +67,6 @@ switch ($action) {
         generate_draft($pdo);
         break;
     // Email workflow
-    case 'approve_draft':
-        approve_draft($pdo);
-        break;
     case 'send_email':
         send_outreach_email($pdo);
         break;
@@ -130,7 +127,6 @@ function get_leads($pdo)
 {
     $status = $_GET['status'] ?? '';
     $response_status = $_GET['response_status'] ?? '';
-    $approval_status = $_GET['approval_status'] ?? '';
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'date_added_desc';
 
@@ -144,10 +140,6 @@ function get_leads($pdo)
     if ($response_status) {
         $where[] = 'response_status = ?';
         $params[] = $response_status;
-    }
-    if ($approval_status) {
-        $where[] = 'approval_status = ?';
-        $params[] = $approval_status;
     }
     if ($search) {
         $where[] = '(business_name LIKE ? OR email LIKE ? OR contact_name LIKE ? OR city LIKE ? OR category LIKE ?)';
@@ -248,7 +240,7 @@ function update_lead($pdo)
 
     $fields = [
         'business_name', 'contact_name', 'email', 'phone', 'website', 'address',
-        'category', 'city', 'source', 'status', 'response_status', 'approval_status',
+        'category', 'city', 'source', 'status', 'response_status',
         'notes', 'feedback_summary', 'offer_sent',
         'draft_subject', 'draft_body', 'contact_page_url',
         'first_contact_date', 'last_contact_date',
@@ -334,8 +326,7 @@ function get_stats($pdo)
     $rows = $pdo->query("SELECT
         COUNT(*) as total,
         SUM(status = 'new') as new_leads,
-        SUM(approval_status = 'draft_ready' OR approval_status = 'needs_review') as drafts_pending,
-        SUM(approval_status = 'approved') as approved,
+        SUM(status = 'draft_generated') as drafts_pending,
         SUM(status = 'contacted') as contacted,
         SUM(status = 'replied') as replied,
         SUM(status = 'interested') as interested
@@ -818,7 +809,7 @@ Return ONLY the JSON, no other text.";
     }
 
     // Save draft to lead
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), approval_status = 'draft_ready', status = CASE WHEN status = 'new' OR status = 'researching' OR status = 'ready_to_contact' THEN 'draft_generated' ELSE status END WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','researching','ready_to_contact','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
     $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
 
     log_activity($pdo, $id, 'draft_generated', 'AI draft generated');
@@ -827,31 +818,6 @@ Return ONLY the JSON, no other text.";
 }
 
 // ─── Email workflow ───
-
-function approve_draft($pdo)
-{
-    $data = json_decode(file_get_contents('php://input'), true);
-    $id = (int)($data['id'] ?? 0);
-
-    $stmt = $pdo->prepare("SELECT * FROM outreach_leads WHERE id = ?");
-    $stmt->execute([$id]);
-    $lead = $stmt->fetch();
-
-    if (!$lead) {
-        json_response(['success' => false, 'message' => 'Lead not found'], 404);
-    }
-
-    if (empty($lead['draft_subject']) || empty($lead['draft_body'])) {
-        json_response(['success' => false, 'message' => 'No draft to approve'], 400);
-    }
-
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET approval_status = 'approved', approved_at = NOW(), status = CASE WHEN status IN ('new','researching','ready_to_contact','draft_generated','awaiting_approval') THEN 'approved' ELSE status END WHERE id = ?");
-    $stmt->execute([$id]);
-
-    log_activity($pdo, $id, 'draft_approved', 'Draft approved for sending');
-
-    json_response(['success' => true, 'message' => 'Draft approved']);
-}
 
 function send_outreach_email($pdo)
 {
@@ -881,7 +847,6 @@ function send_outreach_email($pdo)
 
     if ($result) {
         $stmt = $pdo->prepare("UPDATE outreach_leads SET
-            approval_status = 'sent',
             sent_at = NOW(),
             status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
             first_contact_date = COALESCE(first_contact_date, NOW()),
@@ -932,7 +897,7 @@ function export_csv($pdo)
     $output = fopen('php://output', 'w');
 
     $headers = ['ID', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Website', 'Address',
-        'Category', 'City', 'Source', 'Status', 'Response Status', 'Approval Status',
+        'Category', 'City', 'Source', 'Status', 'Response Status',
         'Date Added', 'First Contact', 'Last Contact', 'Offer Sent',
         'Notes', 'Feedback Summary', 'Draft Subject', 'Draft Body'];
     fputcsv($output, $headers);
@@ -942,7 +907,7 @@ function export_csv($pdo)
             $lead['id'], $lead['business_name'], $lead['contact_name'], $lead['email'],
             $lead['phone'], $lead['website'], $lead['address'], $lead['category'],
             $lead['city'], $lead['source'], $lead['status'], $lead['response_status'],
-            $lead['approval_status'], $lead['date_added'], $lead['first_contact_date'],
+            $lead['date_added'], $lead['first_contact_date'],
             $lead['last_contact_date'], $lead['offer_sent'],
             $lead['notes'], $lead['feedback_summary'], $lead['draft_subject'], $lead['draft_body'],
         ]);

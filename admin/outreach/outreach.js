@@ -130,17 +130,20 @@ function notify(message, type = 'success') {
 
 // ─── Stats ───
 async function loadStats() {
-    const data = await api('get_stats');
-    if (data.success) {
-        const s = data.stats;
-        document.getElementById('statTotal').textContent = s.total || 0;
-        document.getElementById('statNew').textContent = s.new_leads || 0;
-        document.getElementById('statDraftsPending').textContent = s.drafts_pending || 0;
-        document.getElementById('statApproved').textContent = s.approved || 0;
-        document.getElementById('statContacted').textContent = s.contacted || 0;
-        document.getElementById('statReplied').textContent = s.replied || 0;
-        document.getElementById('statInterested').textContent = s.interested || 0;
-
+    try {
+        const data = await api('get_stats');
+        if (data.success) {
+            const s = data.stats;
+            document.getElementById('statTotal').textContent = s.total || 0;
+            document.getElementById('statNew').textContent = s.new_leads || 0;
+            document.getElementById('statDraftsPending').textContent = s.drafts_pending || 0;
+            document.getElementById('statApproved').textContent = s.approved || 0;
+            document.getElementById('statContacted').textContent = s.contacted || 0;
+            document.getElementById('statReplied').textContent = s.replied || 0;
+            document.getElementById('statInterested').textContent = s.interested || 0;
+        }
+    } catch (e) {
+        notify(e.message, 'error');
     }
 }
 
@@ -167,44 +170,48 @@ async function loadLeads() {
     // Persist filters to URL
     updateUrlParams();
 
-    const data = await api('get_leads', { params });
-    const tbody = document.getElementById('leadsTableBody');
+    try {
+        const data = await api('get_leads', { params });
+        const tbody = document.getElementById('leadsTableBody');
 
-    if (!data.success || !data.leads.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No leads found</td></tr>';
+        if (!data.success || !data.leads.length) {
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No leads found</td></tr>';
+            updateBulkBar();
+            return;
+        }
+
+        tbody.innerHTML = data.leads.map(lead => `
+            <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
+                <td class="checkbox-column" onclick="event.stopPropagation()">
+                    <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
+                </td>
+                <td>
+                    <strong>${esc(lead.business_name)}</strong>
+                    ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
+                </td>
+                <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
+                <td>${esc(lead.city || '')}</td>
+                <td>${esc(lead.category || '')}</td>
+                <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
+                <td><span class="badge badge-approval-${lead.approval_status && lead.approval_status !== 'none' ? lead.approval_status : 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
+
+                <td onclick="event.stopPropagation()">
+                    <div class="actions-cell">
+                        <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                        <button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        // Reset select-all checkbox
+        const selectAll = document.getElementById('leadsSelectAll');
+        if (selectAll) selectAll.checked = false;
         updateBulkBar();
-        return;
+    } catch (e) {
+        notify(e.message, 'error');
     }
-
-    tbody.innerHTML = data.leads.map(lead => `
-        <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
-            <td class="checkbox-column" onclick="event.stopPropagation()">
-                <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
-            </td>
-            <td>
-                <strong>${esc(lead.business_name)}</strong>
-                ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
-            </td>
-            <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
-            <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
-            <td>${esc(lead.city || '')}</td>
-            <td>${esc(lead.category || '')}</td>
-            <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
-            <td><span class="badge badge-approval-${lead.approval_status && lead.approval_status !== 'none' ? lead.approval_status : 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
-
-            <td onclick="event.stopPropagation()">
-                <div class="actions-cell">
-                    <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                    <button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
-
-    // Reset select-all checkbox
-    const selectAll = document.getElementById('leadsSelectAll');
-    if (selectAll) selectAll.checked = false;
-    updateBulkBar();
 }
 
 // ─── Bulk Select ───
@@ -285,49 +292,53 @@ async function bulkDeleteLeads() {
 // ─── Lead Detail Modal ───
 async function openLeadDetail(id) {
     currentLeadId = id;
-    const data = await api('get_lead', { params: { id } });
-    if (!data.success) { notify(data.message, 'error'); return; }
+    try {
+        const data = await api('get_lead', { params: { id } });
+        if (!data.success) { notify(data.message, 'error'); return; }
 
-    const lead = data.lead;
-    document.getElementById('detailModalTitle').textContent = lead.business_name;
+        const lead = data.lead;
+        document.getElementById('detailModalTitle').textContent = lead.business_name;
 
-    // Info tab
-    document.getElementById('detailBusinessName').value = lead.business_name || '';
-    document.getElementById('detailContactName').value = lead.contact_name || '';
-    document.getElementById('detailEmail').value = lead.email || '';
-    document.getElementById('detailPhone').value = lead.phone || '';
-    document.getElementById('detailWebsite').value = lead.website || '';
-    document.getElementById('detailAddress').value = lead.address || '';
-    document.getElementById('detailCategory').value = lead.category || '';
-    document.getElementById('detailCity').value = lead.city || '';
-    document.getElementById('detailSource').value = lead.source || 'manual';
-    document.getElementById('detailStatus').value = lead.status || 'new';
-    document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
+        // Info tab
+        document.getElementById('detailBusinessName').value = lead.business_name || '';
+        document.getElementById('detailContactName').value = lead.contact_name || '';
+        document.getElementById('detailEmail').value = lead.email || '';
+        document.getElementById('detailPhone').value = lead.phone || '';
+        document.getElementById('detailWebsite').value = lead.website || '';
+        document.getElementById('detailAddress').value = lead.address || '';
+        document.getElementById('detailCategory').value = lead.category || '';
+        document.getElementById('detailCity').value = lead.city || '';
+        document.getElementById('detailSource').value = lead.source || 'manual';
+        document.getElementById('detailStatus').value = lead.status || 'new';
+        document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
 
-    document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
-    document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
-    document.getElementById('detailNotes').value = lead.notes || '';
-    document.getElementById('detailFeedback').value = lead.feedback_summary || '';
+        document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
+        document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
+        document.getElementById('detailNotes').value = lead.notes || '';
+        document.getElementById('detailFeedback').value = lead.feedback_summary || '';
 
-    // Meta info
-    let meta = `Added: ${formatDateTime(lead.date_added)}`;
-    if (lead.first_contact_date) meta += ` | First contact: ${formatDateTime(lead.first_contact_date)}`;
-    if (lead.last_contact_date) meta += ` | Last contact: ${formatDateTime(lead.last_contact_date)}`;
-    if (lead.sent_at) meta += ` | Last sent: ${formatDateTime(lead.sent_at)}`;
-    document.getElementById('detailMeta').textContent = meta;
+        // Meta info
+        let meta = `Added: ${formatDateTime(lead.date_added)}`;
+        if (lead.first_contact_date) meta += ` | First contact: ${formatDateTime(lead.first_contact_date)}`;
+        if (lead.last_contact_date) meta += ` | Last contact: ${formatDateTime(lead.last_contact_date)}`;
+        if (lead.sent_at) meta += ` | Last sent: ${formatDateTime(lead.sent_at)}`;
+        document.getElementById('detailMeta').textContent = meta;
 
-    // Draft tab
-    document.getElementById('draftSubject').value = lead.draft_subject || '';
-    document.getElementById('draftBody').value = lead.draft_body || '';
-    updateDraftStatus(lead);
+        // Draft tab
+        document.getElementById('draftSubject').value = lead.draft_subject || '';
+        document.getElementById('draftBody').value = lead.draft_body || '';
+        updateDraftStatus(lead);
 
-    // Reset to info tab
-    switchTab('tabInfo', document.querySelector('.tab'));
+        // Reset to info tab
+        switchTab('tabInfo', document.querySelector('.tab'));
 
-    // Load activity
-    loadActivity(id);
+        // Load activity
+        loadActivity(id);
 
-    showModal('leadDetailModal');
+        showModal('leadDetailModal');
+    } catch (e) {
+        notify(e.message, 'error');
+    }
 }
 
 function updateDraftStatus(lead) {
@@ -414,22 +425,30 @@ async function saveLeadDetails() {
     data.draft_subject = document.getElementById('draftSubject').value;
     data.draft_body = document.getElementById('draftBody').value;
 
-    const result = await api('update_lead', { method: 'POST', body: data });
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        loadLeads();
-        loadStats();
+    try {
+        const result = await api('update_lead', { method: 'POST', body: data });
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            loadLeads();
+            loadStats();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
     }
 }
 
 async function deleteCurrentLead() {
     if (!confirm('Are you sure you want to delete this lead?')) return;
-    const result = await api('delete_lead', { method: 'POST', body: { id: currentLeadId } });
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        closeModal('leadDetailModal');
-        loadLeads();
-        loadStats();
+    try {
+        const result = await api('delete_lead', { method: 'POST', body: { id: currentLeadId } });
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            closeModal('leadDetailModal');
+            loadLeads();
+            loadStats();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
     }
 }
 
@@ -463,12 +482,16 @@ async function createLead() {
         notes: document.getElementById('addNotes').value.trim(),
     };
 
-    const result = await api('create_lead', { method: 'POST', body: data });
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        closeModal('addLeadModal');
-        loadLeads();
-        loadStats();
+    try {
+        const result = await api('create_lead', { method: 'POST', body: data });
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            closeModal('addLeadModal');
+            loadLeads();
+            loadStats();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
     }
 }
 
@@ -594,17 +617,23 @@ async function generateDraft() {
     btn.disabled = true;
     btn.textContent = 'Generating...';
 
-    const data = await api('generate_draft', { method: 'POST', body: { id: currentLeadId } });
-    btn.disabled = false;
-    btn.textContent = 'Regenerate Draft';
+    try {
+        const data = await api('generate_draft', { method: 'POST', body: { id: currentLeadId } });
+        btn.disabled = false;
+        btn.textContent = 'Regenerate Draft';
 
-    if (data.success) {
-        document.getElementById('draftSubject').value = data.subject;
-        document.getElementById('draftBody').value = data.body;
-        // Refresh lead to update status
-        openLeadDetail(currentLeadId);
-    } else {
-        notify(data.message, 'error');
+        if (data.success) {
+            document.getElementById('draftSubject').value = data.subject;
+            document.getElementById('draftBody').value = data.body;
+            // Refresh lead to update status
+            openLeadDetail(currentLeadId);
+        } else {
+            notify(data.message, 'error');
+        }
+    } catch (e) {
+        btn.disabled = false;
+        btn.textContent = 'Regenerate Draft';
+        notify(e.message, 'error');
     }
 }
 
@@ -637,18 +666,22 @@ async function approveDraft() {
     const body = document.getElementById('draftBody').value.trim();
     if (!subject || !body) { notify('Subject and body are required', 'error'); return; }
 
-    // Save draft edits
-    await api('update_lead', {
-        method: 'POST',
-        body: { id: currentLeadId, draft_subject: subject, draft_body: body }
-    });
+    try {
+        // Save draft edits
+        await api('update_lead', {
+            method: 'POST',
+            body: { id: currentLeadId, draft_subject: subject, draft_body: body }
+        });
 
-    const result = await api('approve_draft', { method: 'POST', body: { id: currentLeadId } });
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        openLeadDetail(currentLeadId);
-        loadLeads();
-        loadStats();
+        const result = await api('approve_draft', { method: 'POST', body: { id: currentLeadId } });
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            openLeadDetail(currentLeadId);
+            loadLeads();
+            loadStats();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
     }
 }
 
@@ -660,16 +693,22 @@ async function sendEmail() {
     btn.disabled = true;
     btn.textContent = 'Sending...';
 
-    const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
-    btn.textContent = 'Send Email';
+    try {
+        const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
+        btn.textContent = 'Send Email';
 
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        openLeadDetail(currentLeadId);
-        loadLeads();
-        loadStats();
-    } else {
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            openLeadDetail(currentLeadId);
+            loadLeads();
+            loadStats();
+        } else {
+            btn.disabled = false;
+        }
+    } catch (e) {
+        btn.textContent = 'Send Email';
         btn.disabled = false;
+        notify(e.message, 'error');
     }
 }
 
@@ -708,24 +747,28 @@ function copyDraft() {
 // ─── AI Enrichment ───
 // ─── Activity ───
 async function loadActivity(id) {
-    const data = await api('get_activity', { params: { id } });
-    const container = document.getElementById('activityTimeline');
+    try {
+        const data = await api('get_activity', { params: { id } });
+        const container = document.getElementById('activityTimeline');
 
-    if (!data.success || !data.activity.length) {
-        container.innerHTML = '<p class="empty-state-text">No activity yet</p>';
-        return;
-    }
+        if (!data.success || !data.activity.length) {
+            container.innerHTML = '<p class="empty-state-text">No activity yet</p>';
+            return;
+        }
 
-    container.innerHTML = data.activity.map(a => `
-        <div class="activity-item">
-            <div class="activity-dot"></div>
-            <div class="activity-content">
-                <strong>${formatActionType(a.action_type)}</strong>
-                ${a.details ? '<span class="activity-details">' + esc(a.details) + '</span>' : ''}
-                <span class="activity-time">${formatDateTime(a.created_at)}</span>
+        container.innerHTML = data.activity.map(a => `
+            <div class="activity-item">
+                <div class="activity-dot"></div>
+                <div class="activity-content">
+                    <strong>${formatActionType(a.action_type)}</strong>
+                    ${a.details ? '<span class="activity-details">' + esc(a.details) + '</span>' : ''}
+                    <span class="activity-time">${formatDateTime(a.created_at)}</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } catch (e) {
+        notify(e.message, 'error');
+    }
 }
 
 // ─── CSV ───
@@ -742,14 +785,18 @@ async function importCSV() {
     formData.append('csv_file', fileInput.files[0]);
     formData.append('action', 'import_csv');
 
-    const res = await fetch('api.php?action=import_csv', { method: 'POST', body: formData });
-    const result = await res.json();
+    try {
+        const res = await fetch('api.php?action=import_csv', { method: 'POST', body: formData });
+        const result = await res.json();
 
-    notify(result.message, result.success ? 'success' : 'error');
-    if (result.success) {
-        closeModal('csvImportModal');
-        loadLeads();
-        loadStats();
+        notify(result.message, result.success ? 'success' : 'error');
+        if (result.success) {
+            closeModal('csvImportModal');
+            loadLeads();
+            loadStats();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
     }
 }
 

@@ -796,7 +796,12 @@ function summarize_business($website)
     if (strlen($text) < 50) return null;
 
     $result = call_openai(
-        "You summarize businesses based on their website content. Respond with ONLY a 1-2 sentence summary describing what the business does, what services or products they offer, and who their customers are. Be specific and factual. Do not include any other text.",
+        "You summarize businesses based on their website content. Respond with ONLY a concise summary (3-5 sentences) covering:
+1. What specific services or products they offer
+2. Who their typical customers are
+3. How they likely handle billing (e.g. do they invoice clients, do project quotes, charge hourly, sell products, etc.)
+4. Any pain points a simple bookkeeping/invoicing tool could solve for them (e.g. tracking job expenses, sending invoices, managing payments)
+Be specific and factual based on the website content. Do not include any other text or preamble.",
         "Website content from $website:\n\n$text"
     );
 
@@ -826,6 +831,17 @@ function generate_draft($pdo)
         }
     }
 
+    $isLocal = false;
+    $city = strtolower(trim($lead['city'] ?? ''));
+    $province = strtolower(trim($lead['province'] ?? ''));
+    if ($province === 'saskatchewan' || $province === 'sk' || in_array($city, ['saskatoon','regina','prince albert','moose jaw','swift current','yorkton','north battleford','estevan','weyburn','martensville','warman','humboldt','melfort','meadow lake','lloydminster'])) {
+        $isLocal = true;
+    }
+
+    $localInstruction = $isLocal
+        ? "- The business is in Saskatchewan. Evan is a local Saskatchewan developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
+        : "- Evan is an independent software developer based in Saskatoon, Saskatchewan. Mention this briefly for context.";
+
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 About Argo Books:
@@ -837,16 +853,26 @@ About Argo Books:
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
-- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
-- The sender's name is Evan, he is a local independent software developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon software developer in the email body
+$localInstruction
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
+
+PERSONALIZATION (this is critical):
+- If a business summary is provided, you MUST use it to make the email specific to their business. Do not write a generic email when you have summary info
+- Connect Argo Books features directly to their business needs. Examples:
+  - If they do services/contracting: mention how easy it is to invoice clients after a job
+  - If they sell products: mention simple expense tracking and bookkeeping
+  - If they likely deal with quotes/estimates: mention invoicing features
+  - If they have multiple revenue streams: mention how it keeps everything organized without accounting knowledge
+- Reference their actual business type naturally (e.g. \"I know running a landscaping business means a lot of invoicing\" not just \"I see you run a business\")
+- Only reference Argo Books features that are relevant to what they do. Do not list every feature
+- Do NOT invent details about the business you do not have
+- If no summary is available, keep it more general but still mention their industry/category if known
+
+- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
-- If a business summary is provided, use it to personalize the email. For example if they likely send invoices, mention the invoicing feature. If they do services, mention expense tracking. Only reference features that are relevant to their business
-- Do NOT invent details about the business you do not have
-- If limited info is available, keep it more general rather than making up praise
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - Include a link to the website: https://argorobots.com/
@@ -863,6 +889,7 @@ Return ONLY the JSON, no other text.";
     $details = "Business: {$lead['business_name']}";
     if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
     if ($lead['city']) $details .= "\nCity: {$lead['city']}";
+    if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
     if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
     if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
     if ($summary) $details .= "\nBusiness summary: $summary";

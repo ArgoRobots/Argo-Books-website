@@ -112,13 +112,13 @@ header .header-inner .menu-container .menu .contact-us:after {
   border-radius: 16px;
   padding: 32px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-sm);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .option-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px var(--shadow-default);
 }
 
 .option-icon {
@@ -273,7 +273,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
 .form-group input::placeholder,
@@ -314,7 +314,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 20px var(--blue-alpha-30);
 }
 
 .submit-btn:active {

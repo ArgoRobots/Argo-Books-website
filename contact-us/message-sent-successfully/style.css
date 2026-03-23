@@ -7,7 +7,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 .first {
   min-height: calc(100vh - 80px);
   padding: 100px 0 40px;
-  background: linear-gradient(to bottom, var(--whiteBackground), #ffffff);
+  background: linear-gradient(to bottom, var(--whiteBackground), var(--white));
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -18,9 +18,9 @@ header .header-inner .menu-container .menu .contact-us:after {
   max-width: 800px;
   width: 85%;
   margin: 20px auto 0;
-  background: #ffffff;
+  background: var(--white);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 30px var(--shadow);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -41,7 +41,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   align-items: center;
   justify-content: center;
   margin-bottom: 25px;
-  color: white;
+  color: var(--white);
   transform: scale(0);
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   animation-delay: 0.2s;
@@ -61,7 +61,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 h1 {
   font-size: 2.2rem;
   font-weight: 600;
-  color: #1a202c;
+  color: var(--slate-1a202c);
   margin-bottom: 16px;
   transform: translateY(20px);
   opacity: 0;
@@ -71,7 +71,7 @@ h1 {
 
 .success-message {
   font-size: 1.2rem;
-  color: #4a5568;
+  color: var(--neutral-4a5568);
   line-height: 1.6;
   margin-bottom: 30px;
   transform: translateY(20px);
@@ -82,7 +82,7 @@ h1 {
 
 /* Information box */
 .info-box {
-  background: #f7fafc;
+  background: var(--neutral-f7fafc);
   border-radius: 10px;
   padding: 25px;
   margin-bottom: 35px;
@@ -96,7 +96,7 @@ h1 {
 .info-box h3 {
   font-size: 1.2rem;
   font-weight: 500;
-  color: #2d3748;
+  color: var(--slate-2d3748);
   margin-bottom: 15px;
 }
 
@@ -105,7 +105,7 @@ h1 {
 }
 
 .info-box li {
-  color: #4a5568;
+  color: var(--neutral-4a5568);
   margin-bottom: 10px;
   padding-left: 5px;
 }
@@ -137,22 +137,22 @@ h1 {
 
 .primary-btn {
   background: var(--primary-blue);
-  color: white;
+  color: var(--white);
 }
 
 .primary-btn:hover {
   background: var(--blueHover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-default);
 }
 
 .secondary-btn {
-  background: #edf2f7;
-  color: #4a5568;
+  background: var(--neutral-edf2f7);
+  color: var(--neutral-4a5568);
 }
 
 .secondary-btn:hover {
-  background: #e2e8f0;
+  background: var(--gray-200);
   transform: translateY(-2px);
 }
 

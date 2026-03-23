@@ -12,17 +12,17 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--white);
     padding: 24px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--shadow-default);
 }
 
 .stat-card h3 {
     margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--gray-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -30,13 +30,13 @@
 .stat-card .value {
     font-size: 32px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--gray-text-darker);
     margin-bottom: 4px;
 }
 
 .stat-card .subtext {
     font-size: 14px;
-    color: #9ca3af;
+    color: var(--gray-placeholder);
 }
 
 .period-selection {
@@ -45,14 +45,14 @@
     gap: 15px;
     margin-bottom: 30px;
     padding: 15px;
-    background: white;
+    background: var(--white);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--shadow-default);
 }
 
 .period-selection span {
     font-weight: 600;
-    color: #4b5563;
+    color: var(--gray-text-light);
 }
 
 .period-buttons {
@@ -64,19 +64,19 @@
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
-    color: #4b5563;
-    background: #f3f4f6;
+    color: var(--gray-text-light);
+    background: var(--gray-bg-light);
     font-weight: 500;
     transition: all 0.2s;
 }
 
 .period-btn:hover {
-    background: #e5e7eb;
+    background: var(--gray-border);
 }
 
 .period-btn.active {
-    background: #3b82f6;
-    color: white;
+    background: var(--blue-500);
+    color: var(--white);
 }
 
 .chart-row {
@@ -87,10 +87,10 @@
 }
 
 .chart-container {
-    background: white;
+    background: var(--white);
     padding: 24px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--shadow-default);
     min-height: 400px;
 }
 
@@ -98,7 +98,7 @@
     margin: 0 0 20px 0;
     font-size: 18px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--gray-text-darker);
 }
 
 .chart-container canvas {
@@ -106,10 +106,10 @@
 }
 
 .table-container {
-    background: white;
+    background: var(--white);
     padding: 24px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--shadow-default);
     margin-top: 20px;
 }
 
@@ -124,7 +124,7 @@
     margin: 0;
     font-size: 20px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--gray-text-darker);
 }
 
 .table-responsive {
@@ -137,7 +137,7 @@ table {
 }
 
 table thead {
-    background: #f9fafb;
+    background: var(--whiteBackground);
 }
 
 table th {
@@ -145,33 +145,33 @@ table th {
     text-align: left;
     font-weight: 600;
     font-size: 13px;
-    color: #6b7280;
+    color: var(--gray-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--gray-border);
 }
 
 table td {
     padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
-    color: #374151;
+    border-bottom: 1px solid var(--gray-border);
+    color: var(--gray-text-dark);
 }
 
 table tbody tr:hover {
-    background: #f9fafb;
+    background: var(--whiteBackground);
 }
 
 code {
-    background: #f3f4f6;
+    background: var(--gray-bg-light);
     padding: 4px 8px;
     border-radius: 4px;
     font-family: 'Courier New', monospace;
     font-size: 13px;
-    color: #dc2626;
+    color: var(--red-600);
 }
 
 .link-preview {
-    color: #3b82f6;
+    color: var(--blue-500);
     text-decoration: none;
 }
 
@@ -187,13 +187,13 @@ code {
 }
 
 .status-active {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--emerald-100);
+    color: var(--emerald-800);
 }
 
 .status-inactive {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--red-100);
+    color: var(--red-800);
 }
 
 .action-buttons {
@@ -219,44 +219,44 @@ code {
 }
 
 .btn-blue, .btn-small.btn-blue {
-    background: #3b82f6;
-    color: white;
+    background: var(--blue-500);
+    color: var(--white);
 }
 
 .btn-blue:hover, .btn-small.btn-blue:hover {
-    background: #2563eb;
+    background: var(--blue-600);
 }
 
 .btn-yellow, .btn-small.btn-yellow {
-    background: #f59e0b;
-    color: white;
+    background: var(--amber-500);
+    color: var(--white);
 }
 
 .btn-yellow:hover, .btn-small.btn-yellow:hover {
-    background: #d97706;
+    background: var(--amber-600);
 }
 
 .btn-red, .btn-small.btn-red {
-    background: #ef4444;
-    color: white;
+    background: var(--red-500);
+    color: var(--white);
 }
 
 .btn-red:hover, .btn-small.btn-red:hover {
-    background: #dc2626;
+    background: var(--red-600);
 }
 
 .btn-gray {
-    background: #6b7280;
-    color: white;
+    background: var(--gray-text);
+    color: var(--white);
 }
 
 .btn-gray:hover {
-    background: #4b5563;
+    background: var(--gray-text-light);
 }
 
 .success-message {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--emerald-100);
+    color: var(--emerald-800);
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -272,21 +272,21 @@ code {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--overlay-dark);
 }
 
 .modal-content {
-    background-color: white;
+    background-color: var(--white);
     margin: 5% auto;
     padding: 32px;
     border-radius: 12px;
     width: 90%;
     max-width: 600px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px var(--shadow-default);
 }
 
 .modal-close {
-    color: #9ca3af;
+    color: var(--gray-placeholder);
     float: right;
     font-size: 32px;
     font-weight: bold;
@@ -295,13 +295,13 @@ code {
 }
 
 .modal-close:hover {
-    color: #4b5563;
+    color: var(--gray-text-light);
 }
 
 #modalTitle {
     margin-top: 0;
     margin-bottom: 24px;
-    color: #1f2937;
+    color: var(--gray-text-darker);
 }
 
 .form-group {
@@ -312,7 +312,7 @@ code {
     display: block;
     font-weight: 600;
     margin-bottom: 6px;
-    color: #374151;
+    color: var(--gray-text-dark);
 }
 
 .form-group input[type="text"],
@@ -320,7 +320,7 @@ code {
 .form-group textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-input-border);
     border-radius: 6px;
     font-size: 14px;
     box-sizing: border-box;
@@ -329,14 +329,14 @@ code {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
 .form-group small {
     display: block;
     margin-top: 4px;
-    color: #6b7280;
+    color: var(--gray-text);
     font-size: 13px;
 }
 

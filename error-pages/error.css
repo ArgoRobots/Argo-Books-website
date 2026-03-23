@@ -13,7 +13,7 @@ body {
 .large-header {
   position: relative;
   width: 100%;
-  background: #111;
+  background: var(--near-black);
   overflow: hidden;
   background-size: cover;
   background-position: center center;
@@ -31,14 +31,14 @@ body {
 }
 
 .text-container .main-title {
-  color: #f9f1e9;
+  color: var(--warm-bg);
   font-size: 12rem;
   font-weight: 500;
   letter-spacing: .1em;
 }
 
 .text-container .sub-title {
-  color: #f9f1e9;
+  color: var(--warm-bg);
   text-align: center;
   font-size: 2.8rem;
   font-weight: 500;
@@ -56,14 +56,14 @@ body {
   transition: .33s all ease;
   cursor: pointer;
   background: transparent;
-  border: 1px solid #fff;
-  color: #fff;
+  border: 1px solid var(--white);
+  color: var(--white);
   margin: 30px auto;
 }
 
 .text-container .btn:hover {
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
+  background: var(--overlay-medium);
+  color: var(--white);
 }
 
 @media (max-width: 1200px) {

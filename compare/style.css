@@ -197,28 +197,28 @@ body {
 
 .btn-cta-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 20px var(--blue-alpha-30);
 }
 
 .btn-cta-outline {
   background: transparent;
   color: var(--white);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid var(--white-alpha-30);
 }
 
 .btn-cta-outline:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--white-alpha-60);
+  background: var(--white-alpha-05);
 }
 
 .btn-cta-ghost {
   background: transparent;
   color: var(--hero-text-muted);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--white-alpha-20);
 }
 
 .btn-cta-ghost:hover {
-  border-color: rgba(255, 255, 255, 0.4);
+  border-color: var(--white-alpha-40);
   color: var(--white);
 }
 
@@ -246,7 +246,7 @@ body {
 
 .diff-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 32px var(--shadow);
 }
 
 .diff-icon {
@@ -315,7 +315,7 @@ body {
   background: var(--white);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-sm);
 }
 
 .comparison-table thead {
@@ -420,19 +420,19 @@ body {
 
 .pricing-box:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px var(--shadow-default);
 }
 
 .argo-box {
   background: var(--white);
   border: 2px solid var(--primary-blue);
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 20px var(--blue-alpha-10);
 }
 
 .competitor-box {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-sm);
 }
 
 .pricing-box-header {

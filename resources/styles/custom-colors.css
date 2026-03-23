@@ -120,6 +120,162 @@
   /* Pink */
   --pink-500: #ec4899;
 
+  /* Additional neutrals */
+  --black: #000000;
+  --neutral-111827: #111827;
+  --neutral-4a5568: #4a5568;
+  --neutral-666: #666666;
+  --neutral-f8f9fa: #f8f9fa;
+  --neutral-f7f7f8: #f7f7f8;
+  --dark-1a1a2e: #1a1a2e;
+  --warm-bg: #f9f1e9;
+
+  /* Indigo extended */
+  --indigo-200: #c7d2fe;
+  --indigo-400: #818cf8;
+  --indigo-700: #4338ca;
+
+  /* Pink extended */
+  --pink-400: #f472b6;
+
+  /* Yellow/Warning */
+  --yellow-warning-bg: #fff3cd;
+  --yellow-warning-text: #856404;
+  --yellow-highlight: #ffeaa7;
+  --amber-200: #fde68a;
+  --violet-100: #ede9fe;
+
+  /* Blue extended */
+  --blue-link: #0066cc;
+  --blue-link-alt: #0078d4;
+  --blue-link-dark: #0366cc;
+  --blue-e6f3ff: #e6f3ff;
+  --blue-e3f2fd: #e3f2fd;
+  --blue-90caf9: #90caf9;
+  --gold-f0c040: #f0c040;
+
+  /* Shadows & Overlays */
+  --shadow-xs: rgba(0, 0, 0, 0.04);
+  --shadow-sm: rgba(0, 0, 0, 0.05);
+  --shadow-md: rgba(0, 0, 0, 0.06);
+  --shadow: rgba(0, 0, 0, 0.08);
+  --shadow-default: rgba(0, 0, 0, 0.1);
+  --shadow-md2: rgba(0, 0, 0, 0.12);
+  --shadow-lg: rgba(0, 0, 0, 0.15);
+  --shadow-xl: rgba(0, 0, 0, 0.2);
+  --overlay-light: rgba(0, 0, 0, 0.3);
+  --overlay-medium: rgba(0, 0, 0, 0.4);
+  --overlay-dark: rgba(0, 0, 0, 0.5);
+  --overlay-darker: rgba(0, 0, 0, 0.6);
+
+  /* White alpha */
+  --white-alpha-05: rgba(255, 255, 255, 0.05);
+  --white-alpha-10: rgba(255, 255, 255, 0.1);
+  --white-alpha-12: rgba(255, 255, 255, 0.12);
+  --white-alpha-15: rgba(255, 255, 255, 0.15);
+  --white-alpha-20: rgba(255, 255, 255, 0.2);
+  --white-alpha-22: rgba(255, 255, 255, 0.22);
+  --white-alpha-25: rgba(255, 255, 255, 0.25);
+  --white-alpha-30: rgba(255, 255, 255, 0.3);
+  --white-alpha-40: rgba(255, 255, 255, 0.4);
+  --white-alpha-50: rgba(255, 255, 255, 0.5);
+  --white-alpha-60: rgba(255, 255, 255, 0.6);
+  --white-alpha-70: rgba(255, 255, 255, 0.7);
+  --white-alpha-80: rgba(255, 255, 255, 0.8);
+  --white-alpha-90: rgba(255, 255, 255, 0.9);
+  --white-alpha-95: rgba(255, 255, 255, 0.95);
+  --white-alpha-96: rgba(255, 255, 255, 0.96);
+
+  /* Blue alpha */
+  --blue-alpha-08: rgba(59, 130, 246, 0.08);
+  --blue-alpha-10: rgba(59, 130, 246, 0.1);
+  --blue-alpha-12: rgba(59, 130, 246, 0.12);
+  --blue-alpha-15: rgba(59, 130, 246, 0.15);
+  --blue-alpha-20: rgba(59, 130, 246, 0.2);
+  --blue-alpha-30: rgba(59, 130, 246, 0.3);
+  --blue-alpha-40: rgba(59, 130, 246, 0.4);
+  --blue-alpha-50: rgba(59, 130, 246, 0.5);
+  --blue-alpha-80: rgba(59, 130, 246, 0.8);
+  --blue-600-alpha-0: rgba(37, 99, 235, 0);
+  --blue-600-alpha-10: rgba(37, 99, 235, 0.1);
+  --blue-600-alpha-20: rgba(37, 99, 235, 0.2);
+  --blue-600-alpha-30: rgba(37, 99, 235, 0.3);
+  --blue-600-alpha-70: rgba(37, 99, 235, 0.7);
+
+  /* Green alpha */
+  --green-alpha-10: rgba(16, 185, 129, 0.1);
+  --green-alpha-15: rgba(16, 185, 129, 0.15);
+  --green-alpha-20: rgba(16, 185, 129, 0.2);
+  --green-alpha-30: rgba(16, 185, 129, 0.3);
+
+  /* Red alpha */
+  --red-alpha-15: rgba(239, 68, 68, 0.15);
+  --red-alpha-20: rgba(239, 68, 68, 0.2);
+
+  /* Purple alpha */
+  --purple-alpha-15: rgba(139, 92, 246, 0.15);
+  --purple-alpha-20: rgba(139, 92, 246, 0.2);
+  --purple-alpha-40: rgba(139, 92, 246, 0.4);
+
+  /* Amber alpha */
+  --amber-alpha-15: rgba(245, 158, 11, 0.15);
+  --amber-alpha-20: rgba(245, 158, 11, 0.2);
+
+  /* Gray alpha */
+  --gray-text-alpha-50: rgba(55, 65, 81, 0.5);
+  --gray-alpha-20: rgba(107, 114, 128, 0.2);
+  --gray-bg-light-alpha-80: rgba(243, 244, 246, 0.8);
+  --gray-rgb-border: rgb(225, 225, 225);
+
+  /* Indigo alpha */
+  --indigo-alpha-12: rgba(99, 102, 241, 0.12);
+  --indigo-alpha-20: rgba(99, 102, 241, 0.2);
+
+  /* Blue-400 alpha */
+  --blue-400-alpha-20: rgba(96, 165, 250, 0.2);
+
+  /* Additional neutrals (extended) */
+  --near-black: #111111;
+  --neutral-f7fafc: #f7fafc;
+  --neutral-edf2f7: #edf2f7;
+  --neutral-f1f1f1: #f1f1f1;
+  --neutral-f0f0f0: #f0f0f0;
+  --neutral-eee: #eeeeee;
+  --neutral-ddd: #dddddd;
+  --neutral-cccfd5: #cccfd5;
+  --neutral-a3a3a3: #a3a3a3;
+  --neutral-656565: #656565;
+
+  /* Slate/Navy */
+  --slate-1a202c: #1a202c;
+  --slate-2d3748: #2d3748;
+  --slate-253449: #253449;
+  --slate-3f4f63: #3f4f63;
+  --navy-1a365d: #1a365d;
+  --navy-1e3a5f: #1e3a5f;
+
+  /* Brand/Gradient colors */
+  --brand-yellow: #FCC624;
+  --gradient-indigo: #667eea;
+  --gradient-purple: #764ba2;
+  --yellow-50-alt: #fefce8;
+  --purple-50-alt: #f5f3ff;
+
+  /* Additional alpha */
+  --shadow-xxs: rgba(0, 0, 0, 0.07);
+  --gold-alpha-15: rgba(240, 192, 64, 0.15);
+  --red-alpha-10: rgba(239, 68, 68, 0.1);
+  --red-alpha-30: rgba(239, 68, 68, 0.3);
+  --pink-alpha-15: rgba(236, 72, 153, 0.15);
+  --green-alpha-40: rgba(16, 185, 129, 0.4);
+  --violet-alpha-02: rgba(147, 51, 234, 0.02);
+  --violet-alpha-05: rgba(147, 51, 234, 0.05);
+  --violet-alpha-15: rgba(147, 51, 234, 0.15);
+  --violet-alpha-20: rgba(147, 51, 234, 0.2);
+  --sky-alpha-20: rgba(14, 165, 233, 0.2);
+  --purple-alpha-50: rgba(139, 92, 246, 0.5);
+  --gray-alpha-30: rgba(107, 114, 128, 0.3);
+
   /* Hero/Footer theme */
   --hero-gradient-start: #0f172a;
   --hero-gradient-end: #1e293b;

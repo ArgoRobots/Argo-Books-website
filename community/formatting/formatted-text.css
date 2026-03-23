@@ -3,17 +3,17 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 5px;
-  background-color: #f8f9fa;
-  border: 1px solid #e5e7eb;
+  background-color: var(--neutral-f8f9fa);
+  border: 1px solid var(--gray-border);
   border-radius: 4px 4px 0 0;
   padding: 5px;
 }
 
 .formatting-toolbar .format-btn {
-  background-color: #fff;
-  border: 1px solid #d1d5db;
+  background-color: var(--white);
+  border: 1px solid var(--gray-input-border);
   border-radius: 3px;
-  color: #4b5563;
+  color: var(--gray-text-light);
   padding: 5px 8px;
   font-size: 13px;
   cursor: pointer;
@@ -27,12 +27,12 @@
 }
 
 .formatting-toolbar .format-btn:hover {
-  background-color: #f3f4f6;
-  border-color: #9ca3af;
+  background-color: var(--gray-bg-light);
+  border-color: var(--gray-placeholder);
 }
 
 .formatting-toolbar .format-btn:active {
-  background-color: #e5e7eb;
+  background-color: var(--gray-border);
 }
 
 .formatting-toolbar + textarea {
@@ -55,9 +55,9 @@
 
 .formatting-toolbar .help-btn {
   margin-left: auto;
-  background-color: #3b82f6;
+  background-color: var(--blue-500);
   border: none;
-  color: white;
+  color: var(--white);
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -78,14 +78,14 @@
 .formatting-toolbar .help-btn svg {
   width: 22px;
   height: 22px;
-  stroke: white;
+  stroke: var(--white);
 }
 
 .formatted-text blockquote {
   margin: 0.5em 0;
   padding: 0.5em 1.5em;
-  background: #f8fafc;
-  border-left: 4px solid #3b82f6;
+  background: var(--gray-50);
+  border-left: 4px solid var(--blue-500);
   border-radius: 4px;
   font-style: normal;
 }
@@ -106,7 +106,7 @@
 }
 
 .formatted-text a:hover {
-  color: #1d4ed8;
+  color: var(--blue-700);
   text-decoration: underline;
 }
 
@@ -118,5 +118,5 @@
 
 /* Link button styles */
 .format-btn.link-btn svg {
-  stroke: #3b82f6;
+  stroke: var(--blue-500);
 }

@@ -13,7 +13,7 @@
 
 .ai-badge-large {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--white-alpha-20);
     backdrop-filter: blur(8px);
     padding: 8px 20px;
     border-radius: 30px;
@@ -81,13 +81,13 @@
     padding: 32px 24px;
     border-radius: 16px;
     text-align: center;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px var(--shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .ai-feature-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(139, 92, 246, 0.15);
+    box-shadow: 0 10px 30px var(--purple-alpha-15);
 }
 
 .ai-feature-icon {
@@ -167,7 +167,7 @@
 .billing-option.active {
     background: var(--white);
     color: var(--purple-500);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--shadow-default);
 }
 
 .billing-option:hover:not(.active) {
@@ -185,7 +185,7 @@
     background: var(--white);
     padding: 32px 48px;
     border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(139, 92, 246, 0.15);
+    box-shadow: 0 10px 40px var(--purple-alpha-15);
     border: 2px solid var(--purple-500);
 }
 

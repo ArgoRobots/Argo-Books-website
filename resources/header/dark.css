@@ -1,10 +1,10 @@
 header .menu-icon .nav-icon {
-  background: #000 !important;
+  background: var(--black) !important;
 }
 
 header .menu-icon .nav-icon:before,
 header .menu-icon .nav-icon:after {
-  background: #000 !important;
+  background: var(--black) !important;
 }
 
 /* Add transparent background only when menu is open */
@@ -17,31 +17,31 @@ header .header-inner .logo {
 }
 
 header .header-inner .menu-container ul li a {
-  color: #000 !important;
+  color: var(--black) !important;
 }
 
 header .header-inner .menu-container ul li a:after {
-  background: #000 !important;
+  background: var(--black) !important;
 }
 
 .account-avatar {
-  background-color: white;
+  background-color: var(--white);
   justify-content: center;
-  color: #333;
-  border: 2px solid #a3a3a3;
+  color: var(--dark-gray);
+  border: 2px solid var(--neutral-a3a3a3);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .account-button:hover .account-avatar {
   transform: scale(1.05);
-  border-color: #656565;
+  border-color: var(--neutral-656565);
 }
 
 .author-avatar-placeholder {
-  background-color: white;
-  color: #333;
+  background-color: var(--white);
+  color: var(--dark-gray);
 }
 
 .account-avatar svg {
-  stroke: #333;
+  stroke: var(--dark-gray);
 }

@@ -99,7 +99,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 
 .hero .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 20px var(--blue-alpha-30);
 }
 
 .hero .btn-secondary:hover {
@@ -142,13 +142,13 @@ header .header-inner .menu-container .menu .whats-new:after {
   border-radius: 16px;
   padding: 24px;
   line-height: 1.6;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-sm);
   border: 1px solid var(--gray-border);
   transition: box-shadow 0.2s ease;
 }
 
 .version-card:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px var(--shadow);
 }
 
 .version-card:first-child {

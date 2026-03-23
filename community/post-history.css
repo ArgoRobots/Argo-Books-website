@@ -16,7 +16,7 @@ header .header-inner .menu-container .menu .community:after {
   background: var(--white);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 .history-header {
@@ -101,9 +101,9 @@ header .header-inner .menu-container .menu .community:after {
   height: 2px;
   background: linear-gradient(
     to right,
-    rgba(59, 130, 246, 0.5),
-    rgba(59, 130, 246, 0.8),
-    rgba(59, 130, 246, 0.5)
+    var(--blue-alpha-50),
+    var(--blue-alpha-80),
+    var(--blue-alpha-50)
   );
   margin: 30px 0;
 }

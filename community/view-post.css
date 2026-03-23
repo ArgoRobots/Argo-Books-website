@@ -522,7 +522,7 @@ header .header-inner .menu-container .menu .community:after {
 .inline-edit-form textarea:focus {
   outline: none;
   border-color: var(--secondary-blue);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 0 0 2px var(--blue-600-alpha-10);
 }
 
 .inline-edit-form .form-actions {

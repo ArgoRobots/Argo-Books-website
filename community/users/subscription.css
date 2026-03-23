@@ -39,7 +39,7 @@
     padding: 24px;
     margin-bottom: 24px;
     border: 1px solid var(--gray-border);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 .subscription-section h2 {
@@ -526,7 +526,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--overlay-dark);
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
@@ -552,7 +552,7 @@
     position: relative;
     transform: scale(0.95) translateY(10px);
     transition: transform 0.3s;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 20px 40px var(--shadow-xl);
 }
 
 .modal-overlay.active .modal-container {

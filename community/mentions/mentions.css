@@ -4,7 +4,7 @@
   background-color: var(--white);
   border: 1px solid var(--gray-input-border);
   border-radius: 4px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--shadow-default);
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;

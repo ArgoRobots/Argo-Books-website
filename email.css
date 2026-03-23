@@ -13,7 +13,7 @@ body {
     margin: 0 auto;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px var(--shadow-default);
     margin-top: 20px;
     margin-bottom: 20px;
 }
@@ -22,7 +22,7 @@ body {
 .header {
     padding: 20px;
     text-align: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--gradient-indigo) 0%, var(--gradient-purple) 100%);
 }
 
 .header img {
@@ -57,7 +57,7 @@ p {
 
 /* Links */
 a {
-    color: #2563eb;
+    color: var(--blue-600);
     text-decoration: none;
 }
 
@@ -67,8 +67,8 @@ a:hover {
 
 /* License key display */
 .license-key {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background-color: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: 4px;
     font-family: monospace;
     font-size: 18px;
@@ -81,9 +81,9 @@ a:hover {
 
 /* Button styles */
 .button {
-    background-color: #2563eb;
+    background-color: var(--blue-600);
     border-radius: 4px;
-    color: #ffffff;
+    color: var(--white);
     display: inline-block;
     font-weight: bold;
     margin-top: 15px;
@@ -93,7 +93,7 @@ a:hover {
 }
 
 .button:hover {
-    background-color: #1d4ed8;
+    background-color: var(--blue-700);
     text-decoration: none;
 }
 
@@ -109,8 +109,8 @@ a:hover {
 
 /* Footer styles */
 .footer {
-    background-color: #f8fafc;
-    border-top: 1px solid #e2e8f0;
+    background-color: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
     font-size: 12px;
     padding: 20px;
     text-align: center;
@@ -122,7 +122,7 @@ a:hover {
 
 /* Header variations */
 .header-purple {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
 }
 
 /* header-blue is the default, defined in .header */
@@ -135,7 +135,7 @@ a:hover {
 
 .details-table td {
     padding: 8px 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-border);
 }
 
 .details-table td:last-child {
@@ -147,7 +147,7 @@ a:hover {
 }
 
 .details-table .label {
-    color: #6b7280;
+    color: var(--gray-text);
 }
 
 .details-table .value {
@@ -171,32 +171,32 @@ a:hover {
 }
 
 .info-box-gray {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
 }
 
 .info-box-warning {
-    background: #fef3c7;
-    border: 1px solid #fcd34d;
+    background: var(--amber-100);
+    border: 1px solid var(--amber-300);
 }
 
 .info-box-success {
-    background: #d1fae5;
-    border: 1px solid #6ee7b7;
+    background: var(--emerald-100);
+    border: 1px solid var(--emerald-300);
 }
 
 .info-box-note {
-    background: #f0fdf4;
-    border: 1px solid #86efac;
+    background: var(--green-50);
+    border: 1px solid var(--green-300);
 }
 
 /* Payment/receipt box */
 .payment-box {
-    background: #f8fafc;
+    background: var(--gray-50);
     padding: 20px;
     border-radius: 8px;
     margin: 20px 0;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-border);
 }
 
 .payment-box h3 {
@@ -205,8 +205,8 @@ a:hover {
 
 /* Credit display */
 .credit-display {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-    color: white;
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    color: var(--white);
     padding: 30px;
     border-radius: 12px;
     margin: 25px 0;
@@ -227,11 +227,11 @@ a:hover {
 
 /* Button variations */
 .button-purple {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
 }
 
 .button-purple:hover {
-    background: linear-gradient(135deg, #7c3aed, #6d28d9);
+    background: linear-gradient(135deg, var(--purple-600), var(--purple-700));
 }
 
 /* Status badges */
@@ -242,8 +242,8 @@ a:hover {
 }
 
 .status-active {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--emerald-100);
+    color: var(--emerald-800);
 }
 
 /* Lists */
@@ -259,7 +259,7 @@ a:hover {
 }
 
 .styled-list {
-    color: #374151;
+    color: var(--gray-text-dark);
     line-height: 1.8;
 }
 
@@ -268,8 +268,8 @@ a:hover {
     text-align: center;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #e5e7eb;
-    color: #6b7280;
+    border-top: 1px solid var(--gray-border);
+    color: var(--gray-text);
     font-size: 14px;
 }
 
@@ -280,7 +280,7 @@ a:hover {
 
 /* Text colors */
 .text-muted {
-    color: #6b7280;
+    color: var(--gray-text);
 }
 
 /* Mobile responsive */

@@ -500,8 +500,8 @@
     flex: 0 0 auto;
     padding: 4px 12px;
     font-size: 0.75rem;
-    color: var(--gray-500);
-    text-transform: uppercase;
+    margin-left: auto;
+    text-transform: none;
 }
 
 .draft-info {
@@ -805,6 +805,10 @@
 
 [data-theme="dark"] .draft-status-bar {
     background: var(--gray-900);
+}
+
+[data-theme="dark"] .draft-actions .btn-small {
+    color: var(--white);
 }
 
 [data-theme="dark"] .modal-content::-webkit-scrollbar {

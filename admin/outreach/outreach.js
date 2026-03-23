@@ -245,11 +245,11 @@ function updateBulkBar() {
         }
     }
 
-    // Disable "Draft Selected" if any selected lead already has a draft
+    // Switch to "Redraft Selected" if all selected leads already have drafts
     const draftBtn = document.getElementById('btnDraftSelected');
     if (draftBtn) {
-        const anyDrafted = Array.from(checked).some(cb => cb.dataset.hasDraft === '1');
-        draftBtn.disabled = anyDrafted;
+        const allDrafted = checked.length > 0 && Array.from(checked).every(cb => cb.dataset.hasDraft === '1');
+        draftBtn.textContent = allDrafted ? 'Redraft Selected' : 'Draft Selected';
     }
 }
 

@@ -518,20 +518,16 @@
     gap: 8px;
     flex-wrap: nowrap;
     margin-top: 12px;
+    align-items: center;
 }
 
 .draft-actions .btn {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     white-space: nowrap;
-    min-width: 0;
 }
 
-.draft-actions .btn-small {
-    flex: 0 0 auto;
-    padding: 4px 12px;
-    font-size: 0.75rem;
+.draft-actions .draft-copy-btn {
     margin-left: auto;
-    text-transform: none;
 }
 
 .draft-info {

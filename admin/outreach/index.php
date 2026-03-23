@@ -359,9 +359,9 @@ include '../admin_header.php';
                         <textarea id="draftBody" rows="12" placeholder="Email body..."></textarea>
                     </div>
                     <div class="draft-actions">
-                        <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
-                        <button class="btn btn-blue btn-small" onclick="copyDraft(this)">Copy</button>
-                        <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
+                        <button class="btn btn-blue btn-small" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
+                        <button class="btn btn-blue btn-small" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
+                        <button class="btn btn-blue btn-small draft-copy-btn" onclick="copyDraft(this)">Copy</button>
                     </div>
                     <div class="draft-info" id="draftInfo"></div>
                 </div>

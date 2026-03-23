@@ -602,6 +602,9 @@ function import_leads($pdo)
 {
     $data = json_decode(file_get_contents('php://input'), true);
     $businesses = $data['businesses'] ?? [];
+    $companySize = $data['company_size'] ?? 'unknown';
+    $validSizes = ['unknown', 'small', 'medium', 'large'];
+    if (!in_array($companySize, $validSizes)) $companySize = 'unknown';
 
     if (empty($businesses)) {
         json_response(['success' => false, 'message' => 'No businesses to import'], 400);
@@ -623,8 +626,8 @@ function import_leads($pdo)
             }
 
             $stmt = $pdo->prepare("INSERT INTO outreach_leads
-                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
-                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?)");
+                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email, company_size)
+                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?, ?)");
             $stmt->execute([
                 $biz['business_name'] ?? 'Unknown',
                 $biz['phone'] ?? null,
@@ -635,6 +638,7 @@ function import_leads($pdo)
                 $biz['places_id'] ?? null,
                 $biz['contact_page_url'] ?? null,
                 $biz['email'] ?? null,
+                $companySize,
             ]);
 
             $id = $pdo->lastInsertId();

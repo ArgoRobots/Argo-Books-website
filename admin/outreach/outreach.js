@@ -722,7 +722,8 @@ async function importAll() {
 
 async function doImport(businesses) {
     try {
-        const result = await api('import_leads', { method: 'POST', body: { businesses } });
+        const companySize = document.getElementById('discCompanySize').value || 'unknown';
+        const result = await api('import_leads', { method: 'POST', body: { businesses, company_size: companySize } });
         notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             loadLeads();

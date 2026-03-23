@@ -94,6 +94,13 @@ include '../admin_header.php';
             <div class="discovery-actions">
                 <span id="discoveryCount">0 results</span>
                 <div>
+                    <label for="discCompanySize" style="margin-right:4px;">Tag size:</label>
+                    <select id="discCompanySize" style="margin-right:8px;">
+                        <option value="unknown">Unknown</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                    </select>
                     <button class="btn btn-small btn-blue" onclick="selectAllDiscovery()">Select All</button>
                     <button class="btn btn-small btn-blue" onclick="deselectAllDiscovery()">Deselect All</button>
                     <button class="btn btn-small btn-blue" onclick="importSelected()">Import Selected</button>

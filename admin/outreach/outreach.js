@@ -257,16 +257,27 @@ function getSelectedLeadIds() {
     return Array.from(document.querySelectorAll('.lead-check:checked')).map(cb => parseInt(cb.value));
 }
 
+let bulkDraftCancelled = false;
+
+function cancelBulkDrafts() {
+    bulkDraftCancelled = true;
+    const btn = document.getElementById('btnCancelDraft');
+    if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+}
+
 async function bulkGenerateDrafts() {
     const ids = getSelectedLeadIds();
     if (!ids.length) return;
     if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
 
+    bulkDraftCancelled = false;
     const total = ids.length;
     let success = 0, fail = 0;
     const progressEl = document.getElementById('bulkDraftProgress');
     const progressText = document.getElementById('bulkDraftProgressText');
+    const cancelBtn = document.getElementById('btnCancelDraft');
     progressEl.style.display = 'flex';
+    if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.textContent = 'Cancel'; }
 
     // Disable the draft button during processing
     const draftBtn = document.getElementById('btnDraftSelected');
@@ -281,6 +292,8 @@ async function bulkGenerateDrafts() {
     // Process drafts concurrently (3 at a time)
     const CONCURRENCY = 3;
     async function processDraft(id) {
+        if (bulkDraftCancelled) return;
+
         const row = document.querySelector(`#lead-check-${id}`)?.closest('tr');
         const draftCellBtn = row?.querySelector('.actions-cell .btn-blue[title="Generate Draft"]');
         if (draftCellBtn) {
@@ -290,6 +303,10 @@ async function bulkGenerateDrafts() {
 
         try {
             const result = await api('generate_draft', { method: 'POST', body: { id } });
+            if (bulkDraftCancelled) {
+                if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
+                return;
+            }
             if (result.success) {
                 success++;
                 if (draftCellBtn) draftCellBtn.remove();
@@ -315,16 +332,21 @@ async function bulkGenerateDrafts() {
 
     // Run in batches of CONCURRENCY
     for (let i = 0; i < ids.length; i += CONCURRENCY) {
+        if (bulkDraftCancelled) break;
         const batch = ids.slice(i, i + CONCURRENCY);
         await Promise.all(batch.map(id => processDraft(id)));
     }
 
     // Done
-    progressText.textContent = `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
+    const cancelled = bulkDraftCancelled;
+    const doneMsg = cancelled
+        ? `Cancelled: ${success} drafted` + (fail ? `, ${fail} failed` : '') + `, ${total - success - fail} skipped`
+        : `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
+    progressText.textContent = doneMsg;
     setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
 
     if (draftBtn) draftBtn.disabled = false;
-    notify(`Drafted: ${success}, Failed: ${fail}`, success ? 'success' : 'error');
+    notify(doneMsg, success ? 'success' : 'error');
     loadStats();
     updateBulkBar();
 }

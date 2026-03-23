@@ -206,6 +206,7 @@ include '../admin_header.php';
     <div class="bulk-draft-progress" id="bulkDraftProgress" style="display:none;">
         <span class="bulk-draft-spinner"></span>
         <span id="bulkDraftProgressText"></span>
+        <button class="btn btn-small" id="btnCancelDraft" onclick="cancelBulkDrafts()" style="margin-left:8px;">Cancel</button>
     </div>
 
     <!-- Leads Table -->

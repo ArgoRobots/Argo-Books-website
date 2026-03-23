@@ -73,6 +73,9 @@ switch ($action) {
     case 'send_email':
         send_outreach_email($pdo);
         break;
+    case 'bulk_get_leads':
+        bulk_get_leads($pdo);
+        break;
 
     // Activity
     case 'get_activity':
@@ -182,6 +185,23 @@ function get_lead($pdo)
     }
 
     json_response(['success' => true, 'lead' => $lead]);
+}
+
+function bulk_get_leads($pdo)
+{
+    $idsParam = $_GET['ids'] ?? '';
+    $ids = array_filter(array_map('intval', explode(',', $idsParam)));
+
+    if (empty($ids)) {
+        json_response(['success' => false, 'message' => 'No IDs provided'], 400);
+    }
+
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("SELECT * FROM outreach_leads WHERE id IN ($placeholders)");
+    $stmt->execute($ids);
+    $leads = $stmt->fetchAll();
+
+    json_response(['success' => true, 'leads' => $leads]);
 }
 
 function create_lead($pdo)

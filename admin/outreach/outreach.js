@@ -289,6 +289,133 @@ async function bulkDeleteLeads() {
     loadStats();
 }
 
+// ─── Bulk Send Email ───
+let bulkSendLeads = [];
+
+async function openBulkSendModal() {
+    const ids = getSelectedLeadIds();
+    if (!ids.length) { notify('No leads selected', 'error'); return; }
+
+    const statusEl = document.getElementById('bulkSendStatus');
+    const listEl = document.getElementById('bulkSendList');
+    const sendBtn = document.getElementById('btnBulkSend');
+
+    statusEl.textContent = 'Loading leads...';
+    listEl.innerHTML = '';
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Send All';
+    sendBtn.onclick = executeBulkSend;
+    showModal('bulkSendModal');
+
+    try {
+        const data = await api('bulk_get_leads', { params: { ids: ids.join(',') } });
+        if (!data.success) { statusEl.textContent = data.message; return; }
+
+        bulkSendLeads = data.leads;
+
+        // Filter out leads without email
+        const withEmail = bulkSendLeads.filter(l => l.email);
+        const withoutEmail = bulkSendLeads.filter(l => !l.email);
+
+        // Render all leads
+        renderBulkSendList();
+
+        // Auto-generate drafts for leads that don't have one
+        const needsDraft = withEmail.filter(l => !l.draft_subject || !l.draft_body);
+        if (needsDraft.length) {
+            statusEl.textContent = `Generating drafts for ${needsDraft.length} lead(s)...`;
+            for (const lead of needsDraft) {
+                const itemEl = document.getElementById('bulk-send-item-' + lead.id);
+                if (itemEl) {
+                    itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-generating">Generating draft...</span>';
+                }
+                try {
+                    const result = await api('generate_draft', { method: 'POST', body: { id: lead.id } });
+                    if (result.success) {
+                        lead.draft_subject = result.subject;
+                        lead.draft_body = result.body;
+                        if (itemEl) renderBulkSendItemDraft(itemEl, lead);
+                    } else {
+                        if (itemEl) {
+                            itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-error">Failed to generate draft</span>';
+                        }
+                    }
+                } catch (e) {
+                    if (itemEl) {
+                        itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-error">Error: ' + esc(e.message) + '</span>';
+                    }
+                }
+            }
+        }
+
+        const sendable = withEmail.filter(l => l.draft_subject && l.draft_body);
+        statusEl.textContent = `${sendable.length} email(s) ready to send` +
+            (withoutEmail.length ? `, ${withoutEmail.length} skipped (no email)` : '');
+        sendBtn.disabled = sendable.length === 0;
+
+    } catch (e) {
+        statusEl.textContent = 'Error: ' + e.message;
+    }
+}
+
+function renderBulkSendList() {
+    const listEl = document.getElementById('bulkSendList');
+    listEl.innerHTML = bulkSendLeads.map(lead => {
+        const hasEmail = !!lead.email;
+        const hasDraft = lead.draft_subject && lead.draft_body;
+        return `<div class="bulk-send-item" id="bulk-send-item-${lead.id}">
+            <div class="bulk-send-item-header">
+                <strong>${esc(lead.business_name)}</strong>
+                <span class="bulk-send-item-email">${hasEmail ? esc(lead.email) : '<span class="bulk-send-item-no-email">No email address</span>'}</span>
+            </div>
+            <div class="bulk-send-item-draft">
+                ${!hasEmail ? '<span class="bulk-send-item-no-email">Will be skipped — no email address</span>' :
+                  hasDraft ? `<div class="bulk-send-item-subject">Subject: ${esc(lead.draft_subject)}</div><div class="bulk-send-item-body">${esc(lead.draft_body)}</div>` :
+                  '<span class="bulk-send-item-generating">Draft will be generated...</span>'}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function renderBulkSendItemDraft(itemEl, lead) {
+    itemEl.querySelector('.bulk-send-item-draft').innerHTML =
+        `<div class="bulk-send-item-subject">Subject: ${esc(lead.draft_subject)}</div><div class="bulk-send-item-body">${esc(lead.draft_body)}</div>`;
+}
+
+async function executeBulkSend() {
+    const sendBtn = document.getElementById('btnBulkSend');
+    const statusEl = document.getElementById('bulkSendStatus');
+    const sendable = bulkSendLeads.filter(l => l.email && l.draft_subject && l.draft_body);
+
+    if (!sendable.length) return;
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Sending...';
+
+    let success = 0, fail = 0;
+    for (const lead of sendable) {
+        statusEl.textContent = `Sending ${success + fail + 1} of ${sendable.length}...`;
+        try {
+            const result = await api('send_email', { method: 'POST', body: { id: lead.id } });
+            if (result.success) success++; else fail++;
+        } catch { fail++; }
+    }
+
+    sendBtn.textContent = 'Send All';
+    statusEl.textContent = `Sent: ${success}` + (fail ? `, Failed: ${fail}` : '');
+    notify(`Sent: ${success}` + (fail ? `, Failed: ${fail}` : ''), success ? 'success' : 'error');
+
+    if (success > 0) {
+        loadLeads();
+        loadStats();
+    }
+}
+
+function closeBulkSendModal() {
+    closeModal('bulkSendModal');
+    bulkSendLeads = [];
+}
+
 // ─── Lead Detail Modal ───
 async function openLeadDetail(id) {
     currentLeadId = id;

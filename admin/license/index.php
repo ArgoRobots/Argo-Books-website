@@ -1011,10 +1011,14 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelCreditModalBtn.addEventListener('click', closeModal);
     }
 
-    // Close modal on overlay click
+    // Close modal on overlay click (only if mousedown also started on backdrop)
+    let modalMouseDownTarget = null;
     if (creditModal) {
+        creditModal.addEventListener('mousedown', function(e) {
+            modalMouseDownTarget = e.target;
+        });
         creditModal.addEventListener('click', function(e) {
-            if (e.target === creditModal) {
+            if (e.target === creditModal && modalMouseDownTarget === creditModal) {
                 closeModal();
             }
         });

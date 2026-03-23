@@ -42,9 +42,13 @@
         cancelBtn.addEventListener('click', closeModal);
     }
 
-    // Close modal when clicking outside
+    // Close modal when clicking outside (only if mousedown also started on backdrop)
+    let modalMouseDownTarget = null;
+    modal.addEventListener('mousedown', function(e) {
+        modalMouseDownTarget = e.target;
+    });
     modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
+        if (e.target === modal && modalMouseDownTarget === modal) {
             closeModal();
         }
     });

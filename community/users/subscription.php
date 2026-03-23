@@ -514,9 +514,13 @@ if ($premium_subscription) {
             });
         }
 
-        // Close on overlay click (only if not in loading state)
+        // Close on overlay click (only if mousedown also started on backdrop and not in loading state)
+        let modalMouseDownTarget = null;
+        modal.addEventListener('mousedown', function(e) {
+            modalMouseDownTarget = e.target;
+        });
         modal.addEventListener('click', function(e) {
-            if (e.target === modal && stateLoading.classList.contains('hidden')) {
+            if (e.target === modal && modalMouseDownTarget === modal && stateLoading.classList.contains('hidden')) {
                 closeModal();
             }
         });

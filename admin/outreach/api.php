@@ -73,6 +73,9 @@ switch ($action) {
     case 'send_email':
         send_outreach_email($pdo);
         break;
+    case 'bulk_get_leads':
+        bulk_get_leads($pdo);
+        break;
 
     // Activity
     case 'get_activity':
@@ -182,6 +185,23 @@ function get_lead($pdo)
     }
 
     json_response(['success' => true, 'lead' => $lead]);
+}
+
+function bulk_get_leads($pdo)
+{
+    $idsParam = $_GET['ids'] ?? '';
+    $ids = array_filter(array_map('intval', explode(',', $idsParam)));
+
+    if (empty($ids)) {
+        json_response(['success' => false, 'message' => 'No IDs provided'], 400);
+    }
+
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("SELECT * FROM outreach_leads WHERE id IN ($placeholders)");
+    $stmt->execute($ids);
+    $leads = $stmt->fetchAll();
+
+    json_response(['success' => true, 'leads' => $leads]);
 }
 
 function create_lead($pdo)
@@ -846,10 +866,6 @@ function send_outreach_email($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
-    if ($lead['approval_status'] !== 'approved') {
-        json_response(['success' => false, 'message' => 'Draft must be approved before sending'], 400);
-    }
-
     if (empty($lead['email'])) {
         json_response(['success' => false, 'message' => 'No email address for this lead'], 400);
     }
@@ -861,7 +877,7 @@ function send_outreach_email($pdo)
     // Format body for HTML email (convert newlines to <br>)
     $htmlBody = '<p>' . nl2br(htmlspecialchars($lead['draft_body'])) . '</p>';
 
-    $result = send_styled_email($lead['email'], $lead['draft_subject'], $htmlBody);
+    $result = send_styled_email($lead['email'], $lead['draft_subject'], $htmlBody, '', 'contact@argorobots.com', 'Argo Books');
 
     if ($result) {
         $stmt = $pdo->prepare("UPDATE outreach_leads SET

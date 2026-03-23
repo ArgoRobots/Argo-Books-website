@@ -1,4 +1,8 @@
 // Modal handling
+let modalMouseDownTarget = null;
+document.addEventListener('mousedown', function (e) {
+    modalMouseDownTarget = e.target;
+});
 let banModal = document.getElementById('banModal');
 
 function showBanModal(reportId, userId, username) {
@@ -15,9 +19,9 @@ function closeBanModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Close modal when clicking outside
+// Close modal when clicking outside (only if mousedown also started on backdrop)
 banModal.addEventListener('click', function (e) {
-    if (e.target === banModal) {
+    if (e.target === banModal && modalMouseDownTarget === banModal) {
         closeBanModal();
     }
 });
@@ -159,9 +163,9 @@ function closeResetUsernameModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Close modal when clicking outside
+// Close modal when clicking outside (only if mousedown also started on backdrop)
 resetUsernameModal.addEventListener('click', function (e) {
-    if (e.target === resetUsernameModal) {
+    if (e.target === resetUsernameModal && modalMouseDownTarget === resetUsernameModal) {
         closeResetUsernameModal();
     }
 });
@@ -246,9 +250,9 @@ function closeClearBioModal() {
     document.body.style.overflow = 'auto';
 }
 
-// Close modal when clicking outside
+// Close modal when clicking outside (only if mousedown also started on backdrop)
 clearBioModal.addEventListener('click', function (e) {
-    if (e.target === clearBioModal) {
+    if (e.target === clearBioModal && modalMouseDownTarget === clearBioModal) {
         closeClearBioModal();
     }
 });

@@ -197,6 +197,7 @@ include '../admin_header.php';
     <div class="bulk-actions-bar" id="bulkActionsBar" style="display:none;">
         <span><strong id="selectedCount">0</strong> selected</span>
         <button class="btn btn-small btn-blue" onclick="bulkGenerateDrafts()">Draft Selected</button>
+        <button class="btn btn-small btn-blue" onclick="openBulkSendModal()">Send Email</button>
         <button class="btn btn-small btn-blue" onclick="bulkDeleteLeads()">Delete Selected</button>
     </div>
 
@@ -440,6 +441,24 @@ include '../admin_header.php';
         <div class="modal-footer">
             <button class="btn btn-blue" onclick="closeModal('csvImportModal')">Cancel</button>
             <button class="btn btn-blue" onclick="importCSV()">Import</button>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Send Email Modal -->
+<div id="bulkSendModal" class="modal" style="display:none;">
+    <div class="modal-content modal-large">
+        <div class="modal-header">
+            <h3>Send Emails</h3>
+            <button class="modal-close" onclick="closeBulkSendModal()">&times;</button>
+        </div>
+        <div class="modal-body" style="padding:0;">
+            <div id="bulkSendStatus" class="bulk-send-status"></div>
+            <div id="bulkSendList" class="bulk-send-list"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="closeBulkSendModal()">Cancel</button>
+            <button class="btn btn-blue" id="btnBulkSend" disabled>Send All</button>
         </div>
     </div>
 </div>

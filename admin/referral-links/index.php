@@ -773,10 +773,14 @@ include '../admin_header.php';
 
     document.getElementById('createLinkBtn').addEventListener('click', openModal);
 
-    // Close modal when clicking outside
+    // Close modal when clicking outside (only if mousedown also started on backdrop)
+    let modalMouseDownTarget = null;
+    window.addEventListener('mousedown', function(event) {
+        modalMouseDownTarget = event.target;
+    });
     window.addEventListener('click', function(event) {
         const modal = document.getElementById('linkModal');
-        if (event.target === modal) {
+        if (event.target === modal && modalMouseDownTarget === modal) {
             closeModal();
         }
     });

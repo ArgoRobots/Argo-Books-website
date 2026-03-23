@@ -622,6 +622,75 @@
     }
 }
 
+/* ─── Bulk Send Modal ─── */
+.bulk-send-status {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    color: var(--gray-600, #4b5563);
+    border-bottom: 1px solid var(--gray-border, #e5e7eb);
+}
+
+.bulk-send-list {
+    overflow-y: auto;
+    max-height: calc(80vh - 180px);
+}
+
+.bulk-send-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--gray-border, #e5e7eb);
+}
+
+.bulk-send-item:last-child {
+    border-bottom: none;
+}
+
+.bulk-send-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.bulk-send-item-header strong {
+    font-size: 0.95rem;
+}
+
+.bulk-send-item-email {
+    font-size: 0.85rem;
+    color: var(--gray-500, #6b7280);
+}
+
+.bulk-send-item-subject {
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.bulk-send-item-body {
+    font-size: 0.85rem;
+    color: var(--gray-600, #4b5563);
+    white-space: pre-line;
+    line-height: 1.5;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.bulk-send-item-generating {
+    font-size: 0.85rem;
+    color: var(--blue, #3b82f6);
+    font-style: italic;
+}
+
+.bulk-send-item-error {
+    font-size: 0.85rem;
+    color: #ef4444;
+}
+
+.bulk-send-item-no-email {
+    font-size: 0.85rem;
+    color: #f59e0b;
+}
+
 /* ─── Dark Theme ─── */
 [data-theme="dark"] .stat-card,
 [data-theme="dark"] .panel {
@@ -688,6 +757,23 @@
 
 [data-theme="dark"] .modal-footer {
     border-top-color: #334155;
+}
+
+[data-theme="dark"] .bulk-send-status {
+    color: #94a3b8;
+    border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .bulk-send-item {
+    border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .bulk-send-item-email {
+    color: #64748b;
+}
+
+[data-theme="dark"] .bulk-send-item-body {
+    color: #94a3b8;
 }
 
 [data-theme="dark"] .tabs {

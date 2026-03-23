@@ -777,9 +777,13 @@ function closeModal(id) {
     document.body.style.overflow = 'auto';
 }
 
-// Close modals on backdrop click
+// Close modals on backdrop click (only if mousedown also started on the backdrop)
+let modalMouseDownTarget = null;
+document.addEventListener('mousedown', function (e) {
+    modalMouseDownTarget = e.target;
+});
 document.addEventListener('click', function (e) {
-    if (e.target.classList.contains('modal')) {
+    if (e.target.classList.contains('modal') && modalMouseDownTarget === e.target) {
         e.target.style.display = 'none';
         document.body.style.overflow = 'auto';
     }

@@ -118,11 +118,11 @@
    Text Colors
    ============================================================ */
 .text-red {
-    color: var(--red-500, var(--red-500)) !important;
+    color: var(--red-500) !important;
 }
 
 .text-green {
-    color: var(--emerald-500, var(--emerald-500)) !important;
+    color: var(--emerald-500) !important;
 }
 
 /* ============================================================
@@ -167,7 +167,7 @@
 .filter-group input:focus,
 .filter-group select:focus {
     outline: none;
-    border-color: var(--primary-blue, var(--blue-500));
+    border-color: var(--primary-blue);
     box-shadow: 0 0 0 2px var(--blue-alpha-15);
 }
 
@@ -186,12 +186,12 @@
 }
 
 .btn-primary-blue {
-    background: var(--primary-blue, var(--blue-500));
+    background: var(--primary-blue);
     color: var(--white);
 }
 
 .btn-primary-blue:hover {
-    background: var(--blueHover, var(--blue-700));
+    background: var(--blueHover);
 }
 
 .btn-outline {

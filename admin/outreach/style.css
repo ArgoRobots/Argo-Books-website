@@ -151,7 +151,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 20px;
-    background: var(--blue-50, var(--blue-50));
+    background: var(--blue-50);
     border-bottom: 1px solid var(--gray-border);
     font-size: 14px;
 }
@@ -617,8 +617,8 @@
 .bulk-send-status {
     padding: 12px 20px;
     font-size: 0.9rem;
-    color: var(--gray-600, var(--gray-text-light));
-    border-bottom: 1px solid var(--gray-border, var(--gray-border));
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-border);
 }
 
 .bulk-send-list {
@@ -628,7 +628,7 @@
 
 .bulk-send-item {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--gray-border, var(--gray-border));
+    border-bottom: 1px solid var(--gray-border);
 }
 
 .bulk-send-item:last-child {
@@ -648,7 +648,7 @@
 
 .bulk-send-item-email {
     font-size: 0.85rem;
-    color: var(--gray-500, var(--gray-text));
+    color: var(--gray-500);
 }
 
 .bulk-send-item-subject {
@@ -659,7 +659,7 @@
 
 .bulk-send-item-body {
     font-size: 0.85rem;
-    color: var(--gray-600, var(--gray-text-light));
+    color: var(--gray-600);
     white-space: pre-line;
     line-height: 1.5;
     max-height: 120px;
@@ -668,7 +668,7 @@
 
 .bulk-send-item-generating {
     font-size: 0.85rem;
-    color: var(--blue, var(--blue-500));
+    color: var(--blue);
     font-style: italic;
 }
 

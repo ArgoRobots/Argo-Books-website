@@ -23,7 +23,7 @@ header .header-inner .menu-container .menu .documentation:after {
 }
 
 .reference-category {
-  background: var(--whiteBackground, var(--whiteBackground));
+  background: var(--whiteBackground);
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
@@ -64,8 +64,8 @@ header .header-inner .menu-container .menu .documentation:after {
 .reference-category h3 {
   margin-bottom: 20px;
   padding-bottom: 5px;
-  color: var(--primary-blue, var(--blue-600));
-  border-bottom: 2px solid var(--primary-blue, var(--blue-600));
+  color: var(--primary-blue);
+  border-bottom: 2px solid var(--primary-blue);
 }
 
 /* Main groups for featured/common items */
@@ -119,7 +119,7 @@ header .header-inner .menu-container .menu .documentation:after {
   padding: 4px 8px;
   border-radius: 4px;
   font-weight: 600;
-  color: var(--primary-blue, var(--blue-600));
+  color: var(--primary-blue);
   min-width: 40px;
   text-align: center;
   border: 1px solid var(--gray-200);
@@ -156,7 +156,7 @@ header .header-inner .menu-container .menu .documentation:after {
 
 .primary-name {
   font-weight: 600;
-  color: var(--primary-blue, var(--blue-600));
+  color: var(--primary-blue);
 }
 
 /* Alphabetical grid layout */
@@ -211,13 +211,13 @@ header .header-inner .menu-container .menu .documentation:after {
 
 .search-box:focus {
   outline: none;
-  border-color: var(--primary-blue, var(--blue-600));
+  border-color: var(--primary-blue);
   box-shadow: 0 0 0 3px var(--blue-600-alpha-10);
 }
 
 /* No results message */
 .no-results {
-  background: var(--whiteBackground, var(--whiteBackground));
+  background: var(--whiteBackground);
   border-radius: 8px;
   padding: 40px 20px;
   margin: 20px 0 40px;
@@ -266,7 +266,7 @@ header .header-inner .menu-container .menu .documentation:after {
 
 .pattern-note h3 {
   margin-bottom: 15px;
-  color: var(--primary-blue, var(--blue-600));
+  color: var(--primary-blue);
 }
 
 .steps-list {
@@ -288,7 +288,7 @@ header .header-inner .menu-container .menu .documentation:after {
   position: absolute;
   left: 0;
   top: 0;
-  background: var(--primary-blue, var(--blue-600));
+  background: var(--primary-blue);
   color: var(--white);
   width: 1.5rem;
   height: 1.5rem;
@@ -301,14 +301,14 @@ header .header-inner .menu-container .menu .documentation:after {
 
 .info-box {
   background: var(--blue-100);
-  border-left: 4px solid var(--primary-blue, var(--blue-600));
+  border-left: 4px solid var(--primary-blue);
   padding: 15px;
   margin: 15px 0;
   border-radius: 4px;
 }
 
 .warning-box {
-  background: var(--yellow-50, var(--yellow-50-alt));
+  background: var(--yellow-50);
   border: 1px solid var(--amber-400);
   border-radius: 6px;
   padding: 15px;

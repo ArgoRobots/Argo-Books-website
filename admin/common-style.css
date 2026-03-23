@@ -470,7 +470,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: var(--whiteBackground, var(--gray-bg-light-alpha-80)) !important;
+  background-color: var(--whiteBackground) !important;
 }
 
 .key-field {
@@ -550,7 +550,7 @@ tbody tr:hover {
 .stat-card .value {
   font-size: 1.75rem;
   font-weight: bold;
-  color: var(--blueText, var(--gray-text-darker));
+  color: var(--blueText);
   margin: 0;
   line-height: 1.2;
 }

@@ -631,62 +631,87 @@ async function searchBusinesses() {
     btn.disabled = true;
     btn.textContent = 'Searching...';
 
-    const params = {
+    const sizeFilter = document.getElementById('discCompanySize').value;
+    const limit = parseInt(document.getElementById('discLimit').value);
+    const baseParams = {
         city: city,
         province: document.getElementById('discProvince').value.trim(),
         category: document.getElementById('discCategory').value.trim(),
-        limit: document.getElementById('discLimit').value,
+        limit: limit,
     };
 
-    const data = await api('search_businesses', { params });
+    discoveryResults = [];
+    document.getElementById('discoveryResults').style.display = 'block';
+
+    // If a size filter is active, we may need multiple search+classify rounds
+    // to accumulate enough results that match the filter
+    const maxAttempts = sizeFilter ? 3 : 1;
+    let lastNote = null;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        // Exclude businesses we already have so the API finds new ones
+        const excludeIds = discoveryResults.map(b => b.places_id).filter(Boolean).join(',');
+        const params = { ...baseParams };
+        if (excludeIds) params.exclude_place_ids = excludeIds;
+
+        btn.textContent = attempt === 0 ? 'Searching...' : `Searching (round ${attempt + 1})...`;
+        const data = await api('search_businesses', { params });
+
+        if (!data.success) {
+            if (attempt === 0) {
+                btn.disabled = false;
+                btn.textContent = 'Search';
+                notify(data.message, 'error');
+                return;
+            }
+            break;
+        }
+
+        if (!data.businesses.length) break;
+        lastNote = data.note || null;
+
+        // Classify sizes for the new batch
+        const newBatch = data.businesses;
+        try {
+            const classifyData = await api('classify_company_sizes', {
+                method: 'POST',
+                body: { businesses: newBatch }
+            });
+            if (classifyData.success && classifyData.sizes) {
+                classifyData.sizes.forEach((size, i) => {
+                    if (i < newBatch.length) newBatch[i].company_size = size;
+                });
+            }
+        } catch (e) {
+            console.warn('Company size classification failed:', e.message);
+        }
+
+        // Add new batch to results and re-render
+        discoveryResults = discoveryResults.concat(newBatch);
+        renderDiscoveryResults();
+        saveDiscoveryToSession();
+
+        // Check if we have enough filtered results
+        if (!sizeFilter) break;
+        const filteredCount = discoveryResults.filter(b => b.company_size === sizeFilter).length;
+        if (filteredCount >= limit) break;
+    }
+
     btn.disabled = false;
     btn.textContent = 'Search';
 
-    if (!data.success) {
-        notify(data.message, 'error');
-        return;
-    }
-
-    discoveryResults = data.businesses;
-    document.getElementById('discoveryResults').style.display = 'block';
-    renderDiscoveryResults();
-    saveDiscoveryToSession();
-
-    if (data.note) {
-        notify(data.note, 'info');
-    }
-
-    // AI-classify company sizes in the background
-    if (discoveryResults.length) {
-        classifyDiscoveryCompanySizes();
-    }
-}
-
-async function classifyDiscoveryCompanySizes() {
-    try {
-        const data = await api('classify_company_sizes', {
-            method: 'POST',
-            body: { businesses: discoveryResults }
-        });
-        if (data.success && data.sizes) {
-            data.sizes.forEach((size, i) => {
-                if (i < discoveryResults.length) {
-                    discoveryResults[i].company_size = size;
-                }
-            });
-            // Apply filter if one is selected
-            const sizeFilter = document.getElementById('discCompanySize').value;
-            renderDiscoveryResults();
-            saveDiscoveryToSession();
-            if (sizeFilter) {
-                notify('Company sizes classified. Filter applied.', 'success');
-            } else {
-                notify('Company sizes classified by AI.', 'success');
-            }
+    if (lastNote && sizeFilter) {
+        const filteredCount = discoveryResults.filter(b => b.company_size === sizeFilter).length;
+        if (filteredCount < limit) {
+            notify(`Found ${filteredCount} ${sizeFilter} businesses out of ${discoveryResults.length} total. Not enough ${sizeFilter} businesses in this area.`, 'info');
         }
-    } catch (e) {
-        // Non-critical, just log
-        console.warn('Company size classification failed:', e.message);
+    } else if (lastNote) {
+        notify(lastNote, 'info');
+    }
+
+    if (discoveryResults.length) {
+        const msg = sizeFilter ? 'Company sizes classified. Filter applied.' : 'Company sizes classified by AI.';
+        notify(msg, 'success');
     }
 }
 

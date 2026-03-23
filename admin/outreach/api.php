@@ -449,6 +449,7 @@ function search_businesses()
     $province = trim($_GET['province'] ?? '');
     $category = trim($_GET['category'] ?? '');
     $limit = min(100, max(1, (int)($_GET['limit'] ?? 20)));
+    $excludePlaceIds = array_filter(explode(',', $_GET['exclude_place_ids'] ?? ''));
 
     if (empty($city)) {
         json_response(['success' => false, 'message' => 'City is required'], 400);
@@ -462,6 +463,10 @@ function search_businesses()
     $location = $province ? "$city, $province" : $city;
     $businesses = [];
     $seenPlaceIds = [];
+    // Pre-seed seen IDs so we skip businesses the client already has
+    foreach ($excludePlaceIds as $id) {
+        $seenPlaceIds[trim($id)] = true;
+    }
     $maxRounds = 5;
     $roundsUsed = 0;
 
@@ -512,6 +517,14 @@ function search_businesses()
         shuffle($categoryPool);
         for ($i = 0; $i < $maxRounds; $i++) {
             $queries[] = $categoryPool[$i] . " in $location";
+        }
+    }
+
+    // Track which pool category was searched per round (for labeling when no category provided)
+    $queryCategories = [];
+    if (!$category) {
+        foreach ($queries as $q) {
+            $queryCategories[] = ucwords(str_replace(" in $location", '', $q));
         }
     }
 
@@ -585,7 +598,7 @@ function search_businesses()
                     'places_id' => $placeId,
                     'business_name' => $place['name'] ?? '',
                     'address' => $place['formatted_address'] ?? '',
-                    'category' => $category ?: (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : ''),
+                    'category' => $category ?: ($queryCategories[$round] ?? (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : '')),
                     'city' => $city,
                     'phone' => null,
                     'website' => null,

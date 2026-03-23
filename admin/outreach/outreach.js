@@ -199,7 +199,7 @@ async function loadLeads() {
                 <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                        ${lead.approval_status !== 'sent' ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>` : ''}
+                        ${!lead.draft_subject && lead.approval_status !== 'sent' ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
                     </div>
                 </td>
             </tr>

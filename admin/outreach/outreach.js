@@ -401,9 +401,8 @@ async function executeBulkSend() {
         } catch { fail++; }
     }
 
-    sendBtn.textContent = 'Send All';
-    statusEl.textContent = `Sent: ${success}` + (fail ? `, Failed: ${fail}` : '');
     notify(`Sent: ${success}` + (fail ? `, Failed: ${fail}` : ''), success ? 'success' : 'error');
+    closeBulkSendModal();
 
     if (success > 0) {
         loadLeads();

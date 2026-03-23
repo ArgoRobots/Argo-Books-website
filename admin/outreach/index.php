@@ -334,10 +334,9 @@ include '../admin_header.php';
                     <label>Feedback Summary</label>
                     <textarea id="detailFeedback" rows="3" placeholder="Summarize feedback received..."></textarea>
                 </div>
-                <div class="detail-meta" id="detailMeta"></div>
                 <div class="detail-actions">
-                    <button class="btn btn-blue" onclick="saveLeadDetails()">Save Changes</button>
                     <button class="btn btn-red" onclick="deleteCurrentLead()">Delete Lead</button>
+                    <button class="btn btn-blue" onclick="saveLeadDetails()">Save Changes</button>
                 </div>
             </div>
 

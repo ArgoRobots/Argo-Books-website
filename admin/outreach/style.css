@@ -277,6 +277,11 @@
 
 .badge-status-onboarded { background: var(--green-100); color: var(--green-800); }
 
+/* Company size badges */
+.badge-size-small { background: var(--green-100); color: var(--green-700); }
+.badge-size-medium { background: var(--amber-100); color: var(--amber-700); }
+.badge-size-large { background: var(--purple-100); color: var(--purple-700); }
+
 
 /* ─── Filters ─── */
 .filters-container {

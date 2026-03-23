@@ -577,10 +577,13 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     sent_at DATETIME DEFAULT NULL,
     contact_page_url VARCHAR(500) DEFAULT NULL,
     places_id VARCHAR(255) DEFAULT NULL,
+    company_size ENUM('small','medium','large') DEFAULT NULL,
+    business_summary TEXT DEFAULT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_outreach_status (status),
     INDEX idx_outreach_city (city),
-    INDEX idx_outreach_approval (approval_status)
+    INDEX idx_outreach_approval (approval_status),
+    INDEX idx_outreach_company_size (company_size)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Activity log for outreach leads

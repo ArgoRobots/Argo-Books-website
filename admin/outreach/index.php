@@ -75,6 +75,15 @@ include '../admin_header.php';
                     <input type="text" id="discCategory" placeholder="e.g. landscaping, cleaners">
                 </div>
                 <div class="form-group">
+                    <label for="discCompanySize">Company Size</label>
+                    <select id="discCompanySize" onchange="renderDiscoveryResults()">
+                        <option value="">All Sizes</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="discLimit">Limit</label>
                     <select id="discLimit">
                         <option value="5">5</option>
@@ -111,6 +120,7 @@ include '../admin_header.php';
                             <th>Website</th>
                             <th>Address</th>
                             <th>Category</th>
+                            <th>Size</th>
                         </tr>
                     </thead>
                     <tbody id="discoveryTableBody"></tbody>
@@ -161,6 +171,15 @@ include '../admin_header.php';
                     <option value="positive">Positive</option>
                     <option value="neutral">Neutral</option>
                     <option value="negative">Negative</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterCompanySize">Company Size</label>
+                <select id="filterCompanySize" onchange="loadLeads()">
+                    <option value="">All Sizes</option>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -291,6 +310,15 @@ include '../admin_header.php';
                         <select id="detailOfferSent">
                             <option value="0">No</option>
                             <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Company Size</label>
+                        <select id="detailCompanySize">
+                            <option value="">Unknown</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
                         </select>
                     </div>
                     <div class="form-group">

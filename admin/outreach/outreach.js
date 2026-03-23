@@ -13,11 +13,13 @@ function updateUrlParams() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
+    const companySize = document.getElementById('filterCompanySize').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.set('search', search);
     if (status) params.set('status', status);
     if (response) params.set('response', response);
+    if (companySize) params.set('company_size', companySize);
     if (sort && sort !== 'date_added_desc') params.set('sort', sort);
 
     const newUrl = params.toString()
@@ -31,6 +33,7 @@ function restoreFiltersFromUrl() {
     if (params.has('search')) document.getElementById('filterSearch').value = params.get('search');
     if (params.has('status')) document.getElementById('filterStatus').value = params.get('status');
     if (params.has('response')) document.getElementById('filterResponse').value = params.get('response');
+    if (params.has('company_size')) document.getElementById('filterCompanySize').value = params.get('company_size');
     if (params.has('sort')) document.getElementById('filterSort').value = params.get('sort');
 }
 
@@ -43,6 +46,7 @@ function saveDiscoveryToSession() {
         sessionStorage.setItem('outreach_disc_province', document.getElementById('discProvince').value);
         sessionStorage.setItem('outreach_disc_category', document.getElementById('discCategory').value);
         sessionStorage.setItem('outreach_disc_limit', document.getElementById('discLimit').value);
+        sessionStorage.setItem('outreach_disc_company_size', document.getElementById('discCompanySize').value);
     } catch (e) { /* storage full or unavailable */ }
 }
 
@@ -61,10 +65,12 @@ function restoreDiscoveryFromSession() {
         const province = sessionStorage.getItem('outreach_disc_province');
         const category = sessionStorage.getItem('outreach_disc_category');
         const limit = sessionStorage.getItem('outreach_disc_limit');
+        const companySize = sessionStorage.getItem('outreach_disc_company_size');
         if (city) document.getElementById('discCity').value = city;
         if (province) document.getElementById('discProvince').value = province;
         if (category) document.getElementById('discCategory').value = category;
         if (limit) document.getElementById('discLimit').value = limit;
+        if (companySize) document.getElementById('discCompanySize').value = companySize;
     } catch (e) { /* storage unavailable */ }
 }
 
@@ -154,11 +160,13 @@ async function loadLeads() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
+    const companySize = document.getElementById('filterCompanySize').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.search = search;
     if (status) params.status = status;
     if (response) params.response_status = response;
+    if (companySize) params.company_size = companySize;
     if (sort) params.sort = sort;
 
     // Persist filters to URL
@@ -438,6 +446,7 @@ async function openLeadDetail(id) {
         document.getElementById('detailStatus').value = lead.status || 'new';
         document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
 
+        document.getElementById('detailCompanySize').value = lead.company_size || '';
         document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
         document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
         document.getElementById('detailNotes').value = lead.notes || '';
@@ -532,7 +541,7 @@ async function saveLeadDetails() {
         city: document.getElementById('detailCity').value,
         status: document.getElementById('detailStatus').value,
         response_status: document.getElementById('detailResponseStatus').value,
-
+        company_size: document.getElementById('detailCompanySize').value,
         offer_sent: document.getElementById('detailOfferSent').value,
         contact_page_url: document.getElementById('detailContactPageUrl').value,
         notes: document.getElementById('detailNotes').value,
@@ -646,28 +655,73 @@ async function searchBusinesses() {
     if (data.note) {
         notify(data.note, 'info');
     }
+
+    // AI-classify company sizes in the background
+    if (discoveryResults.length) {
+        classifyDiscoveryCompanySizes();
+    }
+}
+
+async function classifyDiscoveryCompanySizes() {
+    try {
+        const data = await api('classify_company_sizes', {
+            method: 'POST',
+            body: { businesses: discoveryResults }
+        });
+        if (data.success && data.sizes) {
+            data.sizes.forEach((size, i) => {
+                if (i < discoveryResults.length) {
+                    discoveryResults[i].company_size = size;
+                }
+            });
+            // Apply filter if one is selected
+            const sizeFilter = document.getElementById('discCompanySize').value;
+            renderDiscoveryResults();
+            saveDiscoveryToSession();
+            if (sizeFilter) {
+                notify('Company sizes classified. Filter applied.', 'success');
+            } else {
+                notify('Company sizes classified by AI.', 'success');
+            }
+        }
+    } catch (e) {
+        // Non-critical, just log
+        console.warn('Company size classification failed:', e.message);
+    }
 }
 
 function renderDiscoveryResults() {
-    document.getElementById('discoveryCount').textContent = `${discoveryResults.length} results`;
+    const sizeFilter = document.getElementById('discCompanySize').value;
+    const filtered = sizeFilter
+        ? discoveryResults.filter(biz => biz.company_size === sizeFilter)
+        : discoveryResults;
+
+    document.getElementById('discoveryCount').textContent = sizeFilter
+        ? `${filtered.length} of ${discoveryResults.length} results (filtered by ${sizeFilter})`
+        : `${discoveryResults.length} results`;
+
     const tbody = document.getElementById('discoveryTableBody');
 
-    if (!discoveryResults.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No businesses found</td></tr>';
+    if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No businesses found</td></tr>';
         return;
     }
 
-    tbody.innerHTML = discoveryResults.map((biz, i) => `
+    tbody.innerHTML = filtered.map((biz, i) => {
+        // Find original index for checkbox data
+        const origIndex = discoveryResults.indexOf(biz);
+        return `
         <tr>
-            <td><div class="checkbox"><input type="checkbox" class="disc-check" data-index="${i}" id="disc-check-${i}" checked><label for="disc-check-${i}"></label></div></td>
+            <td><div class="checkbox"><input type="checkbox" class="disc-check" data-index="${origIndex}" id="disc-check-${origIndex}" checked><label for="disc-check-${origIndex}"></label></div></td>
             <td>${esc(biz.business_name)}</td>
             <td>${biz.email ? esc(biz.email) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.phone ? esc(biz.phone) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.website ? '<a href="' + esc(biz.website) + '" target="_blank" rel="noopener noreferrer" class="link">Link</a>' : '<span class="text-muted">—</span>'}</td>
             <td>${esc(biz.address || '')}</td>
             <td>${esc(biz.category || '')}</td>
-        </tr>
-    `).join('');
+            <td>${biz.company_size ? '<span class="badge badge-size-' + biz.company_size + '">' + biz.company_size.charAt(0).toUpperCase() + biz.company_size.slice(1) + '</span>' : '<span class="text-muted">—</span>'}</td>
+        </tr>`;
+    }).join('');
 
     const selectAll = document.getElementById('discSelectAll');
     if (selectAll) selectAll.checked = true;

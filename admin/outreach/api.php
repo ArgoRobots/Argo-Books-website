@@ -79,6 +79,11 @@ switch ($action) {
         get_activity($pdo);
         break;
 
+    // AI classification
+    case 'classify_company_sizes':
+        classify_company_sizes($pdo);
+        break;
+
     // CSV
     case 'export_csv':
         export_csv($pdo);
@@ -127,6 +132,7 @@ function get_leads($pdo)
 {
     $status = $_GET['status'] ?? '';
     $response_status = $_GET['response_status'] ?? '';
+    $company_size = $_GET['company_size'] ?? '';
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'date_added_desc';
 
@@ -140,6 +146,10 @@ function get_leads($pdo)
     if ($response_status) {
         $where[] = 'response_status = ?';
         $params[] = $response_status;
+    }
+    if ($company_size) {
+        $where[] = 'company_size = ?';
+        $params[] = $company_size;
     }
     if ($search) {
         $where[] = '(business_name LIKE ? OR email LIKE ? OR contact_name LIKE ? OR city LIKE ? OR category LIKE ?)';
@@ -243,7 +253,7 @@ function update_lead($pdo)
         'category', 'city', 'source', 'status', 'response_status',
         'notes', 'feedback_summary', 'offer_sent',
         'draft_subject', 'draft_body', 'contact_page_url',
-        'first_contact_date', 'last_contact_date',
+        'first_contact_date', 'last_contact_date', 'company_size',
     ];
 
     $setClauses = [];
@@ -615,8 +625,8 @@ function import_leads($pdo)
             }
 
             $stmt = $pdo->prepare("INSERT INTO outreach_leads
-                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
-                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?)");
+                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email, company_size)
+                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?, ?)");
             $stmt->execute([
                 $biz['business_name'] ?? 'Unknown',
                 $biz['phone'] ?? null,
@@ -627,6 +637,7 @@ function import_leads($pdo)
                 $biz['places_id'] ?? null,
                 $biz['contact_page_url'] ?? null,
                 $biz['email'] ?? null,
+                $biz['company_size'] ?? null,
             ]);
 
             $id = $pdo->lastInsertId();
@@ -995,5 +1006,65 @@ function import_csv($pdo)
     json_response(['success' => true, 'imported' => $imported, 'message' => "Imported $imported leads from CSV"]);
 }
 
-// ─── AI Enrichment ───
+// ─── AI Company Size Classification ───
+
+function classify_company_sizes($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true);
+    $businesses = $data['businesses'] ?? [];
+
+    if (empty($businesses)) {
+        json_response(['success' => false, 'message' => 'No businesses to classify'], 400);
+    }
+
+    // Build a list of businesses with their details for AI classification
+    $businessList = [];
+    foreach ($businesses as $i => $biz) {
+        $entry = ($i + 1) . '. ' . ($biz['business_name'] ?? 'Unknown');
+        if (!empty($biz['category'])) $entry .= ' (Category: ' . $biz['category'] . ')';
+        if (!empty($biz['address'])) $entry .= ' - ' . $biz['address'];
+        if (!empty($biz['website'])) $entry .= ' [' . $biz['website'] . ']';
+        $businessList[] = $entry;
+    }
+
+    $systemPrompt = "You classify businesses by company size. For each business in the list, determine if it is 'small', 'medium', or 'large' based on available information.
+
+Guidelines:
+- Small: Solo operators, freelancers, local mom-and-pop shops, single-location businesses with likely fewer than 20 employees. Most local service businesses (plumbers, landscapers, cleaners, small restaurants, local retail) are small.
+- Medium: Businesses with multiple locations, established regional presence, or likely 20-200 employees. Regional chains, mid-size professional firms, established contractors with large teams.
+- Large: Major corporations, national/international chains, franchises of well-known brands, businesses with likely 200+ employees.
+
+When in doubt, lean toward 'small' for local businesses found via Google Places search.
+
+Return ONLY a JSON array of size classifications in the same order as the input list.
+Example: [\"small\", \"medium\", \"small\", \"large\"]";
+
+    $userPrompt = "Classify these businesses by size:\n\n" . implode("\n", $businessList);
+
+    $result = call_openai($systemPrompt, $userPrompt);
+
+    if (isset($result['error'])) {
+        json_response(['success' => false, 'message' => $result['error']], 500);
+    }
+
+    $content = trim($result['content']);
+    $content = preg_replace('/^```json\s*/i', '', $content);
+    $content = preg_replace('/\s*```$/', '', $content);
+
+    $sizes = json_decode($content, true);
+
+    if (!is_array($sizes)) {
+        json_response(['success' => false, 'message' => 'Failed to parse AI classification response'], 500);
+    }
+
+    // Validate and normalize sizes
+    $validSizes = ['small', 'medium', 'large'];
+    $normalized = [];
+    foreach ($sizes as $size) {
+        $s = strtolower(trim($size));
+        $normalized[] = in_array($s, $validSizes) ? $s : 'small';
+    }
+
+    json_response(['success' => true, 'sizes' => $normalized]);
+}
 

@@ -504,9 +504,7 @@
 }
 
 .draft-status-bar {
-    padding: 8px 12px;
-    background: var(--gray-50);
-    border-radius: 6px;
+    padding: 8px 0;
     margin-bottom: 14px;
     font-size: 13px;
     display: flex;
@@ -832,7 +830,6 @@
 }
 
 [data-theme="dark"] .draft-status-bar {
-    background: var(--gray-900);
 }
 
 [data-theme="dark"] .draft-actions .btn-small {

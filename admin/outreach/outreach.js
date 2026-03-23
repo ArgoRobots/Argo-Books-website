@@ -550,7 +550,7 @@ function updateDraftStatus(lead) {
     }
 
     if (lead.drafted_at) {
-        statusHtml += ` | Drafted: ${formatDateTime(lead.drafted_at)}`;
+        statusHtml += ` Drafted: ${formatDateTime(lead.drafted_at)}`;
     }
 
     bar.innerHTML = statusHtml;

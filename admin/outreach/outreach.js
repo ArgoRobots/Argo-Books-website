@@ -199,7 +199,7 @@ async function loadLeads() {
                 <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                        <button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>
+                        ${lead.approval_status !== 'sent' ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="${lead.draft_subject ? 'Regenerate Draft' : 'Generate Draft'}">${lead.draft_subject ? 'Redraft' : 'Draft'}</button>` : ''}
                     </div>
                 </td>
             </tr>
@@ -477,20 +477,24 @@ function updateDraftStatus(lead) {
         statusHtml = `<span class="badge badge-approval-sent">Sent</span> on ${formatDateTime(lead.sent_at)}`;
         sendBtn.disabled = true;
         approveBtn.disabled = true;
+        approveBtn.style.display = 'none';
     } else if (lead.approval_status === 'approved') {
         statusHtml = '<span class="badge badge-approval-approved">Approved</span> — Ready to send';
         sendBtn.disabled = !lead.email;
         approveBtn.disabled = true;
+        approveBtn.style.display = '';
         if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
     } else if (lead.draft_subject || lead.draft_body) {
         statusHtml = '<span class="badge badge-approval-draft_ready">Draft Ready</span>';
         sendBtn.disabled = !lead.email;
         approveBtn.disabled = false;
+        approveBtn.style.display = '';
         if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
     } else {
         statusHtml = '<span class="badge badge-approval-not_drafted">None</span>';
         sendBtn.disabled = true;
         approveBtn.disabled = true;
+        approveBtn.style.display = '';
     }
 
     if (lead.drafted_at) {
@@ -502,12 +506,19 @@ function updateDraftStatus(lead) {
 
     bar.innerHTML = statusHtml;
 
-    // Update Generate Draft button text based on whether draft exists
+    // Update Generate Draft button text and visibility based on status
     const genBtn = document.getElementById('btnGenerate');
-    if (lead.draft_subject || lead.draft_body) {
-        genBtn.textContent = 'Regenerate Draft';
+    if (lead.approval_status === 'sent') {
+        genBtn.style.display = 'none';
+        sendBtn.style.display = 'none';
     } else {
-        genBtn.textContent = 'Generate Draft';
+        genBtn.style.display = '';
+        sendBtn.style.display = '';
+        if (lead.draft_subject || lead.draft_body) {
+            genBtn.textContent = 'Regenerate Draft';
+        } else {
+            genBtn.textContent = 'Generate Draft';
+        }
     }
 
     // Info section

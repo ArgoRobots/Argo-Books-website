@@ -892,7 +892,15 @@ function copyDraft() {
     const subject = document.getElementById('draftSubject').value;
     const body = document.getElementById('draftBody').value;
     const text = `Subject: ${subject}\n\n${body}`;
-    navigator.clipboard.writeText(text).catch(() => {
+
+    const copied = () => {
+        const btn = event.target;
+        const original = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => btn.textContent = original, 1000);
+    };
+
+    navigator.clipboard.writeText(text).then(copied).catch(() => {
         // Fallback
         const ta = document.createElement('textarea');
         ta.value = text;
@@ -900,6 +908,7 @@ function copyDraft() {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
+        copied();
     });
 }
 

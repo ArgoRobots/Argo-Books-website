@@ -741,13 +741,13 @@ About Argo Books:
 - It is like QuickBooks but way simpler, designed so you do not need any accounting knowledge at all
 - Built specifically for small businesses, not a bloated enterprise tool
 - Features include invoicing, expense tracking, and simple bookkeeping
-- Evan is a local independent developer based in Saskatoon building this specifically for small businesses
+- Evan is a local independent software developer based in Saskatoon building this specifically for small businesses
 
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
 - Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
-- The sender's name is Evan, he is a local independent developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon developer in the email body
+- The sender's name is Evan, he is a local independent software developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon software developer in the email body
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
@@ -762,7 +762,7 @@ Rules:
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
-- Always sign off with three separate lines: \"Best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
+- Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}

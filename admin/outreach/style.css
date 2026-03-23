@@ -691,6 +691,11 @@
     color: #f59e0b;
 }
 
+.btn-blue:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* ─── Dark Theme ─── */
 [data-theme="dark"] .stat-card,
 [data-theme="dark"] .panel {
@@ -774,6 +779,27 @@
 
 [data-theme="dark"] .bulk-send-item-body {
     color: #94a3b8;
+}
+
+[data-theme="dark"] .bulk-send-list::-webkit-scrollbar,
+[data-theme="dark"] .bulk-send-item-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+[data-theme="dark"] .bulk-send-list::-webkit-scrollbar-track,
+[data-theme="dark"] .bulk-send-item-body::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+
+[data-theme="dark"] .bulk-send-list::-webkit-scrollbar-thumb,
+[data-theme="dark"] .bulk-send-item-body::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .bulk-send-list::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] .bulk-send-item-body::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }
 
 [data-theme="dark"] .tabs {

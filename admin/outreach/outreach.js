@@ -183,7 +183,7 @@ async function loadLeads() {
         tbody.innerHTML = data.leads.map(lead => `
             <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
                 <td class="checkbox-column" onclick="event.stopPropagation()">
-                    <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
+                    <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
                 </td>
                 <td>
                     <strong>${esc(lead.business_name)}</strong>
@@ -242,6 +242,13 @@ function updateBulkBar() {
             selectAll.checked = false;
             selectAll.indeterminate = true;
         }
+    }
+
+    // Disable "Draft Selected" if any selected lead already has a draft
+    const draftBtn = document.getElementById('btnDraftSelected');
+    if (draftBtn) {
+        const anyDrafted = Array.from(checked).some(cb => cb.dataset.hasDraft === '1');
+        draftBtn.disabled = anyDrafted;
     }
 }
 

@@ -196,7 +196,7 @@ include '../admin_header.php';
     <!-- Bulk Actions -->
     <div class="bulk-actions-bar" id="bulkActionsBar" style="display:none;">
         <span><strong id="selectedCount">0</strong> selected</span>
-        <button class="btn btn-small btn-blue" onclick="bulkGenerateDrafts()">Draft Selected</button>
+        <button class="btn btn-small btn-blue" id="btnDraftSelected" onclick="bulkGenerateDrafts()">Draft Selected</button>
         <button class="btn btn-small btn-blue" onclick="openBulkSendModal()">Send Email</button>
         <button class="btn btn-small btn-blue" onclick="bulkDeleteLeads()">Delete Selected</button>
     </div>

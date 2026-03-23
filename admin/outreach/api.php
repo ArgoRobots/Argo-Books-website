@@ -878,6 +878,7 @@ PERSONALIZATION (this is critical):
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
+- You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
 - Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
@@ -913,6 +914,25 @@ Return ONLY the JSON, no other text.";
             'subject' => "Quick question for {$lead['business_name']}",
             'body' => $content,
         ];
+    }
+
+    // Ensure the website URL is in the body — inject before sign-off if AI omitted it
+    if (stripos($parsed['body'], 'argorobots.com') === false) {
+        $parsed['body'] = preg_replace(
+            '/(Feel free to|Don\'t hesitate|Let me know|Reply to this)/i',
+            "You can check it out here: https://argorobots.com/\n\n$1",
+            $parsed['body'],
+            1
+        );
+        // If regex didn't match, append before sign-off
+        if (stripos($parsed['body'], 'argorobots.com') === false) {
+            $parsed['body'] = preg_replace(
+                '/(\nAll the best)/i',
+                "\n\nYou can check it out here: https://argorobots.com/\n$1",
+                $parsed['body'],
+                1
+            );
+        }
     }
 
     // Save draft to lead

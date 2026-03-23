@@ -576,6 +576,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     approved_at DATETIME DEFAULT NULL,
     sent_at DATETIME DEFAULT NULL,
     contact_page_url VARCHAR(500) DEFAULT NULL,
+    company_size ENUM('unknown','small','medium','large') DEFAULT 'unknown',
     places_id VARCHAR(255) DEFAULT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_outreach_status (status),

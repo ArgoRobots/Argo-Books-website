@@ -164,6 +164,17 @@ include '../admin_header.php';
                 </select>
             </div>
             <div class="filter-group">
+                <label for="filterSize">Company Size</label>
+                <select id="filterSize" onchange="loadLeads()">
+                    <option value="">All</option>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                    <option value="unknown">Unknown</option>
+                    <option value="exclude_large">Exclude Large</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <label for="filterSort">Sort</label>
                 <select id="filterSort" onchange="loadLeads()">
                     <option value="date_added_desc">Newest First</option>
@@ -291,6 +302,15 @@ include '../admin_header.php';
                         <select id="detailOfferSent">
                             <option value="0">No</option>
                             <option value="1">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Company Size</label>
+                        <select id="detailCompanySize">
+                            <option value="unknown">Unknown</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
                         </select>
                     </div>
                     <div class="form-group">

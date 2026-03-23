@@ -127,6 +127,7 @@ function get_leads($pdo)
 {
     $status = $_GET['status'] ?? '';
     $response_status = $_GET['response_status'] ?? '';
+    $company_size = $_GET['company_size'] ?? '';
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'date_added_desc';
 
@@ -140,6 +141,13 @@ function get_leads($pdo)
     if ($response_status) {
         $where[] = 'response_status = ?';
         $params[] = $response_status;
+    }
+    if ($company_size === 'exclude_large') {
+        $where[] = 'company_size != ?';
+        $params[] = 'large';
+    } elseif ($company_size) {
+        $where[] = 'company_size = ?';
+        $params[] = $company_size;
     }
     if ($search) {
         $where[] = '(business_name LIKE ? OR email LIKE ? OR contact_name LIKE ? OR city LIKE ? OR category LIKE ?)';
@@ -240,7 +248,7 @@ function update_lead($pdo)
 
     $fields = [
         'business_name', 'contact_name', 'email', 'phone', 'website', 'address',
-        'category', 'city', 'source', 'status', 'response_status',
+        'category', 'city', 'source', 'status', 'response_status', 'company_size',
         'notes', 'feedback_summary', 'offer_sent',
         'draft_subject', 'draft_body', 'contact_page_url',
         'first_contact_date', 'last_contact_date',
@@ -897,7 +905,7 @@ function export_csv($pdo)
     $output = fopen('php://output', 'w');
 
     $headers = ['ID', 'Business Name', 'Contact Name', 'Email', 'Phone', 'Website', 'Address',
-        'Category', 'City', 'Source', 'Status', 'Response Status',
+        'Category', 'City', 'Source', 'Status', 'Response Status', 'Company Size',
         'Date Added', 'First Contact', 'Last Contact', 'Offer Sent',
         'Notes', 'Feedback Summary', 'Draft Subject', 'Draft Body'];
     fputcsv($output, $headers);
@@ -907,6 +915,7 @@ function export_csv($pdo)
             $lead['id'], $lead['business_name'], $lead['contact_name'], $lead['email'],
             $lead['phone'], $lead['website'], $lead['address'], $lead['category'],
             $lead['city'], $lead['source'], $lead['status'], $lead['response_status'],
+            $lead['company_size'] ?? 'unknown',
             $lead['date_added'], $lead['first_contact_date'],
             $lead['last_contact_date'], $lead['offer_sent'],
             $lead['notes'], $lead['feedback_summary'], $lead['draft_subject'], $lead['draft_body'],

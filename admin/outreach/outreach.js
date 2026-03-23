@@ -13,11 +13,13 @@ function updateUrlParams() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
+    const size = document.getElementById('filterSize').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.set('search', search);
     if (status) params.set('status', status);
     if (response) params.set('response', response);
+    if (size) params.set('size', size);
     if (sort && sort !== 'date_added_desc') params.set('sort', sort);
 
     const newUrl = params.toString()
@@ -31,6 +33,7 @@ function restoreFiltersFromUrl() {
     if (params.has('search')) document.getElementById('filterSearch').value = params.get('search');
     if (params.has('status')) document.getElementById('filterStatus').value = params.get('status');
     if (params.has('response')) document.getElementById('filterResponse').value = params.get('response');
+    if (params.has('size')) document.getElementById('filterSize').value = params.get('size');
     if (params.has('sort')) document.getElementById('filterSort').value = params.get('sort');
 }
 
@@ -154,11 +157,13 @@ async function loadLeads() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
+    const size = document.getElementById('filterSize').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.search = search;
     if (status) params.status = status;
     if (response) params.response_status = response;
+    if (size) params.company_size = size;
     if (sort) params.sort = sort;
 
     // Persist filters to URL
@@ -439,6 +444,7 @@ async function openLeadDetail(id) {
         document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
 
         document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
+        document.getElementById('detailCompanySize').value = lead.company_size || 'unknown';
         document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
         document.getElementById('detailNotes').value = lead.notes || '';
         document.getElementById('detailFeedback').value = lead.feedback_summary || '';
@@ -534,6 +540,7 @@ async function saveLeadDetails() {
         response_status: document.getElementById('detailResponseStatus').value,
 
         offer_sent: document.getElementById('detailOfferSent').value,
+        company_size: document.getElementById('detailCompanySize').value,
         contact_page_url: document.getElementById('detailContactPageUrl').value,
         notes: document.getElementById('detailNotes').value,
         feedback_summary: document.getElementById('detailFeedback').value,

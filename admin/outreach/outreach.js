@@ -888,13 +888,12 @@ function togglePreview() {
     }
 }
 
-function copyDraft() {
+function copyDraft(btn) {
     const subject = document.getElementById('draftSubject').value;
     const body = document.getElementById('draftBody').value;
     const text = `Subject: ${subject}\n\n${body}`;
 
     const copied = () => {
-        const btn = event.target;
         const original = btn.textContent;
         btn.textContent = 'Copied';
         setTimeout(() => btn.textContent = original, 1000);

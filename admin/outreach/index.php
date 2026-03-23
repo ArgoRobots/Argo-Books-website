@@ -360,7 +360,7 @@ include '../admin_header.php';
                     <div class="draft-actions">
                         <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
                         <button class="btn btn-blue" onclick="togglePreview()">Preview</button>
-                        <button class="btn btn-blue" onclick="copyDraft()">Copy</button>
+                        <button class="btn btn-blue" onclick="copyDraft(this)">Copy</button>
                         <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
                     </div>
                     <div class="draft-info" id="draftInfo"></div>

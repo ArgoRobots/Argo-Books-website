@@ -40,7 +40,7 @@
   background: var(--white);
   padding: 15px 20px;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-default);
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -68,7 +68,7 @@
   background: var(--white);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px var(--shadow-default);
   width: 80%;
   margin: auto;
 }
@@ -325,7 +325,7 @@
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--overlay-darker);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -334,7 +334,7 @@
 .modal-content {
   background-color: var(--white);
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px var(--shadow-default);
   width: 90%;
   max-width: 600px;
 }
@@ -438,7 +438,7 @@
 
 .offense-dot.green {
   background-color: var(--emerald-500);
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 0 0 2px var(--green-alpha-15);
 }
 
 .offense-indicator:has(.offense-dot.green) {
@@ -449,7 +449,7 @@
 
 .offense-dot.yellow {
   background-color: var(--amber-500);
-  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+  box-shadow: 0 0 0 2px var(--amber-alpha-15);
 }
 
 .offense-indicator:has(.offense-dot.yellow) {
@@ -460,7 +460,7 @@
 
 .offense-dot.red {
   background-color: var(--red-500);
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 0 2px var(--red-alpha-15);
 }
 
 .offense-indicator:has(.offense-dot.red) {

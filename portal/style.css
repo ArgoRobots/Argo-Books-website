@@ -42,7 +42,7 @@ body {
 
 .portal-header {
     background: linear-gradient(135deg, var(--hero-gradient-start), var(--hero-gradient-end));
-    color: white;
+    color: var(--white);
     padding: 24px 20px;
 }
 
@@ -85,18 +85,18 @@ body {
     gap: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--white-alpha-80);
     text-decoration: none;
     padding: 6px 14px;
     border-radius: 6px;
-    background: rgba(255, 255, 255, 0.12);
+    background: var(--white-alpha-12);
     transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .portal-all-invoices-link:hover {
-    background: rgba(255, 255, 255, 0.22);
-    color: #ffffff;
+    background: var(--white-alpha-22);
+    color: var(--white);
 }
 
 .portal-all-invoices-link svg {
@@ -134,7 +134,7 @@ body {
     background: var(--white);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
 }
 
@@ -152,7 +152,7 @@ body {
     padding: 14px 24px;
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
     flex-wrap: wrap;
 }
@@ -170,7 +170,7 @@ body {
     background: var(--white);
     border-radius: 12px;
     padding: 28px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
 }
 
@@ -303,7 +303,7 @@ body {
 .invoice-items-section {
     background: var(--white);
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
     overflow: hidden;
 }
@@ -400,7 +400,7 @@ body {
     background: var(--white);
     border-radius: 12px;
     padding: 20px 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
 }
 
@@ -425,7 +425,7 @@ body {
     background: var(--white);
     border-radius: 12px;
     padding: 28px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
 }
 
@@ -532,7 +532,7 @@ body {
 .form-control:focus {
     outline: none;
     border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
 .card-element-container {
@@ -568,7 +568,7 @@ body {
 .btn-submit:hover {
     background: var(--blueHover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 4px 12px var(--blue-alpha-30);
 }
 
 .btn-submit:disabled {
@@ -659,7 +659,7 @@ body {
     background: var(--white);
     border-radius: 12px;
     padding: 40px 28px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     text-align: center;
     margin-bottom: 20px;
     animation: fadeInUp 0.4s ease;
@@ -822,14 +822,14 @@ body {
 .invoice-card {
     background: var(--white);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
     overflow: hidden;
     transition: box-shadow 0.2s ease;
     border-left: 4px solid var(--primary-blue);
 }
 
 .invoice-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-default);
 }
 
 .invoice-card.overdue {
@@ -939,7 +939,7 @@ body {
     background: var(--white);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
 }
 
 .all-invoices-table thead th {
@@ -987,7 +987,7 @@ body {
     padding: 48px 24px;
     background: var(--white);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px var(--shadow);
 }
 
 .empty-state svg {
@@ -1010,7 +1010,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.96);
+    background-color: var(--white-alpha-96);
     z-index: 9999;
     display: flex;
     flex-direction: column;

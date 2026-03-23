@@ -24,7 +24,7 @@ body.docs-landing {
    ========================================== */
 .hero {
   position: relative;
-  background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 50%, #1a365d 100%);
+  background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 50%, var(--navy-1a365d) 100%);
   padding: 100px 24px 80px;
 }
 
@@ -40,9 +40,9 @@ body.docs-landing {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--white-alpha-10);
+  border: 1px solid var(--white-alpha-20);
+  color: var(--white-alpha-90);
   padding: 8px 16px;
   border-radius: 100px;
   font-size: 0.875rem;
@@ -65,7 +65,7 @@ body.docs-landing {
 
 .hero-subtitle {
   font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--white-alpha-70);
   margin: 0 0 40px;
   line-height: 1.5;
 }
@@ -95,12 +95,12 @@ body.docs-landing {
   width: 100%;
   padding: 18px 100px 18px 56px;
   font-size: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid var(--white-alpha-10);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--white-alpha-95);
   color: var(--gray-900);
   transition: all 0.2s ease;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 24px var(--shadow-xl);
 }
 
 .hero-search input::placeholder {
@@ -110,7 +110,7 @@ body.docs-landing {
 .hero-search input:focus {
   outline: none;
   border-color: var(--primary-blue);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), 0 0 0 4px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 4px 24px var(--shadow-xl), 0 0 0 4px var(--blue-alpha-20);
 }
 
 .hero-search .search-shortcut {
@@ -136,7 +136,7 @@ body.docs-landing {
 .floating-shape {
   position: absolute;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(147, 51, 234, 0.2));
+  background: linear-gradient(135deg, var(--blue-alpha-30), var(--violet-alpha-20));
   filter: blur(60px);
 }
 
@@ -152,7 +152,7 @@ body.docs-landing {
   height: 300px;
   bottom: -50px;
   right: -50px;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
+  background: linear-gradient(135deg, var(--green-alpha-20), var(--blue-alpha-20));
 }
 
 .shape-3 {
@@ -160,7 +160,7 @@ body.docs-landing {
   height: 200px;
   top: 50%;
   left: 60%;
-  background: linear-gradient(135deg, rgba(236, 72, 153, 0.15), rgba(147, 51, 234, 0.15));
+  background: linear-gradient(135deg, var(--pink-alpha-15), var(--violet-alpha-15));
 }
 
 /* ==========================================
@@ -188,14 +188,14 @@ body.docs-landing {
   font-size: 0.9375rem;
   font-weight: 500;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 16px var(--shadow), 0 1px 3px var(--shadow-sm);
   transition: all 0.2s ease;
   border: 1px solid var(--gray-100);
 }
 
 .quick-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 24px var(--shadow-md2);
   color: var(--primary-blue);
   border-color: var(--blue-200);
 }
@@ -301,7 +301,7 @@ body.docs-landing {
 
 .doc-card:hover {
   border-color: var(--gray-300);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 8px 24px var(--shadow-md);
   transform: translateY(-4px);
 }
 
@@ -401,7 +401,7 @@ body.docs-landing {
 .help-button:hover {
   background: var(--blueHover);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px var(--blue-alpha-30);
 }
 
 /* ==========================================
@@ -511,7 +511,7 @@ body.docs-page {
 /* Force header to be fixed with light gray background on doc pages */
 body.docs-page header {
   position: fixed !important;
-  background: #f7f7f8 !important;
+  background: var(--neutral-f7f7f8) !important;
   border-bottom: 1px solid var(--gray-200);
   box-shadow: none !important;
 }
@@ -536,7 +536,7 @@ body.docs-page header .menu-icon .nav-icon:after {
 }
 
 body.docs-page .account-avatar {
-  border-color: rgba(0, 0, 0, 0.15);
+  border-color: var(--shadow-lg);
 }
 
 /* ==========================================
@@ -562,7 +562,7 @@ body.docs-page .account-avatar {
   overflow-y: auto;
   border-right: 1px solid var(--gray-200);
   padding: 16px 0;
-  background: #f7f7f8;
+  background: var(--neutral-f7f7f8);
   z-index: 50;
 }
 
@@ -627,7 +627,7 @@ body.docs-page .account-avatar {
 }
 
 .nav-section-toggle:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--shadow-xs);
   color: var(--gray-900);
 }
 
@@ -675,13 +675,13 @@ body.docs-page .account-avatar {
 
 .nav-links a:hover {
   color: var(--gray-900);
-  background: rgba(0, 0, 0, 0.04);
+  background: var(--shadow-xs);
 }
 
 .nav-links a.active {
   color: var(--primary-blue);
   font-weight: 500;
-  background: rgba(59, 130, 246, 0.08);
+  background: var(--blue-alpha-08);
   border-radius: 6px;
   position: relative;
 }
@@ -1110,7 +1110,7 @@ body.docs-page .account-avatar {
 
 .version-card:hover {
   border-color: var(--gray-300);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 16px var(--shadow-md);
 }
 
 .card-header {
@@ -1164,7 +1164,7 @@ body.docs-page .account-avatar {
 
 .version-card.premium {
   border: 2px solid var(--purple-500);
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.02) 0%, rgba(147, 51, 234, 0.05) 100%);
+  background: linear-gradient(135deg, var(--violet-alpha-02) 0%, var(--violet-alpha-05) 100%);
 }
 
 .version-price {
@@ -1317,19 +1317,19 @@ body.docs-page .account-avatar {
   align-items: center;
   justify-content: center;
   gap: 5px;
-  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 20px var(--blue-alpha-40);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .sidebar-toggle:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 6px 24px var(--blue-alpha-50);
 }
 
 .hamburger-line {
   width: 24px;
   height: 3px;
-  background: white;
+  background: var(--white);
   border-radius: 2px;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
@@ -1377,7 +1377,7 @@ body.docs-page .account-avatar {
     z-index: 1000;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 20px var(--shadow-default);
     border-right: none;
   }
 
@@ -1404,7 +1404,7 @@ body.docs-page .account-avatar {
     left: 300px;
     width: calc(100vw - 300px);
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--overlay-dark);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
@@ -1484,7 +1484,7 @@ body.docs-page .account-avatar {
 .search-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--overlay-dark);
   z-index: 2000;
   display: none;
   align-items: flex-start;
@@ -1523,7 +1523,7 @@ body.docs-page .account-avatar {
   border-radius: 12px 12px 0 0;
   background: var(--white);
   color: var(--gray-900);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px var(--overlay-light);
 }
 
 .search-overlay input:focus {
@@ -1545,7 +1545,7 @@ body.docs-page .account-avatar {
 .search-overlay .search-results {
   border-radius: 0 0 12px 12px;
   border-top: 1px solid var(--gray-200);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px var(--overlay-light);
 }
 
 /* Footer override for sub-pages */

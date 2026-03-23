@@ -234,7 +234,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .post-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px var(--shadow);
   transform: translateY(-2px);
 }
 
@@ -419,15 +419,15 @@ header .header-inner .menu-container .menu .community:after {
 /* Highlighted post */
 @keyframes highlight-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+    box-shadow: 0 0 0 0 var(--blue-600-alpha-70);
   }
 
   70% {
-    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 10px var(--blue-600-alpha-0);
   }
 
   100% {
-    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+    box-shadow: 0 0 0 0 var(--blue-600-alpha-0);
   }
 }
 
@@ -470,7 +470,7 @@ header .header-inner .menu-container .menu .community:after {
   display: inline-block;
   width: 30px;
   height: 30px;
-  border: 3px solid rgba(37, 99, 235, 0.3);
+  border: 3px solid var(--blue-600-alpha-30);
   border-radius: 50%;
   border-top-color: var(--primary-blue);
   animation: spin 1s linear infinite;
@@ -503,7 +503,7 @@ header .header-inner .menu-container .menu .community:after {
 .filter-select:focus {
   outline: none;
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 0 1px var(--blue-600-alpha-20);
 }
 
 /* Responsive adjustments */

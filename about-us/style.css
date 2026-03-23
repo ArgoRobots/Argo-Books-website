@@ -246,7 +246,7 @@ body {
 
 .mission-image img {
   width: 100%;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 25px 50px -12px var(--shadow-lg);
 }
 
 /* ========================================
@@ -288,13 +288,13 @@ body {
   padding: 28px;
   border-radius: 16px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-sm);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feature-item:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px var(--shadow-default);
 }
 
 .feature-icon {
@@ -373,7 +373,7 @@ body {
 .story-image img {
   width: 100%;
   border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 25px 50px -12px var(--shadow-lg);
 }
 
 .image-badge {
@@ -389,7 +389,7 @@ body {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--gray-600);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-default);
 }
 
 .image-badge svg {
@@ -466,13 +466,13 @@ body {
   padding: 32px;
   border-radius: 16px;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px var(--shadow-sm);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .value-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 32px var(--shadow-default);
 }
 
 .value-icon {
@@ -623,7 +623,7 @@ body {
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 20px var(--blue-alpha-30);
 }
 
 .btn-secondary {

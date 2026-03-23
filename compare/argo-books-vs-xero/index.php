@@ -324,6 +324,10 @@
                 <h3>An honest take</h3>
                 <p>Xero is a polished, globally popular platform with strong app integrations, unlimited users on every plan, and a clean UI. If your business already works with an accountant or needs deep third-party integrations, Xero is a solid choice.</p>
                 <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $55+/month for unlimited invoices — Argo Books is built for you.</p>
+                <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
+                    <span>Get Started Now</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

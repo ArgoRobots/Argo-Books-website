@@ -306,6 +306,10 @@
                 <h3>An honest take</h3>
                 <p>ZipBooks was acquired by Divvy, which was later acquired by BILL Holdings, and since the acquisitions, the product appears to have little active development or support. Users have reported issues with bugs, missing features, and difficulty reaching customer service — raising concerns about the long-term viability of the platform.</p>
                 <p>If you're looking for a simple bookkeeping tool that's actively maintained, Argo Books offers AI receipt scanning, predictive analytics, inventory management, and local data storage at a lower premium price — plus offline access so you're never locked out of your own data.</p>
+                <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
+                    <span>Get Started Now</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

@@ -327,6 +327,10 @@
                 <span class="section-label">An Honest Take</span>
                 <h2>QuickBooks is powerful — but is it right for you?</h2>
                 <p class="section-desc">QuickBooks is a mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, it's a solid choice. But as a publicly traded company, Intuit's priorities don't always align with small business owners — and it shows in the rising prices, aggressive feature gating, and complexity you don't need. Argo Books is built for you. Simple pricing, no upsells, and every feature included in one plan.</p>
+                <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
+                    <span>Get Started Now</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

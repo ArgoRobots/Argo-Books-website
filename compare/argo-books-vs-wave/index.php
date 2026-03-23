@@ -309,6 +309,10 @@
                 <h3>An honest take</h3>
                 <p>Wave is an excellent free option for freelancers and service-based businesses that need invoicing, basic accounting, and bank transaction imports. If those are your core needs, Wave is a solid choice.</p>
                 <p>But if you sell physical products and need inventory management, offline access, predictive analytics, or biometric security — features Wave doesn't offer — Argo Books is built for you.</p>
+                <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
+                    <span>Get Started Now</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

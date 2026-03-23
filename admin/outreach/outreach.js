@@ -357,9 +357,10 @@ function updateDraftStatus(lead) {
         approveBtn.disabled = true;
         if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
     } else if (lead.draft_subject || lead.draft_body) {
-        statusHtml = '<span class="badge badge-approval-draft_ready">Draft Ready</span> — Review and approve before sending';
-        sendBtn.disabled = true;
+        statusHtml = '<span class="badge badge-approval-draft_ready">Draft Ready</span>';
+        sendBtn.disabled = !lead.email;
         approveBtn.disabled = false;
+        if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
     } else {
         statusHtml = '<span class="badge badge-approval-not_drafted">None</span>';
         sendBtn.disabled = true;

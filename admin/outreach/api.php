@@ -846,10 +846,6 @@ function send_outreach_email($pdo)
         json_response(['success' => false, 'message' => 'Lead not found'], 404);
     }
 
-    if ($lead['approval_status'] !== 'approved') {
-        json_response(['success' => false, 'message' => 'Draft must be approved before sending'], 400);
-    }
-
     if (empty($lead['email'])) {
         json_response(['success' => false, 'message' => 'No email address for this lead'], 400);
     }

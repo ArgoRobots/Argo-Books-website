@@ -452,11 +452,7 @@ async function openLeadDetail(id) {
         document.getElementById('detailFeedback').value = lead.feedback_summary || '';
 
         // Meta info
-        let meta = `Added: ${formatDateTime(lead.date_added)}`;
-        if (lead.first_contact_date) meta += ` | First contact: ${formatDateTime(lead.first_contact_date)}`;
-        if (lead.last_contact_date) meta += ` | Last contact: ${formatDateTime(lead.last_contact_date)}`;
-        if (lead.sent_at) meta += ` | Last sent: ${formatDateTime(lead.sent_at)}`;
-        document.getElementById('detailMeta').textContent = meta;
+        // Meta info removed from UI
 
         // Draft tab
         document.getElementById('draftSubject').value = lead.draft_subject || '';

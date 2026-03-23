@@ -13,13 +13,11 @@ function updateUrlParams() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
-    const approval = document.getElementById('filterApproval').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.set('search', search);
     if (status) params.set('status', status);
     if (response) params.set('response', response);
-    if (approval) params.set('approval', approval);
     if (sort && sort !== 'date_added_desc') params.set('sort', sort);
 
     const newUrl = params.toString()
@@ -33,7 +31,6 @@ function restoreFiltersFromUrl() {
     if (params.has('search')) document.getElementById('filterSearch').value = params.get('search');
     if (params.has('status')) document.getElementById('filterStatus').value = params.get('status');
     if (params.has('response')) document.getElementById('filterResponse').value = params.get('response');
-    if (params.has('approval')) document.getElementById('filterApproval').value = params.get('approval');
     if (params.has('sort')) document.getElementById('filterSort').value = params.get('sort');
 }
 
@@ -137,7 +134,6 @@ async function loadStats() {
             document.getElementById('statTotal').textContent = s.total || 0;
             document.getElementById('statNew').textContent = s.new_leads || 0;
             document.getElementById('statDraftsPending').textContent = s.drafts_pending || 0;
-            document.getElementById('statApproved').textContent = s.approved || 0;
             document.getElementById('statContacted').textContent = s.contacted || 0;
             document.getElementById('statReplied').textContent = s.replied || 0;
             document.getElementById('statInterested').textContent = s.interested || 0;
@@ -158,13 +154,11 @@ async function loadLeads() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
-    const approval = document.getElementById('filterApproval').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.search = search;
     if (status) params.status = status;
     if (response) params.response_status = response;
-    if (approval) params.approval_status = approval;
     if (sort) params.sort = sort;
 
     // Persist filters to URL
@@ -194,12 +188,11 @@ async function loadLeads() {
                 <td>${esc(lead.city || '')}</td>
                 <td>${esc(lead.category || '')}</td>
                 <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
-                <td><span class="badge badge-approval-${lead.approval_status && lead.approval_status !== 'none' ? lead.approval_status : 'not_drafted'}">${formatApproval(lead.approval_status || 'not_drafted')}</span></td>
 
                 <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                        ${!lead.draft_subject && lead.approval_status !== 'sent' ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
+                        ${!lead.draft_subject && lead.status !== 'contacted' ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
                     </div>
                 </td>
             </tr>
@@ -477,56 +470,36 @@ async function openLeadDetail(id) {
 function updateDraftStatus(lead) {
     const bar = document.getElementById('draftStatusBar');
     const sendBtn = document.getElementById('btnSend');
-    const approveBtn = document.getElementById('btnApprove');
+    const genBtn = document.getElementById('btnGenerate');
 
     let statusHtml = '';
-    if (lead.approval_status === 'sent') {
-        statusHtml = `<span class="badge badge-approval-sent">Sent</span> on ${formatDateTime(lead.sent_at)}`;
+    const isSent = lead.status === 'contacted' || lead.status === 'replied' || lead.status === 'interested';
+
+    if (isSent && lead.sent_at) {
+        statusHtml = `<span class="badge badge-status-contacted">Sent</span> on ${formatDateTime(lead.sent_at)}`;
         sendBtn.disabled = true;
-        approveBtn.disabled = true;
-        approveBtn.style.display = 'none';
-    } else if (lead.approval_status === 'approved') {
-        statusHtml = '<span class="badge badge-approval-approved">Approved</span> — Ready to send';
-        sendBtn.disabled = !lead.email;
-        approveBtn.disabled = true;
-        approveBtn.style.display = '';
-        if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
+        genBtn.style.display = 'none';
+        sendBtn.style.display = 'none';
     } else if (lead.draft_subject || lead.draft_body) {
-        statusHtml = '<span class="badge badge-approval-draft_ready">Draft Ready</span>';
+        statusHtml = '<span class="badge badge-status-draft_generated">Draft Ready</span>';
         sendBtn.disabled = !lead.email;
-        approveBtn.disabled = false;
-        approveBtn.style.display = '';
+        genBtn.style.display = '';
+        sendBtn.style.display = '';
+        genBtn.textContent = 'Regenerate Draft';
         if (!lead.email) statusHtml += ' <span class="text-muted">(no email address)</span>';
     } else {
-        statusHtml = '<span class="badge badge-approval-not_drafted">None</span>';
+        statusHtml = '<span class="badge badge-status-new">No Draft</span>';
         sendBtn.disabled = true;
-        approveBtn.disabled = true;
-        approveBtn.style.display = '';
+        genBtn.style.display = '';
+        sendBtn.style.display = '';
+        genBtn.textContent = 'Generate Draft';
     }
 
     if (lead.drafted_at) {
         statusHtml += ` | Drafted: ${formatDateTime(lead.drafted_at)}`;
     }
-    if (lead.approved_at) {
-        statusHtml += ` | Approved: ${formatDateTime(lead.approved_at)}`;
-    }
 
     bar.innerHTML = statusHtml;
-
-    // Update Generate Draft button text and visibility based on status
-    const genBtn = document.getElementById('btnGenerate');
-    if (lead.approval_status === 'sent') {
-        genBtn.style.display = 'none';
-        sendBtn.style.display = 'none';
-    } else {
-        genBtn.style.display = '';
-        sendBtn.style.display = '';
-        if (lead.draft_subject || lead.draft_body) {
-            genBtn.textContent = 'Regenerate Draft';
-        } else {
-            genBtn.textContent = 'Generate Draft';
-        }
-    }
 
     // Info section
     let info = '';
@@ -803,36 +776,9 @@ async function quickGenerateDraft(id, btn) {
 }
 
 // ─── Email Workflow ───
-async function approveDraft() {
-    if (!currentLeadId) return;
-
-    // Save any edits first
-    const subject = document.getElementById('draftSubject').value.trim();
-    const body = document.getElementById('draftBody').value.trim();
-    if (!subject || !body) { notify('Subject and body are required', 'error'); return; }
-
-    try {
-        // Save draft edits
-        await api('update_lead', {
-            method: 'POST',
-            body: { id: currentLeadId, draft_subject: subject, draft_body: body }
-        });
-
-        const result = await api('approve_draft', { method: 'POST', body: { id: currentLeadId } });
-        notify(result.message, result.success ? 'success' : 'error');
-        if (result.success) {
-            openLeadDetail(currentLeadId);
-            loadLeads();
-            loadStats();
-        }
-    } catch (e) {
-        notify(e.message, 'error');
-    }
-}
-
 async function sendEmail() {
     if (!currentLeadId) return;
-    if (!confirm('Send this approved email now?')) return;
+    if (!confirm('Send this email now?')) return;
 
     const btn = document.getElementById('btnSend');
     btn.disabled = true;
@@ -1013,10 +959,6 @@ function formatStatus(status) {
     return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function formatApproval(status) {
-    if (status === 'not_drafted' || status === 'none') return 'None';
-    return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 function formatActionType(type) {
     return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());

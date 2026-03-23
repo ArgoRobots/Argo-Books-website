@@ -33,7 +33,6 @@
 
 .stat-new { color: var(--blue-500); }
 .stat-pending { color: var(--amber-500); }
-.stat-approved { color: var(--emerald-500); }
 .stat-contacted { color: var(--purple-500); }
 .stat-replied { color: var(--green-600); }
 .stat-interested { color: var(--emerald-700); }
@@ -271,8 +270,6 @@
 .badge-status-researching { background: var(--sky-100); color: var(--sky-700); }
 .badge-status-ready_to_contact { background: var(--amber-100); color: var(--amber-700); }
 .badge-status-draft_generated { background: var(--purple-100); color: var(--purple-700); }
-.badge-status-awaiting_approval { background: var(--amber-100); color: var(--amber-800); }
-.badge-status-approved { background: var(--emerald-100); color: var(--emerald-700); }
 .badge-status-contacted { background: var(--purple-100); color: var(--purple-600); }
 .badge-status-replied { background: var(--green-100); color: var(--green-700); }
 .badge-status-interested { background: var(--emerald-100); color: var(--emerald-800); }
@@ -280,12 +277,6 @@
 
 .badge-status-onboarded { background: var(--green-100); color: var(--green-800); }
 
-/* Approval badges */
-.badge-approval-not_drafted { background: var(--gray-100); color: var(--gray-600); }
-.badge-approval-draft_ready { background: var(--blue-100); color: var(--blue-700); }
-.badge-approval-needs_review { background: var(--amber-100); color: var(--amber-700); }
-.badge-approval-approved { background: var(--emerald-100); color: var(--emerald-700); }
-.badge-approval-sent { background: var(--green-100); color: var(--green-800); }
 
 /* ─── Filters ─── */
 .filters-container {

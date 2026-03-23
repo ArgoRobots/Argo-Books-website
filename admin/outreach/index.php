@@ -40,10 +40,6 @@ include '../admin_header.php';
         <div class="stat-value stat-pending" id="statDraftsPending">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Approved</div>
-        <div class="stat-value stat-approved" id="statApproved">0</div>
-    </div>
-    <div class="stat-card">
         <div class="stat-label">Contacted</div>
         <div class="stat-value stat-contacted" id="statContacted">0</div>
     </div>
@@ -150,8 +146,6 @@ include '../admin_header.php';
                     <option value="researching">Researching</option>
                     <option value="ready_to_contact">Ready to Contact</option>
                     <option value="draft_generated">Draft Generated</option>
-                    <option value="awaiting_approval">Awaiting Approval</option>
-                    <option value="approved">Approved</option>
                     <option value="contacted">Contacted</option>
                     <option value="replied">Replied</option>
                     <option value="interested">Interested</option>
@@ -167,17 +161,6 @@ include '../admin_header.php';
                     <option value="positive">Positive</option>
                     <option value="neutral">Neutral</option>
                     <option value="negative">Negative</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label for="filterApproval">Approval</label>
-                <select id="filterApproval" onchange="loadLeads()">
-                    <option value="">All</option>
-                    <option value="not_drafted">Not Drafted</option>
-                    <option value="draft_ready">Draft Ready</option>
-                    <option value="needs_review">Needs Review</option>
-                    <option value="approved">Approved</option>
-                    <option value="sent">Sent</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -213,7 +196,6 @@ include '../admin_header.php';
                     <th>City</th>
                     <th>Category</th>
                     <th>Status</th>
-                    <th>Approval</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -288,8 +270,6 @@ include '../admin_header.php';
                             <option value="researching">Researching</option>
                             <option value="ready_to_contact">Ready to Contact</option>
                             <option value="draft_generated">Draft Generated</option>
-                            <option value="awaiting_approval">Awaiting Approval</option>
-                            <option value="approved">Approved</option>
                             <option value="contacted">Contacted</option>
                             <option value="replied">Replied</option>
                             <option value="interested">Interested</option>
@@ -353,7 +333,6 @@ include '../admin_header.php';
                         <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
                         <button class="btn btn-blue" onclick="togglePreview()">Preview</button>
                         <button class="btn btn-blue" onclick="copyDraft()">Copy</button>
-                        <button class="btn btn-blue" onclick="approveDraft()" id="btnApprove">Approve</button>
                         <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
                     </div>
                     <div class="draft-info" id="draftInfo"></div>

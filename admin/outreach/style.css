@@ -91,6 +91,7 @@
     gap: 12px;
     align-items: flex-end;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .form-group {
@@ -322,6 +323,7 @@
     gap: 12px;
     align-items: flex-end;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .filter-group {

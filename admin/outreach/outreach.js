@@ -874,19 +874,6 @@ async function sendEmail() {
     }
 }
 
-function togglePreview() {
-    const preview = document.getElementById('draftPreview');
-    if (preview.style.display === 'none') {
-        const subject = document.getElementById('draftSubject').value;
-        const body = document.getElementById('draftBody').value;
-        document.getElementById('draftPreviewContent').innerHTML =
-            '<p><strong>Subject:</strong> ' + esc(subject) + '</p><hr>' +
-            '<p>' + esc(body).replace(/\n/g, '<br>') + '</p>';
-        preview.style.display = 'block';
-    } else {
-        preview.style.display = 'none';
-    }
-}
 
 function copyDraft(btn) {
     const subject = document.getElementById('draftSubject').value;

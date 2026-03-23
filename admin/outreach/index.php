@@ -353,14 +353,9 @@ include '../admin_header.php';
                         <label>Message Body</label>
                         <textarea id="draftBody" rows="12" placeholder="Email body..."></textarea>
                     </div>
-                    <div id="draftPreview" class="draft-preview" style="display:none;">
-                        <h4>Preview</h4>
-                        <div id="draftPreviewContent"></div>
-                    </div>
                     <div class="draft-actions">
                         <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
-                        <button class="btn btn-blue" onclick="togglePreview()">Preview</button>
-                        <button class="btn btn-blue" onclick="copyDraft(this)">Copy</button>
+                        <button class="btn btn-blue btn-small" onclick="copyDraft(this)">Copy</button>
                         <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
                     </div>
                     <div class="draft-info" id="draftInfo"></div>

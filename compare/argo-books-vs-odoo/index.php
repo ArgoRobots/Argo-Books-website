@@ -312,6 +312,10 @@
                 <h3>An honest take</h3>
                 <p>Odoo is a powerful, full-featured ERP platform with CRM, HR, manufacturing, e-commerce, and hundreds of other modules. If your business needs an all-in-one enterprise system, Odoo is hard to beat.</p>
                 <p>But if you're a small business that just needs straightforward finance management, inventory tracking, and invoicing without configuring an entire ERP — Argo Books gets you there in minutes, not weeks.</p>
+                <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
+                    <span>Get Started Now</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

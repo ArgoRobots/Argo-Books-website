@@ -566,8 +566,16 @@ body {
   margin: 0 0 12px;
 }
 
-.honest-card p:last-child {
+.honest-card p:last-of-type {
   margin-bottom: 0;
+}
+
+.honest-take-cta {
+  margin-top: 24px;
+}
+
+.honest-take-alt .honest-take-cta {
+  margin-top: 28px;
 }
 
 /* ========================================

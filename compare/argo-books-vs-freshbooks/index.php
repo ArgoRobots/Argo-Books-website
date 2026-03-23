@@ -318,6 +318,10 @@
                 <h3>An honest take</h3>
                 <p>FreshBooks excels at invoicing, time tracking, and client management — especially for freelancers and service-based businesses. If those are your core needs, FreshBooks is a great tool.</p>
                 <p>But if you're a product-based small business that needs inventory management, offline access, and straightforward finance tracking without paying $26+ CAD/month, Argo Books is built for you.</p>
+                <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
+                    <span>Get Started Now</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

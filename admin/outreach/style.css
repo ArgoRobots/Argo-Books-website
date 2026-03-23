@@ -298,7 +298,6 @@
 
 /* Status badges */
 .badge-status-new { background: var(--blue-100); color: var(--blue-700); }
-.badge-status-researching { background: var(--sky-100); color: var(--sky-700); }
 .badge-status-ready_to_contact { background: var(--amber-100); color: var(--amber-700); }
 .badge-status-draft_generated { background: var(--purple-100); color: var(--purple-700); }
 .badge-status-contacted { background: var(--purple-100); color: var(--purple-600); }

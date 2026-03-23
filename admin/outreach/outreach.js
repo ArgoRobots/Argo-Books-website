@@ -262,7 +262,6 @@ async function bulkGenerateDrafts() {
     if (!ids.length) return;
     if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
 
-    notify(`Generating ${ids.length} draft(s)...`, 'info');
     let success = 0, fail = 0;
     for (const id of ids) {
         try {
@@ -705,13 +704,6 @@ async function searchBusinesses() {
         if (filteredCount < limit) {
             notify(`Found ${filteredCount} ${sizeFilter} businesses out of ${discoveryResults.length} total. Not enough ${sizeFilter} businesses in this area.`, 'info');
         }
-    } else if (lastNote) {
-        notify(lastNote, 'info');
-    }
-
-    if (discoveryResults.length) {
-        const msg = sizeFilter ? 'Company sizes classified. Filter applied.' : 'Company sizes classified by AI.';
-        notify(msg, 'success');
     }
 }
 
@@ -900,9 +892,7 @@ function copyDraft() {
     const subject = document.getElementById('draftSubject').value;
     const body = document.getElementById('draftBody').value;
     const text = `Subject: ${subject}\n\n${body}`;
-    navigator.clipboard.writeText(text).then(() => {
-        notify('Draft copied to clipboard', 'success');
-    }).catch(() => {
+    navigator.clipboard.writeText(text).catch(() => {
         // Fallback
         const ta = document.createElement('textarea');
         ta.value = text;
@@ -910,7 +900,6 @@ function copyDraft() {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        notify('Draft copied to clipboard', 'success');
     });
 }
 

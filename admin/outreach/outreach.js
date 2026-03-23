@@ -631,10 +631,12 @@ async function saveLeadDetails() {
 
     try {
         const result = await api('update_lead', { method: 'POST', body: data });
-        notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
+            closeModal('leadDetailModal');
             loadLeads();
             loadStats();
+        } else {
+            notify(result.message, 'error');
         }
     } catch (e) {
         notify(e.message, 'error');
@@ -1105,12 +1107,6 @@ function formatStatus(status) {
 
 function formatActionType(type) {
     return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function formatDateTime(dateStr) {

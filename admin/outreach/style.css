@@ -254,15 +254,6 @@
     border-bottom: none;
 }
 
-.clickable-row {
-    cursor: pointer;
-    transition: background 0.1s;
-}
-
-.clickable-row:hover {
-    background: var(--gray-50);
-}
-
 .leads-table-wrapper {
     overflow-x: auto;
 }
@@ -744,9 +735,6 @@
     border-bottom-color: var(--gray-700);
 }
 
-[data-theme="dark"] .clickable-row:hover {
-    background: var(--slate-253449);
-}
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,

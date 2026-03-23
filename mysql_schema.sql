@@ -561,7 +561,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     category VARCHAR(100) DEFAULT NULL,
     city VARCHAR(100) DEFAULT NULL,
     source VARCHAR(100) DEFAULT 'manual',
-    status ENUM('new','researching','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
+    status ENUM('new','ready_to_contact','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
     response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
     approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
     date_added DATETIME DEFAULT CURRENT_TIMESTAMP,

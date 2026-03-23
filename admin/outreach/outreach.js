@@ -892,8 +892,10 @@ async function generateDraft() {
         if (data.success) {
             document.getElementById('draftSubject').value = data.subject;
             document.getElementById('draftBody').value = data.body;
-            // Refresh lead to update status
-            openLeadDetail(currentLeadId);
+            // Refresh draft status without switching tabs
+            const leadData = await api('get_lead', { params: { id: currentLeadId } });
+            if (leadData.success) updateDraftStatus(leadData.lead);
+            loadActivity(currentLeadId);
         } else {
             notify(data.message, 'error');
         }

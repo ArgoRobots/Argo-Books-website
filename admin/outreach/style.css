@@ -177,6 +177,16 @@
     color: var(--gray-300);
 }
 
+[data-theme="dark"] .bulk-draft-progress .btn-small {
+    background: var(--gray-700);
+    color: var(--gray-200);
+    border-color: var(--gray-600);
+}
+
+[data-theme="dark"] .bulk-draft-progress .btn-small:hover {
+    background: var(--gray-600);
+}
+
 .bulk-draft-spinner {
     width: 14px;
     height: 14px;

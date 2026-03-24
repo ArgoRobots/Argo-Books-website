@@ -372,7 +372,7 @@ include '../admin_header.php';
         </div>
 
         <div class="table-responsive">
-            <table>
+            <table data-paginate="25">
                 <thead>
                     <tr>
                         <th>Source Code</th>

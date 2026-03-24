@@ -2,6 +2,8 @@
 let currentLeadId = null;
 let discoveryResults = [];
 let debounceTimer = null;
+let leadsPaginator = null;
+let discoveryPaginator = null;
 
 // ─── URL Param Helpers ───
 function getFilterParams() {
@@ -191,7 +193,7 @@ async function loadLeads() {
                     <strong>${esc(lead.business_name)}</strong>
                     ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
                 </td>
-                <td>${lead.website ? '<a href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\\/\\//, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.website ? '<a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
                 <td>${esc(lead.city || '')}</td>
@@ -211,6 +213,16 @@ async function loadLeads() {
         const selectAll = document.getElementById('leadsSelectAll');
         if (selectAll) selectAll.checked = false;
         updateBulkBar();
+
+        // Initialize or reset pagination
+        const leadsTable = document.querySelector('.leads-table');
+        if (leadsTable) {
+            if (!leadsPaginator) {
+                leadsPaginator = new TablePaginator(leadsTable, { perPage: 25 });
+            } else {
+                leadsPaginator.reset();
+            }
+        }
     } catch (e) {
         notify(e.message, 'error');
     }
@@ -823,6 +835,16 @@ function renderDiscoveryResults() {
 
     const selectAll = document.getElementById('discSelectAll');
     if (selectAll) selectAll.checked = true;
+
+    // Initialize or reset discovery pagination
+    const discTable = document.querySelector('.discovery-table');
+    if (discTable) {
+        if (!discoveryPaginator) {
+            discoveryPaginator = new TablePaginator(discTable, { perPage: 25 });
+        } else {
+            discoveryPaginator.reset();
+        }
+    }
 }
 
 function toggleDiscoveryCheckboxes(master) {

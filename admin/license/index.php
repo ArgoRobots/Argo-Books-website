@@ -557,7 +557,7 @@ include '../admin_header.php';
                     <input type="hidden" name="credit_amount" id="credit_amount_input">
                     <input type="hidden" name="credit_note" id="credit_note_input">
                     <div class="table-responsive">
-                        <table>
+                        <table data-paginate="25">
                             <thead>
                                 <tr>
                                     <th class="checkbox-column">
@@ -735,7 +735,7 @@ include '../admin_header.php';
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="bulk_sub_key_action" id="bulk_sub_key_action_input">
                     <div class="table-responsive">
-                        <table>
+                        <table data-paginate="25">
                             <thead>
                                 <tr>
                                     <th class="checkbox-column">
@@ -1098,10 +1098,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function filterTable(input, tbodyId) {
     const filter = input.value.toLowerCase();
-    const rows = document.getElementById(tbodyId).querySelectorAll('tr');
+    const tbody = document.getElementById(tbodyId);
+    const rows = tbody.querySelectorAll('tr');
     rows.forEach(row => {
+        row.classList.remove('pg-hidden');
         const text = row.textContent.toLowerCase();
         row.style.display = text.includes(filter) ? '' : 'none';
     });
+    // Reset pagination after filtering
+    const table = tbody.closest('table');
+    if (table && table._paginator) table._paginator.reset();
 }
 </script>

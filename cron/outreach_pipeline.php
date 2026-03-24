@@ -204,9 +204,39 @@ try {
 //  STEP IMPLEMENTATIONS
 // ══════════════════════════════════════════════════════════════
 
+// The category pool used for discovery. Defined here so the pipeline can
+// cycle through them deterministically instead of randomly.
+$discoveryCategoryPool = [
+    'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
+    'accountants', 'real estate agents', 'insurance agents', 'auto repair',
+    'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
+    'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
+    'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
+    'daycare centers', 'tutoring services', 'martial arts studios',
+    'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
+    'printing services', 'moving companies', 'pest control', 'locksmiths',
+    'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
+    'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
+    'wedding planners', 'interior designers', 'architects', 'surveyors',
+    'physiotherapists', 'psychologists', 'counsellors', 'notaries',
+    'bookkeepers', 'IT support', 'web design', 'marketing agencies',
+    'sign shops', 'trophy shops', 'music schools', 'dance studios',
+    'dog groomers', 'boarding kennels', 'farm equipment dealers',
+    'hardware stores', 'building supplies', 'appliance repair',
+    'upholstery services', 'tailors', 'dry cleaners', 'spas',
+    'tanning salons', 'nail salons', 'barber shops', 'optical stores',
+    'hearing aid clinics', 'home inspectors', 'appraisers',
+    'property management', 'storage facilities', 'courier services',
+    'towing services', 'glass repair', 'fencing contractors',
+    'concrete contractors', 'paving contractors', 'tree services',
+    'snow removal', 'pool services', 'septic services',
+    'garage door repair', 'security companies', 'staffing agencies',
+    'travel agencies', 'event venues', 'food trucks',
+];
+
 function stepDiscover($pdo, $dryRun)
 {
-    global $targetCities;
+    global $targetCities, $discoveryCategoryPool;
 
     $apiKey = $_ENV['GOOGLE_PLACES_API_KEY'] ?? '';
     if (empty($apiKey)) {
@@ -214,20 +244,36 @@ function stepDiscover($pdo, $dryRun)
         return;
     }
 
+    $totalCategories = count($discoveryCategoryPool);
+
     // Determine which city to search next
     $cityIndex = (int) getState($pdo, 'current_city_index', '0');
     if ($cityIndex >= count($targetCities)) {
         // Wrap around to start — re-search cities for new businesses
         $cityIndex = 0;
         setState($pdo, 'current_city_index', '0');
+        setState($pdo, 'current_city_category_offset', '0');
         logPipeline('All cities searched. Wrapping around to start.');
     }
+
+    // Track which categories we've searched for the current city.
+    // Each run searches 5 categories starting from this offset.
+    // Only when we've cycled through ALL categories without finding
+    // new leads do we consider the city truly exhausted.
+    $categoryOffset = (int) getState($pdo, 'current_city_category_offset', '0');
 
     $target = $targetCities[$cityIndex];
     $city = $target['city'];
     $province = $target['province'];
 
-    logPipeline("--- Step 1: Discovery for $city, $province (city #" . ($cityIndex + 1) . "/" . count($targetCities) . ") ---");
+    // Pick the next 5 categories to search (wrapping around the pool)
+    $categoriesToSearch = [];
+    for ($i = 0; $i < 5; $i++) {
+        $categoriesToSearch[] = $discoveryCategoryPool[($categoryOffset + $i) % $totalCategories];
+    }
+
+    logPipeline("--- Step 1: Discovery for $city, $province (city #" . ($cityIndex + 1) . "/" . count($targetCities) . ", categories " . ($categoryOffset + 1) . "-" . ($categoryOffset + 5) . "/$totalCategories) ---");
+    logPipeline("Searching categories: " . implode(', ', $categoriesToSearch));
 
     if ($dryRun) {
         logPipeline("[DRY RUN] Would search Google Places for businesses in $city, $province");
@@ -239,23 +285,32 @@ function stepDiscover($pdo, $dryRun)
     $stmt->execute();
     $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
 
-    $result = search_businesses_core($city, $province, '', DAILY_SEND_LIMIT, $apiKey, $existingPlaceIds);
+    // Search each category individually and collect results
+    $businesses = [];
+    $roundsUsed = 0;
 
-    if (isset($result['error'])) {
-        logPipeline("API error for $city: {$result['error']}. Will retry this city next run.", 'ERROR');
-        return;
+    foreach ($categoriesToSearch as $cat) {
+        if (count($businesses) >= DAILY_SEND_LIMIT) break;
+
+        $remaining = DAILY_SEND_LIMIT - count($businesses);
+        $result = search_businesses_core($city, $province, $cat, $remaining, $apiKey, $existingPlaceIds);
+        $roundsUsed++;
+
+        if (isset($result['error'])) {
+            logPipeline("API error searching '$cat' in $city: {$result['error']}", 'WARN');
+            continue;
+        }
+
+        // Add new place IDs to exclude list so next category doesn't re-find them
+        foreach ($result['businesses'] as $biz) {
+            if (!empty($biz['places_id'])) {
+                $existingPlaceIds[] = $biz['places_id'];
+            }
+            $businesses[] = $biz;
+        }
     }
 
-    $businesses = $result['businesses'];
-    $count = $result['count'];
-
-    logPipeline("Discovered $count businesses with emails in $city (searched {$result['rounds']} round(s))");
-
-    if (empty($businesses)) {
-        logPipeline("No new businesses found in $city. Moving to next city.");
-        setState($pdo, 'current_city_index', (string)($cityIndex + 1));
-        return;
-    }
+    logPipeline("Discovered " . count($businesses) . " businesses with emails in $city ($roundsUsed category searches)");
 
     // Import discovered businesses
     $imported = 0;
@@ -304,13 +359,33 @@ function stepDiscover($pdo, $dryRun)
 
     logPipeline("Imported $imported new leads, skipped $skipped duplicates from $city");
 
-    // Only advance to next city if no new leads were imported (city is exhausted)
-    if ($imported === 0) {
-        logPipeline("No new leads imported from $city. Advancing to next city.");
-        setState($pdo, 'current_city_index', (string)($cityIndex + 1));
+    // Advance the category offset for the next run
+    $newOffset = $categoryOffset + 5;
+
+    if ($newOffset >= $totalCategories) {
+        // We've cycled through every category for this city
+        if ($imported === 0) {
+            // Went through all categories and found nothing new — city is exhausted
+            logPipeline("All $totalCategories categories searched for $city with no new leads. City exhausted, advancing.");
+            setState($pdo, 'current_city_index', (string)($cityIndex + 1));
+            setState($pdo, 'current_city_category_offset', '0');
+        } else {
+            // Found some leads on the last pass — reset offset and search again
+            logPipeline("Completed full category cycle for $city but still finding leads. Resetting categories.");
+            setState($pdo, 'current_city_category_offset', '0');
+        }
     } else {
-        logPipeline("Still finding leads in $city. Will search here again next run.");
+        if ($imported > 0) {
+            // Still finding leads, advance to next batch of categories
+            logPipeline("Still finding leads in $city. Next run will search categories " . ($newOffset + 1) . "-" . min($newOffset + 5, $totalCategories) . ".");
+            setState($pdo, 'current_city_category_offset', (string)$newOffset);
+        } else {
+            // This batch found nothing, but there are more categories to try
+            logPipeline("No new leads from these categories, but " . ($totalCategories - $newOffset) . " categories remaining for $city.");
+            setState($pdo, 'current_city_category_offset', (string)$newOffset);
+        }
     }
+
     setState($pdo, 'last_discovery_date', date('Y-m-d'));
     setState($pdo, 'last_discovery_city', "$city, $province");
 }

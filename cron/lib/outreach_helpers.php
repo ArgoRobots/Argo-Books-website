@@ -523,7 +523,7 @@ Rules:
 $localInstruction
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
-- Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
+- Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [business name]\" if available)
 
 PERSONALIZATION (this is critical):
 - If a business summary is provided, you MUST use it to make the email specific to their business. Do not write a generic email when you have summary info
@@ -539,7 +539,7 @@ PERSONALIZATION (this is critical):
 
 - Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
-- If appropriate, mention offering a free 1-year premium license in exchange for feedback
+- Mention offering a free 1-year premium license in exchange for feedback
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions

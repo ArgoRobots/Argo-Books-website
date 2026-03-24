@@ -181,7 +181,7 @@ async function loadLeads() {
         const tbody = document.getElementById('leadsTableBody');
 
         if (!data.success || !data.leads.length) {
-            tbody.innerHTML = '<tr><td colspan="12" class="empty-state">No leads found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No leads found</td></tr>';
             updateBulkBar();
             return;
         }

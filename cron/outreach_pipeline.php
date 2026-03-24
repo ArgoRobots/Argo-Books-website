@@ -23,10 +23,10 @@
 
 set_time_limit(600); // 10 minutes max for full pipeline
 
-// Only allow CLI/cron execution (some hosts run cron via CGI, not CLI)
-if (php_sapi_name() !== 'cli' && isset($_SERVER['HTTP_HOST'])) {
+// Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request)
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
     http_response_code(403);
-    die('Access denied. This script can only be run via CLI.');
+    die('Access denied. This script can only be run via CLI/cron.');
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -198,13 +198,13 @@ try {
 
 } catch (Exception $e) {
     logPipeline("Pipeline fatal error: " . $e->getMessage(), 'ERROR');
-    flock($lockFp, LOCK_UN);
-    fclose($lockFp);
     exit(1);
 } finally {
     // Release lock file
-    flock($lockFp, LOCK_UN);
-    fclose($lockFp);
+    if (isset($lockFp) && is_resource($lockFp)) {
+        flock($lockFp, LOCK_UN);
+        fclose($lockFp);
+    }
 }
 
 // ══════════════════════════════════════════════════════════════

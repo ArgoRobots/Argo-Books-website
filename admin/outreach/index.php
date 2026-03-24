@@ -231,7 +231,7 @@ include '../admin_header.php';
                 </tr>
             </thead>
             <tbody id="leadsTableBody">
-                <tr><td colspan="11" class="empty-state">Loading...</td></tr>
+                <tr><td colspan="10" class="empty-state">Loading...</td></tr>
             </tbody>
         </table>
     </div>

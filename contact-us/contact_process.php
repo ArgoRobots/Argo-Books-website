@@ -85,7 +85,9 @@ function process_contact_form()
     $safe_last = htmlspecialchars($lastName, ENT_QUOTES, 'UTF-8');
     $safe_email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
 
-    $email_subject = "Argo Books Contact: {$safe_first} {$safe_last}";
+    $clean_first = str_replace(["\r", "\n", "\t"], '', $firstName);
+    $clean_last = str_replace(["\r", "\n", "\t"], '', $lastName);
+    $email_subject = "Argo Books Contact: {$clean_first} {$clean_last}";
     $formatted_message = nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8'));
 
     $body = <<<HTML

@@ -138,6 +138,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
  */
 function send_verification_email($email, $code, $username)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     $body = <<<HTML
         <h1>Welcome to the Argo Community!</h1>
         <p>Hello {$username},</p>
@@ -248,9 +249,10 @@ function send_notification_email($type, $data)
     // Send emails to all recipients via send_styled_email (uses SMTP when configured)
     $success = true;
     foreach ($recipients as $recipient) {
+        $safe_username = htmlspecialchars($recipient['username'], ENT_QUOTES, 'UTF-8');
         $personal_body = str_replace(
             "you're an administrator of the Argo Community.",
-            "you're an administrator ({$recipient['username']}) of the Argo Community.",
+            "you're an administrator ({$safe_username}) of the Argo Community.",
             $body_template
         );
 
@@ -272,6 +274,7 @@ function send_notification_email($type, $data)
  */
 function send_password_reset_email($email, $token, $username)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     // Get the base URL
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
     $host = $_SERVER['HTTP_HOST'];
@@ -310,6 +313,7 @@ function send_password_reset_email($email, $token, $username)
  */
 function send_account_deletion_scheduled_email($email, $username, $scheduled_date)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     // Format the scheduled date nicely
     $formatted_date = date('F j, Y \a\t g:i A', strtotime($scheduled_date));
 
@@ -349,6 +353,7 @@ function send_account_deletion_scheduled_email($email, $username, $scheduled_dat
  */
 function send_account_deletion_cancelled_email($email, $username)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     $body = <<<HTML
         <h1>Account Deletion Cancelled</h1>
         <p>Hello {$username},</p>
@@ -390,6 +395,8 @@ function send_account_deletion_cancelled_email($email, $username)
  */
 function send_ban_notification_email($email, $username, $ban_reason, $ban_duration, $expires_at = null)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $ban_reason = htmlspecialchars($ban_reason, ENT_QUOTES, 'UTF-8');
     // Format duration text
     $duration_text = '';
 
@@ -463,6 +470,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
  */
 function send_unban_notification_email($email, $username)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     $body = <<<HTML
         <h1>Account Unbanned</h1>
         <p>Hello {$username},</p>
@@ -499,8 +507,10 @@ function send_unban_notification_email($email, $username)
  */
 function send_username_reset_email($email, $old_username, $new_username, $violation_type, $additional_info = '')
 {
+    $old_username = htmlspecialchars($old_username, ENT_QUOTES, 'UTF-8');
+    $new_username = htmlspecialchars($new_username, ENT_QUOTES, 'UTF-8');
     // Format violation type
-    $violation_text = ucfirst(str_replace('_', ' ', $violation_type));
+    $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
     // Additional info section
     $additional_section = '';
@@ -550,8 +560,9 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
  */
 function send_bio_cleared_email($email, $username, $violation_type, $additional_info = '')
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     // Format violation type
-    $violation_text = ucfirst(str_replace('_', ' ', $violation_type));
+    $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
     // Additional info section
     $additional_section = '';
@@ -600,9 +611,11 @@ function send_bio_cleared_email($email, $username, $violation_type, $additional_
  */
 function send_new_report_notification($email, $report_id, $content_type, $violation_type, $reporter_username, $reported_username = 'N/A')
 {
+    $reporter_username = htmlspecialchars($reporter_username, ENT_QUOTES, 'UTF-8');
+    $reported_username = htmlspecialchars($reported_username, ENT_QUOTES, 'UTF-8');
     // Format content type and violation type
-    $content_type_text = ucfirst($content_type);
-    $violation_text = ucfirst(str_replace('_', ' ', $violation_type));
+    $content_type_text = ucfirst(htmlspecialchars($content_type, ENT_QUOTES, 'UTF-8'));
+    $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
     $body = <<<HTML
         <h1>New Content Report</h1>

@@ -587,6 +587,20 @@
     text-decoration: underline;
 }
 
+.website-link {
+    color: var(--primary-blue, #3b82f6);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.website-link:visited {
+    color: var(--primary-blue, #3b82f6);
+}
+
+.website-link:hover {
+    text-decoration: underline;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
     .stats-row {

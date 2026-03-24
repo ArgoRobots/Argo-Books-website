@@ -193,7 +193,7 @@ async function loadLeads() {
                     <strong>${esc(lead.business_name)}</strong>
                     ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
                 </td>
-                <td>${lead.website ? '<a href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.website ? '<a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
                 <td>${esc(lead.city || '')}</td>

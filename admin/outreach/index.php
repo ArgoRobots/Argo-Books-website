@@ -25,6 +25,11 @@ include '../admin_header.php';
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
 
+<!-- Pipeline Running Banner -->
+<div id="pipelineBanner" style="display:none; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:6px; padding:12px 16px; margin-bottom:16px; font-weight:500;">
+    The outreach cron pipeline is currently running. Sending, drafting, and discovery are temporarily disabled to prevent conflicts.
+</div>
+
 <!-- Dashboard Stats -->
 <div class="stats-row" id="statsRow">
     <div class="stat-card">

@@ -141,6 +141,12 @@ async function loadStats() {
             document.getElementById('statContacted').textContent = s.contacted || 0;
             document.getElementById('statReplied').textContent = s.replied || 0;
             document.getElementById('statInterested').textContent = s.interested || 0;
+
+            // Show/hide pipeline running banner
+            const banner = document.getElementById('pipelineBanner');
+            if (banner) {
+                banner.style.display = data.pipeline_running ? 'block' : 'none';
+            }
         }
     } catch (e) {
         notify(e.message, 'error');

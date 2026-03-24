@@ -110,7 +110,7 @@ include '../admin_header.php';
                 </div>
             </div>
             <div class="discovery-table-wrapper">
-                <table class="data-table">
+                <table class="data-table discovery-table">
                     <thead>
                         <tr>
                             <th><div class="checkbox"><input type="checkbox" id="discSelectAll" onchange="toggleDiscoveryCheckboxes(this)"><label for="discSelectAll"></label></div></th>

@@ -545,7 +545,7 @@ include '../admin_header.php';
                 <p style="text-align: center; color: #6b7280; padding: 2rem;">No transactions found</p>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table>
+                    <table data-paginate="25">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -779,7 +779,7 @@ include '../admin_header.php';
                 <p style="text-align: center; color: #6b7280; padding: 2rem;">No invoices found</p>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table>
+                    <table data-paginate="25">
                         <thead>
                             <tr>
                                 <th>Invoice ID</th>
@@ -914,7 +914,7 @@ include '../admin_header.php';
                 <p style="text-align: center; color: #6b7280; padding: 2rem;">No failed payments</p>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table>
+                    <table data-paginate="25">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -951,7 +951,7 @@ include '../admin_header.php';
                 <p style="text-align: center; color: #6b7280; padding: 2rem;">No refunded payments</p>
             <?php else: ?>
                 <div class="table-responsive">
-                    <table>
+                    <table data-paginate="25">
                         <thead>
                             <tr>
                                 <th>Date</th>

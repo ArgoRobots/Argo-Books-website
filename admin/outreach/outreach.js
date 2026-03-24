@@ -2,6 +2,8 @@
 let currentLeadId = null;
 let discoveryResults = [];
 let debounceTimer = null;
+let leadsPaginator = null;
+let discoveryPaginator = null;
 
 // ─── URL Param Helpers ───
 function getFilterParams() {
@@ -211,6 +213,16 @@ async function loadLeads() {
         const selectAll = document.getElementById('leadsSelectAll');
         if (selectAll) selectAll.checked = false;
         updateBulkBar();
+
+        // Initialize or reset pagination
+        const leadsTable = document.querySelector('.leads-table');
+        if (leadsTable) {
+            if (!leadsPaginator) {
+                leadsPaginator = new TablePaginator(leadsTable, { perPage: 25 });
+            } else {
+                leadsPaginator.reset();
+            }
+        }
     } catch (e) {
         notify(e.message, 'error');
     }
@@ -823,6 +835,16 @@ function renderDiscoveryResults() {
 
     const selectAll = document.getElementById('discSelectAll');
     if (selectAll) selectAll.checked = true;
+
+    // Initialize or reset discovery pagination
+    const discTable = document.querySelector('.discovery-table');
+    if (discTable) {
+        if (!discoveryPaginator) {
+            discoveryPaginator = new TablePaginator(discTable, { perPage: 25 });
+        } else {
+            discoveryPaginator.reset();
+        }
+    }
 }
 
 function toggleDiscoveryCheckboxes(master) {

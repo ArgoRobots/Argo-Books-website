@@ -27,6 +27,7 @@ $base_path = $in_subdir ? '../' : '';
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="<?php echo $base_path; ?>../resources/notifications/notifications.js" defer></script>
+    <script src="<?php echo $base_path; ?>pagination.js" defer></script>
 
     <link rel="stylesheet" href="<?php echo $base_path; ?>common-style.css">
     <link rel="stylesheet" href="<?php echo $base_path; ?>../resources/styles/link.css">

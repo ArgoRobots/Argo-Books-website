@@ -357,7 +357,7 @@ include '../admin_header.php';
                 <input type="hidden" name="bulk_action" id="bulk_action_input">
 
                 <div class="table-responsive">
-                    <table>
+                    <table data-paginate="25">
                         <thead>
                             <tr>
                                 <th class="checkbox-column">

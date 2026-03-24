@@ -12,6 +12,36 @@
 if (defined('OUTREACH_HELPERS_LOADED')) return;
 define('OUTREACH_HELPERS_LOADED', true);
 
+// ─── Discovery Category Pool ───
+// Used by both the cron pipeline (deterministic cycling) and search_businesses_core (random fallback for admin searches)
+const OUTREACH_CATEGORY_POOL = [
+    'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
+    'accountants', 'real estate agents', 'insurance agents', 'auto repair',
+    'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
+    'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
+    'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
+    'daycare centers', 'tutoring services', 'martial arts studios',
+    'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
+    'printing services', 'moving companies', 'pest control', 'locksmiths',
+    'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
+    'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
+    'wedding planners', 'interior designers', 'architects', 'surveyors',
+    'physiotherapists', 'psychologists', 'counsellors', 'notaries',
+    'bookkeepers', 'IT support', 'web design', 'marketing agencies',
+    'sign shops', 'trophy shops', 'music schools', 'dance studios',
+    'dog groomers', 'boarding kennels', 'farm equipment dealers',
+    'hardware stores', 'building supplies', 'appliance repair',
+    'upholstery services', 'tailors', 'dry cleaners', 'spas',
+    'tanning salons', 'nail salons', 'barber shops', 'optical stores',
+    'hearing aid clinics', 'home inspectors', 'appraisers',
+    'property management', 'storage facilities', 'courier services',
+    'towing services', 'glass repair', 'fencing contractors',
+    'concrete contractors', 'paving contractors', 'tree services',
+    'snow removal', 'pool services', 'septic services',
+    'garage door repair', 'security companies', 'staffing agencies',
+    'travel agencies', 'event venues', 'food trucks',
+];
+
 // ─── Activity Logging ───
 
 function log_activity($pdo, $lead_id, $action_type, $details = null)
@@ -182,7 +212,7 @@ function scrape_email_from_website($url)
  * Core business search logic. Returns array with 'businesses', 'count', 'rounds'.
  * Used by both the admin API endpoint and the cron pipeline.
  */
-function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [])
+function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [], $maxRounds = 5)
 {
     $location = $province ? "$city, $province" : $city;
     $businesses = [];
@@ -191,7 +221,6 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
     foreach ($excludePlaceIds as $id) {
         $seenPlaceIds[trim($id)] = true;
     }
-    $maxRounds = 5;
     $roundsUsed = 0;
 
     // Stream context with timeouts for all Google API calls
@@ -209,35 +238,9 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
         $queries[] = "$category companies in $location";
         $queries[] = "best $category in $location";
     } else {
-        // When no category provided, use a wide spread of real business categories
-        // so each round searches a different industry instead of generic synonyms
-        $categoryPool = [
-            'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
-            'accountants', 'real estate agents', 'insurance agents', 'auto repair',
-            'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
-            'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
-            'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
-            'daycare centers', 'tutoring services', 'martial arts studios',
-            'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
-            'printing services', 'moving companies', 'pest control', 'locksmiths',
-            'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
-            'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
-            'wedding planners', 'interior designers', 'architects', 'surveyors',
-            'physiotherapists', 'psychologists', 'counsellors', 'notaries',
-            'bookkeepers', 'IT support', 'web design', 'marketing agencies',
-            'sign shops', 'trophy shops', 'music schools', 'dance studios',
-            'dog groomers', 'boarding kennels', 'farm equipment dealers',
-            'hardware stores', 'building supplies', 'appliance repair',
-            'upholstery services', 'tailors', 'dry cleaners', 'spas',
-            'tanning salons', 'nail salons', 'barber shops', 'optical stores',
-            'hearing aid clinics', 'home inspectors', 'appraisers',
-            'property management', 'storage facilities', 'courier services',
-            'towing services', 'glass repair', 'fencing contractors',
-            'concrete contractors', 'paving contractors', 'tree services',
-            'snow removal', 'pool services', 'septic services',
-            'garage door repair', 'security companies', 'staffing agencies',
-            'travel agencies', 'event venues', 'food trucks',
-        ];
+        // When no category provided (admin dashboard searches), pick random
+        // categories from the shared pool so each round searches a different industry
+        $categoryPool = OUTREACH_CATEGORY_POOL;
         shuffle($categoryPool);
         for ($i = 0; $i < $maxRounds; $i++) {
             $queries[] = $categoryPool[$i] . " in $location";
@@ -507,7 +510,7 @@ function generate_draft_for_lead($pdo, $lead)
 
     $localInstruction = $isLocal
         ? "- The business is in Saskatchewan. Evan is a local Saskatchewan software developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon software developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
-        : "- Evan is an independent software developer based in Saskatoon, Saskatchewan. Mention this briefly for context.";
+        : "- The business is outside Saskatchewan. Evan is a Canadian software developer. Say \"Canadian software developer\", do NOT say \"local\" and do NOT mention Saskatoon or Saskatchewan.";
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
@@ -515,7 +518,7 @@ About Argo Books:
 - It is like QuickBooks but way simpler, designed so you do not need any accounting knowledge at all
 - Built specifically for small businesses, not a bloated enterprise tool
 - Features include invoicing, expense tracking, and simple bookkeeping
-- Evan is a local independent software developer based in Saskatoon building this specifically for small businesses
+- Evan is " . ($isLocal ? "a local independent software developer based in Saskatoon" : "a Canadian independent software developer") . " building this specifically for small businesses
 
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
@@ -523,7 +526,7 @@ Rules:
 $localInstruction
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
-- Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
+- Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [business name]\" if available)
 
 PERSONALIZATION (this is critical):
 - If a business summary is provided, you MUST use it to make the email specific to their business. Do not write a generic email when you have summary info
@@ -539,7 +542,7 @@ PERSONALIZATION (this is critical):
 
 - Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
-- If appropriate, mention offering a free 1-year premium license in exchange for feedback
+- Mention offering a free 1-year premium license in exchange for feedback
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions

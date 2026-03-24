@@ -87,9 +87,7 @@ php /home/argorobots/public_html/cron/account_purge.php
 |---|---|---|
 | `GOOGLE_PLACES_API_KEY` | — | Required for business discovery |
 | `OPENAI_API_KEY` | — | Required for AI draft generation |
-| `OUTREACH_DAILY_SEND_LIMIT` | 10 | Max emails sent per day |
-| `OUTREACH_DISCOVERY_BATCH` | 20 | Businesses to discover per run |
-| `OUTREACH_DRAFT_BATCH` | 15 | Drafts to generate per run |
+| `OUTREACH_DAILY_SEND_LIMIT` | 10 | Max emails sent per day (also controls discovery and draft batch sizes) |
 | `OUTREACH_AUTO_APPROVE` | true | Auto-approve generated drafts |
 
 ### CLI Flags

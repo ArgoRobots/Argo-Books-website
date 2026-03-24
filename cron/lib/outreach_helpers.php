@@ -507,7 +507,7 @@ function generate_draft_for_lead($pdo, $lead)
 
     $localInstruction = $isLocal
         ? "- The business is in Saskatchewan. Evan is a local Saskatchewan software developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon software developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
-        : "- Evan is an independent software developer based in Saskatoon, Saskatchewan. Mention this briefly for context.";
+        : "- The business is outside Saskatchewan. Evan is a Canadian software developer based in Saskatoon. Mention being a Canadian developer, NOT a local developer. Do not emphasize the Saskatchewan connection.";
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
@@ -515,7 +515,7 @@ About Argo Books:
 - It is like QuickBooks but way simpler, designed so you do not need any accounting knowledge at all
 - Built specifically for small businesses, not a bloated enterprise tool
 - Features include invoicing, expense tracking, and simple bookkeeping
-- Evan is a local independent software developer based in Saskatoon building this specifically for small businesses
+- Evan is an independent software developer based in Saskatoon building this specifically for small businesses
 
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)

@@ -182,9 +182,7 @@ Key-value store used by the cron pipeline to track its position across runs.
 
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
-| `OUTREACH_DAILY_SEND_LIMIT` | `10` | Maximum emails sent per day |
-| `OUTREACH_DISCOVERY_BATCH` | `20` | Businesses to discover per city per run |
-| `OUTREACH_DRAFT_BATCH` | `15` | Drafts to generate per run |
+| `OUTREACH_DAILY_SEND_LIMIT` | `10` | Maximum emails sent per day (also controls discovery and draft batch sizes) |
 | `OUTREACH_AUTO_APPROVE` | `true` | Automatically approve generated drafts |
 
 ### Required API Keys

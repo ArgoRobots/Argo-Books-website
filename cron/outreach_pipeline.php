@@ -52,8 +52,6 @@ if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
 // ─── Configuration ───
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
-define('DISCOVERY_BATCH_SIZE', (int) ($_ENV['OUTREACH_DISCOVERY_BATCH'] ?? 20));
-define('DRAFT_BATCH_SIZE', (int) ($_ENV['OUTREACH_DRAFT_BATCH'] ?? 15));
 define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
 
 // Parse CLI flags
@@ -233,7 +231,6 @@ function stepDiscover($pdo, $dryRun)
 
     if ($dryRun) {
         logPipeline("[DRY RUN] Would search Google Places for businesses in $city, $province");
-        setState($pdo, 'current_city_index', (string)($cityIndex + 1));
         return;
     }
 
@@ -242,7 +239,7 @@ function stepDiscover($pdo, $dryRun)
     $stmt->execute();
     $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
 
-    $result = search_businesses_core($city, $province, '', DISCOVERY_BATCH_SIZE, $apiKey, $existingPlaceIds);
+    $result = search_businesses_core($city, $province, '', DAILY_SEND_LIMIT, $apiKey, $existingPlaceIds);
 
     if (isset($result['error'])) {
         logPipeline("API error for $city: {$result['error']}. Will retry this city next run.", 'ERROR');
@@ -307,8 +304,13 @@ function stepDiscover($pdo, $dryRun)
 
     logPipeline("Imported $imported new leads, skipped $skipped duplicates from $city");
 
-    // Advance to next city for tomorrow
-    setState($pdo, 'current_city_index', (string)($cityIndex + 1));
+    // Only advance to next city if no new leads were imported (city is exhausted)
+    if ($imported === 0) {
+        logPipeline("No new leads imported from $city. Advancing to next city.");
+        setState($pdo, 'current_city_index', (string)($cityIndex + 1));
+    } else {
+        logPipeline("Still finding leads in $city. Will search here again next run.");
+    }
     setState($pdo, 'last_discovery_date', date('Y-m-d'));
     setState($pdo, 'last_discovery_city', "$city, $province");
 }
@@ -334,7 +336,7 @@ function stepGenerateDrafts($pdo, $dryRun)
         ORDER BY date_added ASC
         LIMIT ?
     ");
-    $stmt->execute([DRAFT_BATCH_SIZE]);
+    $stmt->execute([DAILY_SEND_LIMIT]);
     $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($leads)) {

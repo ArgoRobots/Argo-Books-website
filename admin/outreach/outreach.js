@@ -125,7 +125,7 @@ async function api(action, options = {}) {
     return await res.json();
 }
 
-function notify(message, type = 'success') {
+function notify(message) {
     alert(message);
 }
 

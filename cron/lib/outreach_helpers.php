@@ -12,6 +12,36 @@
 if (defined('OUTREACH_HELPERS_LOADED')) return;
 define('OUTREACH_HELPERS_LOADED', true);
 
+// ─── Discovery Category Pool ───
+// Used by both the cron pipeline (deterministic cycling) and search_businesses_core (random fallback for admin searches)
+const OUTREACH_CATEGORY_POOL = [
+    'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
+    'accountants', 'real estate agents', 'insurance agents', 'auto repair',
+    'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
+    'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
+    'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
+    'daycare centers', 'tutoring services', 'martial arts studios',
+    'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
+    'printing services', 'moving companies', 'pest control', 'locksmiths',
+    'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
+    'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
+    'wedding planners', 'interior designers', 'architects', 'surveyors',
+    'physiotherapists', 'psychologists', 'counsellors', 'notaries',
+    'bookkeepers', 'IT support', 'web design', 'marketing agencies',
+    'sign shops', 'trophy shops', 'music schools', 'dance studios',
+    'dog groomers', 'boarding kennels', 'farm equipment dealers',
+    'hardware stores', 'building supplies', 'appliance repair',
+    'upholstery services', 'tailors', 'dry cleaners', 'spas',
+    'tanning salons', 'nail salons', 'barber shops', 'optical stores',
+    'hearing aid clinics', 'home inspectors', 'appraisers',
+    'property management', 'storage facilities', 'courier services',
+    'towing services', 'glass repair', 'fencing contractors',
+    'concrete contractors', 'paving contractors', 'tree services',
+    'snow removal', 'pool services', 'septic services',
+    'garage door repair', 'security companies', 'staffing agencies',
+    'travel agencies', 'event venues', 'food trucks',
+];
+
 // ─── Activity Logging ───
 
 function log_activity($pdo, $lead_id, $action_type, $details = null)
@@ -209,35 +239,9 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
         $queries[] = "$category companies in $location";
         $queries[] = "best $category in $location";
     } else {
-        // When no category provided, use a wide spread of real business categories
-        // so each round searches a different industry instead of generic synonyms
-        $categoryPool = [
-            'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
-            'accountants', 'real estate agents', 'insurance agents', 'auto repair',
-            'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
-            'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
-            'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
-            'daycare centers', 'tutoring services', 'martial arts studios',
-            'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
-            'printing services', 'moving companies', 'pest control', 'locksmiths',
-            'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
-            'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
-            'wedding planners', 'interior designers', 'architects', 'surveyors',
-            'physiotherapists', 'psychologists', 'counsellors', 'notaries',
-            'bookkeepers', 'IT support', 'web design', 'marketing agencies',
-            'sign shops', 'trophy shops', 'music schools', 'dance studios',
-            'dog groomers', 'boarding kennels', 'farm equipment dealers',
-            'hardware stores', 'building supplies', 'appliance repair',
-            'upholstery services', 'tailors', 'dry cleaners', 'spas',
-            'tanning salons', 'nail salons', 'barber shops', 'optical stores',
-            'hearing aid clinics', 'home inspectors', 'appraisers',
-            'property management', 'storage facilities', 'courier services',
-            'towing services', 'glass repair', 'fencing contractors',
-            'concrete contractors', 'paving contractors', 'tree services',
-            'snow removal', 'pool services', 'septic services',
-            'garage door repair', 'security companies', 'staffing agencies',
-            'travel agencies', 'event venues', 'food trucks',
-        ];
+        // When no category provided (admin dashboard searches), pick random
+        // categories from the shared pool so each round searches a different industry
+        $categoryPool = OUTREACH_CATEGORY_POOL;
         shuffle($categoryPool);
         for ($i = 0; $i < $maxRounds; $i++) {
             $queries[] = $categoryPool[$i] . " in $location";

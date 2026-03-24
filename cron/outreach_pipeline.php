@@ -204,39 +204,9 @@ try {
 //  STEP IMPLEMENTATIONS
 // ══════════════════════════════════════════════════════════════
 
-// The category pool used for discovery. Defined here so the pipeline can
-// cycle through them deterministically instead of randomly.
-$discoveryCategoryPool = [
-    'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
-    'accountants', 'real estate agents', 'insurance agents', 'auto repair',
-    'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
-    'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
-    'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
-    'daycare centers', 'tutoring services', 'martial arts studios',
-    'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
-    'printing services', 'moving companies', 'pest control', 'locksmiths',
-    'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
-    'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
-    'wedding planners', 'interior designers', 'architects', 'surveyors',
-    'physiotherapists', 'psychologists', 'counsellors', 'notaries',
-    'bookkeepers', 'IT support', 'web design', 'marketing agencies',
-    'sign shops', 'trophy shops', 'music schools', 'dance studios',
-    'dog groomers', 'boarding kennels', 'farm equipment dealers',
-    'hardware stores', 'building supplies', 'appliance repair',
-    'upholstery services', 'tailors', 'dry cleaners', 'spas',
-    'tanning salons', 'nail salons', 'barber shops', 'optical stores',
-    'hearing aid clinics', 'home inspectors', 'appraisers',
-    'property management', 'storage facilities', 'courier services',
-    'towing services', 'glass repair', 'fencing contractors',
-    'concrete contractors', 'paving contractors', 'tree services',
-    'snow removal', 'pool services', 'septic services',
-    'garage door repair', 'security companies', 'staffing agencies',
-    'travel agencies', 'event venues', 'food trucks',
-];
-
 function stepDiscover($pdo, $dryRun)
 {
-    global $targetCities, $discoveryCategoryPool;
+    global $targetCities;
 
     $apiKey = $_ENV['GOOGLE_PLACES_API_KEY'] ?? '';
     if (empty($apiKey)) {
@@ -244,7 +214,7 @@ function stepDiscover($pdo, $dryRun)
         return;
     }
 
-    $totalCategories = count($discoveryCategoryPool);
+    $totalCategories = count(OUTREACH_CATEGORY_POOL);
 
     // Determine which city to search next
     $cityIndex = (int) getState($pdo, 'current_city_index', '0');
@@ -269,7 +239,7 @@ function stepDiscover($pdo, $dryRun)
     // Pick the next 5 categories to search (wrapping around the pool)
     $categoriesToSearch = [];
     for ($i = 0; $i < 5; $i++) {
-        $categoriesToSearch[] = $discoveryCategoryPool[($categoryOffset + $i) % $totalCategories];
+        $categoriesToSearch[] = OUTREACH_CATEGORY_POOL[($categoryOffset + $i) % $totalCategories];
     }
 
     logPipeline("--- Step 1: Discovery for $city, $province (city #" . ($cityIndex + 1) . "/" . count($targetCities) . ", categories " . ($categoryOffset + 1) . "-" . ($categoryOffset + 5) . "/$totalCategories) ---");

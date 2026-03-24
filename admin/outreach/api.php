@@ -959,7 +959,7 @@ Return ONLY the JSON, no other text.";
     }
 
     // Save draft to lead
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','ready_to_contact','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
     $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
 
     log_activity($pdo, $id, 'draft_generated', 'AI draft generated');

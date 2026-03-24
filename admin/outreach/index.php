@@ -153,7 +153,6 @@ include '../admin_header.php';
                 <select id="filterStatus" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="new">New</option>
-                    <option value="ready_to_contact">Ready to Contact</option>
                     <option value="draft_generated">Draft Generated</option>
                     <option value="contacted">Contacted</option>
                     <option value="replied">Replied</option>
@@ -292,7 +291,6 @@ include '../admin_header.php';
                         <label>Status</label>
                         <select id="detailStatus">
                             <option value="new">New</option>
-                            <option value="ready_to_contact">Ready to Contact</option>
                             <option value="draft_generated">Draft Generated</option>
                             <option value="contacted">Contacted</option>
                             <option value="replied">Replied</option>

@@ -70,7 +70,7 @@ class TablePaginator {
         const range = [];
 
         for (let i = 1; i <= totalPages; i++) {
-            if (i === 1 || i === totalPages || (i >= cur - 1 && i <= cur + 1)) {
+            if (totalPages <= 7 || i === 1 || i === totalPages || (i >= cur - 1 && i <= cur + 1)) {
                 range.push(i);
             } else if (range[range.length - 1] !== '...') {
                 range.push('...');
@@ -101,8 +101,7 @@ class TablePaginator {
     goTo(page) {
         this.currentPage = page;
         this.update();
-        // Scroll table into view
-        this.table.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        window.scrollTo(0, document.documentElement.scrollHeight);
     }
 
     reset() {

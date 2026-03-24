@@ -37,6 +37,18 @@ require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 require_once __DIR__ . '/lib/outreach_helpers.php';
 
+// ─── Lock file to prevent overlapping runs ───
+
+$lockFile = __DIR__ . '/logs/outreach_pipeline.lock';
+if (!is_dir(__DIR__ . '/logs')) {
+    mkdir(__DIR__ . '/logs', 0755, true);
+}
+$lockFp = fopen($lockFile, 'c');
+if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
+    echo "Pipeline already running. Exiting.\n";
+    exit(0);
+}
+
 // ─── Configuration ───
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
@@ -134,7 +146,7 @@ function ensureStateTable($pdo)
         state_key VARCHAR(100) NOT NULL UNIQUE,
         state_value TEXT,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )");
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
 function getState($pdo, $key, $default = null)
@@ -231,6 +243,12 @@ function stepDiscover($pdo, $dryRun)
     $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
 
     $result = search_businesses_core($city, $province, '', DISCOVERY_BATCH_SIZE, $apiKey, $existingPlaceIds);
+
+    if (isset($result['error'])) {
+        logPipeline("API error for $city: {$result['error']}. Will retry this city next run.", 'ERROR');
+        return;
+    }
+
     $businesses = $result['businesses'];
     $count = $result['count'];
 

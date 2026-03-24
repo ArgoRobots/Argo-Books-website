@@ -576,11 +576,12 @@ Return ONLY the JSON, no other text.";
 
     $parsed = json_decode($content, true);
     if (!$parsed || !isset($parsed['subject']) || !isset($parsed['body'])) {
-        // Fallback: use content as body
-        $parsed = [
-            'subject' => "Quick question for {$lead['business_name']}",
-            'body' => $content,
-        ];
+        // AI returned invalid JSON — save with needs_review so it won't be auto-approved
+        $fallbackSubject = "Quick question for {$lead['business_name']}";
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), approval_status = 'needs_review' WHERE id = ?");
+        $stmt->execute([$fallbackSubject, $content, $id]);
+
+        return ['success' => true, 'needs_review' => true, 'subject' => $fallbackSubject, 'body' => $content];
     }
 
     // Ensure the website URL is in the body — inject before sign-off if AI omitted it
@@ -599,6 +600,11 @@ Return ONLY the JSON, no other text.";
                 $parsed['body'],
                 1
             );
+        }
+
+        // Final fallback: if URL is still missing, append it at the end
+        if (stripos($parsed['body'], 'argorobots.com') === false) {
+            $parsed['body'] .= "\n\nYou can check it out here: https://argorobots.com/";
         }
     }
 

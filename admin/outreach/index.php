@@ -75,6 +75,15 @@ include '../admin_header.php';
                     <input type="text" id="discCategory" placeholder="e.g. landscaping, cleaners">
                 </div>
                 <div class="form-group">
+                    <label for="discCompanySize">Company Size</label>
+                    <select id="discCompanySize" onchange="renderDiscoveryResults()">
+                        <option value="">All Sizes</option>
+                        <option value="small">Small</option>
+                        <option value="medium">Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="discLimit">Limit</label>
                     <select id="discLimit">
                         <option value="5">5</option>
@@ -111,6 +120,7 @@ include '../admin_header.php';
                             <th>Website</th>
                             <th>Address</th>
                             <th>Category</th>
+                            <th>Size</th>
                         </tr>
                     </thead>
                     <tbody id="discoveryTableBody"></tbody>
@@ -143,8 +153,6 @@ include '../admin_header.php';
                 <select id="filterStatus" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="new">New</option>
-                    <option value="researching">Researching</option>
-                    <option value="ready_to_contact">Ready to Contact</option>
                     <option value="draft_generated">Draft Generated</option>
                     <option value="contacted">Contacted</option>
                     <option value="replied">Replied</option>
@@ -161,6 +169,15 @@ include '../admin_header.php';
                     <option value="positive">Positive</option>
                     <option value="neutral">Neutral</option>
                     <option value="negative">Negative</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterCompanySize">Company Size</label>
+                <select id="filterCompanySize" onchange="loadLeads()">
+                    <option value="">All Sizes</option>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -182,6 +199,13 @@ include '../admin_header.php';
         <button class="btn btn-small btn-blue" id="btnDraftSelected" onclick="bulkGenerateDrafts()">Draft Selected</button>
         <button class="btn btn-small btn-blue" onclick="openBulkSendModal()">Send Email</button>
         <button class="btn btn-small btn-blue" onclick="bulkDeleteLeads()">Delete Selected</button>
+    </div>
+
+    <!-- Bulk Draft Progress -->
+    <div class="bulk-draft-progress" id="bulkDraftProgress" style="display:none;">
+        <span class="bulk-draft-spinner"></span>
+        <span id="bulkDraftProgressText"></span>
+        <button class="btn btn-small" id="btnCancelDraft" onclick="cancelBulkDrafts()" style="margin-left:8px;">Cancel</button>
     </div>
 
     <!-- Leads Table -->
@@ -267,8 +291,6 @@ include '../admin_header.php';
                         <label>Status</label>
                         <select id="detailStatus">
                             <option value="new">New</option>
-                            <option value="researching">Researching</option>
-                            <option value="ready_to_contact">Ready to Contact</option>
                             <option value="draft_generated">Draft Generated</option>
                             <option value="contacted">Contacted</option>
                             <option value="replied">Replied</option>
@@ -294,6 +316,15 @@ include '../admin_header.php';
                         </select>
                     </div>
                     <div class="form-group">
+                        <label>Company Size</label>
+                        <select id="detailCompanySize">
+                            <option value="">Unknown</option>
+                            <option value="small">Small</option>
+                            <option value="medium">Medium</option>
+                            <option value="large">Large</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label>Contact Page URL</label>
                         <input type="url" id="detailContactPageUrl">
                     </div>
@@ -306,10 +337,9 @@ include '../admin_header.php';
                     <label>Feedback Summary</label>
                     <textarea id="detailFeedback" rows="3" placeholder="Summarize feedback received..."></textarea>
                 </div>
-                <div class="detail-meta" id="detailMeta"></div>
                 <div class="detail-actions">
-                    <button class="btn btn-blue" onclick="saveLeadDetails()">Save Changes</button>
                     <button class="btn btn-red" onclick="deleteCurrentLead()">Delete Lead</button>
+                    <button class="btn btn-blue" onclick="saveLeadDetails()">Save Changes</button>
                 </div>
             </div>
 
@@ -325,15 +355,10 @@ include '../admin_header.php';
                         <label>Message Body</label>
                         <textarea id="draftBody" rows="12" placeholder="Email body..."></textarea>
                     </div>
-                    <div id="draftPreview" class="draft-preview" style="display:none;">
-                        <h4>Preview</h4>
-                        <div id="draftPreviewContent"></div>
-                    </div>
                     <div class="draft-actions">
                         <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
-                        <button class="btn btn-blue" onclick="togglePreview()">Preview</button>
-                        <button class="btn btn-blue" onclick="copyDraft()">Copy</button>
                         <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
+                        <button class="btn btn-blue btn-small draft-copy-btn" onclick="copyDraft(this)">Copy</button>
                     </div>
                     <div class="draft-info" id="draftInfo"></div>
                 </div>

@@ -79,6 +79,11 @@ switch ($action) {
         get_activity($pdo);
         break;
 
+    // AI classification
+    case 'classify_company_sizes':
+        classify_company_sizes($pdo);
+        break;
+
     // CSV
     case 'export_csv':
         export_csv($pdo);
@@ -127,6 +132,7 @@ function get_leads($pdo)
 {
     $status = $_GET['status'] ?? '';
     $response_status = $_GET['response_status'] ?? '';
+    $company_size = $_GET['company_size'] ?? '';
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'date_added_desc';
 
@@ -140,6 +146,10 @@ function get_leads($pdo)
     if ($response_status) {
         $where[] = 'response_status = ?';
         $params[] = $response_status;
+    }
+    if ($company_size) {
+        $where[] = 'company_size = ?';
+        $params[] = $company_size;
     }
     if ($search) {
         $where[] = '(business_name LIKE ? OR email LIKE ? OR contact_name LIKE ? OR city LIKE ? OR category LIKE ?)';
@@ -243,7 +253,7 @@ function update_lead($pdo)
         'category', 'city', 'source', 'status', 'response_status',
         'notes', 'feedback_summary', 'offer_sent',
         'draft_subject', 'draft_body', 'contact_page_url',
-        'first_contact_date', 'last_contact_date',
+        'first_contact_date', 'last_contact_date', 'company_size',
     ];
 
     $setClauses = [];
@@ -353,19 +363,42 @@ function scrape_email_from_website($url)
 
     $falsePositives = ['example.com', 'sentry.io', 'wixpress.com', 'wordpress.org', 'w3.org', 'schema.org', 'googleapis.com', 'gravatar.com'];
 
+    // Clean an extracted email: decode URL encoding, strip non-ASCII and whitespace
+    $cleanEmail = function($email) {
+        $email = urldecode($email);
+        // Strip any non-ASCII characters (emojis, special chars, zero-width spaces, etc.)
+        $email = preg_replace('/[^\x20-\x7E]/', '', $email);
+        $email = trim($email);
+        // Validate it still looks like an email after cleaning
+        if (preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $email)) {
+            return $email;
+        }
+        return null;
+    };
+
     // Helper to extract email from HTML
-    $extractEmail = function($html) use ($falsePositives) {
+    $extractEmail = function($html) use ($falsePositives, $cleanEmail) {
+        // URL-decode the HTML so mailto:%20info@... becomes mailto: info@...
+        $decodedHtml = urldecode($html);
+
         // Look for mailto: links first (most reliable)
-        if (preg_match_all('/mailto:([a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $html, $matches)) {
-            foreach ($matches[1] as $email) {
+        if (preg_match_all('/mailto:\s*([^\s"\'<>]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $decodedHtml, $matches)) {
+            foreach ($matches[1] as $raw) {
+                $email = $cleanEmail($raw);
+                if (!$email) continue;
                 $dominated = false;
                 foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
                 if (!$dominated) return $email;
             }
         }
-        // Fallback: email patterns in text
-        if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $html, $matches)) {
-            foreach ($matches[0] as $email) {
+        // Fallback: email patterns in text (strip HTML tags first to avoid matching attributes)
+        $text = strip_tags($decodedHtml);
+        // Remove common non-ASCII clutter (emojis, zero-width chars) before matching
+        $text = preg_replace('/[^\x20-\x7E\n\r\t]/', ' ', $text);
+        if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $text, $matches)) {
+            foreach ($matches[0] as $raw) {
+                $email = $cleanEmail($raw);
+                if (!$email) continue;
                 $dominated = false;
                 foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
                 if (!$dominated) return $email;
@@ -439,6 +472,7 @@ function search_businesses()
     $province = trim($_GET['province'] ?? '');
     $category = trim($_GET['category'] ?? '');
     $limit = min(100, max(1, (int)($_GET['limit'] ?? 20)));
+    $excludePlaceIds = array_filter(explode(',', $_GET['exclude_place_ids'] ?? ''));
 
     if (empty($city)) {
         json_response(['success' => false, 'message' => 'City is required'], 400);
@@ -452,6 +486,10 @@ function search_businesses()
     $location = $province ? "$city, $province" : $city;
     $businesses = [];
     $seenPlaceIds = [];
+    // Pre-seed seen IDs so we skip businesses the client already has
+    foreach ($excludePlaceIds as $id) {
+        $seenPlaceIds[trim($id)] = true;
+    }
     $maxRounds = 5;
     $roundsUsed = 0;
 
@@ -470,23 +508,81 @@ function search_businesses()
         $queries[] = "$category companies in $location";
         $queries[] = "best $category in $location";
     } else {
-        $queries[] = "businesses in $location";
-        $queries[] = "services in $location";
-        $queries[] = "companies in $location";
-        $queries[] = "local businesses near $location";
-        $queries[] = "shops and services in $location";
+        // When no category provided, use a wide spread of real business categories
+        // so each round searches a different industry instead of generic synonyms
+        $categoryPool = [
+            'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
+            'accountants', 'real estate agents', 'insurance agents', 'auto repair',
+            'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
+            'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
+            'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
+            'daycare centers', 'tutoring services', 'martial arts studios',
+            'yoga studios', 'massage therapists', 'optometrists', 'pharmacies',
+            'printing services', 'moving companies', 'pest control', 'locksmiths',
+            'car dealerships', 'tire shops', 'furniture stores', 'jewelry stores',
+            'clothing boutiques', 'tattoo parlors', 'breweries', 'catering',
+            'wedding planners', 'interior designers', 'architects', 'surveyors',
+            'physiotherapists', 'psychologists', 'counsellors', 'notaries',
+            'bookkeepers', 'IT support', 'web design', 'marketing agencies',
+            'sign shops', 'trophy shops', 'music schools', 'dance studios',
+            'dog groomers', 'boarding kennels', 'farm equipment dealers',
+            'hardware stores', 'building supplies', 'appliance repair',
+            'upholstery services', 'tailors', 'dry cleaners', 'spas',
+            'tanning salons', 'nail salons', 'barber shops', 'optical stores',
+            'hearing aid clinics', 'home inspectors', 'appraisers',
+            'property management', 'storage facilities', 'courier services',
+            'towing services', 'glass repair', 'fencing contractors',
+            'concrete contractors', 'paving contractors', 'tree services',
+            'snow removal', 'pool services', 'septic services',
+            'garage door repair', 'security companies', 'staffing agencies',
+            'travel agencies', 'event venues', 'food trucks',
+        ];
+        shuffle($categoryPool);
+        for ($i = 0; $i < $maxRounds; $i++) {
+            $queries[] = $categoryPool[$i] . " in $location";
+        }
     }
+
+    // Track which pool category was searched per round (for labeling when no category provided)
+    $queryCategories = [];
+    if (!$category) {
+        foreach ($queries as $q) {
+            $queryCategories[] = ucwords(str_replace(" in $location", '', $q));
+        }
+    }
+
+    // Map category keywords to Google Places types for more targeted results
+    $placeTypeMap = [
+        'restaurant' => 'restaurant', 'plumber' => 'plumber',
+        'electrician' => 'electrician', 'dentist' => 'dentist',
+        'lawyer' => 'lawyer', 'accountant' => 'accounting',
+        'gym' => 'gym', 'salon' => 'hair_care', 'veterinarian' => 'veterinary_care',
+        'pharmacy' => 'pharmacy', 'car dealership' => 'car_dealer',
+        'bakery' => 'bakery', 'cafe' => 'cafe', 'coffee' => 'cafe',
+        'spa' => 'spa', 'florist' => 'florist', 'pet store' => 'pet_store',
+        'furniture' => 'furniture_store', 'jewelry' => 'jewelry_store',
+        'hardware' => 'hardware_store', 'barber' => 'hair_care',
+        'locksmith' => 'locksmith', 'storage' => 'storage',
+        'travel agenc' => 'travel_agency', 'insurance' => 'insurance_agency',
+        'real estate' => 'real_estate_agency',
+    ];
 
     for ($round = 0; $round < $maxRounds && count($businesses) < $limit; $round++) {
         $query = $queries[$round] ?? null;
         if (!$query) break;
+        $countBefore = count($businesses);
         $roundsUsed++;
 
         // Initial search for this round
-        $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
-            'query' => $query,
-            'key' => $apiKey,
-        ]);
+        $params = ['query' => $query, 'key' => $apiKey];
+        // Try to match a Google Places type from the query for better results
+        foreach ($placeTypeMap as $keyword => $type) {
+            if (stripos($query, $keyword) !== false) {
+                $params['type'] = $type;
+                break;
+            }
+        }
+        $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query($params);
 
         $resp = @file_get_contents($url, false, $httpContext);
         if ($resp === false) {
@@ -525,7 +621,7 @@ function search_businesses()
                     'places_id' => $placeId,
                     'business_name' => $place['name'] ?? '',
                     'address' => $place['formatted_address'] ?? '',
-                    'category' => $category ?: (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : ''),
+                    'category' => $category ?: ($queryCategories[$round] ?? (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : '')),
                     'city' => $city,
                     'phone' => null,
                     'website' => null,
@@ -581,6 +677,12 @@ function search_businesses()
             $nextPageToken = $nextData['next_page_token'] ?? null;
             $pagesUsed++;
         }
+
+        // Bail early if this round produced too few new results (diminishing returns)
+        $newThisRound = count($businesses) - $countBefore;
+        if ($newThisRound < 2 && $round > 0) {
+            break;
+        }
     }
 
     $response = ['success' => true, 'businesses' => $businesses, 'count' => count($businesses), 'rounds' => $roundsUsed];
@@ -615,8 +717,8 @@ function import_leads($pdo)
             }
 
             $stmt = $pdo->prepare("INSERT INTO outreach_leads
-                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
-                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?)");
+                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email, company_size)
+                VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?, ?)");
             $stmt->execute([
                 $biz['business_name'] ?? 'Unknown',
                 $biz['phone'] ?? null,
@@ -627,6 +729,7 @@ function import_leads($pdo)
                 $biz['places_id'] ?? null,
                 $biz['contact_page_url'] ?? null,
                 $biz['email'] ?? null,
+                $biz['company_size'] ?? null,
             ]);
 
             $id = $pdo->lastInsertId();
@@ -716,7 +819,12 @@ function summarize_business($website)
     if (strlen($text) < 50) return null;
 
     $result = call_openai(
-        "You summarize businesses based on their website content. Respond with ONLY a 1-2 sentence summary describing what the business does, what services or products they offer, and who their customers are. Be specific and factual. Do not include any other text.",
+        "You summarize businesses based on their website content. Respond with ONLY a concise summary (3-5 sentences) covering:
+1. What specific services or products they offer
+2. Who their typical customers are
+3. How they likely handle billing (e.g. do they invoice clients, do project quotes, charge hourly, sell products, etc.)
+4. Any pain points a simple bookkeeping/invoicing tool could solve for them (e.g. tracking job expenses, sending invoices, managing payments)
+Be specific and factual based on the website content. Do not include any other text or preamble.",
         "Website content from $website:\n\n$text"
     );
 
@@ -746,6 +854,17 @@ function generate_draft($pdo)
         }
     }
 
+    $isLocal = false;
+    $city = strtolower(trim($lead['city'] ?? ''));
+    $province = strtolower(trim($lead['province'] ?? ''));
+    if ($province === 'saskatchewan' || $province === 'sk' || in_array($city, ['saskatoon','regina','prince albert','moose jaw','swift current','yorkton','north battleford','estevan','weyburn','martensville','warman','humboldt','melfort','meadow lake','lloydminster'])) {
+        $isLocal = true;
+    }
+
+    $localInstruction = $isLocal
+        ? "- The business is in Saskatchewan. Evan is a local Saskatchewan developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
+        : "- Evan is an independent software developer based in Saskatoon, Saskatchewan. Mention this briefly for context.";
+
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 About Argo Books:
@@ -757,21 +876,32 @@ About Argo Books:
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
-- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
-- The sender's name is Evan, he is a local independent software developer based in Saskatoon building software for small businesses. Always mention that Evan is a local Saskatoon software developer in the email body
+$localInstruction
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [contact name]\" if available)
+
+PERSONALIZATION (this is critical):
+- If a business summary is provided, you MUST use it to make the email specific to their business. Do not write a generic email when you have summary info
+- Connect Argo Books features directly to their business needs. Examples:
+  - If they do services/contracting: mention how easy it is to invoice clients after a job
+  - If they sell products: mention simple expense tracking and bookkeeping
+  - If they likely deal with quotes/estimates: mention invoicing features
+  - If they have multiple revenue streams: mention how it keeps everything organized without accounting knowledge
+- Reference their actual business type naturally (e.g. \"I know running a landscaping business means a lot of invoicing\" not just \"I see you run a business\")
+- Only reference Argo Books features that are relevant to what they do. Do not list every feature
+- Do NOT invent details about the business you do not have
+- If no summary is available, keep it more general but still mention their industry/category if known
+
+- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
 - If appropriate, mention offering a free 1-year premium license in exchange for feedback
-- If a business summary is provided, use it to personalize the email. For example if they likely send invoices, mention the invoicing feature. If they do services, mention expense tracking. Only reference features that are relevant to their business
-- Do NOT invent details about the business you do not have
-- If limited info is available, keep it more general rather than making up praise
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
-- Include a link to the website: https://argorobots.com/
+- ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
+- You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
 - Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
@@ -783,6 +913,7 @@ Return ONLY the JSON, no other text.";
     $details = "Business: {$lead['business_name']}";
     if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
     if ($lead['city']) $details .= "\nCity: {$lead['city']}";
+    if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
     if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
     if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
     if ($summary) $details .= "\nBusiness summary: $summary";
@@ -808,8 +939,27 @@ Return ONLY the JSON, no other text.";
         ];
     }
 
+    // Ensure the website URL is in the body — inject before sign-off if AI omitted it
+    if (stripos($parsed['body'], 'argorobots.com') === false) {
+        $parsed['body'] = preg_replace(
+            '/(Feel free to|Don\'t hesitate|Let me know|Reply to this)/i',
+            "You can check it out here: https://argorobots.com/\n\n$1",
+            $parsed['body'],
+            1
+        );
+        // If regex didn't match, append before sign-off
+        if (stripos($parsed['body'], 'argorobots.com') === false) {
+            $parsed['body'] = preg_replace(
+                '/(\nAll the best)/i',
+                "\n\nYou can check it out here: https://argorobots.com/\n$1",
+                $parsed['body'],
+                1
+            );
+        }
+    }
+
     // Save draft to lead
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','researching','ready_to_contact','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
     $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
 
     log_activity($pdo, $id, 'draft_generated', 'AI draft generated');
@@ -995,5 +1145,65 @@ function import_csv($pdo)
     json_response(['success' => true, 'imported' => $imported, 'message' => "Imported $imported leads from CSV"]);
 }
 
-// ─── AI Enrichment ───
+// ─── AI Company Size Classification ───
+
+function classify_company_sizes($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true);
+    $businesses = $data['businesses'] ?? [];
+
+    if (empty($businesses)) {
+        json_response(['success' => false, 'message' => 'No businesses to classify'], 400);
+    }
+
+    // Build a list of businesses with their details for AI classification
+    $businessList = [];
+    foreach ($businesses as $i => $biz) {
+        $entry = ($i + 1) . '. ' . ($biz['business_name'] ?? 'Unknown');
+        if (!empty($biz['category'])) $entry .= ' (Category: ' . $biz['category'] . ')';
+        if (!empty($biz['address'])) $entry .= ' - ' . $biz['address'];
+        if (!empty($biz['website'])) $entry .= ' [' . $biz['website'] . ']';
+        $businessList[] = $entry;
+    }
+
+    $systemPrompt = "You classify businesses by company size. For each business in the list, determine if it is 'small', 'medium', or 'large' based on available information.
+
+Guidelines:
+- Small: Solo operators, freelancers, local mom-and-pop shops, single-location businesses with likely fewer than 20 employees. Most local service businesses (plumbers, landscapers, cleaners, small restaurants, local retail) are small.
+- Medium: Businesses with multiple locations, established regional presence, or likely 20-200 employees. Regional chains, mid-size professional firms, established contractors with large teams.
+- Large: Major corporations, national/international chains, franchises of well-known brands, businesses with likely 200+ employees.
+
+When in doubt, lean toward 'small' for local businesses found via Google Places search.
+
+Return ONLY a JSON array of size classifications in the same order as the input list.
+Example: [\"small\", \"medium\", \"small\", \"large\"]";
+
+    $userPrompt = "Classify these businesses by size:\n\n" . implode("\n", $businessList);
+
+    $result = call_openai($systemPrompt, $userPrompt);
+
+    if (isset($result['error'])) {
+        json_response(['success' => false, 'message' => $result['error']], 500);
+    }
+
+    $content = trim($result['content']);
+    $content = preg_replace('/^```json\s*/i', '', $content);
+    $content = preg_replace('/\s*```$/', '', $content);
+
+    $sizes = json_decode($content, true);
+
+    if (!is_array($sizes)) {
+        json_response(['success' => false, 'message' => 'Failed to parse AI classification response'], 500);
+    }
+
+    // Validate and normalize sizes
+    $validSizes = ['small', 'medium', 'large'];
+    $normalized = [];
+    foreach ($sizes as $size) {
+        $s = strtolower(trim($size));
+        $normalized[] = in_array($s, $validSizes) ? $s : 'small';
+    }
+
+    json_response(['success' => true, 'sizes' => $normalized]);
+}
 

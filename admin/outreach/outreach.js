@@ -13,11 +13,13 @@ function updateUrlParams() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
+    const companySize = document.getElementById('filterCompanySize').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.set('search', search);
     if (status) params.set('status', status);
     if (response) params.set('response', response);
+    if (companySize) params.set('company_size', companySize);
     if (sort && sort !== 'date_added_desc') params.set('sort', sort);
 
     const newUrl = params.toString()
@@ -31,6 +33,7 @@ function restoreFiltersFromUrl() {
     if (params.has('search')) document.getElementById('filterSearch').value = params.get('search');
     if (params.has('status')) document.getElementById('filterStatus').value = params.get('status');
     if (params.has('response')) document.getElementById('filterResponse').value = params.get('response');
+    if (params.has('company_size')) document.getElementById('filterCompanySize').value = params.get('company_size');
     if (params.has('sort')) document.getElementById('filterSort').value = params.get('sort');
 }
 
@@ -43,6 +46,7 @@ function saveDiscoveryToSession() {
         sessionStorage.setItem('outreach_disc_province', document.getElementById('discProvince').value);
         sessionStorage.setItem('outreach_disc_category', document.getElementById('discCategory').value);
         sessionStorage.setItem('outreach_disc_limit', document.getElementById('discLimit').value);
+        sessionStorage.setItem('outreach_disc_company_size', document.getElementById('discCompanySize').value);
     } catch (e) { /* storage full or unavailable */ }
 }
 
@@ -61,10 +65,12 @@ function restoreDiscoveryFromSession() {
         const province = sessionStorage.getItem('outreach_disc_province');
         const category = sessionStorage.getItem('outreach_disc_category');
         const limit = sessionStorage.getItem('outreach_disc_limit');
+        const companySize = sessionStorage.getItem('outreach_disc_company_size');
         if (city) document.getElementById('discCity').value = city;
         if (province) document.getElementById('discProvince').value = province;
         if (category) document.getElementById('discCategory').value = category;
         if (limit) document.getElementById('discLimit').value = limit;
+        if (companySize) document.getElementById('discCompanySize').value = companySize;
     } catch (e) { /* storage unavailable */ }
 }
 
@@ -154,11 +160,13 @@ async function loadLeads() {
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
+    const companySize = document.getElementById('filterCompanySize').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.search = search;
     if (status) params.status = status;
     if (response) params.response_status = response;
+    if (companySize) params.company_size = companySize;
     if (sort) params.sort = sort;
 
     // Persist filters to URL
@@ -175,7 +183,7 @@ async function loadLeads() {
         }
 
         tbody.innerHTML = data.leads.map(lead => `
-            <tr onclick="openLeadDetail(${lead.id})" class="clickable-row">
+            <tr class="lead-row">
                 <td class="checkbox-column" onclick="event.stopPropagation()">
                     <div class="checkbox"><input type="checkbox" class="lead-check" value="${lead.id}" id="lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateBulkBar()"><label for="lead-check-${lead.id}"></label></div>
                 </td>
@@ -237,11 +245,11 @@ function updateBulkBar() {
         }
     }
 
-    // Disable "Draft Selected" if any selected lead already has a draft
+    // Switch to "Redraft Selected" if all selected leads already have drafts
     const draftBtn = document.getElementById('btnDraftSelected');
     if (draftBtn) {
-        const anyDrafted = Array.from(checked).some(cb => cb.dataset.hasDraft === '1');
-        draftBtn.disabled = anyDrafted;
+        const allDrafted = checked.length > 0 && Array.from(checked).every(cb => cb.dataset.hasDraft === '1');
+        draftBtn.textContent = allDrafted ? 'Redraft Selected' : 'Draft Selected';
     }
 }
 
@@ -249,22 +257,98 @@ function getSelectedLeadIds() {
     return Array.from(document.querySelectorAll('.lead-check:checked')).map(cb => parseInt(cb.value));
 }
 
+let bulkDraftCancelled = false;
+
+function cancelBulkDrafts() {
+    bulkDraftCancelled = true;
+    const btn = document.getElementById('btnCancelDraft');
+    if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+}
+
 async function bulkGenerateDrafts() {
     const ids = getSelectedLeadIds();
     if (!ids.length) return;
     if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
 
-    notify(`Generating ${ids.length} draft(s)...`, 'info');
+    bulkDraftCancelled = false;
+    const total = ids.length;
     let success = 0, fail = 0;
-    for (const id of ids) {
+    const progressEl = document.getElementById('bulkDraftProgress');
+    const progressText = document.getElementById('bulkDraftProgressText');
+    const cancelBtn = document.getElementById('btnCancelDraft');
+    progressEl.style.display = 'flex';
+    if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.textContent = 'Cancel'; }
+
+    // Disable the draft button during processing
+    const draftBtn = document.getElementById('btnDraftSelected');
+    if (draftBtn) draftBtn.disabled = true;
+
+    function updateProgress() {
+        const done = success + fail;
+        progressText.textContent = `Drafting: ${done} of ${total} complete` + (fail ? ` (${fail} failed)` : '');
+    }
+    updateProgress();
+
+    // Process drafts concurrently (3 at a time)
+    const CONCURRENCY = 3;
+    async function processDraft(id) {
+        if (bulkDraftCancelled) return;
+
+        const row = document.querySelector(`#lead-check-${id}`)?.closest('tr');
+        const draftCellBtn = row?.querySelector('.actions-cell .btn-blue[title="Generate Draft"]');
+        if (draftCellBtn) {
+            draftCellBtn.disabled = true;
+            draftCellBtn.textContent = 'Drafting...';
+        }
+
         try {
             const result = await api('generate_draft', { method: 'POST', body: { id } });
-            if (result.success) success++; else fail++;
-        } catch { fail++; }
+            if (bulkDraftCancelled) {
+                if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
+                return;
+            }
+            if (result.success) {
+                success++;
+                if (draftCellBtn) draftCellBtn.remove();
+                if (row) {
+                    const badge = row.querySelector('.badge');
+                    if (badge && !['contacted','replied','interested','not_interested','onboarded'].includes(badge.textContent.trim().toLowerCase().replace(/\s+/g, '_'))) {
+                        badge.className = 'badge badge-status-draft_generated';
+                        badge.textContent = 'Draft Generated';
+                    }
+                    const cb = row.querySelector('.lead-check');
+                    if (cb) cb.dataset.hasDraft = '1';
+                }
+            } else {
+                fail++;
+                if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
+            }
+        } catch {
+            fail++;
+            if (draftCellBtn) { draftCellBtn.disabled = false; draftCellBtn.textContent = 'Draft'; }
+        }
+        updateProgress();
     }
-    notify(`Drafted: ${success}, Failed: ${fail}`, success ? 'success' : 'error');
-    loadLeads();
+
+    // Run in batches of CONCURRENCY
+    for (let i = 0; i < ids.length; i += CONCURRENCY) {
+        if (bulkDraftCancelled) break;
+        const batch = ids.slice(i, i + CONCURRENCY);
+        await Promise.all(batch.map(id => processDraft(id)));
+    }
+
+    // Done
+    const cancelled = bulkDraftCancelled;
+    const doneMsg = cancelled
+        ? `Cancelled: ${success} drafted` + (fail ? `, ${fail} failed` : '') + `, ${total - success - fail} skipped`
+        : `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
+    progressText.textContent = doneMsg;
+    setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+
+    if (draftBtn) draftBtn.disabled = false;
+    notify(doneMsg, success ? 'success' : 'error');
     loadStats();
+    updateBulkBar();
 }
 
 async function bulkDeleteLeads() {
@@ -320,11 +404,12 @@ async function openBulkSendModal() {
         // Render all leads
         renderBulkSendList();
 
-        // Auto-generate drafts for leads that don't have one
+        // Auto-generate drafts for leads that don't have one (3 at a time)
         const needsDraft = withEmail.filter(l => !l.draft_subject || !l.draft_body);
         if (needsDraft.length) {
             statusEl.textContent = `Generating drafts for ${needsDraft.length} lead(s)...`;
-            for (const lead of needsDraft) {
+            const CONCURRENCY = 3;
+            async function processSendDraft(lead) {
                 const itemEl = document.getElementById('bulk-send-item-' + lead.id);
                 if (itemEl) {
                     itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-generating">Generating draft...</span>';
@@ -345,6 +430,10 @@ async function openBulkSendModal() {
                         itemEl.querySelector('.bulk-send-item-draft').innerHTML = '<span class="bulk-send-item-error">Error: ' + esc(e.message) + '</span>';
                     }
                 }
+            }
+            for (let i = 0; i < needsDraft.length; i += CONCURRENCY) {
+                const batch = needsDraft.slice(i, i + CONCURRENCY);
+                await Promise.all(batch.map(lead => processSendDraft(lead)));
             }
         }
 
@@ -438,17 +527,14 @@ async function openLeadDetail(id) {
         document.getElementById('detailStatus').value = lead.status || 'new';
         document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
 
+        document.getElementById('detailCompanySize').value = lead.company_size || '';
         document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
         document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
         document.getElementById('detailNotes').value = lead.notes || '';
         document.getElementById('detailFeedback').value = lead.feedback_summary || '';
 
         // Meta info
-        let meta = `Added: ${formatDateTime(lead.date_added)}`;
-        if (lead.first_contact_date) meta += ` | First contact: ${formatDateTime(lead.first_contact_date)}`;
-        if (lead.last_contact_date) meta += ` | Last contact: ${formatDateTime(lead.last_contact_date)}`;
-        if (lead.sent_at) meta += ` | Last sent: ${formatDateTime(lead.sent_at)}`;
-        document.getElementById('detailMeta').textContent = meta;
+        // Meta info removed from UI
 
         // Draft tab
         document.getElementById('draftSubject').value = lead.draft_subject || '';
@@ -496,7 +582,7 @@ function updateDraftStatus(lead) {
     }
 
     if (lead.drafted_at) {
-        statusHtml += ` | Drafted: ${formatDateTime(lead.drafted_at)}`;
+        statusHtml += ` Drafted: ${formatDateTime(lead.drafted_at)}`;
     }
 
     bar.innerHTML = statusHtml;
@@ -532,7 +618,7 @@ async function saveLeadDetails() {
         city: document.getElementById('detailCity').value,
         status: document.getElementById('detailStatus').value,
         response_status: document.getElementById('detailResponseStatus').value,
-
+        company_size: document.getElementById('detailCompanySize').value,
         offer_sent: document.getElementById('detailOfferSent').value,
         contact_page_url: document.getElementById('detailContactPageUrl').value,
         notes: document.getElementById('detailNotes').value,
@@ -545,10 +631,12 @@ async function saveLeadDetails() {
 
     try {
         const result = await api('update_lead', { method: 'POST', body: data });
-        notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
+            closeModal('leadDetailModal');
             loadLeads();
             loadStats();
+        } else {
+            notify(result.message, 'error');
         }
     } catch (e) {
         notify(e.message, 'error');
@@ -622,52 +710,115 @@ async function searchBusinesses() {
     btn.disabled = true;
     btn.textContent = 'Searching...';
 
-    const params = {
+    const sizeFilter = document.getElementById('discCompanySize').value;
+    const limit = parseInt(document.getElementById('discLimit').value);
+    const baseParams = {
         city: city,
         province: document.getElementById('discProvince').value.trim(),
         category: document.getElementById('discCategory').value.trim(),
-        limit: document.getElementById('discLimit').value,
+        limit: limit,
     };
 
-    const data = await api('search_businesses', { params });
+    discoveryResults = [];
+    document.getElementById('discoveryResults').style.display = 'block';
+
+    // If a size filter is active, we may need multiple search+classify rounds
+    // to accumulate enough results that match the filter
+    const maxAttempts = sizeFilter ? 3 : 1;
+    let lastNote = null;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        // Exclude businesses we already have so the API finds new ones
+        const excludeIds = discoveryResults.map(b => b.places_id).filter(Boolean).join(',');
+        const params = { ...baseParams };
+        if (excludeIds) params.exclude_place_ids = excludeIds;
+
+        btn.textContent = attempt === 0 ? 'Searching...' : `Searching (round ${attempt + 1})...`;
+        const data = await api('search_businesses', { params });
+
+        if (!data.success) {
+            if (attempt === 0) {
+                btn.disabled = false;
+                btn.textContent = 'Search';
+                notify(data.message, 'error');
+                return;
+            }
+            break;
+        }
+
+        if (!data.businesses.length) break;
+        lastNote = data.note || null;
+
+        // Classify sizes for the new batch
+        const newBatch = data.businesses;
+        try {
+            const classifyData = await api('classify_company_sizes', {
+                method: 'POST',
+                body: { businesses: newBatch }
+            });
+            if (classifyData.success && classifyData.sizes) {
+                classifyData.sizes.forEach((size, i) => {
+                    if (i < newBatch.length) newBatch[i].company_size = size;
+                });
+            }
+        } catch (e) {
+            console.warn('Company size classification failed:', e.message);
+        }
+
+        // Add new batch to results and re-render
+        discoveryResults = discoveryResults.concat(newBatch);
+        renderDiscoveryResults();
+        saveDiscoveryToSession();
+
+        // Check if we have enough filtered results
+        if (!sizeFilter) break;
+        const filteredCount = discoveryResults.filter(b => b.company_size === sizeFilter).length;
+        if (filteredCount >= limit) break;
+    }
+
     btn.disabled = false;
     btn.textContent = 'Search';
 
-    if (!data.success) {
-        notify(data.message, 'error');
-        return;
-    }
-
-    discoveryResults = data.businesses;
-    document.getElementById('discoveryResults').style.display = 'block';
-    renderDiscoveryResults();
-    saveDiscoveryToSession();
-
-    if (data.note) {
-        notify(data.note, 'info');
+    if (lastNote && sizeFilter) {
+        const filteredCount = discoveryResults.filter(b => b.company_size === sizeFilter).length;
+        if (filteredCount < limit) {
+            notify(`Found ${filteredCount} ${sizeFilter} businesses out of ${discoveryResults.length} total. Not enough ${sizeFilter} businesses in this area.`, 'info');
+        }
     }
 }
 
 function renderDiscoveryResults() {
-    document.getElementById('discoveryCount').textContent = `${discoveryResults.length} results`;
+    const sizeFilter = document.getElementById('discCompanySize').value;
+    const filtered = sizeFilter
+        ? discoveryResults.filter(biz => biz.company_size === sizeFilter)
+        : discoveryResults;
+
+    document.getElementById('discoveryCount').textContent = sizeFilter
+        ? `${filtered.length} of ${discoveryResults.length} results (filtered by ${sizeFilter})`
+        : `${discoveryResults.length} results`;
+
     const tbody = document.getElementById('discoveryTableBody');
 
-    if (!discoveryResults.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No businesses found</td></tr>';
+    if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No businesses found</td></tr>';
         return;
     }
 
-    tbody.innerHTML = discoveryResults.map((biz, i) => `
+    tbody.innerHTML = filtered.map((biz, i) => {
+        // Find original index for checkbox data
+        const origIndex = discoveryResults.indexOf(biz);
+        return `
         <tr>
-            <td><div class="checkbox"><input type="checkbox" class="disc-check" data-index="${i}" id="disc-check-${i}" checked><label for="disc-check-${i}"></label></div></td>
+            <td><div class="checkbox"><input type="checkbox" class="disc-check" data-index="${origIndex}" id="disc-check-${origIndex}" checked><label for="disc-check-${origIndex}"></label></div></td>
             <td>${esc(biz.business_name)}</td>
             <td>${biz.email ? esc(biz.email) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.phone ? esc(biz.phone) : '<span class="text-muted">—</span>'}</td>
             <td>${biz.website ? '<a href="' + esc(biz.website) + '" target="_blank" rel="noopener noreferrer" class="link">Link</a>' : '<span class="text-muted">—</span>'}</td>
             <td>${esc(biz.address || '')}</td>
             <td>${esc(biz.category || '')}</td>
-        </tr>
-    `).join('');
+            <td>${biz.company_size ? '<span class="badge badge-size-' + biz.company_size + '">' + biz.company_size.charAt(0).toUpperCase() + biz.company_size.slice(1) + '</span>' : '<span class="text-muted">—</span>'}</td>
+        </tr>`;
+    }).join('');
 
     const selectAll = document.getElementById('discSelectAll');
     if (selectAll) selectAll.checked = true;
@@ -743,8 +894,10 @@ async function generateDraft() {
         if (data.success) {
             document.getElementById('draftSubject').value = data.subject;
             document.getElementById('draftBody').value = data.body;
-            // Refresh lead to update status
-            openLeadDetail(currentLeadId);
+            // Refresh draft status without switching tabs
+            const leadData = await api('get_lead', { params: { id: currentLeadId } });
+            if (leadData.success) updateDraftStatus(leadData.lead);
+            loadActivity(currentLeadId);
         } else {
             notify(data.message, 'error');
         }
@@ -803,27 +956,19 @@ async function sendEmail() {
     }
 }
 
-function togglePreview() {
-    const preview = document.getElementById('draftPreview');
-    if (preview.style.display === 'none') {
-        const subject = document.getElementById('draftSubject').value;
-        const body = document.getElementById('draftBody').value;
-        document.getElementById('draftPreviewContent').innerHTML =
-            '<p><strong>Subject:</strong> ' + esc(subject) + '</p><hr>' +
-            '<p>' + esc(body).replace(/\n/g, '<br>') + '</p>';
-        preview.style.display = 'block';
-    } else {
-        preview.style.display = 'none';
-    }
-}
 
-function copyDraft() {
+function copyDraft(btn) {
     const subject = document.getElementById('draftSubject').value;
     const body = document.getElementById('draftBody').value;
     const text = `Subject: ${subject}\n\n${body}`;
-    navigator.clipboard.writeText(text).then(() => {
-        notify('Draft copied to clipboard', 'success');
-    }).catch(() => {
+
+    const copied = () => {
+        const original = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => btn.textContent = original, 1000);
+    };
+
+    navigator.clipboard.writeText(text).then(copied).catch(() => {
         // Fallback
         const ta = document.createElement('textarea');
         ta.value = text;
@@ -831,7 +976,7 @@ function copyDraft() {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        notify('Draft copied to clipboard', 'success');
+        copied();
     });
 }
 
@@ -962,12 +1107,6 @@ function formatStatus(status) {
 
 function formatActionType(type) {
     return type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const d = new Date(dateStr + 'T00:00:00');
-    return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function formatDateTime(dateStr) {

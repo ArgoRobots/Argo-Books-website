@@ -23,8 +23,8 @@
 
 set_time_limit(600); // 10 minutes max for full pipeline
 
-// Only allow CLI execution
-if (php_sapi_name() !== 'cli') {
+// Only allow CLI/cron execution (some hosts run cron via CGI, not CLI)
+if (php_sapi_name() !== 'cli' && isset($_SERVER['HTTP_HOST'])) {
     http_response_code(403);
     die('Access denied. This script can only be run via CLI.');
 }
@@ -129,7 +129,7 @@ function logPipeline($message, $type = 'INFO')
     }
     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
 
-    if (php_sapi_name() === 'cli') {
+    if (!isset($_SERVER['HTTP_HOST'])) {
         echo $logEntry;
     }
 }

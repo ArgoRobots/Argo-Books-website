@@ -212,7 +212,7 @@ function scrape_email_from_website($url)
  * Core business search logic. Returns array with 'businesses', 'count', 'rounds'.
  * Used by both the admin API endpoint and the cron pipeline.
  */
-function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [])
+function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [], $maxRounds = 5)
 {
     $location = $province ? "$city, $province" : $city;
     $businesses = [];
@@ -221,7 +221,6 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
     foreach ($excludePlaceIds as $id) {
         $seenPlaceIds[trim($id)] = true;
     }
-    $maxRounds = 5;
     $roundsUsed = 0;
 
     // Stream context with timeouts for all Google API calls

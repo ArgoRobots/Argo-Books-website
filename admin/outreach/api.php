@@ -400,6 +400,16 @@ function import_leads($pdo)
                 }
             }
 
+            // Deduplicate by email to avoid emailing same address twice
+            if (!empty($biz['email'])) {
+                $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ?");
+                $check->execute([$biz['email']]);
+                if ($check->fetch()) {
+                    $skipped++;
+                    continue;
+                }
+            }
+
             $stmt = $pdo->prepare("INSERT INTO outreach_leads
                 (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email, company_size)
                 VALUES (?, ?, ?, ?, ?, ?, 'google_places', ?, ?, ?, ?)");

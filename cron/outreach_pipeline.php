@@ -198,7 +198,13 @@ try {
 
 } catch (Exception $e) {
     logPipeline("Pipeline fatal error: " . $e->getMessage(), 'ERROR');
+    flock($lockFp, LOCK_UN);
+    fclose($lockFp);
     exit(1);
+} finally {
+    // Release lock file
+    flock($lockFp, LOCK_UN);
+    fclose($lockFp);
 }
 
 // ══════════════════════════════════════════════════════════════

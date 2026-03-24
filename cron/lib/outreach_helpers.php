@@ -352,11 +352,14 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
                 // Skip businesses without a website
                 if (empty($business['website'])) continue;
 
-                // Scrape email from business website
+                // Scrape email from business website and validate
                 $business['email'] = scrape_email_from_website($business['website']);
 
-                // Skip businesses where we couldn't find an email
-                if (empty($business['email'])) continue;
+                // Skip businesses where we couldn't find a valid email
+                if (empty($business['email']) || !filter_var($business['email'], FILTER_VALIDATE_EMAIL)) {
+                    $business['email'] = null;
+                    continue;
+                }
 
                 $businesses[] = $business;
             }

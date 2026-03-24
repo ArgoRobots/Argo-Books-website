@@ -55,8 +55,8 @@ define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
 define('CATEGORIES_PER_RUN', 5);
 
-// Parse CLI flags
-$args = array_slice($argv, 1);
+// Parse CLI flags ($argv is null under CGI, fall back to empty array)
+$args = array_slice($argv ?? [], 1);
 $discoverOnly = in_array('--discover-only', $args);
 $draftOnly = in_array('--draft-only', $args);
 $sendOnly = in_array('--send-only', $args);

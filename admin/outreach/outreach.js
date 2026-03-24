@@ -125,12 +125,8 @@ async function api(action, options = {}) {
     return await res.json();
 }
 
-function notify(message, type = 'success') {
-    if (typeof showNotification === 'function') {
-        showNotification(message, type);
-    } else {
-        alert(message);
-    }
+function notify(message) {
+    alert(message);
 }
 
 // ─── Stats ───

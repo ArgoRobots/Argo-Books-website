@@ -53,30 +53,18 @@ function handleReport(reportId, action, contentType = null, contentId = null) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message, 'success');
-                } else {
-                    alert(data.message);
-                }
+                alert(data.message);
                 // Reload page after a short delay
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } else {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message || 'Action failed', 'error');
-                } else {
-                    alert(data.message || 'Action failed');
-                }
+                alert(data.message || 'Action failed');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            if (typeof showNotification === 'function') {
-                showNotification('An error occurred', 'error');
-            } else {
-                alert('An error occurred');
-            }
+            alert('An error occurred');
         });
 }
 
@@ -113,33 +101,21 @@ function submitBan() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message, 'success');
-                } else {
-                    alert(data.message);
-                }
+                alert(data.message);
                 closeBanModal();
                 // Reload page after a short delay
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } else {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message || 'Failed to ban user', 'error');
-                } else {
-                    alert(data.message || 'Failed to ban user');
-                }
+                alert(data.message || 'Failed to ban user');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Ban User';
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            if (typeof showNotification === 'function') {
-                showNotification('An error occurred', 'error');
-            } else {
-                alert('An error occurred');
-            }
+            alert('An error occurred');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Ban User';
         });
@@ -200,33 +176,21 @@ function submitResetUsername() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message, 'success');
-                } else {
-                    alert(data.message);
-                }
+                alert(data.message);
                 closeResetUsernameModal();
                 // Reload page after a short delay
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } else {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message || 'Failed to reset username', 'error');
-                } else {
-                    alert(data.message || 'Failed to reset username');
-                }
+                alert(data.message || 'Failed to reset username');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Reset Username';
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            if (typeof showNotification === 'function') {
-                showNotification('An error occurred', 'error');
-            } else {
-                alert('An error occurred');
-            }
+            alert('An error occurred');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Reset Username';
         });
@@ -287,33 +251,21 @@ function submitClearBio() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message, 'success');
-                } else {
-                    alert(data.message);
-                }
+                alert(data.message);
                 closeClearBioModal();
                 // Reload page after a short delay
                 setTimeout(() => {
                     window.location.reload();
                 }, 1000);
             } else {
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message || 'Failed to clear bio', 'error');
-                } else {
-                    alert(data.message || 'Failed to clear bio');
-                }
+                alert(data.message || 'Failed to clear bio');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Clear Bio';
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            if (typeof showNotification === 'function') {
-                showNotification('An error occurred', 'error');
-            } else {
-                alert('An error occurred');
-            }
+            alert('An error occurred');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Clear Bio';
         });

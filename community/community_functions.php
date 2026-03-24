@@ -247,46 +247,6 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
 }
 
 /**
- * Delete a comment
- * 
- * @param int $comment_id Comment ID
- * @return array|false Post ID and success status or false on failure
- */
-function delete_comment($comment_id)
-{
-    $db = get_db_connection();
-
-    // Get the post_id before deleting
-    $stmt = $db->prepare('SELECT post_id FROM community_comments WHERE id = ?');
-    $stmt->bind_param('i', $comment_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
-
-    if (!$row) {
-        $stmt->close();
-        return false;
-    }
-
-    $post_id = $row['post_id'];
-
-    // Delete the comment
-    $stmt = $db->prepare('DELETE FROM community_comments WHERE id = ?');
-    $stmt->bind_param('i', $comment_id);
-
-    if ($stmt->execute()) {
-        $stmt->close();
-        return [
-            'post_id' => $post_id,
-            'success' => true
-        ];
-    }
-
-    $stmt->close();
-    return false;
-}
-
-/**
  * Add or update a vote
  * 
  * @param int $post_id Post ID

@@ -846,12 +846,13 @@ function handle_password_change()
             }
         }
 
-        // Delete account functionality
+        // Delete account fallback — available immediately before deferred delete-account.js loads
         function showDeleteModal() {
             document.getElementById('delete-account-modal').style.display = 'block';
             document.getElementById('delete-confirm-input').value = '';
             document.getElementById('confirm-delete').disabled = true;
         }
+
     </script>
 
     <div id="delete-account-modal" class="modal" style="display: none;">

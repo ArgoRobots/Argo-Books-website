@@ -64,20 +64,38 @@ class TablePaginator {
         }
         this.controlsEl.style.display = '';
 
-        const start = (this.currentPage - 1) * this.perPage + 1;
-        const end = Math.min(this.currentPage * this.perPage, total);
+        // Build page number buttons with ellipsis for large page counts
+        let pages = '';
+        const cur = this.currentPage;
+        const range = [];
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || (i >= cur - 1 && i <= cur + 1)) {
+                range.push(i);
+            } else if (range[range.length - 1] !== '...') {
+                range.push('...');
+            }
+        }
+
+        for (const p of range) {
+            if (p === '...') {
+                pages += '<span class="pg-ellipsis">\u2026</span>';
+            } else {
+                pages += `<button class="pg-num${p === cur ? ' pg-active' : ''}" data-pg="${p}">${p}</button>`;
+            }
+        }
 
         this.controlsEl.innerHTML = `
-            <span class="pagination-info">Showing ${start}\u2013${end} of ${total}</span>
-            <div class="pagination-buttons">
-                <button class="btn btn-small pg-btn" ${this.currentPage <= 1 ? 'disabled' : ''} data-pg="prev">\u2190 Prev</button>
-                <span class="pagination-page">Page ${this.currentPage} of ${totalPages}</span>
-                <button class="btn btn-small pg-btn" ${this.currentPage >= totalPages ? 'disabled' : ''} data-pg="next">Next \u2192</button>
-            </div>
+            <button class="pg-arrow" ${cur <= 1 ? 'disabled' : ''} data-pg="prev">\u2039</button>
+            ${pages}
+            <button class="pg-arrow" ${cur >= totalPages ? 'disabled' : ''} data-pg="next">\u203A</button>
         `;
 
-        this.controlsEl.querySelector('[data-pg="prev"]').addEventListener('click', () => this.goTo(this.currentPage - 1));
-        this.controlsEl.querySelector('[data-pg="next"]').addEventListener('click', () => this.goTo(this.currentPage + 1));
+        this.controlsEl.querySelector('[data-pg="prev"]').addEventListener('click', () => this.goTo(cur - 1));
+        this.controlsEl.querySelector('[data-pg="next"]').addEventListener('click', () => this.goTo(cur + 1));
+        this.controlsEl.querySelectorAll('.pg-num').forEach(btn => {
+            btn.addEventListener('click', () => this.goTo(parseInt(btn.dataset.pg, 10)));
+        });
     }
 
     goTo(page) {

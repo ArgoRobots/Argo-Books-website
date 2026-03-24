@@ -28,7 +28,7 @@ $dotenv->load();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 
-define('DAILY_SEND_LIMIT', 10);
+define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 
 function logOutreach($message, $type = 'INFO') {
     $timestamp = date('Y-m-d H:i:s');

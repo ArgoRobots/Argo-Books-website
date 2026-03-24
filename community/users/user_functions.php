@@ -67,37 +67,6 @@ namespace {
     }
 
     /**
-     * Verify user email
-     * 
-     * @param string $token Verification token
-     * @return bool Success status
-     */
-    function verify_email($token)
-    {
-        $db = get_db_connection();
-
-        // Find user by verification token
-        $stmt = $db->prepare('SELECT id FROM community_users WHERE verification_token = ?');
-        $stmt->bind_param('s', $token);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
-
-        if (!$user) {
-            return false;
-        }
-
-        // Update user as verified
-        $stmt = $db->prepare('UPDATE community_users SET email_verified = 1, verification_token = NULL WHERE id = ?');
-        $stmt->bind_param('i', $user['id']);
-        $success = $stmt->execute();
-        $stmt->close();
-
-        return $success;
-    }
-
-    /**
      * Authenticate user
      *
      * @param string $login Username or email
@@ -415,26 +384,6 @@ namespace {
         $stmt->close();
 
         return $success;
-    }
-
-    /**
-     * Check if user is an admin
-     * 
-     * @param int $user_id User ID
-     * @return bool True if user is admin
-     */
-    function is_admin($user_id)
-    {
-        $db = get_db_connection();
-
-        $stmt = $db->prepare('SELECT role FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
-
-        return $user && $user['role'] === 'admin';
     }
 
     /**

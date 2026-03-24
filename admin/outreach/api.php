@@ -862,7 +862,7 @@ function generate_draft($pdo)
     }
 
     $localInstruction = $isLocal
-        ? "- The business is in Saskatchewan. Evan is a local Saskatchewan developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
+        ? "- The business is in Saskatchewan. Evan is a local Saskatchewan software developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon software developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
         : "- Evan is an independent software developer based in Saskatoon, Saskatchewan. Mention this briefly for context.";
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.

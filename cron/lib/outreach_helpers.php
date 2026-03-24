@@ -3,13 +3,59 @@
  * Shared helper functions for outreach automation.
  * Used by both the admin API (admin/outreach/api.php) and the cron pipeline.
  *
- * Contains: scrape_email_from_website, search_businesses_core, call_openai,
- *           summarize_business, generate_draft_for_lead
+ * Contains: log_activity, send_outreach_lead, scrape_email_from_website,
+ *           search_businesses_core, call_openai, summarize_business,
+ *           generate_draft_for_lead
  */
 
 // Guard against double-inclusion
 if (defined('OUTREACH_HELPERS_LOADED')) return;
 define('OUTREACH_HELPERS_LOADED', true);
+
+// ─── Activity Logging ───
+
+function log_activity($pdo, $lead_id, $action_type, $details = null)
+{
+    $stmt = $pdo->prepare("INSERT INTO outreach_activity_log (lead_id, action_type, details) VALUES (?, ?, ?)");
+    $stmt->execute([$lead_id, $action_type, $details]);
+}
+
+// ─── Send a Single Outreach Email ───
+
+/**
+ * Send an outreach email for a lead and update its DB status.
+ * Returns true on success, false on failure.
+ */
+function send_outreach_lead($pdo, $lead)
+{
+    $id = $lead['id'];
+    $email = $lead['email'];
+
+    $htmlBody = '<p>' . nl2br(htmlspecialchars($lead['draft_body'])) . '</p>';
+
+    $result = send_styled_email(
+        $email,
+        $lead['draft_subject'],
+        $htmlBody,
+        '',
+        'contact@argorobots.com',
+        'Argo Books',
+        'contact@argorobots.com'
+    );
+
+    if ($result) {
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET
+            sent_at = NOW(),
+            status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
+            first_contact_date = COALESCE(first_contact_date, NOW()),
+            last_contact_date = NOW()
+            WHERE id = ?");
+        $stmt->execute([$id]);
+        return true;
+    }
+
+    return false;
+}
 
 // ─── Email Scraping Helper ───
 

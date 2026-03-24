@@ -27,6 +27,7 @@ $dotenv->load();
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
+require_once __DIR__ . '/lib/outreach_helpers.php';
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 
@@ -43,11 +44,6 @@ function logOutreach($message, $type = 'INFO') {
     if (php_sapi_name() === 'cli') {
         echo $logEntry;
     }
-}
-
-function log_activity($pdo, $lead_id, $action_type, $details = null) {
-    $stmt = $pdo->prepare("INSERT INTO outreach_activity_log (lead_id, action_type, details) VALUES (?, ?, ?)");
-    $stmt->execute([$lead_id, $action_type, $details]);
 }
 
 logOutreach('Starting outreach email send...');
@@ -104,30 +100,8 @@ try {
         $email = $lead['email'];
 
         try {
-            // Format body for HTML email
-            $htmlBody = '<p>' . nl2br(htmlspecialchars($lead['draft_body'])) . '</p>';
-
-            $result = send_styled_email(
-                $email,
-                $lead['draft_subject'],
-                $htmlBody,
-                '',
-                'contact@argorobots.com',
-                'Argo Books',
-                'contact@argorobots.com'
-            );
-
-            if ($result) {
-                $stmt = $pdo->prepare("UPDATE outreach_leads SET
-                    sent_at = NOW(),
-                    status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
-                    first_contact_date = COALESCE(first_contact_date, NOW()),
-                    last_contact_date = NOW()
-                    WHERE id = ?");
-                $stmt->execute([$id]);
-
+            if (send_outreach_lead($pdo, $lead)) {
                 log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via cron to: ' . $email);
-
                 logOutreach("Sent email to $businessName <$email> (lead #$id)");
                 $successCount++;
             } else {

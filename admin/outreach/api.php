@@ -100,13 +100,7 @@ switch ($action) {
 }
 
 
-// ─── Activity logging helper ───
-
-function log_activity($pdo, $lead_id, $action_type, $details = null)
-{
-    $stmt = $pdo->prepare("INSERT INTO outreach_activity_log (lead_id, action_type, details) VALUES (?, ?, ?)");
-    $stmt->execute([$lead_id, $action_type, $details]);
-}
+// log_activity() is provided by cron/lib/outreach_helpers.php
 
 // ─── JSON response helper ───
 
@@ -484,22 +478,8 @@ function send_outreach_email($pdo)
         json_response(['success' => false, 'message' => 'No draft to send'], 400);
     }
 
-    // Format body for HTML email (convert newlines to <br>)
-    $htmlBody = '<p>' . nl2br(htmlspecialchars($lead['draft_body'])) . '</p>';
-
-    $result = send_styled_email($lead['email'], $lead['draft_subject'], $htmlBody, '', 'contact@argorobots.com', 'Argo Books', 'contact@argorobots.com');
-
-    if ($result) {
-        $stmt = $pdo->prepare("UPDATE outreach_leads SET
-            sent_at = NOW(),
-            status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
-            first_contact_date = COALESCE(first_contact_date, NOW()),
-            last_contact_date = NOW()
-            WHERE id = ?");
-        $stmt->execute([$id]);
-
+    if (send_outreach_lead($pdo, $lead)) {
         log_activity($pdo, $id, 'email_sent', 'Outreach email sent to: ' . $lead['email']);
-
         json_response(['success' => true, 'message' => 'Email sent successfully']);
     } else {
         log_activity($pdo, $id, 'email_failed', 'Email send failed for: ' . $lead['email']);

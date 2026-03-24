@@ -215,6 +215,7 @@ include '../admin_header.php';
                 <tr>
                     <th class="checkbox-column"><div class="checkbox"><input type="checkbox" id="leadsSelectAll" onchange="toggleLeadCheckboxes(this)"><label for="leadsSelectAll"></label></div></th>
                     <th>Business</th>
+                    <th>Website</th>
                     <th>Email</th>
                     <th>Phone</th>
                     <th>City</th>
@@ -224,7 +225,7 @@ include '../admin_header.php';
                 </tr>
             </thead>
             <tbody id="leadsTableBody">
-                <tr><td colspan="9" class="empty-state">Loading...</td></tr>
+                <tr><td colspan="10" class="empty-state">Loading...</td></tr>
             </tbody>
         </table>
     </div>

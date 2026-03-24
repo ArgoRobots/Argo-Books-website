@@ -9,9 +9,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
-// Get database connection
-$db = get_db_connection();
-
 try {
     global $pdo;
 

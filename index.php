@@ -173,40 +173,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         </div>
     </section>
 
-    <!-- Trusted By Section -->
-    <!-- <section class="trusted-section">
-        <div class="container">
-            <p class="trusted-label animate-on-scroll">Trusted by businesses across Canada</p>
-            <div class="trusted-logos animate-on-scroll">
-                <div class="trusted-logo">
-                    <svg width="120" height="40" viewBox="0 0 120 40" fill="currentColor" opacity="0.5">
-                        <text x="0" y="28" font-size="14" font-weight="600">Small Retail</text>
-                    </svg>
-                </div>
-                <div class="trusted-logo">
-                    <svg width="120" height="40" viewBox="0 0 120 40" fill="currentColor" opacity="0.5">
-                        <text x="0" y="28" font-size="14" font-weight="600">E-commerce</text>
-                    </svg>
-                </div>
-                <div class="trusted-logo">
-                    <svg width="120" height="40" viewBox="0 0 120 40" fill="currentColor" opacity="0.5">
-                        <text x="0" y="28" font-size="14" font-weight="600">Services</text>
-                    </svg>
-                </div>
-                <div class="trusted-logo">
-                    <svg width="120" height="40" viewBox="0 0 120 40" fill="currentColor" opacity="0.5">
-                        <text x="0" y="28" font-size="14" font-weight="600">Rental</text>
-                    </svg>
-                </div>
-                <div class="trusted-logo">
-                    <svg width="120" height="40" viewBox="0 0 120 40" fill="currentColor" opacity="0.5">
-                        <text x="0" y="28" font-size="14" font-weight="600">Wholesale</text>
-                    </svg>
-                </div>
-            </div>
-        </div>
-    </section> -->
-
     <!-- Features Tabbed Section -->
     <section id="features" class="features-section">
         <div class="container">

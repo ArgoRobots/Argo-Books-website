@@ -126,11 +126,7 @@ async function api(action, options = {}) {
 }
 
 function notify(message, type = 'success') {
-    if (typeof showNotification === 'function') {
-        showNotification(message, type);
-    } else {
-        alert(message);
-    }
+    alert(message);
 }
 
 // ─── Stats ───

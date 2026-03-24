@@ -82,29 +82,15 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show success notification
-                if (typeof showNotification === 'function') {
-                    showNotification('Report submitted successfully. Our team will review it shortly.', 'success');
-                } else {
-                    alert('Report submitted successfully. Our team will review it shortly.');
-                }
+                alert('Report submitted successfully. Our team will review it shortly.');
                 closeModal();
             } else {
-                // Show error notification
-                if (typeof showNotification === 'function') {
-                    showNotification(data.message || 'Failed to submit report. Please try again.', 'error');
-                } else {
-                    alert(data.message || 'Failed to submit report. Please try again.');
-                }
+                alert(data.message || 'Failed to submit report. Please try again.');
             }
         })
         .catch(error => {
             console.error('Error submitting report:', error);
-            if (typeof showNotification === 'function') {
-                showNotification('An error occurred. Please try again later.', 'error');
-            } else {
-                alert('An error occurred. Please try again later.');
-            }
+            alert('An error occurred. Please try again later.');
         })
         .finally(() => {
             // Re-enable submit button

@@ -234,7 +234,7 @@ function stepDiscover($pdo, $dryRun)
     $stmt->execute();
     $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
 
-    $result = search_businesses_cli($city, $province, '', DISCOVERY_BATCH_SIZE, $apiKey, $existingPlaceIds);
+    $result = search_businesses_core($city, $province, '', DISCOVERY_BATCH_SIZE, $apiKey, $existingPlaceIds);
     $businesses = $result['businesses'];
     $count = $result['count'];
 
@@ -342,7 +342,7 @@ function stepGenerateDrafts($pdo, $dryRun)
 
     foreach ($leads as $lead) {
         try {
-            $result = generate_draft_for_lead_cli($pdo, $lead);
+            $result = generate_draft_for_lead($pdo, $lead);
 
             if (isset($result['error'])) {
                 logPipeline("Draft generation failed for {$lead['business_name']}: {$result['error']}", 'ERROR');

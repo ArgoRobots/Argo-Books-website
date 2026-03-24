@@ -1,12 +1,19 @@
 <?php
 /**
  * Shared helper functions for outreach automation.
- * Used by both the admin API and the automated cron pipeline.
+ * Used by both the admin API (admin/outreach/api.php) and the cron pipeline.
+ *
+ * Contains: scrape_email_from_website, search_businesses_core, call_openai,
+ *           summarize_business, generate_draft_for_lead
  */
 
-// ─── Email Scraping ───
+// Guard against double-inclusion
+if (defined('OUTREACH_HELPERS_LOADED')) return;
+define('OUTREACH_HELPERS_LOADED', true);
 
-function scrape_email_from_website_cli($url)
+// ─── Email Scraping Helper ───
+
+function scrape_email_from_website($url)
 {
     if (empty($url)) return null;
 
@@ -22,65 +29,75 @@ function scrape_email_from_website_cli($url)
 
     $falsePositives = ['example.com', 'sentry.io', 'wixpress.com', 'wordpress.org', 'w3.org', 'schema.org', 'googleapis.com', 'gravatar.com'];
 
-    $cleanEmail = function ($email) {
+    // Clean an extracted email: decode URL encoding, strip non-ASCII and whitespace
+    $cleanEmail = function($email) {
         $email = urldecode($email);
+        // Strip any non-ASCII characters (emojis, special chars, zero-width spaces, etc.)
         $email = preg_replace('/[^\x20-\x7E]/', '', $email);
         $email = trim($email);
+        // Validate it still looks like an email after cleaning
         if (preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $email)) {
             return $email;
         }
         return null;
     };
 
-    $extractEmail = function ($html) use ($falsePositives, $cleanEmail) {
+    // Helper to extract email from HTML
+    $extractEmail = function($html) use ($falsePositives, $cleanEmail) {
+        // URL-decode the HTML so mailto:%20info@... becomes mailto: info@...
         $decodedHtml = urldecode($html);
 
+        // Look for mailto: links first (most reliable)
         if (preg_match_all('/mailto:\s*([^\s"\'<>]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $decodedHtml, $matches)) {
             foreach ($matches[1] as $raw) {
                 $email = $cleanEmail($raw);
                 if (!$email) continue;
-                $skip = false;
-                foreach ($falsePositives as $fp) {
-                    if (str_contains(strtolower($email), $fp)) { $skip = true; break; }
-                }
-                if (!$skip) return $email;
+                $dominated = false;
+                foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
+                if (!$dominated) return $email;
             }
         }
-
+        // Fallback: email patterns in text (strip HTML tags first to avoid matching attributes)
         $text = strip_tags($decodedHtml);
+        // Remove common non-ASCII clutter (emojis, zero-width chars) before matching
         $text = preg_replace('/[^\x20-\x7E\n\r\t]/', ' ', $text);
         if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $text, $matches)) {
             foreach ($matches[0] as $raw) {
                 $email = $cleanEmail($raw);
                 if (!$email) continue;
-                $skip = false;
-                foreach ($falsePositives as $fp) {
-                    if (str_contains(strtolower($email), $fp)) { $skip = true; break; }
-                }
-                if (!$skip) return $email;
+                $dominated = false;
+                foreach ($falsePositives as $fp) { if (str_contains(strtolower($email), $fp)) { $dominated = true; break; } }
+                if (!$dominated) return $email;
             }
         }
         return null;
     };
 
+    // Try homepage first
     $html = @file_get_contents($url, false, $context);
     if ($html) {
         $email = $extractEmail($html);
         if ($email) return $email;
 
+        // Find contact page links in the HTML
+        // Parse base URL properly for resolving relative links
         $parsed = parse_url($url);
         $origin = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? '');
         $basePath = rtrim($url, '/');
         $contactPaths = [];
 
+        // Match all <a> tags - check both href path AND link text for contact-related keywords
         $contactKeywords = 'contact|about|about-us|contact-us|connect|get-in-touch|reach-us|reach out';
         if (preg_match_all('/<a\s[^>]*href=["\']([^"\'#][^"\']*)["\'][^>]*>(.*?)<\/a>/is', $html, $linkMatches, PREG_SET_ORDER)) {
             foreach ($linkMatches as $m) {
                 $href = $m[1];
                 $text = strip_tags($m[2]);
+                // Match if href OR link text contains contact keywords
                 if (!preg_match('/' . $contactKeywords . '/i', $href) && !preg_match('/' . $contactKeywords . '/i', $text)) continue;
+                // Skip mailto/tel/javascript
                 if (preg_match('/^(mailto:|tel:|javascript:)/i', $href)) continue;
 
+                // Resolve relative URLs
                 if (str_starts_with($href, 'http')) {
                     $contactPaths[] = $href;
                 } elseif (str_starts_with($href, '/')) {
@@ -91,6 +108,7 @@ function scrape_email_from_website_cli($url)
             }
         }
 
+        // Fallback: try common paths if none found in links
         if (empty($contactPaths)) {
             $contactPaths = [
                 $basePath . '/contact',
@@ -99,6 +117,7 @@ function scrape_email_from_website_cli($url)
             ];
         }
 
+        // Try each contact page
         foreach (array_unique(array_slice($contactPaths, 0, 3)) as $contactUrl) {
             $contactHtml = @file_get_contents($contactUrl, false, $context);
             if ($contactHtml) {
@@ -111,24 +130,31 @@ function scrape_email_from_website_cli($url)
     return null;
 }
 
-// ─── Google Places Search (CLI version) ───
+// ─── Business Discovery (Google Places API) ───
 
-function search_businesses_cli($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [])
+/**
+ * Core business search logic. Returns array with 'businesses', 'count', 'rounds'.
+ * Used by both the admin API endpoint and the cron pipeline.
+ */
+function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [])
 {
     $location = $province ? "$city, $province" : $city;
     $businesses = [];
     $seenPlaceIds = [];
+    // Pre-seed seen IDs so we skip businesses already known
     foreach ($excludePlaceIds as $id) {
         $seenPlaceIds[trim($id)] = true;
     }
     $maxRounds = 5;
     $roundsUsed = 0;
 
+    // Stream context with timeouts for all Google API calls
     $httpContext = stream_context_create(['http' => [
         'timeout' => 10,
         'ignore_errors' => true,
     ]]);
 
+    // Build query variations to search across multiple rounds
     $queries = [];
     if ($category) {
         $queries[] = "$category in $location";
@@ -137,6 +163,8 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
         $queries[] = "$category companies in $location";
         $queries[] = "best $category in $location";
     } else {
+        // When no category provided, use a wide spread of real business categories
+        // so each round searches a different industry instead of generic synonyms
         $categoryPool = [
             'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
             'accountants', 'real estate agents', 'insurance agents', 'auto repair',
@@ -170,6 +198,7 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
         }
     }
 
+    // Track which pool category was searched per round (for labeling when no category provided)
     $queryCategories = [];
     if (!$category) {
         foreach ($queries as $q) {
@@ -177,6 +206,7 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
         }
     }
 
+    // Map category keywords to Google Places types for more targeted results
     $placeTypeMap = [
         'restaurant' => 'restaurant', 'plumber' => 'plumber',
         'electrician' => 'electrician', 'dentist' => 'dentist',
@@ -198,7 +228,9 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
         $countBefore = count($businesses);
         $roundsUsed++;
 
+        // Initial search for this round
         $params = ['query' => $query, 'key' => $apiKey];
+        // Try to match a Google Places type from the query for better results
         foreach ($placeTypeMap as $keyword => $type) {
             if (stripos($query, $keyword) !== false) {
                 $params['type'] = $type;
@@ -208,22 +240,35 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
         $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query($params);
 
         $resp = @file_get_contents($url, false, $httpContext);
-        if ($resp === false) break;
+        if ($resp === false) {
+            if ($roundsUsed === 1) {
+                return ['error' => 'Failed to connect to Google Places API', 'businesses' => [], 'count' => 0, 'rounds' => 0];
+            }
+            break;
+        }
 
         $data = json_decode($resp, true);
         $status = $data['status'] ?? '';
-        if ($status !== 'OK' && $status !== 'ZERO_RESULTS') break;
+        if ($status !== 'OK' && $status !== 'ZERO_RESULTS') {
+            if ($roundsUsed === 1) {
+                $errorMsg = $data['error_message'] ?? $status ?? 'Unknown error';
+                return ['error' => 'Google Places API error: ' . $errorMsg, 'businesses' => [], 'count' => 0, 'rounds' => 0];
+            }
+            break;
+        }
 
         $candidates = $data['results'] ?? [];
         $nextPageToken = $data['next_page_token'] ?? null;
         $maxPages = 3;
         $pagesUsed = 1;
 
+        // Process candidates from this round, paging through Google results
         while (count($businesses) < $limit) {
             foreach ($candidates as $place) {
                 if (count($businesses) >= $limit) break;
 
                 $placeId = $place['place_id'] ?? '';
+                // Skip duplicates across rounds
                 if ($placeId && isset($seenPlaceIds[$placeId])) continue;
                 if ($placeId) $seenPlaceIds[$placeId] = true;
 
@@ -238,6 +283,7 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
                     'email' => null,
                 ];
 
+                // Fetch place details for phone and website
                 if (!empty($placeId)) {
                     $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?' . http_build_query([
                         'place_id' => $placeId,
@@ -254,16 +300,22 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
                     }
                 }
 
+                // Skip businesses without a website
                 if (empty($business['website'])) continue;
 
-                $business['email'] = scrape_email_from_website_cli($business['website']);
+                // Scrape email from business website
+                $business['email'] = scrape_email_from_website($business['website']);
+
+                // Skip businesses where we couldn't find an email
                 if (empty($business['email'])) continue;
 
                 $businesses[] = $business;
             }
 
+            // If we have enough or no more pages, stop paging
             if (count($businesses) >= $limit || empty($nextPageToken) || $pagesUsed >= $maxPages) break;
 
+            // Google requires a short delay before next_page_token is valid
             sleep(2);
 
             $nextUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
@@ -281,16 +333,19 @@ function search_businesses_cli($city, $province, $category, $limit, $apiKey, $ex
             $pagesUsed++;
         }
 
+        // Bail early if this round produced too few new results (diminishing returns)
         $newThisRound = count($businesses) - $countBefore;
-        if ($newThisRound < 2 && $round > 0) break;
+        if ($newThisRound < 2 && $round > 0) {
+            break;
+        }
     }
 
     return ['businesses' => $businesses, 'count' => count($businesses), 'rounds' => $roundsUsed];
 }
 
-// ─── OpenAI Call (CLI version) ───
+// ─── OpenAI Call ───
 
-function call_openai_cli($systemPrompt, $userPrompt)
+function call_openai($systemPrompt, $userPrompt)
 {
     $apiKey = $_ENV['OPENAI_API_KEY'] ?? '';
     if (empty($apiKey)) {
@@ -336,9 +391,9 @@ function call_openai_cli($systemPrompt, $userPrompt)
     return ['content' => $result['choices'][0]['message']['content'] ?? ''];
 }
 
-// ─── Business Summarization (CLI version) ───
+// ─── Business Summarization ───
 
-function summarize_business_cli($website)
+function summarize_business($website)
 {
     if (empty($website)) return null;
 
@@ -355,15 +410,16 @@ function summarize_business_cli($website)
     $html = @file_get_contents($website, false, $context);
     if (!$html) return null;
 
+    // Strip scripts, styles, and tags to get readable text
     $text = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $html);
     $text = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $text);
     $text = strip_tags($text);
     $text = preg_replace('/\s+/', ' ', $text);
-    $text = trim(mb_substr($text, 0, 3000));
+    $text = trim(mb_substr($text, 0, 3000)); // Cap at 3000 chars
 
     if (strlen($text) < 50) return null;
 
-    $result = call_openai_cli(
+    $result = call_openai(
         "You summarize businesses based on their website content. Respond with ONLY a concise summary (3-5 sentences) covering:
 1. What specific services or products they offer
 2. Who their typical customers are
@@ -376,16 +432,20 @@ Be specific and factual based on the website content. Do not include any other t
     return $result['content'] ?? null;
 }
 
-// ─── Draft Generation (CLI version) ───
+// ─── Draft Generation ───
 
-function generate_draft_for_lead_cli($pdo, $lead)
+/**
+ * Generate an AI email draft for a lead. Saves draft to DB.
+ * Returns ['success' => true, 'subject' => ..., 'body' => ...] or ['error' => ...].
+ */
+function generate_draft_for_lead($pdo, $lead)
 {
     $id = $lead['id'];
 
-    // Generate business summary if missing
+    // Generate business summary if we don't have one yet
     $summary = $lead['business_summary'] ?? null;
     if (empty($summary) && !empty($lead['website'])) {
-        $summary = summarize_business_cli($lead['website']);
+        $summary = summarize_business($lead['website']);
         if ($summary) {
             $stmt = $pdo->prepare("UPDATE outreach_leads SET business_summary = ? WHERE id = ?");
             $stmt->execute([$summary, $id]);
@@ -449,32 +509,35 @@ Return your response as JSON with two fields:
 Return ONLY the JSON, no other text.";
 
     $details = "Business: {$lead['business_name']}";
-    if (!empty($lead['category'])) $details .= "\nCategory/Industry: {$lead['category']}";
-    if (!empty($lead['city'])) $details .= "\nCity: {$lead['city']}";
+    if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
+    if ($lead['city']) $details .= "\nCity: {$lead['city']}";
     if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
-    if (!empty($lead['website'])) $details .= "\nWebsite: {$lead['website']}";
-    if (!empty($lead['contact_name'])) $details .= "\nContact person: {$lead['contact_name']}";
+    if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
+    if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
     if ($summary) $details .= "\nBusiness summary: $summary";
 
-    $result = call_openai_cli($systemPrompt, $details);
+    $result = call_openai($systemPrompt, $details);
 
     if (isset($result['error'])) {
         return ['error' => $result['error']];
     }
 
+    // Parse JSON response from AI
     $content = trim($result['content']);
+    // Strip markdown code fences if present
     $content = preg_replace('/^```json\s*/i', '', $content);
     $content = preg_replace('/\s*```$/', '', $content);
 
     $parsed = json_decode($content, true);
     if (!$parsed || !isset($parsed['subject']) || !isset($parsed['body'])) {
+        // Fallback: use content as body
         $parsed = [
             'subject' => "Quick question for {$lead['business_name']}",
             'body' => $content,
         ];
     }
 
-    // Ensure the website URL is in the body
+    // Ensure the website URL is in the body — inject before sign-off if AI omitted it
     if (stripos($parsed['body'], 'argorobots.com') === false) {
         $parsed['body'] = preg_replace(
             '/(Feel free to|Don\'t hesitate|Let me know|Reply to this)/i',
@@ -482,6 +545,7 @@ Return ONLY the JSON, no other text.";
             $parsed['body'],
             1
         );
+        // If regex didn't match, append before sign-off
         if (stripos($parsed['body'], 'argorobots.com') === false) {
             $parsed['body'] = preg_replace(
                 '/(\nAll the best)/i',
@@ -492,7 +556,7 @@ Return ONLY the JSON, no other text.";
         }
     }
 
-    // Save draft
+    // Save draft to lead
     $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
     $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
 

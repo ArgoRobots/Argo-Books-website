@@ -178,7 +178,7 @@ class InvoiceEmailSender
      */
     private function sendWithAttachment(string $to, string $subject, string $htmlBody, string $textBody, array $baseHeaders, string $pdfBase64, string $filename): bool
     {
-        $boundary = md5(time());
+        $boundary = bin2hex(random_bytes(16));
 
         // Remove Content-Type from base headers (we'll set multipart)
         $headers = array_filter($baseHeaders, fn($h) => !str_starts_with($h, 'Content-Type:'));

@@ -23,10 +23,10 @@
 
 set_time_limit(600); // 10 minutes max for full pipeline
 
-// Only allow CLI execution
-if (php_sapi_name() !== 'cli') {
+// Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request)
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
     http_response_code(403);
-    die('Access denied. This script can only be run via CLI.');
+    die('Access denied. This script can only be run via CLI/cron.');
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -55,8 +55,8 @@ define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
 define('CATEGORIES_PER_RUN', 5);
 
-// Parse CLI flags
-$args = array_slice($argv, 1);
+// Parse CLI flags ($argv is null under CGI, fall back to empty array)
+$args = array_slice($argv ?? [], 1);
 $discoverOnly = in_array('--discover-only', $args);
 $draftOnly = in_array('--draft-only', $args);
 $sendOnly = in_array('--send-only', $args);
@@ -129,7 +129,7 @@ function logPipeline($message, $type = 'INFO')
     }
     file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
 
-    if (php_sapi_name() === 'cli') {
+    if (!isset($_SERVER['HTTP_HOST'])) {
         echo $logEntry;
     }
 }
@@ -199,6 +199,12 @@ try {
 } catch (Exception $e) {
     logPipeline("Pipeline fatal error: " . $e->getMessage(), 'ERROR');
     exit(1);
+} finally {
+    // Release lock file
+    if (isset($lockFp) && is_resource($lockFp)) {
+        flock($lockFp, LOCK_UN);
+        fclose($lockFp);
+    }
 }
 
 // ══════════════════════════════════════════════════════════════

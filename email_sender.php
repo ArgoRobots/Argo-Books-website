@@ -138,6 +138,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
  */
 function send_verification_email($email, $code, $username)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     $body = <<<HTML
         <h1>Welcome to the Argo Community!</h1>
         <p>Hello {$username},</p>
@@ -169,7 +170,7 @@ function send_notification_email($type, $data)
     // Get all admins with the corresponding notification enabled
     $notification_column = ($type === 'new_post') ? 'notify_new_posts' : 'notify_new_comments';
 
-    $stmt = $db->prepare("SELECT u.username, ans.notification_email 
+    $stmt = $db->prepare("SELECT u.username, ans.notification_email
                          FROM admin_notification_settings ans
                          JOIN community_users u ON ans.user_id = u.id
                          WHERE u.role = 'admin' AND ans.$notification_column = 1");
@@ -188,12 +189,10 @@ function send_notification_email($type, $data)
         return true;
     }
 
-    // Load CSS for email template
-    $css = file_get_contents(__DIR__ . '/email.css');
-
     // Prepare email content
     $subject = '';
     $site_url = get_site_url();
+    $body_template = '';
 
     if ($type === 'new_post') {
         $post_type_text = $data['post_type'] === 'bug' ? 'Bug Report' : 'Feature Request';
@@ -202,24 +201,7 @@ function send_notification_email($type, $data)
         $escaped_title = htmlspecialchars($data['title']);
         $escaped_content = nl2br(htmlspecialchars($data['content'] ?? ''));
 
-        $email_template = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>New Community Post</title>
-            <style>
-                {$css}  /* Needs to be embedded for PHP mail() */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
-
-                <div class="content">
+        $body_template = <<<HTML
                     <h2>New {$post_type_text} Posted</h2>
                     <p>A new {$post_type_text} has been posted on the Argo Community:</p>
 
@@ -233,42 +215,17 @@ function send_notification_email($type, $data)
                     <div class="button-container">
                         <a href="{$post_url}" class="button">View Post</a>
                     </div>
-                </div>
 
-                <div class="footer">
-                    <p>This is an automated notification from the Argo Community system.</p>
-                    <p>You received this message because you're an administrator of the Argo Community.
+                    <p class="text-muted" style="font-size: 12px; margin-top: 20px;">This is an automated notification. You received this because you're an administrator of the Argo Community.
                     You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-HTML;
+            HTML;
     } elseif ($type === 'new_comment') {
         $subject = "[Argo Community] New Comment on: " . $data['post_title'];
         $post_url = "$site_url/community/view_post.php?id=" . $data['post_id'];
         $escaped_post_title = htmlspecialchars($data['post_title']);
         $escaped_content = nl2br(htmlspecialchars($data['content'] ?? ''));
 
-        $email_template = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>New Community Comment</title>
-            <style>
-                {$css}  /* Needs to be embedded for PHP mail() */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
-
-                <div class="content">
+        $body_template = <<<HTML
                     <h2>New Comment Posted</h2>
                     <p>A new comment has been posted on "{$escaped_post_title}":</p>
 
@@ -281,42 +238,25 @@ HTML;
                     <div class="button-container">
                         <a href="{$post_url}" class="button">View Comment</a>
                     </div>
-                </div>
 
-                <div class="footer">
-                    <p>This is an automated notification from the Argo Community system.</p>
-                    <p>You received this message because you're an administrator of the Argo Community.
+                    <p class="text-muted" style="font-size: 12px; margin-top: 20px;">This is an automated notification. You received this because you're an administrator of the Argo Community.
                     You can adjust your notification settings <a href="$site_url/community/users/admin_notification_settings.php">here</a>.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-HTML;
+            HTML;
     } else {
         return false; // Unknown notification type
     }
 
-    // Email headers
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    // Send emails to all recipients
+    // Send emails to all recipients via send_styled_email (uses SMTP when configured)
     $success = true;
     foreach ($recipients as $recipient) {
-        $personal_email = str_replace(
-            "You're an administrator of the Argo Community.",
-            "You're an administrator ({$recipient['username']}) of the Argo Community.",
-            $email_template
+        $safe_username = htmlspecialchars($recipient['username'], ENT_QUOTES, 'UTF-8');
+        $personal_body = str_replace(
+            "you're an administrator of the Argo Community.",
+            "you're an administrator ({$safe_username}) of the Argo Community.",
+            $body_template
         );
 
-        $mail_success = mail($recipient['notification_email'], $subject, $personal_email, implode("\r\n", $headers));
-        if (!$mail_success) {
+        if (!send_styled_email($recipient['notification_email'], $subject, $personal_body)) {
             $success = false;
         }
     }
@@ -334,6 +274,7 @@ HTML;
  */
 function send_password_reset_email($email, $token, $username)
 {
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     // Get the base URL
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
     $host = $_SERVER['HTTP_HOST'];
@@ -372,73 +313,35 @@ function send_password_reset_email($email, $token, $username)
  */
 function send_account_deletion_scheduled_email($email, $username, $scheduled_date)
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'Account Deletion Scheduled - Argo Community';
-
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     // Format the scheduled date nicely
     $formatted_date = date('F j, Y \a\t g:i A', strtotime($scheduled_date));
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Account Deletion Scheduled</title>
-            <style>
-                {$css}  /* Needs to be embedded for PHP mail() */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
-                
-                <div class="content">
-                    <h1>Account Deletion Scheduled</h1>
-                    <p>Hello {$username},</p>
-                    
-                    <p>Your Argo Community account has been scheduled for deletion on <strong>{$formatted_date}</strong>.</p>
-                    
-                    <p><strong>Important Information:</strong></p>
-                    <ul>
-                            <li>Your account will be permanently deleted in 30 days</li>
-                            <li>All your posts, comments, and profile data will be removed</li>
-                            <li>This action can be cancelled by logging into your account before the deletion date</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="button-container">
-                        <a href="https://argorobots.com/community/users/login.php" class="button">Cancel Deletion - Login Now</a>
-                    </div>
-                    
-                    <p>If you did not request this deletion, please log into your account immediately to cancel it.</p>
-                    
-                    <p>If you have any questions, please contact our support team.</p>
-                    
-                    <p>Best regards,<br>The Argo Team</p>
-                
-                <div class="footer">
-                    <p>This is an automated message from the Argo Community system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
+    $body = <<<HTML
+        <h1>Account Deletion Scheduled</h1>
+        <p>Hello {$username},</p>
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
+        <p>Your Argo Community account has been scheduled for deletion on <strong>{$formatted_date}</strong>.</p>
 
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    return $mail_result;
+        <p><strong>Important Information:</strong></p>
+        <ul>
+            <li>Your account will be permanently deleted in 30 days</li>
+            <li>All your posts, comments, and profile data will be removed</li>
+            <li>This action can be cancelled by logging into your account before the deletion date</li>
+        </ul>
+
+        <div class="button-container">
+            <a href="https://argorobots.com/community/users/login.php" class="button">Cancel Deletion - Login Now</a>
+        </div>
+
+        <p>If you did not request this deletion, please log into your account immediately to cancel it.</p>
+
+        <p>If you have any questions, please contact our support team.</p>
+
+        <p>Best regards,<br>The Argo Team</p>
+        HTML;
+
+    return send_styled_email($email, 'Account Deletion Scheduled - Argo Community', $body);
 }
 
 /**
@@ -450,72 +353,34 @@ function send_account_deletion_scheduled_email($email, $username, $scheduled_dat
  */
 function send_account_deletion_cancelled_email($email, $username)
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'Account Deletion Cancelled - Argo Community';
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $body = <<<HTML
+        <h1>Account Deletion Cancelled</h1>
+        <p>Hello {$username},</p>
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Account Deletion Cancelled</title>
-            <style>
-                {$css}  /* Needs to be embedded for PHP mail() */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+        <h3>Good News!</h3>
+        <p>Your account deletion has been <strong>cancelled</strong> because you logged into your account.</p>
 
-                <div class="content">
-                    <h1>Account Deletion Cancelled</h1>
-                    <p>Hello {$username},</p>
+        <p>Your Argo Community account is now <strong>active</strong> and will not be deleted. All your:</p>
+        <ul>
+            <li>Profile information</li>
+            <li>Posts and comments</li>
+            <li>Community contributions</li>
+        </ul>
+        <p>remain intact and accessible.</p>
 
-                    <h3>Good News!</h3>
-                        <p>Your account deletion has been <strong>cancelled</strong> because you logged into your account.</p>
+        <div class="button-container">
+            <a href="https://argorobots.com/community/users/profile.php" class="button">View Your Profile</a>
+        </div>
 
-                    <p>Your Argo Community account is now <strong>active</strong> and will not be deleted. All your:</p>
-                    <ul>
-                        <li>Profile information</li>
-                        <li>Posts and comments</li>
-                        <li>Community contributions</li>
-                    </ul>
-                    <p>remain intact and accessible.</p>
+        <p>If you decide to delete your account in the future, you can do so from your profile settings.</p>
 
-                    <div class="button-container">
-                        <a href="https://argorobots.com/community/users/profile.php" class="button">View Your Profile</a>
-                    </div>
+        <p>Welcome back!</p>
 
-                    <p>If you decide to delete your account in the future, you can do so from your profile settings.</p>
+        <p>Best regards,<br>The Argo Team</p>
+        HTML;
 
-                    <p>Welcome back!</p>
-
-                    <p>Best regards,<br>The Argo Team</p>
-                </div>
-
-                <div class="footer">
-                    <p>This is an automated message from the Argo Community system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
-
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    return $mail_result;
+    return send_styled_email($email, 'Account Deletion Cancelled - Argo Community', $body);
 }
 
 /**
@@ -530,12 +395,10 @@ function send_account_deletion_cancelled_email($email, $username)
  */
 function send_ban_notification_email($email, $username, $ban_reason, $ban_duration, $expires_at = null)
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'Community Ban Notification - Argo Books';
-
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $ban_reason = htmlspecialchars($ban_reason, ENT_QUOTES, 'UTF-8');
     // Format duration text
     $duration_text = '';
-    $can_appeal = true;
 
     switch ($ban_duration) {
         case '5_days':
@@ -555,7 +418,6 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
             break;
         case 'permanent':
             $duration_text = 'permanently';
-            $can_appeal = true;
             break;
         default:
             $duration_text = 'an unspecified period';
@@ -569,70 +431,34 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
         $expiration_info = "<p>Your ban will expire on <strong>{$formatted_date}</strong>.</p>";
     }
 
-    $appeal_text = $can_appeal ? '<p>If you believe this ban was issued in error, you can <a href="https://argorobots.com/contact-us/">contact our support team</a> to request a review. Please include your username and explain why you believe the ban should be reconsidered.</p>' : '';
+    $appeal_text = '<p>If you believe this ban was issued in error, you can <a href="https://argorobots.com/contact-us/">contact our support team</a> to request a review. Please include your username and explain why you believe the ban should be reconsidered.</p>';
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Community Ban Notification</title>
-            <style>
-                {$css}  /* Needs to be embedded for PHP mail() */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>Community Ban Notification</h1>
+        <p>Hello {$username},</p>
 
-                <div class="content">
-                    <h1>Community Ban Notification</h1>
-                    <p>Hello {$username},</p>
-                    
-                    <p>Your account has been banned from posting content on the Argo Community for <strong>{$duration_text}</strong>.</p>
-                    
-                    {$expiration_info}
-                    
-                    <p><strong>Reason:</strong> {$ban_reason}</p>
-                    
-                    <p>During this ban period:</p>
-                    <ul>
-                        <li>You can still use the Argo Books application</li>
-                        <li>You can still view posts and comments on the community page</li>
-                        <li>You cannot create new posts or comments</li>
-                        <li>Repeated violations may result in a permanent ban</li>
-                    </ul>
-                    
-                    {$appeal_text}
-                    
-                    <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
-                    
-                    <p>Best regards,<br>The Argo Team</p>
-                </div>
+        <p>Your account has been banned from posting content on the Argo Community for <strong>{$duration_text}</strong>.</p>
 
-                <div class="footer">
-                    <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
+        {$expiration_info}
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
+        <p><strong>Reason:</strong> {$ban_reason}</p>
 
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    return $mail_result;
+        <p>During this ban period:</p>
+        <ul>
+            <li>You can still use the Argo Books application</li>
+            <li>You can still view posts and comments on the community page</li>
+            <li>You cannot create new posts or comments</li>
+            <li>Repeated violations may result in a permanent ban</li>
+        </ul>
+
+        {$appeal_text}
+
+        <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
+
+        <p>Best regards,<br>The Argo Team</p>
+        HTML;
+
+    return send_styled_email($email, 'Community Ban Notification - Argo Books', $body);
 }
 
 /**
@@ -644,68 +470,30 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
  */
 function send_unban_notification_email($email, $username)
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'Account Unbanned - Argo Community';
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $body = <<<HTML
+        <h1>Account Unbanned</h1>
+        <p>Hello {$username},</p>
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Account Unbanned</title>
-            <style>
-                {$css}  /* Needs to be embedded for PHP mail() */
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+        <p>Your community ban has been lifted. You can now post and comment again on the Argo Community.</p>
 
-                <div class="content">
-                    <h1>Account Unbanned</h1>
-                    <p>Hello {$username},</p>
-                    
-                    <p>Your community ban has been lifted. You can now post and comment again on the Argo Community.</p>
-                    
-                    <p>Please remember to:</p>
-                    <ul>
-                        <li>Review and follow our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a></li>
-                        <li>Be respectful and helpful to other community members</li>
-                        <li>Future violations may result in another ban</li>
-                    </ul>
-                    
-                    <div class="button-container">
-                        <a href="https://argorobots.com/community/" class="button">Visit Community</a>
-                    </div>
-                    
-                    <p>Thank you for being part of the Argo community. We're glad to have you back!</p>
-                    
-                    <p>Best regards,<br>The Argo Team</p>
-                </div>
+        <p>Please remember to:</p>
+        <ul>
+            <li>Review and follow our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a></li>
+            <li>Be respectful and helpful to other community members</li>
+            <li>Future violations may result in another ban</li>
+        </ul>
 
-                <div class="footer">
-                    <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
+        <div class="button-container">
+            <a href="https://argorobots.com/community/" class="button">Visit Community</a>
+        </div>
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
+        <p>Thank you for being part of the Argo community. We're glad to have you back!</p>
 
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    return $mail_result;
+        <p>Best regards,<br>The Argo Team</p>
+        HTML;
+
+    return send_styled_email($email, 'Account Unbanned - Argo Community', $body);
 }
 /**
  * Send username reset notification email
@@ -719,11 +507,10 @@ function send_unban_notification_email($email, $username)
  */
 function send_username_reset_email($email, $old_username, $new_username, $violation_type, $additional_info = '')
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'Username Reset - Argo Community';
-
+    $old_username = htmlspecialchars($old_username, ENT_QUOTES, 'UTF-8');
+    $new_username = htmlspecialchars($new_username, ENT_QUOTES, 'UTF-8');
     // Format violation type
-    $violation_text = ucfirst(str_replace('_', ' ', $violation_type));
+    $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
     // Additional info section
     $additional_section = '';
@@ -732,70 +519,34 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
         <p><strong>Additional details:</strong> " . htmlspecialchars($additional_info) . "</p>";
     }
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Username Reset Notification</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>Username Reset Notification</h1>
+        <p>Hello,</p>
 
-                <div class="content">
-                    <h1>Username Reset Notification</h1>
-                    <p>Hello,</p>
+        <p>Your username has been changed by our moderation team due to a policy violation.</p>
 
-                    <p>Your username has been changed by our moderation team due to a policy violation.</p>
+        <p><strong>Previous username:</strong> <del>{$old_username}</del></p>
+        <p><strong>New username:</strong> {$new_username}</p>
 
-                    <p><strong>Previous username:</strong> <del>{$old_username}</del></p>
-                    <p><strong>New username:</strong> {$new_username}</p>
+        <p><strong>Reason for action:</strong> {$violation_text}</p>
 
-                    <p><strong>Reason for action:</strong> {$violation_text}</p>
+        {$additional_section}
 
-                    {$additional_section}
+        <p><strong>What you can do:</strong></p>
+        <ul>
+            <li>You can change your username to something appropriate by visiting your <a href="https://argorobots.com/community/users/edit_profile.php">profile settings</a></li>
+            <li>Your new username must comply with our community guidelines</li>
+            <li>All your posts and comments have been updated with the new username</li>
+        </ul>
 
-                    <p><strong>What you can do:</strong></p>
-                    <ul>
-                        <li>You can change your username to something appropriate by visiting your <a href="https://argorobots.com/community/users/edit_profile.php">profile settings</a></li>
-                        <li>Your new username must comply with our community guidelines</li>
-                        <li>All your posts and comments have been updated with the new username</li>
-                    </ul>
+        <p>If you believe this action was taken in error, please <a href="https://argorobots.com/contact-us/">contact our support team</a> with your account details.</p>
 
-                    <p>If you believe this action was taken in error, please <a href="https://argorobots.com/contact-us/">contact our support team</a> with your account details.</p>
+        <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
 
-                    <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
+        <p>Best regards,<br>The Argo Team</p>
+        HTML;
 
-                    <p>Best regards,<br>The Argo Team</p>
-                </div>
-
-                <div class="footer">
-                    <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
-
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    return $mail_result;
+    return send_styled_email($email, 'Username Reset - Argo Community', $body);
 }
 
 /**
@@ -809,11 +560,9 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
  */
 function send_bio_cleared_email($email, $username, $violation_type, $additional_info = '')
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'Bio Cleared - Argo Community';
-
+    $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     // Format violation type
-    $violation_text = ucfirst(str_replace('_', ' ', $violation_type));
+    $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
     // Additional info section
     $additional_section = '';
@@ -822,67 +571,31 @@ function send_bio_cleared_email($email, $username, $violation_type, $additional_
         <p><strong>Additional details:</strong> " . htmlspecialchars($additional_info) . "</p>";
     }
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Bio Cleared Notification</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>Bio Cleared Notification</h1>
+        <p>Hello {$username},</p>
 
-                <div class="content">
-                    <h1>Bio Cleared Notification</h1>
-                    <p>Hello {$username},</p>
+        <p>Your bio has been removed by our moderation team due to a policy violation.</p>
 
-                    <p>Your bio has been removed by our moderation team due to a policy violation.</p>
+        <p><strong>Reason for action:</strong> {$violation_text}</p>
 
-                    <p><strong>Reason for action:</strong> {$violation_text}</p>
+        {$additional_section}
 
-                    {$additional_section}
+        <p><strong>What you can do:</strong></p>
+        <ul>
+            <li>You can add a new bio by visiting your <a href="https://argorobots.com/community/users/edit_profile.php">profile settings</a></li>
+            <li>Your new bio must comply with our community guidelines</li>
+            <li>Ensure your bio content is appropriate and respectful</li>
+        </ul>
 
-                    <p><strong>What you can do:</strong></p>
-                    <ul>
-                        <li>You can add a new bio by visiting your <a href="https://argorobots.com/community/users/edit_profile.php">profile settings</a></li>
-                        <li>Your new bio must comply with our community guidelines</li>
-                        <li>Ensure your bio content is appropriate and respectful</li>
-                    </ul>
+        <p>If you believe this action was taken in error, please <a href="https://argorobots.com/contact-us/">contact our support team</a> with your account details.</p>
 
-                    <p>If you believe this action was taken in error, please <a href="https://argorobots.com/contact-us/">contact our support team</a> with your account details.</p>
+        <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
 
-                    <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
+        <p>Best regards,<br>The Argo Team</p>
+        HTML;
 
-                    <p>Best regards,<br>The Argo Team</p>
-                </div>
-
-                <div class="footer">
-                    <p>This is an automated message from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
-
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    return $mail_result;
+    return send_styled_email($email, 'Bio Cleared - Argo Community', $body);
 }
 
 /**
@@ -898,76 +611,36 @@ function send_bio_cleared_email($email, $username, $violation_type, $additional_
  */
 function send_new_report_notification($email, $report_id, $content_type, $violation_type, $reporter_username, $reported_username = 'N/A')
 {
-    error_log("send_new_report_notification called for: $email (Report #$report_id, Type: $content_type, Violation: $violation_type)");
-
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = 'New Content Report - Argo Community';
-
+    $reporter_username = htmlspecialchars($reporter_username, ENT_QUOTES, 'UTF-8');
+    $reported_username = htmlspecialchars($reported_username, ENT_QUOTES, 'UTF-8');
     // Format content type and violation type
-    $content_type_text = ucfirst($content_type);
-    $violation_text = ucfirst(str_replace('_', ' ', $violation_type));
+    $content_type_text = ucfirst(htmlspecialchars($content_type, ENT_QUOTES, 'UTF-8'));
+    $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>New Report Notification</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>New Content Report</h1>
+        <p>A new content report has been submitted and requires your attention.</p>
 
-                <div class="content">
-                    <h1>New Content Report</h1>
-                    <p>A new content report has been submitted and requires your attention.</p>
+        <p><strong>Report Details</strong></p>
+        <ul>
+            <li><strong>Report ID:</strong> #{$report_id}</li>
+            <li><strong>Content Type:</strong> {$content_type_text}</li>
+            <li><strong>Violation Type:</strong> {$violation_text}</li>
+            <li><strong>Reported by:</strong> {$reporter_username}</li>
+            <li><strong>Reported user:</strong> {$reported_username}</li>
+        </ul>
 
-                    <p><strong>Report Details</strong></p>
-                    <ul>
-                        <li><strong>Report ID:</strong> #{$report_id}</li>
-                        <li><strong>Content Type:</strong> {$content_type_text}</li>
-                        <li><strong>Violation Type:</strong> {$violation_text}</li>
-                        <li><strong>Reported by:</strong> {$reporter_username}</li>
-                        <li><strong>Reported user:</strong> {$reported_username}</li>
-                    </ul>
+        <p><strong>Action Required</strong></p>
+        <p>Please review this report in the admin panel and take appropriate action.</p>
 
-                    <p><strong>Action Required</strong></p>
-                    <p>Please review this report in the admin panel and take appropriate action.</p>
-                    
-                    <div class="button-container">
-                        <a href="https://argorobots.com/admin/reports/" class="button">View Reports</a>
-                    </div>
+        <div class="button-container">
+            <a href="https://argorobots.com/admin/reports/" class="button">View Reports</a>
+        </div>
 
-                    <p>This report is currently in <strong>pending</strong> status and awaits your review.</p>
-                </div>
+        <p>This report is currently in <strong>pending</strong> status and awaits your review.</p>
+        HTML;
 
-                <div class="footer">
-                    <p>This is an automated notification from the Argo Community moderation system.</p>
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
-                    <p>This email was sent to {$email}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    HTML;
-
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Community <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    $mail_result = mail($email, $subject, $email_html, implode("\r\n", $headers));
-    error_log("send_new_report_notification mail() result for $email: " . ($mail_result ? "TRUE" : "FALSE"));
-    return $mail_result;
+    return send_styled_email($email, 'New Content Report - Argo Community', $body);
 }
 
 /**
@@ -984,98 +657,66 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
  */
 function send_premium_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod)
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "Payment Receipt - Argo Premium Subscription";
-
     $billingText = $billing === 'yearly' ? 'yearly' : 'monthly';
     $renewalDate = date('F j, Y', strtotime($endDate));
     $paymentDate = date('F j, Y');
     $paymentMethodText = ucfirst($paymentMethod);
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Payment Receipt</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header header-purple">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>Payment Receipt</h1>
+        <p>Thank you for subscribing to Argo Premium!</p>
 
-                <div class="content">
-                    <h1>Payment Receipt</h1>
-                    <p>Thank you for subscribing to Argo Premium!</p>
+        <div class="payment-box">
+            <h3>Payment Details</h3>
+            <table class="details-table">
+                <tr>
+                    <td><strong>Date</strong></td>
+                    <td>{$paymentDate}</td>
+                </tr>
+                <tr>
+                    <td><strong>Description</strong></td>
+                    <td>Premium Subscription ({$billingText})</td>
+                </tr>
+                <tr>
+                    <td><strong>Amount</strong></td>
+                    <td>\${$amount} CAD</td>
+                </tr>
+                <tr>
+                    <td><strong>Payment Method</strong></td>
+                    <td>{$paymentMethodText}</td>
+                </tr>
+                <tr>
+                    <td><strong>Transaction ID</strong></td>
+                    <td class="monospace">{$transactionId}</td>
+                </tr>
+                <tr>
+                    <td><strong>Next Renewal</strong></td>
+                    <td>{$renewalDate}</td>
+                </tr>
+            </table>
+        </div>
 
-                    <div class="payment-box">
-                        <h3>Payment Details</h3>
-                        <table class="details-table">
-                            <tr>
-                                <td><strong>Date</strong></td>
-                                <td>{$paymentDate}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Description</strong></td>
-                                <td>Premium Subscription ({$billingText})</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Amount</strong></td>
-                                <td>\${$amount} CAD</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Payment Method</strong></td>
-                                <td>{$paymentMethodText}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Transaction ID</strong></td>
-                                <td class="monospace">{$transactionId}</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Next Renewal</strong></td>
-                                <td>{$renewalDate}</td>
-                            </tr>
-                        </table>
-                    </div>
+        <h3>What's Included:</h3>
+        <ul class="feature-list">
+            <li>✓ Everything in Free</li>
+            <li>✓ Unlimited products</li>
+            <li>✓ Biometric login security</li>
+            <li>✓ Unlimited invoices & payments</li>
+            <li>✓ AI receipt scanning (500/month)</li>
+            <li>✓ Predictive analytics</li>
+            <li>✓ Priority support</li>
+        </ul>
 
-                    <h3>What's Included:</h3>
-                    <ul class="feature-list">
-                        <li>✓ Everything in Free</li>
-                        <li>✓ Unlimited products</li>
-                        <li>✓ Biometric login security</li>
-                        <li>✓ Unlimited invoices & payments</li>
-                        <li>✓ AI receipt scanning (500/month)</li>
-                        <li>✓ Predictive analytics</li>
-                        <li>✓ Priority support</li>
-                    </ul>
+        <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
 
-                    <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
-
-                    <div class="receipt-footer">
-                        <p>Subscription ID: {$subscriptionId}</p>
-                        <p>Thank you for using Argo Books!</p>
-                        <p><a href="https://argorobots.com">argorobots.com</a></p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
+        <div class="receipt-footer">
+            <p>Subscription ID: {$subscriptionId}</p>
+            <p>Thank you for using Argo Books!</p>
+            <p><a href="https://argorobots.com">argorobots.com</a></p>
+        </div>
         HTML;
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    return mail($email, $subject, $email_html, implode("\r\n", $headers));
+    return send_styled_email($email, 'Payment Receipt - Argo Premium Subscription', $body, 'purple');
 }
 
 /**
@@ -1088,66 +729,34 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
  */
 function send_premium_subscription_cancelled_email($email, $subscriptionId, $endDate)
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "Subscription Cancelled - Argo Premium";
-
     $accessUntil = date('F j, Y', strtotime($endDate));
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Subscription Cancelled</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header header-purple">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>Subscription Cancelled</h1>
+        <p>Your Argo Premium subscription has been cancelled as requested.</p>
 
-                <div class="content">
-                    <h1>Subscription Cancelled</h1>
-                    <p>Your Argo Premium subscription has been cancelled as requested.</p>
+        <div class="info-box info-box-warning">
+            <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
+        </div>
 
-                    <div class="info-box info-box-warning">
-                        <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
-                    </div>
+        <p>After this date, Premium features including unlimited products, biometric login security, unlimited invoices & payments, AI receipt scanning, predictive analytics, and priority support will no longer be available.</p>
 
-                    <p>After this date, Premium features including unlimited products, biometric login security, unlimited invoices & payments, AI receipt scanning, predictive analytics, and priority support will no longer be available.</p>
+        <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
-                    <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
+        <div class="button-container">
+            <a href="https://argorobots.com/pricing/premium/" class="button button-purple">Resubscribe</a>
+        </div>
 
-                    <div class="button-container">
-                        <a href="https://argorobots.com/pricing/premium/" class="button button-purple">Resubscribe</a>
-                    </div>
+        <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
-                    <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
-
-                    <div class="receipt-footer">
-                        <p>Subscription ID: {$subscriptionId}</p>
-                        <p>Thank you for trying Argo Premium!</p>
-                        <p><a href="https://argorobots.com">argorobots.com</a></p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
+        <div class="receipt-footer">
+            <p>Subscription ID: {$subscriptionId}</p>
+            <p>Thank you for trying Argo Premium!</p>
+            <p><a href="https://argorobots.com">argorobots.com</a></p>
+        </div>
         HTML;
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    return mail($email, $subject, $email_html, implode("\r\n", $headers));
+    return send_styled_email($email, 'Subscription Cancelled - Argo Premium', $body, 'purple');
 }
 
 /**
@@ -1160,94 +769,62 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
  */
 function send_premium_subscription_reactivated_email($email, $subscriptionId, $endDate, $billingCycle = 'monthly')
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "Subscription Reactivated - Argo Premium";
-
     $nextBillingDate = date('F j, Y', strtotime($endDate));
     $billingLabel = ucfirst($billingCycle);
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Subscription Reactivated</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header header-purple">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>Welcome Back!</h1>
+        <p>Your Argo Premium subscription has been reactivated.</p>
 
-                <div class="content">
-                    <h1>Welcome Back!</h1>
-                    <p>Your Argo Premium subscription has been reactivated.</p>
+        <div class="info-box info-box-success">
+            <p><strong>Your Premium features are now active!</strong> You have full access to all Premium features.</p>
+        </div>
 
-                    <div class="info-box info-box-success">
-                        <p><strong>Your Premium features are now active!</strong> You have full access to all Premium features.</p>
-                    </div>
+        <p>Here's a summary of your subscription:</p>
 
-                    <p>Here's a summary of your subscription:</p>
+        <table class="details-table">
+            <tr>
+                <td class="label">Subscription ID</td>
+                <td class="value">{$subscriptionId}</td>
+            </tr>
+            <tr>
+                <td class="label">Billing Cycle</td>
+                <td class="value">{$billingLabel}</td>
+            </tr>
+            <tr>
+                <td class="label">Next Billing Date</td>
+                <td class="value">{$nextBillingDate}</td>
+            </tr>
+            <tr>
+                <td class="label">Status</td>
+                <td><span class="status-badge status-active">Active</span></td>
+            </tr>
+        </table>
 
-                    <table class="details-table">
-                        <tr>
-                            <td class="label">Subscription ID</td>
-                            <td class="value">{$subscriptionId}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Billing Cycle</td>
-                            <td class="value">{$billingLabel}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Next Billing Date</td>
-                            <td class="value">{$nextBillingDate}</td>
-                        </tr>
-                        <tr>
-                            <td class="label">Status</td>
-                            <td><span class="status-badge status-active">Active</span></td>
-                        </tr>
-                    </table>
+        <p>Features now available:</p>
+        <ul class="styled-list">
+            <li>Everything in Free</li>
+            <li>Unlimited products</li>
+            <li>Biometric login security</li>
+            <li>Unlimited invoices & payments</li>
+            <li>AI receipt scanning (500/month)</li>
+            <li>Predictive analytics</li>
+            <li>Priority support</li>
+        </ul>
 
-                    <p>Features now available:</p>
-                    <ul class="styled-list">
-                        <li>Everything in Free</li>
-                        <li>Unlimited products</li>
-                        <li>Biometric login security</li>
-                        <li>Unlimited invoices & payments</li>
-                        <li>AI receipt scanning (500/month)</li>
-                        <li>Predictive analytics</li>
-                        <li>Priority support</li>
-                    </ul>
+        <div class="button-container">
+            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Subscription</a>
+        </div>
 
-                    <div class="button-container">
-                        <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Subscription</a>
-                    </div>
+        <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
-                    <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
-
-                    <div class="receipt-footer">
-                        <p>Thank you for continuing with Argo Premium!</p>
-                        <p><a href="https://argorobots.com">argorobots.com</a></p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
+        <div class="receipt-footer">
+            <p>Thank you for continuing with Argo Premium!</p>
+            <p><a href="https://argorobots.com">argorobots.com</a></p>
+        </div>
         HTML;
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    return mail($email, $subject, $email_html, implode("\r\n", $headers));
+    return send_styled_email($email, 'Subscription Reactivated - Argo Premium', $body, 'purple');
 }
 
 /**
@@ -1308,15 +885,6 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 }
 
 /**
- * Send free credit notification email
- *
- * @param string $email User's email address
- * @param float $creditAmount Amount of credit given
- * @param string $note Optional note from admin
- * @param string $subscriptionId Subscription ID
- * @return bool Success status
- */
-/**
  * Send payment failed notification email
  *
  * @param string $email User's email address
@@ -1360,11 +928,17 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
     return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'purple');
 }
 
+/**
+ * Send free credit notification email
+ *
+ * @param string $email User's email address
+ * @param float $creditAmount Amount of credit given
+ * @param string $note Optional note from admin
+ * @param string $subscriptionId Subscription ID
+ * @return bool Success status
+ */
 function send_free_credit_email($email, $creditAmount, $note = '', $subscriptionId = '')
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $subject = "You've Received Free Credit - Argo Premium";
-
     $formattedAmount = number_format($creditAmount, 2);
     $noteSection = '';
     if (!empty($note)) {
@@ -1374,67 +948,38 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
             </div>";
     }
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>Free Credit Received</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header header-purple">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-                </div>
+    $body = <<<HTML
+        <h1>You've Received Free Credit!</h1>
+        <p>Free credit has been added to your Argo Premium subscription.</p>
 
-                <div class="content">
-                    <h1>You've Received Free Credit!</h1>
-                    <p>Free credit has been added to your Argo Premium subscription.</p>
+        <div class="credit-display">
+            <p class="label">Credit Added</p>
+            <p class="amount">\${$formattedAmount} CAD</p>
+        </div>
 
-                    <div class="credit-display">
-                        <p class="label">Credit Added</p>
-                        <p class="amount">\${$formattedAmount} CAD</p>
-                    </div>
+        {$noteSection}
 
-                    {$noteSection}
+        <p>This credit will be automatically applied to your future subscription renewals, saving you money on upcoming payments.</p>
 
-                    <p>This credit will be automatically applied to your future subscription renewals, saving you money on upcoming payments.</p>
+        <h3>How Credit Works:</h3>
+        <ul class="styled-list">
+            <li>Credit is applied automatically at renewal time</li>
+            <li>If your credit covers the full renewal amount, you won't be charged</li>
+            <li>Any remaining credit carries over to future renewals</li>
+            <li>You can view your credit balance in your subscription settings</li>
+        </ul>
 
-                    <h3>How Credit Works:</h3>
-                    <ul class="styled-list">
-                        <li>Credit is applied automatically at renewal time</li>
-                        <li>If your credit covers the full renewal amount, you won't be charged</li>
-                        <li>Any remaining credit carries over to future renewals</li>
-                        <li>You can view your credit balance in your subscription settings</li>
-                    </ul>
+        <div class="button-container">
+            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Your Subscription</a>
+        </div>
 
-                    <div class="button-container">
-                        <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Your Subscription</a>
-                    </div>
+        <p>If you have any questions about your credit or subscription, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
-                    <p>If you have any questions about your credit or subscription, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
-
-                    <div class="receipt-footer">
-                        <p>Thank you for being an Argo Premium subscriber!</p>
-                        <p><a href="https://argorobots.com">argorobots.com</a></p>
-                    </div>
-                </div>
-            </div>
-        </body>
-        </html>
+        <div class="receipt-footer">
+            <p>Thank you for being an Argo Premium subscriber!</p>
+            <p><a href="https://argorobots.com">argorobots.com</a></p>
+        </div>
         HTML;
 
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: PHP/' . phpversion()
-    ];
-
-    return mail($email, $subject, $email_html, implode("\r\n", $headers));
+    return send_styled_email($email, "You've Received Free Credit - Argo Premium", $body, 'purple');
 }

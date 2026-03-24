@@ -33,8 +33,34 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 // Ensure tables exist
 
+// Check if the cron pipeline is currently running
+function is_pipeline_running(): bool
+{
+    $lockFile = __DIR__ . '/../../cron/logs/outreach_pipeline.lock';
+    if (!file_exists($lockFile)) {
+        return false;
+    }
+    $fp = @fopen($lockFile, 'r');
+    if (!$fp) {
+        return false;
+    }
+    // If we can get the lock, the pipeline is NOT running
+    $locked = !flock($fp, LOCK_EX | LOCK_NB);
+    fclose($fp);
+    return $locked;
+}
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
+
+// Block actions that conflict with a running pipeline
+$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses'];
+if (in_array($action, $pipelineActions) && is_pipeline_running()) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'The outreach pipeline cron job is currently running. Please wait a few minutes and try again.'
+    ]);
+    exit;
+}
 
 switch ($action) {
     // Lead CRUD
@@ -339,7 +365,11 @@ function get_stats($pdo)
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
 
-    json_response(['success' => true, 'stats' => $rows]);
+    json_response([
+        'success' => true,
+        'stats' => $rows,
+        'pipeline_running' => is_pipeline_running(),
+    ]);
 }
 
 // ─── Business Discovery (Google Places API) ───
@@ -394,6 +424,16 @@ function import_leads($pdo)
             if (!empty($biz['places_id'])) {
                 $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE places_id = ?");
                 $check->execute([$biz['places_id']]);
+                if ($check->fetch()) {
+                    $skipped++;
+                    continue;
+                }
+            }
+
+            // Deduplicate by email to avoid emailing same address twice
+            if (!empty($biz['email'])) {
+                $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ?");
+                $check->execute([$biz['email']]);
                 if ($check->fetch()) {
                     $skipped++;
                     continue;

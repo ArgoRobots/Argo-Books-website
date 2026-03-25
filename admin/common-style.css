@@ -1969,7 +1969,11 @@ tbody tr:hover {
   padding: 4px 24px 4px 8px;
   border: 1px solid var(--neutral-ddd, #d1d5db);
   border-radius: 6px;
-  background: var(--card-bg, #fff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E") no-repeat right 8px center;
+  background-color: var(--card-bg, #fff);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 10px 6px;
   font-size: 0.85rem;
   color: inherit;
   cursor: pointer;

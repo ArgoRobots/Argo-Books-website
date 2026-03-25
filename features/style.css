@@ -440,6 +440,7 @@ body {
 
 .feature-detail-visual {
   position: relative;
+  transform: scale(1.05);
 }
 
 .feature-detail-visual img {

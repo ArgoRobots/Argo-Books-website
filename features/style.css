@@ -962,17 +962,17 @@ body {
 
 /* Position the annotation boxes over receipt regions */
 .annotate-vendor {
-  top: 5%;
-  left: 22%;
-  right: 22%;
-  height: 14%;
+  top: 15%;
+  left: 16%;
+  right: 16%;
+  height: 23%;
   animation-delay: 0.3s !important;
 }
 
 .annotate-date {
-  top: 22%;
-  left: 22%;
-  width: 56%;
+  top: 40%;
+  left: 16%;
+  right: 16%;
   height: 5%;
   border-color: var(--emerald-500);
   animation-delay: 0.6s !important;
@@ -983,10 +983,10 @@ body {
 }
 
 .annotate-items {
-  top: 32%;
-  left: 22%;
-  right: 22%;
-  height: 26%;
+  top: 46%;
+  left: 16%;
+  right: 16%;
+  height: 25%;
   border-color: var(--purple-500);
   animation-delay: 0.9s !important;
 }
@@ -996,10 +996,10 @@ body {
 }
 
 .annotate-total {
-  top: 68%;
-  left: 22%;
-  right: 22%;
-  height: 8%;
+  top: 73%;
+  left: 16%;
+  right: 16%;
+  height: 7%;
   border-color: var(--amber-500);
   animation-delay: 1.2s !important;
 }

@@ -129,46 +129,46 @@
     <path d="M320 300 C320 330 360 330 360 350" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
   </g>
 
-  <!-- Floating badge: "Local Only" -->
+  <!-- Floating badge: "Encrypted" — upper left -->
   <g filter="url(#shadowSm)">
-    <rect x="430" y="232" width="120" height="36" rx="18" fill="white"/>
-    <circle cx="452" cy="250" r="10" fill="#10b981" opacity="0.15"/>
-    <path d="M448 250 L451 253 L457 247" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-    <text x="466" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Local Only</text>
-  </g>
-
-  <!-- Floating badge: "Encrypted" -->
-  <g filter="url(#shadowSm)">
-    <rect x="50" y="200" width="118" height="36" rx="18" fill="white"/>
-    <circle cx="72" cy="218" r="10" fill="#3b82f6" opacity="0.15"/>
+    <rect x="44" y="130" width="118" height="36" rx="18" fill="white"/>
+    <circle cx="66" cy="148" r="10" fill="#3b82f6" opacity="0.15"/>
     <!-- Small lock -->
-    <rect x="68" y="216" width="8" height="6" rx="1.5" fill="#3b82f6"/>
-    <path d="M70 216 L70 213 C70 210 76 210 76 213 L76 216" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
-    <text x="88" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Encrypted</text>
+    <rect x="62" y="146" width="8" height="6" rx="1.5" fill="#3b82f6"/>
+    <path d="M64 146 L64 143 C64 140 70 140 70 143 L70 146" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="82" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Encrypted</text>
   </g>
 
-  <!-- Floating badge: "No Cloud" with crossed-out cloud -->
+  <!-- Floating badge: "No Cloud" — upper right -->
   <g filter="url(#shadowSm)">
-    <rect x="440" y="136" width="116" height="36" rx="18" fill="white"/>
-    <g transform="translate(462, 154)">
+    <rect x="438" y="130" width="116" height="36" rx="18" fill="white"/>
+    <g transform="translate(460, 148)">
       <!-- Cloud shape -->
       <path d="M-6 2 C-10 2 -12 -1 -12 -4 C-12 -7 -10 -9 -7 -9 C-6 -12 -3 -14 0 -14 C4 -14 7 -11 7 -8 C10 -8 12 -6 12 -3 C12 0 10 2 7 2 Z" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
       <!-- Strike through -->
       <line x1="-14" y1="4" x2="14" y2="-14" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
     </g>
-    <text x="480" y="158" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">No Cloud</text>
+    <text x="478" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">No Cloud</text>
   </g>
 
-  <!-- Floating badge: "Offline OK" -->
+  <!-- Floating badge: "Offline OK" — lower left -->
   <g filter="url(#shadowSm)">
-    <rect x="46" y="300" width="112" height="36" rx="18" fill="white"/>
-    <circle cx="68" cy="318" r="10" fill="#10b981" opacity="0.15"/>
-    <!-- Wifi icon with check -->
-    <g transform="translate(68, 318)">
+    <rect x="44" y="240" width="112" height="36" rx="18" fill="white"/>
+    <circle cx="66" cy="258" r="10" fill="#10b981" opacity="0.15"/>
+    <!-- Wifi icon -->
+    <g transform="translate(66, 258)">
       <path d="M-6 -1 C-4 -4 4 -4 6 -1" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
       <path d="M-3 2 C-2 0.5 2 0.5 3 2" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
       <circle cx="0" cy="4" r="1.5" fill="#10b981"/>
     </g>
-    <text x="84" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Offline OK</text>
+    <text x="82" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Offline OK</text>
+  </g>
+
+  <!-- Floating badge: "Local Only" — lower right -->
+  <g filter="url(#shadowSm)">
+    <rect x="438" y="240" width="120" height="36" rx="18" fill="white"/>
+    <circle cx="460" cy="258" r="10" fill="#10b981" opacity="0.15"/>
+    <path d="M456 258 L459 261 L465 255" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="474" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Local Only</text>
   </g>
 </svg>

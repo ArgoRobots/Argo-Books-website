@@ -224,7 +224,7 @@ header .header-inner .menu-container .menu {
 
 header .header-inner .menu-container ul {
   list-style: none;
-  overflow: hidden;
+  overflow: visible;
 }
 
 header .header-inner .menu-container ul li {

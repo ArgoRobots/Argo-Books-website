@@ -448,6 +448,173 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.1);
 }
 
+/* Reversed layout (image left, text right) */
+.feature-detail.reversed {
+  direction: rtl;
+}
+
+.feature-detail.reversed > * {
+  direction: ltr;
+}
+
+/* ========================================
+   Benefits Grid Section
+   ======================================== */
+.benefits-section {
+  padding: 100px 0;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.benefit-card {
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.benefit-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--shadow-default);
+}
+
+.benefit-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
+  color: var(--primary-blue);
+}
+
+.benefit-card-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.benefit-card-icon.green {
+  background: linear-gradient(135deg, var(--green-50), var(--green-100));
+  color: var(--emerald-500);
+}
+
+.benefit-card-icon.purple {
+  background: linear-gradient(135deg, var(--purple-50), var(--purple-100));
+  color: var(--purple-500);
+}
+
+.benefit-card-icon.amber {
+  background: linear-gradient(135deg, var(--amber-50), var(--amber-100));
+  color: var(--amber-500);
+}
+
+.benefit-card-icon.cyan {
+  background: linear-gradient(135deg, var(--cyan-50), var(--cyan-100));
+  color: var(--cyan-500);
+}
+
+.benefit-card-icon.red {
+  background: linear-gradient(135deg, var(--red-50), var(--red-100));
+  color: var(--red-500);
+}
+
+.benefit-card h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+}
+
+.benefit-card p {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  line-height: 1.7;
+}
+
+/* ========================================
+   Highlight / Stats Banner
+   ======================================== */
+.highlight-banner {
+  padding: 60px 0;
+  background: linear-gradient(135deg, var(--blue-50) 0%, var(--white) 100%);
+  border-top: 1px solid var(--blue-100);
+  border-bottom: 1px solid var(--blue-100);
+}
+
+.highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  text-align: center;
+}
+
+.highlight-item h3 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.highlight-item p {
+  font-size: 1rem;
+  color: var(--gray-500);
+}
+
+/* ========================================
+   Use Cases Section
+   ======================================== */
+.use-cases-section {
+  padding: 100px 0;
+}
+
+.use-cases-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.use-case-card {
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.use-case-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--shadow-default);
+}
+
+.use-case-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.use-case-card h3 svg {
+  color: var(--primary-blue);
+  flex-shrink: 0;
+}
+
+.use-case-card p {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+  line-height: 1.7;
+  margin-left: 34px;
+}
+
 /* ========================================
    How It Works Section
    ======================================== */
@@ -642,6 +809,27 @@ body {
     max-width: 500px;
     margin: 0 auto;
   }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .highlight-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .use-cases-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .feature-detail.reversed {
+    direction: ltr;
+  }
 }
 
 @media (max-width: 600px) {
@@ -662,8 +850,18 @@ body {
   .feature-detail-section,
   .how-it-works,
   .related-features,
+  .benefits-section,
+  .use-cases-section,
   .cta-section {
     padding: 60px 0;
+  }
+
+  .highlight-banner {
+    padding: 40px 0;
+  }
+
+  .highlight-item h3 {
+    font-size: 2rem;
   }
 
   .section-title,

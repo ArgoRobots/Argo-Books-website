@@ -1577,50 +1577,49 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             const mockup = document.querySelector('.expenses-mockup');
             if (!mockup) return;
 
-            function runCycle() {
-                const fields = mockup.querySelectorAll('.form-field');
-                const checks = mockup.querySelectorAll('.validation-check');
-                const toggleOptions = mockup.querySelectorAll('.toggle-option');
+            const fields = mockup.querySelectorAll('.form-field');
+            const checks = mockup.querySelectorAll('.validation-check');
+            const toggleOptions = mockup.querySelectorAll('.toggle-option');
 
-                // Reset
-                mockup.classList.add('animating');
-                fields.forEach(f => f.classList.remove('field-visible'));
-                checks.forEach(c => c.classList.remove('check-visible'));
+            // Initial animation: fields and checks appear once
+            mockup.classList.add('animating');
+            fields.forEach(f => f.classList.remove('field-visible'));
+            checks.forEach(c => c.classList.remove('check-visible'));
 
-                // Stagger fields appearing
-                fields.forEach((field, i) => {
-                    t(() => field.classList.add('field-visible'), 300 + i * 400);
-                });
+            fields.forEach((field, i) => {
+                t(() => field.classList.add('field-visible'), 300 + i * 400);
+            });
 
-                // Toggle flip after fields appear
+            checks.forEach((check, i) => {
+                t(() => check.classList.add('check-visible'), 2400 + i * 300);
+            });
+
+            // After initial build, cycle only the expense/revenue toggle
+            function toggleCycle() {
+                // Flip to Revenue
                 t(() => {
                     toggleOptions.forEach(opt => opt.classList.toggle('active'));
                     const amountField = fields[1]?.querySelector('.field-value');
                     if (amountField) amountField.textContent = '$120.50';
                     const catField = fields[2]?.querySelector('.field-value');
                     if (catField) catField.textContent = 'Office Supplies';
-                }, 1800);
+                }, 0);
 
-                // Show validation checks
-                checks.forEach((check, i) => {
-                    t(() => check.classList.add('check-visible'), 2400 + i * 300);
-                });
-
-                // Hold, then reset and loop
+                // Flip back to Expense
                 t(() => {
-                    mockup.classList.remove('animating');
-                    fields.forEach(f => f.classList.remove('field-visible'));
-                    checks.forEach(c => c.classList.remove('check-visible'));
                     toggleOptions.forEach(opt => opt.classList.toggle('active'));
                     const amountField = fields[1]?.querySelector('.field-value');
                     if (amountField) amountField.textContent = '$85.00';
                     const catField = fields[2]?.querySelector('.field-value');
                     if (catField) catField.textContent = 'Books';
-                    t(() => runCycle(), 300);
-                }, 5500);
+
+                    // Continue cycling
+                    t(() => toggleCycle(), 3000);
+                }, 3000);
             }
 
-            runCycle();
+            // Start toggle cycling after initial animation settles
+            t(() => toggleCycle(), 3500);
         }
 
         // Predictive Analytics animation

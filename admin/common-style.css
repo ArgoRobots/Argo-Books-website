@@ -1952,19 +1952,14 @@ tbody tr:hover {
 .pg-rows-selector {
   position: absolute;
   left: 16px;
-  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
-  color: var(--dark-gray, #374151);
-}
-
-.pg-rows-selector label {
-  font-weight: 500;
 }
 
 .pg-rows-selector select {
   min-width: auto;
+  width: 4.5rem;
 }
 
 .pg-nav {

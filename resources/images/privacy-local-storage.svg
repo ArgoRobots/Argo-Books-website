@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f0fdf4"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="300" y1="60" x2="300" y2="320" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="shieldInner" x1="300" y1="90" x2="300" y2="290" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="laptopGrad" x1="170" y1="340" x2="430" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <filter id="shadowLg" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#3b82f6" flood-opacity="0.15"/>
+    </filter>
+    <filter id="shadowSm" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="20" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.04" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="50" x2="600" y2="50"/><line x1="0" y1="100" x2="600" y2="100"/>
+    <line x1="0" y1="150" x2="600" y2="150"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="250" x2="600" y2="250"/><line x1="0" y1="300" x2="600" y2="300"/>
+    <line x1="0" y1="350" x2="600" y2="350"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="0" y1="450" x2="600" y2="450"/>
+    <line x1="50" y1="0" x2="50" y2="500"/><line x1="100" y1="0" x2="100" y2="500"/>
+    <line x1="150" y1="0" x2="150" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="250" y1="0" x2="250" y2="500"/><line x1="300" y1="0" x2="300" y2="500"/>
+    <line x1="350" y1="0" x2="350" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="450" y1="0" x2="450" y2="500"/><line x1="500" y1="0" x2="500" y2="500"/>
+    <line x1="550" y1="0" x2="550" y2="500"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="90" cy="80" r="40" fill="#3b82f6" opacity="0.05"/>
+  <circle cx="520" cy="120" r="55" fill="#10b981" opacity="0.05"/>
+  <circle cx="500" cy="420" r="35" fill="#3b82f6" opacity="0.04"/>
+  <circle cx="80" cy="400" r="28" fill="#10b981" opacity="0.04"/>
+
+  <!-- Laptop base -->
+  <g filter="url(#shadowSm)">
+    <!-- Screen bezel -->
+    <rect x="170" y="280" width="260" height="170" rx="12" fill="url(#laptopGrad)"/>
+    <!-- Screen -->
+    <rect x="182" y="292" width="236" height="146" rx="6" fill="#0f172a"/>
+    <!-- Screen content - file explorer look -->
+    <rect x="190" y="300" width="220" height="16" rx="3" fill="#1e293b"/>
+    <circle cx="200" cy="308" r="3" fill="#ef4444" opacity="0.8"/>
+    <circle cx="210" cy="308" r="3" fill="#eab308" opacity="0.8"/>
+    <circle cx="220" cy="308" r="3" fill="#10b981" opacity="0.8"/>
+
+    <!-- Folder icons and file rows -->
+    <g opacity="0.9">
+      <!-- Folder 1 - Receipts -->
+      <rect x="196" y="324" width="14" height="11" rx="2" fill="#60a5fa"/>
+      <rect x="196" y="322" width="8" height="4" rx="1" fill="#60a5fa"/>
+      <text x="216" y="333" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Receipts/</text>
+
+      <!-- Folder 2 - Expenses -->
+      <rect x="196" y="342" width="14" height="11" rx="2" fill="#60a5fa"/>
+      <rect x="196" y="340" width="8" height="4" rx="1" fill="#60a5fa"/>
+      <text x="216" y="351" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Expenses/</text>
+
+      <!-- File rows -->
+      <rect x="208" y="358" width="10" height="12" rx="1.5" fill="#334155"/>
+      <text x="222" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">receipt_001.jpg</text>
+      <text x="340" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">12 KB</text>
+
+      <rect x="208" y="374" width="10" height="12" rx="1.5" fill="#334155"/>
+      <text x="222" y="384" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">receipt_002.jpg</text>
+      <text x="340" y="384" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">8 KB</text>
+
+      <rect x="208" y="390" width="10" height="12" rx="1.5" fill="#334155"/>
+      <text x="222" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">receipt_003.jpg</text>
+      <text x="340" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">15 KB</text>
+
+      <rect x="208" y="406" width="10" height="12" rx="1.5" fill="#334155"/>
+      <text x="222" y="416" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#64748b">expenses_2025.db</text>
+      <text x="340" y="416" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#475569">256 KB</text>
+    </g>
+
+    <!-- Keyboard base -->
+    <path d="M140 450 L170 450 L170 452 C170 456 174 460 178 460 L422 460 C426 460 430 456 430 452 L430 450 L460 450 L460 454 C460 460 455 466 448 466 L152 466 C145 466 140 460 140 454 Z" fill="#1e293b"/>
+    <!-- Trackpad -->
+    <rect x="262" y="452" width="76" height="8" rx="3" fill="#334155" opacity="0.5"/>
+  </g>
+
+  <!-- Shield - centered above laptop -->
+  <g filter="url(#shadowLg)">
+    <!-- Shield shape -->
+    <path d="M300 72 L368 100 C368 100 374 180 358 228 C342 276 300 308 300 308 C300 308 258 276 242 228 C226 180 232 100 232 100 Z" fill="url(#shieldGrad)" opacity="0.95"/>
+    <!-- Shield inner -->
+    <path d="M300 92 L354 114 C354 114 358 178 346 218 C334 258 300 284 300 284 C300 284 266 258 254 218 C242 178 246 114 246 114 Z" fill="url(#shieldInner)" opacity="0.3"/>
+
+    <!-- Lock icon on shield -->
+    <g transform="translate(300, 180)">
+      <!-- Lock body -->
+      <rect x="-18" y="-6" width="36" height="30" rx="5" fill="white" opacity="0.95"/>
+      <!-- Lock shackle -->
+      <path d="M-10 -6 L-10 -18 C-10 -30 10 -30 10 -18 L10 -6" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" opacity="0.95"/>
+      <!-- Keyhole -->
+      <circle cx="0" cy="8" r="5" fill="#3b82f6"/>
+      <rect x="-2" y="10" width="4" height="8" rx="1" fill="#3b82f6"/>
+    </g>
+  </g>
+
+  <!-- Connection lines from shield to laptop (data stays local) -->
+  <g opacity="0.2">
+    <path d="M280 300 C280 330 240 330 240 350" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+    <path d="M300 310 L300 348" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+    <path d="M320 300 C320 330 360 330 360 350" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+  </g>
+
+  <!-- Floating badge: "Local Only" -->
+  <g filter="url(#shadowSm)">
+    <rect x="430" y="232" width="120" height="36" rx="18" fill="white"/>
+    <circle cx="452" cy="250" r="10" fill="#10b981" opacity="0.15"/>
+    <path d="M448 250 L451 253 L457 247" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <text x="466" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Local Only</text>
+  </g>
+
+  <!-- Floating badge: "Encrypted" -->
+  <g filter="url(#shadowSm)">
+    <rect x="50" y="200" width="118" height="36" rx="18" fill="white"/>
+    <circle cx="72" cy="218" r="10" fill="#3b82f6" opacity="0.15"/>
+    <!-- Small lock -->
+    <rect x="68" y="216" width="8" height="6" rx="1.5" fill="#3b82f6"/>
+    <path d="M70 216 L70 213 C70 210 76 210 76 213 L76 216" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="88" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Encrypted</text>
+  </g>
+
+  <!-- Floating badge: "No Cloud" with crossed-out cloud -->
+  <g filter="url(#shadowSm)">
+    <rect x="440" y="136" width="116" height="36" rx="18" fill="white"/>
+    <g transform="translate(462, 154)">
+      <!-- Cloud shape -->
+      <path d="M-6 2 C-10 2 -12 -1 -12 -4 C-12 -7 -10 -9 -7 -9 C-6 -12 -3 -14 0 -14 C4 -14 7 -11 7 -8 C10 -8 12 -6 12 -3 C12 0 10 2 7 2 Z" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+      <!-- Strike through -->
+      <line x1="-14" y1="4" x2="14" y2="-14" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <text x="480" y="158" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">No Cloud</text>
+  </g>
+
+  <!-- Floating badge: "Offline OK" -->
+  <g filter="url(#shadowSm)">
+    <rect x="46" y="300" width="112" height="36" rx="18" fill="white"/>
+    <circle cx="68" cy="318" r="10" fill="#10b981" opacity="0.15"/>
+    <!-- Wifi icon with check -->
+    <g transform="translate(68, 318)">
+      <path d="M-6 -1 C-4 -4 4 -4 6 -1" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M-3 2 C-2 0.5 2 0.5 3 2" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="0" cy="4" r="1.5" fill="#10b981"/>
+    </g>
+    <text x="84" y="322" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Offline OK</text>
+  </g>
+</svg>

@@ -482,8 +482,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <!-- REPLACE: Screenshot showing local data storage or the privacy/security aspect of the app -->
-                    <img src="../../resources/images/dashboard.webp" alt="Argo Books desktop application with local data storage" loading="lazy">
+                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted, offline-capable, no cloud" loading="lazy">
                 </div>
             </div>
         </div>

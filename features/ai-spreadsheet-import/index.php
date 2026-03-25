@@ -327,14 +327,14 @@
                         <?= svg_icon('bolt', 22) ?>
                     </div>
                     <h3>Handles messy data gracefully</h3>
-                    <p>Real-world spreadsheets aren't perfect. The AI handles merged cells, inconsistent formatting, mixed data types, and pivot-table layouts without breaking.</p>
+                    <p>Real-world spreadsheets aren't perfect. The AI handles merged cells, inconsistent formatting, mixed data types, and pivot-table layouts.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
                         <?= svg_icon('table', 22) ?>
                     </div>
                     <h3>Multi-sheet in one import</h3>
-                    <p>Excel files with multiple sheets — customers on one tab, products on another, invoices on a third — are analyzed and imported together in a single operation.</p>
+                    <p>Excel files with multiple sheets — customers on one tab, products on another — are analyzed and imported together in a single operation.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
@@ -436,7 +436,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Country-aware address schemas adapt to your locale automatically</span>
+                            <span>Country-aware address schemas adapt to your location automatically</span>
                         </li>
                     </ul>
                 </div>

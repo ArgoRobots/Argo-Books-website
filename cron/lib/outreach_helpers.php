@@ -518,7 +518,7 @@ function generate_draft_for_lead($pdo, $lead)
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 About Argo Books:
-- It is like QuickBooks but way simpler, designed so you do not need any accounting knowledge at all
+- It is a simple bookkeeping and invoicing app designed so you do not need any accounting knowledge at all
 - Built specifically for small businesses, not a bloated enterprise tool
 - Features include invoicing, expense tracking, and simple bookkeeping
 - Evan is " . ($isLocal ? "a local independent software developer based in Saskatoon" : "a Canadian independent software developer") . " building this specifically for small businesses
@@ -543,7 +543,7 @@ PERSONALIZATION (this is critical):
 - Do NOT invent details about the business you do not have
 - If no summary is available, keep it more general but still mention their industry/category if known
 
-- Briefly describe Argo Books as a simpler alternative to QuickBooks that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
+- Briefly describe Argo Books as a simple bookkeeping and invoicing app that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
 - Mention offering a free 1-year premium license in exchange for feedback
 - Use a casual but professional tone

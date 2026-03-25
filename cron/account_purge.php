@@ -14,10 +14,10 @@
 
 set_time_limit(120);
 
-// Only allow CLI execution
-if (php_sapi_name() !== 'cli') {
+// Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request)
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
     http_response_code(403);
-    die('Access denied. This script can only be run via CLI.');
+    die('Access denied. This script can only be run via CLI/cron.');
 }
 
 require_once __DIR__ . '/../vendor/autoload.php';

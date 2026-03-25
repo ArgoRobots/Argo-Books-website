@@ -497,9 +497,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                         <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0"/>
                                                     </linearGradient>
                                                 </defs>
-                                                <path d="M0,120 Q50,100 100,80 T200,50 Q250,30 300,20 L300,150 L0,150 Z" fill="url(#chartGradient)"/>
-                                                <path d="M0,120 Q50,100 100,80 T200,50" fill="none" stroke="#3b82f6" stroke-width="3"/>
-                                                <path d="M200,50 Q250,30 300,20" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
+                                                <path d="M0,130 C40,135 60,95 105,90 C150,85 155,65 200,50 L200,150 L0,150 Z" fill="url(#chartGradient)"/>
+                                                <path d="M0,130 C40,135 60,95 105,90 C150,85 155,65 200,50" fill="none" stroke="#3b82f6" stroke-width="3"/>
+                                                <path d="M200,50 C230,40 250,30 265,35 C280,40 285,20 300,15" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
                                                 <circle cx="200" cy="50" r="5" fill="#3b82f6"/>
                                             </svg>
                                             <div class="prediction-badge">
@@ -1513,7 +1513,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             // Run single scan pass
             scanLine.style.animation = 'none';
             scanLine.offsetHeight;
-            scanLine.style.animation = 'scanLine 2.5s ease-in-out 1';
+            scanLine.style.animation = 'scanLine 2.5s ease-in-out 1 forwards';
 
             // Highlight each text line as scan passes over it
             const scanDuration = 2500;
@@ -1577,50 +1577,49 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             const mockup = document.querySelector('.expenses-mockup');
             if (!mockup) return;
 
-            function runCycle() {
-                const fields = mockup.querySelectorAll('.form-field');
-                const checks = mockup.querySelectorAll('.validation-check');
-                const toggleOptions = mockup.querySelectorAll('.toggle-option');
+            const fields = mockup.querySelectorAll('.form-field');
+            const checks = mockup.querySelectorAll('.validation-check');
+            const toggleOptions = mockup.querySelectorAll('.toggle-option');
 
-                // Reset
-                mockup.classList.add('animating');
-                fields.forEach(f => f.classList.remove('field-visible'));
-                checks.forEach(c => c.classList.remove('check-visible'));
+            // Initial animation: fields and checks appear once
+            mockup.classList.add('animating');
+            fields.forEach(f => f.classList.remove('field-visible'));
+            checks.forEach(c => c.classList.remove('check-visible'));
 
-                // Stagger fields appearing
-                fields.forEach((field, i) => {
-                    t(() => field.classList.add('field-visible'), 300 + i * 400);
-                });
+            fields.forEach((field, i) => {
+                t(() => field.classList.add('field-visible'), 300 + i * 400);
+            });
 
-                // Toggle flip after fields appear
+            checks.forEach((check, i) => {
+                t(() => check.classList.add('check-visible'), 2400 + i * 300);
+            });
+
+            // After initial build, cycle only the expense/revenue toggle
+            function toggleCycle() {
+                // Flip to Revenue
                 t(() => {
                     toggleOptions.forEach(opt => opt.classList.toggle('active'));
                     const amountField = fields[1]?.querySelector('.field-value');
                     if (amountField) amountField.textContent = '$120.50';
                     const catField = fields[2]?.querySelector('.field-value');
                     if (catField) catField.textContent = 'Office Supplies';
-                }, 1800);
+                }, 0);
 
-                // Show validation checks
-                checks.forEach((check, i) => {
-                    t(() => check.classList.add('check-visible'), 2400 + i * 300);
-                });
-
-                // Hold, then reset and loop
+                // Flip back to Expense
                 t(() => {
-                    mockup.classList.remove('animating');
-                    fields.forEach(f => f.classList.remove('field-visible'));
-                    checks.forEach(c => c.classList.remove('check-visible'));
                     toggleOptions.forEach(opt => opt.classList.toggle('active'));
                     const amountField = fields[1]?.querySelector('.field-value');
                     if (amountField) amountField.textContent = '$85.00';
                     const catField = fields[2]?.querySelector('.field-value');
                     if (catField) catField.textContent = 'Books';
-                    t(() => runCycle(), 300);
-                }, 5500);
+
+                    // Continue cycling
+                    t(() => toggleCycle(), 5000);
+                }, 5000);
             }
 
-            runCycle();
+            // Start toggle cycling after initial animation settles
+            t(() => toggleCycle(), 5000);
         }
 
         // Predictive Analytics animation

@@ -8,7 +8,7 @@ function getBasePath() {
   var match = path.match(/^(\/[\w-]+\/)/);
 
   // If the path doesn't start with common site paths, assume we're in a subfolder
-  var sitePaths = ['/pricing/', '/community/', '/documentation/', '/about-us/',
+  var sitePaths = ['/features/', '/pricing/', '/community/', '/documentation/', '/about-us/',
                    '/contact-us/', '/whats-new/', '/admin/', '/legal/', '/resources/',
                    '/error-pages/', '/older-versions/', '/downloads/', '/portal/',
                    '/invoice/', '/api/', '/compare/'];

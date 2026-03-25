@@ -12,6 +12,33 @@
     <!-- MENU -->
     <nav aria-label="Main navigation">
       <ul class="menu">
+        <li class="has-dropdown">
+          <a class="features" href="/features/">Features
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+          </a>
+          <div class="dropdown-menu">
+            <div class="dropdown-columns">
+              <div class="dropdown-col">
+                <span class="dropdown-col-header">AI & Automation</span>
+                <a class="dropdown-item" href="/features/ai-receipt-scanning/">AI Receipt Scanning</a>
+                <a class="dropdown-item" href="/features/ai-spreadsheet-import/">AI Spreadsheet Import</a>
+                <a class="dropdown-item" href="/features/predictive-analytics/">Predictive Analytics</a>
+              </div>
+              <div class="dropdown-col">
+                <span class="dropdown-col-header">Financial Tools</span>
+                <a class="dropdown-item" href="/features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
+                <a class="dropdown-item" href="/features/invoicing/">Invoicing</a>
+                <a class="dropdown-item" href="/features/customer-management/">Customer Management</a>
+              </div>
+              <div class="dropdown-col">
+                <span class="dropdown-col-header">Operations</span>
+                <a class="dropdown-item" href="/features/inventory-management/">Inventory Management</a>
+                <a class="dropdown-item" href="/features/rental-management/">Rental Management</a>
+                <a class="dropdown-item" href="/features/">View All Features →</a>
+              </div>
+            </div>
+          </div>
+        </li>
         <li><a class="pricing" href="/pricing/">Pricing</a></li>
         <li><a class="whats-new" href="/whats-new/">What's new</a></li>
         <li><a class="about-us" href="/about-us/">About us</a></li>
@@ -39,6 +66,7 @@
 <div id="menu" class="hamburger-nav-menu">
   <nav aria-label="Mobile navigation">
     <ul>
+      <li><a href="/features/">Features</a></li>
       <li><a href="/pricing/">Pricing</a></li>
       <li><a href="/whats-new/">What's new</a></li>
       <li><a href="/about-us/">About us</a></li>
@@ -118,4 +146,30 @@
       headerToggleMenu();
     }
   });
+
+  // Dropdown touch support for mobile/tablet
+  (function() {
+    var dropdownLi = document.querySelector('.has-dropdown');
+    if (!dropdownLi) return;
+    var dropdownLink = dropdownLi.querySelector(':scope > a');
+
+    dropdownLink.addEventListener('click', function(e) {
+      // Only intercept on touch devices
+      if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) return;
+      if (dropdownLi.classList.contains('dropdown-open')) {
+        // Second tap — navigate
+        return;
+      }
+      // First tap — toggle dropdown open
+      e.preventDefault();
+      dropdownLi.classList.add('dropdown-open');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!dropdownLi.contains(e.target)) {
+        dropdownLi.classList.remove('dropdown-open');
+      }
+    });
+  })();
 </script>

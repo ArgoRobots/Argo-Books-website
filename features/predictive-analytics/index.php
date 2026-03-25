@@ -209,7 +209,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/analytics-accuracy.svg" alt="Past predictions table showing backtested forecasts with accuracy scores and confidence levels" loading="lazy">
+                    <img src="../../resources/images/features/analytics-ml-engine.svg" alt="How predictions work — seasonal pattern detection, trend analysis, adaptive model selection, and confidence scoring" loading="lazy">
                 </div>
             </div>
         </div>

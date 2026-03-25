@@ -258,6 +258,102 @@ header .header-inner .menu-container ul li a:hover::after {
   transform: translateX(-50%) scaleX(1);
 }
 
+/* ========================================
+   Dropdown Menu
+   ======================================== */
+.has-dropdown {
+  position: relative;
+}
+
+.has-dropdown > a {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.has-dropdown > a svg {
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.has-dropdown:hover > a svg,
+.has-dropdown.dropdown-open > a svg {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  min-width: 320px;
+  padding: 12px;
+  z-index: 1001;
+}
+
+.has-dropdown:hover .dropdown-menu,
+.has-dropdown.dropdown-open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+}
+
+.dropdown-menu a:after {
+  display: none !important;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+  text-decoration: none;
+}
+
+.dropdown-item:hover {
+  background: var(--gray-50);
+}
+
+.dropdown-item-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gray-900) !important;
+}
+
+.dropdown-item-desc {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--gray-500) !important;
+  margin-top: 2px;
+}
+
+.dropdown-footer {
+  border-top: 1px solid var(--gray-200);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.dropdown-all-features {
+  display: block;
+  padding: 8px 14px;
+  color: var(--blue-500) !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+  border-radius: 8px;
+}
+
+.dropdown-all-features:hover {
+  background: var(--gray-50);
+}
+
 @media (max-width: 1100px) {
   header .header-inner {
     width: 95vw;
@@ -265,6 +361,14 @@ header .header-inner .menu-container ul li a:hover::after {
 }
 
 @media (max-width: 900px) {
+  .dropdown-menu {
+    display: none !important;
+  }
+
+  .has-dropdown > a svg {
+    display: none;
+  }
+
   header .header-inner .menu-container {
     display: none;
   }

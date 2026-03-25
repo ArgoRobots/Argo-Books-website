@@ -12,6 +12,50 @@
     <!-- MENU -->
     <nav aria-label="Main navigation">
       <ul class="menu">
+        <li class="has-dropdown">
+          <a class="features" href="/features/">Features
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
+          </a>
+          <div class="dropdown-menu">
+            <div class="dropdown-inner">
+              <a class="dropdown-item" href="/features/ai-receipt-scanning/">
+                <span class="dropdown-item-title">AI Receipt Scanning</span>
+                <span class="dropdown-item-desc">Snap, scan, done</span>
+              </a>
+              <a class="dropdown-item" href="/features/expense-revenue-tracking/">
+                <span class="dropdown-item-title">Expense & Revenue Tracking</span>
+                <span class="dropdown-item-desc">Track every dollar</span>
+              </a>
+              <a class="dropdown-item" href="/features/predictive-analytics/">
+                <span class="dropdown-item-title">Predictive Analytics</span>
+                <span class="dropdown-item-desc">Forecast your future</span>
+              </a>
+              <a class="dropdown-item" href="/features/inventory-management/">
+                <span class="dropdown-item-title">Inventory Management</span>
+                <span class="dropdown-item-desc">Track every item</span>
+              </a>
+              <a class="dropdown-item" href="/features/rental-management/">
+                <span class="dropdown-item-title">Rental Management</span>
+                <span class="dropdown-item-desc">Bookings made easy</span>
+              </a>
+              <a class="dropdown-item" href="/features/customer-management/">
+                <span class="dropdown-item-title">Customer Management</span>
+                <span class="dropdown-item-desc">Know your customers</span>
+              </a>
+              <a class="dropdown-item" href="/features/invoicing/">
+                <span class="dropdown-item-title">Invoicing</span>
+                <span class="dropdown-item-desc">Professional invoices</span>
+              </a>
+              <a class="dropdown-item" href="/features/ai-spreadsheet-import/">
+                <span class="dropdown-item-title">AI Spreadsheet Import</span>
+                <span class="dropdown-item-desc">Import any spreadsheet</span>
+              </a>
+            </div>
+            <div class="dropdown-footer">
+              <a class="dropdown-all-features" href="/features/">View all features →</a>
+            </div>
+          </div>
+        </li>
         <li><a class="pricing" href="/pricing/">Pricing</a></li>
         <li><a class="whats-new" href="/whats-new/">What's new</a></li>
         <li><a class="about-us" href="/about-us/">About us</a></li>
@@ -39,6 +83,7 @@
 <div id="menu" class="hamburger-nav-menu">
   <nav aria-label="Mobile navigation">
     <ul>
+      <li><a href="/features/">Features</a></li>
       <li><a href="/pricing/">Pricing</a></li>
       <li><a href="/whats-new/">What's new</a></li>
       <li><a href="/about-us/">About us</a></li>
@@ -118,4 +163,30 @@
       headerToggleMenu();
     }
   });
+
+  // Dropdown touch support for mobile/tablet
+  (function() {
+    var dropdownLi = document.querySelector('.has-dropdown');
+    if (!dropdownLi) return;
+    var dropdownLink = dropdownLi.querySelector(':scope > a');
+
+    dropdownLink.addEventListener('click', function(e) {
+      // Only intercept on touch devices
+      if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) return;
+      if (dropdownLi.classList.contains('dropdown-open')) {
+        // Second tap — navigate
+        return;
+      }
+      // First tap — toggle dropdown open
+      e.preventDefault();
+      dropdownLi.classList.add('dropdown-open');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!dropdownLi.contains(e.target)) {
+        dropdownLi.classList.remove('dropdown-open');
+      }
+    });
+  })();
 </script>

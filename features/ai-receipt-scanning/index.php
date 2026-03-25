@@ -325,7 +325,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/ai-receipt-scanner.webp" alt="Argo Books receipt scanner showing extracted and organized expense data" loading="lazy">
+                    <img src="../../resources/images/features/expenses-table.svg" alt="Argo Books expenses page showing organized, searchable expense records with supplier details and status" loading="lazy">
                 </div>
             </div>
         </div>

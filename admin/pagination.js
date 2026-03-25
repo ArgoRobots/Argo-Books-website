@@ -9,11 +9,17 @@
  *   p.reset();   // after filtering / re-rendering
  */
 class TablePaginator {
+    static ROW_OPTIONS = [10, 25, 50, 100];
+    static STORAGE_KEY = 'admin_rows_per_page';
+
     constructor(tableEl, options = {}) {
         this.table = tableEl;
         this.tbody = tableEl.querySelector('tbody');
         if (!this.tbody) return;
-        this.perPage = options.perPage || 25;
+
+        // Use saved preference if available, otherwise fall back to option/default
+        const saved = localStorage.getItem(TablePaginator.STORAGE_KEY);
+        this.perPage = saved ? parseInt(saved, 10) : (options.perPage || 25);
         this.currentPage = 1;
         this.controlsEl = document.createElement('div');
         this.controlsEl.className = 'pagination-controls';
@@ -58,11 +64,16 @@ class TablePaginator {
     }
 
     _renderControls(total, totalPages) {
-        if (total <= this.perPage) {
+        if (total <= Math.min(...TablePaginator.ROW_OPTIONS)) {
             this.controlsEl.style.display = 'none';
             return;
         }
         this.controlsEl.style.display = '';
+
+        // Build rows-per-page selector
+        const rowOpts = TablePaginator.ROW_OPTIONS.map(n =>
+            `<option value="${n}"${n === this.perPage ? ' selected' : ''}>${n}</option>`
+        ).join('');
 
         // Build page number buttons with ellipsis for large page counts
         let pages = '';
@@ -86,16 +97,32 @@ class TablePaginator {
         }
 
         this.controlsEl.innerHTML = `
-            <button class="pg-arrow" ${cur <= 1 ? 'disabled' : ''} data-pg="prev">\u2039</button>
-            ${pages}
-            <button class="pg-arrow" ${cur >= totalPages ? 'disabled' : ''} data-pg="next">\u203A</button>
+            <div class="pg-rows-selector">
+                <label>Rows</label>
+                <select class="pg-rows-select">${rowOpts}</select>
+            </div>
+            <div class="pg-nav">
+                <button class="pg-arrow" ${cur <= 1 ? 'disabled' : ''} data-pg="prev">\u2039</button>
+                ${pages}
+                <button class="pg-arrow" ${cur >= totalPages ? 'disabled' : ''} data-pg="next">\u203A</button>
+            </div>
         `;
 
+        this.controlsEl.querySelector('.pg-rows-select').addEventListener('change', (e) => {
+            this.setPerPage(parseInt(e.target.value, 10));
+        });
         this.controlsEl.querySelector('[data-pg="prev"]').addEventListener('click', () => this.goTo(cur - 1));
         this.controlsEl.querySelector('[data-pg="next"]').addEventListener('click', () => this.goTo(cur + 1));
         this.controlsEl.querySelectorAll('.pg-num').forEach(btn => {
             btn.addEventListener('click', () => this.goTo(parseInt(btn.dataset.pg, 10)));
         });
+    }
+
+    setPerPage(n) {
+        this.perPage = n;
+        this.currentPage = 1;
+        localStorage.setItem(TablePaginator.STORAGE_KEY, n);
+        this.update();
     }
 
     goTo(page) {

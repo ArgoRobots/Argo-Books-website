@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#f59e0b" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="530" cy="60" r="40" fill="#f59e0b" opacity="0.04"/>
+  <circle cx="70" cy="440" r="30" fill="#3b82f6" opacity="0.04"/>
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Header -->
+  <circle cx="66" cy="56" r="18" fill="#fef3c7"/>
+  <text x="66" y="56" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#f59e0b" text-anchor="middle" dominant-baseline="central">!</text>
+
+  <text x="92" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#1e293b">Import Issues Found</text>
+  <text x="92" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">883 missing reference(s) that can be auto-created.</text>
+
+  <!-- Stats row -->
+  <rect x="48" y="88" width="160" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="128" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Can Auto-fix</text>
+  <text x="128" y="144" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#f59e0b" text-anchor="middle">883</text>
+
+  <rect x="218" y="88" width="160" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="298" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Needs Manual Fix</text>
+  <text x="298" y="144" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#10b981" text-anchor="middle">0</text>
+
+  <rect x="388" y="88" width="160" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="468" y="116" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Sheets Affected</text>
+  <text x="468" y="144" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#1e293b" text-anchor="middle">3</text>
+
+  <!-- Info box -->
+  <rect x="48" y="170" width="504" height="48" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <circle cx="72" cy="194" r="10" fill="#3b82f6" opacity="0.15"/>
+  <text x="68" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#3b82f6">i</text>
+  <text x="90" y="190" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#1e293b">How Auto-fix Works</text>
+  <text x="90" y="206" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Missing references are auto-created as placeholders you can edit later.</text>
+
+  <!-- Employees section -->
+  <rect x="48" y="230" width="504" height="178" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Section header -->
+  <text x="80" y="256" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Employees</text>
+  <rect x="488" y="240" width="32" height="22" rx="11" fill="#f59e0b"/>
+  <text x="504" y="251" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">5</text>
+
+  <!-- Table header -->
+  <text x="68" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="600">ROW</text>
+  <text x="108" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="600">COLUMN</text>
+  <text x="228" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="600">VALUE</text>
+  <text x="330" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" font-weight="600">ISSUE</text>
+  <line x1="60" y1="290" x2="540" y2="290" stroke="#e2e8f0" stroke-width="1"/>
+
+  <!-- Row 1 -->
+  <text x="75" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" text-anchor="middle">2</text>
+  <text x="108" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Department ID</text>
+  <rect x="228" y="296" width="82" height="22" rx="4" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+  <text x="240" y="312" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#b45309">Operations</text>
+  <rect x="330" y="296" width="56" height="22" rx="4" fill="#fef3c7"/>
+  <text x="340" y="312" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#d97706">Auto-fix</text>
+  <text x="392" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">&#x2018;Operations&#x2019; not found</text>
+
+  <!-- Row 2 -->
+  <text x="75" y="338" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" text-anchor="middle">3</text>
+  <text x="108" y="338" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Department ID</text>
+  <rect x="228" y="324" width="66" height="22" rx="4" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+  <text x="240" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#b45309">Finance</text>
+  <rect x="330" y="324" width="56" height="22" rx="4" fill="#fef3c7"/>
+  <text x="340" y="340" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#d97706">Auto-fix</text>
+  <text x="392" y="338" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">&#x2018;Finance&#x2019; not found</text>
+
+  <!-- Row 3 -->
+  <text x="75" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" text-anchor="middle">4</text>
+  <text x="108" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Department ID</text>
+  <rect x="228" y="352" width="52" height="22" rx="4" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+  <text x="240" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#b45309">Sales</text>
+  <rect x="330" y="352" width="56" height="22" rx="4" fill="#fef3c7"/>
+  <text x="340" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#d97706">Auto-fix</text>
+  <text x="392" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">&#x2018;Sales&#x2019; not found</text>
+
+  <!-- Row 4 -->
+  <text x="75" y="394" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569" text-anchor="middle">5</text>
+  <text x="108" y="394" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#475569">Department ID</text>
+  <rect x="228" y="380" width="82" height="22" rx="4" fill="#fef3c7" stroke="#fcd34d" stroke-width="1"/>
+  <text x="240" y="396" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#b45309">Production</text>
+  <rect x="330" y="380" width="56" height="22" rx="4" fill="#fef3c7"/>
+  <text x="340" y="396" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#d97706">Auto-fix</text>
+  <text x="392" y="394" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">&#x2018;Production&#x2019; not found</text>
+
+  <!-- Bottom bar -->
+  <line x1="48" y1="426" x2="552" y2="426" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="64" y="453" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8" dominant-baseline="central">Review the issues above before proceeding.</text>
+
+  <!-- Action buttons -->
+  <rect x="382" y="438" width="72" height="30" rx="8" fill="white" stroke="#d1d5db" stroke-width="1.5"/>
+  <text x="418" y="453" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Cancel</text>
+
+  <rect x="462" y="438" width="90" height="30" rx="8" fill="#3b82f6"/>
+  <text x="507" y="453" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle" dominant-baseline="central">Create &amp; Import</text>
+</svg>

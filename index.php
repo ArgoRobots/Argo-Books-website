@@ -207,7 +207,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <span>Get Started Free</span>
                         <?= svg_icon('arrow-right', 20) ?>
                     </a>
-                    <a href="#features" class="btn btn-secondary btn-lg">
+                    <a href="/features/" class="btn btn-secondary btn-lg">
                         <span>See Features</span>
                     </a>
                 </div>

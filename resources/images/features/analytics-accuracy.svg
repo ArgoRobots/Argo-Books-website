@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#f0fdf4"/>
+    </linearGradient>
+    <filter id="cardShadow3" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad3)"/>
+
+  <g opacity="0.03" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow3)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Title -->
+  <text x="56" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="700" fill="#1e293b">Past Predictions</text>
+  <text x="56" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">Historical forecast accuracy and comparison to actual results</text>
+
+  <!-- Summary cards -->
+  <rect x="48" y="94" width="160" height="64" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="128" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Overall Accuracy</text>
+  <text x="128" y="145" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#1e293b" text-anchor="middle">88%</text>
+
+  <rect x="220" y="94" width="160" height="64" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="300" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Live Predictions</text>
+  <text x="300" y="145" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#3b82f6" text-anchor="middle">0</text>
+
+  <rect x="392" y="94" width="160" height="64" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="472" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">Backtested</text>
+  <text x="472" y="145" font-family="system-ui, -apple-system, sans-serif" font-size="26" font-weight="700" fill="#8b5cf6" text-anchor="middle">9</text>
+
+  <!-- Table header -->
+  <rect x="48" y="178" width="504" height="30" rx="0" fill="#f8fafc"/>
+  <line x1="48" y1="208" x2="552" y2="208" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">PERIOD</text>
+  <text x="140" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">TYPE</text>
+  <text x="210" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">FORECAST REV</text>
+  <text x="310" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">ACTUAL REV</text>
+  <text x="406" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">ACCURACY</text>
+  <text x="480" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">CONFIDENCE</text>
+
+  <!-- Row 1 - Feb 2026 -->
+  <text x="60" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Feb 2026</text>
+  <rect x="140" y="218" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="232" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$10,744</text>
+  <text x="310" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$13,788</text>
+  <text x="406" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">75%</text>
+  <text x="480" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">33%</text>
+  <line x1="48" y1="244" x2="552" y2="244" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 2 - Jan 2026 -->
+  <text x="60" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Jan 2026</text>
+  <rect x="140" y="252" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="266" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$10,494</text>
+  <text x="310" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$12,413</text>
+  <text x="406" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">83%</text>
+  <text x="480" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">33%</text>
+  <line x1="48" y1="278" x2="552" y2="278" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 3 - Dec 2025 -->
+  <text x="60" y="298" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Dec 2025</text>
+  <rect x="140" y="286" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="300" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="298" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$9,462</text>
+  <text x="310" y="298" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$9,744</text>
+  <text x="406" y="298" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">97%</text>
+  <text x="480" y="298" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">33%</text>
+  <line x1="48" y1="312" x2="552" y2="312" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 4 - Nov 2025 -->
+  <text x="60" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Nov 2025</text>
+  <rect x="140" y="320" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="334" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$9,957</text>
+  <text x="310" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$10,716</text>
+  <text x="406" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">93%</text>
+  <text x="480" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">28%</text>
+  <line x1="48" y1="346" x2="552" y2="346" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 5 - Oct 2025 -->
+  <text x="60" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Oct 2025</text>
+  <rect x="140" y="354" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="368" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$10,934</text>
+  <text x="310" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$10,005</text>
+  <text x="406" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">91%</text>
+  <text x="480" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">30%</text>
+  <line x1="48" y1="380" x2="552" y2="380" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 6 - Sep 2025 -->
+  <text x="60" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Sep 2025</text>
+  <rect x="140" y="388" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="402" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$12,560</text>
+  <text x="310" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$10,196</text>
+  <text x="406" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">79%</text>
+  <text x="480" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">28%</text>
+  <line x1="48" y1="414" x2="552" y2="414" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 7 - Aug 2025 -->
+  <text x="60" y="434" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b">Aug 2025</text>
+  <rect x="140" y="422" width="52" height="20" rx="4" fill="#faf5ff"/>
+  <text x="166" y="436" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="500" fill="#8b5cf6" text-anchor="middle">Backtest</text>
+  <text x="210" y="434" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$12,507</text>
+  <text x="310" y="434" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#475569">$11,968</text>
+  <text x="406" y="434" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#10b981">96%</text>
+  <text x="480" y="434" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">28%</text>
+</svg>

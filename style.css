@@ -977,7 +977,7 @@ a {
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--blue-500), transparent);
     box-shadow: 0 0 12px 3px var(--blue-alpha-30);
-    animation: scanLine 2.5s ease-in-out 1;
+    animation: scanLine 2.5s ease-in-out 1 forwards;
     opacity: 1;
     transition: opacity 0.3s ease;
 }

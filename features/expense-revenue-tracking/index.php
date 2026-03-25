@@ -162,7 +162,7 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>2 clicks</h3>
+                    <h3>10 seconds</h3>
                     <p>To record a new transaction</p>
                 </div>
                 <div class="highlight-item">
@@ -170,7 +170,7 @@
                     <p>Revenue, expense &amp; profit summaries</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>0</h3>
+                    <h3>Zero</h3>
                     <p>Accounting experience required</p>
                 </div>
             </div>

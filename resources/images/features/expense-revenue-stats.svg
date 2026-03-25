@@ -49,7 +49,7 @@
 
   <!-- Net profit summary -->
   <text x="56" y="172" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#64748b">Net Profit This Month</text>
-  <text x="544" y="172" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#10b981" text-anchor="end">+$4,165.38</text>
+  <text x="544" y="172" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#10b981" text-anchor="end">+$4,166</text>
 
   <!-- Mini bar chart area -->
   <text x="56" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Monthly Breakdown</text>

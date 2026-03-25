@@ -110,12 +110,12 @@
 
   <!-- Bottom bar -->
   <line x1="48" y1="426" x2="552" y2="426" stroke="#f1f5f9" stroke-width="1"/>
-  <text x="64" y="454" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">Review the issues above before proceeding.</text>
+  <text x="64" y="453" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8" dominant-baseline="central">Review the issues above before proceeding.</text>
 
   <!-- Action buttons -->
   <rect x="370" y="438" width="72" height="30" rx="8" fill="white" stroke="#d1d5db" stroke-width="1.5"/>
-  <text x="389" y="458" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#374151">Cancel</text>
+  <text x="406" y="453" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Cancel</text>
 
   <rect x="450" y="438" width="98" height="30" rx="8" fill="#3b82f6"/>
-  <text x="460" y="458" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="white">Create &amp; Import</text>
+  <text x="499" y="453" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="white" text-anchor="middle" dominant-baseline="central">Create &amp; Import</text>
 </svg>

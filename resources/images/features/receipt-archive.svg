@@ -34,24 +34,24 @@
 
   <!-- Summary stats row -->
   <!-- Total Receipts -->
-  <rect x="56" y="76" width="116" height="56" rx="10" fill="#eff6ff" stroke="#dbeafe" stroke-width="1"/>
-  <text x="114" y="98" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#3b82f6" text-anchor="middle">3</text>
-  <text x="114" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Total Receipts</text>
+  <rect x="56" y="76" width="116" height="62" rx="10" fill="#eff6ff" stroke="#dbeafe" stroke-width="1"/>
+  <text x="114" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#3b82f6" text-anchor="middle">3</text>
+  <text x="114" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Total Receipts</text>
 
   <!-- Expense Receipts -->
-  <rect x="182" y="76" width="116" height="56" rx="10" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
-  <text x="240" y="98" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#ef4444" text-anchor="middle">2</text>
-  <text x="240" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Expense Receipts</text>
+  <rect x="182" y="76" width="116" height="62" rx="10" fill="#fef2f2" stroke="#fecaca" stroke-width="1"/>
+  <text x="240" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#ef4444" text-anchor="middle">2</text>
+  <text x="240" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Expense Receipts</text>
 
   <!-- Revenue Receipts -->
-  <rect x="308" y="76" width="116" height="56" rx="10" fill="#ecfdf5" stroke="#bbf7d0" stroke-width="1"/>
-  <text x="366" y="98" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#10b981" text-anchor="middle">1</text>
-  <text x="366" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Revenue Receipts</text>
+  <rect x="308" y="76" width="116" height="62" rx="10" fill="#ecfdf5" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="366" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#10b981" text-anchor="middle">1</text>
+  <text x="366" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Revenue Receipts</text>
 
   <!-- AI Scanned -->
-  <rect x="434" y="76" width="116" height="56" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="492" y="98" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#1e293b" text-anchor="middle">0</text>
-  <text x="492" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">AI Scanned</text>
+  <rect x="434" y="76" width="116" height="62" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="492" y="106" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#1e293b" text-anchor="middle">1</text>
+  <text x="492" y="126" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">AI Scanned</text>
 
   <!-- Search + AI Scan button row -->
   <rect x="56" y="148" width="180" height="28" rx="7" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>

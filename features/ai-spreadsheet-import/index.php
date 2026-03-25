@@ -123,10 +123,6 @@
                             <?= svg_icon('check', 20) ?>
                             <span>Multi-sheet Excel files processed in one import</span>
                         </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>CSV auto-detection for commas, tabs, semicolons, and pipes</span>
-                        </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
@@ -188,7 +184,6 @@
                     <span class="section-label">Under the Hood</span>
                     <h2>Two-tier AI that adapts to your data</h2>
                     <p>Not all spreadsheets are the same. Simple files with clean headers get fast, deterministic column mapping. Complex files — with merged cells, inconsistent formatting, or pivot-table layouts — get processed row-by-row with AI that understands context.</p>
-                    <p>The AI samples your data intelligently, reading the first rows, last rows, and a random selection from the middle to build a complete picture of your spreadsheet before mapping a single field.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -197,10 +192,6 @@
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Tier 2: AI row processing for complex or messy data</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Intelligent sampling strategy for accurate analysis of large files</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>

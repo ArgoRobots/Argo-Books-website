@@ -854,7 +854,8 @@ body {
 @keyframes scanSweep {
   0%   { top: 12%; opacity: 0; }
   5%   { opacity: 1; }
-  90%  { opacity: 1; }
+  70%  { opacity: 1; }
+  80%  { top: 88%; opacity: 0; }
   100% { top: 88%; opacity: 0; }
 }
 
@@ -909,26 +910,26 @@ body {
 
 /* Only animate when parent scrolls into view */
 .animate-visible .scan-visual .scan-line {
-  animation: scanSweep 3s ease-in-out infinite 1s;
+  animation: scanSweep 4s ease-in-out infinite;
 }
 
 .animate-visible .scan-tag-vendor {
-  animation: tagAppear 0.5s ease-out 2s forwards;
+  animation: tagLoop 4s ease-in-out infinite 1.2s;
 }
 
 .animate-visible .scan-tag-tax {
-  animation: tagAppear 0.5s ease-out 2.6s forwards;
+  animation: tagLoop 4s ease-in-out infinite 1.8s;
 }
 
 .animate-visible .scan-tag-total {
-  animation: tagAppear 0.5s ease-out 3s forwards;
+  animation: tagLoop 4s ease-in-out infinite 2.2s;
 }
 
-@keyframes tagAppear {
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+@keyframes tagLoop {
+  0%   { opacity: 0; transform: translateX(10px); }
+  10%  { opacity: 1; transform: translateX(0); }
+  75%  { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(10px); }
 }
 
 /* --- Bounding box annotations (Section 2) --- */
@@ -937,11 +938,10 @@ body {
   border: 2px solid var(--primary-blue);
   border-radius: 4px;
   opacity: 0;
-  transition: opacity 0.4s ease;
 }
 
 .animate-visible .annotate-visual .annotate-box {
-  animation: boxReveal 0.4s ease-out forwards;
+  animation: boxLoop 4s ease-in-out infinite;
 }
 
 .annotate-label {
@@ -966,7 +966,7 @@ body {
   left: 16%;
   right: 16%;
   height: 23%;
-  animation-delay: 0.3s !important;
+  animation-delay: 0s !important;
 }
 
 .annotate-date {
@@ -975,7 +975,7 @@ body {
   right: 16%;
   height: 5%;
   border-color: var(--emerald-500);
-  animation-delay: 0.6s !important;
+  animation-delay: 0.3s !important;
 }
 
 .annotate-date .annotate-label {
@@ -988,7 +988,7 @@ body {
   right: 16%;
   height: 25%;
   border-color: var(--purple-500);
-  animation-delay: 0.9s !important;
+  animation-delay: 0.6s !important;
 }
 
 .annotate-items .annotate-label {
@@ -1001,22 +1001,18 @@ body {
   right: 16%;
   height: 7%;
   border-color: var(--amber-500);
-  animation-delay: 1.2s !important;
+  animation-delay: 0.9s !important;
 }
 
 .annotate-total .annotate-label {
   background: var(--amber-500);
 }
 
-@keyframes boxReveal {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+@keyframes boxLoop {
+  0%   { opacity: 0; transform: scale(0.95); }
+  10%  { opacity: 1; transform: scale(1); }
+  80%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
 }
 
 /* ========================================

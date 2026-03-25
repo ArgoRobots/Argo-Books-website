@@ -47,21 +47,21 @@
 
   <!-- Stats row -->
   <g>
-    <rect x="48" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-    <text x="107" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Sheets</text>
-    <text x="107" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">13</text>
+    <rect x="48" y="90" width="120" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="108" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Sheets</text>
+    <text x="108" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">13</text>
 
-    <rect x="174" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-    <text x="233" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Total Rows</text>
-    <text x="233" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">1,882</text>
+    <rect x="176" y="90" width="120" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="236" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Total Rows</text>
+    <text x="236" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">1,882</text>
 
-    <rect x="300" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-    <text x="359" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Direct Mapping</text>
-    <text x="359" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#16a34a" text-anchor="middle">13</text>
+    <rect x="304" y="90" width="120" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="364" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Direct Mapping</text>
+    <text x="364" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#16a34a" text-anchor="middle">13</text>
 
-    <rect x="426" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
-    <text x="485" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">AI Processing</text>
-    <text x="485" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">0</text>
+    <rect x="432" y="90" width="120" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="492" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">AI Processing</text>
+    <text x="492" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">0</text>
   </g>
 
   <!-- Sheet list - Tier 1 examples -->

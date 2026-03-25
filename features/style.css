@@ -681,9 +681,6 @@ body {
   gap: 32px;
 }
 
-.steps-grid.steps-grid-5 {
-  grid-template-columns: repeat(5, 1fr);
-}
 
 .step-card {
   background: var(--white);
@@ -1022,12 +1019,6 @@ body {
 /* ========================================
    Responsive
    ======================================== */
-@media (max-width: 1100px) {
-  .steps-grid.steps-grid-5 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 @media (max-width: 900px) {
   .features-grid {
     grid-template-columns: 1fr;

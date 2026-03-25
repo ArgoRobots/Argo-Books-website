@@ -216,40 +216,30 @@
     </section>
 
     <!-- =============================================
-         HOW IT WORKS — 5 Steps
+         HOW IT WORKS — 3 Steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
-                <h2 class="section-title">Five steps from spreadsheet to clean data</h2>
+                <h2 class="section-title">Three steps from spreadsheet to clean data</h2>
                 <p class="section-desc">From a messy Excel file to organized business records in minutes. AI handles the mapping — you just review and confirm.</p>
             </div>
-            <div class="steps-grid steps-grid-5">
+            <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
-                    <h3>Upload your file</h3>
-                    <p>Drop an Excel (.xlsx) or CSV file into Argo Books. Multi-sheet files are fully supported.</p>
+                    <h3>Drop in your file</h3>
+                    <p>Upload an Excel (.xlsx) or CSV file. Multi-sheet workbooks and auto-detected delimiters are fully supported.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
-                    <h3>AI analyzes your data</h3>
-                    <p>The AI reads your spreadsheet, detects entity types for each sheet, and maps columns to the right fields.</p>
+                    <h3>AI maps your columns</h3>
+                    <p>The AI detects entity types, maps columns to the right fields, and validates your data — all with confidence scores you can review.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
-                    <h3>Review the mapping</h3>
-                    <p>See exactly what the AI detected with confidence scores. Adjust any mappings before importing.</p>
-                </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">4</div>
-                    <h3>Validate and fix</h3>
-                    <p>Pre-import validation catches issues like missing references. Auto-fix creates missing entities for you.</p>
-                </div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">5</div>
-                    <h3>Import and categorize</h3>
-                    <p>Data is imported and products are auto-categorized by AI. A full summary shows what was added, updated, or skipped.</p>
+                    <h3>Review and import</h3>
+                    <p>Confirm the mapping, auto-fix any issues, and import. Products are auto-categorized and a full summary shows what was added, updated, or skipped.</p>
                 </div>
             </div>
         </div>

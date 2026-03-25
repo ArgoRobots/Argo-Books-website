@@ -378,11 +378,11 @@ if ($premium_subscription) {
                         $paymentMethodDisplay = ucfirst($premium_subscription['payment_method'] ?? 'Unknown');
                         ?>
                         <?php if ($paymentMethodLower === 'stripe'): ?>
-                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe" class="payment-logo" loading="lazy" width="88" height="22">
+                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe" class="payment-logo" loading="lazy">
                         <?php elseif ($paymentMethodLower === 'paypal'): ?>
-                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal" class="payment-logo" loading="lazy" width="1280" height="339">
+                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal" class="payment-logo" loading="lazy">
                         <?php elseif ($paymentMethodLower === 'square'): ?>
-                            <img src="../../resources/images/Square-logo.svg" alt="Square" class="payment-logo" loading="lazy" width="88" height="22">
+                            <img src="../../resources/images/Square-logo.svg" alt="Square" class="payment-logo" loading="lazy">
                         <?php else: ?>
                             <span class="payment-text"><?php echo $paymentMethodDisplay; ?></span>
                         <?php endif; ?>

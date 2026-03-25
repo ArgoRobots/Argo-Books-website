@@ -178,13 +178,13 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
                     <p class="change-payment-label">Payment provider:</p>
                     <div class="payment-provider-options">
                         <div class="payment-provider-btn <?php echo strtolower($premium_subscription['payment_method']) === 'stripe' ? 'current' : ''; ?>" data-method="stripe" data-name="Stripe">
-                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe" loading="lazy" width="88" height="22">
+                            <img src="../../resources/images/Stripe-logo.svg" alt="Stripe" loading="lazy">
                         </div>
                         <div class="payment-provider-btn <?php echo strtolower($premium_subscription['payment_method']) === 'paypal' ? 'current' : ''; ?>" data-method="paypal" data-name="PayPal">
-                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal" loading="lazy" width="1280" height="339">
+                            <img src="../../resources/images/PayPal-logo.svg" alt="PayPal" loading="lazy">
                         </div>
                         <div class="payment-provider-btn <?php echo strtolower($premium_subscription['payment_method']) === 'square' ? 'current' : ''; ?>" data-method="square" data-name="Square">
-                            <img src="../../resources/images/Square-logo.svg" alt="Square" loading="lazy" width="88" height="22">
+                            <img src="../../resources/images/Square-logo.svg" alt="Square" loading="lazy">
                         </div>
                     </div>
                 </div>

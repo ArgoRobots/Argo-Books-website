@@ -16,7 +16,7 @@ include '../../docs-header.php';
 
             <p>Transform paper receipts into digital records instantly with our AI-powered scanner. Simply take a photo and let the AI do the rest. Our receipt scanner achieves 99% accuracy on printed receipts, and lets you quickly make adjustments.</p>
 
-            <img src="../../../resources/images/ai-receipt-scanner.webp" alt="AI Receipt Scanner" width="1423" height="1124" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+            <img src="../../../resources/images/ai-receipt-scanner.webp" alt="AI Receipt Scanner" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
             <h2>How It Works</h2>
             <ol class="steps-list">

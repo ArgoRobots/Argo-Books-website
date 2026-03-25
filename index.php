@@ -47,6 +47,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <meta name="twitter:title" content="Argo Books - AI-Powered Business Management">
     <meta name="twitter:description"
         content="Transform your business with AI receipt scanning, predictive analytics, and automated business management.">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -56,6 +60,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
      <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/">
+
+    <!-- Preconnect hints -->
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17210317271"></script>
@@ -207,7 +215,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="hero-visual animate-fade-in-up delay-2">
                 <div class="hero-device">
                     <div class="device-frame">
-                        <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen">
+                        <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen" width="2400" height="1524">
                     </div>
                     <div class="floating-card floating-card-1 animate-float">
                         <div class="floating-card-icon">

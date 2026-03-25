@@ -37,6 +37,10 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <meta name="twitter:title" content="Pricing - Argo Books">
     <meta name="twitter:description"
         content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/pricing/">

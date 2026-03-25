@@ -137,15 +137,15 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                 <h3>Select Payment Method</h3>
                 <div class="payment-grid">
                     <button class="payment-btn" id="pay-paypal">
-                        <img src="../../resources/images/PayPal-logo.svg" alt="PayPal">
+                        <img src="../../resources/images/PayPal-logo.svg" alt="PayPal" loading="lazy">
                         <span>Pay with PayPal</span>
                     </button>
                     <button class="payment-btn" id="pay-stripe">
-                        <img class="Stripe" src="../../resources/images/Stripe-logo.svg" alt="Stripe">
+                        <img class="Stripe" src="../../resources/images/Stripe-logo.svg" alt="Stripe" loading="lazy">
                         <span>Pay with Stripe</span>
                     </button>
                     <button class="payment-btn" id="pay-square">
-                        <img class="Square" src="../../resources/images/Square-logo.svg" alt="Square">
+                        <img class="Square" src="../../resources/images/Square-logo.svg" alt="Square" loading="lazy">
                         <span>Pay with Square</span>
                     </button>
                 </div>

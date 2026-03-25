@@ -11,7 +11,7 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>The Analytics page provides detailed visualizations and metrics to help you understand your business performance. Data is organized into eight tabs, each focused on a different aspect of your operations.</p>
 
-            <img src="../../../resources/images/analytics.webp" alt="Argo Books Analytics" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+            <img src="../../../resources/images/analytics.webp" alt="Argo Books Analytics" width="2400" height="1524" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
             <h2>Global Controls</h2>
             <p>Two controls at the top of the page apply across all tabs:</p>

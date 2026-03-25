@@ -11,7 +11,7 @@ include '../../docs-header.php';
         <div class="docs-content">
             <p>The Dashboard is your home screen in Argo Books. It gives you a quick overview of your business performance and highlights items that need your attention.</p>
 
-            <img src="../../../resources/images/dashboard.webp" alt="Argo Books Dashboard" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+            <img src="../../../resources/images/dashboard.webp" alt="Argo Books Dashboard" width="2400" height="1524" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
             <h2>Business Metrics</h2>
             <p>At the top of the Dashboard, four summary cards show your key numbers for the selected time period:</p>

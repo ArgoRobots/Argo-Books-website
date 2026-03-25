@@ -32,7 +32,7 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Privacy Policy"}
+                {"@type": "ListItem", "position": 2, "name": "Privacy Policy", "item": "https://argorobots.com/legal/privacy.php"}
             ]
         }
     </script>

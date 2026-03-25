@@ -32,7 +32,7 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "End User License Agreement"}
+                {"@type": "ListItem", "position": 2, "name": "End User License Agreement", "item": "https://argorobots.com/legal/eula.php"}
             ]
         }
     </script>

@@ -127,7 +127,7 @@
                     </div>
                 </div>
                 <div class="mission-image animate-on-scroll">
-                    <img src="../resources/images/dashboard.webp" alt="Argo Books Interface">
+                    <img src="../resources/images/dashboard.webp" alt="Argo Books Interface" width="2400" height="1524">
                 </div>
             </div>
         </div>
@@ -148,28 +148,28 @@
                     <div class="feature-icon">
                         <?= svg_icon('receipt-scan-detail', null, '', 1.5) ?>
                     </div>
-                    <h4>AI Receipt Scanning</h4>
+                    <h3>AI Receipt Scanning</h3>
                     <p>Snap a photo and let AI extract all the details automatically</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon purple">
                         <?= svg_icon('analytics', null, '', 1.5) ?>
                     </div>
-                    <h4>Predictive Analytics</h4>
+                    <h3>Predictive Analytics</h3>
                     <p>Forecast sales trends and make data-driven decisions</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon green">
                         <?= svg_icon('package', null, '', 1.5) ?>
                     </div>
-                    <h4>Inventory Management</h4>
+                    <h3>Inventory Management</h3>
                     <p>Track stock levels and never run out of best-sellers</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon amber">
                         <?= svg_icon('document', null, '', 1.5) ?>
                     </div>
-                    <h4>Invoicing & Payments</h4>
+                    <h3>Invoicing & Payments</h3>
                     <p>Create professional invoices and get paid faster</p>
                 </div>
             </div>
@@ -181,7 +181,7 @@
         <div class="container">
             <div class="story-grid">
                 <div class="story-image animate-on-scroll">
-                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline">
+                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline" loading="lazy" width="1920" height="1280">
                     <div class="image-badge">
                         <?= svg_icon('map-pin', 16) ?>
                         Saskatoon, SK, Canada

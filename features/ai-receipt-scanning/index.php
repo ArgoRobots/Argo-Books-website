@@ -325,8 +325,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <!-- REPLACE: Screenshot of expense list/search view with receipt thumbnails attached to records -->
-                    <img src="../../resources/images/dashboard.webp" alt="Organized expense records with receipt images attached" loading="lazy">
+                    <img src="../../resources/images/ai-receipt-scanner.webp" alt="Argo Books receipt scanner showing extracted and organized expense data" loading="lazy">
                 </div>
             </div>
         </div>

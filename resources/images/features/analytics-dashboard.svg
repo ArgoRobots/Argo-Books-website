@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#faf5ff"/>
+    </linearGradient>
+    <linearGradient id="chartLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="chartFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.01"/>
+    </linearGradient>
+    <linearGradient id="forecastLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="smallShadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="6" flood-color="#000" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="80" cy="60" r="35" fill="#8b5cf6" opacity="0.04"/>
+  <circle cx="530" cy="440" r="40" fill="#3b82f6" opacity="0.04"/>
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Page title -->
+  <text x="56" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="17" font-weight="700" fill="#1e293b">Forecasted Growth</text>
+  <text x="56" y="76" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">Apr 1, 2026 - Apr 30, 2026</text>
+
+  <!-- Period selector -->
+  <rect x="442" y="40" width="110" height="30" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="462" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="500" fill="#475569">Next Month</text>
+  <path d="M536 53l4 4 4-4" stroke="#94a3b8" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+
+  <!-- Stats Row -->
+  <!-- Revenue -->
+  <rect x="48" y="94" width="120" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="60" y="122" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#1e293b">$15,692</text>
+  <text x="60" y="140" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Next Month Revenue</text>
+  <text x="60" y="153" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#10b981">&#x2191; 34.6% vs avg</text>
+
+  <!-- Expenses -->
+  <rect x="178" y="94" width="120" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="190" y="122" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#1e293b">$9,811</text>
+  <text x="190" y="140" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Next Month Expenses</text>
+  <text x="190" y="153" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#ef4444">&#x2193; 7.8% vs avg</text>
+
+  <!-- Profit -->
+  <rect x="308" y="94" width="120" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="320" y="122" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#10b981">$5,881</text>
+  <text x="320" y="140" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Projected Profit</text>
+  <text x="320" y="153" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#10b981">&#x2191; 130.4% vs avg</text>
+
+  <!-- New Customers -->
+  <rect x="438" y="94" width="114" height="68" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="450" y="122" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#1e293b">1</text>
+  <text x="450" y="140" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">New Customers</text>
+  <text x="450" y="153" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#ef4444">&#x2193; 12.1% vs avg</text>
+
+  <!-- Revenue Chart area -->
+  <text x="56" y="196" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#1e293b">Revenue Trend</text>
+
+  <!-- Chart Y-axis labels -->
+  <text x="56" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">$15k</text>
+  <text x="56" y="262" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">$12k</text>
+  <text x="56" y="302" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">$9k</text>
+  <text x="56" y="342" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">$6k</text>
+
+  <!-- Chart grid lines -->
+  <g stroke="#e2e8f0" stroke-width="0.5" opacity="0.6">
+    <line x1="82" y1="217" x2="540" y2="217"/>
+    <line x1="82" y1="257" x2="540" y2="257"/>
+    <line x1="82" y1="297" x2="540" y2="297"/>
+    <line x1="82" y1="337" x2="540" y2="337"/>
+  </g>
+
+  <!-- Chart X-axis labels -->
+  <text x="100" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Jul</text>
+  <text x="148" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Aug</text>
+  <text x="200" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Sep</text>
+  <text x="252" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Oct</text>
+  <text x="304" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Nov</text>
+  <text x="356" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Dec</text>
+  <text x="408" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Jan</text>
+  <text x="456" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Feb</text>
+  <text x="504" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Mar</text>
+
+  <!-- Actual revenue line (solid) -->
+  <path d="M100 250 L148 242 L200 280 L252 275 L304 260 L356 290 L408 240 L456 222"
+        stroke="url(#chartLine)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Area fill under actual line -->
+  <path d="M100 250 L148 242 L200 280 L252 275 L304 260 L356 290 L408 240 L456 222 L456 337 L100 337 Z"
+        fill="url(#chartFill)"/>
+
+  <!-- Forecast line (dashed) -->
+  <path d="M456 222 L504 218 L540 212"
+        stroke="url(#forecastLine)" stroke-width="2.5" fill="none" stroke-dasharray="6 4" stroke-linecap="round"/>
+
+  <!-- Forecast confidence band -->
+  <path d="M456 222 L504 210 L540 200 L540 225 L504 228 L456 222 Z" fill="#8b5cf6" opacity="0.08"/>
+
+  <!-- Data points on chart -->
+  <circle cx="100" cy="250" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="148" cy="242" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="200" cy="280" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="252" cy="275" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="304" cy="260" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="356" cy="290" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="408" cy="240" r="3.5" fill="white" stroke="#3b82f6" stroke-width="2"/>
+  <circle cx="456" cy="222" r="3.5" fill="white" stroke="#6366f1" stroke-width="2"/>
+  <circle cx="504" cy="218" r="3" fill="white" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3 2"/>
+
+  <!-- Legend -->
+  <line x1="56" y1="380" x2="74" y2="380" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="80" y="384" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Actual Revenue</text>
+  <line x1="180" y1="380" x2="198" y2="380" stroke="#8b5cf6" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4 3"/>
+  <text x="204" y="384" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Forecast</text>
+
+  <!-- Confidence section -->
+  <rect x="48" y="400" width="504" height="60" rx="10" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+
+  <!-- Confidence badge -->
+  <circle cx="70" cy="422" r="10" fill="#10b981"/>
+  <path d="M66 422l3 3 5-5" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="88" y="418" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#475569">Prediction Confidence:</text>
+  <text x="210" y="418" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#10b981">62% Medium</text>
+
+  <text x="88" y="436" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Revenue Forecast Range: $12,554 - $18,831</text>
+  <text x="88" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Historical Accuracy: 88% &middot; Based on 13 months of data using Holt-Winters Additive</text>
+</svg>

@@ -894,17 +894,17 @@ body {
 }
 
 .scan-tag-vendor {
-  top: 18%;
-  right: 2%;
-}
-
-.scan-tag-total {
-  bottom: 22%;
+  top: 22%;
   right: 2%;
 }
 
 .scan-tag-tax {
-  bottom: 32%;
+  top: 57%;
+  right: 2%;
+}
+
+.scan-tag-total {
+  top: 63%;
   right: 2%;
 }
 

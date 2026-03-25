@@ -109,8 +109,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Manual receipt entry is costing you hours every week</h2>
-                    <p>If you're still typing receipt data into spreadsheets or accounting software by hand, you're not just wasting time — you're introducing errors. Misread totals, forgotten line items, and lost receipts add up fast. By tax season, you're scrambling to reconstruct months of expenses from a shoebox of faded paper.</p>
-                    <p>Argo Books fixes this with AI-powered receipt scanning that reads your receipts in seconds and logs every detail directly into your expense records — accurately, every time.</p>
+                    <p>Typing receipts by hand wastes time and introduces errors. Argo Books uses AI to read your receipts in seconds and log every detail directly into your expense records — accurately, every time.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>

@@ -102,7 +102,7 @@ $isDocsLanding = true;
     </section>
 
     <!-- Main Content -->
-    <main class="docs-main">
+    <div class="docs-main">
         <!-- Getting Started Section -->
         <section class="docs-category" data-category="getting-started">
             <div class="category-header">
@@ -386,6 +386,7 @@ $isDocsLanding = true;
                 </a>
             </div>
         </section>
+    </div>
     <!-- Help Banner -->
     <section class="help-banner">
         <div class="help-content">

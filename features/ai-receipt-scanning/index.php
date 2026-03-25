@@ -130,8 +130,25 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <!-- REPLACE: Screenshot of the Argo Books receipt scanning interface showing a receipt being scanned with extracted data fields -->
-                    <img src="../../resources/images/dashboard.webp" alt="AI Receipt Scanning interface in Argo Books showing automatic data extraction" loading="lazy">
+                    <div class="receipt-visual-wrapper scan-visual">
+                        <img src="../../resources/images/receipt-phone.webp" alt="Phone scanning a receipt with Argo Books AI" loading="lazy">
+                        <div class="scan-line"></div>
+                        <div class="scan-tag scan-tag-vendor">
+                            <span class="scan-tag-label">Vendor</span>
+                            <span class="scan-tag-value">Store Name</span>
+                            <?= svg_icon('check', 14) ?>
+                        </div>
+                        <div class="scan-tag scan-tag-total">
+                            <span class="scan-tag-label">Total</span>
+                            <span class="scan-tag-value">$25.20</span>
+                            <?= svg_icon('check', 14) ?>
+                        </div>
+                        <div class="scan-tag scan-tag-tax">
+                            <span class="scan-tag-label">Tax</span>
+                            <span class="scan-tag-value">$1.97</span>
+                            <?= svg_icon('check', 14) ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -210,8 +227,21 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <!-- REPLACE: Screenshot showing the extracted data fields after a scan is complete (the review/edit screen) -->
-                    <img src="../../resources/images/dashboard.webp" alt="AI receipt data extraction results showing structured fields" loading="lazy">
+                    <div class="receipt-visual-wrapper annotate-visual">
+                        <img src="../../resources/images/receipt-desk.webp" alt="Receipt on desk with AI-detected fields highlighted" loading="lazy">
+                        <div class="annotate-box annotate-vendor">
+                            <span class="annotate-label">Vendor</span>
+                        </div>
+                        <div class="annotate-box annotate-date">
+                            <span class="annotate-label">Date</span>
+                        </div>
+                        <div class="annotate-box annotate-items">
+                            <span class="annotate-label">Line Items</span>
+                        </div>
+                        <div class="annotate-box annotate-total">
+                            <span class="annotate-label">Total</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -448,6 +448,10 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.1);
 }
 
+.receipt-visual-wrapper img {
+  box-shadow: none;
+}
+
 /* ========================================
    Inline CTA (mid-page call to action)
    ======================================== */
@@ -821,6 +825,201 @@ body {
 }
 
 /* ========================================
+   Receipt Visual Overlays
+   ======================================== */
+.receipt-visual-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+}
+
+.receipt-visual-wrapper img {
+  width: 100%;
+  display: block;
+  border-radius: 16px;
+}
+
+/* --- Scan line animation (Section 1) --- */
+.scan-visual .scan-line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-blue), var(--secondary-blue), var(--primary-blue), transparent);
+  box-shadow: 0 0 12px var(--blue-alpha-50), 0 0 4px var(--blue-alpha-30);
+  opacity: 0;
+}
+
+@keyframes scanSweep {
+  0%   { top: 12%; opacity: 0; }
+  5%   { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 88%; opacity: 0; }
+}
+
+/* --- Floating extracted-data tags (Section 1) --- */
+.scan-tag {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  font-size: 0.8rem;
+  opacity: 0;
+  transform: translateX(10px);
+  pointer-events: none;
+}
+
+.scan-tag svg {
+  color: var(--emerald-500);
+  flex-shrink: 0;
+}
+
+.scan-tag-label {
+  font-weight: 600;
+  color: var(--gray-400);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.scan-tag-value {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.scan-tag-vendor {
+  top: 18%;
+  right: -4%;
+}
+
+.scan-tag-total {
+  bottom: 22%;
+  right: -4%;
+}
+
+.scan-tag-tax {
+  bottom: 32%;
+  right: -4%;
+}
+
+/* Only animate when parent scrolls into view */
+.animate-visible .scan-visual .scan-line {
+  animation: scanSweep 3s ease-in-out infinite 1s;
+}
+
+.animate-visible .scan-tag-vendor {
+  animation: tagAppear 0.5s ease-out 2s forwards;
+}
+
+.animate-visible .scan-tag-tax {
+  animation: tagAppear 0.5s ease-out 2.6s forwards;
+}
+
+.animate-visible .scan-tag-total {
+  animation: tagAppear 0.5s ease-out 3s forwards;
+}
+
+@keyframes tagAppear {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- Bounding box annotations (Section 2) --- */
+.annotate-visual .annotate-box {
+  position: absolute;
+  border: 2px solid var(--primary-blue);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.animate-visible .annotate-visual .annotate-box {
+  animation: boxReveal 0.4s ease-out forwards;
+}
+
+.annotate-label {
+  position: absolute;
+  top: -11px;
+  left: 8px;
+  background: var(--primary-blue);
+  color: var(--white);
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+/* Position the annotation boxes over receipt regions */
+.annotate-vendor {
+  top: 5%;
+  left: 22%;
+  right: 22%;
+  height: 14%;
+  animation-delay: 0.3s !important;
+}
+
+.annotate-date {
+  top: 22%;
+  left: 22%;
+  width: 56%;
+  height: 5%;
+  border-color: var(--emerald-500);
+  animation-delay: 0.6s !important;
+}
+
+.annotate-date .annotate-label {
+  background: var(--emerald-500);
+}
+
+.annotate-items {
+  top: 32%;
+  left: 22%;
+  right: 22%;
+  height: 26%;
+  border-color: var(--purple-500);
+  animation-delay: 0.9s !important;
+}
+
+.annotate-items .annotate-label {
+  background: var(--purple-500);
+}
+
+.annotate-total {
+  top: 68%;
+  left: 22%;
+  right: 22%;
+  height: 8%;
+  border-color: var(--amber-500);
+  animation-delay: 1.2s !important;
+}
+
+.annotate-total .annotate-label {
+  background: var(--amber-500);
+}
+
+@keyframes boxReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
    Responsive
    ======================================== */
 @media (max-width: 900px) {
@@ -844,6 +1043,17 @@ body {
 
   .feature-detail-visual {
     order: -1;
+  }
+
+  .scan-tag {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+
+  .annotate-label {
+    font-size: 0.55rem;
+    padding: 1px 5px;
+    top: -9px;
   }
 
   .steps-grid {

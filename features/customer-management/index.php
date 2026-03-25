@@ -162,7 +162,7 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>30 seconds</h3>
+                    <h3>10 seconds</h3>
                     <p>To add a new customer profile</p>
                 </div>
                 <div class="highlight-item">

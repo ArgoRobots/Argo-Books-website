@@ -88,8 +88,8 @@
   <text x="453" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Filter</text>
 
   <!-- Add Customer button -->
-  <rect x="486" y="138" width="80" height="26" rx="6" fill="#3b82f6"/>
-  <text x="526" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="white" text-anchor="middle">+ Add Customer</text>
+  <rect x="464" y="138" width="90" height="26" rx="6" fill="#3b82f6"/>
+  <text x="509" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="white" text-anchor="middle">+ Add Customer</text>
 
   <!-- Table header -->
   <rect x="46" y="174" width="508" height="28" rx="0" fill="#f8fafc"/>

@@ -187,13 +187,9 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Add Customers</span>
                     <h2>Build complete customer profiles in seconds</h2>
-                    <p>Click "Add Customer" and fill in a clean, guided form. Enter a first name, last name, company, email, phone number with country code, and a full mailing address — street, city, state, postal code, and country. Each customer gets an automatic ID (CUS-001, CUS-002, etc.) so every record is uniquely identifiable from the start.</p>
+                    <p>Click "Add Customer" and fill in a clean, guided form. Enter a first name, last name, company, email, phone number with country code, and a full mailing address — street, city, state, postal code, and country. Each customer is uniquely identifiable from the start.</p>
                     <p>Add notes to any customer profile for details that don't fit neatly into a form field — preferred contact method, special pricing agreements, or anything else you want to remember. Every field is optional except the name, so you can start with just a name and fill in details later as the relationship grows.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Automatic customer IDs — CUS-001, CUS-002, and so on</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Full address fields — street, city, state, postal code, and country</span>
@@ -229,12 +225,12 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Add your customers</h3>
-                    <p>Click "Add Customer" and fill in names, contact details, and addresses. Each customer gets a unique ID automatically. Start with just a name and add details over time.</p>
+                    <p>Click "Add Customer" and fill in names, contact details, and addresses. Start with just a name and add details over time.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
                     <h3>Search, filter, and manage</h3>
-                    <p>Find any customer instantly with the search bar. Sort by name, email, or country. Edit details, add notes, or view a customer's complete profile — all from the main table.</p>
+                    <p>Find any customer instantly with the search bar. Sort by name, email, or country. Edit details, add notes, or view a customer's complete profile.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
@@ -284,11 +280,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Inline edit, view, and delete actions on every row</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Pagination with configurable rows per page — 10, 25, or 50</span>
+                            <span>Edit, view, and delete actions on every row</span>
                         </li>
                     </ul>
                 </div>

@@ -1614,12 +1614,12 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     if (catField) catField.textContent = 'Books';
 
                     // Continue cycling
-                    t(() => toggleCycle(), 3000);
-                }, 3000);
+                    t(() => toggleCycle(), 5000);
+                }, 5000);
             }
 
             // Start toggle cycling after initial animation settles
-            t(() => toggleCycle(), 3500);
+            t(() => toggleCycle(), 5000);
         }
 
         // Predictive Analytics animation

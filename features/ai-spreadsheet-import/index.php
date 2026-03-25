@@ -126,7 +126,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/dashboard.webp" alt="Argo Books dashboard showing imported business data" loading="lazy">
+                    <img src="../../resources/images/features/ai-column-mapping.svg" alt="AI column mapping showing source columns mapped to target fields with confidence scores" loading="lazy">
                 </div>
             </div>
         </div>
@@ -200,7 +200,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/dashboard.webp" alt="AI analyzing spreadsheet columns and mapping data fields" loading="lazy">
+                    <img src="../../resources/images/features/ai-import-analysis.svg" alt="AI import analysis showing 13 sheets detected with 1,882 rows and direct mapping results" loading="lazy">
                 </div>
             </div>
         </div>
@@ -284,7 +284,7 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/dashboard.webp" alt="Argo Books import validation showing detected issues and auto-fix options" loading="lazy">
+                    <img src="../../resources/images/features/ai-import-validation.svg" alt="Import validation showing 883 auto-fixable issues with missing department references" loading="lazy">
                 </div>
             </div>
         </div>

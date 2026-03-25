@@ -884,7 +884,7 @@ body {
 
 .scan-tag-label {
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-900);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -892,7 +892,7 @@ body {
 
 .scan-tag-value {
   font-weight: 600;
-  color: var(--gray-800);
+  color: var(--gray-900);
 }
 
 .scan-tag-vendor {

@@ -149,5 +149,5 @@
   <text x="210" y="418" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#10b981">62% Medium</text>
 
   <text x="88" y="436" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Revenue Forecast Range: $12,554 - $18,831</text>
-  <text x="88" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Historical Accuracy: 88% &middot; Based on 13 months of data using Holt-Winters Additive</text>
+  <text x="88" y="450" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Historical Accuracy: 88% &#x00B7; Based on 13 months of data using Holt-Winters Additive</text>
 </svg>

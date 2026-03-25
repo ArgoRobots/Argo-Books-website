@@ -1963,28 +1963,8 @@ tbody tr:hover {
   font-weight: 500;
 }
 
-.pg-rows-select {
-  appearance: none;
-  -webkit-appearance: none;
-  padding: 4px 24px 4px 8px;
-  border: 1px solid var(--neutral-ddd, #d1d5db);
-  border-radius: 6px;
-  background-color: var(--card-bg, #fff);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236b7280'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 10px 6px;
-  font-size: 0.85rem;
-  color: inherit;
-  cursor: pointer;
-  min-width: 56px;
-  height: 32px;
-}
-
-.pg-rows-select:focus {
-  outline: none;
-  border-color: var(--blue-primary, #3b82f6);
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+.pg-rows-selector select {
+  min-width: auto;
 }
 
 .pg-nav {
@@ -2057,13 +2037,3 @@ tbody tr:hover {
   color: #fff;
 }
 
-[data-theme="dark"] .pg-rows-selector {
-  color: var(--gray-300, #d1d5db);
-}
-
-[data-theme="dark"] .pg-rows-select {
-  background-color: var(--gray-800, #1f2937);
-  border-color: var(--gray-600, #4b5563);
-  color: var(--gray-300, #d1d5db);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239ca3af'/%3E%3C/svg%3E");
-}

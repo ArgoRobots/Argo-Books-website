@@ -97,9 +97,9 @@ class TablePaginator {
         }
 
         this.controlsEl.innerHTML = `
-            <div class="pg-rows-selector">
+            <div class="pg-rows-selector filter-group">
                 <label>Rows</label>
-                <select class="pg-rows-select">${rowOpts}</select>
+                <select>${rowOpts}</select>
             </div>
             <div class="pg-nav">
                 <button class="pg-arrow" ${cur <= 1 ? 'disabled' : ''} data-pg="prev">\u2039</button>
@@ -108,7 +108,7 @@ class TablePaginator {
             </div>
         `;
 
-        this.controlsEl.querySelector('.pg-rows-select').addEventListener('change', (e) => {
+        this.controlsEl.querySelector('.pg-rows-selector select').addEventListener('change', (e) => {
             this.setPerPage(parseInt(e.target.value, 10));
         });
         this.controlsEl.querySelector('[data-pg="prev"]').addEventListener('click', () => this.goTo(cur - 1));

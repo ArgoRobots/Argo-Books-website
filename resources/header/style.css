@@ -292,8 +292,8 @@ header .header-inner .menu-container ul li a:hover::after {
   background: var(--white);
   border-radius: 12px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  min-width: 320px;
-  padding: 12px;
+  min-width: 280px;
+  padding: 8px;
   z-index: 1001;
 }
 
@@ -308,9 +308,14 @@ header .header-inner .menu-container ul li a:hover::after {
   display: none !important;
 }
 
+.dropdown-menu a {
+  line-height: 1.4 !important;
+  color: var(--gray-900) !important;
+}
+
 .dropdown-item {
   display: block;
-  padding: 10px 14px;
+  padding: 8px 14px;
   border-radius: 8px;
   transition: background 0.15s ease;
   text-decoration: none;
@@ -322,27 +327,27 @@ header .header-inner .menu-container ul li a:hover::after {
 
 .dropdown-item-title {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--gray-900) !important;
 }
 
 .dropdown-item-desc {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--gray-500) !important;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .dropdown-footer {
   border-top: 1px solid var(--gray-200);
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 4px;
+  padding-top: 4px;
 }
 
 .dropdown-all-features {
   display: block;
-  padding: 8px 14px;
+  padding: 6px 14px;
   color: var(--blue-500) !important;
   font-weight: 600;
   font-size: 0.85rem;

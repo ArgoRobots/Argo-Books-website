@@ -138,6 +138,25 @@
         </div>
     </section>
 
+    <!-- Inline CTA 1 -->
+    <section class="inline-cta">
+        <div class="container">
+            <div class="inline-cta-inner animate-on-scroll">
+                <h3>Try AI receipt scanning free</h3>
+                <p>Download Argo Books and scan your first receipt in under a minute. No credit card required.</p>
+                <div class="inline-cta-buttons">
+                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
+                        <span>Download Free</span>
+                        <?= svg_icon('arrow-right', 18) ?>
+                    </a>
+                    <a href="../../pricing/" class="btn-cta btn-cta-outline">
+                        <span>See Pricing</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- =============================================
          STATS BANNER
          ============================================= -->
@@ -224,6 +243,22 @@
                     <div class="step-number">3</div>
                     <h3>Review, categorize, and save</h3>
                     <p>Check the extracted data, assign a category (like "Office Supplies" or "Travel"), make any quick corrections, and save. The receipt image is attached to the record automatically — so you have a digital copy ready for tax time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inline CTA 2 -->
+    <section class="inline-cta">
+        <div class="container">
+            <div class="inline-cta-inner animate-on-scroll">
+                <h3>Stop losing receipts</h3>
+                <p>Every receipt scanned, categorized, and stored — ready for tax season. Get started in minutes.</p>
+                <div class="inline-cta-buttons">
+                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
+                        <span>Get Started Free</span>
+                        <?= svg_icon('arrow-right', 18) ?>
+                    </a>
                 </div>
             </div>
         </div>
@@ -320,6 +355,25 @@
                     </div>
                     <h3>Better expense insights</h3>
                     <p>When all your receipts are digitized, you can see spending patterns you'd otherwise miss — like which vendors cost you the most or where costs are rising.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inline CTA 3 -->
+    <section class="inline-cta">
+        <div class="container">
+            <div class="inline-cta-inner animate-on-scroll">
+                <h3>Save 3-5 hours every month</h3>
+                <p>Join small business owners who eliminated manual receipt entry with Argo Books.</p>
+                <div class="inline-cta-buttons">
+                    <a href="../../downloads/" class="btn-cta btn-cta-primary">
+                        <span>Download Free</span>
+                        <?= svg_icon('arrow-right', 18) ?>
+                    </a>
+                    <a href="../" class="btn-cta btn-cta-outline">
+                        <span>View All Features</span>
+                    </a>
                 </div>
             </div>
         </div>

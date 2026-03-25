@@ -448,6 +448,54 @@ body {
   box-shadow: 0 20px 60px rgba(0,0,0,0.1);
 }
 
+/* ========================================
+   Inline CTA (mid-page call to action)
+   ======================================== */
+.inline-cta {
+  padding: 60px 0;
+  text-align: center;
+  background: linear-gradient(135deg, var(--blue-50) 0%, var(--white) 100%);
+  border-top: 1px solid var(--blue-100);
+  border-bottom: 1px solid var(--blue-100);
+}
+
+.inline-cta-inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.inline-cta-inner h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.inline-cta-inner p {
+  font-size: 1rem;
+  color: var(--gray-500);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.inline-cta-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.inline-cta-buttons .btn-cta-outline {
+  color: var(--gray-700);
+  border-color: var(--gray-300);
+}
+
+.inline-cta-buttons .btn-cta-outline:hover {
+  border-color: var(--gray-500);
+  background: var(--gray-50);
+}
+
 /* Reversed layout (image left, text right) */
 .feature-detail.reversed {
   direction: rtl;

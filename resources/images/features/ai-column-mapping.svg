@@ -59,7 +59,7 @@
   <!-- Row 1: First Name → First Name (98%) -->
   <rect x="64" y="142" width="140" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <text x="78" y="163" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#334155" font-weight="500">First Name</text>
-  <text x="256" y="163" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#cbd5e1">&#8594;</text>
+  <text x="256" y="163" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">&#8594;</text>
   <rect x="310" y="142" width="140" height="32" rx="8" fill="#f5f3ff" stroke="#e9e5ff" stroke-width="1"/>
   <text x="324" y="163" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#7c3aed" font-weight="500">First Name</text>
   <text x="488" y="163" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#10b981" font-weight="600">Match: 98%</text>
@@ -67,7 +67,7 @@
   <!-- Row 2: Email → Email (98%) -->
   <rect x="64" y="190" width="140" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <text x="78" y="211" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#334155" font-weight="500">Email</text>
-  <text x="256" y="211" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#cbd5e1">&#8594;</text>
+  <text x="256" y="211" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">&#8594;</text>
   <rect x="310" y="190" width="140" height="32" rx="8" fill="#f5f3ff" stroke="#e9e5ff" stroke-width="1"/>
   <text x="324" y="211" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#7c3aed" font-weight="500">Email</text>
   <text x="488" y="211" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#10b981" font-weight="600">Match: 98%</text>
@@ -75,7 +75,7 @@
   <!-- Row 3: Department → Department ID (85%) -->
   <rect x="64" y="238" width="140" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <text x="78" y="259" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#334155" font-weight="500">Department</text>
-  <text x="256" y="259" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#cbd5e1">&#8594;</text>
+  <text x="256" y="259" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">&#8594;</text>
   <rect x="310" y="238" width="140" height="32" rx="8" fill="#f5f3ff" stroke="#e9e5ff" stroke-width="1"/>
   <text x="324" y="259" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#7c3aed" font-weight="500">Department ID</text>
   <text x="488" y="259" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#f59e0b" font-weight="600">Match: 85%</text>
@@ -83,7 +83,7 @@
   <!-- Row 4: Job Title → Position (85%) -->
   <rect x="64" y="286" width="140" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <text x="78" y="307" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#334155" font-weight="500">Job Title</text>
-  <text x="256" y="307" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#cbd5e1">&#8594;</text>
+  <text x="256" y="307" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">&#8594;</text>
   <rect x="310" y="286" width="140" height="32" rx="8" fill="#f5f3ff" stroke="#e9e5ff" stroke-width="1"/>
   <text x="324" y="307" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#7c3aed" font-weight="500">Position</text>
   <text x="488" y="307" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#f59e0b" font-weight="600">Match: 85%</text>
@@ -91,7 +91,7 @@
   <!-- Row 5: Hourly Rate → Salary Amount (85%) -->
   <rect x="64" y="334" width="140" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <text x="78" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#334155" font-weight="500">Hourly Rate</text>
-  <text x="256" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#cbd5e1">&#8594;</text>
+  <text x="256" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">&#8594;</text>
   <rect x="310" y="334" width="140" height="32" rx="8" fill="#f5f3ff" stroke="#e9e5ff" stroke-width="1"/>
   <text x="324" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#7c3aed" font-weight="500">Salary Amount</text>
   <text x="488" y="355" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#f59e0b" font-weight="600">Match: 85%</text>
@@ -99,7 +99,7 @@
   <!-- Row 6: Hire Date → Hire Date (98%) -->
   <rect x="64" y="382" width="140" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
   <text x="78" y="403" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#334155" font-weight="500">Hire Date</text>
-  <text x="256" y="403" font-family="system-ui, -apple-system, sans-serif" font-size="15" fill="#cbd5e1">&#8594;</text>
+  <text x="256" y="403" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#94a3b8">&#8594;</text>
   <rect x="310" y="382" width="140" height="32" rx="8" fill="#f5f3ff" stroke="#e9e5ff" stroke-width="1"/>
   <text x="324" y="403" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#7c3aed" font-weight="500">Hire Date</text>
   <text x="488" y="403" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#10b981" font-weight="600">Match: 98%</text>

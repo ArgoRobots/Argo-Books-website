@@ -47,7 +47,6 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
                     {$body_content}
                 </div>
                 <div class="footer">
-                    <p>Argo Books &copy; 2026. All rights reserved.</p>
                 </div>
             </div>
         </body>

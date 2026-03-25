@@ -231,17 +231,17 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Snap a photo or upload an image</h3>
-                    <p>Take a photo of your receipt with your phone and transfer it, or drag and drop an image file directly into Argo Books. We support JPEG, PNG, WebP, and most common image formats. You can even scan multiple receipts in a row.</p>
+                    <p>Take a photo of your receipt or drag and drop an image file directly into Argo Books.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
                     <h3>AI reads and structures the data</h3>
-                    <p>Our AI engine reads the receipt and pulls out every relevant detail — vendor name, date, individual line items with prices, subtotals, tax breakdowns, tips, and the total amount. It handles messy formatting, faded ink, and even handwriting.</p>
+                    <p>Our AI extracts the vendor, date, line items, tax, tip, and total — even from faded ink or messy formatting.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
-                    <h3>Review, categorize, and save</h3>
-                    <p>Check the extracted data, assign a category (like "Office Supplies" or "Travel"), make any quick corrections, and save. The receipt image is attached to the record automatically — so you have a digital copy ready for tax time.</p>
+                    <h3>Verify and save</h3>
+                    <p>The AI auto-categorizes each expense. Just confirm the details, make any quick corrections, and save. The receipt image is attached automatically.</p>
                 </div>
             </div>
         </div>

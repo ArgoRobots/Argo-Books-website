@@ -130,7 +130,7 @@
   <text x="184" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">dmartinez@martinezauto.com</text>
   <text x="310" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-345-7890</text>
   <text x="388" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">1500 Dealer Drive</text>
-  <text x="500" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">United Kingdom</text>
+  <text x="500" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">UK</text>
   <line x1="46" y1="310" x2="554" y2="310" stroke="#f1f5f9" stroke-width="1"/>
 
   <!-- Row 4: David Chen -->
@@ -141,7 +141,7 @@
   <text x="184" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">dchen@chenlaw.com</text>
   <text x="310" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-345-6789</text>
   <text x="388" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">500 Legal Plaza</text>
-  <text x="500" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">United Kingdom</text>
+  <text x="500" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">UK</text>
   <line x1="46" y1="346" x2="554" y2="346" stroke="#f1f5f9" stroke-width="1"/>
 
   <!-- Row 5: Emily Watson -->

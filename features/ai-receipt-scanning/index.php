@@ -188,7 +188,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Under the Hood</span>
                     <h2>AI that reads receipts like a human — but faster</h2>
-                    <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model to understand your receipts contextually — not just reading characters, but understanding what they mean. It knows the difference between a subtotal and a tax line. It can parse multi-column layouts, handle faded thermal paper, and even read handwritten amounts.</p>
+                    <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model to understand your receipts contextually — not just reading characters, but understanding what they mean. It can handle faded thermal paper, and even read handwritten amounts.</p>
                     <p>After scanning, the AI structures the data into clean, organized fields: vendor, date, individual items, quantities, prices, subtotal, tax, and total. You review the results, make any corrections, and save — all in under a minute.</p>
                     <ul class="feature-checklist">
                         <li>

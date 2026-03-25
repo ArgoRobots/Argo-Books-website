@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <filter id="cardShadow2" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad2)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow2)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Revenue stat card -->
+  <rect x="56" y="48" width="240" height="80" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Green up arrow circle -->
+  <circle cx="88" cy="88" r="20" fill="#ecfdf5"/>
+  <path d="M82 92 L88 82 L94 92" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <line x1="88" y1="82" x2="88" y2="96" stroke="#10b981" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="120" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="#10b981">$16,936</text>
+  <text x="120" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">Monthly Revenue</text>
+
+  <!-- Expense stat card -->
+  <rect x="310" y="48" width="240" height="80" rx="12" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <!-- Red down arrow circle -->
+  <circle cx="342" cy="88" r="20" fill="#fef2f2"/>
+  <path d="M336 84 L342 94 L348 84" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <line x1="342" y1="80" x2="342" y2="94" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="374" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="#ef4444">$12,770</text>
+  <text x="374" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">Monthly Expenses</text>
+
+  <!-- Divider -->
+  <line x1="56" y1="148" x2="544" y2="148" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Net profit summary -->
+  <text x="56" y="172" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="600" fill="#64748b">Net Profit This Month</text>
+  <text x="544" y="172" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#10b981" text-anchor="end">+$4,165.38</text>
+
+  <!-- Mini bar chart area -->
+  <text x="56" y="210" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Monthly Breakdown</text>
+
+  <!-- Chart bars - Revenue (green) vs Expenses (red) side by side -->
+  <!-- Jan -->
+  <rect x="76" y="260" width="16" height="120" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="94" y="300" width="16" height="80" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="93" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Jan</text>
+
+  <!-- Feb -->
+  <rect x="132" y="240" width="16" height="140" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="150" y="290" width="16" height="90" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="149" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Feb</text>
+
+  <!-- Mar -->
+  <rect x="188" y="230" width="16" height="150" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="206" y="280" width="16" height="100" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="205" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Mar</text>
+
+  <!-- Apr -->
+  <rect x="244" y="270" width="16" height="110" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="262" y="310" width="16" height="70" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="261" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Apr</text>
+
+  <!-- May -->
+  <rect x="300" y="250" width="16" height="130" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="318" y="295" width="16" height="85" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="317" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">May</text>
+
+  <!-- Jun -->
+  <rect x="356" y="235" width="16" height="145" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="374" y="275" width="16" height="105" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="373" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Jun</text>
+
+  <!-- Jul -->
+  <rect x="412" y="245" width="16" height="135" rx="3" fill="#10b981" opacity="0.8"/>
+  <rect x="430" y="285" width="16" height="95" rx="3" fill="#ef4444" opacity="0.6"/>
+  <text x="429" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="middle">Jul</text>
+
+  <!-- Aug (current - highlighted) -->
+  <rect x="468" y="225" width="16" height="155" rx="3" fill="#10b981"/>
+  <rect x="486" y="270" width="16" height="110" rx="3" fill="#ef4444" opacity="0.8"/>
+  <text x="485" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#1e293b" font-weight="600" text-anchor="middle">Aug</text>
+
+  <!-- Legend -->
+  <rect x="56" y="420" width="10" height="10" rx="2" fill="#10b981"/>
+  <text x="72" y="429" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Revenue</text>
+  <rect x="126" y="420" width="10" height="10" rx="2" fill="#ef4444" opacity="0.7"/>
+  <text x="142" y="429" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Expenses</text>
+
+  <!-- Profit indicator -->
+  <text x="544" y="429" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#10b981" font-weight="600" text-anchor="end">Profitable 8/8 months</text>
+</svg>

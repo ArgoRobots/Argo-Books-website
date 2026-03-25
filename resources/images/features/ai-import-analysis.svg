@@ -68,50 +68,50 @@
   <rect x="48" y="178" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
   <rect x="60" y="190" width="24" height="24" rx="6" fill="#7c3aed"/>
   <polyline points="67,202 72,207 79,198" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="94" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Employees</text>
+  <text x="94" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Employees</text>
   <text x="182" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
   <text x="198" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Employees</text>
   <text x="94" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">5 rows &#8212; 10 columns mapped</text>
   <rect x="368" y="192" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="382" y="208" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Direct Mapping</text>
+  <text x="413" y="203" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
   <rect x="466" y="192" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="477" y="208" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Match: 95%</text>
+  <text x="502" y="203" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 95%</text>
 
   <rect x="48" y="240" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
   <rect x="60" y="252" width="24" height="24" rx="6" fill="#7c3aed"/>
   <polyline points="67,264 72,269 79,260" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="94" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Customers</text>
+  <text x="94" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Customers</text>
   <text x="180" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
   <text x="196" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Customers</text>
   <text x="94" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">248 rows &#8212; 8 columns mapped</text>
   <rect x="368" y="254" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="382" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Direct Mapping</text>
+  <text x="413" y="265" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
   <rect x="466" y="254" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="477" y="270" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Match: 92%</text>
+  <text x="502" y="265" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 92%</text>
 
   <rect x="48" y="302" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
   <rect x="60" y="314" width="24" height="24" rx="6" fill="#7c3aed"/>
   <polyline points="67,326 72,331 79,322" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="94" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Products</text>
+  <text x="94" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Products</text>
   <text x="168" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
   <text x="184" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Products</text>
   <text x="94" y="344" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">412 rows &#8212; 12 columns mapped</text>
   <rect x="368" y="316" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="382" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Direct Mapping</text>
+  <text x="413" y="327" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
   <rect x="466" y="316" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="477" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Match: 97%</text>
+  <text x="502" y="327" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 97%</text>
 
   <rect x="48" y="364" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
   <rect x="60" y="376" width="24" height="24" rx="6" fill="#7c3aed"/>
   <polyline points="67,388 72,393 79,384" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-  <text x="94" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="700" fill="#1e293b">Expenses</text>
+  <text x="94" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Expenses</text>
   <text x="170" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
   <text x="186" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Expenses</text>
   <text x="94" y="406" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">587 rows &#8212; 9 columns mapped</text>
   <rect x="368" y="378" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="382" y="394" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Direct Mapping</text>
+  <text x="413" y="389" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
   <rect x="466" y="378" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
-  <text x="477" y="394" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151">Match: 90%</text>
+  <text x="502" y="389" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 90%</text>
 
   <!-- Bottom bar -->
   <line x1="48" y1="430" x2="552" y2="430" stroke="#f1f5f9" stroke-width="1"/>

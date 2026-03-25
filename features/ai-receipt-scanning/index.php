@@ -271,7 +271,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Verify and save</h3>
-                    <p>The AI auto-categorizes each expense. Just confirm the details, make any quick corrections, and save. The receipt image is attached automatically.</p>
+                    <p>The AI auto-categorizes each expense. Just confirm the details, make any quick corrections, and save.</p>
                 </div>
             </div>
         </div>

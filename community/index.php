@@ -35,6 +35,27 @@ if (empty($_SESSION['csrf_token'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Join the Argo Books community forum. Report bugs, suggest features, share tips, and connect with other small business owners using Argo Books.">
+    <meta name="keywords" content="argo books community, argo books forum, feature requests, bug reports, small business community">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Community Forum - Argo Books">
+    <meta property="og:description" content="Join the Argo Books community forum. Report bugs, suggest features, and connect with other small business owners.">
+    <meta property="og:url" content="https://argorobots.com/community/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Argo Books">
+    <meta property="og:locale" content="en_CA">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Community Forum - Argo Books">
+    <meta name="twitter:description" content="Join the Argo Books community forum. Report bugs, suggest features, and connect with other small business owners.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://argorobots.com/community/">
+
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books Community</title>
 
@@ -58,6 +79,7 @@ if (empty($_SESSION['csrf_token'])) {
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <div class="hero">
         <div class="hero-bg">
@@ -255,6 +277,8 @@ if (empty($_SESSION['csrf_token'])) {
             <p>Loading more posts...</p>
         </div>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

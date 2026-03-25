@@ -4,6 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Read the Argo Books Refund Policy. Learn about our refund process for Premium subscriptions and how to request a refund.">
+    <meta name="keywords" content="argo books refund policy, subscription refund, cancellation policy">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Refund Policy - Argo Books">
+    <meta property="og:description" content="Read the Argo Books Refund Policy for Premium subscriptions and how to request a refund.">
+    <meta property="og:url" content="https://argorobots.com/legal/refund.php">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Argo Books">
+    <meta property="og:locale" content="en_CA">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Refund Policy - Argo Books">
+    <meta name="twitter:description" content="Read the Argo Books Refund Policy for Premium subscriptions and how to request a refund.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://argorobots.com/legal/refund.php">
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
+                {"@type": "ListItem", "position": 2, "name": "Refund Policy"}
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Refund Policy - Argo Books</title>
 
@@ -23,6 +56,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <div class="legal-container">
         <div class="legal-content">
@@ -94,6 +128,8 @@
             <p class="last-updated">Last updated: March 16, 2026</p>
         </div>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

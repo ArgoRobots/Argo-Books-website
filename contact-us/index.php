@@ -82,6 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <header>
     <div id="includeHeader"></div>
   </header>
+  <main>
 
   <!-- Hero Section -->
   <section class="hero">
@@ -232,6 +233,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </section>
+
+  </main>
 
   <footer class="footer">
     <div id="includeFooter"></div>

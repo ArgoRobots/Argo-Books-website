@@ -4,6 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Read the Argo Books End User License Agreement (EULA). Understand the license terms for using our desktop accounting software.">
+    <meta name="keywords" content="argo books EULA, end user license agreement, software license">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="End User License Agreement - Argo Books">
+    <meta property="og:description" content="Read the Argo Books End User License Agreement for our desktop accounting software.">
+    <meta property="og:url" content="https://argorobots.com/legal/eula.php">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Argo Books">
+    <meta property="og:locale" content="en_CA">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="End User License Agreement - Argo Books">
+    <meta name="twitter:description" content="Read the Argo Books End User License Agreement for our desktop accounting software.">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://argorobots.com/legal/eula.php">
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
+                {"@type": "ListItem", "position": 2, "name": "End User License Agreement"}
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>End User License Agreement - Argo Books</title>
 
@@ -23,6 +56,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <div class="legal-container">
         <div class="legal-content">
@@ -150,6 +184,8 @@
             <p class="last-updated">Last updated: March 17, 2026</p>
         </div>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

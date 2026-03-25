@@ -39,6 +39,27 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/about-us/">
 
+    <!-- Organization Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Argo Books",
+            "url": "https://argorobots.com/",
+            "description": "Canada-based startup creating affordable finance management software for small businesses.",
+            "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Saskatoon",
+                "addressRegion": "SK",
+                "addressCountry": "CA"
+            },
+            "foundingLocation": {
+                "@type": "Place",
+                "name": "Saskatoon, Saskatchewan, Canada"
+            }
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>About Us - Argo Books | Canadian Software Company</title>
 
@@ -56,6 +77,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -243,6 +265,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- Contact + Footer Wrapper -->
     <div class="dark-section-wrapper">

@@ -143,6 +143,7 @@ foreach ($platforms as $key => $platform) {
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <section class="hero">
         <div class="hero-bg">
@@ -240,6 +241,8 @@ foreach ($platforms as $key => $platform) {
         </div>
         <?php endforeach; ?>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

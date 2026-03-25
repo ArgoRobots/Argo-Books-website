@@ -27,6 +27,7 @@
   <header>
     <div id="includeHeader"></div>
   </header>
+  <main>
 
   <section class="first">
     <div class="success-container">
@@ -54,6 +55,8 @@
       </div>
     </div>
   </section>
+
+  </main>
 
   <footer class="footer">
     <div id="includeFooter"></div>

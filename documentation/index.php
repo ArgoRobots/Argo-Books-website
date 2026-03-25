@@ -56,6 +56,7 @@ $isDocsLanding = true;
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -385,8 +386,6 @@ $isDocsLanding = true;
                 </a>
             </div>
         </section>
-    </main>
-
     <!-- Help Banner -->
     <section class="help-banner">
         <div class="help-content">
@@ -400,6 +399,8 @@ $isDocsLanding = true;
             <a href="../contact-us/" class="help-button">Contact Support</a>
         </div>
     </section>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

@@ -148,6 +148,7 @@ $systemRequirements = getSystemRequirements();
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <section class="hero">
         <div class="hero-bg">
@@ -275,6 +276,8 @@ $systemRequirements = getSystemRequirements();
             </div>
         </div>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

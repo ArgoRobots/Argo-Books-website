@@ -99,6 +99,64 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What platforms does Argo Books support?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books is available for Windows, macOS, and Linux."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is my data secure?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Absolutely. Your data is stored locally on your computer using AES-256 encryption - the same standard used by banks and government agencies. We don't store your business data on our servers. Premium users can also enable Windows Hello for biometric authentication."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does AI receipt scanning work?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the vendor name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I try Argo Books for free?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes! Argo Books has a free tier that includes up to 10 products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What's included in the Premium subscription?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes unlimited products, invoices & payments, predictive analytics, and priority support. These features help you scale your business as it grows."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What is your refund policy?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period. If you believe you are entitled to a refund, please contact us and we'll review your request."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books - AI-Powered Business Management Software</title>
 
@@ -117,6 +175,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -1302,6 +1361,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- CTA + Footer Wrapper -->
     <div class="dark-section-wrapper">

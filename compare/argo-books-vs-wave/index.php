@@ -36,6 +36,18 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-wave/">
 
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
+                {"@type": "ListItem", "position": 2, "name": "Argo Books vs Wave"}
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs Wave — Offline-Capable & Feature-Rich | Argo Books</title>
 
@@ -54,6 +66,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -380,6 +393,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- CTA + Footer Wrapper -->
     <div class="dark-section-wrapper">

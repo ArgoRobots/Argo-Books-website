@@ -164,11 +164,11 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>95%+</h3>
+                    <h3>98%</h3>
                     <p>Accuracy on printed receipts</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>&lt; 5 sec</h3>
+                    <h3>&lt; 3 seconds</h3>
                     <p>Average processing time per receipt</p>
                 </div>
                 <div class="highlight-item">

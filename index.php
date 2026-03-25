@@ -497,10 +497,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                                         <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0"/>
                                                     </linearGradient>
                                                 </defs>
-                                                <path d="M0,130 C30,125 50,110 80,105 C110,100 120,95 140,85 C155,78 160,72 175,68 C190,64 195,55 210,48 C225,44 240,38 260,32 C275,28 290,22 300,18 L300,150 L0,150 Z" fill="url(#chartGradient)"/>
-                                                <path d="M0,130 C30,125 50,110 80,105 C110,100 120,95 140,85 C155,78 160,72 175,68 C190,64 195,55 210,48" fill="none" stroke="#3b82f6" stroke-width="3"/>
-                                                <path d="M210,48 C225,44 240,38 260,32 C275,28 290,22 300,18" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
-                                                <circle cx="210" cy="48" r="5" fill="#3b82f6"/>
+                                                <path d="M0,130 C40,135 60,95 105,90 C150,85 155,65 200,50 L200,150 L0,150 Z" fill="url(#chartGradient)"/>
+                                                <path d="M0,130 C40,135 60,95 105,90 C150,85 155,65 200,50" fill="none" stroke="#3b82f6" stroke-width="3"/>
+                                                <path d="M200,50 C230,40 250,30 265,35 C280,40 285,20 300,15" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
+                                                <circle cx="200" cy="50" r="5" fill="#3b82f6"/>
                                             </svg>
                                             <div class="prediction-badge">
                                                 <span class="prediction-arrow">+18%</span>

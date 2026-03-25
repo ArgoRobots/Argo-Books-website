@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#7c3aed" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="540" cy="70" r="45" fill="#7c3aed" opacity="0.04"/>
+  <circle cx="60" cy="430" r="35" fill="#3b82f6" opacity="0.04"/>
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Header bar -->
+  <g>
+    <!-- Lightning icon circle -->
+    <circle cx="66" cy="56" r="18" fill="#f5f3ff"/>
+    <path d="M63 48 L60 57 L65 57 L62 66 L70 54 L65 54 L67 48 Z" fill="#7c3aed"/>
+
+    <text x="92" y="52" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="#1e293b">AI Import Analysis</text>
+
+    <!-- Usage badge -->
+    <rect x="248" y="37" width="170" height="22" rx="11" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+    <text x="264" y="53" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#16a34a">98/100 remaining this month</text>
+
+    <text x="92" y="70" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#64748b">Analyzed realistic_business_data.xlsx &#8212; detected 13 sheet(s) with 1,882 total rows</text>
+  </g>
+
+  <!-- Stats row -->
+  <g>
+    <rect x="48" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="107" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Sheets</text>
+    <text x="107" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">13</text>
+
+    <rect x="174" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="233" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Total Rows</text>
+    <text x="233" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">1,882</text>
+
+    <rect x="300" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="359" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Direct Mapping</text>
+    <text x="359" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#16a34a" text-anchor="middle">13</text>
+
+    <rect x="426" y="90" width="118" height="72" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+    <text x="485" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">AI Processing</text>
+    <text x="485" y="148" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="700" fill="#1e293b" text-anchor="middle">0</text>
+  </g>
+
+  <!-- Sheet list - Tier 1 examples -->
+  <rect x="48" y="178" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
+  <rect x="60" y="190" width="24" height="24" rx="6" fill="#7c3aed"/>
+  <polyline points="67,202 72,207 79,198" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="94" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Employees</text>
+  <text x="182" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
+  <text x="198" y="202" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Employees</text>
+  <text x="94" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">5 rows &#8212; 10 columns mapped</text>
+  <rect x="368" y="192" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="413" y="203" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
+  <rect x="466" y="192" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="502" y="203" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 95%</text>
+
+  <rect x="48" y="240" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
+  <rect x="60" y="252" width="24" height="24" rx="6" fill="#7c3aed"/>
+  <polyline points="67,264 72,269 79,260" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="94" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Customers</text>
+  <text x="180" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
+  <text x="196" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Customers</text>
+  <text x="94" y="282" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">248 rows &#8212; 8 columns mapped</text>
+  <rect x="368" y="254" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="413" y="265" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
+  <rect x="466" y="254" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="502" y="265" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 92%</text>
+
+  <rect x="48" y="302" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
+  <rect x="60" y="314" width="24" height="24" rx="6" fill="#7c3aed"/>
+  <polyline points="67,326 72,331 79,322" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="94" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Products</text>
+  <text x="168" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
+  <text x="184" y="326" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Products</text>
+  <text x="94" y="344" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">412 rows &#8212; 12 columns mapped</text>
+  <rect x="368" y="316" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="413" y="327" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
+  <rect x="466" y="316" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="502" y="327" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 97%</text>
+
+  <rect x="48" y="364" width="504" height="52" rx="10" fill="#f8f7ff" stroke="#ede9fe" stroke-width="1"/>
+  <rect x="60" y="376" width="24" height="24" rx="6" fill="#7c3aed"/>
+  <polyline points="67,388 72,393 79,384" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="94" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#1e293b">Expenses</text>
+  <text x="170" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8">&#8594;</text>
+  <text x="186" y="388" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" fill="#7c3aed">Expenses</text>
+  <text x="94" y="406" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8">587 rows &#8212; 9 columns mapped</text>
+  <rect x="368" y="378" width="90" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="413" y="389" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Direct Mapping</text>
+  <rect x="466" y="378" width="72" height="22" rx="11" fill="#f3f4f6" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="502" y="389" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#374151" text-anchor="middle" dominant-baseline="central">Match: 90%</text>
+
+  <!-- Bottom bar -->
+  <line x1="48" y1="430" x2="552" y2="430" stroke="#f1f5f9" stroke-width="1"/>
+  <text x="64" y="456" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8" dominant-baseline="central">Review the detected mappings above, then click Accept to proceed.</text>
+
+  <!-- Accept button -->
+  <rect x="436" y="440" width="116" height="32" rx="8" fill="#3b82f6"/>
+  <text x="494" y="456" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="white" text-anchor="middle" dominant-baseline="central">Accept &amp; Import</text>
+</svg>

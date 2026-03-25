@@ -309,12 +309,12 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Online Payments</span>
                     <h2>Let customers pay with a single click</h2>
-                    <p>Every invoice includes a secure online payment link powered by Stripe. When your customer opens the invoice email, they click the payment link and see a clean, simple payment page with the amount due, invoice details, and a credit card form. No account creation, no extra steps — just enter card details and pay.</p>
-                    <p>Payments are processed securely through Stripe, and the invoice status updates to "Paid" automatically in Argo Books. You get notified when payment is received, and the transaction is recorded in your revenue tracking. No more back-and-forth about e-transfers or check deposits.</p>
+                    <p>Every invoice includes a secure online payment link powered by Stripe, Square, or PayPal. When your customer opens the invoice email, they click the payment link and see a clean, simple payment page with the amount due, invoice details, and a credit card form. No account creation, no extra steps — just enter card details and pay.</p>
+                    <p>Payments are processed securely through Stripe, Square, or PayPal, and the invoice status updates to "Paid" automatically in Argo Books. You get notified when payment is received, and the transaction is recorded in your revenue tracking. No more back-and-forth about e-transfers or check deposits.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Secure credit card payments powered by Stripe</span>
+                            <span>Secure credit card payments powered by Stripe, Square, and PayPal</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>

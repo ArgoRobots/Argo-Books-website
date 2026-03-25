@@ -47,7 +47,7 @@
             "@type": "BreadcrumbList",
             "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
-                {"@type": "ListItem", "position": 2, "name": "Argo Books vs Xero"}
+                {"@type": "ListItem", "position": 2, "name": "Argo Books vs Xero", "item": "https://argorobots.com/compare/argo-books-vs-xero/"}
             ]
         }
     </script>

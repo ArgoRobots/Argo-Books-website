@@ -82,7 +82,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             "description": "AI-powered business management software with receipt scanning, predictive analytics, and inventory management",
             "url": "https://argorobots.com/",
             "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Windows",
+            "operatingSystem": "Windows, macOS, Linux",
             "offers": {
                 "@type": "Offer",
                 "price": "0",

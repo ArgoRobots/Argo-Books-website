@@ -843,8 +843,8 @@ body {
 /* --- Scan line animation (Section 1) --- */
 .scan-visual .scan-line {
   position: absolute;
-  left: 8%;
-  right: 8%;
+  left: 20%;
+  right: 20%;
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--primary-blue), var(--secondary-blue), var(--primary-blue), transparent);
   box-shadow: 0 0 12px var(--blue-alpha-50), 0 0 4px var(--blue-alpha-30);
@@ -895,17 +895,17 @@ body {
 
 .scan-tag-vendor {
   top: 18%;
-  right: -4%;
+  right: 2%;
 }
 
 .scan-tag-total {
   bottom: 22%;
-  right: -4%;
+  right: 2%;
 }
 
 .scan-tag-tax {
   bottom: 32%;
-  right: -4%;
+  right: 2%;
 }
 
 /* Only animate when parent scrolls into view */

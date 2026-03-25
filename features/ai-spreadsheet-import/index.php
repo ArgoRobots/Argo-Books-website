@@ -220,7 +220,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Drop in your file</h3>
-                    <p>Upload an Excel (.xlsx) or CSV file. Multi-sheet workbooks and auto-detected delimiters are fully supported.</p>
+                    <p>Upload an Excel (.xlsx) or CSV file. Multi-sheet workbooks are fully supported.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>

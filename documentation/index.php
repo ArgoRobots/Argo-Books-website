@@ -30,6 +30,10 @@ $isDocsLanding = true;
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="<?php echo htmlspecialchars($pageTitle); ?> - Argo Books">
     <meta name="twitter:description" content="<?php echo htmlspecialchars($pageDescription); ?>">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/documentation/">
@@ -56,6 +60,7 @@ $isDocsLanding = true;
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -101,7 +106,7 @@ $isDocsLanding = true;
     </section>
 
     <!-- Main Content -->
-    <main class="docs-main">
+    <div class="docs-main">
         <!-- Getting Started Section -->
         <section class="docs-category" data-category="getting-started">
             <div class="category-header">
@@ -385,8 +390,7 @@ $isDocsLanding = true;
                 </a>
             </div>
         </section>
-    </main>
-
+    </div>
     <!-- Help Banner -->
     <section class="help-banner">
         <div class="help-content">
@@ -400,6 +404,8 @@ $isDocsLanding = true;
             <a href="../contact-us/" class="help-button">Contact Support</a>
         </div>
     </section>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

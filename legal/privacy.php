@@ -4,6 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Read the Argo Books Privacy Policy. Learn how we collect, use, and protect your personal data when using our website and software.">
+    <meta name="keywords" content="argo books privacy policy, data protection, personal data, privacy">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Privacy Policy - Argo Books">
+    <meta property="og:description" content="Read the Argo Books Privacy Policy. Learn how we collect, use, and protect your personal data.">
+    <meta property="og:url" content="https://argorobots.com/legal/privacy.php">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Argo Books">
+    <meta property="og:locale" content="en_CA">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Privacy Policy - Argo Books">
+    <meta name="twitter:description" content="Read the Argo Books Privacy Policy. Learn how we collect, use, and protect your personal data.">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://argorobots.com/legal/privacy.php">
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
+                {"@type": "ListItem", "position": 2, "name": "Privacy Policy", "item": "https://argorobots.com/legal/privacy.php"}
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Privacy Policy - Argo Books</title>
 
@@ -23,6 +60,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <div class="legal-container">
         <div class="legal-content">
@@ -223,6 +261,8 @@
             <p class="last-updated">Last updated: February 17, 2026</p>
         </div>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

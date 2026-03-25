@@ -365,17 +365,17 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                             <div class="method-buttons">
                                 <?php if (in_array('stripe', $paymentMethods)): ?>
                                     <button type="button" class="method-btn" data-method="stripe">
-                                        <img src="../resources/images/Stripe-logo.svg" alt="Stripe">
+                                        <img src="../resources/images/Stripe-logo.svg" alt="Stripe" loading="lazy" width="88" height="22">
                                     </button>
                                 <?php endif; ?>
                                 <?php if (in_array('paypal', $paymentMethods)): ?>
                                     <button type="button" class="method-btn" data-method="paypal">
-                                        <img src="../resources/images/PayPal-logo.svg" alt="PayPal">
+                                        <img src="../resources/images/PayPal-logo.svg" alt="PayPal" loading="lazy" width="1280" height="339">
                                     </button>
                                 <?php endif; ?>
                                 <?php if (in_array('square', $paymentMethods)): ?>
                                     <button type="button" class="method-btn" data-method="square">
-                                        <img src="../resources/images/Square-logo.svg" alt="Square">
+                                        <img src="../resources/images/Square-logo.svg" alt="Square" loading="lazy" width="88" height="22">
                                     </button>
                                 <?php endif; ?>
                             </div>

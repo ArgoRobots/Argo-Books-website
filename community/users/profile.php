@@ -501,6 +501,10 @@ if ($is_own_profile) {
     <script src="../../resources/scripts/utc-to-local.js" defer></script>
     <script src="../../resources/notifications/notifications.js" defer></script>
 
+    <!-- Preconnect hints -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
     <link rel="stylesheet" href="profile.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">

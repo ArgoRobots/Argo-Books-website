@@ -29,6 +29,10 @@
     <meta name="twitter:title" content="What's New - Argo Books | Latest Features & Updates">
     <meta name="twitter:description"
         content="Latest updates and new features in Argo Books. Download the latest release.">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -58,6 +62,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <section class="hero">
         <div class="hero-bg">
@@ -533,6 +538,8 @@
             </div>
         </div>
     </div>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

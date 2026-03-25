@@ -37,9 +37,55 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <meta name="twitter:title" content="Pricing - Argo Books">
     <meta name="twitter:description"
         content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/pricing/">
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Do I have to pay to use Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need more, consider upgrading to Premium."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What does Premium include?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, predictive analytics, and priority support."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I cancel the Premium subscription anytime?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, you can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is there a yearly plan?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes, you can choose to pay $<?php echo number_format($yearlyPrice, 0); ?> CAD/year instead of monthly, saving you $<?php echo number_format($yearlySavings, 0); ?> per year."
+                    }
+                }
+            ]
+        }
+    </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Pricing - Argo Books</title>
@@ -59,6 +105,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <section class="hero">
         <div class="hero-bg">
@@ -254,6 +301,8 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         });
     });
     </script>
+
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

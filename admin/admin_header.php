@@ -25,6 +25,10 @@ $base_path = $in_subdir ? '../' : '';
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo $base_path; ?>../resources/images/argo-logo/argo-icon.ico">
     <title>Admin - Argo Books</title>
 
+    <!-- Preconnect hints -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <script src="<?php echo $base_path; ?>../resources/notifications/notifications.js" defer></script>
     <script src="<?php echo $base_path; ?>pagination.js" defer></script>

@@ -56,6 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="twitter:title" content="Contact Us - Argo Books Support">
   <meta name="twitter:description"
     content="Contact Argo Books support team in Saskatoon, Canada. Get help with finance management software, report bugs, request features, or ask questions. Fast response times within 1-8 business hours.">
+  <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
   <!-- Additional SEO Meta Tags -->
   <meta name="geo.region" content="CA-SK">
@@ -82,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <header>
     <div id="includeHeader"></div>
   </header>
+  <main>
 
   <!-- Hero Section -->
   <section class="hero">
@@ -232,6 +237,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </section>
+
+  </main>
 
   <footer class="footer">
     <div id="includeFooter"></div>

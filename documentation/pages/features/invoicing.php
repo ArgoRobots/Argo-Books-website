@@ -16,7 +16,7 @@ include '../../docs-header.php';
                 <p><strong>Note:</strong> The free version includes up to 5 invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
             </div>
 
-            <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+            <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" width="2400" height="1524" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
             <h2>Creating Invoices</h2>
             <p>Generate professional invoices with just a few clicks:</p>

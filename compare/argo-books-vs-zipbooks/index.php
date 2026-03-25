@@ -28,6 +28,10 @@
     <meta name="twitter:title" content="Argo Books vs ZipBooks — More Features, Lower Price, Local Data">
     <meta name="twitter:description"
         content="Compare Argo Books and ZipBooks side by side. Both are simple and free to start — see how Argo Books offers more for less.">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -35,6 +39,18 @@
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/compare/argo-books-vs-zipbooks/">
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
+                {"@type": "ListItem", "position": 2, "name": "Argo Books vs ZipBooks", "item": "https://argorobots.com/compare/argo-books-vs-zipbooks/"}
+            ]
+        }
+    </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs ZipBooks — More Features, Lower Price | Argo Books</title>
@@ -54,6 +70,7 @@
     <header>
         <div id="includeHeader"></div>
     </header>
+    <main>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -377,6 +394,8 @@
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- CTA + Footer Wrapper -->
     <div class="dark-section-wrapper">

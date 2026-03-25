@@ -133,20 +133,20 @@
   <g filter="url(#shadowSm)">
     <rect x="44" y="130" width="118" height="36" rx="18" fill="white"/>
     <circle cx="66" cy="148" r="10" fill="#3b82f6" opacity="0.15"/>
-    <!-- Small lock -->
-    <rect x="62" y="146" width="8" height="6" rx="1.5" fill="#3b82f6"/>
-    <path d="M64 146 L64 143 C64 140 70 140 70 143 L70 146" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Small lock — centered at x=66 -->
+    <rect x="62" y="148" width="8" height="7" rx="1.5" fill="#3b82f6"/>
+    <path d="M63.5 148 L63.5 145 C63.5 141.5 68.5 141.5 68.5 145 L68.5 148" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
     <text x="82" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">Encrypted</text>
   </g>
 
   <!-- Floating badge: "No Cloud" — upper right -->
   <g filter="url(#shadowSm)">
     <rect x="438" y="130" width="116" height="36" rx="18" fill="white"/>
-    <g transform="translate(460, 148)">
-      <!-- Cloud shape -->
-      <path d="M-6 2 C-10 2 -12 -1 -12 -4 C-12 -7 -10 -9 -7 -9 C-6 -12 -3 -14 0 -14 C4 -14 7 -11 7 -8 C10 -8 12 -6 12 -3 C12 0 10 2 7 2 Z" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+    <g transform="translate(460, 152)">
+      <!-- Cloud shape — centered vertically around origin -->
+      <path d="M-6 4 C-10 4 -12 1 -12 -2 C-12 -5 -10 -7 -7 -7 C-6 -10 -3 -12 0 -12 C4 -12 7 -9 7 -6 C10 -6 12 -4 12 -1 C12 2 10 4 7 4 Z" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
       <!-- Strike through -->
-      <line x1="-14" y1="4" x2="14" y2="-14" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
+      <line x1="-14" y1="6" x2="14" y2="-12" stroke="#ef4444" stroke-width="2" stroke-linecap="round"/>
     </g>
     <text x="478" y="152" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#1e293b">No Cloud</text>
   </g>

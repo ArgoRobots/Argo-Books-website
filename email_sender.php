@@ -46,8 +46,6 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
                 <div class="content">
                     {$body_content}
                 </div>
-                <div class="footer">
-                </div>
             </div>
         </body>
         </html>

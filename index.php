@@ -1513,7 +1513,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             // Run single scan pass
             scanLine.style.animation = 'none';
             scanLine.offsetHeight;
-            scanLine.style.animation = 'scanLine 2.5s ease-in-out 1';
+            scanLine.style.animation = 'scanLine 2.5s ease-in-out 1 forwards';
 
             // Highlight each text line as scan passes over it
             const scanDuration = 2500;

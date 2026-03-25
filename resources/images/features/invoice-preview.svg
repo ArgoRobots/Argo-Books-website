@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0f9ff"/>
+      <stop offset="100%" stop-color="#eff6ff"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="pageShadow" x="-5%" y="-3%" width="110%" height="108%">
+      <feDropShadow dx="0" dy="6" stdDeviation="16" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="540" cy="60" r="30" fill="#3b82f6" opacity="0.05"/>
+  <circle cx="60" cy="440" r="35" fill="#10b981" opacity="0.04"/>
+
+  <!-- Invoice page/paper -->
+  <g filter="url(#pageShadow)">
+    <rect x="100" y="20" width="400" height="460" rx="8" fill="white"/>
+  </g>
+
+  <!-- Blue header banner -->
+  <rect x="100" y="20" width="400" height="60" rx="8" fill="#3b82f6"/>
+  <rect x="100" y="50" width="400" height="30" fill="#3b82f6"/>
+  <text x="130" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="16" font-weight="700" fill="white">SampleCompany</text>
+  <text x="470" y="58" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="white" text-anchor="end">INVOICE</text>
+
+  <!-- Bill To section -->
+  <text x="130" y="102" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8" font-weight="600" letter-spacing="0.5">BILL TO</text>
+  <text x="130" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="700" fill="#1e293b">Amanda Foster</text>
+  <text x="130" y="132" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">300 Realtor Row</text>
+  <text x="130" y="144" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Dallas, TX 75202</text>
+  <text x="130" y="156" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">amanda@fosterrealty.com</text>
+
+  <!-- Invoice details right side -->
+  <text x="375" y="102" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">Invoice #</text>
+  <text x="470" y="102" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="700" fill="#1e293b" text-anchor="end">#INV-2026-026</text>
+  <text x="375" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">Issue Date</text>
+  <text x="470" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" text-anchor="end">March 25, 2026</text>
+  <text x="375" y="134" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" text-anchor="end">Due Date</text>
+  <text x="470" y="134" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" text-anchor="end">April 24, 2026</text>
+
+  <!-- Due badge -->
+  <rect x="400" y="144" width="72" height="20" rx="4" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="436" y="158" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="#16a34a" text-anchor="middle">DUE: Apr 24</text>
+
+  <!-- Table header -->
+  <rect x="120" y="178" width="360" height="24" rx="0" fill="#f8fafc"/>
+  <line x1="120" y1="202" x2="480" y2="202" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="130" y="194" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8" font-weight="700" letter-spacing="0.5">DESCRIPTION</text>
+  <text x="300" y="194" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8" font-weight="700" letter-spacing="0.5">QTY</text>
+  <text x="360" y="194" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8" font-weight="700" letter-spacing="0.5">PRICE</text>
+  <text x="440" y="194" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8" font-weight="700" letter-spacing="0.5">AMOUNT</text>
+
+  <!-- Item 1 -->
+  <text x="130" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">CamPro HD Webcam</text>
+  <text x="308" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">1</text>
+  <text x="360" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">$50.00</text>
+  <text x="470" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="600" text-anchor="end">$50.00</text>
+  <line x1="120" y1="234" x2="480" y2="234" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Item 2 -->
+  <text x="130" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">CloudOffice Business Premium</text>
+  <text x="308" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">1</text>
+  <text x="360" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">$25.00</text>
+  <text x="470" y="254" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="600" text-anchor="end">$25.00</text>
+  <line x1="120" y1="266" x2="480" y2="266" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Item 3 -->
+  <text x="130" y="286" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">DesignSuite Pro</text>
+  <text x="308" y="286" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">1</text>
+  <text x="360" y="286" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">$10.00</text>
+  <text x="470" y="286" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="600" text-anchor="end">$10.00</text>
+  <line x1="120" y1="298" x2="480" y2="298" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Totals -->
+  <rect x="310" y="310" width="170" height="60" rx="6" fill="#f8fafc"/>
+  <text x="326" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Subtotal</text>
+  <text x="466" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="600" text-anchor="end">$85.00</text>
+  <text x="326" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Tax (6%)</text>
+  <text x="466" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="600" text-anchor="end">$5.10</text>
+  <line x1="320" y1="356" x2="470" y2="356" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="326" y="372" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#1e293b" font-weight="700">Total</text>
+  <text x="466" y="372" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="#3b82f6" font-weight="700" text-anchor="end">$90.10</text>
+
+  <!-- Payment link section -->
+  <rect x="120" y="390" width="360" height="36" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="140" y="412" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#3b82f6" font-weight="600">Online Payment Link Included</text>
+  <text x="340" y="412" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Customer can pay via credit card</text>
+
+  <!-- Footer buttons -->
+  <rect x="190" y="442" width="100" height="28" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="240" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="#475569" text-anchor="middle">Back to Edit</text>
+
+  <rect x="300" y="442" width="110" height="28" rx="8" fill="#3b82f6"/>
+  <text x="355" y="460" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="white" text-anchor="middle">Create &amp; Send</text>
+</svg>

@@ -1949,7 +1949,7 @@ tbody tr:hover {
   position: relative;
 }
 
-.pg-rows-selector {
+.pg-rows-selector.filter-group {
   position: absolute;
   left: 16px;
   flex-direction: row;
@@ -1957,7 +1957,7 @@ tbody tr:hover {
   gap: 6px;
 }
 
-.pg-rows-selector select {
+.pg-rows-selector.filter-group select {
   min-width: auto;
   width: 4.5rem;
 }

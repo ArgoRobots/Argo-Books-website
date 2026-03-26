@@ -137,14 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
   generateOpenAIResponseTimeChart(openaiData);
   generateExchangeRatesChart(exchangeRatesData);
 
-  generateOverallActivityChart(
-    exportData,
-    openaiData,
-    exchangeRatesData,
-    googleSheetsData,
-    sessionData,
-    errorData
-  );
+  generateActiveUsersTab(rawData);
 
   // Geographic Charts
   function generateCountryDistributionChart(
@@ -1706,152 +1699,346 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Overall Activity Charts
-  function generateOverallActivityChart(
-    exportData,
-    openaiData,
-    exchangeRatesData,
-    googleSheetsData,
-    sessionData,
-    errorData
-  ) {
-    const allData = [
-      ...exportData.map((d) => ({
-        ...d,
-        type: "Export",
-      })),
-      ...openaiData.map((d) => ({
-        ...d,
-        type: "OpenAI",
-      })),
-      ...exchangeRatesData.map((d) => ({
-        ...d,
-        type: "Exchange Rates",
-      })),
-      ...googleSheetsData.map((d) => ({
-        ...d,
-        type: "Google Sheets",
-      })),
-      ...(rawData.dataPoints.ReceiptScanning || []).map((d) => ({
-        ...d,
-        type: "Receipt Scan",
-      })),
-      ...sessionData.map((d) => ({
-        ...d,
-        type: "Session",
-      })),
-      ...errorData.map((d) => ({
-        ...d,
-        type: "Error",
-      })),
-      ...(rawData.dataPoints.FeatureUsage || []).map((d) => ({
-        ...d,
-        type: "Feature",
-      })),
-    ];
+  // =====================
+  // Active Users Tab
+  // =====================
+  function generateActiveUsersTab(rawData) {
+    // Collect all events from all categories
+    const allEvents = [];
+    for (const category of Object.keys(rawData.dataPoints)) {
+      const events = rawData.dataPoints[category] || [];
+      events.forEach((e) => allEvents.push({ ...e, _category: category }));
+    }
 
-    if (allData.length === 0) {
-      document.getElementById("overallActivityChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No activity data available</div>';
+    // Filter to events with a hashedIP
+    const eventsWithUser = allEvents.filter((e) => e.hashedIP);
+
+    if (eventsWithUser.length === 0) {
+      document.getElementById("activeUsersKpiGrid").innerHTML =
+        '<div class="chart-no-data" style="grid-column: 1 / -1;">No active user data available</div>';
+      document.getElementById("dauChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No active user data available</div>';
+      document.getElementById("platformBreakdownChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No data</div>';
+      document.getElementById("newVsReturningChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No data</div>';
+      document.getElementById("peakHoursChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No data</div>';
+      document.getElementById("avgSessionDurationChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No data</div>';
       return;
     }
 
-    const dailyCounts = {};
-    allData.forEach((item) => {
-      const date = new Date(item.timestamp).toLocaleDateString();
-      if (!dailyCounts[date]) {
-        dailyCounts[date] = {
-          Export: 0,
-          OpenAI: 0,
-          "Exchange Rates": 0,
-          "Google Sheets": 0,
-          "Receipt Scan": 0,
-          Session: 0,
-          Error: 0,
-          Feature: 0,
+    const now = new Date();
+    const todayStr = now.toISOString().split("T")[0];
+    const msPerDay = 86400000;
+
+    // Helper: date string YYYY-MM-DD from timestamp
+    function toDateStr(ts) {
+      return new Date(ts).toISOString().split("T")[0];
+    }
+
+    // Build user map: hashedIP -> { firstSeen, lastSeen, platform, country, appVersion, sessionCount, days }
+    const userMap = {};
+    eventsWithUser.forEach((e) => {
+      const ip = e.hashedIP;
+      const ts = new Date(e.timestamp).getTime();
+      const dateStr = toDateStr(e.timestamp);
+      if (!userMap[ip]) {
+        userMap[ip] = {
+          firstSeen: ts,
+          lastSeen: ts,
+          platform: e.platform || "Unknown",
+          country: e.country || "Unknown",
+          appVersion: e.appVersion || "Unknown",
+          sessionCount: 0,
+          days: new Set(),
         };
       }
-      dailyCounts[date][item.type]++;
+      const u = userMap[ip];
+      if (ts < u.firstSeen) u.firstSeen = ts;
+      if (ts > u.lastSeen) {
+        u.lastSeen = ts;
+        u.platform = e.platform || u.platform;
+        u.country = e.country || u.country;
+        u.appVersion = e.appVersion || u.appVersion;
+      }
+      u.days.add(dateStr);
+      if (e._category === "Session" && e.action === "SessionStart") {
+        u.sessionCount++;
+      }
     });
 
-    const sortedDates = Object.keys(dailyCounts).sort();
-    const recent30Dates = sortedDates.slice(-30);
+    const allUsers = Object.keys(userMap);
+    const totalUsers = allUsers.length;
 
-    const datasets = [
-      {
-        label: "Exports",
-        data: recent30Dates.map((date) => dailyCounts[date].Export),
-        backgroundColor: "#3b82f6",
-      },
-      {
-        label: "OpenAI",
-        data: recent30Dates.map((date) => dailyCounts[date].OpenAI),
-        backgroundColor: "#8b5cf6",
-      },
-      {
-        label: "Exchange Rates",
-        data: recent30Dates.map((date) => dailyCounts[date]["Exchange Rates"]),
-        backgroundColor: "#f59e0b",
-      },
-      {
-        label: "Google Sheets",
-        data: recent30Dates.map((date) => dailyCounts[date]["Google Sheets"]),
-        backgroundColor: "#10b981",
-      },
-      {
-        label: "Receipt Scans",
-        data: recent30Dates.map((date) => dailyCounts[date]["Receipt Scan"]),
-        backgroundColor: "#ec4899",
-      },
-      {
-        label: "Sessions",
-        data: recent30Dates.map((date) => dailyCounts[date].Session),
-        backgroundColor: "#06b6d4",
-      },
-      {
-        label: "Features",
-        data: recent30Dates.map((date) => dailyCounts[date].Feature),
-        backgroundColor: "#84cc16",
-      },
-      {
-        label: "Errors",
-        data: recent30Dates.map((date) => dailyCounts[date].Error),
-        backgroundColor: "#ef4444",
-      },
-    ];
+    // DAU / WAU / MAU
+    const todayUsers = new Set();
+    const weekUsers = new Set();
+    const monthUsers = new Set();
+    const sevenDaysAgo = now.getTime() - 7 * msPerDay;
+    const thirtyDaysAgo = now.getTime() - 30 * msPerDay;
 
-    const activeDatasets = datasets.filter((dataset) =>
-      dataset.data.some((value) => value > 0)
+    allUsers.forEach((ip) => {
+      const u = userMap[ip];
+      if (u.lastSeen >= new Date(todayStr).getTime()) todayUsers.add(ip);
+      if (u.lastSeen >= sevenDaysAgo) weekUsers.add(ip);
+      if (u.lastSeen >= thirtyDaysAgo) monthUsers.add(ip);
+    });
+
+    document.getElementById("kpiTotalUsers").textContent = totalUsers;
+    document.getElementById("kpiDAU").textContent = todayUsers.size;
+    document.getElementById("kpiWAU").textContent = weekUsers.size;
+    document.getElementById("kpiMAU").textContent = monthUsers.size;
+
+    // --- Daily Active Users line chart (last 30 days) ---
+    const dailyUsers = {};
+    eventsWithUser.forEach((e) => {
+      const dateStr = toDateStr(e.timestamp);
+      if (!dailyUsers[dateStr]) dailyUsers[dateStr] = new Set();
+      dailyUsers[dateStr].add(e.hashedIP);
+    });
+
+    // Build last 30 days labels
+    const last30Dates = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now.getTime() - i * msPerDay);
+      last30Dates.push(d.toISOString().split("T")[0]);
+    }
+    const dauData = last30Dates.map((d) =>
+      dailyUsers[d] ? dailyUsers[d].size : 0
     );
 
-    new Chart(document.getElementById("overallActivityChart"), {
-      type: "bar",
+    new Chart(document.getElementById("dauChart"), {
+      type: "line",
       data: {
-        labels: recent30Dates,
-        datasets: activeDatasets,
+        labels: last30Dates.map((d) => {
+          const dt = new Date(d);
+          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        }),
+        datasets: [
+          {
+            label: "Unique Users",
+            data: dauData,
+            borderColor: "#3b82f6",
+            backgroundColor: "rgba(59, 130, 246, 0.1)",
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: {
-            stacked: true,
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 },
+            title: { display: true, text: "Unique Users" },
           },
+        },
+        plugins: { legend: { display: false } },
+      },
+    });
+
+    // --- Platform Breakdown doughnut (last 30 days) ---
+    const platformCounts = {};
+    allUsers.forEach((ip) => {
+      const u = userMap[ip];
+      if (u.lastSeen >= thirtyDaysAgo) {
+        const p = u.platform;
+        platformCounts[p] = (platformCounts[p] || 0) + 1;
+      }
+    });
+
+    const platformLabels = Object.keys(platformCounts);
+    const platformData = platformLabels.map((l) => platformCounts[l]);
+    const platformColors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899"];
+
+    new Chart(document.getElementById("platformBreakdownChart"), {
+      type: "doughnut",
+      data: {
+        labels: platformLabels,
+        datasets: [
+          {
+            data: platformData,
+            backgroundColor: platformColors.slice(0, platformLabels.length),
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom" } },
+      },
+    });
+
+    // --- New vs Returning Users bar chart (last 30 days) ---
+    // A user is "new" on their firstSeen date, "returning" on any subsequent day
+    const globalFirstSeen = {};
+    allUsers.forEach((ip) => {
+      globalFirstSeen[ip] = toDateStr(new Date(userMap[ip].firstSeen));
+    });
+
+    const newPerDay = {};
+    const returningPerDay = {};
+    last30Dates.forEach((d) => {
+      newPerDay[d] = 0;
+      returningPerDay[d] = 0;
+    });
+
+    last30Dates.forEach((d) => {
+      if (!dailyUsers[d]) return;
+      dailyUsers[d].forEach((ip) => {
+        if (globalFirstSeen[ip] === d) {
+          newPerDay[d]++;
+        } else {
+          returningPerDay[d]++;
+        }
+      });
+    });
+
+    new Chart(document.getElementById("newVsReturningChart"), {
+      type: "bar",
+      data: {
+        labels: last30Dates.map((d) => {
+          const dt = new Date(d);
+          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        }),
+        datasets: [
+          {
+            label: "New",
+            data: last30Dates.map((d) => newPerDay[d]),
+            backgroundColor: "#10b981",
+          },
+          {
+            label: "Returning",
+            data: last30Dates.map((d) => returningPerDay[d]),
+            backgroundColor: "#3b82f6",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true },
           y: {
             stacked: true,
             beginAtZero: true,
-            title: {
-              display: true,
-              text: "Operations Count",
-            },
+            ticks: { stepSize: 1 },
+            title: { display: true, text: "Users" },
           },
         },
-        plugins: {
-          legend: {
-            position: "bottom",
-          },
-        }
+        plugins: { legend: { position: "bottom" } },
       },
+    });
+
+    // --- Peak Usage Hours bar chart (last 30 days) ---
+    const hourlyUsers = {};
+    for (let h = 0; h < 24; h++) hourlyUsers[h] = new Set();
+    eventsWithUser.forEach((e) => {
+      const ts = new Date(e.timestamp);
+      if (ts.getTime() >= thirtyDaysAgo) {
+        hourlyUsers[ts.getHours()].add(e.hashedIP);
+      }
+    });
+
+    const hourLabels = Array.from({ length: 24 }, (_, i) =>
+      i.toString().padStart(2, "0") + ":00"
+    );
+    const hourData = Array.from({ length: 24 }, (_, i) => hourlyUsers[i].size);
+
+    new Chart(document.getElementById("peakHoursChart"), {
+      type: "bar",
+      data: {
+        labels: hourLabels,
+        datasets: [
+          {
+            label: "Unique Users",
+            data: hourData,
+            backgroundColor: "#8b5cf6",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 },
+            title: { display: true, text: "Unique Users" },
+          },
+        },
+        plugins: { legend: { display: false } },
+      },
+    });
+
+    // --- Avg Session Duration bar chart (last 30 days) ---
+    const sessionDurations = {};
+    const sessionEvents = (rawData.dataPoints.Session || []).filter(
+      (e) => e.hashedIP && e.action === "SessionStart" && e.duration > 0
+    );
+    sessionEvents.forEach((e) => {
+      const d = toDateStr(e.timestamp);
+      if (!sessionDurations[d]) sessionDurations[d] = [];
+      sessionDurations[d].push(e.duration);
+    });
+
+    const avgDurationData = last30Dates.map((d) => {
+      const durations = sessionDurations[d];
+      if (!durations || durations.length === 0) return 0;
+      const avg = durations.reduce((a, b) => a + b, 0) / durations.length;
+      return Math.round((avg / 60) * 10) / 10; // convert to minutes, 1 decimal
+    });
+
+    new Chart(document.getElementById("avgSessionDurationChart"), {
+      type: "bar",
+      data: {
+        labels: last30Dates.map((d) => {
+          const dt = new Date(d);
+          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+        }),
+        datasets: [
+          {
+            label: "Avg Duration (min)",
+            data: avgDurationData,
+            backgroundColor: "#06b6d4",
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Minutes" },
+          },
+        },
+        plugins: { legend: { display: false } },
+      },
+    });
+
+    // --- User Details Table ---
+    const tbody = document.querySelector("#activeUsersTable tbody");
+    const sortedUsers = allUsers
+      .map((ip) => ({ ip, ...userMap[ip] }))
+      .sort((a, b) => b.lastSeen - a.lastSeen);
+
+    sortedUsers.forEach((u) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML =
+        "<td style=\"font-family: monospace; font-weight: 600;\">" + u.ip.substring(0, 8) + "</td>" +
+        "<td>" + new Date(u.firstSeen).toLocaleDateString() + "</td>" +
+        "<td>" + new Date(u.lastSeen).toLocaleDateString() + "</td>" +
+        "<td>" + u.sessionCount + "</td>" +
+        "<td>" + u.platform + "</td>" +
+        "<td>" + u.country + "</td>" +
+        "<td>" + u.appVersion + "</td>";
+      tbody.appendChild(tr);
     });
   }
 

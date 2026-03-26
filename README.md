@@ -107,7 +107,7 @@ You need to create a MySQL database and import the schema.
 4. To view emails sent by the application, open http://localhost:8025 (requires MailHog setup — see [Local email setup](read-me/Local%20email%20setup.md))
 
 ## Publishing a new version of Argo Books
-1. Create a new folder in `resources/downloads/versions` named whatever the version number is
+1. Create a new folder in `resources/downloads` named whatever the version number is
 1. Upload the new .exe and the language folder to this new directory
-2. Update the version number in `update.xml`
+2. Update the version number in `avalonia-update.xml`
 3. Add the new version to whats-new/index.php

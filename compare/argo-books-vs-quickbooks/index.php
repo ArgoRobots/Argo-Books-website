@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$plans = get_plan_features();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -262,11 +266,9 @@
                                     <span class="tier-period">forever</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <li><?= svg_icon('check', 14) ?> Unlimited products</li>
-                                    <li><?= svg_icon('check', 14) ?> Expense tracking</li>
-                                    <li><?= svg_icon('check', 14) ?> Financial reports</li>
-                                    <li><?= svg_icon('check', 14) ?> Cross-platform desktop app</li>
-                                    <li><?= svg_icon('check', 14) ?> AI spreadsheet import</li>
+                                    <?php foreach ($plans['free']['compact_features'] as $f): ?>
+                                    <li><?= svg_icon('check', 14) ?> <?= htmlspecialchars($f) ?></li>
+                                    <?php endforeach; ?>
                                 </ul>
                             </div>
                             <div class="tier-divider"></div>
@@ -277,11 +279,9 @@
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <li><?= svg_icon('check', 14) ?> Everything in Free</li>
-                                    <li><?= svg_icon('check', 14) ?> Unlimited products</li>
-                                    <li><?= svg_icon('check', 14) ?> AI receipt scanning</li>
-                                    <li><?= svg_icon('check', 14) ?> Invoicing & payments</li>
-                                    <li><?= svg_icon('check', 14) ?> Predictive analytics</li>
+                                    <?php foreach ($plans['premium']['compact_features'] as $f): ?>
+                                    <li><?= svg_icon('check', 14) ?> <?= htmlspecialchars($f) ?></li>
+                                    <?php endforeach; ?>
                                 </ul>
                             </div>
                         </div>

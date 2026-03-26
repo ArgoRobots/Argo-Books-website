@@ -7,6 +7,7 @@ require_once __DIR__ . '/config/pricing.php';
 require_once __DIR__ . '/resources/icons.php';
 
 $pricing = get_pricing_config();
+$plans = get_plan_features();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
@@ -1133,30 +1134,12 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <p class="pricing-description">Perfect for getting started</p>
                     </div>
                     <ul class="pricing-features">
+                        <?php foreach ($plans['free']['features'] as $feature): ?>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Unlimited products</span>
+                            <span><?= render_feature_label($feature) ?></span>
                         </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Unlimited transactions</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Real-time analytics</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Receipt management</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>5 invoices / month</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>AI spreadsheet import <span>(100/month)</span></span>
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                     <a href="downloads" class="btn btn-secondary btn-block">Get Started Free</a>
                 </div>
@@ -1174,34 +1157,12 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <p class="pricing-description">Unlock the full power of Argo Books</p>
                     </div>
                     <ul class="pricing-features">
+                        <?php foreach ($plans['premium']['features'] as $feature): ?>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Everything in Free</span>
+                            <span><?= render_feature_label($feature) ?></span>
                         </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Unlimited products</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Biometric login security</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Unlimited invoices & payments</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>AI receipt scanning <span>(500/month)</span></span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Predictive analytics</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Priority support</span>
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                     <a href="pricing/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                 </div>

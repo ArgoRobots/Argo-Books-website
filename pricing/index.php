@@ -4,6 +4,7 @@ require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../resources/icons.php';
 
 $pricing = get_pricing_config();
+$plans = get_plan_features();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
@@ -137,30 +138,12 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <p class="price-note">No credit card required</p>
 
                         <ul class="card-features">
+                            <?php foreach ($plans['free']['features'] as $feature): ?>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Unlimited products</span>
+                                <span><?= render_feature_label($feature) ?></span>
                             </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Unlimited transactions</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Real-time analytics</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Receipt management</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>5 invoices / month</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>AI spreadsheet import <span>(100/month)</span></span>
-                            </li>
+                            <?php endforeach; ?>
                         </ul>
 
                         <div class="card-cta">
@@ -182,34 +165,12 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <p class="price-note">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
 
                         <ul class="card-features">
+                            <?php foreach ($plans['premium']['features'] as $feature): ?>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Everything in Free</span>
+                                <span><?= render_feature_label($feature) ?></span>
                             </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Unlimited products</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Biometric login security</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Unlimited invoices & payments</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>AI receipt scanning <span>(500/month)</span></span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Predictive analytics</span>
-                            </li>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span>Priority support</span>
-                            </li>
+                            <?php endforeach; ?>
                         </ul>
 
                         <div class="card-cta">

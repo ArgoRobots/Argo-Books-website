@@ -99,6 +99,40 @@ function _pricing_parse_int_env($key, $default) {
  * @param float $subtotal The pre-fee charge amount
  * @return float Fee amount rounded to 2 decimal places
  */
+/**
+ * Get the plan features configuration from plans.json.
+ * Uses static caching so the file is only read once per request.
+ *
+ * @return array Plan data with 'free' and 'premium' keys
+ */
+function get_plan_features() {
+    static $plans = null;
+
+    if ($plans !== null) {
+        return $plans;
+    }
+
+    $plans = json_decode(file_get_contents(__DIR__ . '/plans.json'), true);
+    return $plans;
+}
+
+/**
+ * Render a feature label, appending the detail in a <span> if present.
+ *
+ * @param array|string $feature Feature array with 'label' and optional 'detail', or plain string
+ * @return string HTML-safe feature text
+ */
+function render_feature_label($feature) {
+    if (is_string($feature)) {
+        return htmlspecialchars($feature);
+    }
+    $html = htmlspecialchars($feature['label']);
+    if (!empty($feature['detail'])) {
+        $html .= ' <span>(' . htmlspecialchars($feature['detail']) . ')</span>';
+    }
+    return $html;
+}
+
 function calculate_processing_fee($subtotal) {
     if ($subtotal <= 0) {
         return 0.00;

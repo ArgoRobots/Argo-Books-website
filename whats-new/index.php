@@ -96,7 +96,7 @@
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.4</span>
-                        <span class="date-tag">March 2026</span>
+                        <span class="date-tag">March 26 2026</span>
                     </div>
                     <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
@@ -134,7 +134,7 @@
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.3</span>
-                        <span class="date-tag">March 2026</span>
+                        <span class="date-tag">March 15 2026</span>
                     </div>
                     <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>
@@ -166,7 +166,7 @@
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.2</span>
-                        <span class="date-tag">March 2026</span>
+                        <span class="date-tag">March 10 2026</span>
                     </div>
                     <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>

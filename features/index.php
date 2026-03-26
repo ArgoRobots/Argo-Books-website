@@ -194,7 +194,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Argo Books</span>
                 <h2 class="section-title">Built different, on purpose</h2>
-                <p class="section-desc">We built Argo Books for people who want powerful tools without the complexity, the monthly drain, or the cloud dependency.</p>
+                <p class="section-desc">We built Argo Books for people who want powerful tools without the complexity, the subscription fees, or the cloud dependency.</p>
             </div>
             <div class="why-grid">
                 <div class="why-card animate-on-scroll">

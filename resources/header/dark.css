@@ -16,7 +16,7 @@ header .header-inner .logo {
   content: url(../../resources/images/argo-logo/argo-logo-black.png);
 }
 
-header .header-inner .menu-container ul li a {
+header .header-inner .menu-container ul li a:not(.dropdown-item) {
   color: var(--black) !important;
 }
 

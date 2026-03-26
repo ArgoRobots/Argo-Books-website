@@ -75,7 +75,7 @@ header.sticky .header-inner .logo {
   content: url(../../resources/images/argo-logo/argo-logo-black.png);
 }
 
-header.sticky .header-inner .menu-container ul li a {
+header.sticky .header-inner .menu-container ul li a:not(.dropdown-item) {
   color: var(--gray-900) !important;
 }
 

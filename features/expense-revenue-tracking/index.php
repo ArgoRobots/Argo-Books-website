@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Do I need accounting experience to use Argo Books for expense tracking?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Argo Books uses guided forms with smart defaults and validation to make recording expenses and revenue simple for anyone, with zero accounting knowledge required."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can Argo Books track both expenses and revenue in one place?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books has dedicated expense and revenue pages with real-time summary cards showing monthly totals, transaction counts, and net profit."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books store receipts with expense records?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can attach receipts to any expense, and AI receipt scanning can auto-create expense records from receipt photos. All receipts are stored in a searchable archive."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Track business expenses and revenue with Argo Books. Guided forms, smart validation, receipt archiving, and real-time profit monitoring make bookkeeping simple.",
+            "featureList": "Guided expense and revenue entry forms, Real-time profit and cash flow monitoring, Receipt archive with AI scanning, Tax-ready categorized records"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Expense &amp; Revenue Tracking — Argo Books</title>
 

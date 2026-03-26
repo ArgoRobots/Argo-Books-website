@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Can Argo Books import data from Excel and CSV files?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Drop any Excel (.xlsx) or CSV file and AI automatically detects your columns, maps them to the right fields, and imports your data cleanly into Argo Books."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What types of data can I import with AI Spreadsheet Import?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can import customers, products, expenses, revenue, invoices, and more. AI detects the entity type from your column headers and maps everything automatically."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does the AI spreadsheet import require manual column mapping?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. AI reads your column headers and automatically maps them to Argo Books fields. You can review and adjust the mapping before importing, but manual work is rarely needed."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Import spreadsheets into Argo Books with AI-powered column mapping. Supports Excel and CSV with automatic entity detection and clean data imports.",
+            "featureList": "AI-powered column mapping, Excel and CSV support, Automatic entity type detection, Data validation before import"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>AI Spreadsheet Import — Argo Books</title>
 
@@ -327,14 +380,14 @@
                         <?= svg_icon('bolt', 22) ?>
                     </div>
                     <h3>Handles messy data gracefully</h3>
-                    <p>Real-world spreadsheets aren't perfect. The AI handles merged cells, inconsistent formatting, mixed data types, and pivot-table layouts without breaking.</p>
+                    <p>Real-world spreadsheets aren't perfect. The AI handles merged cells, inconsistent formatting, mixed data types, and pivot-table layouts.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
                         <?= svg_icon('table', 22) ?>
                     </div>
                     <h3>Multi-sheet in one import</h3>
-                    <p>Excel files with multiple sheets — customers on one tab, products on another, invoices on a third — are analyzed and imported together in a single operation.</p>
+                    <p>Excel files with multiple sheets — customers on one tab, products on another — are analyzed and imported together in a single operation.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
@@ -436,7 +489,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Country-aware address schemas adapt to your locale automatically</span>
+                            <span>Country-aware address schemas adapt to your location automatically</span>
                         </li>
                     </ul>
                 </div>

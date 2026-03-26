@@ -53,8 +53,60 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Can Argo Books import data from Excel and CSV files?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Drop any Excel (.xlsx) or CSV file and AI automatically detects your columns, maps them to the right fields, and imports your data cleanly into Argo Books."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What types of data can I import with AI Spreadsheet Import?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "You can import customers, products, expenses, revenue, invoices, and more. AI detects the entity type from your column headers and maps everything automatically."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does the AI spreadsheet import require manual column mapping?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. AI reads your column headers and automatically maps them to Argo Books fields. You can review and adjust the mapping before importing, but manual work is rarely needed."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Import spreadsheets into Argo Books with AI-powered column mapping. Supports Excel and CSV with automatic entity detection and clean data imports.",
+            "featureList": "AI-powered column mapping, Excel and CSV support, Automatic entity type detection, Data validation before import"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>AI Spreadsheet Import — Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>

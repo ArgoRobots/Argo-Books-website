@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Can Argo Books track inventory across multiple locations?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can add unlimited locations such as warehouses, stores, and offices, and track per-location stock levels, inventory value, and capacity."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books support low-stock alerts and reorder points?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can set configurable reorder points per product, and Argo Books alerts you with status badges when stock is low or out."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I create purchase orders in Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Create purchase orders with supplier details and line items. Stock levels update automatically when orders are marked as received."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Manage your inventory with real-time stock tracking, low-stock alerts, purchase orders, stock adjustments, and multi-location support.",
+            "featureList": "Real-time stock tracking, Low-stock alerts and reorder points, Purchase order management, Multi-location inventory support"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Inventory Management — Argo Books</title>
 

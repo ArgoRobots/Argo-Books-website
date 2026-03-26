@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books include a CRM for managing customers?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes. It integrates with invoicing, revenue tracking, and rentals."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I search and filter my customer list in Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can instantly search customers by name, email, or ID, and filter by country, status, or date added."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is customer data stored in the cloud?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Argo Books is a desktop app and all customer data is stored locally on your computer. Nothing is uploaded to cloud servers."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses.",
+            "featureList": "Customer profiles with contact details, Searchable and sortable customer table, Integration with invoicing and rentals, Local data storage with no cloud dependency"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Customer Management — Argo Books</title>
 

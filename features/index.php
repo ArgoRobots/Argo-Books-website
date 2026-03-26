@@ -10,14 +10,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Explore Argo Books features: AI receipt scanning, expense tracking, predictive analytics, inventory management, invoicing, and more. Everything you need to run your business.">
+        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
     <meta name="keywords"
         content="Argo Books features, AI receipt scanning, expense tracking software, predictive analytics, inventory management, invoicing software, rental management, customer management, spreadsheet import">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Features — AI-Powered Business Tools | Argo Books">
     <meta property="og:description"
-        content="Explore Argo Books features: AI receipt scanning, expense tracking, predictive analytics, inventory management, invoicing, and more.">
+        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
     <meta property="og:url" content="https://argorobots.com/features/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -30,7 +30,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Features — AI-Powered Business Tools | Argo Books">
     <meta name="twitter:description"
-        content="Explore Argo Books features: AI receipt scanning, expense tracking, predictive analytics, inventory management, invoicing, and more.">
+        content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+Features&subtitle=AI-powered+business+tools+for+small+businesses.+Receipt+scanning%2C+expense+tracking%2C+analytics%2C+and+more.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
@@ -194,7 +194,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Argo Books</span>
                 <h2 class="section-title">Built different, on purpose</h2>
-                <p class="section-desc">We built Argo Books for people who want powerful tools without the complexity, the subscription fees, or the cloud dependency.</p>
+                <p class="section-desc">We built Argo Books for people who want powerful tools without the complexity, the bloated pricing, or the cloud dependency.</p>
             </div>
             <div class="why-grid">
                 <div class="why-card animate-on-scroll">

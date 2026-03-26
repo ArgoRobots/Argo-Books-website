@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Can customers pay invoices online through Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Every invoice includes a secure online payment link powered by Stripe, Square, or PayPal. Customers can pay by credit card with a single click."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books support customizable invoice templates?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Choose from multiple professional email templates with your company branding. Invoices include your logo, billing details, and itemized line items."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I track invoice payment status in Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Invoices are tracked from draft to paid with color-coded status badges. Summary cards show outstanding, paid, and overdue totals at a glance."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Create professional invoices with Argo Books. Customizable templates, automatic line-item calculations, online payment links, and payment tracking.",
+            "featureList": "Professional invoice templates with branding, Online payment links via Stripe and Square, Automatic tax and total calculations, Real-time payment status tracking"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Invoicing — Argo Books</title>
 

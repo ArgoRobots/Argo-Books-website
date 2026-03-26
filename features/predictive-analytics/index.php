@@ -10,14 +10,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Predict future revenue, expenses, and customer growth with AI-powered analytics. Argo Books uses machine learning to detect seasonal patterns, forecast trends, and surface actionable business insights — all running locally on your computer.">
+        content="Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.">
     <meta name="keywords"
         content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, AI business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Predictive Analytics — Argo Books">
     <meta property="og:description"
-        content="Predict future revenue, expenses, and customer growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and make smarter business decisions.">
+        content="Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.">
     <meta property="og:url" content="https://argorobots.com/features/predictive-analytics/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -30,7 +30,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Predictive Analytics — Argo Books">
     <meta name="twitter:description"
-        content="Predict future revenue, expenses, and customer growth with AI-powered analytics. Detect seasonal patterns and forecast trends.">
+        content="Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
@@ -50,6 +50,59 @@
                 {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
                 {"@type": "ListItem", "position": 3, "name": "Predictive Analytics", "item": "https://argorobots.com/features/predictive-analytics/"}
             ]
+        }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "How accurate are the revenue forecasts in Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books achieves an average of 88% forecast accuracy in backtesting. Every prediction includes a confidence score so you know how reliable it is."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do I need data science skills to use predictive analytics?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. The analytics engine works automatically in the background with zero configuration. Just use Argo Books normally and forecasts are generated from your data."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books detect seasonal business patterns?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. The AI automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.",
+            "featureList": "AI-powered revenue and expense forecasting, Seasonal pattern detection, Accuracy tracking with confidence scores, Plain-language business insights"
         }
     </script>
 

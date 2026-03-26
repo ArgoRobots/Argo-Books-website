@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Can Argo Books track overdue rental returns automatically?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books automatically flags rentals as overdue when the return date passes, with color-coded status badges for easy identification."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does the rental management feature support deposit tracking?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can set deposit amounts per rental item and track paid or unpaid deposit status for each booking."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I generate invoices from rental records?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can generate professional invoices directly from any rental record with one click. Customer details and pricing auto-populate."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Manage rental bookings, track rental periods, handle returns, and monitor revenue with Argo Books. Built for equipment rental and any rental-based business.",
+            "featureList": "Rental booking and return tracking, Automatic overdue detection, Deposit and revenue management, One-click invoice generation from rentals"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Rental Management — Argo Books</title>
 

@@ -106,9 +106,8 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Bulk receipt management</strong> &mdash; Select and delete multiple receipts at once for faster cleanup.</li>
-                                <li><strong>Invoice template management</strong> &mdash; Browse and manage your invoice templates in a new list view with thumbnail previews.</li>
-                                <li><strong>Multi-currency accounting reports</strong> &mdash; Accounting reports now support multiple currencies with automatic USD conversion.</li>
+                                <li><strong>Invoice template management</strong> &mdash; Browse and manage your invoice templates in a new view with thumbnail previews.</li>
+                                <li><strong>Multi-currency accounting reports</strong> &mdash; Accounting reports now support multiple currencies.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -122,8 +121,8 @@
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li>Fixed currency mixing issues in financial calculations.</li>
                                 <li>Fixed pagination arrows not updating correctly.</li>
+                                <li>Various bug fixes and stability improvements.</li>
                             </ul>
                         </div>
                     </div>

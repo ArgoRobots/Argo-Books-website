@@ -91,6 +91,45 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.4 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.4</span>
+                        <span class="date-tag">March 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Bulk receipt management</strong> &mdash; Select and delete multiple receipts at once for faster cleanup.</li>
+                                <li><strong>Invoice template management</strong> &mdash; Browse and manage your invoice templates in a new list view with thumbnail previews.</li>
+                                <li><strong>Multi-currency accounting reports</strong> &mdash; Accounting reports now support multiple currencies with automatic USD conversion.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Undo/redo for invoice templates</strong> &mdash; Undo and redo changes when editing invoice templates.</li>
+                                <li><strong>Localized tax labels</strong> &mdash; Tax labels now automatically match your company's country.</li>
+                                <li><strong>Improved offline experience</strong> &mdash; Better detection and messaging when working offline, with a pending transaction queue so nothing is lost.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Fixed currency mixing issues in financial calculations.</li>
+                                <li>Fixed pagination arrows not updating correctly.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.3 -->
             <div class="version-card">
                 <div class="version-header">

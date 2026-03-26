@@ -457,45 +457,57 @@
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 5: What Makes It Smart
-         Text left, no image (full-width text)
+         WHAT MAKES IT SMART — 6 capability cards
          ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
+    <section class="benefits-section" style="background: var(--gray-50);">
         <div class="container">
-            <div class="feature-detail animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">What Makes It Smart</span>
-                    <h2>Six capabilities working together</h2>
-                    <p>Argo Books' predictive analytics isn't a single algorithm. It's a system of interconnected capabilities that work together to give you the most accurate and useful forecasts possible.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><strong>Seasonal Pattern Detection</strong> — Automatically detects if your business has patterns like higher sales in December or slower months in summer. The forecast adjusts for these cycles.</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><strong>Trend Analysis</strong> — Understands whether your business is growing, stable, or declining — and factors this into predictions so they're not just based on averages.</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><strong>Accuracy Tracking</strong> — Compares past predictions to what actually happened. Over time, you see how accurate the forecasts have been for your specific business.</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><strong>Confidence Scoring</strong> — Every prediction includes a confidence percentage. Low confidence means less data or more volatility — so you know when to trust the forecast and when to be cautious.</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><strong>Adaptive Learning</strong> — The system automatically selects the best forecasting model for your data. As more months of data come in, the model refines itself.</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><strong>Forecast Range</strong> — Instead of a single number, you get a predicted range (e.g., $12,554 - $18,831) so you can plan for both optimistic and conservative scenarios.</span>
-                        </li>
-                    </ul>
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">What Makes It Smart</span>
+                <h2 class="section-title">Six capabilities working together</h2>
+                <p class="section-desc">Not a single algorithm — a system of interconnected capabilities that produce accurate, useful forecasts.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon">
+                        <?= svg_icon('calendar', 22) ?>
+                    </div>
+                    <h3>Seasonal pattern detection</h3>
+                    <p>Detects recurring cycles like holiday spikes or summer slowdowns and adjusts forecasts automatically.</p>
                 </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local — all analytics processing happens on your computer" loading="lazy">
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon green">
+                        <?= svg_icon('trending-up', 22) ?>
+                    </div>
+                    <h3>Trend analysis</h3>
+                    <p>Factors in whether your business is growing, stable, or declining — so predictions aren't just based on averages.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon purple">
+                        <?= svg_icon('circle-check', 22) ?>
+                    </div>
+                    <h3>Accuracy tracking</h3>
+                    <p>Compares past predictions to actual results so you can see how reliable the forecasts are over time.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon amber">
+                        <?= svg_icon('shield', 22) ?>
+                    </div>
+                    <h3>Confidence scoring</h3>
+                    <p>Every prediction includes a confidence percentage so you know when to trust the forecast and when to be cautious.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon cyan">
+                        <?= svg_icon('bolt', 22) ?>
+                    </div>
+                    <h3>Adaptive learning</h3>
+                    <p>Automatically selects the best forecasting model for your data and refines itself as more months come in.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon red">
+                        <?= svg_icon('analytics', 22) ?>
+                    </div>
+                    <h3>Forecast range</h3>
+                    <p>Gives you a predicted range (e.g., $12,554 – $18,831) so you can plan for both optimistic and conservative scenarios.</p>
                 </div>
             </div>
         </div>

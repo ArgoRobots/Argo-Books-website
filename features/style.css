@@ -242,7 +242,7 @@ body {
 
 .feature-card {
   background: var(--white);
-  padding: 32px;
+  padding: 24px;
   border-radius: 16px;
   border: 1px solid var(--gray-200);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -256,17 +256,17 @@ body {
 }
 
 .feature-card-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: grid;
   place-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .feature-card-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .feature-card-icon.blue {
@@ -307,10 +307,10 @@ body {
 }
 
 .feature-card p {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: var(--gray-500);
-  line-height: 1.7;
-  margin-bottom: 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
 }
 
 .feature-card-link {

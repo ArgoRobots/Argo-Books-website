@@ -53,6 +53,59 @@
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "How does AI receipt scanning work in Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Take a photo of any receipt and Argo Books uses AI to extract the store name, items, totals, taxes, and date automatically. The data is used to create an expense record with no manual typing."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What types of receipts can Argo Books scan?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books can scan printed receipts, handwritten receipts, and digital receipt images. It supports photos from your camera, screenshots, and uploaded image files."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is receipt data uploaded to the cloud for processing?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "AI processing uses a secure API call, but your receipt images and extracted data are stored locally on your computer. No receipt data is kept on third-party servers."
+                    }
+                }
+            ]
+        }
+    </script>
+
+    <!-- SoftwareApplication Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "Argo Books",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Windows, macOS",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "CAD",
+                "description": "Free plan available. Premium for $10/month."
+            },
+            "description": "Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry and keep your books accurate.",
+            "featureList": "AI-powered receipt data extraction, Automatic expense record creation, Receipt archive with search, Support for printed and handwritten receipts"
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>AI Receipt Scanning — Argo Books</title>
 

@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 500" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#fef2f2"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="statShadow" x="-5%" y="-10%" width="110%" height="125%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="600" height="500" rx="24" fill="url(#bgGrad)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.03" stroke="#3b82f6" stroke-width="1">
+    <line x1="0" y1="100" x2="600" y2="100"/><line x1="0" y1="200" x2="600" y2="200"/>
+    <line x1="0" y1="300" x2="600" y2="300"/><line x1="0" y1="400" x2="600" y2="400"/>
+    <line x1="100" y1="0" x2="100" y2="500"/><line x1="200" y1="0" x2="200" y2="500"/>
+    <line x1="300" y1="0" x2="300" y2="500"/><line x1="400" y1="0" x2="400" y2="500"/>
+    <line x1="500" y1="0" x2="500" y2="500"/>
+  </g>
+
+  <!-- Decorative circles -->
+  <circle cx="80" cy="60" r="35" fill="#3b82f6" opacity="0.04"/>
+  <circle cx="530" cy="440" r="40" fill="#ef4444" opacity="0.04"/>
+
+  <!-- Main card -->
+  <g filter="url(#cardShadow)">
+    <rect x="32" y="24" width="536" height="452" rx="16" fill="white"/>
+  </g>
+
+  <!-- Page title -->
+  <text x="56" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#1e293b">Customers</text>
+
+  <!-- Stat cards row -->
+  <!-- Total Customers -->
+  <g filter="url(#statShadow)">
+    <rect x="48" y="72" width="116" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  </g>
+  <circle cx="66" cy="92" r="10" fill="#eff6ff"/>
+  <path d="M63 96v-1a2.5 2.5 0 015 0v1" stroke="#3b82f6" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <circle cx="65.5" cy="90" r="1.8" stroke="#3b82f6" stroke-width="1.2" fill="none"/>
+  <text x="82" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">15</text>
+  <text x="82" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">Total Customers</text>
+
+  <!-- Active Customers -->
+  <g filter="url(#statShadow)">
+    <rect x="172" y="72" width="116" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  </g>
+  <circle cx="190" cy="92" r="10" fill="#f0fdf4"/>
+  <path d="M186 92l2.5 2.5 5-5" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="206" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">15</text>
+  <text x="206" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">Active Customers</text>
+
+  <!-- Banned Customers -->
+  <g filter="url(#statShadow)">
+    <rect x="296" y="72" width="116" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  </g>
+  <circle cx="314" cy="92" r="10" fill="#fef2f2"/>
+  <circle cx="314" cy="92" r="6" fill="none" stroke="#ef4444" stroke-width="1.5"/>
+  <line x1="310" y1="96" x2="318" y2="88" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="330" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">0</text>
+  <text x="330" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">Banned</text>
+
+  <!-- New This Month -->
+  <g filter="url(#statShadow)">
+    <rect x="420" y="72" width="132" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  </g>
+  <circle cx="438" cy="92" r="10" fill="#eff6ff"/>
+  <path d="M435 96v-1a2.5 2.5 0 015 0v1" stroke="#3b82f6" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  <circle cx="437.5" cy="90" r="1.8" stroke="#3b82f6" stroke-width="1.2" fill="none"/>
+  <path d="M441 89l2 0M442 88l0 2" stroke="#3b82f6" stroke-width="1" stroke-linecap="round"/>
+  <text x="454" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">15</text>
+  <text x="454" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">New This Month</text>
+
+  <!-- Search bar and buttons -->
+  <rect x="228" y="138" width="150" height="26" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <circle cx="240" cy="151" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
+  <line x1="244" y1="155" x2="246" y2="157" stroke="#94a3b8" stroke-width="1.2" stroke-linecap="round"/>
+  <text x="252" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Search customers...</text>
+
+  <!-- Filter button -->
+  <rect x="386" y="138" width="50" height="26" rx="6" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="411" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b" text-anchor="middle">Filter</text>
+
+  <!-- Add Customer button -->
+  <rect x="444" y="138" width="110" height="26" rx="6" fill="#3b82f6"/>
+  <text x="499" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="white" text-anchor="middle">+ Add Customer</text>
+
+  <!-- Table header -->
+  <rect x="46" y="174" width="508" height="28" rx="0" fill="#f8fafc"/>
+  <line x1="46" y1="202" x2="554" y2="202" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="56" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">CUSTOMER</text>
+  <text x="184" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">EMAIL</text>
+  <text x="310" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">PHONE</text>
+  <text x="388" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">ADDRESS</text>
+  <text x="500" y="192" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8" font-weight="600">COUNTRY</text>
+
+  <!-- Row 1: Amanda Foster -->
+  <circle cx="66" cy="220" r="12" fill="#3b82f6"/>
+  <text x="66" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">AF</text>
+  <text x="84" y="217" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">Amanda Foster</text>
+  <text x="84" y="228" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">CUS-007</text>
+  <text x="184" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">evandiplacido@outlook.com</text>
+  <text x="310" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-890-1234</text>
+  <text x="388" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">300 Realtor Row, Dallas</text>
+  <text x="500" y="222" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Ireland</text>
+  <line x1="46" y1="238" x2="554" y2="238" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 2: Christopher Brown -->
+  <circle cx="66" cy="256" r="12" fill="#10b981"/>
+  <text x="66" y="256" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">CB</text>
+  <text x="84" y="253" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">Christopher Brown</text>
+  <text x="84" y="264" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">CUS-010</text>
+  <text x="184" y="258" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">cbrown@personalmail.com</text>
+  <text x="310" y="258" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-123-4567</text>
+  <text x="388" y="258" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">789 Residential Ave</text>
+  <text x="500" y="258" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Canada</text>
+  <line x1="46" y1="274" x2="554" y2="274" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 3: Daniel Martinez -->
+  <circle cx="66" cy="292" r="12" fill="#8b5cf6"/>
+  <text x="66" y="292" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">DM</text>
+  <text x="84" y="289" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">Daniel Martinez</text>
+  <text x="84" y="300" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">CUS-012</text>
+  <text x="184" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">dmartinez@martinezauto.com</text>
+  <text x="310" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-345-7890</text>
+  <text x="388" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">1500 Dealer Drive</text>
+  <text x="500" y="294" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">UK</text>
+  <line x1="46" y1="310" x2="554" y2="310" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 4: David Chen -->
+  <circle cx="66" cy="328" r="12" fill="#f59e0b"/>
+  <text x="66" y="328" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">DC</text>
+  <text x="84" y="325" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">David Chen</text>
+  <text x="84" y="336" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">CUS-002</text>
+  <text x="184" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">dchen@chenlaw.com</text>
+  <text x="310" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-345-6789</text>
+  <text x="388" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">500 Legal Plaza</text>
+  <text x="500" y="330" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">UK</text>
+  <line x1="46" y1="346" x2="554" y2="346" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 5: Emily Watson -->
+  <circle cx="66" cy="364" r="12" fill="#ec4899"/>
+  <text x="66" y="364" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">EW</text>
+  <text x="84" y="361" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">Emily Watson</text>
+  <text x="84" y="372" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">CUS-005</text>
+  <text x="184" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">emily.watson@email.com</text>
+  <text x="310" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-678-9012</text>
+  <text x="388" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">456 Oak Street</text>
+  <text x="500" y="366" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Germany</text>
+  <line x1="46" y1="382" x2="554" y2="382" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Row 6: James Wilson -->
+  <circle cx="66" cy="400" r="12" fill="#06b6d4"/>
+  <text x="66" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="700" fill="white" text-anchor="middle" dominant-baseline="central">JW</text>
+  <text x="84" y="397" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="500">James Wilson</text>
+  <text x="84" y="408" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">CUS-008</text>
+  <text x="184" y="402" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">jwilson@wilsonaccounting.c...</text>
+  <text x="310" y="402" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">555-901-2345</text>
+  <text x="388" y="402" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">1100 Financial Center</text>
+  <text x="500" y="402" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Netherlands</text>
+  <line x1="46" y1="418" x2="554" y2="418" stroke="#f1f5f9" stroke-width="1"/>
+
+  <!-- Pagination -->
+  <text x="56" y="444" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#94a3b8">1-10 of 15 customers</text>
+  <text x="370" y="444" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#94a3b8">Rows per page: 10</text>
+  <rect x="490" y="432" width="24" height="24" rx="6" fill="#3b82f6"/>
+  <text x="502" y="444" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="600" fill="white" text-anchor="middle" dominant-baseline="central">1</text>
+  <rect x="518" y="432" width="24" height="24" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="530" y="444" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="500" fill="#64748b" text-anchor="middle" dominant-baseline="central">2</text>
+</svg>

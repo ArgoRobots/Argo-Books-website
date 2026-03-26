@@ -37,46 +37,21 @@
   <text x="56" y="60" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="700" fill="#1e293b">Inventory</text>
 
   <!-- Stat cards row -->
-  <!-- Total Units -->
-  <g filter="url(#statShadow)">
-    <rect x="48" y="72" width="120" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
-  </g>
-  <circle cx="66" cy="92" r="10" fill="#eff6ff"/>
-  <path d="M61 95V89a1.5 1.5 0 011.5-1.5h7A1.5 1.5 0 0171 89v6a1.5 1.5 0 01-1.5 1.5h-7A1.5 1.5 0 0161 95z" stroke="#3b82f6" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
-  <path d="M63 90h4M63 93h2.5" stroke="#3b82f6" stroke-width="1" stroke-linecap="round"/>
-  <text x="82" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">129</text>
-  <text x="82" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">Total Units</text>
+  <rect x="48" y="72" width="120" height="62" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="108" y="92" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Total Units</text>
+  <text x="108" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#1e293b" text-anchor="middle">129</text>
 
-  <!-- In Stock -->
-  <g filter="url(#statShadow)">
-    <rect x="176" y="72" width="116" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
-  </g>
-  <circle cx="194" cy="92" r="10" fill="#f0fdf4"/>
-  <path d="M189 92l3 3 6-6" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <text x="210" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">13</text>
-  <text x="210" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">In Stock</text>
+  <rect x="176" y="72" width="120" height="62" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="236" y="92" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">In Stock</text>
+  <text x="236" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#1e293b" text-anchor="middle">13</text>
 
-  <!-- Low Stock -->
-  <g filter="url(#statShadow)">
-    <rect x="300" y="72" width="116" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
-  </g>
-  <circle cx="318" cy="92" r="10" fill="#fefce8"/>
-  <path d="M318 86l5.5 10h-11z" stroke="#f59e0b" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
-  <line x1="318" y1="89.5" x2="318" y2="93" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
-  <circle cx="318" cy="94.8" r="0.9" fill="#f59e0b"/>
-  <text x="334" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">2</text>
-  <text x="334" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#f59e0b">Low Stock</text>
+  <rect x="304" y="72" width="120" height="62" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="364" y="92" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Low Stock</text>
+  <text x="364" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#f59e0b" text-anchor="middle">2</text>
 
-  <!-- Out of Stock -->
-  <g filter="url(#statShadow)">
-    <rect x="424" y="72" width="128" height="56" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
-  </g>
-  <circle cx="442" cy="92" r="10" fill="#fef2f2"/>
-  <circle cx="442" cy="92" r="7" stroke="#ef4444" stroke-width="1.5" fill="none"/>
-  <line x1="442" y1="89" x2="442" y2="93.5" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
-  <circle cx="442" cy="95.5" r="1" fill="#ef4444"/>
-  <text x="458" y="94" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="700" fill="#1e293b">0</text>
-  <text x="458" y="108" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#94a3b8">Out of Stock</text>
+  <rect x="432" y="72" width="120" height="62" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="492" y="92" font-family="system-ui, -apple-system, sans-serif" font-size="11" fill="#94a3b8" font-weight="500" text-anchor="middle">Out of Stock</text>
+  <text x="492" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="700" fill="#ef4444" text-anchor="middle">0</text>
 
   <!-- Search bar and buttons -->
   <rect x="228" y="138" width="150" height="26" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>

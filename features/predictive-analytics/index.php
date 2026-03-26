@@ -10,14 +10,14 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.">
+        content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta name="keywords"
         content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, AI business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Predictive Analytics — Argo Books">
     <meta property="og:description"
-        content="Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.">
+        content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta property="og:url" content="https://argorobots.com/features/predictive-analytics/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -30,7 +30,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Predictive Analytics — Argo Books">
     <meta name="twitter:description"
-        content="Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.">
+        content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
@@ -101,7 +101,7 @@
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $10/month."
             },
-            "description": "Predict future revenue, expenses, and growth with AI-powered analytics. Detect seasonal patterns, forecast trends, and surface actionable insights.",
+            "description": "Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.",
             "featureList": "AI-powered revenue and expense forecasting, Seasonal pattern detection, Accuracy tracking with confidence scores, Plain-language business insights"
         }
     </script>

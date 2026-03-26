@@ -18,13 +18,6 @@
             {"label": "Receipt management"},
             {"label": "5 invoices / month"},
             {"label": "AI spreadsheet import", "detail": "100/month"}
-        ],
-        "compact_features": [
-            "Unlimited products",
-            "Expense tracking",
-            "Financial reports",
-            "Cross-platform desktop app",
-            "AI spreadsheet import"
         ]
     },
     "premium": {
@@ -47,13 +40,6 @@
             {"label": "AI receipt scanning", "detail": "500/month"},
             {"label": "Predictive analytics"},
             {"label": "Priority support"}
-        ],
-        "compact_features": [
-            "Everything in Free",
-            "Unlimited products",
-            "AI receipt scanning",
-            "Invoicing & payments",
-            "Predictive analytics"
         ]
     }
 }

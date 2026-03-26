@@ -259,8 +259,8 @@ $plans = get_plan_features();
                                     <span class="tier-period">forever</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <?php foreach ($plans['free']['compact_features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= htmlspecialchars($f) ?></li>
+                                    <?php foreach ($plans['free']['features'] as $f): ?>
+                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
@@ -272,8 +272,8 @@ $plans = get_plan_features();
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <?php foreach ($plans['premium']['compact_features'] as $f): ?>
-                                    <li><?= svg_icon('check', 14) ?> <?= htmlspecialchars($f) ?></li>
+                                    <?php foreach ($plans['premium']['features'] as $f): ?>
+                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>

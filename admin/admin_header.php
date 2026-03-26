@@ -30,6 +30,13 @@ $base_path = $in_subdir ? '../' : '';
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <script>
+        // Set Chart.js default text color based on current theme
+        (function() {
+            var theme = document.documentElement.getAttribute('data-theme') || 'light';
+            Chart.defaults.color = theme === 'dark' ? '#ffffff' : '#666666';
+        })();
+    </script>
     <script src="<?php echo $base_path; ?>../resources/notifications/notifications.js" defer></script>
     <script src="<?php echo $base_path; ?>pagination.js" defer></script>
 
@@ -171,6 +178,21 @@ $base_path = $in_subdir ? '../' : '';
                     var next = current === 'dark' ? 'light' : 'dark';
                     document.documentElement.setAttribute('data-theme', next);
                     localStorage.setItem('admin-theme', next);
+
+                    // Update Chart.js default text color and re-render all charts
+                    if (typeof Chart !== 'undefined') {
+                        Chart.defaults.color = next === 'dark' ? '#ffffff' : '#666666';
+                        Object.values(Chart.instances).forEach(function(chart) {
+                            chart.options.scales && Object.values(chart.options.scales).forEach(function(scale) {
+                                if (scale.ticks) scale.ticks.color = Chart.defaults.color;
+                                if (scale.title) scale.title.color = Chart.defaults.color;
+                            });
+                            if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                                chart.options.plugins.legend.labels.color = Chart.defaults.color;
+                            }
+                            chart.update();
+                        });
+                    }
                 }
 
                 const menu = document.getElementById('menu');

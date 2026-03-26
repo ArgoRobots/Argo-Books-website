@@ -279,7 +279,7 @@ const sharedTooltip = {
 
 const sharedScaleX = {
     grid: { display: false },
-    ticks: { color: '#94a3b8', font: { size: 10 }, maxRotation: 45 }
+    ticks: { font: { size: 10 }, maxRotation: 45 }
 };
 
 // 1. MRR Line Chart
@@ -315,7 +315,7 @@ new Chart(document.getElementById('mrrChart').getContext('2d'), {
             x: sharedScaleX,
             y: {
                 grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                ticks: { color: '#94a3b8', font: { size: 11 }, callback: v => '$' + v.toLocaleString() }
+                ticks: { font: { size: 11 }, callback: v => '$' + v.toLocaleString() }
             }
         }
     }
@@ -354,7 +354,7 @@ new Chart(document.getElementById('cumulativeChart').getContext('2d'), {
             x: sharedScaleX,
             y: {
                 grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                ticks: { color: '#94a3b8', font: { size: 11 }, callback: v => '$' + v.toLocaleString() }
+                ticks: { font: { size: 11 }, callback: v => '$' + v.toLocaleString() }
             }
         }
     }
@@ -398,7 +398,7 @@ new Chart(document.getElementById('licensesChart').getContext('2d'), {
             y: {
                 stacked: true,
                 grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                ticks: { color: '#94a3b8', font: { size: 11 }, stepSize: 1 }
+                ticks: { font: { size: 11 }, stepSize: 1 }
             }
         }
     }
@@ -437,7 +437,7 @@ new Chart(document.getElementById('churnChart').getContext('2d'), {
             x: sharedScaleX,
             y: {
                 grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                ticks: { color: '#94a3b8', font: { size: 11 }, callback: v => v + '%' },
+                ticks: { font: { size: 11 }, callback: v => v + '%' },
                 min: 0
             }
         }

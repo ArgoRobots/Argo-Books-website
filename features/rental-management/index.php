@@ -109,7 +109,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Lost rentals and missed returns cost you money</h2>
-                    <p>Most rental businesses track bookings in spreadsheets or on paper. Items go out without proper records, return dates are forgotten, deposits aren't tracked, and overdue rentals slip through the cracks. Argo Books gives you a complete rental management system — every booking, every item, every customer, every date — so nothing falls through the cracks.</p>
+                    <p>Most rental businesses track bookings in spreadsheets or on paper. Items go out without proper records, return dates are forgotten, deposits aren't tracked, and overdue rentals slip through the cracks. Argo Books gives you a complete rental management system — every booking, every item, every customer, every date — so nothing gets missed.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -271,7 +271,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Rental Records</span>
                     <h2>Every rental tracked from start to return</h2>
-                    <p>The rental records page gives you a complete view of every rental — past and present. Each record shows the rental ID, item name with pricing, customer, quantity, start date, due date, status, total charged, deposit amount, and whether it's been paid. Summary cards at the top show total rentals, active bookings, overdue items, and total revenue earned.</p>
+                    <p>The rental records page gives you a complete view of every rental — past and present. See what's currently out, what's overdue, and what's been returned, all in one sortable table with summary cards at the top.</p>
                     <p>Color-coded status badges make it easy to spot which rentals are active (green), overdue (red), or returned (blue). Filter by status to see only what needs attention. Click any rental to view full details, generate an invoice, or mark it as returned.</p>
                     <ul class="feature-checklist">
                         <li>

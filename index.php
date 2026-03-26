@@ -142,7 +142,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "Can I try Argo Books for free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! Argo Books has a free tier that includes up to 10 products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready."
+                        "text": "Yes! Argo Books has a free tier that includes unlimited products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready."
                     }
                 },
                 {
@@ -1135,7 +1135,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <ul class="pricing-features">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Up to 10 products</span>
+                            <span>Unlimited products</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -1270,7 +1270,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes! Argo Books has a free tier that includes up to 10 products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready.</p>
+                            <p>Yes! Argo Books has a free tier that includes unlimited products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready.</p>
                         </div>
                     </div>
                 </div>

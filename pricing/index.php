@@ -56,7 +56,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Do I have to pay to use Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need more, consider upgrading to Premium."
+                        "text": "No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with unlimited products. If you need more advanced features, consider upgrading to Premium."
                     }
                 },
                 {
@@ -139,7 +139,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <ul class="card-features">
                             <li>
                                 <?= svg_icon('check-pricing') ?>
-                                <span>Up to 10 products</span>
+                                <span>Unlimited products</span>
                             </li>
                             <li>
                                 <?= svg_icon('check-pricing') ?>
@@ -234,7 +234,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with a limit of up to 10 products. If you need more, consider upgrading to Premium.</p>
+                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with unlimited products. If you need more advanced features, consider upgrading to Premium.</p>
                         </div>
                     </div>
                 </div>

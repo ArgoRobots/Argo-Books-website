@@ -216,7 +216,7 @@
                         <?= svg_icon('dollar', 28) ?>
                     </div>
                     <h3>Free forever — premium for power users</h3>
-                    <p>The free version covers the essentials. Premium unlocks AI features, invoicing, and unlimited products — all for a fraction of what competitors charge.</p>
+                    <p>The free version covers the essentials with unlimited products. Premium unlocks AI features, invoicing, and more — all for a fraction of what competitors charge.</p>
                 </div>
             </div>
         </div>

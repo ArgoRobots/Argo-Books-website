@@ -35,7 +35,7 @@ include '../../docs-header.php';
                     <ul class="feature-list">
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Up to 10 products</span>
+                            <span class="feature-text">Unlimited products</span>
                         </li>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>

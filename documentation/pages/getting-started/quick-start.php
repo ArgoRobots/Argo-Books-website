@@ -33,7 +33,7 @@ include '../../docs-header.php';
             <p>Navigate to "Products / Services" under Management. Add the items your business sells or uses, assigning each one to a category. You can set pricing, supplier, and other details for each product.</p>
 
             <div class="info-box">
-                <strong>Note:</strong> The free version supports up to 10 products. <a class="link" href="../../../pricing/">Upgrade to Premium</a> for unlimited products.
+                <strong>Note:</strong> The free version supports unlimited products.
             </div>
 
             <h2>5. Start Tracking Expenses and Revenue</h2>

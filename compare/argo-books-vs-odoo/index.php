@@ -255,7 +255,7 @@
                                     <span class="tier-period">forever</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <li><?= svg_icon('check', 14) ?> Up to 10 products</li>
+                                    <li><?= svg_icon('check', 14) ?> Unlimited products</li>
                                     <li><?= svg_icon('check', 14) ?> Expense tracking</li>
                                     <li><?= svg_icon('check', 14) ?> Financial reports</li>
                                     <li><?= svg_icon('check', 14) ?> Cross-platform desktop app</li>
@@ -351,7 +351,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and support for up to 10 products. No credit card required, no trial period — it's free forever. Premium unlocks unlimited products, AI features, invoicing, and more.</p>
+                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and unlimited products. No credit card required, no trial period — it's free forever. Premium unlocks AI features, invoicing, and more.</p>
                         </div>
                     </div>
                 </div>

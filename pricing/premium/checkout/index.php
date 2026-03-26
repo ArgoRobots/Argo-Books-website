@@ -158,7 +158,7 @@
                 </div>
                 <?php if ($feeToday > 0): ?>
                 <div class="order-item">
-                    <span>Processing Fee</span>
+                    <span>Payment Processor Fee</span>
                     <span>$<?php echo number_format($feeToday, 2); ?> CAD</span>
                 </div>
                 <?php endif; ?>

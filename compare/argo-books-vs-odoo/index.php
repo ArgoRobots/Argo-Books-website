@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$plans = get_plan_features();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -255,11 +259,9 @@
                                     <span class="tier-period">forever</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <li><?= svg_icon('check', 14) ?> Up to 10 products</li>
-                                    <li><?= svg_icon('check', 14) ?> Expense tracking</li>
-                                    <li><?= svg_icon('check', 14) ?> Financial reports</li>
-                                    <li><?= svg_icon('check', 14) ?> Cross-platform desktop app</li>
-                                    <li><?= svg_icon('check', 14) ?> AI spreadsheet import</li>
+                                    <?php foreach ($plans['free']['features'] as $f): ?>
+                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
+                                    <?php endforeach; ?>
                                 </ul>
                             </div>
                             <div class="tier-divider"></div>
@@ -270,11 +272,9 @@
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
-                                    <li><?= svg_icon('check', 14) ?> Everything in Free</li>
-                                    <li><?= svg_icon('check', 14) ?> Unlimited products</li>
-                                    <li><?= svg_icon('check', 14) ?> AI receipt scanning</li>
-                                    <li><?= svg_icon('check', 14) ?> Invoicing & payments</li>
-                                    <li><?= svg_icon('check', 14) ?> Predictive analytics</li>
+                                    <?php foreach ($plans['premium']['features'] as $f): ?>
+                                    <li><?= svg_icon('check', 14) ?> <?= render_feature_label($f) ?></li>
+                                    <?php endforeach; ?>
                                 </ul>
                             </div>
                         </div>
@@ -351,7 +351,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and support for up to 10 products. No credit card required, no trial period — it's free forever. Premium unlocks unlimited products, AI features, invoicing, and more.</p>
+                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and unlimited products. No credit card required, no trial period — it's free forever. Premium unlocks AI features, invoicing, and more.</p>
                         </div>
                     </div>
                 </div>

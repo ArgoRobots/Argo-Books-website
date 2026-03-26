@@ -452,7 +452,7 @@ include '../admin_header.php';
                 <div class="tab-button" onclick="switchTab('errors')">Errors</div>
                 <div class="tab-button" onclick="switchTab('usage')">Usage</div>
                 <div class="tab-button" onclick="switchTab('api')">API Usage</div>
-                <div class="tab-button" onclick="switchTab('activity')">Activity</div>
+                <div class="tab-button" onclick="switchTab('active-users')">Active Users</div>
             </div>
 
             <!-- Geographic Tab -->
@@ -685,15 +685,78 @@ include '../admin_header.php';
                 </div>
             </div>
 
-            <!-- Activity Tab -->
-            <div id="activity-tab" class="tab-content">
-                <h2 class="section-title">Overall Activity</h2>
+            <!-- Active Users Tab -->
+            <div id="active-users-tab" class="tab-content">
+                <h2 class="section-title">Active Users</h2>
+
+                <div class="stats-grid" id="activeUsersKpiGrid">
+                    <div class="stat-card">
+                        <h3>Total Unique Users</h3>
+                        <div class="value" id="kpiTotalUsers">—</div>
+                        <p class="subtext">All time</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Today</h3>
+                        <div class="value" id="kpiDAU">—</div>
+                        <p class="subtext">DAU</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active This Week</h3>
+                        <div class="value" id="kpiWAU">—</div>
+                        <p class="subtext">Last 7 days</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active This Month</h3>
+                        <div class="value" id="kpiMAU">—</div>
+                        <p class="subtext">Last 30 days</p>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container" style="flex: 1;">
+                        <h2>Daily Active Users (Last 30 Days)</h2>
+                        <canvas id="dauChart"></canvas>
+                    </div>
+                </div>
 
                 <div class="chart-row">
                     <div class="chart-container">
-                        <h2>Data Points Over Time</h2>
-                        <canvas id="overallActivityChart"></canvas>
+                        <h2>Active Users by Platform</h2>
+                        <canvas id="platformBreakdownChart"></canvas>
                     </div>
+                    <div class="chart-container">
+                        <h2>New vs Returning Users</h2>
+                        <canvas id="newVsReturningChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Peak Usage Hours</h2>
+                        <canvas id="peakHoursChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Avg Session Duration (minutes)</h2>
+                        <canvas id="avgSessionDurationChart"></canvas>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 2rem;">User Details</h2>
+                <div class="error-details-wrapper">
+                    <table class="error-details-table" id="activeUsersTable">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>First Seen</th>
+                                <th>Last Seen</th>
+                                <th>Sessions</th>
+                                <th>Platform</th>
+                                <th>Country</th>
+                                <th>App Version</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
             </div>
         </div>

@@ -476,8 +476,11 @@ function record_portal_payment(array $params): array
     $paymentId = $stmt->insert_id;
     $stmt->close();
 
-    // Update invoice balance if payment completed
+    // Update invoice balance if payment completed.
+    // Subtract only the invoice portion (excluding processing fee) from the balance.
+    // The processing fee covers payment provider costs and is not part of the invoice total.
     if ($status === 'completed') {
+        $invoiceAmount = $amount - $processingFee;
         $stmt = $db->prepare(
             'UPDATE portal_invoices
              SET balance_due = GREATEST(0, balance_due - ?),
@@ -489,7 +492,7 @@ function record_portal_payment(array $params): array
                  updated_at = NOW()
              WHERE company_id = ? AND invoice_id = ?'
         );
-        $stmt->bind_param('dddis', $amount, $amount, $amount, $companyId, $invoiceId);
+        $stmt->bind_param('dddis', $invoiceAmount, $invoiceAmount, $invoiceAmount, $companyId, $invoiceId);
         $stmt->execute();
         $stmt->close();
     }

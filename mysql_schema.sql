@@ -484,6 +484,7 @@ CREATE TABLE IF NOT EXISTS portal_invoices (
     balance_due DECIMAL(12,2) NOT NULL DEFAULT 0.00,
     currency VARCHAR(3) NOT NULL DEFAULT 'USD',
     due_date DATE DEFAULT NULL,
+    pass_processing_fee TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Whether to add processing fee to online payments',
     environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

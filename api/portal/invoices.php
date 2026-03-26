@@ -89,6 +89,7 @@ function handle_publish_invoice(): void
     $currency = $data['currency'] ?? 'USD';
     $dueDate = $data['dueDate'] ?? null;
     $status = $data['status'] ?? 'sent';
+    $passProcessingFee = filter_var($data['passProcessingFee'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
     if ($existing) {
         // Update existing invoice
@@ -96,14 +97,16 @@ function handle_publish_invoice(): void
             'UPDATE portal_invoices SET
                 customer_name = ?, customer_email = ?, invoice_data = ?,
                 status = ?, total_amount = ?, balance_due = ?,
-                currency = ?, due_date = ?, updated_at = NOW()
+                currency = ?, due_date = ?, pass_processing_fee = ?,
+                updated_at = NOW()
              WHERE company_id = ? AND invoice_id = ?'
         );
         $stmt->bind_param(
-            'ssssddssis',
+            'ssssddssisis',
             $customerName, $customerEmail, $invoiceData,
             $status, $totalAmount, $balanceDue,
-            $currency, $dueDate, $companyId, $invoiceId
+            $currency, $dueDate, $passProcessingFee,
+            $companyId, $invoiceId
         );
     } else {
         // Create new invoice
@@ -113,15 +116,15 @@ function handle_publish_invoice(): void
              (company_id, invoice_id, invoice_token, customer_token,
               customer_name, customer_email, invoice_data,
               status, total_amount, balance_due, currency, due_date,
-              environment, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+              pass_processing_fee, environment, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
         );
         $stmt->bind_param(
-            'isssssssddsss',
+            'isssssssddssiss',
             $companyId, $invoiceId, $invoiceToken, $customerToken,
             $customerName, $customerEmail, $invoiceData,
             $status, $totalAmount, $balanceDue, $currency, $dueDate,
-            $environment
+            $passProcessingFee, $environment
         );
     }
 

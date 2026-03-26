@@ -88,6 +88,16 @@ $taxAmount = $invoiceData['taxAmount'] ?? $invoiceData['TaxAmount'] ?? 0;
 $taxRate = $invoiceData['taxRate'] ?? $invoiceData['TaxRate'] ?? '';
 $amountPaid = $totalAmount - $balanceDue;
 
+// Calculate processing fee if enabled and invoice is unpaid
+$passProcessingFee = !empty($invoice['pass_processing_fee']);
+$processingFee = 0.00;
+$totalWithFee = $balanceDue;
+if ($passProcessingFee && $balanceDue > 0) {
+    require_once __DIR__ . '/../config/pricing.php';
+    $processingFee = calculate_invoice_processing_fee($balanceDue, $currency);
+    $totalWithFee = $balanceDue + $processingFee;
+}
+
 // Custom invoice HTML (rendered by Argo Books desktop app)
 $customInvoiceHtml = $invoiceData['customInvoiceHtml'] ?? '';
 
@@ -128,6 +138,8 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             invoiceToken: <?php echo json_encode($token, $je); ?>,
             invoiceId: <?php echo json_encode($invoiceId, $je); ?>,
             balanceDue: <?php echo $balanceDue; ?>,
+            processingFee: <?php echo $processingFee; ?>,
+            totalWithFee: <?php echo $totalWithFee; ?>,
             currency: <?php echo json_encode($currency, $je); ?>,
             currencySymbol: <?php echo json_encode($currencySymbol, $je); ?>,
             paymentMethods: <?php echo json_encode($paymentMethods, $je); ?>,
@@ -338,6 +350,19 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                             <span>Balance Due</span>
                             <span><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></span>
                         </div>
+                        <?php if ($processingFee > 0 && !$isPaid): ?>
+                            <div class="total-row total-row-fee">
+                                <span>
+                                    Card processing fee
+                                    <span class="fee-info" title="This fee covers the cost of secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</span>
+                                </span>
+                                <span><?php echo $currencySymbol . number_format($processingFee, 2); ?></span>
+                            </div>
+                            <div class="total-row total-row-charge">
+                                <span>Amount to Pay</span>
+                                <span><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -353,7 +378,11 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             <?php if (!$isPaid && !empty($paymentMethods)): ?>
                 <div class="payment-section" id="payment-section">
                     <h3>Pay This Invoice</h3>
-                    <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></strong></p>
+                    <?php if ($processingFee > 0): ?>
+                        <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></strong> <span class="payment-fee-note">(includes <?php echo $currencySymbol . number_format($processingFee, 2); ?> processing fee)</span></p>
+                    <?php else: ?>
+                        <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></strong></p>
+                    <?php endif; ?>
 
                     <?php if ($singleMethod): ?>
                         <!-- Single payment method: go straight to form -->

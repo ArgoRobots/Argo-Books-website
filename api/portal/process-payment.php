@@ -48,15 +48,27 @@ $amount = floatval($data['amount']);
 $referenceNumber = generate_reference_number();
 $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 
+// Calculate processing fee if enabled for this invoice
+$passProcessingFee = !empty($invoice['pass_processing_fee']);
+$processingFee = 0.00;
+if ($passProcessingFee) {
+    require_once __DIR__ . '/../../config/pricing.php';
+    $processingFee = calculate_invoice_processing_fee(
+        floatval($invoice['balance_due']),
+        strtoupper($invoice['currency'] ?: 'USD')
+    );
+}
+
 // Use integer cents for precise monetary comparisons
 $amountCents = (int) round($amount * 100);
 $balanceDueCents = (int) round(floatval($invoice['balance_due']) * 100);
+$expectedTotalCents = $balanceDueCents + (int) round($processingFee * 100);
 $invoiceStatus = $invoice['status'] ?? '';
 
 if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
+if ($amountCents > $expectedTotalCents + 1) { // 1 cent tolerance
     send_error_response(400, 'Payment amount exceeds balance due.', 'EXCEEDS_BALANCE');
 }
 if (in_array($invoiceStatus, ['paid', 'cancelled'])) {
@@ -129,11 +141,13 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
     }
 
     // Record the payment
+    global $processingFee;
     $result = record_portal_payment([
         'company_id' => $invoice['company_id'],
         'invoice_id' => $invoice['invoice_id'],
         'customer_name' => $invoice['customer_name'],
         'amount' => $amount,
+        'processing_fee' => $processingFee,
         'currency' => strtoupper($invoice['currency'] ?: 'usd'),
         'payment_method' => 'stripe',
         'provider_payment_id' => $paymentIntentId,
@@ -263,11 +277,13 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
     $amount = $capturedAmount; // Use the verified amount
 
     // Record the payment
+    global $processingFee;
     $result = record_portal_payment([
         'company_id' => $invoice['company_id'],
         'invoice_id' => $invoice['invoice_id'],
         'customer_name' => $invoice['customer_name'],
         'amount' => $amount,
+        'processing_fee' => $processingFee,
         'currency' => strtoupper($invoice['currency'] ?: 'usd'),
         'payment_method' => 'paypal',
         'provider_payment_id' => $orderId,

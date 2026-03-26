@@ -52,15 +52,27 @@ if ($invoice['status'] === 'cancelled') {
     send_error_response(400, 'This invoice has been cancelled.', 'CANCELLED');
 }
 
+// Calculate processing fee if enabled for this invoice
+$passProcessingFee = !empty($invoice['pass_processing_fee']);
+$processingFee = 0.00;
+if ($passProcessingFee) {
+    require_once __DIR__ . '/../../config/pricing.php';
+    $processingFee = calculate_invoice_processing_fee(
+        floatval($invoice['balance_due']),
+        $invoice['currency'] ?: 'USD'
+    );
+}
+
 // Validate payment amount using integer cents for precision
 $requestedAmount = floatval($data['amount']);
 $amountCents = (int) round($requestedAmount * 100);
 $balanceDueCents = (int) round(floatval($invoice['balance_due']) * 100);
+$expectedTotalCents = $balanceDueCents + (int) round($processingFee * 100);
 
 if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
+if ($amountCents > $expectedTotalCents + 1) { // 1 cent tolerance
     send_error_response(400, 'Payment amount exceeds balance due.', 'AMOUNT_EXCEEDS_BALANCE');
 }
 
@@ -273,11 +285,13 @@ function process_square_payment(array $invoice, array $company, array $data, int
             $payment = $paymentResult['payment'];
 
             // Record the payment
+            global $processingFee;
             $result = record_portal_payment([
                 'company_id' => $invoice['company_id'],
                 'invoice_id' => $invoice['invoice_id'],
                 'customer_name' => $invoice['customer_name'],
                 'amount' => $amount,
+                'processing_fee' => $processingFee,
                 'currency' => strtoupper($currency),
                 'payment_method' => 'square',
                 'provider_payment_id' => $payment['id'],

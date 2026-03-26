@@ -14,13 +14,15 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!config) return;
 
   var balanceDue = config.balanceDue;
+  var processingFee = config.processingFee || 0;
+  var totalWithFee = config.totalWithFee || balanceDue;
   var currency = config.currency;
   var currencySymbol = config.currencySymbol;
   var apiBase = config.apiBase;
   var invoiceToken = config.invoiceToken;
 
   function getPaymentAmount() {
-    return balanceDue;
+    return totalWithFee;
   }
 
   // Payment method selection
@@ -116,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '<button type="submit" id="portal-stripe-submit" class="btn-submit">' +
       "Pay " +
       currencySymbol +
-      balanceDue.toFixed(2) +
+      totalWithFee.toFixed(2) +
       " " +
       currency +
       "</button>" +
@@ -406,7 +408,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '<button type="submit" id="portal-square-submit" class="btn-submit">' +
       "Pay " +
       currencySymbol +
-      balanceDue.toFixed(2) +
+      totalWithFee.toFixed(2) +
       " " +
       currency +
       "</button>" +
@@ -660,9 +662,16 @@ document.addEventListener("DOMContentLoaded", function () {
       var confMethod = document.getElementById("conf-method");
       var confDate = document.getElementById("conf-date");
 
-      if (confAmount)
-        confAmount.textContent =
-          currencySymbol + amount.toFixed(2) + " " + currency;
+      if (confAmount) {
+        if (processingFee > 0) {
+          confAmount.innerHTML =
+            currencySymbol + amount.toFixed(2) + " " + currency +
+            '<span class="conf-fee-note"> (includes ' + currencySymbol + processingFee.toFixed(2) + ' processing fee)</span>';
+        } else {
+          confAmount.textContent =
+            currencySymbol + amount.toFixed(2) + " " + currency;
+        }
+      }
       if (confRef) confRef.textContent = referenceNumber;
       if (confMethod) confMethod.textContent = method;
       if (confDate)
@@ -672,21 +681,28 @@ document.addEventListener("DOMContentLoaded", function () {
           day: "numeric",
         });
 
-      // Update balance display
+      // Update balance display (balance decreases by invoice amount, not fee)
       var balanceEl = document.querySelector(".total-row-balance span:last-child");
-      var newBalance = Math.max(0, balanceDue - amount);
+      var invoiceAmount = amount - processingFee;
+      var newBalance = Math.max(0, balanceDue - invoiceAmount);
       if (balanceEl) {
         balanceEl.textContent =
           currencySymbol + newBalance.toFixed(2) + " " + currency;
       }
 
-      // Update status badge
+      // Update status badge and hide fee rows
       if (newBalance <= 0) {
         var badges = document.querySelectorAll(".status-badge");
         badges.forEach(function (badge) {
           badge.className = "status-badge status-paid";
           badge.textContent = "Paid";
         });
+
+        // Hide processing fee and "Amount to Pay" rows since invoice is fully paid
+        var feeRow = document.querySelector(".total-row-fee");
+        var chargeRow = document.querySelector(".total-row-charge");
+        if (feeRow) feeRow.style.display = "none";
+        if (chargeRow) chargeRow.style.display = "none";
       }
 
       // Smooth scroll to confirmation

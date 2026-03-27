@@ -398,7 +398,7 @@ function show_result_page(bool $success, string $message, string $companyName = 
         .callback-icon { margin-bottom: 20px; }
         .callback-title { font-size: 22px; font-weight: 600; color: var(--gray-900, #111); margin: 0; }
         .callback-message { color: var(--gray-600, #555); font-size: 15px; margin-top: 12px; line-height: 1.5; }
-        .callback-hint { color: var(--gray-400, #999); font-size: 13px; margin-top: 24px; }
+        .callback-hint { color: var(--gray-900, #111); font-size: 13px; margin-top: 24px; }
     </style>
 </head>
 <body>
@@ -416,7 +416,7 @@ function show_result_page(bool $success, string $message, string $companyName = 
                 <div class="callback-icon"><?= $iconSvg ?></div>
                 <h2 class="callback-title"><?= htmlspecialchars($statusText) ?></h2>
                 <p class="callback-message"><?= htmlspecialchars($message) ?></p>
-                <p class="callback-hint">You can close this window and return to Argo Books.</p>
+                <p class="callback-hint">You can close this window and return to Argo Books. It may take a few seconds for the app to update.</p>
             </div>
         </main>
         <footer class="portal-footer">

@@ -71,17 +71,11 @@ if (!empty($ownerEmail)) {
     $stmt->close();
 
     if ($existing) {
-        // Rotate API key: generate new key, store hash if column exists, update plaintext as fallback
+        // Rotate API key: generate new key and store its hash
         $rotatedKey = bin2hex(random_bytes(32));
         $rotatedHash = hash('sha256', $rotatedKey);
-        $checkCol = $db->query("SHOW COLUMNS FROM portal_companies LIKE 'api_key_hash'");
-        if ($checkCol && $checkCol->num_rows > 0) {
-            $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = "" WHERE id = ?');
-            $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
-        } else {
-            $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key = ? WHERE id = ?');
-            $rotateStmt->bind_param('si', $rotatedKey, $existing['id']);
-        }
+        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = "" WHERE id = ?');
+        $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
         $rotateStmt->execute();
         $rotateStmt->close();
         $db->close();
@@ -111,39 +105,19 @@ if ($squareAccessToken !== null && $squareAccessToken !== '') {
 $squareLocationId = $data['squareLocationId'] ?? null;
 $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
 
-// Use api_key_hash column if available, otherwise store plaintext key
-$checkCol = $db->query("SHOW COLUMNS FROM portal_companies LIKE 'api_key_hash'");
-$hasHashColumn = $checkCol && $checkCol->num_rows > 0;
-
-if ($hasHashColumn) {
-    $stmt = $db->prepare(
-        'INSERT INTO portal_companies
-         (api_key_hash, company_name, company_logo_url, stripe_account_id,
-          paypal_merchant_id, square_merchant_id, square_access_token,
-          square_location_id, owner_email, environment, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
-    );
-    $stmt->bind_param(
-        'ssssssssss',
-        $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
-        $paypalMerchantId, $squareMerchantId, $squareAccessToken,
-        $squareLocationId, $ownerEmail, $environment
-    );
-} else {
-    $stmt = $db->prepare(
-        'INSERT INTO portal_companies
-         (api_key, company_name, company_logo_url, stripe_account_id,
-          paypal_merchant_id, square_merchant_id, square_access_token,
-          square_location_id, owner_email, environment, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
-    );
-    $stmt->bind_param(
-        'ssssssssss',
-        $apiKey, $companyName, $companyLogoUrl, $stripeAccountId,
-        $paypalMerchantId, $squareMerchantId, $squareAccessToken,
-        $squareLocationId, $ownerEmail, $environment
-    );
-}
+$stmt = $db->prepare(
+    'INSERT INTO portal_companies
+     (api_key_hash, company_name, company_logo_url, stripe_account_id,
+      paypal_merchant_id, square_merchant_id, square_access_token,
+      square_location_id, owner_email, environment, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+);
+$stmt->bind_param(
+    'ssssssssss',
+    $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
+    $paypalMerchantId, $squareMerchantId, $squareAccessToken,
+    $squareLocationId, $ownerEmail, $environment
+);
 
 if (!$stmt->execute()) {
     $error = $stmt->error;

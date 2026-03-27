@@ -53,38 +53,24 @@ function authenticate_portal_request(): ?array
         return null;
     }
 
-    // Look up by hashed API key first, fall back to plaintext for legacy databases
+    // Look up by hashed API key, then fall back to plaintext for existing records
     $apiKeyHash = hash('sha256', $providedApiKey);
     $db = get_db_connection();
-    $company = null;
 
-    // Try hash-based lookup (requires api_key_hash column to exist)
-    $hasHashColumn = false;
-    $checkCol = $db->query("SHOW COLUMNS FROM portal_companies LIKE 'api_key_hash'");
-    if ($checkCol && $checkCol->num_rows > 0) {
-        $hasHashColumn = true;
-        $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
-        $stmt->bind_param('s', $apiKeyHash);
-        $stmt->execute();
-        $company = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-    }
+    // Try hash-based lookup first
+    $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
+    $stmt->bind_param('s', $apiKeyHash);
+    $stmt->execute();
+    $company = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
     if (!$company) {
-        // Fall back to plaintext key lookup (pre-migration or not-yet-migrated records)
+        // Fall back to plaintext key for records that haven't been re-registered
         $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key = ? LIMIT 1');
         $stmt->bind_param('s', $providedApiKey);
         $stmt->execute();
         $company = $stmt->get_result()->fetch_assoc();
         $stmt->close();
-
-        // Auto-migrate: store the hash and clear the plaintext key if the column exists
-        if ($company && $hasHashColumn) {
-            $migrateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = "" WHERE id = ?');
-            $migrateStmt->bind_param('si', $apiKeyHash, $company['id']);
-            $migrateStmt->execute();
-            $migrateStmt->close();
-        }
     }
 
     $db->close();

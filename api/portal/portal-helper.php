@@ -53,25 +53,14 @@ function authenticate_portal_request(): ?array
         return null;
     }
 
-    // Look up by hashed API key, then fall back to plaintext for existing records
     $apiKeyHash = hash('sha256', $providedApiKey);
     $db = get_db_connection();
 
-    // Try hash-based lookup first
     $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
     $stmt->bind_param('s', $apiKeyHash);
     $stmt->execute();
     $company = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-
-    if (!$company) {
-        // Fall back to plaintext key for records that haven't been re-registered
-        $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key = ? LIMIT 1');
-        $stmt->bind_param('s', $providedApiKey);
-        $stmt->execute();
-        $company = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-    }
 
     $db->close();
     return $company ?: null;

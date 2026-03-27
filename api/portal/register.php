@@ -74,7 +74,7 @@ if (!empty($ownerEmail)) {
         // Rotate API key: generate new key and store its hash
         $rotatedKey = bin2hex(random_bytes(32));
         $rotatedHash = hash('sha256', $rotatedKey);
-        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = CONCAT("migrated_", HEX(RANDOM_BYTES(16))) WHERE id = ?');
+        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
         $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
         $rotateStmt->execute();
         $rotateStmt->close();
@@ -105,19 +105,16 @@ if ($squareAccessToken !== null && $squareAccessToken !== '') {
 $squareLocationId = $data['squareLocationId'] ?? null;
 $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
 
-// Use a unique placeholder for the legacy api_key column (NOT NULL with unique index on live DB)
-$legacyApiKeyPlaceholder = 'migrated_' . bin2hex(random_bytes(16));
-
 $stmt = $db->prepare(
     'INSERT INTO portal_companies
-     (api_key, api_key_hash, company_name, company_logo_url, stripe_account_id,
+     (api_key_hash, company_name, company_logo_url, stripe_account_id,
       paypal_merchant_id, square_merchant_id, square_access_token,
       square_location_id, owner_email, environment, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
 );
 $stmt->bind_param(
-    'sssssssssss',
-    $legacyApiKeyPlaceholder, $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
+    'ssssssssss',
+    $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
     $paypalMerchantId, $squareMerchantId, $squareAccessToken,
     $squareLocationId, $ownerEmail, $environment
 );

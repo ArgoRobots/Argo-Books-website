@@ -53,18 +53,34 @@ function authenticate_portal_request(): ?array
         return null;
     }
 
-    // SECURITY TODO: API keys should be stored as hashed values. Current plaintext
-    // storage is a risk if the database is compromised. This requires a schema migration
-    // to store hashed keys and a key rotation plan for existing integrations.
+    // Look up by hashed API key first, fall back to plaintext for legacy records
+    $apiKeyHash = hash('sha256', $providedApiKey);
     $db = get_db_connection();
-    $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key = ? LIMIT 1');
-    $stmt->bind_param('s', $providedApiKey);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $company = $result->fetch_assoc();
-    $stmt->close();
-    $db->close();
 
+    $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
+    $stmt->bind_param('s', $apiKeyHash);
+    $stmt->execute();
+    $company = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+
+    if (!$company) {
+        // Backward compatibility: check plaintext key for records not yet migrated
+        $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key = ? AND (api_key_hash IS NULL OR api_key_hash = "") LIMIT 1');
+        $stmt->bind_param('s', $providedApiKey);
+        $stmt->execute();
+        $company = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+
+        // Auto-migrate: store the hash and clear the plaintext key
+        if ($company) {
+            $migrateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = "" WHERE id = ?');
+            $migrateStmt->bind_param('si', $apiKeyHash, $company['id']);
+            $migrateStmt->execute();
+            $migrateStmt->close();
+        }
+    }
+
+    $db->close();
     return $company ?: null;
 }
 

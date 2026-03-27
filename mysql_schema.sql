@@ -390,7 +390,8 @@ CREATE TABLE IF NOT EXISTS receipt_scan_usage (
 -- Companies (Argo Books businesses) registered for the payment portal
 CREATE TABLE IF NOT EXISTS portal_companies (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    api_key VARCHAR(128) NOT NULL UNIQUE COMMENT 'API key for Argo Books app to authenticate with portal',
+    api_key VARCHAR(128) DEFAULT '' COMMENT 'Legacy plaintext API key (cleared after migration to hash)',
+    api_key_hash VARCHAR(64) DEFAULT NULL COMMENT 'SHA-256 hash of the API key for secure lookup',
     company_name VARCHAR(255) NOT NULL,
     company_logo_url VARCHAR(500) DEFAULT NULL,
     -- Connected payment provider accounts (money goes to these, not to ArgoRobots)
@@ -408,6 +409,7 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     is_active TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE INDEX idx_api_key_hash (api_key_hash),
     INDEX idx_api_key (api_key),
     INDEX idx_is_active (is_active),
     INDEX idx_environment (environment)
@@ -498,7 +500,7 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_company_id (company_id),
     INDEX idx_invoice_id (invoice_id),
     INDEX idx_reference_number (reference_number),
-    INDEX idx_provider_payment_id (provider_payment_id),
+    UNIQUE INDEX idx_provider_payment_id (provider_payment_id),
     INDEX idx_status (status),
     INDEX idx_synced (synced_to_argo),
     INDEX idx_created_at (created_at),

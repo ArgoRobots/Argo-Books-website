@@ -86,8 +86,7 @@ function handle_publish_invoice(): void
     $customerName = $data['customerName'];
     $totalAmount = floatval($data['totalAmount']);
     $balanceDue = floatval($data['balanceDue']);
-    $allowedCurrencies = ['USD', 'CAD', 'EUR', 'GBP', 'AUD', 'JPY', 'CHF', 'CNY', 'INR', 'MXN'];
-    $currency = in_array(strtoupper($data['currency'] ?? 'USD'), $allowedCurrencies) ? strtoupper($data['currency'] ?? 'USD') : 'USD';
+    $currency = strtoupper(preg_replace('/[^A-Za-z]/', '', $data['currency'] ?? 'USD') ?: 'USD');
     $dueDate = $data['dueDate'] ?? null;
     $allowedStatuses = ['draft', 'pending', 'sent', 'viewed', 'partial', 'paid', 'overdue', 'cancelled'];
     $status = in_array(strtolower($data['status'] ?? 'pending'), $allowedStatuses) ? strtolower($data['status'] ?? 'pending') : 'pending';

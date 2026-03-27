@@ -102,7 +102,7 @@ function handle_publish_invoice(): void
              WHERE company_id = ? AND invoice_id = ?'
         );
         $stmt->bind_param(
-            'ssssddssisis',
+            'ssssddssiis',
             $customerName, $customerEmail, $invoiceData,
             $status, $totalAmount, $balanceDue,
             $currency, $dueDate, $passProcessingFee,
@@ -120,7 +120,7 @@ function handle_publish_invoice(): void
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
         );
         $stmt->bind_param(
-            'isssssssddssiss',
+            'isssssssddssis',
             $companyId, $invoiceId, $invoiceToken, $customerToken,
             $customerName, $customerEmail, $invoiceData,
             $status, $totalAmount, $balanceDue, $currency, $dueDate,

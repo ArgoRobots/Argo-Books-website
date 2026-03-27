@@ -133,7 +133,6 @@ body {
 .custom-invoice-container {
     background: var(--white);
     border-radius: 12px;
-    overflow: hidden;
     box-shadow: 0 1px 3px var(--shadow);
     margin-bottom: 20px;
 }

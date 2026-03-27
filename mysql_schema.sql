@@ -27,22 +27,6 @@ CREATE TABLE IF NOT EXISTS admin_users (
     last_login DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Payment transactions table to log all payment details
-CREATE TABLE IF NOT EXISTS payment_transactions (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    transaction_id VARCHAR(100) NOT NULL,
-    order_id VARCHAR(100),
-    email VARCHAR(100) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
-    payment_method VARCHAR(50) NOT NULL,
-    status VARCHAR(20) NOT NULL,
-    license_key VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    
-    FOREIGN KEY (license_key) REFERENCES license_keys(license_key) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Create users table
 CREATE TABLE IF NOT EXISTS community_users (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -360,11 +344,6 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
 CREATE INDEX idx_license_keys_transaction_id ON license_keys(transaction_id);
 CREATE INDEX idx_license_keys_email ON license_keys(email);
 CREATE INDEX idx_license_keys_payment_intent ON license_keys(payment_intent);
-
--- Add indexes for payment_transactions table
-CREATE INDEX idx_payment_transactions_transaction_id ON payment_transactions(transaction_id);
-CREATE INDEX idx_payment_transactions_email ON payment_transactions(email);
-CREATE INDEX idx_payment_transactions_license_key ON payment_transactions(license_key);
 
 -- Add indexes for community tables
 CREATE INDEX idx_users_username ON community_users(username);

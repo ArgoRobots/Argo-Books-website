@@ -396,8 +396,7 @@ body {
 }
 
 .total-row-fee {
-    color: var(--gray-500);
-    font-size: 13px;
+    font-size: 14px;
     padding-top: 8px;
 }
 

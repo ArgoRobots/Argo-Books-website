@@ -397,7 +397,7 @@ function show_result_page(bool $success, string $message, string $companyName = 
         .callback-result { text-align: center; padding: 60px 20px; max-width: 480px; margin: 0 auto; }
         .callback-icon { margin-bottom: 20px; }
         .callback-title { font-size: 22px; font-weight: 600; color: var(--gray-900, #111); margin: 0; }
-        .callback-message { color: var(--gray-600, #555); font-size: 15px; margin-top: 12px; line-height: 1.5; }
+        .callback-message { color: var(--gray-900, #111); font-size: 15px; margin-top: 12px; line-height: 1.5; }
         .callback-hint { color: var(--gray-900, #111); font-size: 13px; margin-top: 24px; }
     </style>
 </head>
@@ -416,7 +416,11 @@ function show_result_page(bool $success, string $message, string $companyName = 
                 <div class="callback-icon"><?= $iconSvg ?></div>
                 <h2 class="callback-title"><?= htmlspecialchars($statusText) ?></h2>
                 <p class="callback-message"><?= htmlspecialchars($message) ?></p>
+                <?php if ($success): ?>
                 <p class="callback-hint">You can close this window and return to Argo Books. It may take a few seconds for the app to update.</p>
+                <?php else: ?>
+                <p class="callback-hint">You can close this window and try again from Argo Books.</p>
+                <?php endif; ?>
             </div>
         </main>
         <footer class="portal-footer">

@@ -390,7 +390,7 @@ CREATE TABLE IF NOT EXISTS receipt_scan_usage (
 -- Companies (Argo Books businesses) registered for the payment portal
 CREATE TABLE IF NOT EXISTS portal_companies (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    api_key VARCHAR(128) DEFAULT '' COMMENT 'Legacy plaintext API key (cleared after migration to hash)',
+    api_key VARCHAR(128) DEFAULT NULL COMMENT 'Legacy plaintext API key (cleared after migration to hash)',
     api_key_hash VARCHAR(64) DEFAULT NULL COMMENT 'SHA-256 hash of the API key for secure lookup',
     company_name VARCHAR(255) NOT NULL,
     company_logo_url VARCHAR(500) DEFAULT NULL,

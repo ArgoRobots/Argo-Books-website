@@ -74,7 +74,7 @@ if (!empty($ownerEmail)) {
         // Rotate API key: generate new key and store its hash
         $rotatedKey = bin2hex(random_bytes(32));
         $rotatedHash = hash('sha256', $rotatedKey);
-        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = "" WHERE id = ?');
+        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = NULL WHERE id = ?');
         $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
         $rotateStmt->execute();
         $rotateStmt->close();
@@ -107,10 +107,10 @@ $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' :
 
 $stmt = $db->prepare(
     'INSERT INTO portal_companies
-     (api_key_hash, company_name, company_logo_url, stripe_account_id,
+     (api_key, api_key_hash, company_name, company_logo_url, stripe_account_id,
       paypal_merchant_id, square_merchant_id, square_access_token,
       square_location_id, owner_email, environment, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+     VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
 );
 $stmt->bind_param(
     'ssssssssss',

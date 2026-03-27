@@ -239,6 +239,9 @@ php_value error_log error_log.txt
     RewriteRule ^api/google/callback/?$ api/google/callback.php [L,QSA]
     RewriteRule ^api/google/sheets/export/?$ api/google/sheets/export.php [L,QSA]
 
+    # Portal API: company name update
+    RewriteRule ^api/portal/company-name/?$ api/portal/company-name.php [L,QSA]
+
     # Portal API: company logo upload/delete
     RewriteRule ^api/portal/logo/?$ api/portal/logo.php [L,QSA]
 

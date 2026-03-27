@@ -92,10 +92,18 @@ $amountPaid = $totalAmount - $balanceDue;
 $passProcessingFee = !empty($invoice['pass_processing_fee']);
 $processingFee = 0.00;
 $totalWithFee = $balanceDue;
+$feeProviderLabel = '';
 if ($passProcessingFee && $balanceDue > 0) {
     require_once __DIR__ . '/../config/pricing.php';
     $processingFee = calculate_invoice_processing_fee($balanceDue, $currency);
     $totalWithFee = $balanceDue + $processingFee;
+
+    // Build provider name for the fee label
+    $providerNames = [];
+    if (in_array('stripe', $paymentMethods)) $providerNames[] = 'Stripe';
+    if (in_array('paypal', $paymentMethods)) $providerNames[] = 'PayPal';
+    if (in_array('square', $paymentMethods)) $providerNames[] = 'Square';
+    $feeProviderLabel = !empty($providerNames) ? implode(' / ', $providerNames) : 'payment provider';
 }
 
 // Custom invoice HTML (rendered by Argo Books desktop app)
@@ -140,6 +148,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             balanceDue: <?php echo $balanceDue; ?>,
             processingFee: <?php echo $processingFee; ?>,
             totalWithFee: <?php echo $totalWithFee; ?>,
+            feeProviderLabel: <?php echo json_encode($feeProviderLabel, $je); ?>,
             currency: <?php echo json_encode($currency, $je); ?>,
             currencySymbol: <?php echo json_encode($currencySymbol, $je); ?>,
             paymentMethods: <?php echo json_encode($paymentMethods, $je); ?>,
@@ -238,6 +247,21 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     });
                 })();
                 </script>
+                <?php if ($processingFee > 0 && !$isPaid): ?>
+                    <div class="invoice-fee-banner">
+                        <div class="total-row total-row-fee">
+                            <span>
+                                <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee
+                                <span class="fee-info" title="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</span>
+                            </span>
+                            <span><?php echo $currencySymbol . number_format($processingFee, 2); ?></span>
+                        </div>
+                        <div class="total-row total-row-charge">
+                            <span>Amount to Pay</span>
+                            <span><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></span>
+                        </div>
+                    </div>
+                <?php endif; ?>
             <?php else: ?>
                 <!-- Standard invoice template -->
                 <div class="invoice-header-section">
@@ -353,8 +377,8 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                         <?php if ($processingFee > 0 && !$isPaid): ?>
                             <div class="total-row total-row-fee">
                                 <span>
-                                    Card processing fee
-                                    <span class="fee-info" title="This fee covers the cost of secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</span>
+                                    <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee
+                                    <span class="fee-info" title="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</span>
                                 </span>
                                 <span><?php echo $currencySymbol . number_format($processingFee, 2); ?></span>
                             </div>
@@ -379,7 +403,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                 <div class="payment-section" id="payment-section">
                     <h3>Pay This Invoice</h3>
                     <?php if ($processingFee > 0): ?>
-                        <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></strong> <span class="payment-fee-note">(includes <?php echo $currencySymbol . number_format($processingFee, 2); ?> processing fee)</span></p>
+                        <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></strong> <span class="payment-fee-note">(includes <?php echo $currencySymbol . number_format($processingFee, 2); ?> <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee)</span></p>
                     <?php else: ?>
                         <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></strong></p>
                     <?php endif; ?>

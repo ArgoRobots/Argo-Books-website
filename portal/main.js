@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var balanceDue = config.balanceDue;
   var processingFee = config.processingFee || 0;
   var totalWithFee = config.totalWithFee || balanceDue;
+  var feeProviderLabel = config.feeProviderLabel || "payment provider";
   var currency = config.currency;
   var currencySymbol = config.currencySymbol;
   var apiBase = config.apiBase;
@@ -666,7 +667,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (processingFee > 0) {
           confAmount.innerHTML =
             currencySymbol + amount.toFixed(2) + " " + currency +
-            '<span class="conf-fee-note"> (includes ' + currencySymbol + processingFee.toFixed(2) + ' processing fee)</span>';
+            '<span class="conf-fee-note"> (includes ' + currencySymbol + processingFee.toFixed(2) + ' ' + escapeHtml(feeProviderLabel) + ' processing fee)</span>';
         } else {
           confAmount.textContent =
             currencySymbol + amount.toFixed(2) + " " + currency;

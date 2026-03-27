@@ -120,7 +120,7 @@ if (!move_uploaded_file($file['tmp_name'], $destPath)) {
 }
 
 // Build the public URL path
-$baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://argorobots.com', '/');
+$baseUrl = rtrim($_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com', '/');
 $logoUrl = $baseUrl . '/resources/uploads/logos/' . $filename;
 
 // Update the database

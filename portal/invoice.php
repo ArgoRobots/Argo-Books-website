@@ -363,7 +363,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                             <div class="total-row total-row-fee">
                                 <span>
                                     <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee
-                                    <span class="fee-info" title="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</span>
+                                    <button type="button" class="fee-info" aria-label="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>." title="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</button>
                                 </span>
                                 <span><?php echo $currencySymbol . number_format($processingFee, 2); ?></span>
                             </div>

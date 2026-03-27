@@ -68,8 +68,14 @@ $invoiceStatus = $invoice['status'] ?? '';
 if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($amountCents > $expectedTotalCents + 1) { // 1 cent tolerance
-    send_error_response(400, 'Payment amount exceeds balance due.', 'EXCEEDS_BALANCE');
+if ($passProcessingFee) {
+    if (abs($amountCents - $expectedTotalCents) > 1) {
+        send_error_response(400, 'Payment amount must equal the balance due plus processing fee.', 'INVALID_AMOUNT_WITH_FEE');
+    }
+} else {
+    if ($amountCents > $balanceDueCents + 1) {
+        send_error_response(400, 'Payment amount exceeds balance due.', 'EXCEEDS_BALANCE');
+    }
 }
 if (in_array($invoiceStatus, ['paid', 'cancelled'])) {
     send_error_response(400, 'This invoice is not payable.', 'NOT_PAYABLE');
@@ -81,10 +87,10 @@ if ($balanceDueCents <= 0) {
 try {
     switch ($method) {
         case 'stripe':
-            process_stripe_payment($invoice, $data, $amount, $referenceNumber);
+            process_stripe_payment($invoice, $data, $amount, $referenceNumber, $processingFee);
             break;
         case 'paypal':
-            process_paypal_payment($invoice, $data, $amount, $referenceNumber);
+            process_paypal_payment($invoice, $data, $amount, $referenceNumber, $processingFee);
             break;
         default:
             // Square payments are processed directly in checkout.php
@@ -98,7 +104,7 @@ try {
 /**
  * Process a confirmed Stripe payment
  */
-function process_stripe_payment(array $invoice, array $data, float $amount, string $referenceNumber): void
+function process_stripe_payment(array $invoice, array $data, float $amount, string $referenceNumber, float $processingFee = 0.00): void
 {
     global $is_production;
 
@@ -141,7 +147,6 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
     }
 
     // Record the payment
-    global $processingFee;
     $result = record_portal_payment([
         'company_id' => $invoice['company_id'],
         'invoice_id' => $invoice['invoice_id'],
@@ -189,7 +194,7 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
 /**
  * Process a confirmed PayPal payment
  */
-function process_paypal_payment(array $invoice, array $data, float $amount, string $referenceNumber): void
+function process_paypal_payment(array $invoice, array $data, float $amount, string $referenceNumber, float $processingFee = 0.00): void
 {
     global $is_production;
 
@@ -277,7 +282,6 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
     $amount = $capturedAmount; // Use the verified amount
 
     // Record the payment
-    global $processingFee;
     $result = record_portal_payment([
         'company_id' => $invoice['company_id'],
         'invoice_id' => $invoice['invoice_id'],

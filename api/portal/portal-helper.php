@@ -480,7 +480,7 @@ function record_portal_payment(array $params): array
     // Subtract only the invoice portion (excluding processing fee) from the balance.
     // The processing fee covers payment provider costs and is not part of the invoice total.
     if ($status === 'completed') {
-        $invoiceAmount = $amount - $processingFee;
+        $invoiceAmount = max(0, $amount - $processingFee);
         $stmt = $db->prepare(
             'UPDATE portal_invoices
              SET balance_due = GREATEST(0, balance_due - ?),

@@ -141,3 +141,80 @@ function calculate_processing_fee($subtotal) {
     return round(($subtotal * $config['processing_fee_percent'] / 100) + $config['processing_fee_fixed'], 2);
 }
 
+/**
+ * Calculate the processing fee for an invoice payment, with currency conversion
+ * for the fixed fee portion.
+ *
+ * The percentage portion (2.90%) is currency-agnostic. The fixed portion ($0.30 CAD)
+ * is converted to the invoice's currency using exchange rates from the database.
+ *
+ * @param float  $amount   The payment amount
+ * @param string $currency The invoice currency code (e.g., "USD", "CAD", "EUR")
+ * @return float Fee amount rounded to 2 decimal places
+ */
+function calculate_invoice_processing_fee($amount, $currency = 'CAD') {
+    if ($amount <= 0) {
+        return 0.00;
+    }
+
+    $config = get_pricing_config();
+    $percentFee = $amount * $config['processing_fee_percent'] / 100;
+    $fixedFeeCAD = $config['processing_fee_fixed'];
+
+    // If invoice is in CAD, no conversion needed
+    $currency = strtoupper($currency);
+    if ($currency === 'CAD') {
+        return round($percentFee + $fixedFeeCAD, 2);
+    }
+
+    // Convert the fixed fee from CAD to the invoice currency using exchange rates
+    $fixedFeeConverted = _convert_fixed_fee_to_currency($fixedFeeCAD, $currency);
+
+    return round($percentFee + $fixedFeeConverted, 2);
+}
+
+/**
+ * Convert a CAD amount to the target currency using exchange rates from the database.
+ * Rates in the exchange_rates table are relative to USD.
+ *
+ * @param float  $amountCAD The amount in CAD
+ * @param string $currency  Target currency code
+ * @return float Converted amount (falls back to original amount if no rates available)
+ */
+function _convert_fixed_fee_to_currency($amountCAD, $currency) {
+    try {
+        $db = get_db_connection();
+        $stmt = $db->prepare(
+            'SELECT rates FROM exchange_rates WHERE rate_date <= CURDATE() ORDER BY rate_date DESC LIMIT 1'
+        );
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+        $stmt->close();
+        $db->close();
+
+        if (!$row || empty($row['rates'])) {
+            return $amountCAD; // Fallback: use same numeric value
+        }
+
+        $rates = json_decode($row['rates'], true);
+        if (!$rates) {
+            return $amountCAD;
+        }
+
+        $cadRate = $rates['CAD'] ?? null;
+        $targetRate = $rates[$currency] ?? null;
+
+        if (!$cadRate || $cadRate <= 0 || !$targetRate || $targetRate <= 0) {
+            return $amountCAD;
+        }
+
+        // Convert: CAD -> USD -> target currency
+        // $amountCAD / cadRate = amount in USD; * targetRate = amount in target currency
+        return round($amountCAD / $cadRate * $targetRate, 4);
+    } catch (\Throwable $e) {
+        error_log('Fee currency conversion failed: ' . $e->getMessage());
+        return $amountCAD; // Fallback: use same numeric value
+    }
+}
+

@@ -247,21 +247,6 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     });
                 })();
                 </script>
-                <?php if ($processingFee > 0 && !$isPaid): ?>
-                    <div class="invoice-fee-banner">
-                        <div class="total-row total-row-fee">
-                            <span>
-                                <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee
-                                <span class="fee-info" title="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</span>
-                            </span>
-                            <span><?php echo $currencySymbol . number_format($processingFee, 2); ?></span>
-                        </div>
-                        <div class="total-row total-row-charge">
-                            <span>Amount to Pay</span>
-                            <span><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></span>
-                        </div>
-                    </div>
-                <?php endif; ?>
             <?php else: ?>
                 <!-- Standard invoice template -->
                 <div class="invoice-header-section">

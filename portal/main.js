@@ -663,16 +663,9 @@ document.addEventListener("DOMContentLoaded", function () {
       var confMethod = document.getElementById("conf-method");
       var confDate = document.getElementById("conf-date");
 
-      if (confAmount) {
-        if (processingFee > 0) {
-          confAmount.innerHTML =
-            currencySymbol + amount.toFixed(2) + " " + currency +
-            '<span class="conf-fee-note"> (includes ' + currencySymbol + processingFee.toFixed(2) + ' ' + escapeHtml(feeProviderLabel) + ' processing fee)</span>';
-        } else {
-          confAmount.textContent =
-            currencySymbol + amount.toFixed(2) + " " + currency;
-        }
-      }
+      if (confAmount)
+        confAmount.textContent =
+          currencySymbol + amount.toFixed(2) + " " + currency;
       if (confRef) confRef.textContent = referenceNumber;
       if (confMethod) confMethod.textContent = method;
       if (confDate)

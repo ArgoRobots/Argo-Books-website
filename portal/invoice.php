@@ -402,11 +402,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             <?php if (!$isPaid && !empty($paymentMethods)): ?>
                 <div class="payment-section" id="payment-section">
                     <h3>Pay This Invoice</h3>
-                    <?php if ($processingFee > 0): ?>
-                        <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></strong> <span class="payment-fee-note">(includes <?php echo $currencySymbol . number_format($processingFee, 2); ?> <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee)</span></p>
-                    <?php else: ?>
-                        <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></strong></p>
-                    <?php endif; ?>
+                    <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></strong></p>
 
                     <?php if ($singleMethod): ?>
                         <!-- Single payment method: go straight to form -->

@@ -976,9 +976,6 @@ body {
    Tables (All Invoices)
    ============================================ */
 
-.all-invoices-table-wrapper {
-}
-
 .all-invoices-table {
     width: 100%;
     border-collapse: collapse;

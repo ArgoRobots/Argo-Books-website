@@ -38,11 +38,11 @@ if (empty($webhookId)) {
 
 // PayPal webhook verification
 $paypalClientId = $is_production
-    ? $_ENV['PAYPAL_LIVE_CLIENT_ID']
-    : $_ENV['PAYPAL_SANDBOX_CLIENT_ID'];
+    ? ($_ENV['PAYPAL_LIVE_CLIENT_ID'] ?? '')
+    : ($_ENV['PAYPAL_SANDBOX_CLIENT_ID'] ?? '');
 $paypalSecret = $is_production
-    ? $_ENV['PAYPAL_LIVE_CLIENT_SECRET']
-    : $_ENV['PAYPAL_SANDBOX_CLIENT_SECRET'];
+    ? ($_ENV['PAYPAL_LIVE_CLIENT_SECRET'] ?? '')
+    : ($_ENV['PAYPAL_SANDBOX_CLIENT_SECRET'] ?? '');
 $paypalBaseUrl = $is_production
     ? 'https://api-m.paypal.com'
     : 'https://api-m.sandbox.paypal.com';
@@ -58,7 +58,14 @@ curl_setopt_array($ch, [
     CURLOPT_SSL_VERIFYPEER => true,
     CURLOPT_SSL_VERIFYHOST => 2,
 ]);
-$tokenResponse = json_decode(curl_exec($ch), true);
+$response = curl_exec($ch);
+if ($response === false) {
+    error_log('PayPal token request failed: ' . curl_error($ch));
+    curl_close($ch);
+    send_json_response(200, ['received' => true]); // acknowledge to prevent retries
+    exit;
+}
+$tokenResponse = json_decode($response, true);
 curl_close($ch);
 
 if (empty($tokenResponse['access_token'])) {
@@ -107,7 +114,43 @@ switch ($eventType) {
     case 'PAYMENT.CAPTURE.COMPLETED':
         // Payment completed - this is handled by process-payment.php
         // This webhook serves as a backup confirmation
-        error_log('Portal PayPal webhook: Payment capture completed for order ' . ($data['resource']['id'] ?? 'unknown'));
+        $resource = $data['resource'] ?? [];
+        error_log('Portal PayPal webhook: Payment capture completed for order ' . ($resource['id'] ?? 'unknown'));
+
+        $captureAmount = floatval($resource['amount']['value'] ?? 0);
+        $captureCurrency = strtoupper($resource['amount']['currency_code'] ?? 'USD');
+        $captureId = $resource['id'] ?? '';
+        $orderId = $resource['supplementary_data']['related_ids']['order_id'] ?? '';
+        $invoiceRef = $resource['invoice_id'] ?? ($resource['custom_id'] ?? '');
+
+        if (!empty($captureId) && $captureAmount > 0 && !empty($invoiceRef)) {
+            // Look up the invoice by invoice_id to get the company_id
+            $db = get_db_connection();
+            $stmt = $db->prepare(
+                'SELECT company_id, invoice_id, customer_name FROM portal_invoices WHERE invoice_id = ? LIMIT 1'
+            );
+            $stmt->bind_param('s', $invoiceRef);
+            $stmt->execute();
+            $invoiceRecord = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            $db->close();
+
+            if ($invoiceRecord) {
+                record_portal_payment([
+                    'company_id' => (int) $invoiceRecord['company_id'],
+                    'invoice_id' => $invoiceRecord['invoice_id'],
+                    'customer_name' => $invoiceRecord['customer_name'] ?? '',
+                    'amount' => $captureAmount,
+                    'currency' => $captureCurrency,
+                    'payment_method' => 'paypal',
+                    'provider_payment_id' => $orderId ?: $captureId,
+                    'provider_transaction_id' => $captureId,
+                    'reference_number' => generate_reference_number(),
+                    'status' => 'completed',
+                    'payment_environment' => $is_production ? 'production' : 'sandbox',
+                ]);
+            }
+        }
         break;
 
     case 'PAYMENT.CAPTURE.REFUNDED':

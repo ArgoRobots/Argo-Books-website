@@ -35,8 +35,8 @@ if (empty($webhook_secret)) {
 }
 
 $stripe_secret_key = $is_production
-    ? $_ENV['STRIPE_LIVE_SECRET_KEY']
-    : $_ENV['STRIPE_SANDBOX_SECRET_KEY'];
+    ? ($_ENV['STRIPE_LIVE_SECRET_KEY'] ?? '')
+    : ($_ENV['STRIPE_SANDBOX_SECRET_KEY'] ?? '');
 
 \Stripe\Stripe::setApiKey($stripe_secret_key);
 
@@ -87,8 +87,10 @@ function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
         return;
     }
 
-    $amount = $paymentIntent->amount / 100;
     $currency = strtoupper($paymentIntent->currency);
+    $zeroDecimalCurrencies = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
+    $divisor = in_array($currency, $zeroDecimalCurrencies) ? 1 : 100;
+    $amount = $paymentIntent->amount / $divisor;
 
     // Record the payment (idempotent - will skip if already recorded)
     record_portal_payment([
@@ -138,7 +140,10 @@ function handle_refund(\Stripe\Charge $charge): void
     }
 
     // Calculate refund amount
-    $refundAmount = $charge->amount_refunded / 100;
+    $refundCurrency = strtoupper($originalPayment['currency'] ?? 'USD');
+    $zeroDecimalCurrencies = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
+    $divisor = in_array($refundCurrency, $zeroDecimalCurrencies) ? 1 : 100;
+    $refundAmount = $charge->amount_refunded / $divisor;
 
     // Record the refund as a negative payment
     record_portal_payment([

@@ -78,7 +78,8 @@ $invoiceId = $invoice['invoice_id'] ?? '';
 $totalAmount = floatval($invoice['total_amount']);
 $balanceDue = floatval($invoice['balance_due']);
 $currency = $invoice['currency'] ?: 'USD';
-$currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+$currencySymbols = ['USD' => '$', 'CAD' => 'CA$', 'EUR' => '€', 'GBP' => '£', 'AUD' => 'A$', 'JPY' => '¥', 'CHF' => 'CHF ', 'CNY' => '¥', 'INR' => '₹', 'MXN' => 'MX$'];
+$currencySymbol = $currencySymbols[$currency] ?? '$';
 $dueDate = $invoice['due_date'] ?? '';
 $status = $invoice['status'] ?? 'sent';
 $issueDate = $invoiceData['issueDate'] ?? $invoiceData['IssueDate'] ?? $invoice['created_at'] ?? '';
@@ -310,16 +311,16 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                             <?php if (!empty($lineItems)): ?>
                                 <?php foreach ($lineItems as $item): ?>
                                     <tr>
-                                        <td class="col-description">
+                                        <td class="col-description" data-label="Description">
                                             <?php echo htmlspecialchars($item['description'] ?? $item['Description'] ?? ''); ?>
                                         </td>
-                                        <td class="col-qty">
+                                        <td class="col-qty" data-label="Qty">
                                             <?php echo htmlspecialchars($item['quantity'] ?? $item['Quantity'] ?? 1); ?>
                                         </td>
-                                        <td class="col-price">
+                                        <td class="col-price" data-label="Price">
                                             <?php echo $currencySymbol . number_format(floatval($item['unitPrice'] ?? $item['UnitPrice'] ?? $item['price'] ?? $item['Price'] ?? 0), 2); ?>
                                         </td>
-                                        <td class="col-total">
+                                        <td class="col-total" data-label="Amount">
                                             <?php echo $currencySymbol . number_format(floatval($item['total'] ?? $item['Total'] ?? $item['amount'] ?? $item['Amount'] ?? 0), 2); ?>
                                         </td>
                                     </tr>
@@ -333,7 +334,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     </table>
 
                     <div class="invoice-totals">
-                        <?php if ($subtotal != $totalAmount): ?>
+                        <?php if (abs($subtotal - $totalAmount) > 0.01): ?>
                             <div class="total-row">
                                 <span>Subtotal</span>
                                 <span><?php echo $currencySymbol . number_format(floatval($subtotal), 2); ?></span>

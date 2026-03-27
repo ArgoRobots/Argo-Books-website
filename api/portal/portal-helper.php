@@ -53,6 +53,9 @@ function authenticate_portal_request(): ?array
         return null;
     }
 
+    // SECURITY TODO: API keys should be stored as hashed values. Current plaintext
+    // storage is a risk if the database is compromised. This requires a schema migration
+    // to store hashed keys and a key rotation plan for existing integrations.
     $db = get_db_connection();
     $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key = ? LIMIT 1');
     $stmt->bind_param('s', $providedApiKey);
@@ -413,6 +416,10 @@ function get_invoices_by_customer_token(string $customerToken): array
  */
 function record_portal_payment(array $params): array
 {
+    if (!is_numeric($params['amount']) || $params['amount'] <= 0) {
+        return ['success' => false, 'error' => 'Invalid payment amount'];
+    }
+
     $db = get_db_connection();
 
     $companyId = $params['company_id'];
@@ -428,34 +435,16 @@ function record_portal_payment(array $params): array
     $status = $params['status'] ?? 'completed';
     $paymentEnvironment = $params['payment_environment'] ?? null;
 
-    // Check for duplicate payment (idempotency)
-    if (!empty($providerPaymentId)) {
-        $stmt = $db->prepare(
-            'SELECT id, reference_number FROM portal_payments
-             WHERE provider_payment_id = ? LIMIT 1'
-        );
-        $stmt->bind_param('s', $providerPaymentId);
-        $stmt->execute();
-        $existing = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-
-        if ($existing) {
-            $db->close();
-            return [
-                'success' => true,
-                'reference_number' => $existing['reference_number'],
-                'message' => 'Payment already recorded'
-            ];
-        }
-    }
-
-    // Insert payment record
+    // Use INSERT ... ON DUPLICATE KEY UPDATE to prevent race conditions on duplicate payments.
+    // SCHEMA REQUIREMENT: A UNIQUE index on `provider_payment_id` is required in portal_payments
+    // for this to work correctly. e.g.: ALTER TABLE portal_payments ADD UNIQUE INDEX (provider_payment_id);
     $stmt = $db->prepare(
         'INSERT INTO portal_payments
          (company_id, invoice_id, customer_name, amount, processing_fee,
           currency, payment_method, provider_payment_id, provider_transaction_id,
           reference_number, status, synced_to_argo, payment_environment, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW())'
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW())
+         ON DUPLICATE KEY UPDATE id=id'
     );
     $stmt->bind_param(
         'issddsssssss',
@@ -466,15 +455,37 @@ function record_portal_payment(array $params): array
 
     if (!$stmt->execute()) {
         $error = $stmt->error;
+        error_log('Portal payment DB error: ' . $error);
         $stmt->close();
         $db->close();
         return [
             'success' => false,
-            'message' => 'Failed to record payment: ' . $error
+            'message' => 'Failed to record payment'
         ];
     }
+
+    // ON DUPLICATE KEY UPDATE sets affected_rows to 2 when a duplicate is found.
+    // affected_rows == 1 means a new row was inserted.
+    $affectedRows = $stmt->affected_rows;
     $paymentId = $stmt->insert_id;
     $stmt->close();
+
+    if ($affectedRows !== 1 && !empty($providerPaymentId)) {
+        // Duplicate payment detected — return existing reference
+        $stmt = $db->prepare(
+            'SELECT reference_number FROM portal_payments WHERE provider_payment_id = ? LIMIT 1'
+        );
+        $stmt->bind_param('s', $providerPaymentId);
+        $stmt->execute();
+        $existing = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        $db->close();
+        return [
+            'success' => true,
+            'reference_number' => $existing['reference_number'] ?? $referenceNumber,
+            'message' => 'Payment already recorded'
+        ];
+    }
 
     // Update invoice balance if payment completed.
     // Subtract only the invoice portion (excluding processing fee) from the balance.
@@ -685,7 +696,7 @@ function send_invoice_notification(array $params): array
             'X-Mailer: ArgoBooks/1.0'
         ];
 
-        $to = $customerName ? "{$customerName} <{$customerEmail}>" : $customerEmail;
+        $to = $customerName ? '"' . str_replace('"', '', $customerName) . '" <' . $customerEmail . '>' : $customerEmail;
         $result = mail($to, $subject, $html, implode("\r\n", $headers));
 
         if ($result) {
@@ -766,7 +777,7 @@ function send_payment_confirmation(array $params): array
             'X-Mailer: ArgoBooks/1.0'
         ];
 
-        $to = $customerName ? "{$customerName} <{$customerEmail}>" : $customerEmail;
+        $to = $customerName ? '"' . str_replace('"', '', $customerName) . '" <' . $customerEmail . '>' : $customerEmail;
         $result = mail($to, $subject, $html, implode("\r\n", $headers));
 
         if ($result) {

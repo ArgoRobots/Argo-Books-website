@@ -67,10 +67,12 @@ $db->close();
 // Determine connected payment methods
 $paymentMethods = get_available_payment_methods($company);
 
+$portalBaseUrl = $_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com/portal/';
+
 send_json_response(200, [
     'success' => true,
     'connected' => true,
-    'portalUrl' => 'https://argorobots.com/portal/',
+    'portalUrl' => $portalBaseUrl,
     'company' => [
         'name' => $company['company_name'],
         'logo_url' => $company['company_logo_url'],

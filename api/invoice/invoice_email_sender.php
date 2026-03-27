@@ -20,7 +20,7 @@ class InvoiceEmailSender
         $this->defaultFromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
         $this->defaultFromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
         $this->logEnabled = filter_var($_ENV['INVOICE_LOG_ENABLED'] ?? getenv('INVOICE_LOG_ENABLED') ?? true, FILTER_VALIDATE_BOOLEAN);
-        $this->logFile = $_ENV['INVOICE_LOG_FILE'] ?? getenv('INVOICE_LOG_FILE') ?: __DIR__ . '/logs/invoice_emails.log';
+        $this->logFile = $_ENV['INVOICE_LOG_FILE'] ?? getenv('INVOICE_LOG_FILE') ?: __DIR__ . '/../../logs/invoice_emails.log';
     }
 
     /**
@@ -37,6 +37,8 @@ class InvoiceEmailSender
             // Get sender info
             $fromEmail = $data['from'] ?? $this->defaultFromEmail;
             $fromName = $data['fromName'] ?? $this->defaultFromName;
+            // Sanitize fromName to prevent email header injection
+            $fromName = preg_replace('/[\r\n\x00-\x1f]/', '', $fromName);
             $toEmail = $data['to'];
             $toName = $data['toName'] ?? '';
             $subject = $data['subject'];
@@ -223,7 +225,7 @@ class InvoiceEmailSender
      */
     private function generateMessageId(string $invoiceId): string
     {
-        $domain = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $domain = 'argorobots.com';
         $timestamp = time();
         $random = bin2hex(random_bytes(8));
         return "<{$invoiceId}.{$timestamp}.{$random}@{$domain}>";

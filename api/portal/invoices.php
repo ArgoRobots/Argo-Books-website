@@ -86,9 +86,12 @@ function handle_publish_invoice(): void
     $customerName = $data['customerName'];
     $totalAmount = floatval($data['totalAmount']);
     $balanceDue = floatval($data['balanceDue']);
-    $currency = $data['currency'] ?? 'USD';
+    $currency = strtoupper(preg_replace('/[^A-Za-z]/', '', $data['currency'] ?? 'USD') ?: 'USD');
     $dueDate = $data['dueDate'] ?? null;
-    $status = $data['status'] ?? 'sent';
+    $allowedStatuses = ['draft', 'pending', 'sent', 'viewed', 'partial', 'paid', 'overdue', 'cancelled'];
+    $status = in_array(strtolower($data['status'] ?? 'pending'), $allowedStatuses) ? strtolower($data['status'] ?? 'pending') : 'pending';
+    // Prevent callers from directly setting status to 'paid' — that should only happen through payment processing
+    if ($status === 'paid') { $status = 'pending'; }
     $passProcessingFee = filter_var($data['passProcessingFee'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 
     if ($existing) {

@@ -49,6 +49,21 @@ if (!$license) {
     exit;
 }
 
+// Rate limit: 500 emails per hour per license key (prevents abuse while allowing legitimate bulk use)
+$rateLimitKey = 'email_' . ($license['license_key_hash'] ?? get_client_ip());
+if (is_rate_limited($rateLimitKey, 500, 3600, 'invoice_email')) {
+    http_response_code(429);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Email rate limit exceeded. Please try again later.',
+        'messageId' => null,
+        'errorCode' => 'RATE_LIMITED',
+        'timestamp' => date('c')
+    ]);
+    exit;
+}
+record_rate_limit_attempt($rateLimitKey, 'invoice_email');
+
 // Get JSON input
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);

@@ -57,8 +57,46 @@ switch ($eventType) {
     case 'payment.completed':
         // Payment completed - handled primarily by checkout.php
         // This webhook serves as a backup confirmation
-        $paymentId = $data['data']['object']['payment']['id'] ?? 'unknown';
+        $payment = $data['data']['object']['payment'] ?? [];
+        $paymentId = $payment['id'] ?? 'unknown';
         error_log("Portal Square webhook: Payment completed - $paymentId");
+
+        $squareAmount = floatval($payment['amount_money']['amount'] ?? 0) / 100;
+        $squareCurrency = strtoupper($payment['amount_money']['currency'] ?? 'USD');
+        $squareOrderId = $payment['order_id'] ?? '';
+        $squareReferenceId = $payment['reference_id'] ?? '';
+        $squareNote = $payment['note'] ?? '';
+
+        // Try to extract invoice reference from reference_id or note
+        $invoiceRef = $squareReferenceId ?: $squareNote;
+
+        if (!empty($paymentId) && $paymentId !== 'unknown' && $squareAmount > 0 && !empty($invoiceRef)) {
+            $db = get_db_connection();
+            $stmt = $db->prepare(
+                'SELECT company_id, invoice_id, customer_name FROM portal_invoices WHERE invoice_id = ? LIMIT 1'
+            );
+            $stmt->bind_param('s', $invoiceRef);
+            $stmt->execute();
+            $invoiceRecord = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            $db->close();
+
+            if ($invoiceRecord) {
+                record_portal_payment([
+                    'company_id' => (int) $invoiceRecord['company_id'],
+                    'invoice_id' => $invoiceRecord['invoice_id'],
+                    'customer_name' => $invoiceRecord['customer_name'] ?? '',
+                    'amount' => $squareAmount,
+                    'currency' => $squareCurrency,
+                    'payment_method' => 'square',
+                    'provider_payment_id' => $paymentId,
+                    'provider_transaction_id' => $squareOrderId ?: $paymentId,
+                    'reference_number' => generate_reference_number(),
+                    'status' => 'completed',
+                    'payment_environment' => ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
+                ]);
+            }
+        }
         break;
 
     case 'refund.created':

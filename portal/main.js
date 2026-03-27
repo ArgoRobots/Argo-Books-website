@@ -526,7 +526,7 @@ document.addEventListener("DOMContentLoaded", function () {
           if (container) {
             container.innerHTML =
               '<div class="payment-error-box">Failed to load card form: ' +
-              err.message +
+              escapeHtml(err.message) +
               "</div>";
           }
         });
@@ -553,6 +553,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ============= UI HELPERS =============
 
   function showProcessing() {
+    if (document.getElementById('portal-processing')) return;
     var overlay = document.createElement("div");
     overlay.className = "processing-overlay";
     overlay.id = "portal-processing";

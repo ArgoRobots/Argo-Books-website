@@ -91,6 +91,8 @@ AddDefaultCharset UTF-8
             https://googleads.g.doubleclick.net \
             https://*.doubleclick.net; \
         style-src 'self' 'unsafe-inline' \
+            https://argorobots.com \
+            https://dev.argorobots.com \
             https://fonts.googleapis.com \
             https://cdnjs.cloudflare.com \
             https://*.paypalobjects.com \

@@ -113,6 +113,13 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 <html lang="en">
 
 <head>
+    <script>
+        // Apply saved theme immediately to prevent flash
+        (function() {
+            var theme = localStorage.getItem('admin-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">

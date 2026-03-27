@@ -1,0 +1,45 @@
+{
+    "free": {
+        "name": "Free",
+        "price": 0,
+        "period": "forever",
+        "tag": "Free Forever",
+        "description": "Perfect for getting started",
+        "note": "No credit card required",
+        "badge": null,
+        "cta": {
+            "text": "Download for Free",
+            "url": "/downloads/"
+        },
+        "features": [
+            {"label": "Unlimited products"},
+            {"label": "Unlimited transactions"},
+            {"label": "Real-time analytics"},
+            {"label": "Receipt management"},
+            {"label": "5 invoices / month"},
+            {"label": "AI spreadsheet import", "detail": "100/month"}
+        ]
+    },
+    "premium": {
+        "name": "Premium",
+        "price": null,
+        "period": "CAD/month",
+        "tag": "Premium",
+        "description": "Unlock the full power of Argo Books",
+        "note": null,
+        "badge": "AI-Powered",
+        "cta": {
+            "text": "Get Premium",
+            "url": "/pricing/premium/"
+        },
+        "features": [
+            {"label": "Everything in Free"},
+            {"label": "Unlimited products"},
+            {"label": "Biometric login security"},
+            {"label": "Unlimited invoices & payments"},
+            {"label": "AI receipt scanning", "detail": "500/month"},
+            {"label": "Predictive analytics"},
+            {"label": "Priority support"}
+        ]
+    }
+}

@@ -8,6 +8,7 @@ require_once __DIR__ . '/../../../config/pricing.php';
 require_once __DIR__ . '/../../../resources/icons.php';
 
 $pricing = get_pricing_config();
+$plans = get_plan_features();
 $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
@@ -33,30 +34,12 @@ include '../../docs-header.php';
                         <div class="version-price">$0</div>
                     </div>
                     <ul class="feature-list">
+                        <?php foreach ($plans['free']['features'] as $feature): ?>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Up to 10 products</span>
+                            <span class="feature-text"><?= render_feature_label($feature) ?></span>
                         </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Unlimited transactions</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Real-time analytics</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Receipt management</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">5 invoices / month</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">AI spreadsheet import <span>(100/month)</span></span>
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                     <a href="../../../downloads/" class="btn btn-gray">Get Started for Free</a>
                 </div>
@@ -70,34 +53,12 @@ include '../../docs-header.php';
                         <p class="price-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
                     </div>
                     <ul class="feature-list">
+                        <?php foreach ($plans['premium']['features'] as $feature): ?>
                         <li class="feature-item">
                             <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Everything in Free</span>
+                            <span class="feature-text"><?= render_feature_label($feature) ?></span>
                         </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Unlimited products</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Biometric login security</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Unlimited invoices & payments</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">AI receipt scanning <span>(500/month)</span></span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Predictive analytics</span>
-                        </li>
-                        <li class="feature-item">
-                            <?= svg_icon('check-alt', 20, 'check-icon') ?>
-                            <span class="feature-text">Priority support</span>
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                     <a href="../../../pricing/premium/" class="btn btn-purple">Subscribe to Premium</a>
                 </div>

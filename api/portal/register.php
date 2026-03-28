@@ -74,7 +74,12 @@ if (!empty($ownerEmail)) {
         // Rotate API key: generate new key and store its hash
         $rotatedKey = bin2hex(random_bytes(32));
         $rotatedHash = hash('sha256', $rotatedKey);
-        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ?, api_key = "" WHERE id = ?');
+        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
+        if ($rotateStmt === false) {
+            error_log('Portal registration failed: failed to prepare API key rotation statement: ' . $db->error);
+            $db->close();
+            send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
+        }
         $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
         $rotateStmt->execute();
         $rotateStmt->close();

@@ -53,25 +53,27 @@ function authenticate_portal_request(): ?array
         return null;
     }
 
-    // Look up by hashed API key, then fall back to plaintext for existing records
     $apiKeyHash = hash('sha256', $providedApiKey);
     $db = get_db_connection();
 
-    // Try hash-based lookup first
     $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
+    if ($stmt === false) {
+        error_log('authenticate_portal_request: DB prepare failed: ' . $db->error);
+        $db->close();
+        return null;
+    }
+
     $stmt->bind_param('s', $apiKeyHash);
-    $stmt->execute();
+
+    if (!$stmt->execute()) {
+        error_log('authenticate_portal_request: DB execute failed: ' . $stmt->error);
+        $stmt->close();
+        $db->close();
+        return null;
+    }
+
     $company = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-
-    if (!$company) {
-        // Fall back to plaintext key for records that haven't been re-registered
-        $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key = ? LIMIT 1');
-        $stmt->bind_param('s', $providedApiKey);
-        $stmt->execute();
-        $company = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-    }
 
     $db->close();
     return $company ?: null;
@@ -614,7 +616,7 @@ function set_portal_headers(): void
 {
     $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);
-    header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
     header('X-Content-Type-Options: nosniff');
 }

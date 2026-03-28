@@ -163,7 +163,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         <?php else: ?>
             <div class="login-header">
                 <h1>Admin Login</h1>
-                <p>Enter your credentials to access the license management system</p>
             </div>
 
             <?php if ($error): ?>

@@ -94,6 +94,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
 
+    <link rel="stylesheet" href="../features/style.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
@@ -182,6 +183,192 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         </div>
     </section>
 
+    <!-- =============================================
+         PREMIUM FEATURES INTRO
+         ============================================= -->
+    <section class="premium-intro">
+        <div class="container">
+            <div class="premium-intro-inner animate-on-scroll">
+                <div class="premium-intro-badge">
+                    <?= svg_icon('star', 16) ?>
+                    <span>Premium Features</span>
+                </div>
+                <h2>Everything you unlock with Premium</h2>
+                <p>The complete toolkit for running your business — AI-powered, unlimited, and built to save you time.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         DETAIL: AI Receipt Scanning
+         Text left, image right
+         ============================================= -->
+    <section class="feature-detail-section">
+        <div class="container">
+            <div class="feature-detail animate-on-scroll">
+                <div class="feature-detail-text">
+                    <span class="section-label">AI-Powered</span>
+                    <h2>Scan receipts in seconds, not minutes</h2>
+                    <p>Point your camera at any receipt and Argo Books extracts the vendor, date, and total automatically — no typing required. Receipts are categorized and attached to your expense records instantly.</p>
+                    <ul class="feature-checklist">
+                        <li><?= svg_icon('check', 20) ?><span>Up to 500 AI scans per month</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Auto-categorized by expense type</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Attached directly to your transaction records</span></li>
+                    </ul>
+                </div>
+                <div class="feature-detail-visual">
+                    <img src="../resources/images/features/receipt-archive.svg" alt="AI receipt scanning archive showing scanned receipts organized by category" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         DETAIL: Predictive Analytics
+         Image left, text right (reversed)
+         ============================================= -->
+    <section class="feature-detail-section" style="background: var(--gray-50);">
+        <div class="container">
+            <div class="feature-detail reversed animate-on-scroll">
+                <div class="feature-detail-text">
+                    <span class="section-label">Smart Insights</span>
+                    <h2>See where your revenue is heading</h2>
+                    <p>Argo Books analyzes your historical data to surface trends and forecast revenue. Built-in charts show where your business is headed — no spreadsheets or external tools needed.</p>
+                    <ul class="feature-checklist">
+                        <li><?= svg_icon('check', 20) ?><span>Revenue and expense forecasting</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Seasonal trend detection</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Profit margin and anomaly alerts</span></li>
+                    </ul>
+                </div>
+                <div class="feature-detail-visual">
+                    <img src="../resources/images/features/analytics-dashboard.svg" alt="Predictive analytics dashboard showing revenue forecasts and trend charts" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         STATS BANNER
+         ============================================= -->
+    <section class="highlight-banner">
+        <div class="container">
+            <div class="highlight-grid animate-on-scroll">
+                <div class="highlight-item">
+                    <h3>500</h3>
+                    <p>AI receipt scans per month</p>
+                </div>
+                <div class="highlight-item">
+                    <h3>Unlimited</h3>
+                    <p>Invoices you can send</p>
+                </div>
+                <div class="highlight-item">
+                    <h3>Online</h3>
+                    <p>Payments via Stripe &amp; Square</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         DETAIL: Invoices & Payments
+         Text left, image right
+         ============================================= -->
+    <section class="feature-detail-section">
+        <div class="container">
+            <div class="feature-detail animate-on-scroll">
+                <div class="feature-detail-text">
+                    <span class="section-label">Get Paid Faster</span>
+                    <h2>Send unlimited invoices and accept online payments</h2>
+                    <p>The free plan caps invoices at 5 per month. Premium removes that limit entirely — and adds online payment links so customers can pay directly from the invoice by credit card.</p>
+                    <ul class="feature-checklist">
+                        <li><?= svg_icon('check', 20) ?><span>Unlimited invoices with no monthly cap</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Online payment links via Stripe &amp; Square</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Real-time status tracking from draft to paid</span></li>
+                    </ul>
+                </div>
+                <div class="feature-detail-visual">
+                    <img src="../resources/images/features/invoice-payment.svg" alt="Invoice payment page showing a secure online payment form with invoice details" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         BENEFITS GRID
+         ============================================= -->
+    <section class="benefits-section" style="background: var(--gray-50);">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">What You Get</span>
+                <h2 class="section-title">Six reasons to go Premium</h2>
+                <p class="section-desc">Every Premium feature is designed to save you time, reduce manual work, and give you a clearer picture of your business.</p>
+            </div>
+            <div class="benefits-grid">
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon purple">
+                        <?= svg_icon('receipt-scan', 22) ?>
+                    </div>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Snap a photo and let AI handle the data entry. Vendors, dates, and totals are extracted and categorized automatically.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon">
+                        <?= svg_icon('analytics', 22) ?>
+                    </div>
+                    <h3>Predictive Analytics</h3>
+                    <p>Historical trends become forward-looking forecasts. Know what's coming before your next bank statement arrives.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon green">
+                        <?= svg_icon('document', 22) ?>
+                    </div>
+                    <h3>Unlimited Invoices</h3>
+                    <p>Send as many invoices as your business demands and accept online payments directly — no monthly cap, ever.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon amber">
+                        <?= svg_icon('shield', 22) ?>
+                    </div>
+                    <h3>Biometric Login</h3>
+                    <p>Log in with your face or fingerprint via Windows Hello. No passwords to remember, forget, or compromise.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon cyan">
+                        <?= svg_icon('message-circle', 22) ?>
+                    </div>
+                    <h3>Priority Support</h3>
+                    <p>Premium subscribers get to the front of the queue — real help, faster, when something needs attention.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon red">
+                        <?= svg_icon('trending-up', 22) ?>
+                    </div>
+                    <h3>Higher AI Limits</h3>
+                    <p>500 receipt scans and expanded AI headroom each month — built to keep up as your business grows.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inline CTA -->
+    <section class="inline-cta">
+        <div class="container">
+            <div class="inline-cta-inner animate-on-scroll">
+                <h3>Ready to unlock Premium?</h3>
+                <p>Cancel anytime. No lock-in.</p>
+                <div class="inline-cta-buttons">
+                    <a href="premium/" class="btn-cta btn-cta-primary">
+                        <span>Get Premium</span>
+                        <?= svg_icon('arrow-right', 18) ?>
+                    </a>
+                    <a href="../downloads/" class="btn-cta btn-cta-outline">
+                        <span>Download Free</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="faq">
         <div class="container">
             <h2>Frequently Asked Questions</h2>
@@ -247,6 +434,21 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-visible');
+                }
+            });
+        }, observerOptions);
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
         const faqItems = document.querySelectorAll('.faq-item');
         faqItems.forEach(item => {
             const question = item.querySelector('.faq-question');
@@ -265,9 +467,29 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     </main>
 
-    <footer class="footer">
-        <div id="includeFooter"></div>
-    </footer>
+    <div class="dark-section-wrapper">
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-card animate-on-scroll">
+                    <h2>The complete toolkit for $<?php echo number_format($monthlyPrice, 0); ?>/month</h2>
+                    <p>Everything in Free, plus AI receipt scanning, predictive analytics, unlimited invoices, and biometric login.</p>
+                    <div class="cta-buttons">
+                        <a href="premium/" class="btn-cta btn-cta-primary">
+                            <span>Get Premium</span>
+                            <?= svg_icon('arrow-right', 18) ?>
+                        </a>
+                        <a href="../downloads/" class="btn-cta btn-cta-ghost">
+                            <span>Download Free</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div id="includeFooter"></div>
+        </footer>
+    </div>
 </body>
 
 </html>

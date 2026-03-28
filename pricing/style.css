@@ -291,6 +291,58 @@ body {
   box-shadow: 0 4px 15px var(--purple-alpha-40);
 }
 
+/* ========================================
+   Premium Features Intro
+   ======================================== */
+.premium-intro {
+    padding: 80px 0 0;
+    background: var(--white);
+    text-align: center;
+}
+
+.premium-intro-inner {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.premium-intro-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, var(--purple-50), var(--purple-100));
+    color: var(--purple-600);
+    border: 1px solid var(--purple-200);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.premium-intro-badge svg {
+    color: var(--purple-500);
+}
+
+.premium-intro h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}
+
+.premium-intro p {
+    font-size: 1.1rem;
+    color: var(--gray-500);
+    line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+    .premium-intro h2 {
+        font-size: 1.75rem;
+    }
+}
+
 .payment-grid {
   display: grid;
   gap: 16px;

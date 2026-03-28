@@ -33,6 +33,9 @@ if (empty($data['companyName']) || !is_string($data['companyName'])) {
 }
 
 $companyName = trim($data['companyName']);
+if ($companyName === '') {
+    send_error_response(400, 'Company name cannot be blank.', 'INVALID_NAME');
+}
 if (mb_strlen($companyName) > 255) {
     send_error_response(400, 'Company name must be 255 characters or fewer.', 'NAME_TOO_LONG');
 }
@@ -41,6 +44,11 @@ $companyId = $company['id'];
 
 $db = get_db_connection();
 $stmt = $db->prepare('UPDATE portal_companies SET company_name = ? WHERE id = ?');
+if ($stmt === false) {
+    error_log('Portal company name update DB prepare error: ' . $db->error);
+    $db->close();
+    send_error_response(500, 'Failed to update company name. Please try again.', 'DB_ERROR');
+}
 $stmt->bind_param('si', $companyName, $companyId);
 
 if (!$stmt->execute()) {

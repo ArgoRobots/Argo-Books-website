@@ -2,6 +2,7 @@
 .env*
 *.exe
 .VSCodeCounter
+/.claude
 GitHub Actions Secrets Backup.txt
 SSH Key.ppk
 error_log.txt

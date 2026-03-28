@@ -303,7 +303,7 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     INDEX idx_email (email),
     INDEX idx_status (status),
     INDEX idx_end_date (end_date),
-    INDEX idx_renewal (status, end_date, auto_renew),
+    INDEX idx_renewal (status, end_date, auto_renew)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Premium Subscription Payments table

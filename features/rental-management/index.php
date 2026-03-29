@@ -61,26 +61,34 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "Can Argo Books track overdue rental returns automatically?",
+                    "name": "How does Argo Books track overdue rentals?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books automatically flags rentals as overdue when the return date passes, with color-coded status badges for easy identification."
+                        "text": "Argo Books automatically flags rentals as overdue when the return date passes. Color-coded status badges make it easy to spot late returns at a glance, so nothing slips through the cracks. You can see all overdue, active, and completed rentals from a single dashboard."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does the rental management feature support deposit tracking?",
+                    "name": "Can I track deposits and payments for rentals?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can set deposit amounts per rental item and track paid or unpaid deposit status for each booking."
+                        "text": "Yes. You can set deposit amounts per rental item and track whether each deposit has been paid or is still outstanding. When the rental is complete, you can generate a professional invoice directly from the rental record with one click — customer details and pricing auto-populate, so there's no double entry."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I generate invoices from rental records?",
+                    "name": "Is rental management included in the Free plan?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can generate professional invoices directly from any rental record with one click. Customer details and pricing auto-populate."
+                        "text": "Yes. Rental management is a core feature available on both the Free and Premium plans. You can create and manage rental bookings, track deposits, and monitor return dates at no cost. Premium users additionally benefit from unlimited invoicing directly from rental records."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What types of businesses use rental management in Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Rental management in Argo Books is designed for any business that lends or rents items — equipment rental companies, tool libraries, party supply rentals, AV equipment providers, and more. If you need to track who has what, when it's due back, and what they owe, Argo Books handles it."
                     }
                 }
             ]

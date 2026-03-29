@@ -64,23 +64,31 @@
                     "name": "Can Argo Books track inventory across multiple locations?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can add unlimited locations such as warehouses, stores, and offices, and track per-location stock levels, inventory value, and capacity."
+                        "text": "Yes. You can add unlimited locations — warehouses, stores, offices, or any other facility — and track per-location stock levels, inventory value, and capacity. Everything is visible from a single dashboard, so you always know what you have and where it is."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books support low-stock alerts and reorder points?",
+                    "name": "How do low-stock alerts work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can set configurable reorder points per product, and Argo Books alerts you with status badges when stock is low or out."
+                        "text": "You can set a reorder point for each product. When stock drops to that level, Argo Books flags it with a color-coded status badge so you know it's time to restock. No more surprise stockouts — you'll see the warning before it becomes a problem."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I create purchase orders in Argo Books?",
+                    "name": "Can I create and manage purchase orders?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Create purchase orders with supplier details and line items. Stock levels update automatically when orders are marked as received."
+                        "text": "Yes. Create purchase orders with supplier details and itemized line items directly in Argo Books. When you mark an order as received, stock levels update automatically — no manual adjustments needed. It keeps your inventory accurate without the extra work."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is inventory management included in the Free plan?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Inventory management is a core feature available on both the Free and Premium plans. You get unlimited products, multi-location tracking, low-stock alerts, and purchase orders at no cost. Premium adds predictive analytics to help you forecast demand and plan inventory purchases ahead of time."
                     }
                 }
             ]

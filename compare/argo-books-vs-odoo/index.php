@@ -56,6 +56,56 @@ $plans = get_plan_features();
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Is Argo Books really free?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. Odoo's free plan is limited to a single app, and adding a second module starts at $31.10 CAD/month."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books work offline?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure to set up and maintain."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books have CRM or HR features?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice. Argo Books is designed to do fewer things really well — it's simple to learn and doesn't require a consultant to set up."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does Argo Books pricing compare to Odoo?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $31+ CAD/month per user. Costs escalate quickly as you add modules and users."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What platforms does Argo Books run on?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs Odoo — Simpler & More Affordable | Argo Books</title>
 
@@ -179,25 +229,25 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Unlimited products</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Invoicing &amp; payments</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Inventory management</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
@@ -351,7 +401,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and unlimited products. No credit card required, no trial period — it's free forever. Premium unlocks AI features, invoicing, and more.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
+                            <p>Odoo's free plan is limited to a single app, and adding a second module starts at $31.10 CAD/month.</p>
                         </div>
                     </div>
                 </div>
@@ -365,7 +416,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books is a desktop application that works offline. Your data is stored locally on your device, so you can manage your finances even without an internet connection. Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure.</p>
+                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
+                            <p>Odoo Online requires a constant internet connection, and self-hosted Odoo requires significant IT infrastructure to set up and maintain.</p>
                         </div>
                     </div>
                 </div>
@@ -379,21 +431,38 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No. Argo Books is focused on finance management, inventory, and invoicing. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice. Argo Books is designed to do fewer things really well.</p>
+                            <p>No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice.</p>
+                            <p>Argo Books is designed to do fewer things really well — it's simple to learn and doesn't require a consultant to set up.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What platforms does Argo Books support?</h3>
+                        <h3>How does Argo Books pricing compare to Odoo?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available on Windows, macOS, and Linux as a native desktop application.</p>
+                            <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $31+ CAD/month per user.</p>
+                            <p>Costs escalate quickly as you add modules and users.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What platforms does Argo Books run on?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy.</p>
                         </div>
                     </div>
                 </div>

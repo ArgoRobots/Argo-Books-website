@@ -116,50 +116,58 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "What platforms does Argo Books support?",
+                    "name": "What is Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is available for Windows, macOS, and Linux."
+                        "text": "Argo Books is desktop accounting and business management software for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts with AI, manage products and inventory, and run real-time financial reports — all from your own computer. Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is my data secure?",
+                    "name": "How does Argo Books work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely. Your data is stored locally on your computer using AES-256 encryption - the same standard used by banks and government agencies. We don't store your business data on our servers. Premium users can also enable Windows Hello for biometric authentication."
+                        "text": "Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts using AI. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health. Premium users unlock predictive analytics, unlimited invoicing, and more."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How does AI receipt scanning work?",
+                    "name": "Can I use Argo Books for free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the supplier name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy."
+                        "text": "Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month. When your business is ready for more, you can upgrade to Premium at any time."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I try Argo Books for free?",
+                    "name": "Is my business data secure?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes! Argo Books has a free tier that includes unlimited products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready."
+                        "text": "Your data is stored locally on your computer — not on a remote server — so you always have full control. Argo Books uses AES-256-GCM encryption, the same standard used by banks and government agencies. Premium users can also enable biometric login via Windows Hello for an extra layer of security. We never store your business data on our servers."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What's included in the Premium subscription?",
+                    "name": "Which plan is right for me — Free or Premium?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes unlimited products, invoices & payments, predictive analytics, and priority support. These features help you scale your business as it grows."
+                        "text": "The Free plan is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports. Upgrade to Premium if you need unlimited invoicing, higher AI scanning limits, predictive analytics, biometric security, and priority support. Premium is available monthly or yearly with savings on the annual plan."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What is your refund policy?",
+                    "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period. If you believe you are entitled to a refund, please contact us and we'll review your request."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like AI receipt scanning, license activation, and software updates."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books offer customer support?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "All users have access to our documentation and community forum where you can ask questions, report bugs, and request features. Premium subscribers get priority support with faster response times. You can also reach us directly through our contact page — we're a small team and we read every message."
                     }
                 }
             ]
@@ -1163,90 +1171,111 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">FAQ</span>
                 <h2 class="section-title">Frequently Asked Questions</h2>
-                <p class="section-description">Everything you need to know about Argo Books. Can't find the answer you're looking for? Feel free to contact us.</p>
+                <p class="section-description">Everything you need to know about Argo Books. Can't find the answer you're looking for? <a href="contact.php">Get in touch</a> — we read every message.</p>
             </div>
 
             <div class="faq-grid">
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>What platforms does Argo Books support?</h3>
+                        <h3>What is Argo Books?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available for Windows, macOS, and Linux.</p>
+                            <p>Argo Books is desktop accounting and business management software built for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts with AI, manage products and inventory, and run real-time financial reports — all from your own computer.</p>
+                            <p>Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy. Argo Books is available on Windows, macOS, and Linux.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>Is my data secure?</h3>
+                        <h3>How does Argo Books work?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Absolutely. Your data is stored locally on your computer using AES-256 encryption - the same standard used by banks and government agencies. We don't store your business data on our servers. Premium users can also enable Windows Hello for biometric authentication.</p>
+                            <p>Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts using AI. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health.</p>
+                            <p>Premium users unlock predictive analytics, unlimited invoicing, and priority support. <a href="downloads/">Download Argo Books</a> and start managing your business in minutes.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>How does AI receipt scanning work?</h3>
+                        <h3>Can I use Argo Books for free?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the supplier name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy.</p>
+                            <p>Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month.</p>
+                            <p>When your business is ready for more, you can upgrade to Premium at any time. <a href="pricing/">Compare plans</a></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>Can I try Argo Books for free?</h3>
+                        <h3>Is my business data secure?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes! Argo Books has a free tier that includes unlimited products, unlimited transactions, real-time analytics, and receipt management. No credit card required to get started. You can upgrade whenever you're ready.</p>
+                            <p>Your data is stored locally on your computer — not on a remote server — so you always have full control. Argo Books uses AES-256-GCM encryption, the same standard used by banks and government agencies. Premium users can also enable biometric login via Windows Hello for an extra layer of security.</p>
+                            <p>We never store your business data on our servers. Your books are yours and yours alone.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>What's included in the Premium subscription?</h3>
+                        <h3>Which plan is right for me — Free or Premium?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>The Premium subscription ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) includes unlimited products, invoices & payments, predictive analytics, and priority support. These features help you scale your business as it grows.</p>
+                            <p>The <strong>Free plan</strong> is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports.</p>
+                            <p>Upgrade to <strong>Premium</strong> ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) if you need unlimited invoicing, higher AI scanning limits, predictive analytics, biometric security, and priority support. Save with the annual plan. <a href="pricing/">View pricing details</a></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item animate-on-scroll">
                     <div class="faq-question">
-                        <h3>What is your refund policy?</h3>
+                        <h3>What platforms does Argo Books run on?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>You can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period. If you believe you are entitled to a refund, please contact us and we'll review your request. <a href="legal/refund.php" class="link">View full refund policy</a></p>
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like AI receipt scanning, license activation, and software updates.</p>
+                            <p><a href="downloads/">Download for your platform</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item animate-on-scroll">
+                    <div class="faq-question">
+                        <h3>Does Argo Books offer customer support?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>All users have access to our <a href="documentation/">documentation</a> and <a href="community/">community forum</a> where you can ask questions, report bugs, and request features. Premium subscribers get priority support with faster response times.</p>
+                            <p>You can also reach us directly through our <a href="contact.php">contact page</a> — we're a small team and we read every message.</p>
                         </div>
                     </div>
                 </div>

@@ -54,34 +54,50 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "Do I have to pay to use Argo Books?",
+                    "name": "How does the Free plan work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with unlimited products. If you need more advanced features, consider upgrading to Premium."
+                        "text": "Argo Books is free to download and use — no credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month. You can use it for as long as you like."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What does Premium include?",
+                    "name": "What does Premium unlock?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, predictive analytics, and priority support."
+                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year — the annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I cancel the Premium subscription anytime?",
+                    "name": "Can I cancel or change my plan anytime?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes, you can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period."
+                        "text": "Yes. You can cancel your Premium subscription at any time from your customer portal — no phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period. You can also switch between monthly and yearly billing whenever it suits you."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is there a yearly plan?",
+                    "name": "Do I need to install anything?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes, you can choose to pay $<?php echo number_format($yearlyPrice, 0); ?> CAD/year instead of monthly, saving you $<?php echo number_format($yearlySavings, 0); ?> per year."
+                        "text": "Yes — Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is my payment information secure?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Absolutely. All payments are processed through Stripe, PayPal, or Square — we never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide. Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What if I need help getting started?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "We've got you covered. All users have access to our documentation and community forum. Premium subscribers get priority support with faster response times. You can also reach us through our contact page — we're a small team and we personally read every message."
                     }
                 }
             ]
@@ -375,56 +391,90 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             <div class="faq-grid">
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Do I have to pay to use Argo Books?</h3>
+                        <h3>How does the Free plan work?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No, you don't have to pay. We offer a free version that you can use indefinitely. The free version includes all essential features needed to manage your basic business operations, with unlimited products. If you need more advanced features, consider upgrading to Premium.</p>
+                            <p>Argo Books is free to download and use — no credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month.</p>
+                            <p>You can use it for as long as you like. When your business needs more, upgrading to Premium takes just a few clicks.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What does Premium include?</h3>
+                        <h3>What does Premium unlock?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Premium ($<?php echo number_format($monthlyPrice, 0); ?>/month) unlocks unlimited products, biometric login security, invoices & payments, predictive analytics, and priority support.</p>
+                            <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support.</p>
+                            <p>Premium is available at <strong>$<?php echo number_format($monthlyPrice, 0); ?> CAD/month</strong> or <strong>$<?php echo number_format($yearlyPrice, 0); ?> CAD/year</strong> — the annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Can I cancel the Premium subscription anytime?</h3>
+                        <h3>Can I cancel or change my plan anytime?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes, you can cancel your Premium subscription at any time. Your Premium features will remain active until the end of your current billing period.</p>
+                            <p>Yes. You can cancel your Premium subscription at any time from your <a href="../portal/">customer portal</a> — no phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period.</p>
+                            <p>You can also switch between monthly and yearly billing whenever it suits you. If you believe you're entitled to a refund, <a href="../contact.php">get in touch</a> and we'll review your request. <a href="../legal/refund.php">View full refund policy</a></p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>Is there a yearly plan?</h3>
+                        <h3>Do I need to install anything?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes, you can choose to pay $<?php echo number_format($yearlyPrice, 0); ?> CAD/year instead of monthly, saving you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
+                            <p>Yes — Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
+                            <p>You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import. <a href="../downloads/">Download Argo Books</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Is my payment information secure?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Absolutely. All payments are processed through Stripe, PayPal, or Square — we never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide.</p>
+                            <p>Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What if I need help getting started?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>We've got you covered. All users have access to our <a href="../documentation/">documentation</a> and <a href="../community/">community forum</a>. Premium subscribers get priority support with faster response times.</p>
+                            <p>You can also reach us through our <a href="../contact.php">contact page</a> — we're a small team and we personally read every message.</p>
                         </div>
                     </div>
                 </div>

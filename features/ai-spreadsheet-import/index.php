@@ -61,26 +61,34 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "Can Argo Books import data from Excel and CSV files?",
+                    "name": "What file formats does AI Spreadsheet Import support?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Drop any Excel (.xlsx) or CSV file and AI automatically detects your columns, maps them to the right fields, and imports your data cleanly into Argo Books."
+                        "text": "Argo Books supports Excel (.xlsx) and CSV files. Just drag and drop your file, and the AI takes it from there — detecting your columns, mapping them to the right fields, and importing your data cleanly. No manual formatting or template files required."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What types of data can I import with AI Spreadsheet Import?",
+                    "name": "What types of data can I import?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can import customers, products, expenses, revenue, invoices, and more. AI detects the entity type from your column headers and maps everything automatically."
+                        "text": "You can import customers, products, expenses, revenue, invoices, and more. The AI detects the entity type from your column headers and maps everything automatically. It's the fastest way to migrate your existing business data into Argo Books — whether you're coming from another tool or a pile of spreadsheets."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does the AI spreadsheet import require manual column mapping?",
+                    "name": "Do I need to manually map columns?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No. AI reads your column headers and automatically maps them to Argo Books fields. You can review and adjust the mapping before importing, but manual work is rarely needed."
+                        "text": "No. The AI reads your column headers and automatically maps them to the correct Argo Books fields. You can review and adjust the mapping before importing if needed, but manual work is rarely necessary. Most imports go through with a single click."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How many records can I import per month?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Free plan includes 100 AI spreadsheet imports per month, which is plenty for getting started or migrating data in batches. Premium users don't have this limit — you can import as much data as you need. Each import processes your entire file, so one file counts as one import regardless of how many rows it contains."
                     }
                 }
             ]

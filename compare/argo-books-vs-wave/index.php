@@ -56,6 +56,56 @@ $plans = get_plan_features();
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Is Argo Books really free?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. Wave's free plan was discontinued in 2023 — it now starts at $16 CAD/month for basic accounting."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books work offline?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. Wave is cloud-only and requires a constant internet connection to access your data."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books support bank transaction imports?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for reconciliation. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now. Argo Books is always adding new features based on user feedback."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does Argo Books pricing compare to Wave?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books offers a genuinely free plan forever. Wave discontinued its free plan in 2023 and now charges $16 CAD/month for Starter and $22/month for Pro. Argo Books Premium is just $10 CAD/month with unlimited invoicing, AI features, and predictive analytics — less than Wave's cheapest paid plan."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What platforms does Argo Books run on?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. Wave is web-based and also has a mobile app for iOS and Android."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs Wave — Offline-Capable & Feature-Rich | Argo Books</title>
 
@@ -167,7 +217,7 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Invoicing &amp; payments</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
@@ -185,19 +235,19 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Unlimited products</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Inventory management</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
@@ -348,7 +398,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and unlimited products. No credit card required, no trial period — it's free forever. Premium unlocks AI features, invoicing, and more.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
+                            <p>Wave's free plan was discontinued in 2023 — it now starts at $16 CAD/month for basic accounting.</p>
                         </div>
                     </div>
                 </div>
@@ -362,7 +413,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books is a desktop application that works offline. Your data is stored locally on your device, so you can manage your finances even without an internet connection. Wave is cloud-only and requires a constant internet connection.</p>
+                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
+                            <p>Wave is cloud-only and requires a constant internet connection to access your data.</p>
                         </div>
                     </div>
                 </div>
@@ -376,21 +428,38 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for reconciliation. If auto bank imports are critical for your workflow, Wave may be a better fit for now. We're always adding new features based on user feedback.</p>
+                            <p>Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for reconciliation. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now.</p>
+                            <p>We're always adding new features based on user feedback.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What platforms does Argo Books support?</h3>
+                        <h3>How does Argo Books pricing compare to Wave?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available on Windows, macOS, and Linux as a native desktop application.</p>
+                            <p>Argo Books offers a genuinely free plan forever. Wave discontinued its free plan in 2023 and now charges $16 CAD/month for Starter and $22/month for Pro.</p>
+                            <p>Argo Books Premium is just <strong>$10 CAD/month</strong> with unlimited invoicing, AI features, and predictive analytics — less than Wave's cheapest paid plan.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What platforms does Argo Books run on?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>Wave is web-based and also has a mobile app for iOS and Android.</p>
                         </div>
                     </div>
                 </div>

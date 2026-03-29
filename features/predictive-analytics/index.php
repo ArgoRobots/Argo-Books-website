@@ -61,26 +61,34 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "How accurate are the revenue forecasts in Argo Books?",
+                    "name": "How accurate are the revenue forecasts?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books achieves an average of 88% forecast accuracy in backtesting. Every prediction includes a confidence score so you know how reliable it is."
+                        "text": "Argo Books achieves an average of 88% forecast accuracy in backtesting. Every prediction includes a confidence score so you know exactly how reliable it is. The more data Argo Books has to work with, the more accurate forecasts become over time."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Do I need data science skills to use predictive analytics?",
+                    "name": "Do I need technical skills to use predictive analytics?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No. The analytics engine works automatically in the background with zero configuration. Just use Argo Books normally and forecasts are generated from your data."
+                        "text": "Not at all. The analytics engine runs automatically in the background with zero configuration — no formulas, no spreadsheets, no data science degree required. Just use Argo Books normally and forecasts are generated from your real business data. Results are presented in clear, visual charts that anyone can understand."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books detect seasonal business patterns?",
+                    "name": "Can Argo Books detect seasonal patterns in my business?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. The AI automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast."
+                        "text": "Yes. The AI automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast. This means your projections account for predictable fluctuations like holiday rushes or slow summer months, giving you a more realistic picture of what's ahead."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Is predictive analytics included in the Free plan?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Basic real-time analytics are included in the Free plan. Predictive analytics — including revenue forecasting, trend detection, and confidence scoring — is a Premium feature. It's one of the most powerful reasons to upgrade, especially for businesses that want to plan ahead with data-driven insights."
                     }
                 }
             ]

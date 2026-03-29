@@ -18,20 +18,24 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate using license key (premium feature, not tied to payment portal)
+// Authenticate using license key (premium) or device ID (free)
 // Accept X-Api-Key as a fallback for backward compatibility
 if (empty($_SERVER['HTTP_X_LICENSE_KEY']) && !empty($_SERVER['HTTP_X_API_KEY'])) {
     $_SERVER['HTTP_X_LICENSE_KEY'] = $_SERVER['HTTP_X_API_KEY'];
 }
 
 $license = authenticate_license_request();
+$deviceIdHash = null;
 if (!$license) {
-    send_error_response(401, 'Invalid or expired license key.', 'UNAUTHORIZED');
+    // Try device ID authentication for free users
+    $deviceIdHash = authenticate_device_request();
+    if (!$deviceIdHash) {
+        send_error_response(401, 'Invalid or expired license key.', 'UNAUTHORIZED');
+    }
 }
 
-// Rate limiting: 30 scans per 15 minutes per license key
-// Key by license hash (not IP) so the limit is truly per-license
-$rateLimitIdentifier = substr($license['license_key_hash'], 0, 32);
+// Rate limiting: 30 scans per 15 minutes per identity
+$rateLimitIdentifier = $license ? substr($license['license_key_hash'], 0, 32) : substr($deviceIdHash, 0, 32);
 $rateLimitKey = 'receipt_' . $rateLimitIdentifier;
 if (is_rate_limited($rateLimitIdentifier, 30, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');

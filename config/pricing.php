@@ -11,9 +11,10 @@
  *   PREMIUM_YEARLY_PRICE        - Premium yearly subscription (default: 100.00)
  *   PROCESSING_FEE_PERCENT      - Payment processing fee percentage (default: 2.90)
  *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
- *   RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for premium tier (default: 500)
- *   AI_IMPORT_MONTHLY_LIMIT     - Monthly AI import limit for all users (default: 100)
- *   FREE_INVOICE_MONTHLY_LIMIT  - Monthly invoice send limit for free tier (default: 5)
+ *   RECEIPT_SCAN_MONTHLY_LIMIT       - Monthly receipt scan limit for premium tier (default: 500)
+ *   FREE_RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for free tier (default: 5)
+ *   AI_IMPORT_MONTHLY_LIMIT          - Monthly AI import limit for all users (default: 100)
+ *   FREE_INVOICE_MONTHLY_LIMIT       - Monthly invoice send limit for free tier (default: 5)
  */
 
 /**
@@ -39,9 +40,10 @@ function get_pricing_config() {
         'premium_yearly_price'  => _pricing_parse_env('PREMIUM_YEARLY_PRICE', 100.00),
         'processing_fee_percent' => _pricing_parse_env('PROCESSING_FEE_PERCENT', 2.90),
         'processing_fee_fixed'   => _pricing_parse_env('PROCESSING_FEE_FIXED', 0.30),
-        'receipt_scan_monthly_limit' => _pricing_parse_int_env('RECEIPT_SCAN_MONTHLY_LIMIT', 500),
-        'ai_import_monthly_limit'    => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 100),
-        'free_invoice_monthly_limit' => _pricing_parse_int_env('FREE_INVOICE_MONTHLY_LIMIT', 5),
+        'receipt_scan_monthly_limit'      => _pricing_parse_int_env('RECEIPT_SCAN_MONTHLY_LIMIT', 500),
+        'free_receipt_scan_monthly_limit' => _pricing_parse_int_env('FREE_RECEIPT_SCAN_MONTHLY_LIMIT', 5),
+        'ai_import_monthly_limit'         => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 100),
+        'free_invoice_monthly_limit'      => _pricing_parse_int_env('FREE_INVOICE_MONTHLY_LIMIT', 5),
         'currency'              => 'CAD',
     ];
 

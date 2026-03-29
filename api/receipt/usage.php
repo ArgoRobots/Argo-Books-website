@@ -1,8 +1,8 @@
 <?php
 /**
  * Receipt Scan Usage Tracking API
- * Tracks and enforces monthly scan limits for Premium tier subscribers.
- * AI Receipt Scanning is only available on the Premium plan with 500 scans/month.
+ * Tracks and enforces monthly scan limits.
+ * Free tier: 5 scans/month. Premium tier: 500 scans/month.
  */
 
 header('Content-Type: application/json');
@@ -26,9 +26,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Get JSON input
 $input = json_decode(file_get_contents('php://input'), true);
 
-if (!isset($input['license_key']) || empty($input['license_key'])) {
+// Accept either license_key (premium) or device_id (free)
+$license_key = trim($input['license_key'] ?? '');
+$device_id = trim($input['device_id'] ?? '');
+
+if (empty($license_key) && empty($device_id)) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'error' => 'License key is required']);
+    echo json_encode(['success' => false, 'error' => 'Either license_key or device_id is required']);
     exit();
 }
 
@@ -38,7 +42,6 @@ if (!isset($input['action']) || !in_array($input['action'], ['check', 'increment
     exit();
 }
 
-$license_key = trim($input['license_key']);
 $action = $input['action'];
 
 // Load database connection and pricing config
@@ -46,37 +49,48 @@ require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../config/pricing.php';
 
 /**
- * Determine tier and validate license key
- * @param PDO $pdo
- * @param string $license_key
- * @return array|null Returns ['tier' => 'premium', 'limit' => N] for valid premium keys,
- *                    or null if invalid
+ * Determine tier and validate identity.
+ * Premium users (license key) get 500 scans/month.
+ * Free users (device ID) get the configured free monthly limit.
  */
-function validateAndGetTier($pdo, $license_key) {
-    // Check if it's a Premium key (starts with PREM-)
-    if (strpos($license_key, 'PREM-') === 0) {
-        // Check premium_subscription_keys table (unredeemed promo keys)
-        $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
-        $stmt->execute([$license_key]);
-        if ($stmt->fetch()) {
-            $config = get_pricing_config();
-            return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit']];
+function validateAndGetTier($pdo, $license_key, $device_id) {
+    $config = get_pricing_config();
+
+    if (!empty($license_key)) {
+        // Check if it's a Premium key (starts with PREM-)
+        if (strpos($license_key, 'PREM-') === 0) {
+            // Check premium_subscription_keys table (unredeemed promo keys)
+            $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
+            $stmt->execute([$license_key]);
+            if ($stmt->fetch()) {
+                return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit'], 'identifier' => $license_key];
+            }
+
+            // Check premium_subscriptions table for active subscriptions
+            $stmt = $pdo->prepare("
+                SELECT id FROM premium_subscriptions
+                WHERE subscription_id = ?
+                AND status IN ('active', 'cancelled')
+                AND end_date > NOW()
+            ");
+            $stmt->execute([$license_key]);
+            if ($stmt->fetch()) {
+                return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit'], 'identifier' => $license_key];
+            }
         }
 
-        // Check premium_subscriptions table for active subscriptions
-        $stmt = $pdo->prepare("
-            SELECT id FROM premium_subscriptions
-            WHERE subscription_id = ?
-            AND status IN ('active', 'cancelled')
-            AND end_date > NOW()
-        ");
+        // Check free license keys table
+        $stmt = $pdo->prepare("SELECT id FROM license_keys WHERE license_key = ?");
         $stmt->execute([$license_key]);
         if ($stmt->fetch()) {
-            $config = get_pricing_config();
-            return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit']];
+            return ['tier' => 'free', 'limit' => $config['free_receipt_scan_monthly_limit'], 'identifier' => $license_key];
         }
+    }
 
-        return null;
+    if (!empty($device_id)) {
+        // Free tier via device ID
+        $identifier = 'device_' . hash('sha256', $device_id);
+        return ['tier' => 'free', 'limit' => $config['free_receipt_scan_monthly_limit'], 'identifier' => $identifier];
     }
 
     return null;
@@ -149,8 +163,8 @@ function buildResponse($scan_count, $monthly_limit, $tier, $can_scan = null) {
 }
 
 try {
-    // Validate license key and get tier
-    $tierInfo = validateAndGetTier($pdo, $license_key);
+    // Validate identity and get tier
+    $tierInfo = validateAndGetTier($pdo, $license_key, $device_id);
 
     if (!$tierInfo) {
         http_response_code(401);
@@ -160,9 +174,10 @@ try {
 
     $tier = $tierInfo['tier'];
     $monthly_limit = $tierInfo['limit'];
+    $identifier = $tierInfo['identifier'];
 
     // Get or create usage record
-    $usage = getOrCreateUsageRecord($pdo, $license_key, $monthly_limit);
+    $usage = getOrCreateUsageRecord($pdo, $identifier, $monthly_limit);
     $scan_count = $usage['scan_count'];
     // Use the limit from the tier info (in case it changed)
     $monthly_limit = $tierInfo['limit'];
@@ -191,7 +206,7 @@ try {
             SET scan_count = scan_count + 1
             WHERE license_key = ? AND usage_month = ?
         ");
-        $stmt->execute([$license_key, $usage_month]);
+        $stmt->execute([$identifier, $usage_month]);
 
         // Return updated status
         $new_scan_count = $scan_count + 1;

@@ -200,7 +200,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <div class="feature-detail-text">
                     <span class="section-label purple">AI-Powered</span>
                     <h2>Scan receipts with AI — 500 per month</h2>
-                    <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts vendor, date, amount, and line items with 98% accuracy. No more manual data entry.</p>
+                    <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts supplier, date, amount, and line items with 98% accuracy. No more manual data entry.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -208,7 +208,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Extracts vendor, date, line items, tax, and totals</span>
+                            <span>Extracts supplier, date, line items, tax, and totals</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -221,7 +221,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../resources/images/features/receipt-archive.svg" alt="AI receipt scanning automatically extracts vendor, date, line items and totals from any receipt" loading="lazy">
+                    <img src="../resources/images/features/receipt-archive.svg" alt="AI receipt scanning automatically extracts supplier, date, line items and totals from any receipt" loading="lazy">
                 </div>
             </div>
         </div>

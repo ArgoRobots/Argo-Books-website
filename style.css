@@ -2295,15 +2295,10 @@ a {
     justify-content: center;
 }
 
-.shield-graphic {
+.security-visual img {
     width: 100%;
-    max-width: 300px;
-}
-
-.shield-svg {
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 20px 40px var(--blue-alpha-30));
+    border-radius: 22px;
+    box-shadow: 0 20px 60px var(--shadow-default);
 }
 
 /* ========================================

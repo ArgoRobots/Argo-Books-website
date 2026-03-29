@@ -91,6 +91,42 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.5 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.5</span>
+                        <span class="date-tag">March 29 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>AI receipt scanning for everyone</strong> &mdash; AI-powered receipt scanning is now available on the free plan with a monthly usage limit.</li>
+                                <li><strong>Company name in payment portal</strong> &mdash; Control which business name your customers see in the payment portal.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Faster currency switching</strong> &mdash; Exchange rates are now preloaded in bulk, so changing your default currency is noticeably faster.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Fixed invoice line item totals not rounding correctly in some cases.</li>
+                                <li>Various bug fixes and stability improvements.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.4 -->
             <div class="version-card">
                 <div class="version-header">

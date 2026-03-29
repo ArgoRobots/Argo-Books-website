@@ -135,7 +135,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "How does AI receipt scanning work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the vendor name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy."
+                        "text": "Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the supplier name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy."
                     }
                 },
                 {
@@ -323,7 +323,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="tab-content-inner">
                             <div class="tab-content-text">
                                 <h3>Scan receipts with AI</h3>
-                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts vendor, date, amount, and line items with 98% accuracy.</p>
+                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts supplier, date, amount, and line items with 98% accuracy.</p>
                                 <ul class="feature-list">
                                     <li>
                                         <?= svg_icon('check', 20) ?>
@@ -861,7 +861,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
-                                <div class="demo-map-target">Vendor Name</div>
+                                <div class="demo-map-target">supplier Name</div>
                                 <div class="demo-map-confidence">97%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="1">
@@ -926,7 +926,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <?= svg_icon('pencil', 32) ?>
                     </div>
                     <h3>Set Up</h3>
-                    <p>Add your products, customers, and vendors. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
+                    <p>Add your products, customers, and suppliers. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
                 </div>
                 <div class="step-connector animate-on-scroll"></div>
                 <div class="step-card animate-on-scroll">
@@ -1094,20 +1094,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                 </div>
                 <div class="security-visual animate-on-scroll">
-                    <div class="shield-graphic">
-                        <svg viewBox="0 0 200 240" class="shield-svg">
-                            <defs>
-                                <linearGradient id="shieldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" style="stop-color:#3b82f6"/>
-                                    <stop offset="100%" style="stop-color:#1d4ed8"/>
-                                </linearGradient>
-                            </defs>
-                            <path d="M100 10 L180 40 L180 100 Q180 160 100 220 Q20 160 20 100 L20 40 Z" fill="url(#shieldGradient)" opacity="0.1"/>
-                            <path d="M100 30 L160 55 L160 100 Q160 145 100 195 Q40 145 40 100 L40 55 Z" fill="url(#shieldGradient)" opacity="0.2"/>
-                            <path d="M100 50 L140 70 L140 100 Q140 130 100 170 Q60 130 60 100 L60 70 Z" fill="url(#shieldGradient)"/>
-                            <polyline points="75,110 95,130 130,90" fill="none" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
+                    <img src="resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted with AES-256, stored offline, no cloud dependency" loading="lazy">
                 </div>
             </div>
         </div>
@@ -1217,7 +1204,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the vendor name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy.</p>
+                            <p>Simply take a photo of your receipt with your phone or upload an image. Our AI analyzes the receipt and automatically extracts the supplier name, date, individual line items, taxes, and total amount. The extracted data is then added to your expense records with 98% accuracy.</p>
                         </div>
                     </div>
                 </div>

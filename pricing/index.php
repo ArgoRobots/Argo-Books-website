@@ -209,7 +209,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <div class="feature-detail-text">
                     <span class="section-label">AI-Powered</span>
                     <h2>Scan receipts in seconds, not minutes</h2>
-                    <p>Point your camera at any receipt and Argo Books extracts the vendor, date, and total automatically — no typing required. Receipts are categorized and attached to your expense records instantly.</p>
+                    <p>Point your camera at any receipt and Argo Books extracts the supplier, date, and total automatically — no typing required. Receipts are categorized and attached to your expense records instantly.</p>
                     <ul class="feature-checklist">
                         <li><?= svg_icon('check', 20) ?><span>Up to 500 AI scans per month</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Auto-categorized by expense type</span></li>
@@ -309,7 +309,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <?= svg_icon('receipt-scan', 22) ?>
                     </div>
                     <h3>AI Receipt Scanning</h3>
-                    <p>Snap a photo and let AI handle the data entry. Vendors, dates, and totals are extracted and categorized automatically.</p>
+                    <p>Snap a photo and let AI handle the data entry. Suppliers, dates, and totals are extracted and categorized automatically.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon">

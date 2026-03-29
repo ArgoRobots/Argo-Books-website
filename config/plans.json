@@ -16,7 +16,8 @@
             {"label": "Real-time analytics"},
             {"label": "Receipt management"},
             {"label": "5 invoices / month"},
-            {"label": "AI spreadsheet import", "detail": "100/month"}
+            {"label": "AI spreadsheet import", "detail": "100/month"},
+            {"label": "AI receipt scanning", "detail": "5/month"}
         ]
     },
     "premium": {

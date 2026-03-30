@@ -427,8 +427,12 @@ function get_invoices_by_customer_token(string $customerToken): array
  */
 function record_portal_payment(array $params): array
 {
-    if (!is_numeric($params['amount']) || $params['amount'] <= 0) {
+    if (!is_numeric($params['amount']) || $params['amount'] == 0) {
         return ['success' => false, 'error' => 'Invalid payment amount'];
+    }
+    $status = $params['status'] ?? 'completed';
+    if ($params['amount'] < 0 && $status !== 'refunded') {
+        return ['success' => false, 'error' => 'Negative amounts are only allowed for refunds'];
     }
 
     $db = get_db_connection();
@@ -614,7 +618,12 @@ function require_method($allowed): void
  */
 function set_portal_headers(): void
 {
-    $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
+    $originSource = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
+    $parsed = parse_url($originSource);
+    $allowedOrigin = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? 'argorobots.com');
+    if (!empty($parsed['port'])) {
+        $allowedOrigin .= ':' . $parsed['port'];
+    }
     header('Access-Control-Allow-Origin: ' . $allowedOrigin);
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');

@@ -2,7 +2,7 @@
 /**
  * Invoice Send Usage Tracking API
  * Tracks and enforces monthly invoice send limits for free-tier users.
- * Free users get 5 invoice sends per month; premium users are unlimited.
+ * Free users get 25 invoice sends per month; premium users are unlimited.
  */
 
 header('Content-Type: application/json');

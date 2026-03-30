@@ -869,7 +869,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 <div class="demo-map-arrow">
                                     <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                 </div>
-                                <div class="demo-map-target">supplier Name</div>
+                                <div class="demo-map-target">Supplier Name</div>
                                 <div class="demo-map-confidence">97%</div>
                             </div>
                             <div class="demo-mapping-row" data-delay="1">

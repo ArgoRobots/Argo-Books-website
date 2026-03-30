@@ -71,11 +71,11 @@ cp ".env - sandbox" .env
 - Schema file: `mysql_schema.sql` — update this when adding/modifying tables
 
 Key table groups:
-- **Licensing:** `license_keys`, `payment_transactions`
+- **Licensing:** `license_keys`, `premium_subscriptions`, `premium_subscription_payments`
 - **Community:** `community_users`, `community_posts`, `community_comments`, `community_votes`
-- **Portal:** `portal_users`, `portal_invoices`, `portal_stripe_customers`
-- **Analytics:** `page_views`, `ai_import_usage`, `receipt_scan_usage`
-- **Email:** `outreach_emails`, `email_queue`
+- **Portal:** `portal_companies`, `portal_invoices`, `portal_payments`
+- **Analytics:** `statistics`, `receipt_scan_usage`, `invoice_send_usage`
+- **Email:** `outreach_leads`, `outreach_activity_log`
 
 ## Payment Gateways
 
@@ -84,7 +84,7 @@ Three gateways are supported — Stripe, PayPal, Square. Each has:
 - A webhook handler in `/webhooks/`
 - Sandbox credentials in `.env - sandbox` (see `/read-me/` for testing guides)
 
-Processing fees are configurable via `.env` (`PROCESSING_FEE_PERCENTAGE`, `PROCESSING_FEE_FIXED`).
+Processing fees are configurable via `.env` (`PROCESSING_FEE_PERCENT`, `PROCESSING_FEE_FIXED`).
 
 ## Cron Jobs
 

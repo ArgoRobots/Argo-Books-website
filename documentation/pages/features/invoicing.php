@@ -13,7 +13,7 @@ include '../../docs-header.php';
             integrated payment processing. Argo Books makes invoicing simple and efficient.</p>
 
             <div class="info-box">
-                <p><strong>Note:</strong> The free version includes up to 5 invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
+                <p><strong>Note:</strong> The free version includes up to 25 invoices per month. <a href="../getting-started/version-comparison.php" class="link">Upgrade to Premium</a> for unlimited invoices and online payment integration.</p>
             </div>
 
             <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">

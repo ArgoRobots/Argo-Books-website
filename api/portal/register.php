@@ -81,7 +81,12 @@ if (!empty($ownerEmail)) {
             send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
         }
         $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
-        $rotateStmt->execute();
+        if (!$rotateStmt->execute() || $rotateStmt->affected_rows <= 0) {
+            error_log('Portal registration failed: API key rotation UPDATE failed for company ID ' . $existing['id'] . ': ' . $rotateStmt->error);
+            $rotateStmt->close();
+            $db->close();
+            send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
+        }
         $rotateStmt->close();
         $db->close();
         send_json_response(200, [

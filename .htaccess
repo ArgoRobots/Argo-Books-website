@@ -207,6 +207,10 @@ php_flag display_errors Off
 php_flag log_errors On
 php_value error_log error_log.txt
 
+# Allow large POST bodies for AI vision requests (base64 images)
+php_value post_max_size 10M
+php_value upload_max_filesize 10M
+
 # Rewrite rules
 <IfModule mod_rewrite.c>
     RewriteEngine On

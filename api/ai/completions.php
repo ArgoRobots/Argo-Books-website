@@ -61,12 +61,29 @@ $maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 16000)); // Clamp 1-1
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 
 // Build OpenAI request
+$base64Image = $data['base64Image'] ?? null;
+$mimeType = $data['mimeType'] ?? 'image/jpeg';
+
 $messages = [];
 if (!empty($systemPrompt)) {
     $messages[] = ['role' => 'system', 'content' => $systemPrompt];
 }
 if (!empty($userPrompt)) {
-    $messages[] = ['role' => 'user', 'content' => $userPrompt];
+    if (!empty($base64Image)) {
+        // Vision request: include image in user message
+        $messages[] = [
+            'role' => 'user',
+            'content' => [
+                ['type' => 'text', 'text' => $userPrompt],
+                ['type' => 'image_url', 'image_url' => [
+                    'url' => "data:{$mimeType};base64,{$base64Image}",
+                    'detail' => 'high',
+                ]],
+            ],
+        ];
+    } else {
+        $messages[] = ['role' => 'user', 'content' => $userPrompt];
+    }
 }
 
 $openaiPayload = json_encode([

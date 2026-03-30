@@ -115,6 +115,13 @@ Files excluded from deployment: `.git`, `.github`, `README.md`, `composer.json`,
 
 **Never commit `.env` files** — they are gitignored. Configure the server's `.env` directly.
 
+## What's New Page
+
+- Write for non-technical users — plain language, no jargon
+- Only include changes users will notice (new features, UI changes, important fixes)
+- Skip internal refactors, code cleanup, dependency updates, and developer-facing changes
+- Use short, benefit-oriented descriptions (e.g., "Faster invoice loading" not "Optimized SQL query for invoice retrieval")
+
 ## Security Notes
 
 - Admin requires TOTP 2FA — secret stored in `admin_users` table

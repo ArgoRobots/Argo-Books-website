@@ -113,6 +113,9 @@
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
+                                <li><strong>More accurate receipt scanning</strong> &mdash; The AI receipt scanner is now significantly better at reading receipts, especially ones with complex layouts.</li>
+                                <li><strong>Receipt total mismatch warning</strong> &mdash; You'll now see a warning if the scanned line items don't add up to the receipt total, so you can catch errors before saving.</li>
+                                <li><strong>Fullscreen receipt viewer</strong> &mdash; Toggle fullscreen when reviewing scanned receipts for a better view of the details.</li>
                                 <li><strong>Faster currency switching</strong> &mdash; Exchange rates are now preloaded in bulk, so changing your default currency is noticeably faster.</li>
                             </ul>
                         </div>

@@ -106,8 +106,8 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>AI receipt scanning for everyone</strong> &mdash; AI-powered receipt scanning is now available on the free plan with a monthly usage limit.</li>
-                                <li><strong>Company name in payment portal</strong> &mdash; Control which business name your customers see in the payment portal.</li>
+                                <li><strong>AI receipt scanning for everyone</strong> &mdash; AI-powered receipt scanning is now available in the free plan with a 5 receipt per month usage limit.</li>
+                                <li><strong>Company name in payment portal</strong> &mdash; Directly control which business name your customers see in the payment portal.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">

@@ -122,6 +122,7 @@
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
+                                <li>Fixed small visual inconsistencies throughout the app</li>
                                 <li>Fixed invoice line item totals not rounding correctly in some cases.</li>
                                 <li>Various bug fixes and stability improvements.</li>
                             </ul>

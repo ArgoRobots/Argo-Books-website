@@ -118,7 +118,7 @@
                                 <li><strong>Receipt total mismatch warning</strong> &mdash; You'll now see a warning if the scanned line items don't add up to the receipt total, so you can catch errors before saving.</li>
                                 <li><strong>Fullscreen receipt viewer</strong> &mdash; Toggle fullscreen when reviewing scanned receipts for a better view of the details.</li>
                                 <li><strong>Faster currency switching</strong> &mdash; Exchange rates are now preloaded in bulk, so changing your default currency is noticeably faster.</li>
-                                <li><strong>Faster charts</strong> &mdash; The charts now load significantly faster and are more responsive</li>
+                                <li><strong>Faster charts</strong> &mdash; The charts now load significantly faster and are more responsive.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">

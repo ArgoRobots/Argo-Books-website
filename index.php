@@ -331,7 +331,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="tab-content-inner">
                             <div class="tab-content-text">
                                 <h3>Scan receipts with AI</h3>
-                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts supplier, date, amount, and line items with 98% accuracy.</p>
+                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts supplier, date, amount, and line items with 99% accuracy.</p>
                                 <ul class="feature-list">
                                     <li>
                                         <?= svg_icon('check', 20) ?>

@@ -107,7 +107,8 @@
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
                                 <li><strong>AI receipt scanning for everyone</strong> &mdash; AI-powered receipt scanning is now available in the free plan with a 5 receipt per month usage limit.</li>
-                                <li><strong>Company name in payment portal</strong> &mdash; Directly control which business name your customers see in the payment portal.</li>
+                                <li><strong>Company name in payment portal</strong> &mdash; Directly control which business name your customers see in the payment portal. There is now a dedicated control for this in the settings.</li>
+                                <li><strong>Export world map to Excel</strong> &mdash; The world map on the Analytics page can now be exported to Excel.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -117,13 +118,15 @@
                                 <li><strong>Receipt total mismatch warning</strong> &mdash; You'll now see a warning if the scanned line items don't add up to the receipt total, so you can catch errors before saving.</li>
                                 <li><strong>Fullscreen receipt viewer</strong> &mdash; Toggle fullscreen when reviewing scanned receipts for a better view of the details.</li>
                                 <li><strong>Faster currency switching</strong> &mdash; Exchange rates are now preloaded in bulk, so changing your default currency is noticeably faster.</li>
+                                <li><strong>Faster charts</strong> &mdash; The charts now load significantly faster and are more responsive</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li>Fixed small visual inconsistencies throughout the app</li>
+                                <li>Fixed world map saving as a blank image when using "Save as Image".</li>
                                 <li>Fixed invoice line item totals not rounding correctly in some cases.</li>
+                                <li>Fixed small visual inconsistencies throughout the app</li>
                                 <li>Various bug fixes and stability improvements.</li>
                             </ul>
                         </div>

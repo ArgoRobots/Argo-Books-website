@@ -96,7 +96,7 @@
                 <div class="version-header">
                     <div class="version-info">
                         <span class="version-tag">Version 2.0.5</span>
-                        <span class="date-tag">March 29 2026</span>
+                        <span class="date-tag">April 2 2026</span>
                     </div>
                     <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                 </div>

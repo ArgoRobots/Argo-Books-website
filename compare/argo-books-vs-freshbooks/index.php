@@ -56,6 +56,56 @@ $plans = get_plan_features();
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Is Argo Books really free?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $22 CAD/month."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books work offline?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. FreshBooks is cloud-only and requires a constant internet connection to access your data."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books have time tracking?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Not yet. FreshBooks has built-in time tracking, which is great for freelancers and consultants who bill by the hour. If billable hours are a core part of your business, FreshBooks may be a better fit for that specific need. Argo Books is focused on product-based businesses, inventory management, and financial reporting."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does Argo Books pricing compare to FreshBooks?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month (or $96/year). FreshBooks starts at $22 CAD/month for its Lite plan with a 5-client limit, and goes up to $55+/month for Premium. Argo Books has no client limits on any plan."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What platforms does Argo Books run on?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. FreshBooks is web-based and also has a mobile app for iOS and Android."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs FreshBooks — Simpler & More Affordable | Argo Books</title>
 
@@ -167,7 +217,7 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Invoicing &amp; payments</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
@@ -185,19 +235,19 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Unlimited products</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Inventory management</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
@@ -357,7 +407,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and unlimited products. No credit card required, no trial period — it's free forever. Premium unlocks AI features, invoicing, and more.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
+                            <p>FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $22 CAD/month.</p>
                         </div>
                     </div>
                 </div>
@@ -371,7 +422,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books is a desktop application that works offline. Your data is stored locally on your device, so you can manage your finances even without an internet connection. FreshBooks is cloud-only and requires a constant internet connection.</p>
+                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
+                            <p>FreshBooks is cloud-only and requires a constant internet connection to access your data.</p>
                         </div>
                     </div>
                 </div>
@@ -385,21 +437,38 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Not yet. FreshBooks has built-in time tracking, which is great for freelancers and consultants. If billable hours are a core part of your business, FreshBooks may be a better fit. Argo Books is focused on product-based businesses, inventory, and financial management.</p>
+                            <p>Not yet. FreshBooks has built-in time tracking, which is great for freelancers and consultants who bill by the hour. If billable hours are a core part of your business, FreshBooks may be a better fit for that specific need.</p>
+                            <p>Argo Books is focused on product-based businesses, inventory management, and financial reporting.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What platforms does Argo Books support?</h3>
+                        <h3>How does Argo Books pricing compare to FreshBooks?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available on Windows, macOS, and Linux as a native desktop application.</p>
+                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong> (or $96/year). FreshBooks starts at $22 CAD/month for its Lite plan with a 5-client limit, and goes up to $55+/month for Premium.</p>
+                            <p>Argo Books has no client limits on any plan.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What platforms does Argo Books run on?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>FreshBooks is web-based and also has a mobile app for iOS and Android.</p>
                         </div>
                     </div>
                 </div>

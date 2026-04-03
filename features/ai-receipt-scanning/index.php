@@ -61,10 +61,10 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "How does AI receipt scanning work in Argo Books?",
+                    "name": "How does AI receipt scanning work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Take a photo of any receipt and Argo Books uses AI to extract the store name, items, totals, taxes, and date automatically. The data is used to create an expense record with no manual typing."
+                        "text": "Take a photo of any receipt — or upload an image — and Argo Books uses AI to extract the store name, individual line items, totals, taxes, and date automatically. The extracted data is used to create an expense record with no manual typing. It achieves 98% accuracy, so you spend less time on data entry and more time running your business."
                     }
                 },
                 {
@@ -72,15 +72,23 @@
                     "name": "What types of receipts can Argo Books scan?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books can scan printed receipts, handwritten receipts, and digital receipt images. It supports photos from your camera, screenshots, and uploaded image files."
+                        "text": "Argo Books can scan printed receipts, handwritten receipts, and digital receipt images. It supports photos taken with your phone camera, screenshots, and uploaded image files in common formats like JPG and PNG. Whether it's a crumpled gas station receipt or a clean digital invoice, the AI handles it."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is receipt data uploaded to the cloud for processing?",
+                    "name": "Is my receipt data private?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "AI processing uses a secure API call, but your receipt images and extracted data are stored locally on your computer. No receipt data is kept on third-party servers."
+                        "text": "Yes. AI processing uses a secure API call to extract the data, but your receipt images and all extracted information are stored locally on your computer. No receipt data is kept on third-party servers after processing. Your financial records remain fully under your control."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How many receipts can I scan per month?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Free plan includes 5 AI receipt scans per month — enough to get started and see how it works. Premium users get 500 scans per month, which is more than enough for even the busiest small businesses. If you regularly collect receipts, Premium pays for itself in time saved."
                     }
                 }
             ]

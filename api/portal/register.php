@@ -64,17 +64,34 @@ $db = get_db_connection();
 // Check if company already exists by owner_email
 $ownerEmail = $data['ownerEmail'] ?? '';
 if (!empty($ownerEmail)) {
-    $stmt = $db->prepare('SELECT id, api_key FROM portal_companies WHERE owner_email = ? LIMIT 1');
+    $stmt = $db->prepare('SELECT id FROM portal_companies WHERE owner_email = ? LIMIT 1');
     $stmt->bind_param('s', $ownerEmail);
     $stmt->execute();
     $existing = $stmt->get_result()->fetch_assoc();
     $stmt->close();
 
     if ($existing) {
+        // Rotate API key: generate new key and store its hash
+        $rotatedKey = bin2hex(random_bytes(32));
+        $rotatedHash = hash('sha256', $rotatedKey);
+        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
+        if ($rotateStmt === false) {
+            error_log('Portal registration failed: failed to prepare API key rotation statement: ' . $db->error);
+            $db->close();
+            send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
+        }
+        $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
+        if (!$rotateStmt->execute() || $rotateStmt->affected_rows <= 0) {
+            error_log('Portal registration failed: API key rotation UPDATE failed for company ID ' . $existing['id'] . ': ' . $rotateStmt->error);
+            $rotateStmt->close();
+            $db->close();
+            send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
+        }
+        $rotateStmt->close();
         $db->close();
         send_json_response(200, [
             'success' => true,
-            'api_key' => $existing['api_key'],
+            'api_key' => $rotatedKey,
             'company_id' => $existing['id'],
             'message' => 'Company already registered',
             'timestamp' => date('c')
@@ -84,6 +101,7 @@ if (!empty($ownerEmail)) {
 
 // Generate API key (64-char hex = 256 bits of entropy)
 $apiKey = bin2hex(random_bytes(32));
+$apiKeyHash = hash('sha256', $apiKey);
 
 $companyName = $data['companyName'];
 $companyLogoUrl = $data['companyLogoUrl'] ?? null;
@@ -99,14 +117,14 @@ $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' :
 
 $stmt = $db->prepare(
     'INSERT INTO portal_companies
-     (api_key, company_name, company_logo_url, stripe_account_id,
+     (api_key_hash, company_name, company_logo_url, stripe_account_id,
       paypal_merchant_id, square_merchant_id, square_access_token,
       square_location_id, owner_email, environment, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
 );
 $stmt->bind_param(
     'ssssssssss',
-    $apiKey, $companyName, $companyLogoUrl, $stripeAccountId,
+    $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
     $paypalMerchantId, $squareMerchantId, $squareAccessToken,
     $squareLocationId, $ownerEmail, $environment
 );

@@ -120,8 +120,17 @@ if (!move_uploaded_file($file['tmp_name'], $destPath)) {
 }
 
 // Build the public URL path
-$baseUrl = rtrim($_ENV['APP_URL'] ?? 'https://argorobots.com', '/');
-$logoUrl = $baseUrl . '/resources/uploads/logos/' . $filename;
+$assetBaseUrl = rtrim($_ENV['APP_URL'] ?? 'https://argorobots.com', '/');
+if (empty($_ENV['APP_URL']) && !empty($_ENV['PORTAL_BASE_URL'])) {
+    $parsed = parse_url($_ENV['PORTAL_BASE_URL']);
+    if (!empty($parsed['scheme']) && !empty($parsed['host'])) {
+        $assetBaseUrl = $parsed['scheme'] . '://' . $parsed['host'];
+        if (!empty($parsed['port'])) {
+            $assetBaseUrl .= ':' . $parsed['port'];
+        }
+    }
+}
+$logoUrl = $assetBaseUrl . '/resources/uploads/logos/' . $filename;
 
 // Update the database
 $db = get_db_connection();

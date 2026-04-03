@@ -78,7 +78,8 @@ $invoiceId = $invoice['invoice_id'] ?? '';
 $totalAmount = floatval($invoice['total_amount']);
 $balanceDue = floatval($invoice['balance_due']);
 $currency = $invoice['currency'] ?: 'USD';
-$currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+$currencySymbols = ['USD' => '$', 'CAD' => 'CA$', 'EUR' => '€', 'GBP' => '£', 'AUD' => 'A$', 'JPY' => '¥', 'CHF' => 'CHF ', 'CNY' => '¥', 'INR' => '₹', 'MXN' => 'MX$'];
+$currencySymbol = $currencySymbols[$currency] ?? '$';
 $dueDate = $invoice['due_date'] ?? '';
 $status = $invoice['status'] ?? 'sent';
 $issueDate = $invoiceData['issueDate'] ?? $invoiceData['IssueDate'] ?? $invoice['created_at'] ?? '';
@@ -87,6 +88,24 @@ $subtotal = $invoiceData['subtotal'] ?? $invoiceData['Subtotal'] ?? $totalAmount
 $taxAmount = $invoiceData['taxAmount'] ?? $invoiceData['TaxAmount'] ?? 0;
 $taxRate = $invoiceData['taxRate'] ?? $invoiceData['TaxRate'] ?? '';
 $amountPaid = $totalAmount - $balanceDue;
+
+// Calculate processing fee if enabled and invoice is unpaid
+$passProcessingFee = !empty($invoice['pass_processing_fee']);
+$processingFee = 0.00;
+$totalWithFee = $balanceDue;
+$feeProviderLabel = '';
+if ($passProcessingFee && $balanceDue > 0) {
+    require_once __DIR__ . '/../config/pricing.php';
+    $processingFee = calculate_invoice_processing_fee($balanceDue, $currency);
+    $totalWithFee = $balanceDue + $processingFee;
+
+    // Build provider name for the fee label
+    $providerNames = [];
+    if (in_array('stripe', $paymentMethods)) $providerNames[] = 'Stripe';
+    if (in_array('paypal', $paymentMethods)) $providerNames[] = 'PayPal';
+    if (in_array('square', $paymentMethods)) $providerNames[] = 'Square';
+    $feeProviderLabel = !empty($providerNames) ? implode(' / ', $providerNames) : 'payment provider';
+}
 
 // Custom invoice HTML (rendered by Argo Books desktop app)
 $customInvoiceHtml = $invoiceData['customInvoiceHtml'] ?? '';
@@ -128,6 +147,9 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             invoiceToken: <?php echo json_encode($token, $je); ?>,
             invoiceId: <?php echo json_encode($invoiceId, $je); ?>,
             balanceDue: <?php echo $balanceDue; ?>,
+            processingFee: <?php echo $processingFee; ?>,
+            totalWithFee: <?php echo $totalWithFee; ?>,
+            feeProviderLabel: <?php echo json_encode($feeProviderLabel, $je); ?>,
             currency: <?php echo json_encode($currency, $je); ?>,
             currencySymbol: <?php echo json_encode($currencySymbol, $je); ?>,
             paymentMethods: <?php echo json_encode($paymentMethods, $je); ?>,
@@ -289,16 +311,16 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                             <?php if (!empty($lineItems)): ?>
                                 <?php foreach ($lineItems as $item): ?>
                                     <tr>
-                                        <td class="col-description">
+                                        <td class="col-description" data-label="Description">
                                             <?php echo htmlspecialchars($item['description'] ?? $item['Description'] ?? ''); ?>
                                         </td>
-                                        <td class="col-qty">
+                                        <td class="col-qty" data-label="Qty">
                                             <?php echo htmlspecialchars($item['quantity'] ?? $item['Quantity'] ?? 1); ?>
                                         </td>
-                                        <td class="col-price">
+                                        <td class="col-price" data-label="Price">
                                             <?php echo $currencySymbol . number_format(floatval($item['unitPrice'] ?? $item['UnitPrice'] ?? $item['price'] ?? $item['Price'] ?? 0), 2); ?>
                                         </td>
-                                        <td class="col-total">
+                                        <td class="col-total" data-label="Amount">
                                             <?php echo $currencySymbol . number_format(floatval($item['total'] ?? $item['Total'] ?? $item['amount'] ?? $item['Amount'] ?? 0), 2); ?>
                                         </td>
                                     </tr>
@@ -312,7 +334,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     </table>
 
                     <div class="invoice-totals">
-                        <?php if ($subtotal != $totalAmount): ?>
+                        <?php if (abs($subtotal - $totalAmount) > 0.01): ?>
                             <div class="total-row">
                                 <span>Subtotal</span>
                                 <span><?php echo $currencySymbol . number_format(floatval($subtotal), 2); ?></span>
@@ -338,6 +360,19 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                             <span>Balance Due</span>
                             <span><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></span>
                         </div>
+                        <?php if ($processingFee > 0 && !$isPaid): ?>
+                            <div class="total-row total-row-fee">
+                                <span>
+                                    <?php echo htmlspecialchars($feeProviderLabel); ?> processing fee
+                                    <button type="button" class="fee-info" aria-label="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>." title="This fee is charged by <?php echo htmlspecialchars($feeProviderLabel); ?> for secure online payment processing. It is not charged by <?php echo htmlspecialchars($companyName); ?>.">&#9432;</button>
+                                </span>
+                                <span><?php echo $currencySymbol . number_format($processingFee, 2); ?></span>
+                            </div>
+                            <div class="total-row total-row-charge">
+                                <span>Amount to Pay</span>
+                                <span><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></span>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -353,7 +388,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
             <?php if (!$isPaid && !empty($paymentMethods)): ?>
                 <div class="payment-section" id="payment-section">
                     <h3>Pay This Invoice</h3>
-                    <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($balanceDue, 2); ?> <?php echo $currency; ?></strong></p>
+                    <p class="payment-summary">Amount due: <strong><?php echo $currencySymbol . number_format($totalWithFee, 2); ?> <?php echo $currency; ?></strong></p>
 
                     <?php if ($singleMethod): ?>
                         <!-- Single payment method: go straight to form -->

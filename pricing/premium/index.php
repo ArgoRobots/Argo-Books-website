@@ -91,7 +91,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                         <?= svg_icon('document-lines') ?>
                     </div>
                     <h3>Unlimited Invoices & Payments</h3>
-                    <p>Send unlimited invoices and track payments with ease. Free users get 5 invoices per month — upgrade for unlimited billing.</p>
+                    <p>Send unlimited invoices and track payments with ease. Free users get 25 invoices per month — upgrade for unlimited billing.</p>
                 </div>
                 <div class="ai-feature-card">
                     <div class="ai-feature-icon">

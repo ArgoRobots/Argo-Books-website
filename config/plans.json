@@ -12,11 +12,11 @@
             "url": "/downloads/"
         },
         "features": [
-            {"label": "Unlimited products"},
-            {"label": "Unlimited transactions"},
+            {"label": "All core features"},
             {"label": "Real-time analytics"},
             {"label": "Receipt management"},
-            {"label": "5 invoices / month"},
+            {"label": "25 invoices / month"},
+            {"label": "AI receipt scanning", "detail": "5/month"},
             {"label": "AI spreadsheet import", "detail": "100/month"}
         ]
     },
@@ -33,12 +33,10 @@
             "url": "/pricing/premium/"
         },
         "features": [
-            {"label": "Everything in Free"},
-            {"label": "Unlimited products"},
-            {"label": "Biometric login security"},
             {"label": "Unlimited invoices & payments"},
             {"label": "AI receipt scanning", "detail": "500/month"},
             {"label": "Predictive analytics"},
+            {"label": "Biometric login security"},
             {"label": "Priority support"}
         ]
     }

@@ -64,23 +64,31 @@
                     "name": "Can customers pay invoices online through Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Every invoice includes a secure online payment link powered by Stripe, Square, or PayPal. Customers can pay by credit card with a single click."
+                        "text": "Yes. Every invoice includes a secure online payment link so your customers can pay by credit card with a single click. Argo Books supports Stripe, Square, and PayPal — you choose which payment gateway works best for your business. Payments are tracked automatically, so you always know which invoices are outstanding and which have been paid."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books support customizable invoice templates?",
+                    "name": "Can I customize how my invoices look?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Choose from multiple professional email templates with your company branding. Invoices include your logo, billing details, and itemized line items."
+                        "text": "Yes. Invoices are sent via professional email templates that include your company logo, billing details, and itemized line items. You can choose from multiple templates and customize the content to match your brand. Every invoice looks polished and professional — no design skills required."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I track invoice payment status in Argo Books?",
+                    "name": "How does invoice tracking work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Invoices are tracked from draft to paid with color-coded status badges. Summary cards show outstanding, paid, and overdue totals at a glance."
+                        "text": "Argo Books tracks every invoice from draft to paid with color-coded status badges so you can see where things stand at a glance. Summary cards on the invoicing dashboard show your outstanding, paid, and overdue totals in real time. You'll never have to wonder whether a client has paid — it's all right there."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How many invoices can I send per month?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Free plan includes 25 invoices per month, which is plenty for most small businesses and freelancers getting started. If you need unlimited invoicing, the Premium plan removes all limits so you can send as many invoices as your business requires."
                     }
                 }
             ]

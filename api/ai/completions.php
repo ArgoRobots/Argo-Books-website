@@ -2,10 +2,11 @@
 /**
  * AI Completions Proxy Endpoint
  *
- * POST /api/ai/completions - Proxy OpenAI chat completion requests
+ * POST /api/ai/completions - Proxy AI chat completion requests
  *
- * Receives prompts from the Argo Books app, forwards them to OpenAI,
- * and returns the response. All API keys are stored server-side.
+ * Receives prompts from the Argo Books app, forwards them to the appropriate
+ * AI provider (Gemini or OpenAI), and returns the response.
+ * All API keys are stored server-side.
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
@@ -32,14 +33,6 @@ if (is_rate_limited($rateLimitId, 60, 900, $rateLimitKey)) {
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);
 
-// Validate server configuration
-$openaiKey = $_ENV['OPENAI_API_KEY'] ?? '';
-if (empty($openaiKey)) {
-    send_error_response(500, 'AI service not configured on server.', 'CONFIG_ERROR');
-}
-
-$defaultModel = $_ENV['OPENAI_MODEL'] ?? 'gpt-4o-mini';
-
 // Parse request body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -55,76 +48,213 @@ if (empty($data['systemPrompt']) && empty($data['userPrompt'])) {
 
 $systemPrompt = $data['systemPrompt'] ?? '';
 $userPrompt = $data['userPrompt'] ?? '';
-$allowedModels = ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'];
-$model = in_array($data['model'] ?? '', $allowedModels, true) ? $data['model'] : $defaultModel;
+$requestedModel = $data['model'] ?? '';
 $maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 16000)); // Clamp 1-16k
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
+$base64Image = $data['base64Image'] ?? null;
+$mimeType = $data['mimeType'] ?? 'image/jpeg';
 
-// Build OpenAI request
-$messages = [];
-if (!empty($systemPrompt)) {
-    $messages[] = ['role' => 'system', 'content' => $systemPrompt];
-}
-if (!empty($userPrompt)) {
-    $messages[] = ['role' => 'user', 'content' => $userPrompt];
-}
+// Determine provider based on model name
+$geminiModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
+$openaiModels = ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo', 'gpt-3.5-turbo'];
+$isGemini = in_array($requestedModel, $geminiModels, true);
 
-$openaiPayload = json_encode([
-    'model' => $model,
-    'messages' => $messages,
-    'temperature' => $temperature,
-    'max_tokens' => $maxTokens,
-]);
-
-// Forward to OpenAI
-$ch = curl_init('https://api.openai.com/v1/chat/completions');
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => $openaiPayload,
-    CURLOPT_HTTPHEADER => [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $openaiKey,
-    ],
-    CURLOPT_TIMEOUT => 120,
-    CURLOPT_CONNECTTIMEOUT => 10,
-]);
-
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-$curlError = curl_error($ch);
-curl_close($ch);
-
-if ($response === false) {
-    error_log('OpenAI proxy cURL error: ' . $curlError);
-    send_error_response(502, 'Failed to connect to AI service.', 'UPSTREAM_ERROR');
-}
-
-$responseData = json_decode($response, true);
-
-if ($httpCode !== 200) {
-    $errorMessage = $responseData['error']['message'] ?? 'Unknown upstream error';
-    error_log("OpenAI proxy error ({$httpCode}): {$errorMessage}");
-
-    if ($httpCode === 429) {
-        send_error_response(429, 'AI service rate limit exceeded. Please try again later.', 'UPSTREAM_RATE_LIMITED');
+if ($isGemini) {
+    // --- Gemini API path ---
+    $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';
+    if (empty($geminiKey)) {
+        send_error_response(500, 'Gemini AI service not configured on server.', 'CONFIG_ERROR');
     }
 
-    send_error_response(502, 'AI service returned an error.', 'UPSTREAM_ERROR');
+    $model = $requestedModel;
+
+    // Build Gemini request: https://ai.google.dev/api/generate-content
+    $contents = [];
+
+    // Gemini uses system_instruction for system prompts (not in contents array)
+    $systemInstruction = null;
+    if (!empty($systemPrompt)) {
+        $systemInstruction = ['parts' => [['text' => $systemPrompt]]];
+    }
+
+    // Build user message parts
+    $userParts = [];
+    if (!empty($base64Image)) {
+        $userParts[] = [
+            'inline_data' => [
+                'mime_type' => $mimeType,
+                'data' => $base64Image,
+            ],
+        ];
+    }
+    if (!empty($userPrompt)) {
+        $userParts[] = ['text' => $userPrompt];
+    }
+    if (!empty($userParts)) {
+        $contents[] = ['role' => 'user', 'parts' => $userParts];
+    }
+
+    $geminiPayload = [
+        'contents' => $contents,
+        'generationConfig' => [
+            'temperature' => $temperature,
+            'maxOutputTokens' => $maxTokens,
+            'responseMimeType' => 'application/json',
+        ],
+    ];
+    if ($systemInstruction) {
+        $geminiPayload['system_instruction'] = $systemInstruction;
+    }
+
+    $geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$geminiKey}";
+
+    $ch = curl_init($geminiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => json_encode($geminiPayload),
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+        ],
+        CURLOPT_TIMEOUT => 120,
+        CURLOPT_CONNECTTIMEOUT => 10,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+        error_log('Gemini proxy cURL error: ' . $curlError);
+        send_error_response(502, 'Failed to connect to AI service.', 'UPSTREAM_ERROR');
+    }
+
+    $responseData = json_decode($response, true);
+
+    if ($httpCode !== 200) {
+        $errorMessage = $responseData['error']['message'] ?? 'Unknown upstream error';
+        error_log("Gemini proxy error ({$httpCode}): {$errorMessage}");
+
+        if ($httpCode === 429) {
+            send_error_response(429, 'AI service rate limit exceeded. Please try again later.', 'UPSTREAM_RATE_LIMITED');
+        }
+
+        send_error_response(502, 'AI service returned an error.', 'UPSTREAM_ERROR');
+    }
+
+    // Extract content from Gemini response
+    $content = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? null;
+    if ($content === null) {
+        send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
+    }
+
+    $usage = null;
+    if (isset($responseData['usageMetadata'])) {
+        $usage = [
+            'prompt_tokens' => $responseData['usageMetadata']['promptTokenCount'] ?? 0,
+            'completion_tokens' => $responseData['usageMetadata']['candidatesTokenCount'] ?? 0,
+            'total_tokens' => $responseData['usageMetadata']['totalTokenCount'] ?? 0,
+        ];
+    }
+
+    send_json_response(200, [
+        'success' => true,
+        'content' => $content,
+        'model' => $model,
+        'usage' => $usage,
+        'timestamp' => date('c'),
+    ]);
+
+} else {
+    // --- OpenAI API path ---
+    $openaiKey = $_ENV['OPENAI_API_KEY'] ?? '';
+    if (empty($openaiKey)) {
+        send_error_response(500, 'AI service not configured on server.', 'CONFIG_ERROR');
+    }
+
+    $defaultModel = $_ENV['OPENAI_MODEL'] ?? 'gpt-4o-mini';
+    $model = in_array($requestedModel, $openaiModels, true) ? $requestedModel : $defaultModel;
+
+    $messages = [];
+    if (!empty($systemPrompt)) {
+        $messages[] = ['role' => 'system', 'content' => $systemPrompt];
+    }
+    if (!empty($userPrompt)) {
+        if (!empty($base64Image)) {
+            // Vision request: include image in user message
+            $messages[] = [
+                'role' => 'user',
+                'content' => [
+                    ['type' => 'text', 'text' => $userPrompt],
+                    ['type' => 'image_url', 'image_url' => [
+                        'url' => "data:{$mimeType};base64,{$base64Image}",
+                        'detail' => 'high',
+                    ]],
+                ],
+            ];
+        } else {
+            $messages[] = ['role' => 'user', 'content' => $userPrompt];
+        }
+    }
+
+    $openaiPayload = json_encode([
+        'model' => $model,
+        'messages' => $messages,
+        'temperature' => $temperature,
+        'max_tokens' => $maxTokens,
+    ]);
+
+    // Forward to OpenAI
+    $ch = curl_init('https://api.openai.com/v1/chat/completions');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $openaiPayload,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $openaiKey,
+        ],
+        CURLOPT_TIMEOUT => 120,
+        CURLOPT_CONNECTTIMEOUT => 10,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false) {
+        error_log('OpenAI proxy cURL error: ' . $curlError);
+        send_error_response(502, 'Failed to connect to AI service.', 'UPSTREAM_ERROR');
+    }
+
+    $responseData = json_decode($response, true);
+
+    if ($httpCode !== 200) {
+        $errorMessage = $responseData['error']['message'] ?? 'Unknown upstream error';
+        error_log("OpenAI proxy error ({$httpCode}): {$errorMessage}");
+
+        if ($httpCode === 429) {
+            send_error_response(429, 'AI service rate limit exceeded. Please try again later.', 'UPSTREAM_RATE_LIMITED');
+        }
+
+        send_error_response(502, 'AI service returned an error.', 'UPSTREAM_ERROR');
+    }
+
+    // Extract content from OpenAI response
+    $content = $responseData['choices'][0]['message']['content'] ?? null;
+    if ($content === null) {
+        send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
+    }
+
+    $usage = $responseData['usage'] ?? null;
+
+    send_json_response(200, [
+        'success' => true,
+        'content' => $content,
+        'model' => $responseData['model'] ?? $model,
+        'usage' => $usage,
+        'timestamp' => date('c'),
+    ]);
 }
-
-// Extract content from OpenAI response
-$content = $responseData['choices'][0]['message']['content'] ?? null;
-if ($content === null) {
-    send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
-}
-
-$usage = $responseData['usage'] ?? null;
-
-send_json_response(200, [
-    'success' => true,
-    'content' => $content,
-    'model' => $responseData['model'] ?? $model,
-    'usage' => $usage,
-    'timestamp' => date('c'),
-]);

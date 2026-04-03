@@ -61,26 +61,34 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books include a CRM for managing customers?",
+                    "name": "Does Argo Books include a built-in customer database?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes. It integrates with invoicing, revenue tracking, and rentals."
+                        "text": "Yes. Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes for every client. It integrates directly with invoicing, revenue tracking, and rental management — so when you create an invoice or rental, your customer details auto-populate without re-entering anything."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can I search and filter my customer list in Argo Books?",
+                    "name": "How do I find customers in Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can instantly search customers by name, email, or ID, and filter by country, status, or date added."
+                        "text": "You can instantly search customers by name, email, or ID, and filter by country, status, or date added. Whether you have 10 customers or 10,000, finding the right record takes seconds."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is customer data stored in the cloud?",
+                    "name": "Is my customer data private and secure?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No. Argo Books is a desktop app and all customer data is stored locally on your computer. Nothing is uploaded to cloud servers."
+                        "text": "Absolutely. Argo Books is a desktop application, so all customer data is stored locally on your computer — nothing is uploaded to cloud servers. Your data is encrypted with AES-256-GCM, the same standard used by banks and government agencies. You have full control over your customer information at all times."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I import my existing customer list?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. You can import customers from Excel or CSV files using the AI Spreadsheet Import feature. The AI automatically detects your columns and maps them to the right fields, so you can migrate your existing customer data into Argo Books in minutes — no manual data entry required."
                     }
                 }
             ]

@@ -56,6 +56,56 @@ $plans = get_plan_features();
         }
     </script>
 
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "Is Argo Books really free?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. ZipBooks also has a free tier, but it's more limited in features — no AI capabilities, no inventory management, and no offline access."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does Argo Books work offline?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy. ZipBooks is cloud-only and requires a constant internet connection to access your data."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How is Argo Books different from ZipBooks?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management — all at a lower premium price ($10 CAD/month vs $20+ CAD). ZipBooks is cloud-based and focused on invoicing and time tracking for freelancers."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How does Argo Books pricing compare to ZipBooks?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is $10 CAD/month vs ZipBooks Smarter at $20 CAD/month. You get more features for less with Argo Books."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "What platforms does Argo Books run on?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. ZipBooks is web-based and accessible from any browser."
+                    }
+                }
+            ]
+        }
+    </script>
+
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs ZipBooks — More Features, Lower Price | Argo Books</title>
 
@@ -167,7 +217,7 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Invoicing &amp; payments</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
@@ -185,19 +235,19 @@ $plans = get_plan_features();
                         </tr>
                         <tr>
                             <td>Unlimited products</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>Inventory management</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI receipt scanning</td>
-                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
+                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
@@ -345,7 +395,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. The free version of Argo Books includes expense tracking, financial reports, and unlimited products. No credit card required, no trial period — it's free forever. Premium unlocks AI features, invoicing, and more.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
+                            <p>ZipBooks also has a free tier, but it's more limited — no AI capabilities, no inventory management, and no offline access.</p>
                         </div>
                     </div>
                 </div>
@@ -359,7 +410,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books is a desktop application that works offline. Your data is stored locally on your device, so you can manage your finances even without an internet connection. ZipBooks is cloud-only and requires a constant internet connection.</p>
+                            <p>Yes. Argo Books is a desktop application that runs natively on your computer, so it works even without an internet connection. Your data is stored locally with AES-256 encryption, giving you full control and privacy.</p>
+                            <p>ZipBooks is cloud-only and requires a constant internet connection to access your data.</p>
                         </div>
                     </div>
                 </div>
@@ -373,21 +425,38 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management — all at a lower premium price ($10 CAD vs $20+ CAD).</p>
+                            <p>Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management — all at a lower premium price.</p>
+                            <p>ZipBooks is cloud-based and focused more on invoicing and time tracking for freelancers.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="faq-item">
                     <div class="faq-question">
-                        <h3>What platforms does Argo Books support?</h3>
+                        <h3>How does Argo Books pricing compare to ZipBooks?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
                         </div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is available on Windows, macOS, and Linux as a native desktop application.</p>
+                            <p>Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is <strong>$10 CAD/month</strong> vs ZipBooks Smarter at $20 CAD/month.</p>
+                            <p>You get more features for less with Argo Books.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>What platforms does Argo Books run on?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>ZipBooks is web-based and accessible from any browser.</p>
                         </div>
                     </div>
                 </div>

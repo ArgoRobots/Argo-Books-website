@@ -2,7 +2,7 @@
 /**
  * Invoice Send Usage Tracking API
  * Tracks and enforces monthly invoice send limits for free-tier users.
- * Free users get 5 invoice sends per month; premium users are unlimited.
+ * Free users get 25 invoice sends per month; premium users are unlimited.
  */
 
 header('Content-Type: application/json');
@@ -20,7 +20,11 @@ if (is_rate_limited($ip, 30, 900, 'invoice_usage')) {
 record_rate_limit_attempt($ip, 'invoice_usage');
 
 // Get JSON input
-$input = json_decode(file_get_contents('php://input'), true);
+$rawInput = file_get_contents('php://input');
+$input = json_decode($rawInput, true);
+if (!is_array($input)) {
+    send_error_response(400, 'Invalid JSON input');
+}
 
 // Accept either license_key (premium) or device_id (free)
 $license_key = trim($input['license_key'] ?? '');

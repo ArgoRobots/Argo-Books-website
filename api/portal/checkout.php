@@ -52,16 +52,35 @@ if ($invoice['status'] === 'cancelled') {
     send_error_response(400, 'This invoice has been cancelled.', 'CANCELLED');
 }
 
+// Calculate processing fee if enabled for this invoice
+$passProcessingFee = !empty($invoice['pass_processing_fee']);
+$processingFee = 0.00;
+if ($passProcessingFee) {
+    require_once __DIR__ . '/../../config/pricing.php';
+    $processingFee = calculate_invoice_processing_fee(
+        floatval($invoice['balance_due']),
+        $invoice['currency'] ?: 'USD'
+    );
+}
+
 // Validate payment amount using integer cents for precision
 $requestedAmount = floatval($data['amount']);
 $amountCents = (int) round($requestedAmount * 100);
 $balanceDueCents = (int) round(floatval($invoice['balance_due']) * 100);
+$expectedTotalCents = $balanceDueCents + (int) round($processingFee * 100);
 
 if ($amountCents <= 0) {
     send_error_response(400, 'Payment amount must be greater than zero.', 'INVALID_AMOUNT');
 }
-if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
-    send_error_response(400, 'Payment amount exceeds balance due.', 'AMOUNT_EXCEEDS_BALANCE');
+if ($passProcessingFee) {
+    // When fee is enabled, require the exact fee-inclusive total (within 1 cent tolerance)
+    if (abs($amountCents - $expectedTotalCents) > 1) {
+        send_error_response(400, 'Payment amount must equal the balance due plus processing fee.', 'INVALID_AMOUNT_WITH_FEE');
+    }
+} else {
+    if ($amountCents > $balanceDueCents + 1) { // 1 cent tolerance
+        send_error_response(400, 'Payment amount exceeds balance due.', 'AMOUNT_EXCEEDS_BALANCE');
+    }
 }
 
 $method = strtolower($data['method']);
@@ -80,7 +99,7 @@ try {
             handle_paypal_checkout($invoice, $requestedAmount, $currency, $data);
             break;
         case 'square':
-            handle_square_checkout($invoice, $amountCents, $currency, $requestedAmount, $data);
+            handle_square_checkout($invoice, $amountCents, $currency, $requestedAmount, $data, $processingFee);
             break;
         default:
             send_error_response(400, 'Invalid payment method. Must be stripe, paypal, or square.', 'INVALID_METHOD');
@@ -171,7 +190,7 @@ function handle_paypal_checkout(array $invoice, float $amount, string $currency,
 /**
  * Handle Square checkout
  */
-function handle_square_checkout(array $invoice, int $amountCents, string $currency, float $amount, array $data): void
+function handle_square_checkout(array $invoice, int $amountCents, string $currency, float $amount, array $data, float $processingFee = 0.00): void
 {
     global $is_production;
 
@@ -196,7 +215,7 @@ function handle_square_checkout(array $invoice, int $amountCents, string $curren
 
     // If a source_id is provided, process the payment directly
     if (!empty($data['source_id'])) {
-        process_square_payment($invoice, $company, $data, $amountCents, $currency, $amount);
+        process_square_payment($invoice, $company, $data, $amountCents, $currency, $amount, $processingFee);
         return;
     }
 
@@ -220,7 +239,7 @@ function handle_square_checkout(array $invoice, int $amountCents, string $curren
 /**
  * Process a Square payment using the business's access token
  */
-function process_square_payment(array $invoice, array $company, array $data, int $amountCents, string $currency, float $amount): void
+function process_square_payment(array $invoice, array $company, array $data, int $amountCents, string $currency, float $amount, float $processingFee = 0.00): void
 {
     global $is_production;
 
@@ -278,6 +297,7 @@ function process_square_payment(array $invoice, array $company, array $data, int
                 'invoice_id' => $invoice['invoice_id'],
                 'customer_name' => $invoice['customer_name'],
                 'amount' => $amount,
+                'processing_fee' => $processingFee,
                 'currency' => strtoupper($currency),
                 'payment_method' => 'square',
                 'provider_payment_id' => $payment['id'],

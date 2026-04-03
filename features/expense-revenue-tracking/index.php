@@ -61,26 +61,34 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "Do I need accounting experience to use Argo Books for expense tracking?",
+                    "name": "Do I need accounting experience to track expenses?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No. Argo Books uses guided forms with smart defaults and validation to make recording expenses and revenue simple for anyone, with zero accounting knowledge required."
+                        "text": "Not at all. Argo Books uses guided forms with smart defaults and built-in validation to make recording expenses and revenue simple for anyone. You don't need to know debits from credits — just fill in the amount, category, and date, and Argo Books handles the rest."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Can Argo Books track both expenses and revenue in one place?",
+                    "name": "Can I track both expenses and revenue in one place?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has dedicated expense and revenue pages with real-time summary cards showing monthly totals, transaction counts, and net profit."
+                        "text": "Yes. Argo Books has dedicated expense and revenue pages with real-time summary cards showing monthly totals, transaction counts, and net profit. You get a complete picture of your business finances without switching between apps or spreadsheets."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Does Argo Books store receipts with expense records?",
+                    "name": "How does receipt management work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can attach receipts to any expense, and AI receipt scanning can auto-create expense records from receipt photos. All receipts are stored in a searchable archive."
+                        "text": "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos — it extracts the supplier name, line items, taxes, and total with 98% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Can I import existing expense data into Argo Books?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. If you have expense or revenue records in a spreadsheet, you can import them using the AI Spreadsheet Import feature. Just drop your Excel or CSV file and the AI maps your columns to the right fields automatically. It's the fastest way to get up and running with your existing financial data."
                     }
                 }
             ]

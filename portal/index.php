@@ -117,7 +117,8 @@ $customerName = !empty($invoices) ? ($invoices[0]['customer_name'] ?? '') : '';
 
 // Currency info
 $currency = !empty($invoices) ? ($invoices[0]['currency'] ?: 'USD') : 'USD';
-$currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
+$currencySymbols = ['USD' => '$', 'CAD' => 'CA$', 'EUR' => '€', 'GBP' => '£', 'AUD' => 'A$', 'JPY' => '¥', 'CHF' => 'CHF ', 'CNY' => '¥', 'INR' => '₹', 'MXN' => 'MX$'];
+$currencySymbol = $currencySymbols[$currency] ?? '$';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -187,7 +188,7 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
                             $invBalance = floatval($inv['balance_due']);
                             $invTotal = floatval($inv['total_amount']);
                             $invCurrency = $inv['currency'] ?: 'USD';
-                            $invSymbol = $invCurrency === 'CAD' ? 'CA$' : '$';
+                            $invSymbol = $currencySymbols[$invCurrency] ?? '$';
                         ?>
                             <div class="invoice-card <?php echo $invStatus === 'overdue' ? 'overdue' : ''; ?>">
                                 <div class="card-header">
@@ -249,7 +250,7 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
                                     $invBalance = floatval($inv['balance_due']);
                                     $invTotal = floatval($inv['total_amount']);
                                     $invCurrency = $inv['currency'] ?: 'USD';
-                                    $invSymbol = $invCurrency === 'CAD' ? 'CA$' : '$';
+                                    $invSymbol = $currencySymbols[$invCurrency] ?? '$';
 
                                     if ($inv['due_date'] && !in_array($invStatus, ['paid', 'cancelled'])) {
                                         if (strtotime($inv['due_date']) < time() && $invStatus !== 'partial') {
@@ -258,14 +259,14 @@ $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
                                     }
                                 ?>
                                     <tr>
-                                        <td><strong><?php echo htmlspecialchars($inv['invoice_id']); ?></strong></td>
-                                        <td><?php echo date('M j, Y', strtotime($inv['created_at'])); ?></td>
-                                        <td class="<?php echo $invStatus === 'overdue' ? 'text-danger' : ''; ?>">
+                                        <td data-label="Invoice #"><strong><?php echo htmlspecialchars($inv['invoice_id']); ?></strong></td>
+                                        <td data-label="Date"><?php echo date('M j, Y', strtotime($inv['created_at'])); ?></td>
+                                        <td data-label="Due Date" class="<?php echo $invStatus === 'overdue' ? 'text-danger' : ''; ?>">
                                             <?php echo $inv['due_date'] ? date('M j, Y', strtotime($inv['due_date'])) : '-'; ?>
                                         </td>
-                                        <td><?php echo $invSymbol . number_format($invTotal, 2); ?></td>
-                                        <td><?php echo $invSymbol . number_format($invBalance, 2); ?></td>
-                                        <td>
+                                        <td data-label="Total"><?php echo $invSymbol . number_format($invTotal, 2); ?></td>
+                                        <td data-label="Balance"><?php echo $invSymbol . number_format($invBalance, 2); ?></td>
+                                        <td data-label="Status">
                                             <span class="status-badge status-<?php echo htmlspecialchars($invStatus); ?>">
                                                 <?php echo ucfirst(htmlspecialchars($invStatus)); ?>
                                             </span>

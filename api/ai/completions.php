@@ -79,13 +79,101 @@ if ($isGemini) {
 
     // Build user message parts
     $userParts = [];
+    $uploadedFileUri = null;
+    $uploadedFileName = null;
     if (!empty($base64Image)) {
-        $userParts[] = [
-            'inline_data' => [
-                'mime_type' => $mimeType,
-                'data' => $base64Image,
-            ],
-        ];
+        if ($mimeType === 'application/pdf') {
+            // PDFs must be uploaded via the Gemini Files API, then referenced by URI.
+            // inline_data only works for image formats.
+            $pdfBytes = base64_decode($base64Image, true);
+            if ($pdfBytes === false) {
+                send_error_response(400, 'Invalid base64 PDF data.', 'INVALID_DATA');
+            }
+
+            $uploadUrl = "https://generativelanguage.googleapis.com/upload/v1beta/files?key={$geminiKey}";
+            $boundary = bin2hex(random_bytes(16));
+
+            // Build multipart/related body: JSON metadata + raw file bytes
+            $metadataJson = json_encode(['file' => ['displayName' => 'receipt.pdf']]);
+            $multipartBody = "--{$boundary}\r\n"
+                . "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+                . $metadataJson . "\r\n"
+                . "--{$boundary}\r\n"
+                . "Content-Type: application/pdf\r\n\r\n"
+                . $pdfBytes . "\r\n"
+                . "--{$boundary}--\r\n";
+
+            $ch = curl_init($uploadUrl);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $multipartBody,
+                CURLOPT_HTTPHEADER => [
+                    "Content-Type: multipart/related; boundary={$boundary}",
+                    'X-Goog-Upload-Protocol: multipart',
+                    'Content-Length: ' . strlen($multipartBody),
+                ],
+                CURLOPT_TIMEOUT => 60,
+                CURLOPT_CONNECTTIMEOUT => 10,
+            ]);
+
+            $uploadResponse = curl_exec($ch);
+            $uploadHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $uploadError = curl_error($ch);
+            curl_close($ch);
+
+            if ($uploadResponse === false || $uploadHttpCode !== 200) {
+                error_log("Gemini Files API upload failed ({$uploadHttpCode}): {$uploadError} - Response: {$uploadResponse}");
+                send_error_response(502, 'Failed to upload PDF to AI service.', 'UPSTREAM_ERROR');
+            }
+
+            $uploadData = json_decode($uploadResponse, true);
+            $uploadedFileUri = $uploadData['file']['uri'] ?? null;
+            $uploadedFileName = $uploadData['file']['name'] ?? null;
+            if (empty($uploadedFileUri) || empty($uploadedFileName)) {
+                error_log('Gemini Files API returned no file URI: ' . $uploadResponse);
+                send_error_response(502, 'Failed to process uploaded PDF.', 'UPSTREAM_ERROR');
+            }
+
+            // Poll until the file is ACTIVE (Gemini processes uploads asynchronously)
+            $fileStatusUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
+            $maxPolls = 15;
+            for ($i = 0; $i < $maxPolls; $i++) {
+                $ch = curl_init($fileStatusUrl);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 10,
+                ]);
+                $statusResponse = curl_exec($ch);
+                curl_close($ch);
+
+                $statusData = json_decode($statusResponse, true);
+                $state = $statusData['state'] ?? '';
+                if ($state === 'ACTIVE') {
+                    break;
+                }
+                if ($state === 'FAILED') {
+                    error_log('Gemini file processing failed: ' . $statusResponse);
+                    send_error_response(502, 'AI service failed to process the PDF.', 'UPSTREAM_ERROR');
+                }
+                // Still PROCESSING — wait and retry
+                usleep(500000); // 500ms
+            }
+
+            $userParts[] = [
+                'file_data' => [
+                    'file_uri' => $uploadedFileUri,
+                    'mime_type' => 'application/pdf',
+                ],
+            ];
+        } else {
+            $userParts[] = [
+                'inline_data' => [
+                    'mime_type' => $mimeType,
+                    'data' => $base64Image,
+                ],
+            ];
+        }
     }
     if (!empty($userPrompt)) {
         $userParts[] = ['text' => $userPrompt];
@@ -141,6 +229,19 @@ if ($isGemini) {
         }
 
         send_error_response(502, 'AI service returned an error.', 'UPSTREAM_ERROR');
+    }
+
+    // Clean up uploaded PDF file from Gemini storage
+    if (!empty($uploadedFileName)) {
+        $deleteUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
+        $ch = curl_init($deleteUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => 'DELETE',
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
     }
 
     // Extract content from Gemini response

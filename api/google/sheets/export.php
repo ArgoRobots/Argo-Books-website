@@ -292,7 +292,6 @@ function googleApiRequest(string $accessToken, string $method, string $url, ?arr
     curl_setopt_array($ch, $opts);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($response === false || $httpCode >= 400) {
         error_log("Google API error ({$method} {$url}): HTTP {$httpCode} - " . substr($response ?: '', 0, 500));

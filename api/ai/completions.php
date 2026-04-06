@@ -120,7 +120,6 @@ if ($isGemini) {
             $uploadResponse = curl_exec($ch);
             $uploadHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $uploadError = curl_error($ch);
-            curl_close($ch);
 
             if ($uploadResponse === false || $uploadHttpCode !== 200) {
                 error_log("Gemini Files API upload failed ({$uploadHttpCode}): {$uploadError} - Response: {$uploadResponse}");
@@ -145,7 +144,6 @@ if ($isGemini) {
                     CURLOPT_TIMEOUT => 10,
                 ]);
                 $statusResponse = curl_exec($ch);
-                curl_close($ch);
 
                 $statusData = json_decode($statusResponse, true);
                 $state = $statusData['state'] ?? '';
@@ -211,7 +209,6 @@ if ($isGemini) {
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
-    curl_close($ch);
 
     if ($response === false) {
         error_log('Gemini proxy cURL error: ' . $curlError);
@@ -241,7 +238,6 @@ if ($isGemini) {
             CURLOPT_TIMEOUT => 10,
         ]);
         curl_exec($ch);
-        curl_close($ch);
     }
 
     // Extract content from Gemini response
@@ -323,7 +319,6 @@ if ($isGemini) {
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
-    curl_close($ch);
 
     if ($response === false) {
         error_log('OpenAI proxy cURL error: ' . $curlError);

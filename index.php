@@ -766,153 +766,155 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     </section>
 
     <!-- AI Spreadsheet Import Section -->
+    <div class="ai-import-divider-top">
+        <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,200 L0,100 Q360,0 720,80 Q1080,160 1440,60 L1440,200 Z" fill="var(--gray-900)"/>
+            <path d="M0,200 L0,130 Q300,50 720,110 Q1100,170 1440,90 L1440,200 Z" fill="var(--gray-900)" opacity="0.5"/>
+        </svg>
+    </div>
     <section class="ai-import-section">
+        <div class="ai-import-bg-glow"></div>
         <div class="container">
-            <div class="ai-import-content">
-                <div class="ai-import-text animate-on-scroll">
-                    <span class="section-tag">Smart Import</span>
-                    <h2 class="section-title text-left">Import any spreadsheet — instantly</h2>
-                    <p class="section-description text-left">Just upload your spreadsheet — the system figures out what each column means and puts everything in the right place for you.</p>
+            <div class="ai-import-header animate-on-scroll">
+                <span class="section-tag">Smart Import</span>
+                <h2 class="section-title">Import any spreadsheet — instantly</h2>
+                <p class="section-description">Drop your file in and the system figures out what each column means. No reformatting, no manual mapping, no headaches.</p>
+            </div>
 
-                    <div class="ai-import-features">
-                        <div class="ai-import-feature">
-                            <div class="ai-feature-icon">
-                                <?= svg_icon('bolt', 24) ?>
+            <div class="ai-import-flow animate-on-scroll" id="aiImportDemo">
+                <!-- Source: messy spreadsheet -->
+                <div class="ai-flow-source">
+                    <div class="ai-flow-card ai-flow-card-source">
+                        <div class="ai-flow-card-header">
+                            <div class="ai-flow-file-icon"><?= svg_icon('table', 16) ?></div>
+                            <span class="ai-flow-file-name">bill_export.xlsx</span>
+                            <span class="ai-flow-file-badge">Excel</span>
+                        </div>
+                        <div class="ai-flow-table">
+                            <div class="ai-flow-row ai-flow-row-header">
+                                <span>Supplier</span>
+                                <span>Amt Owed</span>
+                                <span>Pay By</span>
+                                <span>Memo</span>
                             </div>
-                            <div class="ai-feature-detail">
-                                <h4>Instant Column Detection</h4>
-                                <p>Automatically recognizes names, emails, phone numbers, dates, currencies, and more — regardless of column names</p>
+                            <div class="ai-flow-row" data-row="0">
+                                <span>Acme Supply Co</span>
+                                <span>$4,280.00</span>
+                                <span>12/15/2025</span>
+                                <span>INV-3847</span>
+                            </div>
+                            <div class="ai-flow-row" data-row="1">
+                                <span>TechFlow LLC</span>
+                                <span>$950.50</span>
+                                <span>01/02/2026</span>
+                                <span>PO-9912</span>
+                            </div>
+                            <div class="ai-flow-row ai-flow-row-faded" data-row="2">
+                                <span>NovaCorp Int'l</span>
+                                <span>$12,100.00</span>
+                                <span>11/30/2025</span>
+                                <span>Contract #441</span>
                             </div>
                         </div>
-                        <div class="ai-import-feature">
-                            <div class="ai-feature-icon">
-                                <?= svg_icon('table', 24) ?>
-                            </div>
-                            <div class="ai-feature-detail">
-                                <h4>Any Format, Any Layout</h4>
-                                <p>Works with messy spreadsheets, unusual column names, and mixed data — no reformatting needed</p>
-                            </div>
-                        </div>
-                        <div class="ai-import-feature">
-                            <div class="ai-feature-icon">
-                                <?= svg_icon('shield', 24) ?>
-                            </div>
-                            <div class="ai-feature-detail">
-                                <h4>Private &amp; Secure</h4>
-                                <p>Your data is encrypted and processed securely — it's never stored or used for training</p>
-                            </div>
-                        </div>
+                        <div class="ai-flow-row-count">+384 rows</div>
                     </div>
                 </div>
 
-                <div class="ai-import-visual animate-on-scroll">
-                    <div class="ai-import-demo" id="aiImportDemo">
-                        <div class="demo-card">
-                            <!-- Spreadsheet header -->
-                            <div class="demo-spreadsheet-header">
-                                <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
-                                <span class="demo-file-name">bill_export.xlsx</span>
-                                <span class="demo-file-badge">Excel</span>
-                            </div>
-                            <div class="demo-spreadsheet-table">
-                                <div class="demo-table-row demo-table-header-row">
-                                    <span>Supplier</span>
-                                    <span>Amt Owed</span>
-                                    <span>Pay By</span>
-                                    <span>Memo</span>
-                                </div>
-                                <div class="demo-table-row">
-                                    <span>Acme Supply Co</span>
-                                    <span>$4,280.00</span>
-                                    <span>12/15/2025</span>
-                                    <span>INV-3847</span>
-                                </div>
-                                <div class="demo-table-row">
-                                    <span>TechFlow LLC</span>
-                                    <span>$950.50</span>
-                                    <span>01/02/2026</span>
-                                    <span>PO-9912</span>
-                                </div>
-                                <div class="demo-table-row demo-table-faded">
-                                    <span>NovaCorp Int'l</span>
-                                    <span>$12,100.00</span>
-                                    <span>11/30/2025</span>
-                                    <span>Contract #441</span>
-                                </div>
-                            </div>
-                            <div class="demo-row-count">384 more rows...</div>
-
-                            <!-- AI Processing divider -->
-                            <div class="demo-ai-divider" id="aiProcessor">
-                                <div class="ai-divider-line"></div>
-                                <div class="ai-processor-ring">
-                                    <svg viewBox="0 0 48 48" class="processor-ring-svg">
-                                        <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                                        <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
-                                        <defs>
-                                            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style="stop-color:#6366f1"/>
-                                                <stop offset="100%" style="stop-color:#8b5cf6"/>
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <span class="processor-label">AI</span>
-                                </div>
-                                <span class="processor-text">Mapping columns...</span>
-                                <div class="ai-divider-line"></div>
-                            </div>
-
-                            <!-- Mapping results -->
-                            <div class="demo-mapping-results" id="aiMappingResults">
-                                <div class="demo-mapping-header">
-                                    <span class="demo-mapping-title">Mapped Fields</span>
-                                    <span class="demo-mapping-badge">4/4 matched</span>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="0">
-                                    <div class="demo-map-source">Supplier</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Supplier Name</div>
-                                    <div class="demo-map-confidence">97%</div>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="1">
-                                    <div class="demo-map-source">Amt Owed</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Balance Due</div>
-                                    <div class="demo-map-confidence">93%</div>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="2">
-                                    <div class="demo-map-source">Pay By</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Due Date</div>
-                                    <div class="demo-map-confidence">91%</div>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="3">
-                                    <div class="demo-map-source">Memo</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Reference #</div>
-                                    <div class="demo-map-confidence">86%</div>
-                                </div>
-                                <div class="demo-mapping-footer" id="aiMappingFooter">
-                                    <div class="demo-mapping-success">
-                                        <?= svg_icon('check', 16) ?>
-                                        <span>Ready to import 387 rows</span>
-                                    </div>
-                                </div>
+                <!-- Center: processing hub -->
+                <div class="ai-flow-center">
+                    <div class="ai-flow-connector-line ai-flow-connector-left"></div>
+                    <div class="ai-flow-hub" id="aiFlowHub">
+                        <div class="ai-flow-hub-ring">
+                            <svg viewBox="0 0 80 80" class="ai-hub-svg">
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="2"/>
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="url(#hubGrad)" stroke-width="2.5" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round" class="ai-hub-progress"/>
+                                <defs>
+                                    <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#6366f1"/>
+                                        <stop offset="100%" style="stop-color:#a78bfa"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="ai-hub-icon">
+                                <?= svg_icon('bolt', 24) ?>
                             </div>
                         </div>
+                        <span class="ai-flow-hub-label" id="aiHubLabel">Analyzing...</span>
+                    </div>
+                    <div class="ai-flow-connector-line ai-flow-connector-right"></div>
+                    <!-- Animated particles -->
+                    <div class="ai-flow-particles" id="aiParticles"></div>
+                </div>
+
+                <!-- Destination: clean mapped fields -->
+                <div class="ai-flow-dest">
+                    <div class="ai-flow-card ai-flow-card-dest">
+                        <div class="ai-flow-card-header ai-flow-card-header-dest">
+                            <span class="ai-flow-dest-title">Mapped Fields</span>
+                            <span class="ai-flow-dest-badge" id="aiMatchBadge">0/4</span>
+                        </div>
+                        <div class="ai-flow-fields" id="aiFlowFields">
+                            <div class="ai-flow-field" data-field="0">
+                                <div class="ai-flow-field-label">Supplier Name</div>
+                                <div class="ai-flow-field-value">Acme Supply Co</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-text"><?= svg_icon('check', 12) ?> Text</div>
+                            </div>
+                            <div class="ai-flow-field" data-field="1">
+                                <div class="ai-flow-field-label">Balance Due</div>
+                                <div class="ai-flow-field-value">$4,280.00</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-currency"><?= svg_icon('check', 12) ?> Currency</div>
+                            </div>
+                            <div class="ai-flow-field" data-field="2">
+                                <div class="ai-flow-field-label">Due Date</div>
+                                <div class="ai-flow-field-value">Dec 15, 2025</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-date"><?= svg_icon('check', 12) ?> Date</div>
+                            </div>
+                            <div class="ai-flow-field" data-field="3">
+                                <div class="ai-flow-field-label">Reference #</div>
+                                <div class="ai-flow-field-value">INV-3847</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-id"><?= svg_icon('check', 12) ?> ID</div>
+                            </div>
+                        </div>
+                        <div class="ai-flow-footer" id="aiFlowFooter">
+                            <?= svg_icon('check', 16) ?>
+                            <span>Ready to import 387 rows</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature pills -->
+            <div class="ai-import-pills animate-on-scroll">
+                <div class="ai-pill">
+                    <div class="ai-pill-icon"><?= svg_icon('bolt', 18) ?></div>
+                    <div class="ai-pill-text">
+                        <strong>Instant detection</strong>
+                        <span>Names, emails, dates, currencies — recognized automatically</span>
+                    </div>
+                </div>
+                <div class="ai-pill">
+                    <div class="ai-pill-icon"><?= svg_icon('table', 18) ?></div>
+                    <div class="ai-pill-text">
+                        <strong>Any format</strong>
+                        <span>Messy columns, unusual names, mixed data — no cleanup needed</span>
+                    </div>
+                </div>
+                <div class="ai-pill">
+                    <div class="ai-pill-icon"><?= svg_icon('shield', 18) ?></div>
+                    <div class="ai-pill-text">
+                        <strong>Private &amp; secure</strong>
+                        <span>Encrypted processing — never stored or used for training</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+    <div class="ai-import-divider-bottom">
+        <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,0 L0,120 Q360,200 720,100 Q1080,20 1440,140 L1440,0 Z" fill="var(--gray-900)"/>
+            <path d="M0,0 L0,80 Q400,180 720,70 Q1050,0 1440,100 L1440,0 Z" fill="var(--gray-900)" opacity="0.5"/>
+        </svg>
+    </div>
 
     <!-- How It Works Section -->
     <section class="how-it-works-section">
@@ -1886,61 +1888,98 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             runCycle();
         }
 
-        // AI Import demo animation
+        // AI Import flow animation
         const aiImportDemo = document.getElementById('aiImportDemo');
         if (aiImportDemo) {
             let aiAnimationStarted = false;
+            const particleColors = ['#6366f1', '#a78bfa', '#818cf8', '#34d399'];
+
+            function spawnParticles(container, direction, count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const p = document.createElement('div');
+                        p.className = 'ai-particle particle-' + direction;
+                        p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+                        p.style.marginTop = (Math.random() * 20 - 10) + 'px';
+                        container.appendChild(p);
+                        setTimeout(() => p.remove(), 1300);
+                    }, i * 120);
+                }
+            }
 
             function runAiImportAnimation() {
-                const processor = document.getElementById('aiProcessor');
-                const results = document.getElementById('aiMappingResults');
-                const rows = results.querySelectorAll('.demo-mapping-row');
-                const footer = document.getElementById('aiMappingFooter');
+                const hub = document.getElementById('aiFlowHub');
+                const hubLabel = document.getElementById('aiHubLabel');
+                const progress = hub.querySelector('.ai-hub-progress');
+                const hubIcon = hub.querySelector('.ai-hub-icon');
+                const fields = document.querySelectorAll('#aiFlowFields .ai-flow-field');
+                const footer = document.getElementById('aiFlowFooter');
+                const badge = document.getElementById('aiMatchBadge');
+                const particles = document.getElementById('aiParticles');
+                const connLeft = document.querySelector('.ai-flow-connector-left');
+                const connRight = document.querySelector('.ai-flow-connector-right');
+                const sourceRows = document.querySelectorAll('.ai-flow-row[data-row]');
 
                 // Reset
-                processor.classList.remove('active');
-                results.classList.remove('active');
-                rows.forEach(r => r.classList.remove('visible'));
+                progress.style.transition = 'none';
+                progress.style.strokeDashoffset = '226';
+                hubLabel.textContent = 'Analyzing...';
+                hubLabel.classList.remove('complete');
+                hubIcon.classList.remove('complete');
+                fields.forEach(f => f.classList.remove('visible'));
                 footer.classList.remove('visible');
-                const progressRing = processor.querySelector('.processor-progress');
-                progressRing.style.transition = 'none';
-                progressRing.style.strokeDashoffset = '126';
-                processor.querySelector('.processor-text').textContent = 'Mapping columns...';
+                badge.textContent = '0/4';
+                badge.classList.remove('complete');
+                connLeft.classList.remove('active');
+                connRight.classList.remove('active');
+                sourceRows.forEach(r => r.classList.remove('ai-flow-row-highlight'));
 
-                // Step 1: Show AI processor (0.5s)
+                // Step 1: Activate connectors + start progress ring (0.3s)
                 setTimeout(() => {
-                    processor.classList.add('active');
-                    // Re-enable transition, then animate progress ring
+                    connLeft.classList.add('active');
+                    spawnParticles(particles, 'left', 6);
                     requestAnimationFrame(() => {
-                        progressRing.style.transition = '';
+                        progress.style.transition = '';
                         requestAnimationFrame(() => {
-                            progressRing.style.strokeDashoffset = '0';
+                            progress.style.strokeDashoffset = '0';
                         });
                     });
-                }, 500);
+                }, 300);
 
-                // Step 2: Show mapping results card (2s)
-                setTimeout(() => {
-                    processor.querySelector('.processor-text').textContent = 'Complete!';
-                    results.classList.add('active');
-                }, 2000);
-
-                // Step 3: Reveal rows one by one (2.3s, 2.6s, 2.9s, 3.2s)
-                rows.forEach((row, i) => {
+                // Step 2: Highlight source rows one by one (0.6s, 1.0s, 1.4s)
+                sourceRows.forEach((row, i) => {
                     setTimeout(() => {
-                        row.classList.add('visible');
-                    }, 2300 + (i * 300));
+                        row.classList.add('ai-flow-row-highlight');
+                    }, 600 + i * 400);
                 });
 
-                // Step 4: Show footer (3.8s)
+                // Step 3: Hub complete + right connector (2.2s)
+                setTimeout(() => {
+                    hubLabel.textContent = 'Mapped!';
+                    hubLabel.classList.add('complete');
+                    hubIcon.classList.add('complete');
+                    connRight.classList.add('active');
+                    spawnParticles(particles, 'right', 6);
+                }, 2200);
+
+                // Step 4: Reveal destination fields one by one (2.6s+)
+                fields.forEach((field, i) => {
+                    setTimeout(() => {
+                        field.classList.add('visible');
+                        badge.textContent = (i + 1) + '/4';
+                    }, 2600 + i * 350);
+                });
+
+                // Step 5: Show footer + mark complete (4.2s)
                 setTimeout(() => {
                     footer.classList.add('visible');
-                }, 3800);
+                    badge.classList.add('complete');
+                }, 4200);
 
-                // Step 5: Hold for 4s, then restart (7.8s)
+                // Step 6: Hold, then restart (8.5s)
                 setTimeout(() => {
                     runAiImportAnimation();
-                }, 8000);
+                }, 8500);
             }
 
             const aiObserver = new IntersectionObserver((entries) => {
@@ -1950,7 +1989,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         runAiImportAnimation();
                     }
                 });
-            }, { threshold: 0.3 });
+            }, { threshold: 0.2 });
 
             aiObserver.observe(aiImportDemo);
         }

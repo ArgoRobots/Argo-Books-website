@@ -115,7 +115,6 @@ $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
 $curlError = curl_error($ch);
-curl_close($ch);
 
 if ($response === false) {
     error_log('Azure receipt scan cURL error: ' . $curlError);
@@ -156,7 +155,6 @@ for ($i = 0; $i < $maxAttempts; $i++) {
     $pollResponse = curl_exec($ch);
     $pollHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $pollError = curl_error($ch);
-    curl_close($ch);
 
     if ($pollResponse === false || $pollHttpCode !== 200) {
         error_log("Azure poll attempt {$i}: HTTP {$pollHttpCode}, curl error: {$pollError}");

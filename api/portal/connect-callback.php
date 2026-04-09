@@ -201,7 +201,6 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpCode !== 200) {
         $error = json_decode($response, true);
@@ -229,7 +228,6 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpCode !== 200) {
         throw new Exception('Failed to retrieve PayPal user info.');
@@ -296,7 +294,6 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpCode !== 200) {
         $error = json_decode($response, true);
@@ -328,7 +325,6 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($httpCode === 200) {
         $locationsData = json_decode($response, true);

@@ -64,7 +64,7 @@
                     "name": "How does AI receipt scanning work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Take a photo of any receipt — or upload an image — and Argo Books uses AI to extract the store name, individual line items, totals, taxes, and date automatically. The extracted data is used to create an expense record with no manual typing. It achieves 98% accuracy, so you spend less time on data entry and more time running your business."
+                        "text": "Take a photo of any receipt — or upload an image — and Argo Books uses AI to extract the store name, individual line items, totals, taxes, and date automatically. The extracted data is used to create an expense record with no manual typing. It achieves 99% accuracy, so you spend less time on data entry and more time running your business."
                     }
                 },
                 {
@@ -241,7 +241,7 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>98%</h3>
+                    <h3>99%</h3>
                     <p>Accuracy on printed receipts</p>
                 </div>
                 <div class="highlight-item">

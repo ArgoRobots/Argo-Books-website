@@ -61,12 +61,10 @@ curl_setopt_array($ch, [
 $response = curl_exec($ch);
 if ($response === false) {
     error_log('PayPal token request failed: ' . curl_error($ch));
-    curl_close($ch);
     send_json_response(200, ['received' => true]); // acknowledge to prevent retries
     exit;
 }
 $tokenResponse = json_decode($response, true);
-curl_close($ch);
 
 if (empty($tokenResponse['access_token'])) {
     error_log('Portal PayPal webhook: Failed to get access token');
@@ -99,7 +97,6 @@ curl_setopt_array($ch, [
     CURLOPT_SSL_VERIFYHOST => 2,
 ]);
 $verifyResponse = json_decode(curl_exec($ch), true);
-curl_close($ch);
 
 if (($verifyResponse['verification_status'] ?? '') !== 'SUCCESS') {
     error_log('Portal PayPal webhook: Signature verification failed');

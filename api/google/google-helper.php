@@ -184,7 +184,6 @@ function refresh_google_token(string $refreshToken, array $authContext): ?string
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($response === false || $httpCode !== 200) {
         error_log('Google token refresh failed: ' . ($response ?: 'curl error'));

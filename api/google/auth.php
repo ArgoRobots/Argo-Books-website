@@ -132,7 +132,6 @@ function handleRevoke(array $authContext): void
                 CURLOPT_TIMEOUT => 5,
             ]);
             curl_exec($ch);
-            curl_close($ch);
         } catch (RuntimeException $e) {
             error_log('Failed to decrypt Google token for revocation: ' . $e->getMessage());
         }

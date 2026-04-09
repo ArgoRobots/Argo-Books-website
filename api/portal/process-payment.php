@@ -236,7 +236,6 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $tokenResponse = json_decode(curl_exec($ch), true);
-    curl_close($ch);
 
     if (empty($tokenResponse['access_token'])) {
         send_error_response(500, 'Failed to authenticate with PayPal.', 'PAYPAL_AUTH_FAILED');
@@ -256,7 +255,6 @@ function process_paypal_payment(array $invoice, array $data, float $amount, stri
         CURLOPT_SSL_VERIFYHOST => 2,
     ]);
     $orderResponse = json_decode(curl_exec($ch), true);
-    curl_close($ch);
 
     if (empty($orderResponse['id']) || $orderResponse['status'] !== 'COMPLETED') {
         send_error_response(400, 'PayPal order is not completed.', 'PAYPAL_NOT_COMPLETED');

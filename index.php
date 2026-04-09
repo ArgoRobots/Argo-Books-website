@@ -30,14 +30,14 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Transform your small business with Argo Books. AI-powered receipt scanning, AI spreadsheet import, predictive analytics, inventory management and more. Free software.">
+        content="Transform your small business with Argo Books. Smart receipt scanning, spreadsheet import, predictive analytics, inventory management and more. Free software.">
     <meta name="keywords"
-        content="AI receipt scanning, AI spreadsheet import, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation, data import">
+        content="receipt scanning, smart spreadsheet import, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation, data import">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books - AI-Powered Business Management">
+    <meta property="og:title" content="Argo Books - Smart Business Management Software">
     <meta property="og:description"
-        content="Transform your business with AI receipt scanning, predictive analytics, inventory management and automated invoicing.">
+        content="Transform your business with smart receipt scanning, predictive analytics, inventory management and automated invoicing.">
     <meta property="og:url" content="https://argorobots.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -45,9 +45,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books - AI-Powered Business Management">
+    <meta name="twitter:title" content="Argo Books - Smart Business Management Software">
     <meta name="twitter:description"
-        content="Transform your business with AI receipt scanning, predictive analytics, and automated business management.">
+        content="Transform your business with smart receipt scanning, predictive analytics, and automated business management.">
     <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -80,7 +80,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Argo Books",
-            "description": "AI-powered business management software with receipt scanning, predictive analytics, and inventory management",
+            "description": "Smart business management software with receipt scanning, predictive analytics, and inventory management",
             "url": "https://argorobots.com/",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Windows, macOS, Linux",
@@ -119,7 +119,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "What is Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is desktop accounting and business management software for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts with AI, manage products and inventory, and run real-time financial reports — all from your own computer. Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy."
+                        "text": "Argo Books is desktop accounting and business management software for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts automatically, manage products and inventory, and run real-time financial reports — all from your own computer. Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy."
                     }
                 },
                 {
@@ -127,7 +127,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "How does Argo Books work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts using AI. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health. Premium users unlock predictive analytics, unlimited invoicing, and more."
+                        "text": "Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts automatically. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health. Premium users unlock predictive analytics, unlimited invoicing, and more."
                     }
                 },
                 {
@@ -135,7 +135,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "Can I use Argo Books for free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month. When your business is ready for more, you can upgrade to Premium at any time."
+                        "text": "Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 receipt scans per month, and 100 spreadsheet imports per month. When your business is ready for more, you can upgrade to Premium at any time."
                     }
                 },
                 {
@@ -151,7 +151,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "Which plan is right for me — Free or Premium?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Free plan is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports. Upgrade to Premium if you need unlimited invoicing, higher AI scanning limits, predictive analytics, biometric security, and priority support. Premium is available monthly or yearly with savings on the annual plan."
+                        "text": "The Free plan is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports. Upgrade to Premium if you need unlimited invoicing, higher scanning limits, predictive analytics, biometric security, and priority support. Premium is available monthly or yearly with savings on the annual plan."
                     }
                 },
                 {
@@ -159,7 +159,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like AI receipt scanning, license activation, and software updates."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like receipt scanning, license activation, and software updates."
                     }
                 },
                 {
@@ -175,7 +175,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books - AI-Powered Business Management Software</title>
+    <title>Argo Books - Smart Business Management Software</title>
 
     <script src="resources/scripts/jquery-3.6.0.js"></script>
     <script src="resources/scripts/main.js"></script>
@@ -225,13 +225,16 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="hero-device">
                     <div class="device-frame">
                         <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen" width="2400" height="1524">
+                        <button class="hero-play-btn" id="heroPlayBtn" aria-label="Watch demo video">
+                            <?= svg_icon('play-filled', 28) ?>
+                        </button>
                     </div>
                     <div class="floating-card floating-card-1 animate-float">
                         <div class="floating-card-icon">
                             <?= svg_icon('loading', 24) ?>
                         </div>
                         <div class="floating-card-content">
-                            <span class="floating-card-label">AI Scanning</span>
+                            <span class="floating-card-label">Smart Scanning</span>
                             <span class="floating-card-value">Receipt processed</span>
                         </div>
                     </div>
@@ -255,7 +258,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Features</span>
                 <h2 class="section-title">Everything you need to grow</h2>
-                <p class="section-description">Easy-to-use accounting software with AI-powered receipt scanning, smart spreadsheet import, predictive analytics, and inventory management. Everything you need to run your business.</p>
+                <p class="section-description">Easy-to-use accounting software with smart receipt scanning, spreadsheet import, predictive analytics, and inventory management. Everything you need to run your business.</p>
             </div>
 
             <div class="features-tabs">
@@ -330,8 +333,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="tab-content active" id="tab-ai-receipts">
                         <div class="tab-content-inner">
                             <div class="tab-content-text">
-                                <h3>Scan receipts with AI</h3>
-                                <p>Take a photo of any receipt with your phone or upload from your computer. Our AI automatically extracts supplier, date, amount, and line items with 98% accuracy.</p>
+                                <h3>Scan receipts instantly</h3>
+                                <p>Take a photo of any receipt with your phone or upload from your computer. The system automatically extracts supplier, date, amount, and line items with 99% accuracy.</p>
                                 <ul class="feature-list">
                                     <li>
                                         <?= svg_icon('check', 20) ?>
@@ -767,9 +770,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         <div class="container">
             <div class="ai-import-content">
                 <div class="ai-import-text animate-on-scroll">
-                    <span class="section-tag">AI-Powered</span>
+                    <span class="section-tag">Smart Import</span>
                     <h2 class="section-title text-left">Import any spreadsheet — instantly</h2>
-                    <p class="section-description text-left">Just upload your spreadsheet — our AI figures out what each column means and puts everything in the right place for you.</p>
+                    <p class="section-description text-left">Just upload your spreadsheet — the system figures out what each column means and puts everything in the right place for you.</p>
 
                     <div class="ai-import-features">
                         <div class="ai-import-feature">
@@ -778,7 +781,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </div>
                             <div class="ai-feature-detail">
                                 <h4>Instant Column Detection</h4>
-                                <p>AI recognizes names, emails, phone numbers, dates, currencies, and more — regardless of column names</p>
+                                <p>Automatically recognizes names, emails, phone numbers, dates, currencies, and more — regardless of column names</p>
                             </div>
                         </div>
                         <div class="ai-import-feature">
@@ -804,8 +807,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
                 <div class="ai-import-visual animate-on-scroll">
                     <div class="ai-import-demo" id="aiImportDemo">
-                        <!-- Spreadsheet source -->
-                        <div class="demo-spreadsheet">
+                        <div class="demo-card">
+                            <!-- Spreadsheet header -->
                             <div class="demo-spreadsheet-header">
                                 <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
                                 <span class="demo-file-name">bill_export.xlsx</span>
@@ -838,68 +841,70 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 </div>
                             </div>
                             <div class="demo-row-count">384 more rows...</div>
-                        </div>
 
-                        <!-- AI Processing indicator -->
-                        <div class="demo-ai-processor" id="aiProcessor">
-                            <div class="ai-processor-ring">
-                                <svg viewBox="0 0 48 48" class="processor-ring-svg">
-                                    <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                                    <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
-                                    <defs>
-                                        <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#6366f1"/>
-                                            <stop offset="100%" style="stop-color:#8b5cf6"/>
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                                <span class="processor-label">AI</span>
+                            <!-- AI Processing divider -->
+                            <div class="demo-ai-divider" id="aiProcessor">
+                                <div class="ai-divider-line"></div>
+                                <div class="ai-processor-ring">
+                                    <svg viewBox="0 0 48 48" class="processor-ring-svg">
+                                        <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                                        <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
+                                        <defs>
+                                            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#6366f1"/>
+                                                <stop offset="100%" style="stop-color:#8b5cf6"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <span class="processor-label">AI</span>
+                                </div>
+                                <span class="processor-text">Mapping columns...</span>
+                                <div class="ai-divider-line"></div>
                             </div>
-                            <span class="processor-text">Mapping columns...</span>
-                        </div>
 
-                        <!-- Mapping results -->
-                        <div class="demo-mapping-results" id="aiMappingResults">
-                            <div class="demo-mapping-header">
-                                <span class="demo-mapping-title">Mapped Fields</span>
-                                <span class="demo-mapping-badge">4/4 matched</span>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="0">
-                                <div class="demo-map-source">Supplier</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <!-- Mapping results -->
+                            <div class="demo-mapping-results" id="aiMappingResults">
+                                <div class="demo-mapping-header">
+                                    <span class="demo-mapping-title">Mapped Fields</span>
+                                    <span class="demo-mapping-badge">4/4 matched</span>
                                 </div>
-                                <div class="demo-map-target">Supplier Name</div>
-                                <div class="demo-map-confidence">97%</div>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="1">
-                                <div class="demo-map-source">Amt Owed</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div class="demo-mapping-row" data-delay="0">
+                                    <div class="demo-map-source">Supplier</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Supplier Name</div>
+                                    <div class="demo-map-confidence">97%</div>
                                 </div>
-                                <div class="demo-map-target">Balance Due</div>
-                                <div class="demo-map-confidence">93%</div>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="2">
-                                <div class="demo-map-source">Pay By</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div class="demo-mapping-row" data-delay="1">
+                                    <div class="demo-map-source">Amt Owed</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Balance Due</div>
+                                    <div class="demo-map-confidence">93%</div>
                                 </div>
-                                <div class="demo-map-target">Due Date</div>
-                                <div class="demo-map-confidence">91%</div>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="3">
-                                <div class="demo-map-source">Memo</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div class="demo-mapping-row" data-delay="2">
+                                    <div class="demo-map-source">Pay By</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Due Date</div>
+                                    <div class="demo-map-confidence">91%</div>
                                 </div>
-                                <div class="demo-map-target">Reference #</div>
-                                <div class="demo-map-confidence">86%</div>
-                            </div>
-                            <div class="demo-mapping-footer" id="aiMappingFooter">
-                                <div class="demo-mapping-success">
-                                    <?= svg_icon('check', 16) ?>
-                                    <span>Ready to import 387 rows</span>
+                                <div class="demo-mapping-row" data-delay="3">
+                                    <div class="demo-map-source">Memo</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Reference #</div>
+                                    <div class="demo-map-confidence">86%</div>
+                                </div>
+                                <div class="demo-mapping-footer" id="aiMappingFooter">
+                                    <div class="demo-mapping-success">
+                                        <?= svg_icon('check', 16) ?>
+                                        <span>Ready to import 387 rows</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -934,7 +939,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <?= svg_icon('pencil', 32) ?>
                     </div>
                     <h3>Set Up</h3>
-                    <p>Add your products, customers, and suppliers. Import existing data from any spreadsheet — our AI handles the formatting automatically.</p>
+                    <p>Add your products, customers, and suppliers. Import existing data from any spreadsheet — the system handles the formatting automatically.</p>
                 </div>
                 <div class="step-connector animate-on-scroll"></div>
                 <div class="step-card animate-on-scroll">
@@ -1033,7 +1038,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             </div>
                             <div class="mobile-feature-text">
                                 <h4>Snap & Scan Receipts</h4>
-                                <p>Take a photo of any receipt and let AI extract all the details automatically</p>
+                                <p>Take a photo of any receipt and extract all the details automatically</p>
                             </div>
                         </div>
                         <div class="mobile-feature-item">
@@ -1184,7 +1189,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is desktop accounting and business management software built for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts with AI, manage products and inventory, and run real-time financial reports — all from your own computer.</p>
+                            <p>Argo Books is desktop accounting and business management software built for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts automatically, manage products and inventory, and run real-time financial reports — all from your own computer.</p>
                             <p>Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy. Argo Books is available on Windows, macOS, and Linux.</p>
                         </div>
                     </div>
@@ -1199,7 +1204,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts using AI. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health.</p>
+                            <p>Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts automatically. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health.</p>
                             <p>Premium users unlock predictive analytics, unlimited invoicing, and priority support. <a href="downloads/">Download Argo Books</a> and start managing your business in minutes.</p>
                         </div>
                     </div>
@@ -1214,7 +1219,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month.</p>
+                            <p>Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 receipt scans per month, and 100 spreadsheet imports per month.</p>
                             <p>When your business is ready for more, you can upgrade to Premium at any time. <a href="pricing/">Compare plans</a></p>
                         </div>
                     </div>
@@ -1245,7 +1250,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>The <strong>Free plan</strong> is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports.</p>
-                            <p>Upgrade to <strong>Premium</strong> ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) if you need unlimited invoicing, higher AI scanning limits, predictive analytics, biometric security, and priority support. Save with the annual plan. <a href="pricing/">View pricing details</a></p>
+                            <p>Upgrade to <strong>Premium</strong> ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) if you need unlimited invoicing, higher scanning limits, predictive analytics, biometric security, and priority support. Save with the annual plan. <a href="pricing/">View pricing details</a></p>
                         </div>
                     </div>
                 </div>
@@ -1259,7 +1264,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like AI receipt scanning, license activation, and software updates.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like receipt scanning, license activation, and software updates.</p>
                             <p><a href="downloads/">Download for your platform</a></p>
                         </div>
                     </div>
@@ -1349,6 +1354,17 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     </main>
 
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-backdrop"></div>
+        <div class="video-modal-content">
+            <button class="video-modal-close" aria-label="Close video">&times;</button>
+            <div class="video-modal-player">
+                <iframe id="videoIframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- CTA + Footer Wrapper -->
     <div class="dark-section-wrapper">
         <!-- CTA Section -->
@@ -1391,6 +1407,31 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Video modal
+        const videoModal = document.getElementById('videoModal');
+        const videoIframe = document.getElementById('videoIframe');
+        const videoUrl = 'https://www.youtube.com/embed/Dsn38p5g3Zg';
+
+        document.getElementById('heroPlayBtn').addEventListener('click', function() {
+            videoIframe.src = videoUrl + '?autoplay=1&rel=0&modestbranding=1';
+            videoModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeVideoModal() {
+            videoModal.classList.remove('active');
+            videoIframe.src = '';
+            document.body.style.overflow = '';
+        }
+
+        videoModal.querySelector('.video-modal-close').addEventListener('click', closeVideoModal);
+        videoModal.querySelector('.video-modal-backdrop').addEventListener('click', closeVideoModal);
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && videoModal.classList.contains('active')) {
+                closeVideoModal();
+            }
+        });
+
         // Scroll animations
         const observerOptions = {
             threshold: 0.1,

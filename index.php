@@ -435,36 +435,34 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <div class="tab-content-visual">
                                 <div class="feature-visual-card">
                                     <div class="visual-mockup expenses-mockup">
-                                        <div class="expense-form-preview">
-                                            <div class="expense-form-header">
-                                                <span class="form-title">New Transaction</span>
-                                            </div>
-                                            <div class="expense-form-fields">
-                                                <div class="form-field">
-                                                    <span class="field-label">Type</span>
-                                                    <div class="field-toggle">
-                                                        <span class="toggle-option">Expense</span>
-                                                        <span class="toggle-option active">Revenue</span>
-                                                    </div>
-                                                </div>
-                                                <div class="form-field">
-                                                    <span class="field-label">Amount</span>
-                                                    <span class="field-value">$85.00</span>
-                                                </div>
-                                                <div class="form-field">
-                                                    <span class="field-label">Category</span>
-                                                    <span class="field-value">Books</span>
+                                        <div class="expense-form-header">
+                                            <span class="form-title">New Transaction</span>
+                                        </div>
+                                        <div class="expense-form-fields">
+                                            <div class="form-field">
+                                                <span class="field-label">Type</span>
+                                                <div class="field-toggle">
+                                                    <span class="toggle-option">Expense</span>
+                                                    <span class="toggle-option active">Revenue</span>
                                                 </div>
                                             </div>
-                                            <div class="expense-form-validation">
-                                                <div class="validation-check">
-                                                    <?= svg_icon('check', 16) ?>
-                                                    <span>Valid amount</span>
-                                                </div>
-                                                <div class="validation-check">
-                                                    <?= svg_icon('check', 16) ?>
-                                                    <span>Category selected</span>
-                                                </div>
+                                            <div class="form-field">
+                                                <span class="field-label">Amount</span>
+                                                <span class="field-value">$85.00</span>
+                                            </div>
+                                            <div class="form-field">
+                                                <span class="field-label">Category</span>
+                                                <span class="field-value">Books</span>
+                                            </div>
+                                        </div>
+                                        <div class="expense-form-validation">
+                                            <div class="validation-check">
+                                                <?= svg_icon('check', 16) ?>
+                                                <span>Valid amount</span>
+                                            </div>
+                                            <div class="validation-check">
+                                                <?= svg_icon('check', 16) ?>
+                                                <span>Category selected</span>
                                             </div>
                                         </div>
                                     </div>
@@ -734,26 +732,24 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <div class="tab-content-visual">
                                 <div class="feature-visual-card">
                                     <div class="visual-mockup invoice-mockup">
-                                        <div class="invoice-preview">
-                                            <div class="invoice-header">
-                                                <div class="invoice-logo">INVOICE</div>
-                                            </div>
-                                            <div class="invoice-meta">
-                                                <div class="meta-item">
-                                                    <span class="meta-label">Date</span>
-                                                    <span class="meta-value">Nov 28, 2025</span>
-                                                </div>
-                                                <div class="meta-item">
-                                                    <span class="meta-label">Due</span>
-                                                    <span class="meta-value">Dec 28, 2025</span>
-                                                </div>
-                                            </div>
-                                            <div class="invoice-total">
-                                                <span class="total-label">Total Due</span>
-                                                <span class="total-value">$1,234.00</span>
-                                            </div>
-                                            <div class="invoice-status paid">Paid</div>
+                                        <div class="invoice-header">
+                                            <div class="invoice-logo">INVOICE</div>
                                         </div>
+                                        <div class="invoice-meta">
+                                            <div class="meta-item">
+                                                <span class="meta-label">Date</span>
+                                                <span class="meta-value">Nov 28, 2025</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="meta-label">Due</span>
+                                                <span class="meta-value">Dec 28, 2025</span>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span class="total-label">Total Due</span>
+                                            <span class="total-value">$1,234.00</span>
+                                        </div>
+                                        <div class="invoice-status paid">Paid</div>
                                     </div>
                                 </div>
                             </div>
@@ -766,14 +762,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     </section>
 
     <!-- AI Spreadsheet Import Section -->
-    <div class="ai-import-divider-top">
-        <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,200 L0,100 Q360,0 720,80 Q1080,160 1440,60 L1440,200 Z" fill="var(--gray-900)"/>
-            <path d="M0,200 L0,130 Q300,50 720,110 Q1100,170 1440,90 L1440,200 Z" fill="var(--gray-900)" opacity="0.5"/>
-        </svg>
-    </div>
     <section class="ai-import-section">
-        <div class="ai-import-bg-glow"></div>
         <div class="container">
             <div class="ai-import-header animate-on-scroll">
                 <span class="section-tag">Smart Import</span>
@@ -825,13 +814,14 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="ai-flow-connector-line ai-flow-connector-left"></div>
                     <div class="ai-flow-hub" id="aiFlowHub">
                         <div class="ai-flow-hub-ring">
+                            <div class="ai-hub-glow"></div>
                             <svg viewBox="0 0 80 80" class="ai-hub-svg">
-                                <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="2"/>
-                                <circle cx="40" cy="40" r="36" fill="none" stroke="url(#hubGrad)" stroke-width="2.5" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round" class="ai-hub-progress"/>
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="url(#hubGrad)" stroke-width="3" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round" class="ai-hub-progress"/>
                                 <defs>
                                     <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#6366f1"/>
-                                        <stop offset="100%" style="stop-color:#a78bfa"/>
+                                        <stop offset="0%" style="stop-color:#3b82f6"/>
+                                        <stop offset="100%" style="stop-color:#2563eb"/>
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -846,11 +836,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="ai-flow-particles" id="aiParticles"></div>
                 </div>
 
-                <!-- Destination: clean mapped fields -->
+                <!-- Destination: clean imported fields -->
                 <div class="ai-flow-dest">
                     <div class="ai-flow-card ai-flow-card-dest">
                         <div class="ai-flow-card-header ai-flow-card-header-dest">
-                            <span class="ai-flow-dest-title">Mapped Fields</span>
+                            <span class="ai-flow-dest-title">Imported Fields</span>
                             <span class="ai-flow-dest-badge" id="aiMatchBadge">0/4</span>
                         </div>
                         <div class="ai-flow-fields" id="aiFlowFields">
@@ -909,12 +899,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             </div>
         </div>
     </section>
-    <div class="ai-import-divider-bottom">
-        <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,0 L0,120 Q360,200 720,100 Q1080,20 1440,140 L1440,0 Z" fill="var(--gray-900)"/>
-            <path d="M0,0 L0,80 Q400,180 720,70 Q1050,0 1440,100 L1440,0 Z" fill="var(--gray-900)" opacity="0.5"/>
-        </svg>
-    </div>
 
     <!-- How It Works Section -->
     <section class="how-it-works-section">
@@ -1892,7 +1876,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         const aiImportDemo = document.getElementById('aiImportDemo');
         if (aiImportDemo) {
             let aiAnimationStarted = false;
-            const particleColors = ['#6366f1', '#a78bfa', '#818cf8', '#34d399'];
+            const particleColors = ['#3b82f6', '#60a5fa', '#2563eb', '#93c5fd'];
 
             function spawnParticles(container, direction, count) {
                 for (let i = 0; i < count; i++) {
@@ -1910,6 +1894,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             function runAiImportAnimation() {
                 const hub = document.getElementById('aiFlowHub');
                 const hubLabel = document.getElementById('aiHubLabel');
+                const hubRing = hub.querySelector('.ai-flow-hub-ring');
                 const progress = hub.querySelector('.ai-hub-progress');
                 const hubIcon = hub.querySelector('.ai-hub-icon');
                 const fields = document.querySelectorAll('#aiFlowFields .ai-flow-field');
@@ -1926,6 +1911,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 hubLabel.textContent = 'Analyzing...';
                 hubLabel.classList.remove('complete');
                 hubIcon.classList.remove('complete');
+                hubRing.classList.remove('active', 'complete');
                 fields.forEach(f => f.classList.remove('visible'));
                 footer.classList.remove('visible');
                 badge.textContent = '0/4';
@@ -1934,10 +1920,11 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 connRight.classList.remove('active');
                 sourceRows.forEach(r => r.classList.remove('ai-flow-row-highlight'));
 
-                // Step 1: Activate connectors + start progress ring (0.3s)
+                // Step 1: Activate connectors + start progress ring + glow (0.3s)
                 setTimeout(() => {
                     connLeft.classList.add('active');
-                    spawnParticles(particles, 'left', 6);
+                    hubRing.classList.add('active');
+                    spawnParticles(particles, 'left', 8);
                     requestAnimationFrame(() => {
                         progress.style.transition = '';
                         requestAnimationFrame(() => {
@@ -1953,13 +1940,14 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     }, 600 + i * 400);
                 });
 
-                // Step 3: Hub complete + right connector (2.2s)
+                // Step 3: Hub complete + right connector + full glow (2.2s)
                 setTimeout(() => {
-                    hubLabel.textContent = 'Mapped!';
+                    hubLabel.textContent = 'Imported!';
                     hubLabel.classList.add('complete');
                     hubIcon.classList.add('complete');
+                    hubRing.classList.add('complete');
                     connRight.classList.add('active');
-                    spawnParticles(particles, 'right', 6);
+                    spawnParticles(particles, 'right', 8);
                 }, 2200);
 
                 // Step 4: Reveal destination fields one by one (2.6s+)

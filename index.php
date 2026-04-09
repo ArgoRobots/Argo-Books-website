@@ -767,7 +767,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="ai-import-header animate-on-scroll">
                 <span class="section-tag">Smart Import</span>
                 <h2 class="section-title">Import any spreadsheet — instantly</h2>
-                <p class="section-description">Drop your file in and the system figures out what each column means. No reformatting, no manual mapping, no headaches.</p>
+                <p class="section-description">Drop your file in and Argo Books handles the rest. No reformatting, no manual mapping, no headaches.</p>
             </div>
 
             <div class="ai-import-flow animate-on-scroll" id="aiImportDemo">
@@ -1056,44 +1056,62 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <!-- Security Section -->
     <section class="security-section">
         <div class="container">
-            <div class="security-content">
+            <div class="security-layout">
                 <div class="security-text animate-on-scroll">
                     <span class="section-tag">Security</span>
-                    <h2 class="section-title text-left">Your data, protected</h2>
-                    <p class="section-description text-left">We take security seriously. Your business data is encrypted with the same technology used by banks and government agencies.</p>
+                    <h2 class="section-title text-left">This is what your data looks like on disk</h2>
+                    <p class="section-description text-left">Every transaction, invoice, and customer record is encrypted with AES-256-GCM before it's saved. Even if someone copied your files, they'd see nothing useful.</p>
 
-                    <div class="security-features">
-                        <div class="security-item">
-                            <div class="security-icon">
-                                <?= svg_icon('shield', 24) ?>
-                            </div>
-                            <div class="security-detail">
-                                <h4>AES-256 Encryption</h4>
-                                <p>Bank-grade encryption protects all your data</p>
-                            </div>
+                    <div class="security-stats">
+                        <div class="security-stat">
+                            <span class="security-stat-value">AES-256</span>
+                            <span class="security-stat-label">Encryption standard</span>
                         </div>
-                        <div class="security-item">
-                            <div class="security-icon">
-                                <?= svg_icon('lock', 24) ?>
-                            </div>
-                            <div class="security-detail">
-                                <h4>Local Storage</h4>
-                                <p>Your data stays on your computer, not in the cloud</p>
-                            </div>
+                        <div class="security-stat">
+                            <span class="security-stat-value">Local</span>
+                            <span class="security-stat-label">Data never leaves your PC</span>
                         </div>
-                        <div class="security-item">
-                            <div class="security-icon">
-                                <?= svg_icon('biometric-clock', 24) ?>
-                            </div>
-                            <div class="security-detail">
-                                <h4>Biometric Login</h4>
-                                <p>Fingerprint and face unlock for quick, secure access</p>
-                            </div>
+                        <div class="security-stat">
+                            <span class="security-stat-value">Bio</span>
+                            <span class="security-stat-label">Fingerprint &amp; face unlock</span>
                         </div>
                     </div>
                 </div>
-                <div class="security-visual animate-on-scroll">
-                    <img src="resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted with AES-256, stored offline, no cloud dependency" loading="lazy">
+
+                <div class="security-terminal-wrap animate-on-scroll">
+                    <div class="security-terminal" id="securityTerminal">
+                        <div class="terminal-bar">
+                            <div class="terminal-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <span class="terminal-title">your_company.argo — encrypted view</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-section">
+                                <div class="terminal-label">Your data</div>
+                                <div class="terminal-plain" id="termPlain">
+                                    <div class="terminal-row"><span class="t-key">supplier</span> <span class="t-val">"Acme Supply Co"</span></div>
+                                    <div class="terminal-row"><span class="t-key">amount</span> <span class="t-val">"$4,280.00"</span></div>
+                                    <div class="terminal-row"><span class="t-key">due_date</span> <span class="t-val">"2025-12-15"</span></div>
+                                    <div class="terminal-row"><span class="t-key">reference</span> <span class="t-val">"INV-3847"</span></div>
+                                </div>
+                            </div>
+                            <div class="terminal-encrypt-bar" id="termEncryptBar">
+                                <div class="terminal-encrypt-icon"><?= svg_icon('lock', 14) ?></div>
+                                <span id="termEncryptLabel">AES-256-GCM encrypting...</span>
+                                <div class="terminal-encrypt-progress"><div class="terminal-encrypt-fill" id="termEncryptFill"></div></div>
+                            </div>
+                            <div class="terminal-section">
+                                <div class="terminal-label">What's stored on disk</div>
+                                <div class="terminal-cipher" id="termCipher">
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="supplier  &quot;Acme Supply Co&quot;"></span></div>
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="amount    &quot;$4,280.00&quot;"></span></div>
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="due_date  &quot;2025-12-15&quot;"></span></div>
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="reference &quot;INV-3847&quot;"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1332,7 +1350,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <p>Want to reach out directly?</p>
                 <a href="contact-us/" class="btn btn-primary">
                     <?= svg_icon('message-circle', 20) ?>
-                    Contact Form
+                    Contact Us
                 </a>
             </div>
         </div>
@@ -1980,6 +1998,99 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             }, { threshold: 0.2 });
 
             aiObserver.observe(aiImportDemo);
+        }
+
+        // Security encryption terminal animation
+        const secTerminal = document.getElementById('securityTerminal');
+        if (secTerminal) {
+            let secAnimStarted = false;
+            const cipherChars = '0123456789abcdef';
+
+            function randomHex(len) {
+                let s = '';
+                for (let i = 0; i < len; i++) s += cipherChars[Math.floor(Math.random() * cipherChars.length)];
+                return s;
+            }
+
+            function scrambleText(el, duration) {
+                const plain = el.dataset.plain;
+                const len = plain.length;
+                const startTime = Date.now();
+                const interval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const locked = Math.floor(progress * len);
+                    let result = '';
+                    for (let i = 0; i < len; i++) {
+                        if (i < locked) {
+                            result += randomHex(1);
+                        } else {
+                            result += plain[i];
+                        }
+                    }
+                    el.textContent = result;
+                    if (progress >= 1) {
+                        clearInterval(interval);
+                        // Keep cycling the cipher text
+                        const cycleInterval = setInterval(() => {
+                            el.textContent = randomHex(len);
+                        }, 120);
+                        el._cycleInterval = cycleInterval;
+                    }
+                }, 50);
+                return interval;
+            }
+
+            function runEncryptionAnimation() {
+                const bar = document.getElementById('termEncryptBar');
+                const fill = document.getElementById('termEncryptFill');
+                const label = document.getElementById('termEncryptLabel');
+                const ciphers = secTerminal.querySelectorAll('.t-cipher');
+
+                // Reset
+                bar.classList.remove('active', 'done');
+                fill.style.transition = 'none';
+                fill.style.width = '0%';
+                label.textContent = 'AES-256-GCM encrypting...';
+                ciphers.forEach(el => {
+                    if (el._cycleInterval) clearInterval(el._cycleInterval);
+                    el.textContent = '';
+                });
+
+                // Step 1: Show encrypt bar (0.5s)
+                setTimeout(() => {
+                    bar.classList.add('active');
+                    requestAnimationFrame(() => {
+                        fill.style.transition = 'width 2s ease-in-out';
+                        requestAnimationFrame(() => { fill.style.width = '100%'; });
+                    });
+                }, 500);
+
+                // Step 2: Scramble each row staggered (0.8s+)
+                ciphers.forEach((el, i) => {
+                    setTimeout(() => scrambleText(el, 1800), 800 + i * 300);
+                });
+
+                // Step 3: Mark complete (2.8s)
+                setTimeout(() => {
+                    bar.classList.add('done');
+                    label.textContent = 'Encryption complete — stored locally';
+                }, 2800);
+
+                // Step 4: Hold, then restart (8s)
+                setTimeout(() => runEncryptionAnimation(), 8000);
+            }
+
+            const secObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !secAnimStarted) {
+                        secAnimStarted = true;
+                        runEncryptionAnimation();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            secObserver.observe(secTerminal);
         }
 
         // FAQ Accordion

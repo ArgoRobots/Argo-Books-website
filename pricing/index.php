@@ -227,7 +227,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <h2>Scan receipts in seconds, not minutes</h2>
                     <p>Point your camera at any receipt and Argo Books extracts the supplier, date, and total automatically — no typing required. Receipts are categorized and attached to your expense records instantly.</p>
                     <ul class="feature-checklist">
-                        <li><?= svg_icon('check', 20) ?><span>Up to 500 AI scans per month</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>500 receipt scans per month</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Auto-categorized by expense type</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Attached directly to your transaction records</span></li>
                     </ul>
@@ -279,7 +279,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 </div>
                 <div class="highlight-item">
                     <h3>Online</h3>
-                    <p>Payments via Stripe &amp; Square</p>
+                    <p>Payments via Stripe, PayPal &amp; Square</p>
                 </div>
             </div>
         </div>
@@ -298,7 +298,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <p>The free plan caps invoices at 25 per month. Premium removes that limit entirely — and adds online payment links so customers can pay directly from the invoice by credit card.</p>
                     <ul class="feature-checklist">
                         <li><?= svg_icon('check', 20) ?><span>Unlimited invoices with no monthly cap</span></li>
-                        <li><?= svg_icon('check', 20) ?><span>Online payment links via Stripe &amp; Square</span></li>
+                        <li><?= svg_icon('check', 20) ?><span>Online payment links via Stripe, PayPal &amp; Square</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Real-time status tracking from draft to paid</span></li>
                     </ul>
                 </div>

@@ -435,36 +435,34 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <div class="tab-content-visual">
                                 <div class="feature-visual-card">
                                     <div class="visual-mockup expenses-mockup">
-                                        <div class="expense-form-preview">
-                                            <div class="expense-form-header">
-                                                <span class="form-title">New Transaction</span>
-                                            </div>
-                                            <div class="expense-form-fields">
-                                                <div class="form-field">
-                                                    <span class="field-label">Type</span>
-                                                    <div class="field-toggle">
-                                                        <span class="toggle-option">Expense</span>
-                                                        <span class="toggle-option active">Revenue</span>
-                                                    </div>
-                                                </div>
-                                                <div class="form-field">
-                                                    <span class="field-label">Amount</span>
-                                                    <span class="field-value">$85.00</span>
-                                                </div>
-                                                <div class="form-field">
-                                                    <span class="field-label">Category</span>
-                                                    <span class="field-value">Books</span>
+                                        <div class="expense-form-header">
+                                            <span class="form-title">New Transaction</span>
+                                        </div>
+                                        <div class="expense-form-fields">
+                                            <div class="form-field">
+                                                <span class="field-label">Type</span>
+                                                <div class="field-toggle">
+                                                    <span class="toggle-option">Expense</span>
+                                                    <span class="toggle-option active">Revenue</span>
                                                 </div>
                                             </div>
-                                            <div class="expense-form-validation">
-                                                <div class="validation-check">
-                                                    <?= svg_icon('check', 16) ?>
-                                                    <span>Valid amount</span>
-                                                </div>
-                                                <div class="validation-check">
-                                                    <?= svg_icon('check', 16) ?>
-                                                    <span>Category selected</span>
-                                                </div>
+                                            <div class="form-field">
+                                                <span class="field-label">Amount</span>
+                                                <span class="field-value">$85.00</span>
+                                            </div>
+                                            <div class="form-field">
+                                                <span class="field-label">Category</span>
+                                                <span class="field-value">Books</span>
+                                            </div>
+                                        </div>
+                                        <div class="expense-form-validation">
+                                            <div class="validation-check">
+                                                <?= svg_icon('check', 16) ?>
+                                                <span>Valid amount</span>
+                                            </div>
+                                            <div class="validation-check">
+                                                <?= svg_icon('check', 16) ?>
+                                                <span>Category selected</span>
                                             </div>
                                         </div>
                                     </div>
@@ -734,26 +732,24 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <div class="tab-content-visual">
                                 <div class="feature-visual-card">
                                     <div class="visual-mockup invoice-mockup">
-                                        <div class="invoice-preview">
-                                            <div class="invoice-header">
-                                                <div class="invoice-logo">INVOICE</div>
-                                            </div>
-                                            <div class="invoice-meta">
-                                                <div class="meta-item">
-                                                    <span class="meta-label">Date</span>
-                                                    <span class="meta-value">Nov 28, 2025</span>
-                                                </div>
-                                                <div class="meta-item">
-                                                    <span class="meta-label">Due</span>
-                                                    <span class="meta-value">Dec 28, 2025</span>
-                                                </div>
-                                            </div>
-                                            <div class="invoice-total">
-                                                <span class="total-label">Total Due</span>
-                                                <span class="total-value">$1,234.00</span>
-                                            </div>
-                                            <div class="invoice-status paid">Paid</div>
+                                        <div class="invoice-header">
+                                            <div class="invoice-logo">INVOICE</div>
                                         </div>
+                                        <div class="invoice-meta">
+                                            <div class="meta-item">
+                                                <span class="meta-label">Date</span>
+                                                <span class="meta-value">Nov 28, 2025</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="meta-label">Due</span>
+                                                <span class="meta-value">Dec 28, 2025</span>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span class="total-label">Total Due</span>
+                                            <span class="total-value">$1,234.00</span>
+                                        </div>
+                                        <div class="invoice-status paid">Paid</div>
                                     </div>
                                 </div>
                             </div>
@@ -768,146 +764,136 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <!-- AI Spreadsheet Import Section -->
     <section class="ai-import-section">
         <div class="container">
-            <div class="ai-import-content">
-                <div class="ai-import-text animate-on-scroll">
-                    <span class="section-tag">Smart Import</span>
-                    <h2 class="section-title text-left">Import any spreadsheet — instantly</h2>
-                    <p class="section-description text-left">Just upload your spreadsheet — the system figures out what each column means and puts everything in the right place for you.</p>
+            <div class="ai-import-header animate-on-scroll">
+                <span class="section-tag">Smart Import</span>
+                <h2 class="section-title">Import any spreadsheet — instantly</h2>
+                <p class="section-description">Drop your file in and Argo Books handles the rest. No reformatting, no manual mapping, no headaches.</p>
+            </div>
 
-                    <div class="ai-import-features">
-                        <div class="ai-import-feature">
-                            <div class="ai-feature-icon">
-                                <?= svg_icon('bolt', 24) ?>
+            <div class="ai-import-flow animate-on-scroll" id="aiImportDemo">
+                <!-- Source: messy spreadsheet -->
+                <div class="ai-flow-source">
+                    <div class="ai-flow-card ai-flow-card-source">
+                        <div class="ai-flow-card-header">
+                            <div class="ai-flow-file-icon"><?= svg_icon('table', 16) ?></div>
+                            <span class="ai-flow-file-name">bill_export.xlsx</span>
+                            <span class="ai-flow-file-badge">Excel</span>
+                        </div>
+                        <div class="ai-flow-table">
+                            <div class="ai-flow-row ai-flow-row-header">
+                                <span>Supplier</span>
+                                <span>Amt Owed</span>
+                                <span>Pay By</span>
+                                <span>Memo</span>
                             </div>
-                            <div class="ai-feature-detail">
-                                <h4>Instant Column Detection</h4>
-                                <p>Automatically recognizes names, emails, phone numbers, dates, currencies, and more — regardless of column names</p>
+                            <div class="ai-flow-row" data-row="0">
+                                <span>Acme Supply Co</span>
+                                <span>$4,280.00</span>
+                                <span>12/15/2025</span>
+                                <span>INV-3847</span>
+                            </div>
+                            <div class="ai-flow-row" data-row="1">
+                                <span>TechFlow LLC</span>
+                                <span>$950.50</span>
+                                <span>01/02/2026</span>
+                                <span>PO-9912</span>
+                            </div>
+                            <div class="ai-flow-row ai-flow-row-faded" data-row="2">
+                                <span>NovaCorp Int'l</span>
+                                <span>$12,100.00</span>
+                                <span>11/30/2025</span>
+                                <span>Contract #441</span>
                             </div>
                         </div>
-                        <div class="ai-import-feature">
-                            <div class="ai-feature-icon">
-                                <?= svg_icon('table', 24) ?>
-                            </div>
-                            <div class="ai-feature-detail">
-                                <h4>Any Format, Any Layout</h4>
-                                <p>Works with messy spreadsheets, unusual column names, and mixed data — no reformatting needed</p>
-                            </div>
-                        </div>
-                        <div class="ai-import-feature">
-                            <div class="ai-feature-icon">
-                                <?= svg_icon('shield', 24) ?>
-                            </div>
-                            <div class="ai-feature-detail">
-                                <h4>Private &amp; Secure</h4>
-                                <p>Your data is encrypted and processed securely — it's never stored or used for training</p>
-                            </div>
-                        </div>
+                        <div class="ai-flow-row-count">+384 rows</div>
                     </div>
                 </div>
 
-                <div class="ai-import-visual animate-on-scroll">
-                    <div class="ai-import-demo" id="aiImportDemo">
-                        <div class="demo-card">
-                            <!-- Spreadsheet header -->
-                            <div class="demo-spreadsheet-header">
-                                <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
-                                <span class="demo-file-name">bill_export.xlsx</span>
-                                <span class="demo-file-badge">Excel</span>
-                            </div>
-                            <div class="demo-spreadsheet-table">
-                                <div class="demo-table-row demo-table-header-row">
-                                    <span>Supplier</span>
-                                    <span>Amt Owed</span>
-                                    <span>Pay By</span>
-                                    <span>Memo</span>
-                                </div>
-                                <div class="demo-table-row">
-                                    <span>Acme Supply Co</span>
-                                    <span>$4,280.00</span>
-                                    <span>12/15/2025</span>
-                                    <span>INV-3847</span>
-                                </div>
-                                <div class="demo-table-row">
-                                    <span>TechFlow LLC</span>
-                                    <span>$950.50</span>
-                                    <span>01/02/2026</span>
-                                    <span>PO-9912</span>
-                                </div>
-                                <div class="demo-table-row demo-table-faded">
-                                    <span>NovaCorp Int'l</span>
-                                    <span>$12,100.00</span>
-                                    <span>11/30/2025</span>
-                                    <span>Contract #441</span>
-                                </div>
-                            </div>
-                            <div class="demo-row-count">384 more rows...</div>
-
-                            <!-- AI Processing divider -->
-                            <div class="demo-ai-divider" id="aiProcessor">
-                                <div class="ai-divider-line"></div>
-                                <div class="ai-processor-ring">
-                                    <svg viewBox="0 0 48 48" class="processor-ring-svg">
-                                        <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                                        <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
-                                        <defs>
-                                            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style="stop-color:#6366f1"/>
-                                                <stop offset="100%" style="stop-color:#8b5cf6"/>
-                                            </linearGradient>
-                                        </defs>
-                                    </svg>
-                                    <span class="processor-label">AI</span>
-                                </div>
-                                <span class="processor-text">Mapping columns...</span>
-                                <div class="ai-divider-line"></div>
-                            </div>
-
-                            <!-- Mapping results -->
-                            <div class="demo-mapping-results" id="aiMappingResults">
-                                <div class="demo-mapping-header">
-                                    <span class="demo-mapping-title">Mapped Fields</span>
-                                    <span class="demo-mapping-badge">4/4 matched</span>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="0">
-                                    <div class="demo-map-source">Supplier</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Supplier Name</div>
-                                    <div class="demo-map-confidence">97%</div>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="1">
-                                    <div class="demo-map-source">Amt Owed</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Balance Due</div>
-                                    <div class="demo-map-confidence">93%</div>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="2">
-                                    <div class="demo-map-source">Pay By</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Due Date</div>
-                                    <div class="demo-map-confidence">91%</div>
-                                </div>
-                                <div class="demo-mapping-row" data-delay="3">
-                                    <div class="demo-map-source">Memo</div>
-                                    <div class="demo-map-arrow">
-                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                    </div>
-                                    <div class="demo-map-target">Reference #</div>
-                                    <div class="demo-map-confidence">86%</div>
-                                </div>
-                                <div class="demo-mapping-footer" id="aiMappingFooter">
-                                    <div class="demo-mapping-success">
-                                        <?= svg_icon('check', 16) ?>
-                                        <span>Ready to import 387 rows</span>
-                                    </div>
-                                </div>
+                <!-- Center: processing hub -->
+                <div class="ai-flow-center">
+                    <div class="ai-flow-connector-line ai-flow-connector-left"></div>
+                    <div class="ai-flow-hub" id="aiFlowHub">
+                        <div class="ai-flow-hub-ring">
+                            <div class="ai-hub-glow"></div>
+                            <svg viewBox="0 0 80 80" class="ai-hub-svg">
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="#e0e7ff" stroke-width="2"/>
+                                <circle cx="40" cy="40" r="36" fill="none" stroke="url(#hubGrad)" stroke-width="3" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round" class="ai-hub-progress"/>
+                                <defs>
+                                    <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#3b82f6"/>
+                                        <stop offset="100%" style="stop-color:#2563eb"/>
+                                    </linearGradient>
+                                </defs>
+                            </svg>
+                            <div class="ai-hub-icon">
+                                <?= svg_icon('bolt', 24) ?>
                             </div>
                         </div>
+                        <span class="ai-flow-hub-label" id="aiHubLabel">Analyzing...</span>
+                    </div>
+                    <div class="ai-flow-connector-line ai-flow-connector-right"></div>
+                    <!-- Animated particles -->
+                    <div class="ai-flow-particles" id="aiParticles"></div>
+                </div>
+
+                <!-- Destination: clean imported fields -->
+                <div class="ai-flow-dest">
+                    <div class="ai-flow-card ai-flow-card-dest">
+                        <div class="ai-flow-card-header ai-flow-card-header-dest">
+                            <span class="ai-flow-dest-title">Imported Fields</span>
+                            <span class="ai-flow-dest-badge" id="aiMatchBadge">0/4</span>
+                        </div>
+                        <div class="ai-flow-fields" id="aiFlowFields">
+                            <div class="ai-flow-field" data-field="0">
+                                <div class="ai-flow-field-label">Supplier Name</div>
+                                <div class="ai-flow-field-value">Acme Supply Co</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-text"><?= svg_icon('check', 12) ?> Text</div>
+                            </div>
+                            <div class="ai-flow-field" data-field="1">
+                                <div class="ai-flow-field-label">Balance Due</div>
+                                <div class="ai-flow-field-value">$4,280.00</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-currency"><?= svg_icon('check', 12) ?> Currency</div>
+                            </div>
+                            <div class="ai-flow-field" data-field="2">
+                                <div class="ai-flow-field-label">Due Date</div>
+                                <div class="ai-flow-field-value">Dec 15, 2025</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-date"><?= svg_icon('check', 12) ?> Date</div>
+                            </div>
+                            <div class="ai-flow-field" data-field="3">
+                                <div class="ai-flow-field-label">Reference #</div>
+                                <div class="ai-flow-field-value">INV-3847</div>
+                                <div class="ai-flow-field-tag ai-flow-field-tag-id"><?= svg_icon('check', 12) ?> ID</div>
+                            </div>
+                        </div>
+                        <div class="ai-flow-footer" id="aiFlowFooter">
+                            <?= svg_icon('check', 16) ?>
+                            <span>Ready to import 387 rows</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature pills -->
+            <div class="ai-import-pills animate-on-scroll">
+                <div class="ai-pill">
+                    <div class="ai-pill-icon"><?= svg_icon('bolt', 18) ?></div>
+                    <div class="ai-pill-text">
+                        <strong>Instant detection</strong>
+                        <span>Names, emails, dates, currencies — recognized automatically</span>
+                    </div>
+                </div>
+                <div class="ai-pill">
+                    <div class="ai-pill-icon"><?= svg_icon('table', 18) ?></div>
+                    <div class="ai-pill-text">
+                        <strong>Any format</strong>
+                        <span>Messy columns, unusual names, mixed data — no cleanup needed</span>
+                    </div>
+                </div>
+                <div class="ai-pill">
+                    <div class="ai-pill-icon"><?= svg_icon('shield', 18) ?></div>
+                    <div class="ai-pill-text">
+                        <strong>Private &amp; secure</strong>
+                        <span>Encrypted processing — never stored or used for training</span>
                     </div>
                 </div>
             </div>
@@ -1070,44 +1056,62 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <!-- Security Section -->
     <section class="security-section">
         <div class="container">
-            <div class="security-content">
+            <div class="security-layout">
                 <div class="security-text animate-on-scroll">
                     <span class="section-tag">Security</span>
-                    <h2 class="section-title text-left">Your data, protected</h2>
-                    <p class="section-description text-left">We take security seriously. Your business data is encrypted with the same technology used by banks and government agencies.</p>
+                    <h2 class="section-title text-left">This is what your data looks like on disk</h2>
+                    <p class="section-description text-left">Every transaction, invoice, and customer record is encrypted with AES-256-GCM before it's saved. Even if someone copied your files, they'd see nothing useful.</p>
 
-                    <div class="security-features">
-                        <div class="security-item">
-                            <div class="security-icon">
-                                <?= svg_icon('shield', 24) ?>
-                            </div>
-                            <div class="security-detail">
-                                <h4>AES-256 Encryption</h4>
-                                <p>Bank-grade encryption protects all your data</p>
-                            </div>
+                    <div class="security-stats">
+                        <div class="security-stat">
+                            <span class="security-stat-value">AES-256</span>
+                            <span class="security-stat-label">Encryption standard</span>
                         </div>
-                        <div class="security-item">
-                            <div class="security-icon">
-                                <?= svg_icon('lock', 24) ?>
-                            </div>
-                            <div class="security-detail">
-                                <h4>Local Storage</h4>
-                                <p>Your data stays on your computer, not in the cloud</p>
-                            </div>
+                        <div class="security-stat">
+                            <span class="security-stat-value">Local</span>
+                            <span class="security-stat-label">Data never leaves your PC</span>
                         </div>
-                        <div class="security-item">
-                            <div class="security-icon">
-                                <?= svg_icon('biometric-clock', 24) ?>
-                            </div>
-                            <div class="security-detail">
-                                <h4>Biometric Login</h4>
-                                <p>Fingerprint and face unlock for quick, secure access</p>
-                            </div>
+                        <div class="security-stat">
+                            <span class="security-stat-value">Bio</span>
+                            <span class="security-stat-label">Fingerprint &amp; face unlock</span>
                         </div>
                     </div>
                 </div>
-                <div class="security-visual animate-on-scroll">
-                    <img src="resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted with AES-256, stored offline, no cloud dependency" loading="lazy">
+
+                <div class="security-terminal-wrap animate-on-scroll">
+                    <div class="security-terminal" id="securityTerminal">
+                        <div class="terminal-bar">
+                            <div class="terminal-dots">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <span class="terminal-title">your_company.argo — encrypted view</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-section">
+                                <div class="terminal-label">Your data</div>
+                                <div class="terminal-plain" id="termPlain">
+                                    <div class="terminal-row"><span class="t-key">supplier</span> <span class="t-val">"Acme Supply Co"</span></div>
+                                    <div class="terminal-row"><span class="t-key">amount</span> <span class="t-val">"$4,280.00"</span></div>
+                                    <div class="terminal-row"><span class="t-key">due_date</span> <span class="t-val">"2025-12-15"</span></div>
+                                    <div class="terminal-row"><span class="t-key">reference</span> <span class="t-val">"INV-3847"</span></div>
+                                </div>
+                            </div>
+                            <div class="terminal-encrypt-bar" id="termEncryptBar">
+                                <div class="terminal-encrypt-icon"><?= svg_icon('lock', 14) ?></div>
+                                <span id="termEncryptLabel">AES-256-GCM encrypting...</span>
+                                <div class="terminal-encrypt-progress"><div class="terminal-encrypt-fill" id="termEncryptFill"></div></div>
+                            </div>
+                            <div class="terminal-section">
+                                <div class="terminal-label">What's stored on disk</div>
+                                <div class="terminal-cipher" id="termCipher">
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="supplier  &quot;Acme Supply Co&quot;"></span></div>
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="amount    &quot;$4,280.00&quot;"></span></div>
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="due_date  &quot;2025-12-15&quot;"></span></div>
+                                    <div class="terminal-row cipher-row"><span class="t-cipher" data-plain="reference &quot;INV-3847&quot;"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1346,7 +1350,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <p>Want to reach out directly?</p>
                 <a href="contact-us/" class="btn btn-primary">
                     <?= svg_icon('message-circle', 20) ?>
-                    Contact Form
+                    Contact Us
                 </a>
             </div>
         </div>
@@ -1886,61 +1890,102 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             runCycle();
         }
 
-        // AI Import demo animation
+        // AI Import flow animation
         const aiImportDemo = document.getElementById('aiImportDemo');
         if (aiImportDemo) {
             let aiAnimationStarted = false;
+            const particleColors = ['#3b82f6', '#60a5fa', '#2563eb', '#93c5fd'];
+
+            function spawnParticles(container, direction, count) {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const p = document.createElement('div');
+                        p.className = 'ai-particle particle-' + direction;
+                        p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+                        p.style.marginTop = (Math.random() * 20 - 10) + 'px';
+                        container.appendChild(p);
+                        setTimeout(() => p.remove(), 1300);
+                    }, i * 120);
+                }
+            }
 
             function runAiImportAnimation() {
-                const processor = document.getElementById('aiProcessor');
-                const results = document.getElementById('aiMappingResults');
-                const rows = results.querySelectorAll('.demo-mapping-row');
-                const footer = document.getElementById('aiMappingFooter');
+                const hub = document.getElementById('aiFlowHub');
+                const hubLabel = document.getElementById('aiHubLabel');
+                const hubRing = hub.querySelector('.ai-flow-hub-ring');
+                const progress = hub.querySelector('.ai-hub-progress');
+                const hubIcon = hub.querySelector('.ai-hub-icon');
+                const fields = document.querySelectorAll('#aiFlowFields .ai-flow-field');
+                const footer = document.getElementById('aiFlowFooter');
+                const badge = document.getElementById('aiMatchBadge');
+                const particles = document.getElementById('aiParticles');
+                const connLeft = document.querySelector('.ai-flow-connector-left');
+                const connRight = document.querySelector('.ai-flow-connector-right');
+                const sourceRows = document.querySelectorAll('.ai-flow-row[data-row]');
 
                 // Reset
-                processor.classList.remove('active');
-                results.classList.remove('active');
-                rows.forEach(r => r.classList.remove('visible'));
+                progress.style.transition = 'none';
+                progress.style.strokeDashoffset = '226';
+                hubLabel.textContent = 'Analyzing...';
+                hubLabel.classList.remove('complete');
+                hubIcon.classList.remove('complete');
+                hubRing.classList.remove('active', 'complete');
+                fields.forEach(f => f.classList.remove('visible'));
                 footer.classList.remove('visible');
-                const progressRing = processor.querySelector('.processor-progress');
-                progressRing.style.transition = 'none';
-                progressRing.style.strokeDashoffset = '126';
-                processor.querySelector('.processor-text').textContent = 'Mapping columns...';
+                badge.textContent = '0/4';
+                badge.classList.remove('complete');
+                connLeft.classList.remove('active');
+                connRight.classList.remove('active');
+                sourceRows.forEach(r => r.classList.remove('ai-flow-row-highlight'));
 
-                // Step 1: Show AI processor (0.5s)
+                // Step 1: Activate connectors + start progress ring + glow (0.3s)
                 setTimeout(() => {
-                    processor.classList.add('active');
-                    // Re-enable transition, then animate progress ring
+                    connLeft.classList.add('active');
+                    hubRing.classList.add('active');
+                    spawnParticles(particles, 'left', 8);
                     requestAnimationFrame(() => {
-                        progressRing.style.transition = '';
+                        progress.style.transition = '';
                         requestAnimationFrame(() => {
-                            progressRing.style.strokeDashoffset = '0';
+                            progress.style.strokeDashoffset = '0';
                         });
                     });
-                }, 500);
+                }, 300);
 
-                // Step 2: Show mapping results card (2s)
-                setTimeout(() => {
-                    processor.querySelector('.processor-text').textContent = 'Complete!';
-                    results.classList.add('active');
-                }, 2000);
-
-                // Step 3: Reveal rows one by one (2.3s, 2.6s, 2.9s, 3.2s)
-                rows.forEach((row, i) => {
+                // Step 2: Highlight source rows one by one (0.6s, 1.0s, 1.4s)
+                sourceRows.forEach((row, i) => {
                     setTimeout(() => {
-                        row.classList.add('visible');
-                    }, 2300 + (i * 300));
+                        row.classList.add('ai-flow-row-highlight');
+                    }, 600 + i * 400);
                 });
 
-                // Step 4: Show footer (3.8s)
+                // Step 3: Hub complete + right connector + full glow (2.2s)
+                setTimeout(() => {
+                    hubLabel.textContent = 'Imported!';
+                    hubLabel.classList.add('complete');
+                    hubIcon.classList.add('complete');
+                    hubRing.classList.add('complete');
+                    connRight.classList.add('active');
+                    spawnParticles(particles, 'right', 8);
+                }, 2200);
+
+                // Step 4: Reveal destination fields one by one (2.6s+)
+                fields.forEach((field, i) => {
+                    setTimeout(() => {
+                        field.classList.add('visible');
+                        badge.textContent = (i + 1) + '/4';
+                    }, 2600 + i * 350);
+                });
+
+                // Step 5: Show footer + mark complete (4.2s)
                 setTimeout(() => {
                     footer.classList.add('visible');
-                }, 3800);
+                    badge.classList.add('complete');
+                }, 4200);
 
-                // Step 5: Hold for 4s, then restart (7.8s)
+                // Step 6: Hold, then restart (8.5s)
                 setTimeout(() => {
                     runAiImportAnimation();
-                }, 8000);
+                }, 8500);
             }
 
             const aiObserver = new IntersectionObserver((entries) => {
@@ -1950,9 +1995,102 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         runAiImportAnimation();
                     }
                 });
-            }, { threshold: 0.3 });
+            }, { threshold: 0.2 });
 
             aiObserver.observe(aiImportDemo);
+        }
+
+        // Security encryption terminal animation
+        const secTerminal = document.getElementById('securityTerminal');
+        if (secTerminal) {
+            let secAnimStarted = false;
+            const cipherChars = '0123456789abcdef';
+
+            function randomHex(len) {
+                let s = '';
+                for (let i = 0; i < len; i++) s += cipherChars[Math.floor(Math.random() * cipherChars.length)];
+                return s;
+            }
+
+            function scrambleText(el, duration) {
+                const plain = el.dataset.plain;
+                const len = plain.length;
+                const startTime = Date.now();
+                const interval = setInterval(() => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const locked = Math.floor(progress * len);
+                    let result = '';
+                    for (let i = 0; i < len; i++) {
+                        if (i < locked) {
+                            result += randomHex(1);
+                        } else {
+                            result += plain[i];
+                        }
+                    }
+                    el.textContent = result;
+                    if (progress >= 1) {
+                        clearInterval(interval);
+                        // Keep cycling the cipher text
+                        const cycleInterval = setInterval(() => {
+                            el.textContent = randomHex(len);
+                        }, 120);
+                        el._cycleInterval = cycleInterval;
+                    }
+                }, 50);
+                return interval;
+            }
+
+            function runEncryptionAnimation() {
+                const bar = document.getElementById('termEncryptBar');
+                const fill = document.getElementById('termEncryptFill');
+                const label = document.getElementById('termEncryptLabel');
+                const ciphers = secTerminal.querySelectorAll('.t-cipher');
+
+                // Reset
+                bar.classList.remove('active', 'done');
+                fill.style.transition = 'none';
+                fill.style.width = '0%';
+                label.textContent = 'AES-256-GCM encrypting...';
+                ciphers.forEach(el => {
+                    if (el._cycleInterval) clearInterval(el._cycleInterval);
+                    el.textContent = '';
+                });
+
+                // Step 1: Show encrypt bar (0.5s)
+                setTimeout(() => {
+                    bar.classList.add('active');
+                    requestAnimationFrame(() => {
+                        fill.style.transition = 'width 2s ease-in-out';
+                        requestAnimationFrame(() => { fill.style.width = '100%'; });
+                    });
+                }, 500);
+
+                // Step 2: Scramble each row staggered (0.8s+)
+                ciphers.forEach((el, i) => {
+                    setTimeout(() => scrambleText(el, 1800), 800 + i * 300);
+                });
+
+                // Step 3: Mark complete (2.8s)
+                setTimeout(() => {
+                    bar.classList.add('done');
+                    label.textContent = 'Encryption complete — stored locally';
+                }, 2800);
+
+                // Step 4: Hold, then restart (8s)
+                setTimeout(() => runEncryptionAnimation(), 8000);
+            }
+
+            const secObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !secAnimStarted) {
+                        secAnimStarted = true;
+                        runEncryptionAnimation();
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            secObserver.observe(secTerminal);
         }
 
         // FAQ Accordion

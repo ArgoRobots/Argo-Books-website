@@ -173,7 +173,7 @@ $plans = get_plan_features();
                         <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
                     <h3>No feature gating</h3>
-                    <p>QuickBooks locks inventory management, project tracking, and other core features behind their $80+/month plans. Argo Books Premium gives you everything for $10 CAD/month — no upsells, no surprises.</p>
+                    <p>QuickBooks locks inventory management and other core features behind their $80+/month plans. Argo Books Premium gives you everything for $10 CAD/month — no upsells, no surprises.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -416,7 +416,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and more.</p>
                             <p>QuickBooks does not offer a free plan — pricing starts at $22 CAD/month after a limited trial.</p>
                         </div>
                     </div>

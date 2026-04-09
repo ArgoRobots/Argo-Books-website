@@ -636,6 +636,7 @@ a {
 }
 
 .device-frame {
+    position: relative;
     background: linear-gradient(145deg, var(--gray-800), var(--gray-900));
     border-radius: 16px;
     padding: 12px;
@@ -649,6 +650,37 @@ a {
     height: auto;
     border-radius: 8px;
     display: block;
+}
+
+.hero-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.hero-play-btn:hover {
+    background: rgba(0, 0, 0, 0.65);
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.hero-play-btn svg {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .floating-card {
@@ -704,6 +736,79 @@ a {
 
 .floating-card-value.success {
     color: var(--emerald-600);
+}
+
+/* ----------------------------------------
+   Video Modal
+   ---------------------------------------- */
+.video-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.video-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.video-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.video-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 960px;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.video-modal.active .video-modal-content {
+    transform: scale(1);
+}
+
+.video-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.video-modal-close:hover {
+    opacity: 1;
+}
+
+.video-modal-player {
+    position: relative;
+    padding-bottom: 56.25%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--gray-900);
+}
+
+.video-modal-player iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 
 /* ========================================
@@ -1582,11 +1687,10 @@ a {
 .ai-import-demo {
     display: flex;
     flex-direction: column;
-    gap: 16px;
 }
 
-/* Spreadsheet card */
-.demo-spreadsheet {
+/* Single demo card */
+.demo-card {
     background: var(--white);
     border-radius: 16px;
     box-shadow: 0 4px 24px var(--shadow-md), 0 1px 2px var(--shadow-xs);
@@ -1671,21 +1775,26 @@ a {
     border-top: 1px solid var(--gray-100);
 }
 
-/* AI Processor */
-.demo-ai-processor {
+/* AI Divider */
+.demo-ai-divider {
     display: flex;
     align-items: center;
     gap: 14px;
-    justify-content: center;
-    padding: 8px 0;
+    padding: 12px 20px;
     opacity: 0;
     transform: scale(0.9);
     transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-.demo-ai-processor.active {
+.demo-ai-divider.active {
     opacity: 1;
     transform: scale(1);
+}
+
+.ai-divider-line {
+    flex: 1;
+    height: 1px;
+    background: var(--gray-200);
 }
 
 .ai-processor-ring {
@@ -1704,7 +1813,7 @@ a {
     transition: stroke-dashoffset 2s ease-in-out;
 }
 
-.demo-ai-processor.active .processor-progress {
+.demo-ai-divider.active .processor-progress {
     stroke-dashoffset: 0;
 }
 
@@ -1730,19 +1839,12 @@ a {
 
 /* Mapping results */
 .demo-mapping-results {
-    background: var(--white);
-    border-radius: 16px;
-    box-shadow: 0 4px 24px var(--shadow-md), 0 1px 2px var(--shadow-xs);
-    overflow: hidden;
-    border: 1px solid var(--gray-200);
     opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transition: opacity 0.5s ease;
 }
 
 .demo-mapping-results.active {
     opacity: 1;
-    transform: translateY(0);
 }
 
 .demo-mapping-header {
@@ -2836,6 +2938,25 @@ a {
 
     .floating-card {
         display: none;
+    }
+
+    .hero-play-btn {
+        width: 48px;
+        height: 48px;
+    }
+
+    .hero-play-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .video-modal-content {
+        width: 95%;
+    }
+
+    .video-modal-close {
+        top: -36px;
+        font-size: 1.5rem;
     }
 
     .section-title {

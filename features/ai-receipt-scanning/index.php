@@ -241,7 +241,7 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>98%</h3>
+                    <h3>99%</h3>
                     <p>Accuracy on printed receipts</p>
                 </div>
                 <div class="highlight-item">

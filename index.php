@@ -225,6 +225,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="hero-device">
                     <div class="device-frame">
                         <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen" width="2400" height="1524">
+                        <button class="hero-play-btn" id="heroPlayBtn" aria-label="Watch demo video">
+                            <?= svg_icon('play-filled', 28) ?>
+                        </button>
                     </div>
                     <div class="floating-card floating-card-1 animate-float">
                         <div class="floating-card-icon">
@@ -804,8 +807,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
                 <div class="ai-import-visual animate-on-scroll">
                     <div class="ai-import-demo" id="aiImportDemo">
-                        <!-- Spreadsheet source -->
-                        <div class="demo-spreadsheet">
+                        <div class="demo-card">
+                            <!-- Spreadsheet header -->
                             <div class="demo-spreadsheet-header">
                                 <div class="demo-file-icon"><?= svg_icon('table', 16) ?></div>
                                 <span class="demo-file-name">bill_export.xlsx</span>
@@ -838,68 +841,70 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                 </div>
                             </div>
                             <div class="demo-row-count">384 more rows...</div>
-                        </div>
 
-                        <!-- AI Processing indicator -->
-                        <div class="demo-ai-processor" id="aiProcessor">
-                            <div class="ai-processor-ring">
-                                <svg viewBox="0 0 48 48" class="processor-ring-svg">
-                                    <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                                    <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
-                                    <defs>
-                                        <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#6366f1"/>
-                                            <stop offset="100%" style="stop-color:#8b5cf6"/>
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                                <span class="processor-label">AI</span>
+                            <!-- AI Processing divider -->
+                            <div class="demo-ai-divider" id="aiProcessor">
+                                <div class="ai-divider-line"></div>
+                                <div class="ai-processor-ring">
+                                    <svg viewBox="0 0 48 48" class="processor-ring-svg">
+                                        <circle cx="24" cy="24" r="20" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                                        <circle cx="24" cy="24" r="20" fill="none" stroke="url(#aiGradient)" stroke-width="3" stroke-dasharray="126" stroke-dashoffset="126" stroke-linecap="round" class="processor-progress"/>
+                                        <defs>
+                                            <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#6366f1"/>
+                                                <stop offset="100%" style="stop-color:#8b5cf6"/>
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
+                                    <span class="processor-label">AI</span>
+                                </div>
+                                <span class="processor-text">Mapping columns...</span>
+                                <div class="ai-divider-line"></div>
                             </div>
-                            <span class="processor-text">Mapping columns...</span>
-                        </div>
 
-                        <!-- Mapping results -->
-                        <div class="demo-mapping-results" id="aiMappingResults">
-                            <div class="demo-mapping-header">
-                                <span class="demo-mapping-title">Mapped Fields</span>
-                                <span class="demo-mapping-badge">4/4 matched</span>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="0">
-                                <div class="demo-map-source">Supplier</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <!-- Mapping results -->
+                            <div class="demo-mapping-results" id="aiMappingResults">
+                                <div class="demo-mapping-header">
+                                    <span class="demo-mapping-title">Mapped Fields</span>
+                                    <span class="demo-mapping-badge">4/4 matched</span>
                                 </div>
-                                <div class="demo-map-target">Supplier Name</div>
-                                <div class="demo-map-confidence">97%</div>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="1">
-                                <div class="demo-map-source">Amt Owed</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div class="demo-mapping-row" data-delay="0">
+                                    <div class="demo-map-source">Supplier</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Supplier Name</div>
+                                    <div class="demo-map-confidence">97%</div>
                                 </div>
-                                <div class="demo-map-target">Balance Due</div>
-                                <div class="demo-map-confidence">93%</div>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="2">
-                                <div class="demo-map-source">Pay By</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div class="demo-mapping-row" data-delay="1">
+                                    <div class="demo-map-source">Amt Owed</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Balance Due</div>
+                                    <div class="demo-map-confidence">93%</div>
                                 </div>
-                                <div class="demo-map-target">Due Date</div>
-                                <div class="demo-map-confidence">91%</div>
-                            </div>
-                            <div class="demo-mapping-row" data-delay="3">
-                                <div class="demo-map-source">Memo</div>
-                                <div class="demo-map-arrow">
-                                    <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <div class="demo-mapping-row" data-delay="2">
+                                    <div class="demo-map-source">Pay By</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Due Date</div>
+                                    <div class="demo-map-confidence">91%</div>
                                 </div>
-                                <div class="demo-map-target">Reference #</div>
-                                <div class="demo-map-confidence">86%</div>
-                            </div>
-                            <div class="demo-mapping-footer" id="aiMappingFooter">
-                                <div class="demo-mapping-success">
-                                    <?= svg_icon('check', 16) ?>
-                                    <span>Ready to import 387 rows</span>
+                                <div class="demo-mapping-row" data-delay="3">
+                                    <div class="demo-map-source">Memo</div>
+                                    <div class="demo-map-arrow">
+                                        <svg width="20" height="12" viewBox="0 0 20 12"><path d="M0 6h16M13 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                    </div>
+                                    <div class="demo-map-target">Reference #</div>
+                                    <div class="demo-map-confidence">86%</div>
+                                </div>
+                                <div class="demo-mapping-footer" id="aiMappingFooter">
+                                    <div class="demo-mapping-success">
+                                        <?= svg_icon('check', 16) ?>
+                                        <span>Ready to import 387 rows</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1349,6 +1354,17 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     </main>
 
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-backdrop"></div>
+        <div class="video-modal-content">
+            <button class="video-modal-close" aria-label="Close video">&times;</button>
+            <div class="video-modal-player">
+                <iframe id="videoIframe" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            </div>
+        </div>
+    </div>
+
     <!-- CTA + Footer Wrapper -->
     <div class="dark-section-wrapper">
         <!-- CTA Section -->
@@ -1391,6 +1407,31 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Video modal
+        const videoModal = document.getElementById('videoModal');
+        const videoIframe = document.getElementById('videoIframe');
+        const videoUrl = 'https://www.youtube.com/embed/Dsn38p5g3Zg';
+
+        document.getElementById('heroPlayBtn').addEventListener('click', function() {
+            videoIframe.src = videoUrl + '?autoplay=1&rel=0&modestbranding=1';
+            videoModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        function closeVideoModal() {
+            videoModal.classList.remove('active');
+            videoIframe.src = '';
+            document.body.style.overflow = '';
+        }
+
+        videoModal.querySelector('.video-modal-close').addEventListener('click', closeVideoModal);
+        videoModal.querySelector('.video-modal-backdrop').addEventListener('click', closeVideoModal);
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && videoModal.classList.contains('active')) {
+                closeVideoModal();
+            }
+        });
+
         // Scroll animations
         const observerOptions = {
             threshold: 0.1,

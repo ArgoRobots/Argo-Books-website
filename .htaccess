@@ -265,6 +265,9 @@ php_value upload_max_filesize 10M
     # Provider connect/disconnect: /api/portal/connect/{provider}
     RewriteRule ^api/portal/connect/(stripe|paypal|square)/?$ api/portal/connect.php?provider=$1 [L,QSA]
 
+    # Telemetry data upload
+    RewriteRule ^api/data/upload/?$ api/data/upload.php [L,QSA]
+
     # --- Avalonia (cross-platform) download routes ---
 
     # Versioned: /download/avalonia/2.1.0/win

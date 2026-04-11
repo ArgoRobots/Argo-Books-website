@@ -468,7 +468,7 @@ include '../admin_header.php';
                     <div class="stat-card">
                         <h3>Active Today</h3>
                         <div class="value" id="kpiDAU">—</div>
-                        <p class="subtext">DAU</p>
+                        <p class="subtext">Daily Active Users</p>
                     </div>
                     <div class="stat-card">
                         <h3>Active This Week</h3>

@@ -25,7 +25,7 @@ define('MAX_FILENAME_LENGTH', 255);
 function checkRateLimit($authIdentifier = null)
 {
     // Use auth identifier in rate limiting to prevent key sharing abuse
-    $api_key = $authIdentifier ?? $_SERVER['HTTP_X_API_KEY'] ?? 'unknown';
+    $api_key = $authIdentifier ?? $_SERVER['HTTP_X_LICENSE_KEY'] ?? 'unknown';
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $rate_key = md5($api_key . $ip); // Combine auth identifier and IP for rate limiting
     $rate_file = sys_get_temp_dir() . '/upload_rate_' . $rate_key;
@@ -101,7 +101,7 @@ function logSecurityEvent($event, $details = '')
         'timestamp' => date('Y-m-d H:i:s'),
         'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
-        'api_key_provided' => !empty($_SERVER['HTTP_X_API_KEY']),
+        'license_key_provided' => !empty($_SERVER['HTTP_X_LICENSE_KEY']),
         'event' => $event,
         'details' => $details
     ];
@@ -117,18 +117,18 @@ try {
         exit;
     }
 
-    // Authenticate request FIRST (using portal API key)
-    $company = authenticate_portal_request();
-    if (!$company) {
+    // Authenticate request using license key (the desktop app sends its license key)
+    $license = authenticate_license_request();
+    if (!$license) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized']);
-        logSecurityEvent('invalid_api_key');
+        logSecurityEvent('invalid_license_key');
         exit;
     }
 
-    // Rate limiting check — use company ID so Bearer-auth requests get a proper bucket
-    $companyId = is_array($company) ? ($company['id'] ?? null) : null;
-    if (!checkRateLimit($companyId ? 'company:' . $companyId : null)) {
+    // Rate limiting check — use subscription ID for rate limiting bucket
+    $subscriptionId = $license['subscription_id'] ?? null;
+    if (!checkRateLimit($subscriptionId ? 'subscription:' . $subscriptionId : null)) {
         http_response_code(429);
         echo json_encode(['error' => 'Rate limit exceeded']);
         logSecurityEvent('rate_limit_exceeded');

@@ -29,8 +29,6 @@ document.addEventListener("DOMContentLoaded", function () {
   // Payment method selection
   var methodButtons = document.querySelectorAll(".method-btn");
   var formContainer = document.getElementById("payment-form-container");
-  var selectedMethod = null;
-
   methodButtons.forEach(function (btn) {
     btn.addEventListener("click", function () {
       var method = this.getAttribute("data-method");
@@ -41,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       this.classList.add("active");
 
-      selectedMethod = method;
       if (formContainer) formContainer.style.display = "block";
 
       initializeMethod(method);
@@ -64,7 +61,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Auto-initialize if only one payment method
   if (config.singleMethod && formContainer) {
-    selectedMethod = config.singleMethod;
     initializeMethod(config.singleMethod);
   }
 

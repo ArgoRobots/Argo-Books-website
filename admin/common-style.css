@@ -52,15 +52,6 @@ body.menu-open::after {
   text-align: center;
 }
 
-.input-button-wrapper {
-  display: flex;
-  gap: 10px;
-}
-
-.input-button-wrapper input {
-  flex: 1;
-}
-
 /* Header */
 .admin-header {
   background: var(--white);
@@ -980,20 +971,6 @@ tbody tr:hover {
   /* Make checkboxes visible on mobile */
   .checkbox-column {
     min-width: 50px;
-  }
-}
-
-@media (max-width: 600px) {
-  .input-button-wrapper {
-    flex-direction: column;
-  }
-
-  .input-button-wrapper input {
-    width: 100%;
-  }
-
-  .input-button-wrapper button {
-    width: 100%;
   }
 }
 

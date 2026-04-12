@@ -105,6 +105,8 @@ function logSecurityEvent($event, $details = '')
         'event' => $event,
         'details' => $details
     ];
+
+    error_log(json_encode($log_entry));
 }
 
 // Main upload handling

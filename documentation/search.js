@@ -9,6 +9,7 @@ class DocumentationSearch {
         this.basePath = this.searchInput ? (this.searchInput.dataset.basePath || '') : '';
 
         // Static index of all documentation pages
+        // NOTE: Keep this list in sync when adding or removing documentation pages
         this.pages = [
             // Getting Started
             { id: 'system-requirements', title: 'System Requirements', category: 'Getting Started', folder: 'getting-started', keywords: 'windows macos linux requirements specs hardware disk space ram memory' },

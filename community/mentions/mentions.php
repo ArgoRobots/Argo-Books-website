@@ -4,7 +4,6 @@
  * Process @mentions in post and comment content and convert them to links
  * 
  * @param string $content The content to process
- * @param string $link_class The CSS class to apply to the mention link
  * @return string The processed content with mentions converted to links
  */
 function process_mentions($content)

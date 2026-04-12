@@ -134,7 +134,7 @@ try {
 
 /**
  * Handle subscription activated event
- * This is called when a new subscription is created and activated
+ * Called when a subscription is activated — either a new subscription or a reactivation of a suspended one
  */
 function handleSubscriptionActivated($resource) {
     global $pdo;
@@ -148,6 +148,7 @@ function handleSubscriptionActivated($resource) {
     }
 
     // Extract user_id from custom_id (format: user_123)
+    // Currently used only for logging context; subscription is matched by paypal_subscription_id below
     $userId = null;
     if (preg_match('/^user_(\d+)$/', $customId, $matches)) {
         $userId = intval($matches[1]);

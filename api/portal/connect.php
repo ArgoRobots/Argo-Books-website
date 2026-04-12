@@ -98,7 +98,8 @@ function initiate_connect(array $company, string $provider): void
                             $stripeAccountId = $row['stripe_account_id'];
                         }
                     } catch (\Stripe\Exception\ApiErrorException $e) {
-                        // Account doesn't exist or can't be accessed — will create a new one below
+                        // Account doesn't exist or can't be accessed — the stored ID
+                        // will be cleared and a new account created below
                     }
 
                     if (!$stripeAccountId) {

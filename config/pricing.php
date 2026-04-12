@@ -95,13 +95,6 @@ function _pricing_parse_int_env($key, $default) {
 }
 
 /**
- * Calculate the processing fee for a given subtotal.
- * Returns 0 if subtotal is zero or negative (e.g. credit-covered payments).
- *
- * @param float $subtotal The pre-fee charge amount
- * @return float Fee amount rounded to 2 decimal places
- */
-/**
  * Get the plan features configuration from plans.json.
  * Uses static caching so the file is only read once per request.
  *
@@ -135,6 +128,13 @@ function render_feature_label($feature) {
     return $html;
 }
 
+/**
+ * Calculate the processing fee for a given subtotal.
+ * Returns 0 if subtotal is zero or negative (e.g. credit-covered payments).
+ *
+ * @param float $subtotal The pre-fee charge amount
+ * @return float Fee amount rounded to 2 decimal places
+ */
 function calculate_processing_fee($subtotal) {
     if ($subtotal <= 0) {
         return 0.00;

@@ -135,6 +135,8 @@ if ($isGemini) {
             }
 
             // Poll until the file is ACTIVE (Gemini processes uploads asynchronously)
+            // Polls up to 15 times at 500ms intervals (~7.5s max). If still PROCESSING after
+            // all polls, the file is used as-is (Gemini will reject it if not ready).
             $fileStatusUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
             $maxPolls = 15;
             for ($i = 0; $i < $maxPolls; $i++) {

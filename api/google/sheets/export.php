@@ -203,7 +203,7 @@ if ($chartConfig && $numRows > 1 && $numCols >= 2) {
             'headerCount' => 1,
         ];
 
-        if (in_array($chartType, ['LINE', 'AREA'])) {
+        if ($chartType === 'LINE') {
             $basicChart['lineSmoothing'] = true;
         }
 
@@ -232,10 +232,13 @@ if ($chartConfig && $numRows > 1 && $numCols >= 2) {
 }
 
 if (!empty($batchRequests)) {
-    googleApiRequest($accessToken, 'POST',
+    $batchResult = googleApiRequest($accessToken, 'POST',
         "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheetId}:batchUpdate",
         ['requests' => $batchRequests]
     );
+    if ($batchResult === null) {
+        error_log('Google Sheets batchUpdate failed for spreadsheet: ' . $spreadsheetId . ' — requests: ' . json_encode($batchRequests));
+    }
 }
 
 // Step 4: Share if requested
@@ -294,7 +297,7 @@ function googleApiRequest(string $accessToken, string $method, string $url, ?arr
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
     if ($response === false || $httpCode >= 400) {
-        error_log("Google API error ({$method} {$url}): HTTP {$httpCode} - " . substr($response ?: '', 0, 500));
+        error_log("Google API error ({$method} {$url}): HTTP {$httpCode} - " . substr($response ?: '', 0, 1000));
         return null;
     }
 

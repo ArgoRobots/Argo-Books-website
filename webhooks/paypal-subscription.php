@@ -140,18 +140,9 @@ function handleSubscriptionActivated($resource) {
     global $pdo;
 
     $paypalSubscriptionId = $resource['id'] ?? '';
-    $status = $resource['status'] ?? '';
-    $customId = $resource['custom_id'] ?? ''; // We set this as user_ID during creation
 
     if (empty($paypalSubscriptionId)) {
         throw new Exception("Missing subscription ID in activated event");
-    }
-
-    // Extract user_id from custom_id (format: user_123)
-    // Currently used only for logging context; subscription is matched by paypal_subscription_id below
-    $userId = null;
-    if (preg_match('/^user_(\d+)$/', $customId, $matches)) {
-        $userId = intval($matches[1]);
     }
 
     // Check if we already have this subscription in our database

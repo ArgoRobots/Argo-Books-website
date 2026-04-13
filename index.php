@@ -2034,10 +2034,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         // Keep cycling the cipher text
                         const cycleInterval = setInterval(() => {
                             el.textContent = randomHex(len);
-                        }, 120);
+                        }, 200);
                         el._cycleInterval = cycleInterval;
                     }
-                }, 50);
+                }, 100);
                 return interval;
             }
 
@@ -2061,24 +2061,24 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 setTimeout(() => {
                     bar.classList.add('active');
                     requestAnimationFrame(() => {
-                        fill.style.transition = 'width 2s ease-in-out';
+                        fill.style.transition = 'width 5.1s ease-in-out';
                         requestAnimationFrame(() => { fill.style.width = '100%'; });
                     });
                 }, 2500);
 
                 // Step 2: Scramble each row staggered (after 2s plain text delay)
                 ciphers.forEach((el, i) => {
-                    setTimeout(() => scrambleText(el, 1800), 2800 + i * 300);
+                    setTimeout(() => scrambleText(el, 1800), 2800 + i * 1000);
                 });
 
-                // Step 3: Mark complete (4.8s)
+                // Step 3: Mark complete (7.6s — when last row finishes scrambling)
                 setTimeout(() => {
                     bar.classList.add('done');
                     label.textContent = 'Encryption complete — stored locally';
-                }, 4800);
+                }, 7600);
 
-                // Step 4: Hold, then restart (10s)
-                setTimeout(() => runEncryptionAnimation(), 10000);
+                // Step 4: Hold, then restart (12s)
+                setTimeout(() => runEncryptionAnimation(), 12000);
             }
 
             const secObserver = new IntersectionObserver((entries) => {

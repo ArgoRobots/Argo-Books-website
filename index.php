@@ -2054,31 +2054,31 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 label.textContent = 'AES-256-GCM encrypting...';
                 ciphers.forEach(el => {
                     if (el._cycleInterval) clearInterval(el._cycleInterval);
-                    el.textContent = '';
+                    el.textContent = el.dataset.plain;
                 });
 
-                // Step 1: Show encrypt bar (0.5s)
+                // Step 1: Show plain text for 2s, then start encrypt bar
                 setTimeout(() => {
                     bar.classList.add('active');
                     requestAnimationFrame(() => {
                         fill.style.transition = 'width 2s ease-in-out';
                         requestAnimationFrame(() => { fill.style.width = '100%'; });
                     });
-                }, 500);
+                }, 2500);
 
-                // Step 2: Scramble each row staggered (0.8s+)
+                // Step 2: Scramble each row staggered (after 2s plain text delay)
                 ciphers.forEach((el, i) => {
-                    setTimeout(() => scrambleText(el, 1800), 800 + i * 300);
+                    setTimeout(() => scrambleText(el, 1800), 2800 + i * 300);
                 });
 
-                // Step 3: Mark complete (2.8s)
+                // Step 3: Mark complete (4.8s)
                 setTimeout(() => {
                     bar.classList.add('done');
                     label.textContent = 'Encryption complete — stored locally';
-                }, 2800);
+                }, 4800);
 
-                // Step 4: Hold, then restart (8s)
-                setTimeout(() => runEncryptionAnimation(), 8000);
+                // Step 4: Hold, then restart (10s)
+                setTimeout(() => runEncryptionAnimation(), 10000);
             }
 
             const secObserver = new IntersectionObserver((entries) => {

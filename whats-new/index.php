@@ -91,6 +91,49 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.6 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.6</span>
+                        <span class="date-tag">April 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Customizable dashboard</strong> &mdash; The dashboard now has an Edit button that lets you fully customize the layout. Add, remove, resize, and rearrange widgets to highlight what matters most to your business. Everything works the same by default &mdash; customization is there when you want it.</li>
+                                <li><strong>Bulk receipt scanning</strong> &mdash; Scan multiple receipts at once. Drop or select a batch of files, watch them process in real time, then review and approve them all in a carousel view.</li>
+                                <li><strong>PDF receipt scanning</strong> &mdash; You can now scan PDF receipts in addition to images.</li>
+                                <li><strong>Password strength meter</strong> &mdash; A strength indicator now appears when setting or changing your password.</li>
+                                <li><strong>Duplicate customer warning</strong> &mdash; You'll now see a warning when creating a customer that already exists.</li>
+                                <li><strong>Deletion protection</strong> &mdash; Records that are referenced by other data (like a customer linked to invoices) can no longer be deleted.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Improved search</strong> &mdash; The header search bar now searches across all your data, not just quick actions.</li>
+                                <li><strong>Faster performance</strong> &mdash; Numerous speed and memory optimizations throughout the app, especially on pages with large datasets. Invoices and PDFs also render much faster.</li>
+                                <li><strong>Automatic inventory adjustments</strong> &mdash; Inventory now adjusts automatically when you record expenses or revenue, so stock levels stay in sync without manual updates.</li>
+                                <li><strong>Quick entity creation</strong> &mdash; Creating new items like customers or products now opens on top of your current page instead of navigating away.</li>
+                                <li><strong>Phone number validation</strong> &mdash; Phone numbers are now validated before saving to help catch typos.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li>Various bug fixes and stability improvements.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.5 -->
             <div class="version-card">
                 <div class="version-header">

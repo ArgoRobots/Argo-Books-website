@@ -177,7 +177,7 @@ $systemRequirements = getSystemRequirements();
                     <p class="platform-desc">For Windows 10 and later</p>
                     <?php if ($latestVersion && isset($latestVersion['platforms']['windows'])): ?>
                         <div class="version-details">
-                            <span class="version-tag">v<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
                             <span class="file-size"><?php echo formatFileSize($latestVersion['platforms']['windows']['filesize']); ?></span>
                         </div>
                     <?php endif; ?>
@@ -187,9 +187,6 @@ $systemRequirements = getSystemRequirements();
                         <?= svg_icon('download', null, 'btn-icon') ?>
                         Download for Windows
                     </a>
-                    <?php if ($latestVersion): ?>
-                        <span class="platform-badge available">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
-                    <?php endif; ?>
                 </div>
             </div>
 
@@ -218,12 +215,19 @@ $systemRequirements = getSystemRequirements();
                 </div>
                 <div class="platform-info">
                     <h2>Linux</h2>
-                    <p class="platform-desc">Ubuntu, Debian, Fedora & more</p>
+                    <p class="platform-desc">Ubuntu, Debian, Fedora & more (AppImage)</p>
+                    <?php if ($latestVersion && isset($latestVersion['platforms']['linux'])): ?>
+                        <div class="version-details">
+                            <span class="version-tag">V.<?php echo htmlspecialchars($latestVersion['version']); ?></span>
+                            <span class="file-size"><?php echo formatFileSize($latestVersion['platforms']['linux']['filesize']); ?></span>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div class="platform-actions">
-                    <button class="btn btn-gray download-btn disabled" disabled>
-                        Coming Soon
-                    </button>
+                    <a href="../download/avalonia/linux" class="btn btn-blue download-btn" data-platform="linux">
+                        <?= svg_icon('download', null, 'btn-icon') ?>
+                        Download for Linux
+                    </a>
                 </div>
             </div>
         </div>

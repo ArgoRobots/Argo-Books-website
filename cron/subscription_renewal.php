@@ -534,7 +534,7 @@ function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $ne
 
         <div class="content">
             <h1>Payment Receipt</h1>
-            <p>Thank you for your continued subscription to Argo AI!</p>
+            <p>Thank you for your continued subscription to Argo Premium!</p>
 
             <div class="subscription-box" style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
                 <h3 style="margin-top: 0;">Payment Details</h3>

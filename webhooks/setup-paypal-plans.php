@@ -185,7 +185,7 @@ function createPlan($baseUrl, $accessToken, $productId, $interval, $price) {
 
     $planData = [
         'product_id' => $productId,
-        'name' => "Argo AI - $planName",
+        'name' => "Argo Premium - $planName",
         'description' => "Argo Premium Subscription - $planName billing",
         'status' => 'ACTIVE',
         'billing_cycles' => [

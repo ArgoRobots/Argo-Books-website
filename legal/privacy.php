@@ -101,7 +101,7 @@
             </ul>
 
             <h4>Subscription Information</h4>
-            <p>When you subscribe to Argo AI, we store:</p>
+            <p>When you subscribe to Argo Premium, we store:</p>
             <ul>
                 <li>Subscription status and billing cycle</li>
                 <li>Payment method type (Stripe, PayPal, or Square)</li>

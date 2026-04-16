@@ -19,14 +19,18 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Authenticate using license key
+// Authenticate using license key (premium) or device ID (free)
 $license = authenticate_license_request();
+$deviceIdHash = null;
 if (!$license) {
-    send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
+    $deviceIdHash = authenticate_device_request();
+    if (!$deviceIdHash) {
+        send_error_response(401, 'Invalid or missing license key.', 'UNAUTHORIZED');
+    }
 }
 
-// Rate limiting: 60 requests per 15 minutes per license (global per license, not per IP)
-$rateLimitId = substr($license['license_key_hash'], 0, 16);
+// Rate limiting: 60 requests per 15 minutes per identity
+$rateLimitId = $license ? substr($license['license_key_hash'], 0, 16) : substr($deviceIdHash, 0, 16);
 $rateLimitKey = 'ai_license';
 if (is_rate_limited($rateLimitId, 60, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');

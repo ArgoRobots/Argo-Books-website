@@ -28,7 +28,7 @@ function imap_connect_mailbox()
         throw new Exception('IMAP credentials not configured in .env');
     }
 
-    $mailboxString = '{' . $host . ':' . $port . '/imap/ssl}' . $mailbox;
+    $mailboxString = '{' . $host . ':' . $port . '/imap/ssl/novalidate-cert}' . $mailbox;
 
     $imap = @imap_open($mailboxString, $username, $password, 0, 1);
     if (!$imap) {

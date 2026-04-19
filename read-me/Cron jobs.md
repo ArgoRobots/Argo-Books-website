@@ -105,3 +105,57 @@ php outreach_pipeline.php --dry-run        # Log what would happen without doing
 `/cron/logs/outreach_pipeline_YYYY-MM-DD.log`
 
 A lock file (`/cron/logs/outreach_pipeline.lock`) prevents overlapping runs.
+
+---
+
+## 4. Outreach Reply Checker
+
+**Script:** `cron/reply_checker.php`
+**Schedule:** Hourly
+
+```bash
+0 * * * * /usr/bin/php /home/argorobots/public_html/cron/reply_checker.php
+```
+
+### What It Does
+
+1. Connects to the contact mailbox via IMAP
+2. Fetches emails received in the last 7 days
+3. Skips auto-responders (out-of-office, auto-reply headers)
+4. Matches sender addresses against outreach leads in `contacted` status
+5. Auto-promotes matched leads to `replied` status (only if the email arrived after `sent_at`)
+6. Logs a `reply_received` activity entry for each match
+
+Admins can then manually classify replied leads as `interested` or `not_interested` in the outreach dashboard.
+
+### Requirements
+
+- PHP `imap` extension must be enabled. In cPanel: **Select PHP Version → Extensions → check `imap`**
+- Mailbox credentials configured in `.env` (see below)
+
+### Environment Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `IMAP_HOST` | — | e.g. `mail.argorobots.com` |
+| `IMAP_PORT` | 993 | IMAP SSL port |
+| `IMAP_USERNAME` | — | Full email address (e.g. `contact@argorobots.com`) |
+| `IMAP_PASSWORD` | — | Mailbox password or app password |
+| `IMAP_MAILBOX` | INBOX | Folder to check |
+
+### Manual Execution
+
+```bash
+php /home/argorobots/public_html/cron/reply_checker.php
+```
+
+### Logs
+
+`/cron/logs/reply_checker_YYYY-MM-DD.log`
+
+A lock file (`/cron/logs/reply_checker.lock`) prevents overlapping runs.
+
+### Limitations
+
+- Replies sent from a different address than the lead's email won't be detected
+- Relies on the contact mailbox being the reply-to for outreach emails (it is, per `send_outreach_lead()`)

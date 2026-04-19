@@ -1,0 +1,127 @@
+<?php
+/**
+ * Outreach Reply Detection Cron
+ *
+ * Polls the contact mailbox via IMAP, matches incoming emails against
+ * outreach leads in 'contacted' status, and auto-promotes matched leads
+ * to 'replied'. Admins can then manually classify as interested/not_interested.
+ *
+ * RECOMMENDED SCHEDULE: Hourly
+ *   0 * * * * /usr/local/bin/php /path/to/cron/reply_checker.php
+ *
+ * Requires:
+ *   - PHP imap extension enabled (cPanel → Select PHP Version → Extensions)
+ *   - IMAP_* env vars configured in .env
+ */
+
+set_time_limit(300);
+
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI/cron.');
+}
+
+require_once __DIR__ . '/../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
+
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/lib/outreach_helpers.php';
+require_once __DIR__ . '/lib/imap_helpers.php';
+
+// ─── Lock file ───
+
+$lockFile = __DIR__ . '/logs/reply_checker.lock';
+if (!is_dir(__DIR__ . '/logs')) {
+    mkdir(__DIR__ . '/logs', 0755, true);
+}
+$lockFp = fopen($lockFile, 'c');
+if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
+    echo "Reply checker already running. Exiting.\n";
+    exit(0);
+}
+
+// ─── Logging ───
+
+function logReply($message, $type = 'INFO')
+{
+    $timestamp = date('Y-m-d H:i:s');
+    $logEntry = "[$timestamp] [$type] $message\n";
+
+    $logFile = __DIR__ . '/logs/reply_checker_' . date('Y-m-d') . '.log';
+    if (!is_dir(__DIR__ . '/logs')) {
+        mkdir(__DIR__ . '/logs', 0755, true);
+    }
+    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
+
+    if (!isset($_SERVER['HTTP_HOST'])) {
+        echo $logEntry;
+    }
+}
+
+// ─── Main ───
+
+logReply('=== Reply Checker Starting ===');
+
+try {
+    global $pdo;
+
+    $imap = imap_connect_mailbox();
+    logReply('Connected to IMAP mailbox');
+
+    $messages = imap_fetch_recent_messages($imap, 7);
+    logReply('Fetched ' . count($messages) . ' messages from last 7 days');
+
+    $matched = 0;
+    $skipped_auto = 0;
+    $no_match = 0;
+
+    $selectStmt = $pdo->prepare("SELECT id, business_name, sent_at FROM outreach_leads WHERE LOWER(email) = ? AND status = 'contacted' AND sent_at IS NOT NULL LIMIT 1");
+    $updateStmt = $pdo->prepare("UPDATE outreach_leads SET status = 'replied' WHERE id = ? AND status = 'contacted'");
+
+    foreach ($messages as $msg) {
+        if (empty($msg['sender_email'])) continue;
+
+        if (imap_is_autoresponder($msg['headers_raw'], $msg['subject'])) {
+            $skipped_auto++;
+            logReply('Skipped auto-responder from: ' . $msg['sender_email'] . ' | Subject: ' . $msg['subject']);
+            continue;
+        }
+
+        $selectStmt->execute([$msg['sender_email']]);
+        $lead = $selectStmt->fetch();
+
+        if (!$lead) {
+            $no_match++;
+            continue;
+        }
+
+        // Only count as reply if email arrived after we sent the outreach
+        if ($msg['date'] && $lead['sent_at'] && strtotime($msg['date']) <= strtotime($lead['sent_at'])) {
+            logReply('Email from ' . $msg['sender_email'] . ' predates outreach sent_at, skipping');
+            continue;
+        }
+
+        $updateStmt->execute([$lead['id']]);
+        if ($updateStmt->rowCount() > 0) {
+            log_activity($pdo, $lead['id'], 'reply_received',
+                'Auto-detected reply from: ' . $msg['sender_email'] . ' | Subject: ' . $msg['subject']);
+            $matched++;
+            logReply('Matched reply: lead #' . $lead['id'] . ' (' . $lead['business_name'] . ') from ' . $msg['sender_email']);
+        }
+    }
+
+    imap_close($imap);
+
+    logReply("Run complete. Matched: $matched | Auto-responders skipped: $skipped_auto | No match: $no_match");
+    logReply('=== Reply Checker Complete ===');
+
+} catch (Exception $e) {
+    logReply('Fatal error: ' . $e->getMessage(), 'ERROR');
+    exit(1);
+} finally {
+    if (isset($lockFp) && is_resource($lockFp)) {
+        flock($lockFp, LOCK_UN);
+        fclose($lockFp);
+    }
+}

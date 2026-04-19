@@ -480,6 +480,17 @@ try {
 
         $pdo->commit();
 
+        // Mark referral visit as converted if this purchase came from a referral source
+        if (!empty($_SESSION['referral_source'])) {
+            try {
+                $refStmt = $pdo->prepare("UPDATE referral_visits SET converted = 1, license_key = ? WHERE source_code = ? AND converted = 0 ORDER BY visited_at DESC LIMIT 1");
+                $refStmt->execute([$subscriptionId, $_SESSION['referral_source']]);
+                unset($_SESSION['referral_source']);
+            } catch (Exception $e) {
+                error_log("Failed to mark referral conversion: " . $e->getMessage());
+            }
+        }
+
         // Send receipt email
         try {
             send_premium_subscription_receipt($email, $subscriptionId, $billing, $amount, $endDate, $transactionId, $paymentMethod);

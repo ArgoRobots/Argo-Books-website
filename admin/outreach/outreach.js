@@ -141,6 +141,7 @@ async function loadStats() {
             document.getElementById('statContacted').textContent = s.contacted || 0;
             document.getElementById('statReplied').textContent = s.replied || 0;
             document.getElementById('statInterested').textContent = s.interested || 0;
+            document.getElementById('statClicked').textContent = s.clicked || 0;
 
             // Show/hide pipeline running banner
             const banner = document.getElementById('pipelineBanner');
@@ -181,7 +182,7 @@ async function loadLeads() {
         const tbody = document.getElementById('leadsTableBody');
 
         if (!data.success || !data.leads.length) {
-            tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No leads found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="empty-state">No leads found</td></tr>';
             updateBulkBar();
             return;
         }
@@ -202,6 +203,7 @@ async function loadLeads() {
                 <td>${esc(lead.category || '')}</td>
                 <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
                 <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
                 <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>

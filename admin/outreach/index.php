@@ -56,6 +56,10 @@ include '../admin_header.php';
         <div class="stat-label">Interested</div>
         <div class="stat-value stat-interested" id="statInterested">0</div>
     </div>
+    <div class="stat-card">
+        <div class="stat-label">Clicked</div>
+        <div class="stat-value stat-clicked" id="statClicked">0</div>
+    </div>
 </div>
 
 <!-- Business Discovery Panel -->
@@ -227,11 +231,12 @@ include '../admin_header.php';
                     <th>Category</th>
                     <th>Status</th>
                     <th>Sent</th>
+                    <th>Clicked</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="leadsTableBody">
-                <tr><td colspan="10" class="empty-state">Loading...</td></tr>
+                <tr><td colspan="11" class="empty-state">Loading...</td></tr>
             </tbody>
         </table>
     </div>

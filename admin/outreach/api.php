@@ -163,19 +163,19 @@ function get_leads($pdo)
     $params = [];
 
     if ($status) {
-        $where[] = 'status = ?';
+        $where[] = 'ol.status = ?';
         $params[] = $status;
     }
     if ($response_status) {
-        $where[] = 'response_status = ?';
+        $where[] = 'ol.response_status = ?';
         $params[] = $response_status;
     }
     if ($company_size) {
-        $where[] = 'company_size = ?';
+        $where[] = 'ol.company_size = ?';
         $params[] = $company_size;
     }
     if ($search) {
-        $where[] = '(business_name LIKE ? OR email LIKE ? OR contact_name LIKE ? OR city LIKE ? OR category LIKE ?)';
+        $where[] = '(ol.business_name LIKE ? OR ol.email LIKE ? OR ol.contact_name LIKE ? OR ol.city LIKE ? OR ol.category LIKE ?)';
         $s = "%$search%";
         $params = array_merge($params, [$s, $s, $s, $s, $s]);
     }
@@ -183,15 +183,15 @@ function get_leads($pdo)
     $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
     $orderMap = [
-        'date_added_desc' => 'date_added DESC',
-        'date_added_asc' => 'date_added ASC',
-        'last_contact_desc' => 'last_contact_date DESC',
-        'business_name_asc' => 'business_name ASC',
-        'status_asc' => 'status ASC',
+        'date_added_desc' => 'ol.date_added DESC',
+        'date_added_asc' => 'ol.date_added ASC',
+        'last_contact_desc' => 'ol.last_contact_date DESC',
+        'business_name_asc' => 'ol.business_name ASC',
+        'status_asc' => 'ol.status ASC',
     ];
-    $orderBy = $orderMap[$sort] ?? 'date_added DESC';
+    $orderBy = $orderMap[$sort] ?? 'ol.date_added DESC';
 
-    $stmt = $pdo->prepare("SELECT * FROM outreach_leads $whereClause ORDER BY $orderBy");
+    $stmt = $pdo->prepare("SELECT ol.*, MIN(rv.visited_at) AS clicked_at FROM outreach_leads ol LEFT JOIN referral_visits rv ON rv.source_code = CONCAT('outreach-', ol.id) $whereClause GROUP BY ol.id ORDER BY $orderBy");
     $stmt->execute($params);
     $leads = $stmt->fetchAll();
 
@@ -364,6 +364,8 @@ function get_stats($pdo)
         SUM(status = 'replied') as replied,
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
+
+    $rows['clicked'] = $pdo->query("SELECT COUNT(DISTINCT rv.source_code) FROM referral_visits rv WHERE rv.source_code LIKE 'outreach-%'")->fetchColumn();
 
     json_response([
         'success' => true,

@@ -61,7 +61,14 @@ function send_outreach_lead($pdo, $lead)
     $id = $lead['id'];
     $email = $lead['email'];
 
-    $htmlBody = '<p>' . nl2br(htmlspecialchars($lead['draft_body'])) . '</p>';
+    // Replace plain URL with tracked version for click tracking via referral system
+    $sourceCode = 'outreach-' . $id;
+    $trackedUrl = 'https://argorobots.com/?source=' . $sourceCode;
+    $body = $lead['draft_body'];
+    $body = str_replace('https://argorobots.com/', $trackedUrl, $body);
+    $body = str_replace('https://argorobots.com', $trackedUrl, $body);
+
+    $htmlBody = '<p>' . nl2br(htmlspecialchars($body)) . '</p>';
 
     $result = send_styled_email(
         $email,
@@ -510,9 +517,15 @@ function generate_draft_for_lead($pdo, $lead)
         $isLocal = true;
     }
 
+    $isSaskatoon = in_array($city, ['saskatoon','martensville','warman']);
+
     $localInstruction = $isLocal
         ? "- The business is in Saskatchewan. Evan is a local Saskatchewan software developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon software developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
         : "- The business is outside Saskatchewan. Evan is a Canadian software developer. Say \"Canadian software developer\", do NOT say \"local\" and do NOT mention Saskatoon or Saskatchewan.";
+
+    $inPersonInstruction = $isSaskatoon
+        ? "\n- IMPORTANT: Since this business is in the Saskatoon area, you MUST include an offer for an in-person visit to help them get set up. Work it in naturally, e.g. \"Since I'm right here in Saskatoon, I'd be happy to stop by and help you get set up in person\" or \"I could even swing by to walk you through it\". This is a key selling point for local businesses."
+        : "\n- Do NOT mention any in-person visits or stopping by. The business is not in Saskatoon.";
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
@@ -526,20 +539,17 @@ Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
 - Sound human, friendly, and genuine, not like marketing spam
 $localInstruction
+$inPersonInstruction
 - Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [business name]\" if available)
 
 PERSONALIZATION (this is critical):
-- If a business summary is provided, you MUST use it to make the email specific to their business. Do not write a generic email when you have summary info
-- Connect Argo Books features directly to their business needs. Examples:
-  - If they do services/contracting: mention how easy it is to invoice clients after a job
-  - If they sell products: mention simple expense tracking and bookkeeping
-  - If they likely deal with quotes/estimates: mention invoicing features
-  - If they have multiple revenue streams: mention how it keeps everything organized without accounting knowledge
-- Reference their actual business type naturally (e.g. \"I know running a landscaping business means a lot of invoicing\" not just \"I see you run a business\")
-- Only reference Argo Books features that are relevant to what they do. Do not list every feature
-- Do NOT invent details about the business you do not have
+- You may reference the business's industry/category to explain why Argo Books could be useful (e.g. \"running a landscaping business usually means a lot of invoicing\")
+- NEVER claim to know specific details about how the business operates, what tools they use, what payment methods they accept, or how they handle their finances. You do NOT know these things. Do NOT say things like \"I know you handle donations\" or \"I see you use e-transfers\" or \"I noticed you do quotes\". This comes across as creepy and dishonest
+- Instead of asserting facts about their business, use general industry knowledge. Say things like \"businesses like yours often deal with...\" or \"in the [industry] space, invoicing can be a hassle\" rather than \"I know you do X\"
+- Only reference Argo Books features that are relevant to their general industry. Do not list every feature
+- If a business summary is provided, use it ONLY to understand their industry and tailor which Argo features to mention. Do NOT parrot back details from the summary as if you personally know about their business
 - If no summary is available, keep it more general but still mention their industry/category if known
 
 - Briefly describe Argo Books as a simple bookkeeping and invoicing app that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is

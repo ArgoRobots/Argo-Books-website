@@ -61,14 +61,49 @@ function send_outreach_lead($pdo, $lead)
     $id = $lead['id'];
     $email = $lead['email'];
 
-    // Replace plain URL with tracked version for click tracking via referral system
+    // Skip if this email is on the suppression list
+    if (!empty($email)) {
+        $suppStmt = $pdo->prepare("SELECT 1 FROM email_suppressions WHERE email = ? AND context = 'outreach' LIMIT 1");
+        $suppStmt->execute([strtolower(trim($email))]);
+        if ($suppStmt->fetchColumn()) {
+            log_activity($pdo, $id, 'email_skipped_suppressed', 'Skipped send: email is on outreach suppression list (' . $email . ')');
+            return false;
+        }
+    }
+
+    // Generate and persist an unsubscribe token if we don't have one yet
+    $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+    if (empty($unsubscribeToken)) {
+        $unsubscribeToken = bin2hex(random_bytes(32));
+        $tokStmt = $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?");
+        $tokStmt->execute([$unsubscribeToken, $id]);
+    }
+
+    // Replace plain URL with a clickable "argorobots.com" link that carries the tracking param
     $sourceCode = 'outreach-' . $id;
     $trackedUrl = 'https://argorobots.com/?source=' . $sourceCode;
-    $body = $lead['draft_body'];
-    $body = str_replace('https://argorobots.com/', $trackedUrl, $body);
-    $body = str_replace('https://argorobots.com', $trackedUrl, $body);
+    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '">argorobots.com</a>';
 
-    $htmlBody = '<p>' . nl2br(htmlspecialchars($body)) . '</p>';
+    $escapedBody = htmlspecialchars($lead['draft_body']);
+    $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
+
+    // Replace {UNSUBSCRIBE_URL} placeholder with the tracked unsubscribe link
+    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+    $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
+    $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
+
+    // Fallback: if the AI skipped the placeholder, inject a soft unsubscribe line before the sign-off
+    if (strpos($escapedBody, 'unsubscribe?t=') === false) {
+        $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
+        $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $escapedBody, 1);
+        if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
+            $escapedBody = $replaced;
+        } else {
+            $escapedBody .= $unsubLine;
+        }
+    }
+
+    $htmlBody = '<p>' . nl2br($escapedBody) . '</p>';
 
     $result = send_styled_email(
         $email,
@@ -562,6 +597,7 @@ PERSONALIZATION (this is critical):
 - The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
 - You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
+- After that line, add ONE short, respectful unsubscribe line on its own paragraph, such as: \"Not interested? {UNSUBSCRIBE_URL} and I'll stop emailing you.\" The literal token {UNSUBSCRIBE_URL} will be replaced with a tracked unsubscribe link before sending — include it verbatim, do NOT invent or replace the placeholder yourself. Keep the tone soft, brief, and non-pushy.
 - Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
 
 Return your response as JSON with two fields:

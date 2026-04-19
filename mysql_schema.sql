@@ -555,6 +555,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     drafted_at DATETIME DEFAULT NULL,
     approved_at DATETIME DEFAULT NULL,
     sent_at DATETIME DEFAULT NULL,
+    unsubscribe_token VARCHAR(64) UNIQUE DEFAULT NULL,
     contact_page_url VARCHAR(500) DEFAULT NULL,
     places_id VARCHAR(255) DEFAULT NULL,
     company_size ENUM('small','medium','large') DEFAULT NULL,
@@ -563,7 +564,20 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     INDEX idx_outreach_status (status),
     INDEX idx_outreach_city (city),
     INDEX idx_outreach_approval (approval_status),
-    INDEX idx_outreach_company_size (company_size)
+    INDEX idx_outreach_company_size (company_size),
+    INDEX idx_unsubscribe_token (unsubscribe_token)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Email suppression list (unsubscribes, opt-outs across all email contexts)
+CREATE TABLE IF NOT EXISTS email_suppressions (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    context VARCHAR(50) NOT NULL DEFAULT 'outreach',
+    reason VARCHAR(255) DEFAULT NULL,
+    source_id INT DEFAULT NULL,
+    suppressed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_email_context (email, context),
+    INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Activity log for outreach leads

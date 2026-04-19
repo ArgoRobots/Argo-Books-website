@@ -11,7 +11,7 @@ require_once __DIR__ . '/smtp_mailer.php';
  * @param string $header_style Optional custom header style (default: blue gradient)
  * @return bool True if successful, false otherwise
  */
-function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null)
+function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [])
 {
     $css = file_get_contents(__DIR__ . '/email.css');
 
@@ -62,6 +62,11 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             $mailer->addReplyTo($reply_to ?? 'support@argorobots.com');
             $mailer->Subject = $subject;
             $mailer->Body = $email_html;
+            if (!empty($extra_headers) && is_array($extra_headers)) {
+                foreach ($extra_headers as $name => $value) {
+                    $mailer->addCustomHeader($name, $value);
+                }
+            }
             $mailer->send();
             return true;
         } catch (\Exception $e) {

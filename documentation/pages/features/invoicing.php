@@ -18,6 +18,20 @@ include '../../docs-header.php';
 
             <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
+            <h2>Setting Up Payment Integration</h2>
+            <p>This is a one-time setup and should be your first step — it's what enables customers to pay your invoices online. Argo Books supports <strong>Stripe</strong>, <strong>PayPal</strong>, and <strong>Square</strong>, covering credit/debit cards, Apple Pay, Google Pay, PayPal balance, and more.</p>
+            <ol class="steps-list">
+                <li>Go to Settings > Payment Portal</li>
+                <li>Add your company name and logo — these appear on the payment portal your customers see when paying an invoice</li>
+                <li>Under "Connected Payment Providers", select your preferred provider (Stripe, PayPal, or Square)</li>
+                <li>Click "Connect" to link your existing account (or create a new one)</li>
+                <li>Authorize Argo Books to process payments on your behalf</li>
+            </ol>
+
+            <div class="info-box">
+                <p><strong>Note:</strong> A standard <strong>Stripe</strong>, <strong>PayPal Business</strong>, or <strong>Square seller</strong> account is all you need — there's no special developer or merchant setup required. If you don't already have one, you can create it during the "Connect" step. Argo Books connects to your account - we never store your payment credentials.</p>
+            </div>
+
             <h2>Creating Invoices</h2>
             <p>Generate professional invoices with just a few clicks:</p>
             <ol class="steps-list">
@@ -33,7 +47,6 @@ include '../../docs-header.php';
             <p>Keep track of all your invoices and their payment status:</p>
             <ul>
                 <li><strong>Draft:</strong> Invoice created but not yet sent</li>
-                <li><strong>Pending:</strong> Invoice is awaiting review or approval</li>
                 <li><strong>Sent:</strong> Invoice delivered to customer</li>
                 <li><strong>Partial:</strong> Customer has made a partial payment</li>
                 <li><strong>Paid:</strong> Invoice fully paid</li>
@@ -41,32 +54,12 @@ include '../../docs-header.php';
                 <li><strong>Cancelled:</strong> Invoice has been cancelled</li>
             </ul>
 
-            <h2>Online Payment Providers</h2>
-            <p>Connect your existing payment processor accounts to accept payments online:</p>
-            <ul>
-                <li><strong>Stripe:</strong> Credit/debit cards, Apple Pay, Google Pay</li>
-                <li><strong>PayPal:</strong> PayPal balance, cards, Pay Later options</li>
-                <li><strong>Square:</strong> Cards, Square Cash, afterpay</li>
-            </ul>
-
-            <h2>Setting Up Payment Integration</h2>
-            <ol class="steps-list">
-                <li>Go to Settings > Payment Portal</li>
-                <li>Under "Connected Payment Providers", select your preferred provider</li>
-                <li>Click "Connect" to link your existing account (or create a new one)</li>
-                <li>Authorize Argo Books to process payments on your behalf</li>
-            </ol>
-
-            <div class="info-box">
-                <p><strong>Note:</strong> You'll need an existing account with Stripe, PayPal, or Square. Argo Books connects to your account - we never store your payment credentials.</p>
-            </div>
-
             <h2>Payment Portal</h2>
             <p>When you connect a payment provider, customers can pay invoices online:</p>
             <ul>
-                <li>Customers receive invoices with a link to your payment portal</li>
+                <li>Customers receive an email with their invoice and a link to your payment portal</li>
                 <li>They can pay securely using their preferred payment method</li>
-                <li>Payments sync automatically with your Argo Books account</li>
+                <li>Payments sync automatically with your Argo Books company</li>
             </ul>
 
             <h2>Transaction Fees</h2>
@@ -78,7 +71,7 @@ include '../../docs-header.php';
             </ul>
 
             <div class="info-box">
-                <p><strong>Tip:</strong> Transaction fees are added on top of the invoice subtotal and are paid by the customer at checkout.</p>
+                <p><strong>Tip:</strong> Transaction fees are optionally passed on to the customer at checkout. To absorb the fees yourself instead, create an invoice template, go to the "Display" tab, and uncheck "Pass processing fees to customers".</p>
             </div>
 
             <h2>Payment Dashboard</h2>

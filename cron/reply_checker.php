@@ -74,13 +74,42 @@ try {
 
     $matched = 0;
     $skipped_auto = 0;
+    $bounces = 0;
     $no_match = 0;
 
     $selectStmt = $pdo->prepare("SELECT id, business_name, sent_at FROM outreach_leads WHERE LOWER(email) = ? AND status = 'contacted' AND sent_at IS NOT NULL LIMIT 1");
     $updateStmt = $pdo->prepare("UPDATE outreach_leads SET status = 'replied' WHERE id = ? AND status = 'contacted'");
+    $suppressStmt = $pdo->prepare("INSERT IGNORE INTO email_suppressions (email, context, reason, source_id) VALUES (?, 'outreach', ?, ?)");
+    $leadByEmailStmt = $pdo->prepare("SELECT id FROM outreach_leads WHERE LOWER(email) = ? LIMIT 1");
+    $markNotInterestedStmt = $pdo->prepare("UPDATE outreach_leads SET status = 'not_interested' WHERE id = ? AND status NOT IN ('replied','interested','not_interested','onboarded')");
 
     foreach ($messages as $msg) {
         if (empty($msg['sender_email'])) continue;
+
+        // Bounce / complaint handling — add bounced address to suppression list
+        if (imap_is_bounce($msg['sender_email'], $msg['subject'])) {
+            $body = imap_fetch_body_text($imap, $msg['uid']);
+            $bouncedAddr = imap_parse_bounced_address($body);
+
+            if ($bouncedAddr) {
+                $leadByEmailStmt->execute([$bouncedAddr]);
+                $leadRow = $leadByEmailStmt->fetch();
+                $leadId = $leadRow['id'] ?? null;
+
+                $suppressStmt->execute([$bouncedAddr, 'Auto-suppressed from bounce: ' . substr($msg['subject'], 0, 100), $leadId]);
+
+                if ($leadId) {
+                    $markNotInterestedStmt->execute([$leadId]);
+                    log_activity($pdo, $leadId, 'bounce_received',
+                        'Auto-suppressed after bounce from ' . $msg['sender_email'] . ' for address ' . $bouncedAddr);
+                }
+                $bounces++;
+                logReply('Bounce: ' . $bouncedAddr . ' (from ' . $msg['sender_email'] . ') — added to suppression list');
+            } else {
+                logReply('Bounce-looking message from ' . $msg['sender_email'] . ' but could not parse bounced address; skipping');
+            }
+            continue;
+        }
 
         if (imap_is_autoresponder($msg['headers_raw'], $msg['subject'])) {
             $skipped_auto++;
@@ -113,7 +142,7 @@ try {
 
     imap_close($imap);
 
-    logReply("Run complete. Matched: $matched | Auto-responders skipped: $skipped_auto | No match: $no_match");
+    logReply("Run complete. Matched: $matched | Bounces: $bounces | Auto-responders skipped: $skipped_auto | No match: $no_match");
     logReply('=== Reply Checker Complete ===');
 
 } catch (Exception $e) {

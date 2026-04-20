@@ -199,7 +199,7 @@ Email sending uses the shared SMTP configuration defined in `/smtp_mailer.php`:
 
 | Environment Variable | Description |
 |---------------------|-------------|
-| `SMTP_HOST` | SMTP server (e.g. `smtp-relay.brevo.com`) |
+| `SMTP_HOST` | SMTP server (Amazon SES, e.g. `email-smtp.us-east-2.amazonaws.com`) |
 | `SMTP_PORT` | Port (default: `587`) |
 | `SMTP_USERNAME` | Login |
 | `SMTP_PASSWORD` | Password |

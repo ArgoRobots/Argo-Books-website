@@ -7,11 +7,11 @@ use PHPMailer\PHPMailer\PHPMailer;
  * Returns null if SMTP is not configured (SMTP_HOST not set), allowing callers to
  * fall back to PHP's mail() function.
  *
- * Required .env variables for SMTP:
- *   SMTP_HOST     - SMTP server hostname (e.g. smtp-relay.brevo.com)
+ * Required .env variables for SMTP (Amazon SES):
+ *   SMTP_HOST     - SES SMTP endpoint (e.g. email-smtp.us-east-2.amazonaws.com)
  *   SMTP_PORT     - SMTP port (default: 587)
- *   SMTP_USERNAME - SMTP login username
- *   SMTP_PASSWORD - SMTP login password
+ *   SMTP_USERNAME - SES SMTP credentials username (starts with AKIA)
+ *   SMTP_PASSWORD - SES SMTP credentials password
  *
  * Optional:
  *   SMTP_FROM_EMAIL - Default sender email (default: noreply@argorobots.com)

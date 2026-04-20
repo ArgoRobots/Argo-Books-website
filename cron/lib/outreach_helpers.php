@@ -105,14 +105,6 @@ function send_outreach_lead($pdo, $lead)
 
     $htmlBody = '<p>' . nl2br($escapedBody) . '</p>';
 
-    // Ask Brevo (and other relays that honor these) to skip link/open tracking
-    // so the URL preview stays clean — these are undocumented-but-known Brevo headers.
-    $extraHeaders = [
-        'X-Mailin-Track-Clicks' => '0',
-        'X-Mailin-Track-Opens' => '0',
-        'X-Mailin-Track' => '0',
-    ];
-
     $result = send_styled_email(
         $email,
         $lead['draft_subject'],
@@ -120,8 +112,7 @@ function send_outreach_lead($pdo, $lead)
         '',
         'contact@argorobots.com',
         'Argo Books',
-        'contact@argorobots.com',
-        $extraHeaders
+        'contact@argorobots.com'
     );
 
     if ($result) {

@@ -116,14 +116,14 @@ function imap_is_autoresponder($rawHeaders, $subject = '')
 
 /**
  * Check if a message looks like a delivery bounce or complaint notification.
- * Detects Amazon SES bounces and generic MAILER-DAEMON DSNs.
+ * Detects Resend/SES bounces and generic MAILER-DAEMON DSNs.
  */
 function imap_is_bounce($senderEmail, $subject = '')
 {
     $senderEmail = strtolower(trim($senderEmail));
 
-    // SES-specific senders
-    if (str_contains($senderEmail, '@amazonses.com') || str_contains($senderEmail, '@email-smtp.amazonaws.com')) {
+    // Resend uses SES infrastructure; bounces can come from either sender domain
+    if (str_contains($senderEmail, '@resend.com') || str_contains($senderEmail, '@amazonses.com') || str_contains($senderEmail, '@email-smtp.amazonaws.com')) {
         return true;
     }
     // Generic postmaster/mailer-daemon bounces

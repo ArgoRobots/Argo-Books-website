@@ -38,7 +38,7 @@ cp ".env - sandbox" .env
 |------|---------|
 | `index.php` | Homepage / main entry point |
 | `db_connect.php` | Database connection, AES-256-GCM encryption helpers |
-| `email_sender.php` | All email sending logic (SMTP via Amazon SES) |
+| `email_sender.php` | All email sending logic (SMTP via Resend) |
 | `license_functions.php` | License key generation and validation |
 | `statistics.php` | Page view tracking (include in each page) |
 | `mysql_schema.sql` | Full database schema |
@@ -137,7 +137,7 @@ Files excluded from deployment: `.git`, `.github`, `README.md`, `composer.json`,
 | Stripe | Payments | `STRIPE_` |
 | PayPal | Payments | `PAYPAL_` |
 | Square | Payments | `SQUARE_` |
-| Amazon SES | Email relay (SMTP) | `SMTP_` |
+| Resend | Email relay (SMTP) | `SMTP_` |
 | Google OAuth | Social login | `GOOGLE_` |
 | OpenAI | AI features | `OPENAI_` |
 | Azure Document Intelligence | Receipt scanning | `AZURE_` |

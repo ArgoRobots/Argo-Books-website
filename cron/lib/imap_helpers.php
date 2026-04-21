@@ -122,9 +122,16 @@ function imap_is_bounce($senderEmail, $subject = '')
 {
     $senderEmail = strtolower(trim($senderEmail));
 
-    // Resend uses SES infrastructure; bounces can come from either sender domain
-    if (str_contains($senderEmail, '@resend.com') || str_contains($senderEmail, '@amazonses.com') || str_contains($senderEmail, '@email-smtp.amazonaws.com')) {
-        return true;
+    // Resend uses SES infrastructure; bounces can come from either provider.
+    // Exact-domain match (not substring) to avoid false positives from addresses
+    // like user@resend.com.example.com.
+    $atPos = strrpos($senderEmail, '@');
+    $domain = $atPos !== false ? substr($senderEmail, $atPos + 1) : '';
+    $bounceDomains = ['resend.com', 'amazonses.com', 'email-smtp.amazonaws.com'];
+    foreach ($bounceDomains as $d) {
+        if ($domain === $d || str_ends_with($domain, '.' . $d)) {
+            return true;
+        }
     }
     // Generic postmaster/mailer-daemon bounces
     if (preg_match('/^(mailer-daemon|postmaster|complaints|bounce|bounces)@/i', $senderEmail)) {

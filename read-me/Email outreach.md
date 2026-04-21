@@ -199,10 +199,10 @@ Email sending uses the shared SMTP configuration defined in `/smtp_mailer.php`:
 
 | Environment Variable | Description |
 |---------------------|-------------|
-| `SMTP_HOST` | SMTP server (e.g. `smtp-relay.brevo.com`) |
+| `SMTP_HOST` | SMTP server (Resend: `smtp.resend.com`) |
 | `SMTP_PORT` | Port (default: `587`) |
-| `SMTP_USERNAME` | Login |
-| `SMTP_PASSWORD` | Password |
+| `SMTP_USERNAME` | Always the literal string `resend` |
+| `SMTP_PASSWORD` | Resend API key (starts with `re_`) |
 | `SMTP_FROM_EMAIL` | Sender address (default: `noreply@argorobots.com`) |
 | `SMTP_FROM_NAME` | Sender name (default: `Argo Books`) |
 

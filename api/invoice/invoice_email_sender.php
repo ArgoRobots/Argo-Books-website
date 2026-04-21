@@ -2,7 +2,7 @@
 /**
  * Invoice Email Sender
  *
- * Handles sending invoice emails via SMTP relay (Brevo) when configured,
+ * Handles sending invoice emails via SMTP relay (Resend) when configured,
  * with fallback to PHP's native mail() function.
  */
 

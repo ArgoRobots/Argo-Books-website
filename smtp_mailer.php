@@ -7,11 +7,11 @@ use PHPMailer\PHPMailer\PHPMailer;
  * Returns null if SMTP is not configured (SMTP_HOST not set), allowing callers to
  * fall back to PHP's mail() function.
  *
- * Required .env variables for SMTP:
- *   SMTP_HOST     - SMTP server hostname (e.g. smtp-relay.brevo.com)
+ * Required .env variables for SMTP (Resend):
+ *   SMTP_HOST     - Resend SMTP endpoint (smtp.resend.com)
  *   SMTP_PORT     - SMTP port (default: 587)
- *   SMTP_USERNAME - SMTP login username
- *   SMTP_PASSWORD - SMTP login password
+ *   SMTP_USERNAME - Always the literal string "resend"
+ *   SMTP_PASSWORD - Resend API key (starts with re_)
  *
  * Optional:
  *   SMTP_FROM_EMAIL - Default sender email (default: noreply@argorobots.com)

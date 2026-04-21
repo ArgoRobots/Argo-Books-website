@@ -113,3 +113,74 @@ function imap_is_autoresponder($rawHeaders, $subject = '')
     }
     return false;
 }
+
+/**
+ * Check if a message looks like a delivery bounce or complaint notification.
+ * Detects Resend/SES bounces and generic MAILER-DAEMON DSNs.
+ */
+function imap_is_bounce($senderEmail, $subject = '')
+{
+    $senderEmail = strtolower(trim($senderEmail));
+
+    // Resend uses SES infrastructure; bounces can come from either provider.
+    // Exact-domain match (not substring) to avoid false positives from addresses
+    // like user@resend.com.example.com.
+    $atPos = strrpos($senderEmail, '@');
+    $domain = $atPos !== false ? substr($senderEmail, $atPos + 1) : '';
+    $bounceDomains = ['resend.com', 'amazonses.com', 'email-smtp.amazonaws.com'];
+    foreach ($bounceDomains as $d) {
+        if ($domain === $d || str_ends_with($domain, '.' . $d)) {
+            return true;
+        }
+    }
+    // Generic postmaster/mailer-daemon bounces
+    if (preg_match('/^(mailer-daemon|postmaster|complaints|bounce|bounces)@/i', $senderEmail)) {
+        return true;
+    }
+    // Subject-based detection for bounces that come from other return paths
+    if (preg_match('/(delivery status notification|undelivered mail|mail delivery failed|returned mail|failure notice|delivery failure)/i', $subject)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Fetch the plain-text body of a message by UID.
+ * Returns empty string if unavailable.
+ */
+function imap_fetch_body_text($imap, $uid)
+{
+    $body = @imap_fetchbody($imap, $uid, 1, FT_UID | FT_PEEK);
+    if (empty($body)) {
+        $body = @imap_body($imap, imap_msgno($imap, $uid), FT_PEEK);
+    }
+    return $body ?: '';
+}
+
+/**
+ * Parse the bounced recipient address from a DSN/bounce body.
+ * Looks for Final-Recipient or Original-Recipient headers, then falls back
+ * to the first email address mentioned after a failure indicator.
+ */
+function imap_parse_bounced_address($body)
+{
+    if (empty($body)) return null;
+
+    // Standard DSN: "Final-Recipient: rfc822; user@example.com"
+    if (preg_match('/^(Final-Recipient|Original-Recipient):\s*(?:rfc822;\s*)?([^\s<>]+@[^\s<>]+)/mi', $body, $m)) {
+        $addr = trim($m[2], " \t\r\n<>.,;");
+        if (filter_var($addr, FILTER_VALIDATE_EMAIL)) {
+            return strtolower($addr);
+        }
+    }
+
+    // Fallback: "failed recipient: user@example.com" or "<user@example.com>"
+    if (preg_match('/(?:failed|undeliverable|rejected|could not be delivered)[^@\n]{0,60}<?([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,})>?/i', $body, $m)) {
+        $addr = strtolower(trim($m[1]));
+        if (filter_var($addr, FILTER_VALIDATE_EMAIL)) {
+            return $addr;
+        }
+    }
+
+    return null;
+}

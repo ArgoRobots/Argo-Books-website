@@ -82,7 +82,7 @@ function send_outreach_lead($pdo, $lead)
     // Replace plain URL with a clickable "argorobots.com" link that carries the tracking param
     $sourceCode = 'outreach-' . $id;
     $trackedUrl = 'https://argorobots.com/?source=' . $sourceCode;
-    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '">argorobots.com</a>';
+    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
 
     $escapedBody = htmlspecialchars($lead['draft_body']);
     $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);

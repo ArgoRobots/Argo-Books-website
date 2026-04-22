@@ -630,14 +630,14 @@
                     <h3>Expense & Revenue Tracking</h3>
                     <p>The more expense and revenue data you track, the more accurate your forecasts become. Every transaction feeds the analytics engine.</p>
                 </a>
-                <a href="../ai-receipt-scanning/" class="related-card animate-on-scroll">
+                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('receipt-scan-detail', 22) ?>
                     </div>
                     <h3>AI Receipt Scanning</h3>
                     <p>Scan receipts to capture detailed expense data. More granular data means better predictions and more useful anomaly detection.</p>
                 </a>
-                <a href="../ai-spreadsheet-import/" class="related-card animate-on-scroll">
+                <a href="../spreadsheet-import/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('document-upload', 22) ?>
                     </div>

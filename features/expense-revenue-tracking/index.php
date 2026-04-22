@@ -566,7 +566,7 @@
                 <p class="section-desc">Expense and revenue tracking is even more powerful when combined with these features.</p>
             </div>
             <div class="related-grid">
-                <a href="../ai-receipt-scanning/" class="related-card animate-on-scroll">
+                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('receipt-scan-detail', 22) ?>
                     </div>

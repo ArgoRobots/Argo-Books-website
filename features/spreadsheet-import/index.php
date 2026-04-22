@@ -10,35 +10,35 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Argo Books' AI receipt scanner eliminates manual data entry and keeps your books accurate.">
+        content="Import spreadsheets into Argo Books with AI-powered column mapping. Supports Excel and CSV. Automatically detects entity types, maps columns, validates data, and imports everything cleanly.">
     <meta name="keywords"
-        content="AI receipt scanner, OCR receipt, automatic receipt scanning, receipt data extraction, receipt management software, scan receipts app, receipt OCR software, digital receipt organizer, receipt tracker, expense receipt app">
+        content="AI spreadsheet import, CSV import software, Excel import tool, automatic column mapping, data migration tool, bulk data import, AI data mapping, spreadsheet to accounting, business data import, Excel to bookkeeping">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="AI Receipt Scanning — Argo Books">
+    <meta property="og:title" content="AI Spreadsheet Import — Argo Books">
     <meta property="og:description"
-        content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry and keep your books accurate.">
-    <meta property="og:url" content="https://argorobots.com/features/ai-receipt-scanning/">
+        content="Import spreadsheets into Argo Books with AI-powered column mapping. Supports Excel and CSV. Automatic entity detection and clean imports every time.">
+    <meta property="og:url" content="https://argorobots.com/features/spreadsheet-import/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=AI+Receipt+Scanning&subtitle=Snap+a+photo%2C+let+AI+do+the+rest.+Automatic+data+extraction+for+your+business+receipts.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=AI+Spreadsheet+Import&subtitle=Drop+a+spreadsheet%2C+let+AI+map+it.+Automatic+column+mapping+for+your+business+data.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AI Receipt Scanning — Argo Books">
+    <meta name="twitter:title" content="AI Spreadsheet Import — Argo Books">
     <meta name="twitter:description"
-        content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=AI+Receipt+Scanning&subtitle=Snap+a+photo%2C+let+AI+do+the+rest.+Automatic+data+extraction+for+your+business+receipts.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+        content="Import spreadsheets into Argo Books with AI-powered column mapping. Supports Excel and CSV. Automatic entity detection and clean imports.">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=AI+Spreadsheet+Import&subtitle=Drop+a+spreadsheet%2C+let+AI+map+it.+Automatic+column+mapping+for+your+business+data.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/features/ai-receipt-scanning/">
+    <link rel="canonical" href="https://argorobots.com/features/spreadsheet-import/">
 
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -48,7 +48,7 @@
             "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
                 {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
-                {"@type": "ListItem", "position": 3, "name": "AI Receipt Scanning", "item": "https://argorobots.com/features/ai-receipt-scanning/"}
+                {"@type": "ListItem", "position": 3, "name": "AI Spreadsheet Import", "item": "https://argorobots.com/features/spreadsheet-import/"}
             ]
         }
     </script>
@@ -61,34 +61,34 @@
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "How does AI receipt scanning work?",
+                    "name": "What file formats does AI Spreadsheet Import support?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Take a photo of any receipt — or upload an image — and Argo Books uses AI to extract the store name, individual line items, totals, taxes, and date automatically. The extracted data is used to create an expense record with no manual typing. It achieves 99% accuracy, so you spend less time on data entry and more time running your business."
+                        "text": "Argo Books supports Excel (.xlsx) and CSV files. Just drag and drop your file, and the AI takes it from there — detecting your columns, mapping them to the right fields, and importing your data cleanly. No manual formatting or template files required."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What types of receipts can Argo Books scan?",
+                    "name": "What types of data can I import?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books can scan printed receipts, handwritten receipts, and digital receipt images. It supports photos taken with your phone camera, screenshots, and uploaded image files in common formats like JPG and PNG. Whether it's a crumpled gas station receipt or a clean digital invoice, the AI handles it."
+                        "text": "You can import customers, products, expenses, revenue, invoices, and more. The AI detects the entity type from your column headers and maps everything automatically. It's the fastest way to migrate your existing business data into Argo Books — whether you're coming from another tool or a pile of spreadsheets."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is my receipt data private?",
+                    "name": "Do I need to manually map columns?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. AI processing uses a secure API call to extract the data, but your receipt images and all extracted information are stored locally on your computer. No receipt data is kept on third-party servers after processing. Your financial records remain fully under your control."
+                        "text": "No. The AI reads your column headers and automatically maps them to the correct Argo Books fields. You can review and adjust the mapping before importing if needed, but manual work is rarely necessary. Most imports go through with a single click."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How many receipts can I scan per month?",
+                    "name": "How many records can I import per month?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Free plan includes 5 AI receipt scans per month — enough to get started and see how it works. Premium users get 500 scans per month, which is more than enough for even the busiest small businesses. If you regularly collect receipts, Premium pays for itself in time saved."
+                        "text": "The Free plan includes 100 AI spreadsheet imports per month, which is plenty for getting started or migrating data in batches. Premium users don't have this limit — you can import as much data as you need. Each import processes your entire file, so one file counts as one import regardless of how many rows it contains."
                     }
                 }
             ]
@@ -109,13 +109,13 @@
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $10/month."
             },
-            "description": "Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry and keep your books accurate.",
-            "featureList": "AI-powered receipt data extraction, Automatic expense record creation, Receipt archive with search, Support for printed and handwritten receipts"
+            "description": "Import spreadsheets into Argo Books with AI-powered column mapping. Supports Excel and CSV with automatic entity detection and clean data imports.",
+            "featureList": "AI-powered column mapping, Excel and CSV support, Automatic entity type detection, Data validation before import"
         }
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>AI Receipt Scanning — Argo Books</title>
+    <title>AI Spreadsheet Import — Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -143,11 +143,11 @@
         </div>
         <div class="container">
             <div class="hero-badge animate-fade-in">
-                <?= svg_icon('receipt-scan-detail', 16) ?>
-                <span>AI Receipt Scanning</span>
+                <?= svg_icon('document-upload', 16) ?>
+                <span>AI Spreadsheet Import</span>
             </div>
-            <h1 class="animate-fade-in">Turn any receipt into organized data — instantly</h1>
-            <p class="hero-subtitle animate-fade-in">Stop typing. Start scanning. Argo Books reads your receipts with AI and pulls out every detail — store name, items, totals, and taxes — so your books stay accurate without the busywork.</p>
+            <h1 class="animate-fade-in">Select a spreadsheet, let Argo Books do the rest</h1>
+            <p class="hero-subtitle animate-fade-in">Import customers, products, expenses, invoices, and more from any Excel or CSV file. AI reads your columns, detects your data types, and maps everything into Argo Books — no manual mapping required.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -169,47 +169,25 @@
             <div class="feature-detail animate-on-scroll">
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
-                    <h2>Manual receipt entry is costing you hours every week</h2>
-                    <p>Typing receipts by hand wastes time and introduces errors. Argo Books uses AI to read your receipts in seconds and log every detail directly into your expense records — accurately, every time.</p>
+                    <h2>Migrating business data shouldn't take days</h2>
+                    <p>Switching software or consolidating spreadsheets usually means hours of manual data entry — or paying someone to do it. Argo Books uses AI to read your spreadsheets, understand what each column means, and import everything automatically. What used to take days now takes minutes.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Automatic extraction of store name, date, and address</span>
+                            <span>Automatic detection of 20+ entity types — customers, products, invoices, expenses, and more</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Line-by-line item detection with individual prices</span>
+                            <span>AI maps columns to the right fields, even with non-standard headers</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Tax, tip, and total calculation verification</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Works with printed receipts, handwritten notes, and faded ink</span>
+                            <span>Multi-sheet Excel files processed in one import</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <div class="receipt-visual-wrapper scan-visual">
-                        <img src="../../resources/images/receipt-phone.webp" alt="Phone scanning a receipt with Argo Books AI" loading="lazy">
-                        <div class="scan-line"></div>
-                        <div class="scan-tag scan-tag-vendor">
-                            <span class="scan-tag-label">Vendor</span>
-                            <span class="scan-tag-value">Store Name</span>
-                            <?= svg_icon('check', 14) ?>
-                        </div>
-                        <div class="scan-tag scan-tag-total">
-                            <span class="scan-tag-label">Total</span>
-                            <span class="scan-tag-value">$25.20</span>
-                            <?= svg_icon('check', 14) ?>
-                        </div>
-                        <div class="scan-tag scan-tag-tax">
-                            <span class="scan-tag-label">Tax</span>
-                            <span class="scan-tag-value">$1.97</span>
-                            <?= svg_icon('check', 14) ?>
-                        </div>
-                    </div>
+                    <img src="../../resources/images/features/ai-column-mapping.svg" alt="AI column mapping showing source columns mapped to target fields with confidence scores" loading="lazy">
                 </div>
             </div>
         </div>
@@ -219,8 +197,8 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Try AI receipt scanning free</h3>
-                <p>Download Argo Books and scan your first receipt in under a minute. No credit card required.</p>
+                <h3>Try AI spreadsheet import free</h3>
+                <p>Download Argo Books and import your first spreadsheet in under five minutes. No credit card required.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -241,16 +219,16 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>99%</h3>
-                    <p>Accuracy on printed receipts</p>
+                    <h3>20+</h3>
+                    <p>Entity types automatically detected</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>&lt; 3 seconds</h3>
-                    <p>Average processing time per receipt</p>
+                    <h3>Excel &amp; CSV</h3>
+                    <p>Multi-sheet and multi-delimiter support</p>
                 </div>
                 <div class="highlight-item">
                     <h3>0</h3>
-                    <p>Receipts you need to type manually</p>
+                    <p>Rows you need to map by hand</p>
                 </div>
             </div>
         </div>
@@ -265,44 +243,25 @@
             <div class="feature-detail reversed animate-on-scroll">
                 <div class="feature-detail-text">
                     <span class="section-label">Under the Hood</span>
-                    <h2>AI that reads receipts like a human — but faster</h2>
-                    <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model to understand your receipts contextually — not just reading characters, but understanding what they mean. It can handle faded thermal paper, and even read handwritten amounts.</p>
-                    <p>After scanning, the AI structures the data into clean, organized fields: vendor, date, individual items, quantities, prices, subtotal, tax, and total. You review the results, make any corrections, and save — all in under a minute.</p>
+                    <h2>Two-tier AI that adapts to your data</h2>
+                    <p>Not all spreadsheets are the same. Simple files with clean headers get fast, deterministic column mapping. Complex files — with merged cells, inconsistent formatting, or pivot-table layouts — get processed row-by-row with AI that understands context.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>OCR + AI language model for contextual understanding</span>
+                            <span>Tier 1: Direct column mapping for clean, well-structured files</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Handles faded thermal paper, wrinkled receipts, and poor lighting</span>
+                            <span>Tier 2: AI row processing for complex or messy data</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Multi-currency support for international purchases</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Review and edit before saving — you're always in control</span>
+                            <span>Confidence scores on every mapping — you see exactly how sure the AI is</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <div class="receipt-visual-wrapper annotate-visual">
-                        <img src="../../resources/images/receipt-desk.webp" alt="Receipt on desk with AI-detected fields highlighted" loading="lazy">
-                        <div class="annotate-box annotate-vendor">
-                            <span class="annotate-label">Vendor</span>
-                        </div>
-                        <div class="annotate-box annotate-date">
-                            <span class="annotate-label">Date</span>
-                        </div>
-                        <div class="annotate-box annotate-items">
-                            <span class="annotate-label">Line Items</span>
-                        </div>
-                        <div class="annotate-box annotate-total">
-                            <span class="annotate-label">Total</span>
-                        </div>
-                    </div>
+                    <img src="../../resources/images/features/ai-import-analysis.svg" alt="AI import analysis showing 13 sheets detected with 1,882 rows and direct mapping results" loading="lazy">
                 </div>
             </div>
         </div>
@@ -315,24 +274,24 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps to paperless receipts</h2>
-                <p class="section-desc">From paper receipt to organized expense record in under a minute. No typing, no guessing, no lost receipts.</p>
+                <h2 class="section-title">Three steps from spreadsheet to clean data</h2>
+                <p class="section-desc">From a messy Excel file to organized business records in minutes. AI handles the mapping — you just review and confirm.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
-                    <h3>Snap a photo or upload an image</h3>
-                    <p>Take a photo of your receipt or drag and drop an image file directly into Argo Books.</p>
+                    <h3>Drop in your file</h3>
+                    <p>Upload an Excel (.xlsx) or CSV file. Multi-sheet workbooks are fully supported.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
-                    <h3>AI reads and structures the data</h3>
-                    <p>Our AI extracts the vendor, date, line items, tax, tip, and total — even from faded ink or messy formatting.</p>
+                    <h3>AI maps your columns</h3>
+                    <p>The AI detects entity types, maps columns to the right fields, and validates your data — all with confidence scores you can review.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
-                    <h3>Verify and save</h3>
-                    <p>The AI auto-categorizes each expense. Just confirm the details, make any quick corrections, and save.</p>
+                    <h3>Review and import</h3>
+                    <p>Confirm the mapping, auto-fix any issues, and import. Products are auto-categorized and a full summary shows what was added, updated, or skipped.</p>
                 </div>
             </div>
         </div>
@@ -342,8 +301,8 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop losing receipts</h3>
-                <p>Every receipt scanned, categorized, and stored — ready for tax season. Get started in minutes.</p>
+                <h3>Stop re-typing your spreadsheets</h3>
+                <p>Every row imported, mapped, and validated — ready to use. Get started in minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -355,38 +314,38 @@
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Organized + Searchable
+         DETAIL SECTION 3: Validation + Smart Handling
          Text left, image right
          ============================================= -->
     <section class="feature-detail-section">
         <div class="container">
             <div class="feature-detail animate-on-scroll">
                 <div class="feature-detail-text">
-                    <span class="section-label">Stay Organized</span>
-                    <h2>Every receipt, filed and searchable</h2>
-                    <p>Once scanned, your receipts become part of your financial records. Every expense is categorized, timestamped, and linked to the original receipt image. No more digging through shoeboxes before tax season — everything is organized and searchable from day one.</p>
-                    <p>Need to find that $342 equipment purchase from last July? Search by amount, date, vendor, or category and find it in seconds. Argo Books turns your chaotic receipt pile into a clean, audit-ready expense log.</p>
+                    <span class="section-label">Validation Built In</span>
+                    <h2>Catch problems before they hit your books</h2>
+                    <p>Before anything is imported, Argo Books validates your entire dataset. Missing suppliers referenced in expenses? A customer name that doesn't exist yet? The validation step catches these issues and offers to auto-create missing records so your import goes smoothly.</p>
+                    <p>You decide what gets auto-fixed and what gets skipped. After import, a detailed summary shows exactly how many records were inserted, updated, or skipped — and why. Every import creates an undo snapshot, so you can always roll back if needed.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Receipts attached to expense records automatically</span>
+                            <span>Pre-import validation detects missing references and data issues</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Search by vendor, amount, date, or category</span>
+                            <span>Auto-create missing customers, suppliers, categories, and more</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Original receipt images stored alongside extracted data</span>
+                            <span>Skip duplicate records automatically to avoid double-entry</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Export expense reports for accountants and tax filing</span>
+                            <span>Undo snapshot created before every import for easy rollback</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/expenses-table.svg" alt="Argo Books expenses page showing organized, searchable expense records with supplier details and status" loading="lazy">
+                    <img src="../../resources/images/features/ai-import-validation.svg" alt="Import validation showing 883 auto-fixable issues with missing department references" loading="lazy">
                 </div>
             </div>
         </div>
@@ -399,51 +358,51 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just a scanner</h2>
-                <p class="section-desc">AI receipt scanning isn't just about saving time — it changes how you manage your business finances.</p>
+                <h2 class="section-title">More than just a file importer</h2>
+                <p class="section-desc">AI spreadsheet import isn't just about moving data — it changes how you migrate, consolidate, and manage your business records.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon">
                         <?= svg_icon('clock', 22) ?>
                     </div>
-                    <h3>Save hours every month</h3>
-                    <p>Stop typing receipt data by hand. Most small business owners spend 3-5 hours per month on manual receipt entry. AI scanning cuts that to minutes.</p>
+                    <h3>Migrate in minutes, not days</h3>
+                    <p>Switching from another system? Import years of customer, product, and transaction data in a single session instead of weeks of manual entry.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
-                    <h3>Eliminate data entry errors</h3>
-                    <p>Manual entry leads to typos, wrong totals, and missing items. The AI reads receipts accurately and catches math errors humans miss.</p>
+                    <h3>No mapping expertise needed</h3>
+                    <p>You don't need to know field names or database schemas. The AI figures out what your columns mean — even when headers are abbreviated or non-standard.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
                         <?= svg_icon('shield', 22) ?>
                     </div>
-                    <h3>Tax-ready records all year</h3>
-                    <p>Every scanned receipt is categorized and stored with the original image. When tax season arrives, your records are already organized and audit-ready.</p>
+                    <h3>Safe imports with undo</h3>
+                    <p>Every import creates a snapshot before changes are applied. If something doesn't look right, roll back to exactly where you were with one click.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon amber">
                         <?= svg_icon('bolt', 22) ?>
                     </div>
-                    <h3>Process receipts in seconds</h3>
-                    <p>No more "I'll do it later" — scan receipts the moment you get them. The entire process from photo to saved expense takes under 30 seconds.</p>
+                    <h3>Handles messy data gracefully</h3>
+                    <p>Real-world spreadsheets aren't perfect. The AI handles merged cells, inconsistent formatting, mixed data types, and pivot-table layouts.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
-                        <?= svg_icon('search', 22) ?>
+                        <?= svg_icon('table', 22) ?>
                     </div>
-                    <h3>Find any receipt instantly</h3>
-                    <p>Search your expense records by vendor, amount, date, or category. No more digging through files — every receipt is digital and searchable.</p>
+                    <h3>Multi-sheet in one import</h3>
+                    <p>Excel files with multiple sheets — customers on one tab, products on another — are analyzed and imported together in a single operation.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
-                    <h3>Better expense insights</h3>
-                    <p>When all your receipts are digitized, you can see spending patterns you'd otherwise miss — like which vendors cost you the most or where costs are rising.</p>
+                    <h3>Auto-categorize after import</h3>
+                    <p>After your products are imported, AI automatically categorizes uncategorized items — so your inventory is organized from day one without extra work.</p>
                 </div>
             </div>
         </div>
@@ -453,8 +412,8 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Save 3-5 hours every month</h3>
-                <p>Join small business owners who eliminated manual receipt entry with Argo Books.</p>
+                <h3>Import your existing data today</h3>
+                <p>Join business owners who migrated their entire operation to Argo Books in minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -475,37 +434,37 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for the way you actually work</h2>
-                <p class="section-desc">Whether you're a freelancer with a few receipts a week or a retail shop with dozens per day, AI scanning adapts to your workflow.</p>
+                <h2 class="section-title">Built for real-world data migration</h2>
+                <p class="section-desc">Whether you're switching from another tool, consolidating spreadsheets, or onboarding a new business — AI import handles it.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">
                     <h3>
                         <?= svg_icon('users', 22) ?>
-                        Freelancers & consultants
+                        Switching from other software
                     </h3>
-                    <p>Track client-related expenses by scanning receipts on the go. Attach scanned receipts to invoices as proof of expenses for client reimbursement.</p>
+                    <p>Export your data from QuickBooks, Wave, or any other tool as a spreadsheet. Argo Books AI maps everything into the right place — customers, invoices, expenses, and all.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
                         <?= svg_icon('package', 22) ?>
-                        Retail & e-commerce
+                        Bulk product &amp; inventory setup
                     </h3>
-                    <p>Scan supplier invoices and purchase receipts to keep inventory costs accurate. Know exactly what you paid for every product on your shelves.</p>
+                    <p>Got a supplier price list or product catalog in Excel? Import hundreds of products with prices, descriptions, and categories in one shot instead of adding them one by one.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
                         <?= svg_icon('calendar', 22) ?>
-                        Service businesses
+                        Consolidating scattered records
                     </h3>
-                    <p>Scan fuel receipts, material purchases, and equipment costs. Categorize expenses by job or project to track profitability on every engagement.</p>
+                    <p>Years of customer lists, expense logs, and transaction records spread across multiple spreadsheets? Combine them into a single, organized system with AI-powered import.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
                         <?= svg_icon('document', 22) ?>
-                        Anyone at tax time
+                        Accountant handoffs
                     </h3>
-                    <p>No more January panic. Every receipt is already scanned, categorized, and stored — ready to hand to your accountant or file with your return.</p>
+                    <p>Your accountant sends data in spreadsheets. Import their formatted reports directly — no reformatting needed. The AI understands standard accounting layouts.</p>
                 </div>
             </div>
         </div>
@@ -520,25 +479,25 @@
             <div class="feature-detail reversed animate-on-scroll">
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
-                    <h2>Your receipts stay on your computer</h2>
-                    <p>Unlike cloud-based receipt scanners that upload your financial data to third-party servers, Argo Books is a desktop application. Your receipts and expense data are stored locally on your device — not on someone else's cloud.</p>
-                    <p>The AI processing happens securely, and your scanned receipt images are saved alongside your financial records on your own machine. You control your data, always.</p>
+                    <h2>Your spreadsheets stay on your computer</h2>
+                    <p>Unlike cloud-based import tools that upload your business data to third-party servers, Argo Books is a desktop application. Your spreadsheets are read locally on your device. Only a small sample of your data is sent to the AI for analysis — never the full file.</p>
+                    <p>The AI processes column headers and a handful of representative rows to understand your data structure. Your complete dataset never leaves your machine. You control your data, always.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Desktop app — your data stays on your computer</span>
+                            <span>Desktop app — your spreadsheets are read locally</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>No third-party cloud storage of your financial documents</span>
+                            <span>Only a small data sample is sent for AI analysis, never the full file</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Receipt images stored locally alongside expense records</span>
+                            <span>Imported data stored locally alongside your financial records</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Works offline — scan and save without internet</span>
+                            <span>Country-aware address schemas adapt to your location automatically</span>
                         </li>
                     </ul>
                 </div>
@@ -557,7 +516,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Related Features</span>
                 <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">AI receipt scanning is even more powerful when combined with these features.</p>
+                <p class="section-desc">AI spreadsheet import is even more powerful when combined with these features.</p>
             </div>
             <div class="related-grid">
                 <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
@@ -565,21 +524,21 @@
                         <?= svg_icon('dollar', 22) ?>
                     </div>
                     <h3>Expense & Revenue Tracking</h3>
-                    <p>Scanned receipts flow directly into your expense records. Every transaction is categorized and ready for reports.</p>
+                    <p>Imported transactions flow directly into your expense and revenue records. Every entry is categorized and ready for reports.</p>
+                </a>
+                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon">
+                        <?= svg_icon('receipt-scan-detail', 22) ?>
+                    </div>
+                    <h3>AI Receipt Scanning</h3>
+                    <p>Import your historical data with spreadsheets, then scan new receipts going forward. A complete solution for past and present expenses.</p>
                 </a>
                 <a href="../predictive-analytics/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('analytics', 22) ?>
                     </div>
                     <h3>Predictive Analytics</h3>
-                    <p>More expense data means better forecasts. AI scanning feeds your analytics engine with accurate, detailed financial data.</p>
-                </a>
-                <a href="../ai-spreadsheet-import/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('document-upload', 22) ?>
-                    </div>
-                    <h3>AI Spreadsheet Import</h3>
-                    <p>Have existing receipt data in spreadsheets? Import it instantly with AI-powered column mapping — then scan new receipts going forward.</p>
+                    <p>More data means better forecasts. Importing your full transaction history gives the analytics engine a head start on accurate predictions.</p>
                 </a>
             </div>
         </div>
@@ -593,8 +552,8 @@
         <section class="cta-section">
             <div class="container">
                 <div class="cta-card animate-on-scroll">
-                    <h2>Ready to ditch manual data entry?</h2>
-                    <p>Download Argo Books and start scanning receipts with AI. Free to get started — no credit card, no trial period.</p>
+                    <h2>Ready to import your data?</h2>
+                    <p>Download Argo Books and let AI handle the spreadsheet mapping. Free to get started — no credit card, no trial period.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

@@ -106,7 +106,7 @@
             </div>
             <div class="features-grid">
                 <!-- AI Receipt Scanning -->
-                <a href="ai-receipt-scanning/" class="feature-card animate-on-scroll">
+                <a href="receipt-scanning/" class="feature-card animate-on-scroll">
                     <div class="feature-card-icon blue">
                         <?= svg_icon('receipt-scan-detail', 24) ?>
                     </div>
@@ -176,7 +176,7 @@
                 </a>
 
                 <!-- AI Spreadsheet Import -->
-                <a href="ai-spreadsheet-import/" class="feature-card animate-on-scroll">
+                <a href="spreadsheet-import/" class="feature-card animate-on-scroll">
                     <div class="feature-card-icon green">
                         <?= svg_icon('document-upload', 24) ?>
                     </div>

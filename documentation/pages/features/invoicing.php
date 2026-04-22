@@ -63,12 +63,7 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <h2>Transaction Fees</h2>
-            <p>Payment processing fees are charged by the payment provider, not Argo Books:</p>
-            <ul>
-                <li><strong>Stripe:</strong> Typically 2.9% + $0.30 per transaction</li>
-                <li><strong>PayPal:</strong> Typically 2.9% + fixed fee (varies by currency)</li>
-                <li><strong>Square:</strong> Typically 2.9% + $0.30 per transaction</li>
-            </ul>
+            <p>Payment processing fees are charged by the payment provider, not Argo Books. Most providers typically charge around 2.9% + $0.30 per transaction, including Stripe, PayPal, and Square.</p>
 
             <div class="info-box">
                 <p><strong>Tip:</strong> Transaction fees are optionally passed on to the customer at checkout. To absorb the fees yourself instead, create an invoice template, go to the "Display" tab, and uncheck "Pass processing fees to customers".</p>

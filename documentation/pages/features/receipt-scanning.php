@@ -14,7 +14,7 @@ include __DIR__ . '/../../docs-header.php';
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
-            <p>Transform paper receipts into digital records instantly with our AI-powered scanner. Simply take a photo and let the AI do the rest. Our receipt scanner achieves 99% accuracy on printed receipts, and lets you quickly make adjustments.</p>
+            <p>Transform paper receipts into digital records instantly with our AI-powered scanner. Simply take a photo and let Argo Books do the rest. Our receipt scanner achieves 99% accuracy on printed receipts, and lets you quickly make adjustments.</p>
 
             <img src="../../../resources/images/ai-receipt-scanner.webp" alt="AI Receipt Scanner" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 

@@ -57,8 +57,7 @@ $stmt->close();
 // Exchange authorization code for tokens
 $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
 $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? '';
-$baseUrl = env('SITE_URL', 'https://argorobots.com');
-$redirectUri = $baseUrl . '/api/google/callback';
+$redirectUri = site_url('/api/google/callback');
 
 $tokenPayload = http_build_query([
     'code' => $code,

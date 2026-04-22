@@ -71,8 +71,7 @@ function handleInitiate(array $authContext, string $clientId): void
 
     store_google_oauth_state($authContext, $state);
 
-    $baseUrl = env('SITE_URL', 'https://argorobots.com');
-    $redirectUri = $baseUrl . '/api/google/callback';
+    $redirectUri = site_url('/api/google/callback');
 
     $scopes = implode(' ', [
         'https://www.googleapis.com/auth/spreadsheets',

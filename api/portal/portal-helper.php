@@ -575,8 +575,8 @@ function send_invoice_notification(array $params): array
 
     $html = build_portal_email_html([
         'headerGradient' => 'linear-gradient(135deg, #2563eb, #1e40af)',
-        'headerTitle' => $safeCompany,
-        'greetingName' => htmlspecialchars($customerName),
+        'headerTitle' => $companyName,         // escaped by helper
+        'greetingName' => $customerName,       // escaped by helper
         'introHtml' => 'You have a new invoice from <strong>' . $safeCompany . '</strong>.',
         'detailRows' => $detailRows,
         'ctaButton' => ['url' => $invoiceUrl, 'text' => 'View & Pay Invoice', 'color' => '#2563eb'],
@@ -678,7 +678,7 @@ function send_payment_confirmation(array $params): array
     $html = build_portal_email_html([
         'headerGradient' => 'linear-gradient(135deg, #059669, #047857)',
         'headerTitle' => 'Payment Confirmed',
-        'greetingName' => htmlspecialchars($customerName),
+        'greetingName' => $customerName,       // escaped by helper
         'introHtml' => 'Your payment to <strong>' . $safeCompany . '</strong> has been received. Here are the details:',
         'detailRows' => $detailRows,
         'ctaButton' => null,
@@ -739,18 +739,27 @@ function send_payment_confirmation(array $params): array
  */
 function build_portal_email_html(array $params): string
 {
+    // Plain-text params — escaped by the helper. Callers should pass raw values.
+    $headerTitle  = htmlspecialchars((string)($params['headerTitle'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $greetingName = htmlspecialchars((string)($params['greetingName'] ?? ''), ENT_QUOTES, 'UTF-8');
+
+    // HTML-by-design params — callers must sanitize/escape any interpolated
+    // user data before passing in. Named with *Html to flag the contract.
+    $introHtml   = (string)($params['introHtml'] ?? '');
+    $closingHtml = (string)($params['closingHtml'] ?? '');
+
+    // Controlled CSS values — not user input.
     $headerGradient = $params['headerGradient'] ?? 'linear-gradient(135deg, #2563eb, #1e40af)';
-    $headerTitle    = $params['headerTitle'] ?? '';
-    $greetingName   = $params['greetingName'] ?? '';
-    $introHtml      = $params['introHtml'] ?? '';
-    $detailRows     = $params['detailRows'] ?? [];
-    $ctaButton      = $params['ctaButton'] ?? null;
-    $closingHtml    = $params['closingHtml'] ?? '';
+
+    $detailRows = $params['detailRows'] ?? [];
+    $ctaButton  = $params['ctaButton'] ?? null;
 
     $rowsHtml = '';
     foreach ($detailRows as $row) {
-        $label = $row[0] ?? '';
-        $value = $row[1] ?? '';
+        // Row label is semantically plain text — escape here.
+        // Row value may be pre-formatted HTML (e.g., bold amounts) — callers must escape.
+        $label = htmlspecialchars((string)($row[0] ?? ''), ENT_QUOTES, 'UTF-8');
+        $value = (string)($row[1] ?? '');
         $valueStyle = $row[2] ?? 'padding: 8px 0; text-align: right; font-size: 14px; color: #111827;';
         $rowsHtml .= '
                                             <tr>
@@ -766,15 +775,15 @@ function build_portal_email_html(array $params): string
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td align="center">
-                                        <a href="' . htmlspecialchars($ctaButton['url']) . '" style="display: inline-block; padding: 14px 40px; background-color: ' . $ctaColor . '; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px;">
-                                            ' . htmlspecialchars($ctaButton['text']) . '
+                                        <a href="' . htmlspecialchars($ctaButton['url'], ENT_QUOTES, 'UTF-8') . '" style="display: inline-block; padding: 14px 40px; background-color: ' . $ctaColor . '; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px;">
+                                            ' . htmlspecialchars($ctaButton['text'], ENT_QUOTES, 'UTF-8') . '
                                         </a>
                                     </td>
                                 </tr>
                             </table>';
     }
 
-    $greeting = 'Hi' . ($greetingName ? ' ' . $greetingName : '') . ',';
+    $greeting = 'Hi' . ($greetingName !== '' ? ' ' . $greetingName : '') . ',';
 
     return '<!DOCTYPE html>
 <html>

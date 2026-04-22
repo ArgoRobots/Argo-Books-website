@@ -42,7 +42,12 @@ function read_rate_limits_locked(int $windowSeconds = 900): array
 {
     $rateDir = __DIR__ . '/resources/rate_limits';
     if (!is_dir($rateDir)) {
-        @mkdir($rateDir, 0755, true);
+        // `&& !is_dir($rateDir)` handles the race where a concurrent request
+        // created the directory between our is_dir() check and mkdir().
+        if (!mkdir($rateDir, 0755, true) && !is_dir($rateDir)) {
+            error_log('rate_limit_helper: failed to create rate-limit storage dir: ' . $rateDir);
+            return ['rateLimits' => [], 'handle' => null];
+        }
     }
     $rateFile = $rateDir . '/rate_limits.json';
     $handle = fopen($rateFile, 'c+');

@@ -6,13 +6,21 @@
  * Always checks both $_ENV and getenv() because $_ENV is only populated when
  * php.ini's variables_order includes "E", which is not guaranteed on every host.
  *
+ * Returns the raw env value when the variable is set, even if it's "0" or "".
+ * Only falls back to $default when the variable is truly unset — this matters
+ * for boolean-style vars like INVOICE_LOG_ENABLED=0.
+ *
  * @param string $key
- * @param mixed $default Returned when the variable is unset or empty
+ * @param mixed $default Returned when the variable is not set at all
  * @return mixed
  */
 function env(string $key, $default = '')
 {
-    return $_ENV[$key] ?? getenv($key) ?: $default;
+    if (isset($_ENV[$key])) {
+        return $_ENV[$key];
+    }
+    $value = getenv($key);
+    return $value !== false ? $value : $default;
 }
 
 /**

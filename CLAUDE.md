@@ -137,12 +137,6 @@ For site URLs in emails, crons, or any non-request context, use `site_url($path)
 
 Shared flat-file rate limiting helpers (`is_rate_limited`, `record_rate_limit_attempt`, `get_client_ip`, …) live in `rate_limit_helper.php` at the repo root. Callers pass a bucket prefix (`'admin_login'`, `'portal'`, `'payment'`, etc.) so buckets don't collide. Rate-limit state lives in `/resources/rate_limits/rate_limits.json`.
 
-## Known Deferred Refactors
-
-One piece of consistent-but-dated state exists in the codebase. Don't "helpfully" clean it up mid-feature:
-
-- **~150 `require_once` / `include_once` calls use relative paths** (not `__DIR__`-prefixed). The convention in new code is absolute paths, but the bulk conversion is pending. Leave them unless the task is explicitly the migration.
-
 ## Cron Jobs
 
 Located in `/cron/`. Must be scheduled on the server (see `/read-me/Cron jobs.md`):

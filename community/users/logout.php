@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
-require_once 'user_functions.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/user_functions.php';
 
 // Clear remember token if user is logged in
 if (isset($_SESSION['user_id'])) {

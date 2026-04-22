@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../db_connect.php';
+require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../resources/icons.php';
 
 // Check if user is logged in
@@ -196,7 +196,7 @@ for ($i = 11; $i >= 0; $i--) {
     $churn_data[] = $active_start > 0 ? round($cancelled / $active_start * 100, 1) : 0;
 }
 
-include 'admin_header.php';
+include __DIR__ . '/admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">

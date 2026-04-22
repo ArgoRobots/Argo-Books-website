@@ -1,8 +1,8 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
-require_once '../community_functions.php';
-require_once 'user_functions.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../community_functions.php';
+require_once __DIR__ . '/user_functions.php';
 
 // Check if user is logged in and has admin role
 if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {

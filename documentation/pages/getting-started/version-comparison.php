@@ -13,7 +13,7 @@ $monthlyPrice = $pricing['premium_monthly_price'];
 $yearlyPrice = $pricing['premium_yearly_price'];
 $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
-include '../../docs-header.php';
+include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
@@ -151,4 +151,4 @@ include '../../docs-header.php';
             </div>
         </div>
 
-<?php include '../../docs-footer.php'; ?>
+<?php include __DIR__ . '/../../docs-footer.php'; ?>

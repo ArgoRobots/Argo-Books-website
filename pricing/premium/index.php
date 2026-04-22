@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../community/users/user_functions.php';
+require_once __DIR__ . '/../../community/users/user_functions.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../resources/icons.php';
 

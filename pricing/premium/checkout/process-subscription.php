@@ -9,10 +9,10 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 header('Content-Type: application/json');
 
-require_once '../../../db_connect.php';
-require_once '../../../email_sender.php';
-require_once '../../../license_functions.php';
-require_once '../../../vendor/autoload.php';
+require_once __DIR__ . '/../../../db_connect.php';
+require_once __DIR__ . '/../../../email_sender.php';
+require_once __DIR__ . '/../../../license_functions.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once __DIR__ . '/../../../config/pricing.php';
 
 // Only accept POST requests

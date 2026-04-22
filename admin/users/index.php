@@ -1,8 +1,8 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
-require_once '../../email_sender.php';
-require_once '../../community/report/ban_check.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../email_sender.php';
+require_once __DIR__ . '/../../community/report/ban_check.php';
 
 require_once __DIR__ . '/../../resources/icons.php';
 
@@ -229,7 +229,7 @@ if (isset($_SESSION['message'])) {
     unset($_SESSION['message_type']);
 }
 
-include '../admin_header.php';
+include __DIR__ . '/../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">

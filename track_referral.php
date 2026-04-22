@@ -4,7 +4,7 @@
  * Include this file at the top of pages where you want to track referral sources
  */
 
-require_once 'statistics.php';
+require_once __DIR__ . '/statistics.php';
 
 // Check if 'source' parameter exists in the URL
 if (isset($_GET['source']) && !empty($_GET['source'])) {

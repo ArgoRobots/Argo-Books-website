@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
+require_once __DIR__ . '/../../db_connect.php';
 
 // Check if user is logged in as admin
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -18,7 +18,7 @@ $page_title = "Business Outreach";
 $page_description = "Find local businesses, generate outreach emails, and track leads";
 
 // Include the admin header
-include '../admin_header.php';
+include __DIR__ . '/../admin_header.php';
 ?>
 
 <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">

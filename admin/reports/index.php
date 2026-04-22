@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
+require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../resources/icons.php';
 
 // Check if user is logged in as admin
@@ -119,7 +119,7 @@ $reports = get_reports($status_filter, $content_type_filter);
 $status_counts = get_reports_count_by_status();
 
 // Include the admin header
-include '../admin_header.php';
+include __DIR__ . '/../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">

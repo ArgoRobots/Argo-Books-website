@@ -5,7 +5,7 @@ $pageDescription = 'Learn how to track expenses and revenue in Argo Books. Add t
 $currentPage = 'sales-tracking';
 $pageCategory = 'features';
 
-include '../../docs-header.php';
+include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
@@ -75,4 +75,4 @@ include '../../docs-header.php';
             </div>
         </div>
 
-<?php include '../../docs-footer.php'; ?>
+<?php include __DIR__ . '/../../docs-footer.php'; ?>

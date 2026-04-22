@@ -1,9 +1,9 @@
 <?php
 session_start();
-require_once '../db_connect.php';
-require_once 'community_functions.php';
-require_once 'mentions/mentions.php';
-require_once 'report/ban_check.php';
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/community_functions.php';
+require_once __DIR__ . '/mentions/mentions.php';
+require_once __DIR__ . '/report/ban_check.php';
 
 header('Content-Type: application/json');
 

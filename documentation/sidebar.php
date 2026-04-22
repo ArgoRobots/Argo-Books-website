@@ -5,7 +5,7 @@ require_once __DIR__ . '/../resources/icons.php';
  *
  * Usage: Include this file in documentation pages
  * Set $currentPage variable before including to highlight the active page
- * Example: $currentPage = 'installation'; include 'sidebar.php';
+ * Example: $currentPage = 'installation'; include __DIR__ . '/sidebar.php';
  */
 
 // Get current page from variable or URL

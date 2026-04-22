@@ -12,9 +12,9 @@
 
     <?php
     session_start();
-    require_once '../../../db_connect.php';
-    require_once '../../../community/users/user_functions.php';
-    require_once '../../../config/pricing.php';
+    require_once __DIR__ . '/../../../db_connect.php';
+    require_once __DIR__ . '/../../../community/users/user_functions.php';
+    require_once __DIR__ . '/../../../config/pricing.php';
 
     $pricing = get_pricing_config();
 

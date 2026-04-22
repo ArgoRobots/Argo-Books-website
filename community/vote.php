@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../db_connect.php';
-require_once 'community_functions.php';
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/community_functions.php';
 
 // Set the content type to JSON
 header('Content-Type: application/json');

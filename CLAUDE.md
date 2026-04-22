@@ -86,6 +86,18 @@ Three gateways are supported — Stripe, PayPal, Square. Each has:
 
 Processing fees are configurable via `.env` (`PROCESSING_FEE_PERCENT`, `PROCESSING_FEE_FIXED`).
 
+## Email Sending
+
+**All transactional email must go through Resend via the SMTP relay.** The entry points are `email_sender.php` (general-purpose, `send_styled_email()`) and `smtp_mailer.php` (`create_smtp_mailer()` — returns a configured PHPMailer instance, or `null` if SMTP is not configured so the caller can fall back to PHP `mail()`).
+
+Rules for any code that sends email:
+
+- **Never call `mail()` directly without first attempting `create_smtp_mailer()`.** Raw `mail()` bypasses Resend, loses deliverability, and silently no-ops on servers without an MTA.
+- Prefer reusing existing helpers in `email_sender.php` (e.g., `send_premium_subscription_receipt`, `send_payment_failed_email`, `resend_subscription_id_email`) rather than duplicating HTML templates elsewhere.
+- The accepted pattern for new callers outside `email_sender.php`: try SMTP first, fall back to `mail()` only when `create_smtp_mailer()` returns `null`. See `api/invoice/invoice_email_sender.php` and `api/portal/portal-helper.php` for reference implementations.
+- SMTP config lives in `.env` under `SMTP_*` (see `smtp_mailer.php` docblock). In production and sandbox, `SMTP_HOST=smtp.resend.com`, `SMTP_USERNAME=resend`, `SMTP_PASSWORD` is the Resend API key.
+- For local development, set up MailHog (see `/read-me/Local email setup.md`) so mail() fallback works without hitting real inboxes.
+
 ## Cron Jobs
 
 Located in `/cron/`. Must be scheduled on the server (see `/read-me/Cron jobs.md`):

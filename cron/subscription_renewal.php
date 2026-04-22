@@ -252,7 +252,7 @@ foreach ($subscriptions as $subscription) {
 
             // Send receipt email (only for actual charges, not credit-covered renewals)
             if ($amountToCharge > 0) {
-                sendRenewalReceiptEmail(
+                send_premium_subscription_receipt(
                     $email,
                     $subscriptionId,
                     $billing,
@@ -284,7 +284,7 @@ foreach ($subscriptions as $subscription) {
         $stmt->execute([$subscriptionId, $amount, $paymentMethod, $e->getMessage()]);
 
         // Send payment failed notification
-        sendPaymentFailedEmail($email, $subscriptionId, $e->getMessage());
+        send_payment_failed_email($email, $subscriptionId, $e->getMessage());
 
         // If multiple failures, consider suspending
         $failureCount = getRecentFailureCount($pdo, $subscriptionId);
@@ -503,159 +503,3 @@ function getRecentFailureCount($pdo, $subscriptionId) {
     return $result['count'] ?? 0;
 }
 
-/**
- * Send renewal receipt email
- */
-function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $nextRenewal, $transactionId, $paymentMethod) {
-    $css = file_get_contents(__DIR__ . '/../email.css');
-    $subject = "Payment Receipt - Argo Premium Subscription";
-
-    $billingText = $billing === 'yearly' ? 'yearly' : 'monthly';
-    $renewalDate = date('F j, Y', strtotime($nextRenewal));
-    $paymentDate = date('F j, Y');
-    $paymentMethodText = ucfirst($paymentMethod);
-
-    $email_html = <<<HTML
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Payment Receipt</title>
-    <style>
-        {$css}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-            <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-        </div>
-
-        <div class="content">
-            <h1>Payment Receipt</h1>
-            <p>Thank you for your continued subscription to Argo Premium!</p>
-
-            <div class="subscription-box" style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #e5e7eb;">
-                <h3 style="margin-top: 0;">Payment Details</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Date</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">{$paymentDate}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Description</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">Premium Subscription ({$billingText})</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Amount</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">\${$amount} CAD</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Payment Method</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right;">{$paymentMethodText}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb;"><strong>Transaction ID</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e5e7eb; text-align: right; font-size: 12px;">{$transactionId}</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 8px 0;"><strong>Next Renewal</strong></td>
-                        <td style="padding: 8px 0; text-align: right;">{$renewalDate}</td>
-                    </tr>
-                </table>
-            </div>
-
-            <p>Your subscription has been renewed and will continue until {$renewalDate}.</p>
-
-            <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
-
-            <div class="footer" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-                <p>License Key: {$subscriptionId}</p>
-                <p>Thank you for using Argo Books!</p>
-                <p><a href="https://argorobots.com">argorobots.com</a></p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-HTML;
-
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: ArgoBooks'
-    ];
-
-    return mail($email, $subject, $email_html, implode("\r\n", $headers));
-}
-
-/**
- * Send payment failed notification
- */
-function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
-    $css = file_get_contents(__DIR__ . '/../email.css');
-    $subject = "Payment Failed - Argo Premium Subscription";
-
-    $email_html = <<<HTML
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Payment Failed</title>
-    <style>
-        {$css}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
-            <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
-        </div>
-
-        <div class="content">
-            <h1>Payment Failed</h1>
-            <p>We were unable to process your subscription renewal payment.</p>
-
-            <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; color: #991b1b;"><strong>License Key:</strong> {$subscriptionId}</p>
-            </div>
-
-            <p><strong>What to do next:</strong></p>
-            <ul>
-                <li>Check that your payment method is up to date</li>
-                <li>Ensure there are sufficient funds available</li>
-                <li>Update your payment information in your account settings</li>
-            </ul>
-
-            <p>If the payment continues to fail, your subscription may be suspended. Please update your payment method to avoid interruption of service.</p>
-
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="https://argorobots.com/community/users/subscription.php" style="display: inline-block; background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Update Payment Method</a>
-            </div>
-
-            <p>If you need assistance, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
-
-            <div class="footer" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-                <p>Argo Books &copy; 2026. All rights reserved.</p>
-                <p><a href="https://argorobots.com">argorobots.com</a></p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-HTML;
-
-    $headers = [
-        'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
-        'From: Argo Books <noreply@argorobots.com>',
-        'Reply-To: support@argorobots.com',
-        'X-Mailer: ArgoBooks'
-    ];
-
-    return mail($email, $subject, $email_html, implode("\r\n", $headers));
-}

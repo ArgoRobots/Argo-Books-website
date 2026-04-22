@@ -8,6 +8,7 @@
  */
 
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../smtp_mailer.php';
 
 /**
  * Generate a cryptographically secure token (48-character hex string = 192 bits of entropy)
@@ -708,6 +709,17 @@ function send_invoice_notification(array $params): array
         $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
         $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
 
+        $mailer = create_smtp_mailer();
+        if ($mailer) {
+            $mailer->setFrom($fromEmail, $fromName);
+            $mailer->addAddress($customerEmail, $customerName);
+            $mailer->addReplyTo($fromEmail, $fromName);
+            $mailer->Subject = $subject;
+            $mailer->Body = $html;
+            $mailer->send();
+            return ['success' => true, 'message' => 'Email sent'];
+        }
+
         $headers = [
             'MIME-Version: 1.0',
             'Content-Type: text/html; charset=UTF-8',
@@ -788,6 +800,17 @@ function send_payment_confirmation(array $params): array
     try {
         $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
         $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
+
+        $mailer = create_smtp_mailer();
+        if ($mailer) {
+            $mailer->setFrom($fromEmail, $fromName);
+            $mailer->addAddress($customerEmail, $customerName);
+            $mailer->addReplyTo($fromEmail, $fromName);
+            $mailer->Subject = $subject;
+            $mailer->Body = $html;
+            $mailer->send();
+            return ['success' => true, 'message' => 'Confirmation email sent'];
+        }
 
         $headers = [
             'MIME-Version: 1.0',

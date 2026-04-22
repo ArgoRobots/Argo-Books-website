@@ -46,7 +46,7 @@
             <h2>Subscription Details</h2>
 
             <div class="subscription-id-box">
-                <label>Your Subscription ID</label>
+                <label>Your License Key</label>
                 <div class="subscription-id" id="subscription-id"><?php echo $subscriptionId; ?></div>
                 <button class="copy-btn" onclick="copySubscriptionId()">Copy to Clipboard</button>
             </div>
@@ -61,44 +61,14 @@
             </div>
         </div>
 
-        <div class="features-list">
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>Everything in Free</span>
-            </div>
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>Unlimited products</span>
-            </div>
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>Biometric login security</span>
-            </div>
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>Unlimited invoices & payments</span>
-            </div>
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>AI receipt scanning <span>(500/month)</span></span>
-            </div>
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>Predictive analytics</span>
-            </div>
-            <div class="feature-item">
-                <?= svg_icon('check-pricing') ?>
-                <span>Priority support</span>
-            </div>
-        </div>
-
         <div class="activation-steps">
             <h3>How to Activate Premium Features</h3>
             <ol>
                 <li>Open <strong>Argo Books</strong> on your computer</li>
                 <li>Click the blue <strong>Upgrade</strong> button in the top right corner</li>
-                <li>Enter your <strong>Subscription ID</strong> shown above</li>
-                <li>Click <strong>Activate</strong> and enjoy all premium features!</li>
+                <li>Click the <strong>Enter a Key</strong> button in the bottom right</li>
+                <li>Enter your <strong>License key</strong> as shown above</li>
+                <li>Click <strong>Verify Key</strong> and enjoy all premium features!</li>
             </ol>
         </div>
 

@@ -95,7 +95,9 @@ try {
             $deletedCount++;
 
         } catch (Exception $e) {
-            $pdo->rollBack();
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
             logPurge("Failed to delete account $username (#$userId): " . $e->getMessage(), 'ERROR');
             $failedCount++;
         }

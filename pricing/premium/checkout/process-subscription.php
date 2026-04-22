@@ -507,7 +507,9 @@ try {
     }
 
 } catch (PDOException $e) {
-    $pdo->rollBack();
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log("Premium Subscription Error: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([

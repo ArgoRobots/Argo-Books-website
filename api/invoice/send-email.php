@@ -62,7 +62,7 @@ if (is_rate_limited($rateLimitKey, 500, 3600, 'invoice_email')) {
     ]);
     exit;
 }
-record_rate_limit_attempt($rateLimitKey, 'invoice_email');
+record_rate_limit_attempt($rateLimitKey, 'invoice_email', 3600);
 
 // Get JSON input
 $input = file_get_contents('php://input');
@@ -81,8 +81,8 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 
 // Get default from email (makes 'from' field optional)
-$defaultFromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?? '';
-$defaultFromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?? 'Argo Books';
+$defaultFromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', '');
+$defaultFromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
 // Use defaults if not provided in request
 if (empty($data['from']) && !empty($defaultFromEmail)) {

@@ -9,6 +9,7 @@
 
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../smtp_mailer.php';
+require_once __DIR__ . '/../../rate_limit_helper.php';
 
 /**
  * Generate a cryptographically secure token (48-character hex string = 192 bits of entropy)
@@ -162,116 +163,6 @@ function authenticate_device_request(): ?string
         return null;
     }
     return hash('sha256', $deviceId);
-}
-
-/**
- * Read rate limits file with exclusive lock to prevent TOCTOU race conditions.
- * Returns the parsed array and keeps the file handle open for atomic updates.
- *
- * @param int $windowSeconds Time window for cleanup
- * @return array{rateLimits: array, handle: resource|null}
- */
-function read_rate_limits_locked(int $windowSeconds = 900): array
-{
-    $rateFile = __DIR__ . '/rate_limits.json';
-    $handle = fopen($rateFile, 'c+');
-    if (!$handle) {
-        return ['rateLimits' => [], 'handle' => null];
-    }
-
-    if (!flock($handle, LOCK_EX)) {
-        fclose($handle);
-        return ['rateLimits' => [], 'handle' => null];
-    }
-
-    $content = stream_get_contents($handle);
-    $rateLimits = json_decode($content, true) ?: [];
-
-    // Clean up expired entries
-    $now = time();
-    foreach ($rateLimits as $key => $data) {
-        if ($now - ($data['first_attempt'] ?? 0) > $windowSeconds) {
-            unset($rateLimits[$key]);
-        }
-    }
-
-    return ['rateLimits' => $rateLimits, 'handle' => $handle];
-}
-
-/**
- * Write rate limits and release the file lock.
- *
- * @param resource $handle File handle from read_rate_limits_locked
- * @param array $rateLimits Updated rate limits data
- */
-function write_rate_limits_unlock($handle, array $rateLimits): void
-{
-    ftruncate($handle, 0);
-    rewind($handle);
-    fwrite($handle, json_encode($rateLimits));
-    fflush($handle);
-    flock($handle, LOCK_UN);
-    fclose($handle);
-}
-
-/**
- * Check rate limiting for an IP address and action type.
- * Uses file locking to prevent race conditions under concurrent requests.
- *
- * @param string $ip Client IP address
- * @param int $maxAttempts Maximum attempts allowed (default: 10)
- * @param int $windowSeconds Time window in seconds (default: 900 = 15 minutes)
- * @param string $prefix Key prefix for different rate limit buckets (default: 'portal')
- * @return bool True if rate limit exceeded
- */
-function is_rate_limited(string $ip, int $maxAttempts = 10, int $windowSeconds = 900, string $prefix = 'portal'): bool
-{
-    $result = read_rate_limits_locked($windowSeconds);
-    $rateLimits = $result['rateLimits'];
-    $handle = $result['handle'];
-
-    $key = $prefix . '_' . hash('sha256', $ip);
-    $isLimited = isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts;
-
-    if ($handle) {
-        // Write back cleaned data and release lock
-        write_rate_limits_unlock($handle, $rateLimits);
-    }
-
-    return $isLimited;
-}
-
-/**
- * Record a rate-limited action attempt for an IP address.
- * Uses file locking to prevent race conditions under concurrent requests.
- *
- * @param string $ip Client IP address
- * @param string $prefix Key prefix for different rate limit buckets (default: 'portal')
- */
-function record_rate_limit_attempt(string $ip, string $prefix = 'portal'): void
-{
-    $windowSeconds = 900;
-    $result = read_rate_limits_locked($windowSeconds);
-    $rateLimits = $result['rateLimits'];
-    $handle = $result['handle'];
-
-    if (!$handle) {
-        return;
-    }
-
-    $now = time();
-    $key = $prefix . '_' . hash('sha256', $ip);
-
-    if (!isset($rateLimits[$key])) {
-        $rateLimits[$key] = [
-            'count' => 1,
-            'first_attempt' => $now
-        ];
-    } else {
-        $rateLimits[$key]['count']++;
-    }
-
-    write_rate_limits_unlock($handle, $rateLimits);
 }
 
 /**
@@ -601,7 +492,7 @@ function require_method($allowed): void
 
     // Handle preflight OPTIONS
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        $allowedOrigin = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
+        $allowedOrigin = env('SITE_URL', 'https://argorobots.com');
         header('Access-Control-Allow-Origin: ' . $allowedOrigin);
         header('Access-Control-Allow-Methods: ' . implode(', ', $allowed) . ', OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
@@ -619,7 +510,7 @@ function require_method($allowed): void
  */
 function set_portal_headers(): void
 {
-    $originSource = $_ENV['PORTAL_BASE_URL'] ?? $_ENV['APP_URL'] ?? 'https://argorobots.com';
+    $originSource = env('SITE_URL', 'https://argorobots.com');
     $parsed = parse_url($originSource);
     $allowedOrigin = ($parsed['scheme'] ?? 'https') . '://' . ($parsed['host'] ?? 'argorobots.com');
     if (!empty($parsed['port'])) {
@@ -629,29 +520,6 @@ function set_portal_headers(): void
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, X-Api-Key, X-License-Key, X-Device-Id, Authorization');
     header('X-Content-Type-Options: nosniff');
-}
-
-/**
- * Get the client IP address
- *
- * @return string Client IP
- */
-function get_client_ip(): string
-{
-    $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-
-    // Only trust X-Forwarded-For when the request comes from a known trusted proxy.
-    // Configure via environment: TRUSTED_PROXY_IPS="203.0.113.10,203.0.113.11"
-    $trustedProxyConfig = $_ENV['TRUSTED_PROXY_IPS'] ?? getenv('TRUSTED_PROXY_IPS') ?: '';
-    if (!empty($trustedProxyConfig) && !empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $trustedProxies = array_map('trim', explode(',', $trustedProxyConfig));
-        if (in_array($remoteAddr, $trustedProxies, true)) {
-            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            return trim($ips[0]);
-        }
-    }
-
-    return $remoteAddr;
 }
 
 /**
@@ -696,18 +564,28 @@ function send_invoice_notification(array $params): array
     $formattedDueDate = $dueDate ? date('F j, Y', strtotime($dueDate)) : '';
     $subject = "Invoice {$invoiceId} from {$companyName}";
 
-    $html = build_invoice_email_html([
-        'customerName' => $customerName,
-        'companyName' => $companyName,
-        'invoiceId' => $invoiceId,
-        'formattedAmount' => $formattedAmount,
-        'formattedDueDate' => $formattedDueDate,
-        'invoiceUrl' => $invoiceUrl,
+    $safeCompany = htmlspecialchars($companyName);
+    $detailRows = [
+        ['Invoice', htmlspecialchars($invoiceId), 'padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;'],
+        ['Amount Due', htmlspecialchars($formattedAmount), 'padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;'],
+    ];
+    if (!empty($formattedDueDate)) {
+        $detailRows[] = ['Due Date', htmlspecialchars($formattedDueDate)];
+    }
+
+    $html = build_portal_email_html([
+        'headerGradient' => 'linear-gradient(135deg, #2563eb, #1e40af)',
+        'headerTitle' => $companyName,         // escaped by helper
+        'greetingName' => $customerName,       // escaped by helper
+        'introHtml' => 'You have a new invoice from <strong>' . $safeCompany . '</strong>.',
+        'detailRows' => $detailRows,
+        'ctaButton' => ['url' => $invoiceUrl, 'text' => 'View & Pay Invoice', 'color' => '#2563eb'],
+        'closingHtml' => 'If you have any questions about this invoice, please contact ' . $safeCompany . ' directly.',
     ]);
 
     try {
-        $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
-        $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
+        $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
+        $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
         $mailer = create_smtp_mailer();
         if ($mailer) {
@@ -788,18 +666,28 @@ function send_payment_confirmation(array $params): array
     ];
     $methodLabel = $methodLabels[$paymentMethod] ?? ucfirst($paymentMethod);
 
-    $html = build_payment_confirmation_email_html([
-        'customerName' => $customerName,
-        'companyName' => $companyName,
-        'invoiceId' => $invoiceId,
-        'formattedAmount' => $formattedAmount,
-        'referenceNumber' => $referenceNumber,
-        'paymentMethod' => $methodLabel,
+    $safeCompany = htmlspecialchars($companyName);
+    $detailRows = [
+        ['Invoice', htmlspecialchars($invoiceId), 'padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;'],
+        ['Amount Paid', htmlspecialchars($formattedAmount), 'padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;'],
+        ['Payment Method', htmlspecialchars($methodLabel)],
+        ['Reference', htmlspecialchars($referenceNumber), 'padding: 8px 0; text-align: right; font-size: 14px; font-family: monospace; color: #111827;'],
+        ['Date', date('F j, Y')],
+    ];
+
+    $html = build_portal_email_html([
+        'headerGradient' => 'linear-gradient(135deg, #059669, #047857)',
+        'headerTitle' => 'Payment Confirmed',
+        'greetingName' => $customerName,       // escaped by helper
+        'introHtml' => 'Your payment to <strong>' . $safeCompany . '</strong> has been received. Here are the details:',
+        'detailRows' => $detailRows,
+        'ctaButton' => null,
+        'closingHtml' => 'If you have any questions about this payment, please contact ' . $safeCompany . ' directly.',
     ]);
 
     try {
-        $fromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
-        $fromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
+        $fromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
+        $fromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
 
         $mailer = create_smtp_mailer();
         if ($mailer) {
@@ -836,184 +724,110 @@ function send_payment_confirmation(array $params): array
 }
 
 /**
- * Build the HTML for a payment confirmation email.
- * Uses table-based layout with inline styles for maximum email client compatibility.
+ * Build the HTML shell for a portal customer email (invoice notification or
+ * payment confirmation). Uses table-based layout with inline styles for
+ * maximum email client compatibility.
+ *
+ * @param array $params Keys:
+ *   - headerGradient: string  CSS gradient for the header bar
+ *   - headerTitle:    string  Title shown in the header bar
+ *   - greetingName:   string  Optional name to append after "Hi"
+ *   - introHtml:      string  Intro paragraph HTML (after greeting)
+ *   - detailRows:     array   List of [label, valueHtml, valueStyle?] rows
+ *   - ctaButton:      array|null  ['url' => ..., 'text' => ..., 'color' => ...]
+ *   - closingHtml:    string  Closing paragraph HTML (above footer)
  */
-function build_payment_confirmation_email_html(array $params): string
+function build_portal_email_html(array $params): string
 {
-    $customerName = htmlspecialchars($params['customerName'] ?? '');
-    $companyName = htmlspecialchars($params['companyName'] ?? '');
-    $invoiceId = htmlspecialchars($params['invoiceId'] ?? '');
-    $formattedAmount = htmlspecialchars($params['formattedAmount'] ?? '');
-    $referenceNumber = htmlspecialchars($params['referenceNumber'] ?? '');
-    $paymentMethod = htmlspecialchars($params['paymentMethod'] ?? '');
+    // Plain-text params — escaped by the helper. Callers should pass raw values.
+    $headerTitle  = htmlspecialchars((string)($params['headerTitle'] ?? ''), ENT_QUOTES, 'UTF-8');
+    $greetingName = htmlspecialchars((string)($params['greetingName'] ?? ''), ENT_QUOTES, 'UTF-8');
 
-    return '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <!-- Header bar -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #059669, #047857); padding: 28px 32px; text-align: center;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 700;">Payment Confirmed</h1>
-                        </td>
-                    </tr>
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding: 32px;">
-                            <p style="margin: 0 0 20px; font-size: 16px; color: #374151; line-height: 1.5;">
-                                Hi' . ($customerName ? ' ' . $customerName : '') . ',
-                            </p>
-                            <p style="margin: 0 0 24px; font-size: 16px; color: #374151; line-height: 1.5;">
-                                Your payment to <strong>' . $companyName . '</strong> has been received. Here are the details:
-                            </p>
+    // HTML-by-design params — callers must sanitize/escape any interpolated
+    // user data before passing in. Named with *Html to flag the contract.
+    $introHtml   = (string)($params['introHtml'] ?? '');
+    $closingHtml = (string)($params['closingHtml'] ?? '');
 
-                            <!-- Payment summary card -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 28px;">
-                                <tr>
-                                    <td style="padding: 20px;">
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Invoice</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;">' . $invoiceId . '</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Amount Paid</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">' . $formattedAmount . '</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Payment Method</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; color: #111827;">' . $paymentMethod . '</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Reference</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; font-family: monospace; color: #111827;">' . $referenceNumber . '</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Date</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; color: #111827;">' . date('F j, Y') . '</td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
+    // Controlled CSS values — not user input.
+    $headerGradient = $params['headerGradient'] ?? 'linear-gradient(135deg, #2563eb, #1e40af)';
 
-                            <p style="margin: 0; font-size: 13px; color: #9ca3af; line-height: 1.5; text-align: center;">
-                                If you have any questions about this payment, please contact ' . $companyName . ' directly.
-                            </p>
-                        </td>
-                    </tr>
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 20px 32px; border-top: 1px solid #e5e7eb; text-align: center;">
-                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                Powered by <a href="https://argorobots.com" style="color: #2563eb; text-decoration: none;">Argo Books</a>
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>';
-}
+    $detailRows = $params['detailRows'] ?? [];
+    $ctaButton  = $params['ctaButton'] ?? null;
 
-/**
- * Build the HTML for a generic invoice notification email.
- * Uses table-based layout with inline styles for maximum email client compatibility.
- */
-function build_invoice_email_html(array $params): string
-{
-    $customerName = htmlspecialchars($params['customerName'] ?? '');
-    $companyName = htmlspecialchars($params['companyName'] ?? '');
-    $invoiceId = htmlspecialchars($params['invoiceId'] ?? '');
-    $formattedAmount = htmlspecialchars($params['formattedAmount'] ?? '');
-    $formattedDueDate = htmlspecialchars($params['formattedDueDate'] ?? '');
-    $invoiceUrl = htmlspecialchars($params['invoiceUrl'] ?? '');
-
-    $dueDateRow = '';
-    if (!empty($formattedDueDate)) {
-        $dueDateRow = '
-                        <tr>
-                            <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Due Date</td>
-                            <td style="padding: 8px 0; text-align: right; font-size: 14px; color: #111827;">' . $formattedDueDate . '</td>
-                        </tr>';
+    $rowsHtml = '';
+    foreach ($detailRows as $row) {
+        // Row label is semantically plain text — escape here.
+        // Row value may be pre-formatted HTML (e.g., bold amounts) — callers must escape.
+        $label = htmlspecialchars((string)($row[0] ?? ''), ENT_QUOTES, 'UTF-8');
+        $value = (string)($row[1] ?? '');
+        $valueStyle = $row[2] ?? 'padding: 8px 0; text-align: right; font-size: 14px; color: #111827;';
+        $rowsHtml .= '
+                                            <tr>
+                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">' . $label . '</td>
+                                                <td style="' . $valueStyle . '">' . $value . '</td>
+                                            </tr>';
     }
 
-    return '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <!-- Header bar -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #2563eb, #1e40af); padding: 28px 32px; text-align: center;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 700;">' . $companyName . '</h1>
-                        </td>
-                    </tr>
-                    <!-- Body -->
-                    <tr>
-                        <td style="padding: 32px;">
-                            <p style="margin: 0 0 20px; font-size: 16px; color: #374151; line-height: 1.5;">
-                                Hi' . ($customerName ? ' ' . $customerName : '') . ',
-                            </p>
-                            <p style="margin: 0 0 24px; font-size: 16px; color: #374151; line-height: 1.5;">
-                                You have a new invoice from <strong>' . $companyName . '</strong>.
-                            </p>
-
-                            <!-- Invoice summary card -->
-                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 28px;">
-                                <tr>
-                                    <td style="padding: 20px;">
-                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Invoice</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;">' . $invoiceId . '</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Amount Due</td>
-                                                <td style="padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;">' . $formattedAmount . '</td>
-                                            </tr>' . $dueDateRow . '
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- CTA Button -->
+    $ctaHtml = '';
+    if ($ctaButton && !empty($ctaButton['url']) && !empty($ctaButton['text'])) {
+        $ctaColor = $ctaButton['color'] ?? '#2563eb';
+        $ctaHtml = '
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td align="center">
-                                        <a href="' . $invoiceUrl . '" style="display: inline-block; padding: 14px 40px; background-color: #2563eb; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px;">
-                                            View &amp; Pay Invoice
+                                        <a href="' . htmlspecialchars($ctaButton['url'], ENT_QUOTES, 'UTF-8') . '" style="display: inline-block; padding: 14px 40px; background-color: ' . $ctaColor . '; color: #ffffff; font-size: 16px; font-weight: 600; text-decoration: none; border-radius: 6px;">
+                                            ' . htmlspecialchars($ctaButton['text'], ENT_QUOTES, 'UTF-8') . '
                                         </a>
                                     </td>
                                 </tr>
-                            </table>
+                            </table>';
+    }
 
+    $greeting = 'Hi' . ($greetingName !== '' ? ' ' . $greetingName : '') . ',';
+
+    return '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <tr>
+                        <td style="background: ' . $headerGradient . '; padding: 28px 32px; text-align: center;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 20px; font-weight: 700;">' . $headerTitle . '</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 20px; font-size: 16px; color: #374151; line-height: 1.5;">
+                                ' . $greeting . '
+                            </p>
+                            <p style="margin: 0 0 24px; font-size: 16px; color: #374151; line-height: 1.5;">
+                                ' . $introHtml . '
+                            </p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; margin-bottom: 28px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">' . $rowsHtml . '
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+' . $ctaHtml . '
                             <p style="margin: 28px 0 0; font-size: 13px; color: #9ca3af; line-height: 1.5; text-align: center;">
-                                If you have any questions about this invoice, please contact ' . $companyName . ' directly.
+                                ' . $closingHtml . '
                             </p>
                         </td>
                     </tr>
-                    <!-- Footer -->
                     <tr>
                         <td style="padding: 20px 32px; border-top: 1px solid #e5e7eb; text-align: center;">
                             <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                Powered by <a href="https://argorobots.com" style="color: #2563eb; text-decoration: none;">Argo Books</a>
+                                Powered by <a href="' . site_url() . '" style="color: #2563eb; text-decoration: none;">Argo Books</a>
                             </p>
                         </td>
                     </tr>

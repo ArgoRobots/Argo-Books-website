@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../db_connect.php';
+require_once '../rate_limit_helper.php';
 require_once 'settings/2fa.php';
 
 // Check if user is already logged in
@@ -30,7 +31,6 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
             } else if (verify_2fa_code($secret, $verification_code)) {
                 // Code is valid, complete login
                 session_regenerate_id(true);
-                unset($_SESSION['admin_login_attempts']);
                 $_SESSION['awaiting_2fa'] = false;
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $username;
@@ -52,15 +52,9 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
 }
 // Process login form submission
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    // Rate limit login attempts (max 5 per 15 minutes)
-    if (!isset($_SESSION['admin_login_attempts'])) {
-        $_SESSION['admin_login_attempts'] = [];
-    }
-    $now = time();
-    $_SESSION['admin_login_attempts'] = array_filter($_SESSION['admin_login_attempts'], function ($t) use ($now) {
-        return ($now - $t) < 900;
-    });
-    if (count($_SESSION['admin_login_attempts']) >= 5) {
+    // Rate limit login attempts (max 5 per 15 minutes, per IP, flat-file backed)
+    $clientIp = get_client_ip();
+    if (is_rate_limited($clientIp, 5, 900, 'admin_login')) {
         $error = 'Too many login attempts. Please wait 15 minutes before trying again.';
     }
 
@@ -72,7 +66,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
 
     if (empty($error)) {
-        $_SESSION['admin_login_attempts'][] = $now;
         $db = get_db_connection();
         $stmt = $db->prepare('SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?)');
         $stmt->bind_param('s', $username);
@@ -91,7 +84,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             } else {
                 // No 2FA, complete login
                 session_regenerate_id(true);
-                unset($_SESSION['admin_login_attempts']);
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $actual_username;
 
@@ -104,9 +96,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 exit;
             }
         } else {
+            // Count this failed attempt only on authentication failure
+            record_rate_limit_attempt($clientIp, 'admin_login');
             $error = 'Invalid username or password.';
         }
-    } // end rate limit check
+    }
 }
 ?>
 <!DOCTYPE html>

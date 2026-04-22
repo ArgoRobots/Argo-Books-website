@@ -65,7 +65,7 @@ $companyId = $oauthState['company_id'];
 $companyName = $oauthState['company_name'];
 $stateId = $oauthState['state_id'];
 $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
-$callbackBase = rtrim($_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com', '/');
+$callbackBase = rtrim(env('SITE_URL', 'https://argorobots.com'), '/');
 
 $isRefresh = isset($_GET['refresh']);
 
@@ -269,7 +269,7 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
         : 'https://connect.squareupsandbox.com';
 
     // Build the redirect_uri (must match the one sent in the authorize request)
-    $callbackBase = rtrim($_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com', '/');
+    $callbackBase = rtrim(env('SITE_URL', 'https://argorobots.com'), '/');
     $redirectUri = "$callbackBase/api/portal/connect/callback/square";
 
     // Exchange authorization code for access token

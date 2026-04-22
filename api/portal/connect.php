@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 function initiate_connect(array $company, string $provider): void
 {
     $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
-    $callbackBase = rtrim($_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com', '/');
+    $callbackBase = rtrim(env('SITE_URL', 'https://argorobots.com'), '/');
     $callbackUrl = "$callbackBase/api/portal/connect/callback/$provider";
 
     // Generate CSRF state token

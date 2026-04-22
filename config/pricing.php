@@ -185,15 +185,12 @@ function calculate_invoice_processing_fee($amount, $currency = 'CAD') {
  */
 function _convert_fixed_fee_to_currency($amountCAD, $currency) {
     try {
-        $db = get_db_connection();
-        $stmt = $db->prepare(
+        global $pdo;
+        $stmt = $pdo->prepare(
             'SELECT rates FROM exchange_rates WHERE rate_date <= CURDATE() ORDER BY rate_date DESC LIMIT 1'
         );
         $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-        $stmt->close();
-        $db->close();
+        $row = $stmt->fetch();
 
         if (!$row || empty($row['rates'])) {
             return $amountCAD; // Fallback: use same numeric value

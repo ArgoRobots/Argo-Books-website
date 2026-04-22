@@ -201,13 +201,10 @@ function handle_square_checkout(array $invoice, int $amountCents, string $curren
 
     // For Square with OAuth, the payment is processed using the business's access token.
     // Get the encrypted access token from the company record.
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT square_access_token, square_location_id FROM portal_companies WHERE id = ? LIMIT 1');
-    $stmt->bind_param('i', $invoice['company_id']);
-    $stmt->execute();
-    $company = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-    $db->close();
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT square_access_token, square_location_id FROM portal_companies WHERE id = ? LIMIT 1');
+    $stmt->execute([$invoice['company_id']]);
+    $company = $stmt->fetch();
 
     if (empty($company['square_access_token'])) {
         send_error_response(400, 'Square is not properly configured for this business.', 'SQUARE_NOT_CONFIGURED');

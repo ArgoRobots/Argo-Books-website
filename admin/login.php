@@ -37,10 +37,8 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
                 unset($_SESSION['temp_username']);
 
                 // Update last login time
-                $db = get_db_connection();
-                $stmt = $db->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
-                $stmt->bind_param('s', $username);
-                $stmt->execute();
+                $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
+                $stmt->execute([$username]);
 
                 header('Location: index.php');
                 exit;
@@ -66,12 +64,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     }
 
     if (empty($error)) {
-        $db = get_db_connection();
-        $stmt = $db->prepare('SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?)');
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
+        $stmt = $pdo->prepare('SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?)');
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password_hash'])) {
             $actual_username = $user['username']; // Get actual username with correct case
@@ -88,9 +83,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 $_SESSION['admin_username'] = $actual_username;
 
                 // Update last login time
-                $stmt = $db->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
-                $stmt->bind_param('s', $actual_username);
-                $stmt->execute();
+                $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
+                $stmt->execute([$actual_username]);
 
                 header('Location: index.php');
                 exit;

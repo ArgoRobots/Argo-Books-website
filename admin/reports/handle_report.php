@@ -32,16 +32,11 @@ if (!in_array($action, ['delete', 'ban', 'dismiss', 'reset_username', 'clear_bio
 }
 
 try {
-    $db = get_db_connection();
-
     // Get admin user ID from community_users table (may be null if admin is only in admin_users)
-    $stmt = $db->prepare('SELECT id FROM community_users WHERE email = ? AND role = "admin" LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id FROM community_users WHERE email = ? AND role = "admin" LIMIT 1');
     $admin_email = $_SESSION['admin_email'] ?? '';
-    $stmt->bind_param('s', $admin_email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $admin_user = $result->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$admin_email]);
+    $admin_user = $stmt->fetch();
 
     $admin_user_id = $admin_user ? $admin_user['id'] : null;
 
@@ -57,24 +52,19 @@ try {
 
         // Delete the content
         if ($content_type === 'post') {
-            $stmt = $db->prepare('DELETE FROM community_posts WHERE id = ?');
+            $stmt = $pdo->prepare('DELETE FROM community_posts WHERE id = ?');
         } else {
-            $stmt = $db->prepare('DELETE FROM community_comments WHERE id = ?');
+            $stmt = $pdo->prepare('DELETE FROM community_comments WHERE id = ?');
         }
-        $stmt->bind_param('i', $content_id);
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$stmt->execute([$content_id])) {
             echo json_encode(['success' => false, 'message' => 'Failed to delete content']);
             exit;
         }
-        $stmt->close();
 
         // Mark report as resolved
-        $stmt = $db->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "content_deleted" WHERE id = ?');
-        $stmt->bind_param('ii', $admin_user_id, $report_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "content_deleted" WHERE id = ?');
+        $stmt->execute([$admin_user_id, $report_id]);
 
         echo json_encode(['success' => true, 'message' => 'Content deleted successfully']);
 
@@ -116,12 +106,9 @@ try {
         // For permanent, expires_at remains null
 
         // Get user details for email
-        $stmt = $db->prepare('SELECT username, email FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT username, email FROM community_users WHERE id = ?');
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             echo json_encode(['success' => false, 'message' => 'User not found']);
@@ -130,28 +117,24 @@ try {
 
         // Insert ban record (banned_by can be NULL if admin is not in community_users)
         if ($expires_at) {
-            $stmt = $db->prepare('INSERT INTO user_bans (user_id, banned_by, ban_reason, ban_duration, expires_at) VALUES (?, ?, ?, ?, ?)');
-            $stmt->bind_param('iisss', $user_id, $admin_user_id, $ban_reason, $ban_duration, $expires_at);
+            $stmt = $pdo->prepare('INSERT INTO user_bans (user_id, banned_by, ban_reason, ban_duration, expires_at) VALUES (?, ?, ?, ?, ?)');
+            $ban_params = [$user_id, $admin_user_id, $ban_reason, $ban_duration, $expires_at];
         } else {
-            $stmt = $db->prepare('INSERT INTO user_bans (user_id, banned_by, ban_reason, ban_duration) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('iiss', $user_id, $admin_user_id, $ban_reason, $ban_duration);
+            $stmt = $pdo->prepare('INSERT INTO user_bans (user_id, banned_by, ban_reason, ban_duration) VALUES (?, ?, ?, ?)');
+            $ban_params = [$user_id, $admin_user_id, $ban_reason, $ban_duration];
         }
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$stmt->execute($ban_params)) {
             echo json_encode(['success' => false, 'message' => 'Failed to ban user']);
             exit;
         }
-        $stmt->close();
 
         // Mark current report as resolved
-        $stmt = $db->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "user_banned" WHERE id = ?');
-        $stmt->bind_param('ii', $admin_user_id, $report_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "user_banned" WHERE id = ?');
+        $stmt->execute([$admin_user_id, $report_id]);
 
         // Mark all other pending reports for this user as resolved
-        $stmt = $db->prepare('UPDATE content_reports r
+        $stmt = $pdo->prepare('UPDATE content_reports r
             LEFT JOIN community_posts p ON r.content_type = "post" AND r.content_id = p.id
             LEFT JOIN community_comments c ON r.content_type = "comment" AND r.content_id = c.id
             SET r.status = "resolved",
@@ -165,10 +148,8 @@ try {
                 (r.content_type = "comment" AND c.user_id = ?) OR
                 (r.content_type = "user" AND r.content_id = ?)
             )');
-        $stmt->bind_param('iiiii', $admin_user_id, $report_id, $user_id, $user_id, $user_id);
-        $stmt->execute();
-        $affected_reports = $stmt->affected_rows;
-        $stmt->close();
+        $stmt->execute([$admin_user_id, $report_id, $user_id, $user_id, $user_id]);
+        $affected_reports = $stmt->rowCount();
 
         // Send ban notification email
         send_ban_notification_email($user['email'], $user['username'], $ban_reason, $ban_duration, $expires_at);
@@ -182,14 +163,11 @@ try {
 
     } elseif ($action === 'dismiss') {
         // Mark report as dismissed
-        $stmt = $db->prepare('UPDATE content_reports SET status = "dismissed", resolved_by = ?, resolved_at = NOW(), resolution_action = "dismissed" WHERE id = ?');
-        $stmt->bind_param('ii', $admin_user_id, $report_id);
+        $stmt = $pdo->prepare('UPDATE content_reports SET status = "dismissed", resolved_by = ?, resolved_at = NOW(), resolution_action = "dismissed" WHERE id = ?');
 
-        if ($stmt->execute()) {
-            $stmt->close();
+        if ($stmt->execute([$admin_user_id, $report_id])) {
             echo json_encode(['success' => true, 'message' => 'Report dismissed successfully']);
         } else {
-            $stmt->close();
             echo json_encode(['success' => false, 'message' => 'Failed to dismiss report']);
             exit;
         }
@@ -205,12 +183,9 @@ try {
         }
 
         // Get user details before making changes
-        $stmt = $db->prepare('SELECT username, email FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT username, email FROM community_users WHERE id = ?');
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             echo json_encode(['success' => false, 'message' => 'User not found']);
@@ -226,13 +201,11 @@ try {
         // Check if username already exists (very unlikely but let's be safe)
         $attempts = 0;
         while ($attempts < 5) {
-            $stmt = $db->prepare('SELECT id FROM community_users WHERE username = ?');
-            $stmt->bind_param('s', $random_username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $stmt->close();
+            $stmt = $pdo->prepare('SELECT id FROM community_users WHERE username = ?');
+            $stmt->execute([$random_username]);
+            $existing = $stmt->fetch();
 
-            if ($result->num_rows === 0) {
+            if ($existing === false) {
                 break;
             }
 
@@ -241,32 +214,23 @@ try {
         }
 
         // Update username in community_users table
-        $stmt = $db->prepare('UPDATE community_users SET username = ? WHERE id = ?');
-        $stmt->bind_param('si', $random_username, $user_id);
+        $stmt = $pdo->prepare('UPDATE community_users SET username = ? WHERE id = ?');
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$stmt->execute([$random_username, $user_id])) {
             echo json_encode(['success' => false, 'message' => 'Failed to reset username']);
             exit;
         }
-        $stmt->close();
 
         // Update username across all posts and comments
-        $stmt = $db->prepare('UPDATE community_posts SET user_name = ? WHERE user_id = ?');
-        $stmt->bind_param('si', $random_username, $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE community_posts SET user_name = ? WHERE user_id = ?');
+        $stmt->execute([$random_username, $user_id]);
 
-        $stmt = $db->prepare('UPDATE community_comments SET user_name = ? WHERE user_id = ?');
-        $stmt->bind_param('si', $random_username, $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE community_comments SET user_name = ? WHERE user_id = ?');
+        $stmt->execute([$random_username, $user_id]);
 
         // Mark report as resolved
-        $stmt = $db->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "username_reset" WHERE id = ?');
-        $stmt->bind_param('ii', $admin_user_id, $report_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "username_reset" WHERE id = ?');
+        $stmt->execute([$admin_user_id, $report_id]);
 
         // Send email notification to user
         send_username_reset_email($user_email, $old_username, $random_username, $violation_type, $additional_details);
@@ -284,12 +248,9 @@ try {
         }
 
         // Get user details before making changes
-        $stmt = $db->prepare('SELECT username, email FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT username, email FROM community_users WHERE id = ?');
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             echo json_encode(['success' => false, 'message' => 'User not found']);
@@ -300,21 +261,16 @@ try {
         $user_email = $user['email'];
 
         // Clear the bio
-        $stmt = $db->prepare('UPDATE community_users SET bio = NULL WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
+        $stmt = $pdo->prepare('UPDATE community_users SET bio = NULL WHERE id = ?');
 
-        if (!$stmt->execute()) {
-            $stmt->close();
+        if (!$stmt->execute([$user_id])) {
             echo json_encode(['success' => false, 'message' => 'Failed to clear bio']);
             exit;
         }
-        $stmt->close();
 
         // Mark report as resolved
-        $stmt = $db->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "bio_cleared" WHERE id = ?');
-        $stmt->bind_param('ii', $admin_user_id, $report_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE content_reports SET status = "resolved", resolved_by = ?, resolved_at = NOW(), resolution_action = "bio_cleared" WHERE id = ?');
+        $stmt->execute([$admin_user_id, $report_id]);
 
         // Send email notification to user
         send_bio_cleared_email($user_email, $username, $violation_type, $additional_details);

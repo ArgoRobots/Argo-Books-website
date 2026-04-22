@@ -30,29 +30,23 @@ if (empty($state) || empty($code)) {
 }
 
 // Validate state token against google_oauth_states table
-$db = get_db_connection();
-$stmt = $db->prepare(
+$stmt = $pdo->prepare(
     'SELECT device_id_hash FROM google_oauth_states
      WHERE state_token = ? AND expires_at > NOW()
      LIMIT 1'
 );
-$stmt->bind_param('s', $state);
-$stmt->execute();
-$row = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+$stmt->execute([$state]);
+$row = $stmt->fetch();
 
 if (!$row) {
-    $db->close();
     showResult(false, 'Invalid or expired authorization state. Please try again from the app.');
 }
 
 $deviceIdHash = $row['device_id_hash'];
 
 // Clean up used state token
-$stmt = $db->prepare('DELETE FROM google_oauth_states WHERE state_token = ?');
-$stmt->bind_param('s', $state);
-$stmt->execute();
-$stmt->close();
+$stmt = $pdo->prepare('DELETE FROM google_oauth_states WHERE state_token = ?');
+$stmt->execute([$state]);
 
 // Exchange authorization code for tokens
 $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? '';
@@ -81,7 +75,6 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
 
 if ($response === false || $httpCode !== 200) {
-    $db->close();
     error_log('Google token exchange failed (HTTP ' . $httpCode . '): ' . ($response ?: $curlError));
     showResult(false, 'Failed to complete Google authorization. Please try again.');
 }
@@ -92,7 +85,6 @@ $refreshToken = $tokenData['refresh_token'] ?? '';
 $expiresIn = $tokenData['expires_in'] ?? 3600;
 
 if (empty($accessToken)) {
-    $db->close();
     showResult(false, 'Invalid token response from Google.');
 }
 
@@ -102,7 +94,7 @@ $encryptedRefresh = !empty($refreshToken) ? google_encrypt($refreshToken) : null
 $expiresAt = date('Y-m-d H:i:s', time() + $expiresIn);
 
 // Store tokens in database
-$stmt = $db->prepare(
+$stmt = $pdo->prepare(
     'INSERT INTO google_oauth_tokens (device_id_hash, google_access_token, google_refresh_token, google_token_expires)
      VALUES (?, ?, ?, ?)
      ON DUPLICATE KEY UPDATE
@@ -110,10 +102,7 @@ $stmt = $db->prepare(
         google_refresh_token = COALESCE(VALUES(google_refresh_token), google_refresh_token),
         google_token_expires = VALUES(google_token_expires)'
 );
-$stmt->bind_param('ssss', $deviceIdHash, $encryptedAccess, $encryptedRefresh, $expiresAt);
-$stmt->execute();
-$stmt->close();
-$db->close();
+$stmt->execute([$deviceIdHash, $encryptedAccess, $encryptedRefresh, $expiresAt]);
 
 showResult(true, 'Google Sheets connected successfully!');
 

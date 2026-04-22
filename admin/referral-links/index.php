@@ -14,8 +14,6 @@ $page_description = "Create and manage referral links to track ad/sponsor perfor
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $db = get_db_connection();
-
     if (isset($_POST['action'])) {
         if ($_POST['action'] === 'create') {
             $source_code = trim($_POST['source_code']);
@@ -23,10 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $description = trim($_POST['description']);
             $target_url = trim($_POST['target_url']);
 
-            $stmt = $db->prepare('INSERT INTO referral_links (source_code, name, description, target_url) VALUES (?, ?, ?, ?)');
-            $stmt->bind_param('ssss', $source_code, $name, $description, $target_url);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('INSERT INTO referral_links (source_code, name, description, target_url) VALUES (?, ?, ?, ?)');
+            $stmt->execute([$source_code, $name, $description, $target_url]);
 
             $_SESSION['success_message'] = 'Referral link created successfully!';
             header('Location: index.php');
@@ -38,10 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $target_url = trim($_POST['target_url']);
             $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-            $stmt = $db->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ?, is_active = ? WHERE id = ?');
-            $stmt->bind_param('sssii', $name, $description, $target_url, $is_active, $id);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ?, is_active = ? WHERE id = ?');
+            $stmt->execute([$name, $description, $target_url, $is_active, $id]);
 
             $_SESSION['success_message'] = 'Referral link updated successfully!';
             header('Location: index.php');
@@ -49,10 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($_POST['action'] === 'delete') {
             $id = (int)$_POST['id'];
 
-            $stmt = $db->prepare('DELETE FROM referral_links WHERE id = ?');
-            $stmt->bind_param('i', $id);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('DELETE FROM referral_links WHERE id = ?');
+            $stmt->execute([$id]);
 
             $_SESSION['success_message'] = 'Referral link deleted successfully!';
             header('Location: index.php');
@@ -64,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Function to get all referral links
 function get_referral_links()
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
         SELECT
             rl.*,
@@ -75,10 +67,10 @@ function get_referral_links()
         GROUP BY rl.id
         ORDER BY total_visits DESC, rl.created_at DESC";
 
-    $result = $db->query($query);
+    $stmt = $pdo->query($query);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
@@ -88,7 +80,7 @@ function get_referral_links()
 // Function to get referral visits by source
 function get_visits_by_source($limit = 10)
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
         SELECT
             source_code,
@@ -100,24 +92,21 @@ function get_visits_by_source($limit = 10)
         ORDER BY visit_count DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
-    $stmt->close();
     return $data;
 }
 
 // Function to get visits over time by source
 function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     $sql_period = '';
     $display_format = '';
@@ -149,8 +138,8 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
             ORDER BY period DESC
             LIMIT ?";
 
-        $stmt = $db->prepare($query);
-        $stmt->bind_param('si', $source_code, $limit);
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$source_code, $limit]);
     } else {
         $query = "
             SELECT
@@ -163,26 +152,22 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
             ORDER BY period DESC
             LIMIT ?";
 
-        $stmt = $db->prepare($query);
-        $stmt->bind_param('i', $limit);
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([$limit]);
     }
 
-    $stmt->execute();
-    $result = $stmt->get_result();
-
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
-    $stmt->close();
     return $data;
 }
 
 // Function to get geographic distribution
 function get_referral_countries($limit = 10)
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
         SELECT
             country_code,
@@ -194,17 +179,14 @@ function get_referral_countries($limit = 10)
         ORDER BY visit_count DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
-    $stmt->close();
     return $data;
 }
 

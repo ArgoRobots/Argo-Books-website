@@ -19,10 +19,9 @@ if (!$company) {
 }
 
 $companyId = $company['id'];
-$db = get_db_connection();
 
 // Get invoice and payment statistics
-$stmt = $db->prepare(
+$stmt = $pdo->prepare(
     'SELECT
          COUNT(*) as total_invoices,
          SUM(CASE WHEN status IN ("sent", "viewed", "partial", "overdue", "pending") THEN 1 ELSE 0 END) as active_invoices,
@@ -31,25 +30,21 @@ $stmt = $db->prepare(
      FROM portal_invoices
      WHERE company_id = ?'
 );
-$stmt->bind_param('i', $companyId);
-$stmt->execute();
-$invoiceStats = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+$stmt->execute([$companyId]);
+$invoiceStats = $stmt->fetch();
 
 // Get unsynced payment count
-$stmt = $db->prepare(
+$stmt = $pdo->prepare(
     'SELECT COUNT(*) as unsynced_count,
             COALESCE(SUM(amount), 0) as unsynced_amount
      FROM portal_payments
      WHERE company_id = ? AND synced_to_argo = 0 AND status = "completed"'
 );
-$stmt->bind_param('i', $companyId);
-$stmt->execute();
-$syncStats = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+$stmt->execute([$companyId]);
+$syncStats = $stmt->fetch();
 
 // Get this month's online revenue
-$stmt = $db->prepare(
+$stmt = $pdo->prepare(
     'SELECT COALESCE(SUM(amount), 0) as monthly_revenue,
             COUNT(*) as monthly_transactions
      FROM portal_payments
@@ -57,12 +52,8 @@ $stmt = $db->prepare(
        AND YEAR(created_at) = YEAR(NOW())
        AND MONTH(created_at) = MONTH(NOW())'
 );
-$stmt->bind_param('i', $companyId);
-$stmt->execute();
-$revenueStats = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-$db->close();
+$stmt->execute([$companyId]);
+$revenueStats = $stmt->fetch();
 
 // Determine connected payment methods
 $paymentMethods = get_available_payment_methods($company);

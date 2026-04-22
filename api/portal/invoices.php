@@ -45,19 +45,17 @@ function handle_publish_invoice(): void
         send_error_response(400, 'Missing required fields: ' . implode(', ', $missing), 'MISSING_FIELDS');
     }
 
-    $db = get_db_connection();
+    global $pdo;
     $companyId = $company['id'];
     $invoiceId = $data['invoiceId'];
 
     // Check if invoice already exists (update vs create)
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'SELECT id, invoice_token, customer_token FROM portal_invoices
          WHERE company_id = ? AND invoice_id = ? LIMIT 1'
     );
-    $stmt->bind_param('is', $companyId, $invoiceId);
-    $stmt->execute();
-    $existing = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$companyId, $invoiceId]);
+    $existing = $stmt->fetch();
 
     $invoiceToken = $existing['invoice_token'] ?? generate_portal_token();
     $customerToken = $existing['customer_token'] ?? '';
@@ -66,15 +64,13 @@ function handle_publish_invoice(): void
     $customerEmail = $data['customerEmail'] ?? '';
     if (empty($customerToken) && !empty($customerEmail)) {
         // Check if this customer already has a token with this company
-        $stmt = $db->prepare(
+        $stmt = $pdo->prepare(
             'SELECT customer_token FROM portal_invoices
              WHERE company_id = ? AND customer_email = ? AND customer_token != ""
              LIMIT 1'
         );
-        $stmt->bind_param('is', $companyId, $customerEmail);
-        $stmt->execute();
-        $existingCustomer = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
+        $stmt->execute([$companyId, $customerEmail]);
+        $existingCustomer = $stmt->fetch();
 
         $customerToken = $existingCustomer['customer_token'] ?? generate_portal_token();
     } elseif (empty($customerToken)) {
@@ -96,7 +92,7 @@ function handle_publish_invoice(): void
 
     if ($existing) {
         // Update existing invoice
-        $stmt = $db->prepare(
+        $stmt = $pdo->prepare(
             'UPDATE portal_invoices SET
                 customer_name = ?, customer_email = ?, invoice_data = ?,
                 status = ?, total_amount = ?, balance_due = ?,
@@ -104,17 +100,16 @@ function handle_publish_invoice(): void
                 updated_at = NOW()
              WHERE company_id = ? AND invoice_id = ?'
         );
-        $stmt->bind_param(
-            'ssssddssiis',
+        $params = [
             $customerName, $customerEmail, $invoiceData,
             $status, $totalAmount, $balanceDue,
             $currency, $dueDate, $passProcessingFee,
             $companyId, $invoiceId
-        );
+        ];
     } else {
         // Create new invoice
         $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
-        $stmt = $db->prepare(
+        $stmt = $pdo->prepare(
             'INSERT INTO portal_invoices
              (company_id, invoice_id, invoice_token, customer_token,
               customer_name, customer_email, invoice_data,
@@ -122,24 +117,20 @@ function handle_publish_invoice(): void
               pass_processing_fee, environment, created_at, updated_at)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
         );
-        $stmt->bind_param(
-            'isssssssddssis',
+        $params = [
             $companyId, $invoiceId, $invoiceToken, $customerToken,
             $customerName, $customerEmail, $invoiceData,
             $status, $totalAmount, $balanceDue, $currency, $dueDate,
             $passProcessingFee, $environment
-        );
+        ];
     }
 
-    if (!$stmt->execute()) {
-        $error = $stmt->error;
-        $stmt->close();
-        $db->close();
-        error_log('Portal invoice DB error: ' . $error);
+    try {
+        $stmt->execute($params);
+    } catch (\PDOException $e) {
+        error_log('Portal invoice DB error: ' . $e->getMessage());
         send_error_response(500, 'Failed to save invoice. Please try again.', 'DB_ERROR');
     }
-    $stmt->close();
-    $db->close();
 
     $invoiceUrl = site_url('/invoice/' . $invoiceToken);
     $portalUrl = site_url('/portal/' . $customerToken);

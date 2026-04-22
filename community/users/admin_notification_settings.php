@@ -14,14 +14,10 @@ $user_id = $_SESSION['user_id'];
 $success_message = '';
 $error_message = '';
 
-$db = get_db_connection();
-
 // Load current notification settings
-$stmt = $db->prepare('SELECT * FROM admin_notification_settings WHERE user_id = ?');
-$stmt->bind_param('i', $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$settings = $result->fetch_assoc();
+$stmt = $pdo->prepare('SELECT * FROM admin_notification_settings WHERE user_id = ?');
+$stmt->execute([$user_id]);
+$settings = $stmt->fetch();
 
 // If no settings exist, create default ones
 if (!$settings) {
@@ -33,11 +29,10 @@ if (!$settings) {
     ];
 
     // Create settings row
-    $stmt = $db->prepare('INSERT INTO admin_notification_settings
+    $stmt = $pdo->prepare('INSERT INTO admin_notification_settings
                          (user_id, notify_new_posts, notify_new_comments, notify_new_reports, notification_email)
                          VALUES (?, ?, ?, ?, ?)');
-    $stmt->bind_param('iiiis', $user_id, $settings['notify_new_posts'], $settings['notify_new_comments'], $settings['notify_new_reports'], $settings['notification_email']);
-    $stmt->execute();
+    $stmt->execute([$user_id, $settings['notify_new_posts'], $settings['notify_new_comments'], $settings['notify_new_reports'], $settings['notification_email']]);
 }
 
 // Process form submission
@@ -53,29 +48,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = 'Please enter a valid email address';
     } else {
         // Update settings
-        $stmt = $db->prepare('UPDATE admin_notification_settings
+        $stmt = $pdo->prepare('UPDATE admin_notification_settings
                              SET notify_new_posts = ?,
                                  notify_new_comments = ?,
                                  notify_new_reports = ?,
                                  notification_email = ?,
                                  updated_at = CURRENT_TIMESTAMP
                              WHERE user_id = ?');
-        $stmt->bind_param('iiisi', $notify_new_posts, $notify_new_comments, $notify_new_reports, $notification_email, $user_id);
 
-        if ($stmt->execute()) {
+        try {
+            $stmt->execute([$notify_new_posts, $notify_new_comments, $notify_new_reports, $notification_email, $user_id]);
             $success_message = 'Notification settings updated successfully.';
             // Update settings array to reflect changes
             $settings['notify_new_posts'] = $notify_new_posts;
             $settings['notify_new_comments'] = $notify_new_comments;
             $settings['notify_new_reports'] = $notify_new_reports;
             $settings['notification_email'] = $notification_email;
-        } else {
-            $error_message = 'Error updating notification settings: ' . $db->error;
+        } catch (PDOException $e) {
+            error_log('admin_notification_settings update failed: ' . $e->getMessage());
+            $error_message = 'Failed to update notification settings. Please try again.';
         }
     }
 }
-
-$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">

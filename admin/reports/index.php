@@ -20,7 +20,7 @@ $content_type_filter = $_GET['content_type'] ?? 'all';
 // Function to get all reports with filters
 function get_reports($status = 'pending', $content_type = 'all')
 {
-    $db = get_db_connection();
+    global $pdo;
     $reports = [];
 
     $query = 'SELECT
@@ -73,33 +73,28 @@ function get_reports($status = 'pending', $content_type = 'all')
     )
     WHERE 1=1';
 
-    $types = '';
     $params = [];
 
     if ($status !== 'all') {
         $query .= ' AND r.status = ?';
-        $types .= 's';
         $params[] = $status;
     }
 
     if ($content_type !== 'all') {
         $query .= ' AND r.content_type = ?';
-        $types .= 's';
         $params[] = $content_type;
     }
 
     $query .= ' ORDER BY r.created_at DESC';
 
     if (!empty($params)) {
-        $stmt = $db->prepare($query);
-        $stmt->bind_param($types, ...$params);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
     } else {
-        $result = $db->query($query);
+        $stmt = $pdo->query($query);
     }
 
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $reports[] = $row;
     }
 
@@ -109,11 +104,11 @@ function get_reports($status = 'pending', $content_type = 'all')
 // Get reports count by status
 function get_reports_count_by_status()
 {
-    $db = get_db_connection();
+    global $pdo;
     $counts = ['pending' => 0, 'resolved' => 0, 'dismissed' => 0];
 
-    $result = $db->query('SELECT status, COUNT(*) as count FROM content_reports GROUP BY status');
-    while ($row = $result->fetch_assoc()) {
+    $stmt = $pdo->query('SELECT status, COUNT(*) as count FROM content_reports GROUP BY status');
+    while ($row = $stmt->fetch()) {
         $counts[$row['status']] = $row['count'];
     }
 

@@ -42,21 +42,17 @@ if (empty($state)) {
 }
 
 // Verify the CSRF state token and look up the company
-$db = get_db_connection();
-$stmt = $db->prepare(
+$stmt = $pdo->prepare(
     'SELECT os.id AS state_id, os.company_id, pc.company_name
      FROM portal_oauth_states os
      JOIN portal_companies pc ON os.company_id = pc.id
      WHERE os.state_token = ? AND os.provider = ? AND os.expires_at > NOW()
      LIMIT 1'
 );
-$stmt->bind_param('ss', $state, $provider);
-$stmt->execute();
-$oauthState = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+$stmt->execute([$state, $provider]);
+$oauthState = $stmt->fetch();
 
 if (!$oauthState) {
-    $db->close();
     show_result_page(false, 'Invalid or expired authorization state. Please try connecting again from Argo Books.');
     exit;
 }
@@ -73,38 +69,31 @@ try {
     switch ($provider) {
         case 'stripe':
             $callbackUrl = "$callbackBase/api/portal/connect/callback/stripe";
-            $result = handle_stripe_callback($db, $companyId, $is_production, $isRefresh, $callbackUrl, $state);
+            $result = handle_stripe_callback($pdo, $companyId, $is_production, $isRefresh, $callbackUrl, $state);
             if ($result === 'redirect') {
                 // Onboarding incomplete — keep the state token alive for the next callback
-                $db->close();
                 exit;
             }
             break;
         case 'paypal':
-            handle_paypal_callback($db, $companyId, $code, $is_production);
+            handle_paypal_callback($pdo, $companyId, $code, $is_production);
             break;
         case 'square':
-            handle_square_callback($db, $companyId, $code, $is_production);
+            handle_square_callback($pdo, $companyId, $code, $is_production);
             break;
     }
 
     // Delete the used state token (and clean up expired ones)
-    $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
-    $stmt->bind_param('i', $stateId);
-    $stmt->execute();
-    $stmt->close();
-    $db->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
+    $stmt = $pdo->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
+    $stmt->execute([$stateId]);
+    $pdo->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
 
-    $db->close();
     show_result_page(true, ucfirst($provider) . ' has been connected successfully!', $companyName);
 } catch (Exception $e) {
     // Clean up state token even on failure
-    $stmt = $db->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
-    $stmt->bind_param('i', $stateId);
-    $stmt->execute();
-    $stmt->close();
+    $stmt = $pdo->prepare('DELETE FROM portal_oauth_states WHERE id = ?');
+    $stmt->execute([$stateId]);
 
-    $db->close();
     error_log("OAuth callback error ($provider): " . $e->getMessage());
     show_result_page(false, 'Failed to complete connection: ' . $e->getMessage());
 }
@@ -114,7 +103,7 @@ try {
  * Retrieves the Express account, checks onboarding status, and saves email if complete.
  * Returns 'redirect' if onboarding is incomplete and the user was redirected back to Stripe.
  */
-function handle_stripe_callback(mysqli $db, int $companyId, bool $is_production, bool $isRefresh, string $callbackUrl, string $state): ?string
+function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bool $isRefresh, string $callbackUrl, string $state): ?string
 {
     $secretKey = $is_production
         ? ($_ENV['STRIPE_LIVE_SECRET_KEY'] ?? '')
@@ -123,10 +112,8 @@ function handle_stripe_callback(mysqli $db, int $companyId, bool $is_production,
 
     // Look up the stored Stripe account ID for this company
     $stmt = $db->prepare('SELECT stripe_account_id FROM portal_companies WHERE id = ?');
-    $stmt->bind_param('i', $companyId);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$companyId]);
+    $row = $stmt->fetch();
 
     $stripeAccountId = $row['stripe_account_id'] ?? '';
     if (empty($stripeAccountId)) {
@@ -159,9 +146,7 @@ function handle_stripe_callback(mysqli $db, int $companyId, bool $is_production,
          SET stripe_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->bind_param('si', $email, $companyId);
-    $stmt->execute();
-    $stmt->close();
+    $stmt->execute([$email, $companyId]);
 
     return null;
 }
@@ -170,7 +155,7 @@ function handle_stripe_callback(mysqli $db, int $companyId, bool $is_production,
  * Handle PayPal OAuth callback.
  * Exchanges the authorization code for tokens, then retrieves the merchant/payer ID and email.
  */
-function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $is_production): void
+function handle_paypal_callback(PDO $db, int $companyId, string $code, bool $is_production): void
 {
     $clientId = $is_production
         ? $_ENV['PAYPAL_LIVE_CLIENT_ID']
@@ -247,16 +232,14 @@ function handle_paypal_callback(mysqli $db, int $companyId, string $code, bool $
          SET paypal_merchant_id = ?, paypal_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->bind_param('ssi', $payerId, $email, $companyId);
-    $stmt->execute();
-    $stmt->close();
+    $stmt->execute([$payerId, $email, $companyId]);
 }
 
 /**
  * Handle Square OAuth callback.
  * Exchanges the authorization code for access token, merchant ID, and location.
  */
-function handle_square_callback(mysqli $db, int $companyId, string $code, bool $is_production): void
+function handle_square_callback(PDO $db, int $companyId, string $code, bool $is_production): void
 {
     $appId = $is_production
         ? ($_ENV['SQUARE_LIVE_APP_ID'] ?? '')
@@ -360,9 +343,7 @@ function handle_square_callback(mysqli $db, int $companyId, string $code, bool $
              square_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->bind_param('ssssi', $merchantId, $encryptedAccessToken, $locationId, $email, $companyId);
-    $stmt->execute();
-    $stmt->close();
+    $stmt->execute([$merchantId, $encryptedAccessToken, $locationId, $email, $companyId]);
 }
 
 /**

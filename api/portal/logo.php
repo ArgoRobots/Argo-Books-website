@@ -37,12 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     // --- Delete the current logo ---
     delete_logo_file($company['company_logo_url'], $logosDir);
 
-    $db = get_db_connection();
-    $stmt = $db->prepare('UPDATE portal_companies SET company_logo_url = NULL WHERE id = ?');
-    $stmt->bind_param('i', $companyId);
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    $stmt = $pdo->prepare('UPDATE portal_companies SET company_logo_url = NULL WHERE id = ?');
+    $stmt->execute([$companyId]);
 
     send_json_response(200, [
         'success' => true,
@@ -124,12 +120,8 @@ $assetBaseUrl = rtrim(env('SITE_URL', 'https://argorobots.com'), '/');
 $logoUrl = $assetBaseUrl . '/resources/uploads/logos/' . $filename;
 
 // Update the database
-$db = get_db_connection();
-$stmt = $db->prepare('UPDATE portal_companies SET company_logo_url = ? WHERE id = ?');
-$stmt->bind_param('si', $logoUrl, $companyId);
-$stmt->execute();
-$stmt->close();
-$db->close();
+$stmt = $pdo->prepare('UPDATE portal_companies SET company_logo_url = ? WHERE id = ?');
+$stmt->execute([$logoUrl, $companyId]);
 
 send_json_response(200, [
     'success' => true,

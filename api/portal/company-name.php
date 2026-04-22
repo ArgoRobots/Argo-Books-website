@@ -42,25 +42,13 @@ if (mb_strlen($companyName) > 255) {
 
 $companyId = $company['id'];
 
-$db = get_db_connection();
-$stmt = $db->prepare('UPDATE portal_companies SET company_name = ? WHERE id = ?');
-if ($stmt === false) {
-    error_log('Portal company name update DB prepare error: ' . $db->error);
-    $db->close();
+try {
+    $stmt = $pdo->prepare('UPDATE portal_companies SET company_name = ? WHERE id = ?');
+    $stmt->execute([$companyName, $companyId]);
+} catch (\PDOException $e) {
+    error_log('Portal company name update DB error: ' . $e->getMessage());
     send_error_response(500, 'Failed to update company name. Please try again.', 'DB_ERROR');
 }
-$stmt->bind_param('si', $companyName, $companyId);
-
-if (!$stmt->execute()) {
-    $error = $stmt->error;
-    $stmt->close();
-    $db->close();
-    error_log('Portal company name update DB error: ' . $error);
-    send_error_response(500, 'Failed to update company name. Please try again.', 'DB_ERROR');
-}
-
-$stmt->close();
-$db->close();
 
 send_json_response(200, [
     'success' => true,

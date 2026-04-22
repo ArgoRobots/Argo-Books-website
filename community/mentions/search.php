@@ -26,8 +26,7 @@ try {
     $current_user_id = $_SESSION['user_id']; // Get current user ID to exclude from results
 
     // Connect to the database
-    $db = get_db_connection();
-    if (!$db) {
+    if (!$pdo) {
         throw new Exception('Database connection failed');
     }
 
@@ -42,21 +41,13 @@ try {
             ORDER BY c.created_at DESC
         ";
 
-        $stmt = $db->prepare($sql_commenters);
-        if (!$stmt) {
-            throw new Exception('Prepare failed: ' . $db->error);
-        }
+        $stmt = $pdo->prepare($sql_commenters);
 
-        $stmt->bind_param('ii', $post_id, $current_user_id);
-        if (!$stmt->execute()) {
-            throw new Exception('Execute failed: ' . $stmt->error);
-        }
+        $stmt->execute([$post_id, $current_user_id]);
 
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
+        while ($row = $stmt->fetch()) {
             $commenters[$row['id']] = $row;
         }
-        $stmt->close();
 
         // Get the post author if not already in commenters (and not current user)
         $sql_author = "
@@ -66,23 +57,15 @@ try {
             WHERE p.id = ? AND u.id != ?
         ";
 
-        $stmt = $db->prepare($sql_author);
-        if (!$stmt) {
-            throw new Exception('Prepare failed: ' . $db->error);
-        }
+        $stmt = $pdo->prepare($sql_author);
 
-        $stmt->bind_param('ii', $post_id, $current_user_id);
-        if (!$stmt->execute()) {
-            throw new Exception('Execute failed: ' . $stmt->error);
-        }
+        $stmt->execute([$post_id, $current_user_id]);
 
-        $result = $stmt->get_result();
-        if ($author = $result->fetch_assoc()) {
+        if ($author = $stmt->fetch()) {
             if (!isset($commenters[$author['id']])) {
                 $commenters[$author['id']] = $author;
             }
         }
-        $stmt->close();
     }
 
     // If query is empty (just '@'), show only commenters and post author
@@ -107,21 +90,13 @@ try {
         LIMIT 10
     ";
 
-    $stmt = $db->prepare($sql_exact_start);
-    if (!$stmt) {
-        throw new Exception('Prepare failed: ' . $db->error);
-    }
+    $stmt = $pdo->prepare($sql_exact_start);
 
-    $stmt->bind_param('si', $search_exact_start, $current_user_id);
-    if (!$stmt->execute()) {
-        throw new Exception('Execute failed: ' . $stmt->error);
-    }
+    $stmt->execute([$search_exact_start, $current_user_id]);
 
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $users[$row['id']] = $row;
     }
-    $stmt->close();
 
     // Then, if we have fewer than 10 results, get partial matches anywhere in the username (excluding current user)
     if (count($users) < 10) {
@@ -135,32 +110,23 @@ try {
             ORDER BY username ASC
             LIMIT ?";
 
-        $stmt = $db->prepare($sql_anywhere);
-        if (!$stmt) {
-            error_log('Mentions search prepare failed: ' . $db->error);
-            throw new Exception('Prepare failed');
-        }
+        $stmt = $pdo->prepare($sql_anywhere);
 
-        $types = 's' . str_repeat('i', count($exclude_ids)) . 'ii';
         $params = array_merge([$search_anywhere], $exclude_ids, [$current_user_id, $remaining]);
-        // mysqli bind_param requires pass-by-reference; use call_user_func_array
-        $bindParams = [];
-        $bindParams[] = &$types;
-        foreach ($params as $key => $value) {
-            $bindParams[] = &$params[$key];
+        // Bind parameters with explicit types so LIMIT receives an INT
+        $index = 1;
+        $stmt->bindValue($index++, $search_anywhere, PDO::PARAM_STR);
+        foreach ($exclude_ids as $exclude_id) {
+            $stmt->bindValue($index++, $exclude_id, PDO::PARAM_INT);
         }
-        if (!call_user_func_array([$stmt, 'bind_param'], $bindParams)) {
-            throw new Exception('Bind failed');
-        }
-        if (!$stmt->execute()) {
-            throw new Exception('Execute failed');
-        }
+        $stmt->bindValue($index++, $current_user_id, PDO::PARAM_INT);
+        $stmt->bindValue($index++, $remaining, PDO::PARAM_INT);
 
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
+        $stmt->execute();
+
+        while ($row = $stmt->fetch()) {
             $users[$row['id']] = $row;
         }
-        $stmt->close();
     }
 
     // Combine results, giving priority to commenters and the post author (all already exclude current user)

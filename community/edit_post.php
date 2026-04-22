@@ -62,25 +62,21 @@ if (!$can_edit_post) {
 
 // Check for metadata
 $metadata = [];
-$db = get_db_connection();
 
 // Check if metadata column exists
 $metadata_exists = false;
-$result = $db->query("SHOW COLUMNS FROM community_posts LIKE 'metadata'");
-$metadata_exists = ($result->num_rows > 0);
+$result = $pdo->query("SHOW COLUMNS FROM community_posts LIKE 'metadata'");
+$metadata_exists = ($result->fetch() !== false);
 
 if ($metadata_exists) {
     // Get metadata if it exists
-    $stmt = $db->prepare('SELECT metadata FROM community_posts WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT metadata FROM community_posts WHERE id = ?');
+    $stmt->execute([$post_id]);
+    $row = $stmt->fetch();
 
     if ($row && !empty($row['metadata'])) {
         $metadata = json_decode($row['metadata'], true);
     }
-    $stmt->close();
 }
 
 // Generate CSRF token if not present
@@ -136,8 +132,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($content) > 10000) {
         $error_message = 'Content is too long (maximum 10,000 characters)';
     } else {
-        $db = get_db_connection();
-
         // Check if anything actually changed before saving to history
         $has_changes = false;
 
@@ -149,11 +143,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if metadata changed (for bug reports)
         if ($post_type === 'bug' && $metadata_exists) {
             $current_metadata = null;
-            $stmt = $db->prepare('SELECT metadata FROM community_posts WHERE id = ?');
-            $stmt->bind_param('i', $post_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $row = $result->fetch_assoc();
+            $stmt = $pdo->prepare('SELECT metadata FROM community_posts WHERE id = ?');
+            $stmt->execute([$post_id]);
+            $row = $stmt->fetch();
 
             if ($row && !empty($row['metadata'])) {
                 $current_metadata = json_decode($row['metadata'], true);
@@ -169,49 +161,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // If no previous metadata but new metadata has values
                 $has_changes = true;
             }
-            $stmt->close();
         }
 
         // Only proceed if there are actual changes
         if ($has_changes) {
-            $result = $db->query("SHOW COLUMNS FROM post_edit_history LIKE 'metadata'");
+            $result = $pdo->query("SHOW COLUMNS FROM post_edit_history LIKE 'metadata'");
 
             // Get the current metadata for history
             $previous_metadata = null;
             if ($metadata_exists) {
-                $stmt = $db->prepare('SELECT metadata FROM community_posts WHERE id = ?');
-                $stmt->bind_param('i', $post_id);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $row = $result->fetch_assoc();
+                $stmt = $pdo->prepare('SELECT metadata FROM community_posts WHERE id = ?');
+                $stmt->execute([$post_id]);
+                $row = $stmt->fetch();
                 if ($row && isset($row['metadata'])) {
                     $previous_metadata = $row['metadata'];
                 }
-                $stmt->close();
             }
 
             // Save the current post to history
-            $stmt = $db->prepare('INSERT INTO post_edit_history (post_id, user_id, title, content, metadata, edited_at) 
+            $stmt = $pdo->prepare('INSERT INTO post_edit_history (post_id, user_id, title, content, metadata, edited_at) 
                                 VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)');
-            $stmt->bind_param('iisss', $post_id, $user_id, $post['title'], $post['content'], $previous_metadata);
-            $stmt->execute();
-            $stmt->close();
+            $stmt->execute([$post_id, $user_id, $post['title'], $post['content'], $previous_metadata]);
 
             // Update the post
-            $stmt = $db->prepare('UPDATE community_posts 
+            $stmt = $pdo->prepare('UPDATE community_posts 
                                 SET title = ?, content = ?, post_type = ?, updated_at = CURRENT_TIMESTAMP 
                                 WHERE id = ?');
-            $stmt->bind_param('sssi', $title, $content, $post_type, $post_id);
-            $update_success = $stmt->execute();
-            $stmt->close();
+            $update_success = $stmt->execute([$title, $content, $post_type, $post_id]);
 
             // Save bug metadata if applicable
             if ($post_type === 'bug' && !empty($bug_metadata) && $metadata_exists) {
                 $metadata_json = json_encode($bug_metadata);
-                $stmt = $db->prepare('UPDATE community_posts SET metadata = ? WHERE id = ?');
-                $stmt->bind_param('si', $metadata_json, $post_id);
-                $stmt->execute();
-                $stmt->close();
+                $stmt = $pdo->prepare('UPDATE community_posts SET metadata = ? WHERE id = ?');
+                $stmt->execute([$metadata_json, $post_id]);
             }
 
             if ($update_success) {

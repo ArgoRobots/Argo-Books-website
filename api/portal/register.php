@@ -59,36 +59,28 @@ if (!empty($licenseKey)) {
 }
 // Free path: no license key, device ID is the sole identifier (already validated as non-empty)
 
-$db = get_db_connection();
-
 // Check if company already exists by owner_email
 $ownerEmail = $data['ownerEmail'] ?? '';
 if (!empty($ownerEmail)) {
-    $stmt = $db->prepare('SELECT id FROM portal_companies WHERE owner_email = ? LIMIT 1');
-    $stmt->bind_param('s', $ownerEmail);
-    $stmt->execute();
-    $existing = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT id FROM portal_companies WHERE owner_email = ? LIMIT 1');
+    $stmt->execute([$ownerEmail]);
+    $existing = $stmt->fetch();
 
     if ($existing) {
         // Rotate API key: generate new key and store its hash
         $rotatedKey = bin2hex(random_bytes(32));
         $rotatedHash = hash('sha256', $rotatedKey);
-        $rotateStmt = $db->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
-        if ($rotateStmt === false) {
-            error_log('Portal registration failed: failed to prepare API key rotation statement: ' . $db->error);
-            $db->close();
+        try {
+            $rotateStmt = $pdo->prepare('UPDATE portal_companies SET api_key_hash = ? WHERE id = ?');
+            $rotateStmt->execute([$rotatedHash, $existing['id']]);
+            if ($rotateStmt->rowCount() <= 0) {
+                error_log('Portal registration failed: API key rotation UPDATE affected 0 rows for company ID ' . $existing['id']);
+                send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
+            }
+        } catch (PDOException $e) {
+            error_log('Portal registration failed: API key rotation error: ' . $e->getMessage());
             send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
         }
-        $rotateStmt->bind_param('si', $rotatedHash, $existing['id']);
-        if (!$rotateStmt->execute() || $rotateStmt->affected_rows <= 0) {
-            error_log('Portal registration failed: API key rotation UPDATE failed for company ID ' . $existing['id'] . ': ' . $rotateStmt->error);
-            $rotateStmt->close();
-            $db->close();
-            send_error_response(500, 'Service temporarily unavailable. Please try again later.', 'DB_ERROR');
-        }
-        $rotateStmt->close();
-        $db->close();
         send_json_response(200, [
             'success' => true,
             'api_key' => $rotatedKey,
@@ -115,31 +107,25 @@ if ($squareAccessToken !== null && $squareAccessToken !== '') {
 $squareLocationId = $data['squareLocationId'] ?? null;
 $environment = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox';
 
-$stmt = $db->prepare(
-    'INSERT INTO portal_companies
-     (api_key_hash, company_name, company_logo_url, stripe_account_id,
-      paypal_merchant_id, square_merchant_id, square_access_token,
-      square_location_id, owner_email, environment, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
-);
-$stmt->bind_param(
-    'ssssssssss',
-    $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
-    $paypalMerchantId, $squareMerchantId, $squareAccessToken,
-    $squareLocationId, $ownerEmail, $environment
-);
-
-if (!$stmt->execute()) {
-    $error = $stmt->error;
-    $stmt->close();
-    $db->close();
-    error_log('Portal registration DB error: ' . $error);
+try {
+    $stmt = $pdo->prepare(
+        'INSERT INTO portal_companies
+         (api_key_hash, company_name, company_logo_url, stripe_account_id,
+          paypal_merchant_id, square_merchant_id, square_access_token,
+          square_location_id, owner_email, environment, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())'
+    );
+    $stmt->execute([
+        $apiKeyHash, $companyName, $companyLogoUrl, $stripeAccountId,
+        $paypalMerchantId, $squareMerchantId, $squareAccessToken,
+        $squareLocationId, $ownerEmail, $environment
+    ]);
+} catch (PDOException $e) {
+    error_log('Portal registration DB error: ' . $e->getMessage());
     send_error_response(500, 'Failed to register company. Please try again.', 'DB_ERROR');
 }
 
-$companyId = $stmt->insert_id;
-$stmt->close();
-$db->close();
+$companyId = $pdo->lastInsertId();
 
 send_json_response(201, [
     'success' => true,

@@ -71,15 +71,11 @@ switch ($eventType) {
         $invoiceRef = $squareReferenceId ?: $squareNote;
 
         if (!empty($paymentId) && $paymentId !== 'unknown' && $squareAmount > 0 && !empty($invoiceRef)) {
-            $db = get_db_connection();
-            $stmt = $db->prepare(
+            $stmt = $pdo->prepare(
                 'SELECT company_id, invoice_id, customer_name FROM portal_invoices WHERE invoice_id = ? LIMIT 1'
             );
-            $stmt->bind_param('s', $invoiceRef);
-            $stmt->execute();
-            $invoiceRecord = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-            $db->close();
+            $stmt->execute([$invoiceRef]);
+            $invoiceRecord = $stmt->fetch();
 
             if ($invoiceRecord) {
                 record_portal_payment([

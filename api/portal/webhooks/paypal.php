@@ -122,15 +122,11 @@ switch ($eventType) {
 
         if (!empty($captureId) && $captureAmount > 0 && !empty($invoiceRef)) {
             // Look up the invoice by invoice_id to get the company_id
-            $db = get_db_connection();
-            $stmt = $db->prepare(
+            $stmt = $pdo->prepare(
                 'SELECT company_id, invoice_id, customer_name FROM portal_invoices WHERE invoice_id = ? LIMIT 1'
             );
-            $stmt->bind_param('s', $invoiceRef);
-            $stmt->execute();
-            $invoiceRecord = $stmt->get_result()->fetch_assoc();
-            $stmt->close();
-            $db->close();
+            $stmt->execute([$invoiceRef]);
+            $invoiceRecord = $stmt->fetch();
 
             if ($invoiceRecord) {
                 record_portal_payment([

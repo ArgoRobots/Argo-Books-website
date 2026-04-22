@@ -98,41 +98,31 @@ function handle_profile_update()
         exit;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Check if username is taken by someone else
     if ($username !== $user['username']) {
-        $stmt = $db->prepare('SELECT id FROM community_users WHERE username = ? AND id != ?');
-        $stmt->bind_param('si', $username, $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        if ($result->fetch_assoc()) {
-            $stmt->close();
+        $stmt = $pdo->prepare('SELECT id FROM community_users WHERE username = ? AND id != ?');
+        $stmt->execute([$username, $user_id]);
+        if ($stmt->fetch()) {
             $_SESSION['profile_error'] = 'Username is already taken';
             header('Location: edit_profile.php');
             exit;
         }
-        $stmt->close();
     }
 
     // Update user profile
-    $stmt = $db->prepare('UPDATE community_users SET username = ?, bio = ? WHERE id = ?');
-    $stmt->bind_param('ssi', $username, $bio, $user_id);
+    $stmt = $pdo->prepare('UPDATE community_users SET username = ?, bio = ? WHERE id = ?');
 
-    if ($stmt->execute()) {
-        $stmt->close();
+    if ($stmt->execute([$username, $bio, $user_id])) {
 
         // Update username across all posts and comments if changed
         if ($username !== $user['username']) {
-            $stmt = $db->prepare('UPDATE community_posts SET user_name = ? WHERE user_id = ?');
-            $stmt->bind_param('si', $username, $user_id);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('UPDATE community_posts SET user_name = ? WHERE user_id = ?');
+            $stmt->execute([$username, $user_id]);
 
-            $stmt = $db->prepare('UPDATE community_comments SET user_name = ? WHERE user_id = ?');
-            $stmt->bind_param('si', $username, $user_id);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('UPDATE community_comments SET user_name = ? WHERE user_id = ?');
+            $stmt->execute([$username, $user_id]);
 
             // Update session
             $_SESSION['username'] = $username;
@@ -142,7 +132,6 @@ function handle_profile_update()
         header('Location: edit_profile.php');
         exit;
     } else {
-        $stmt->close();
         $_SESSION['profile_error'] = 'Failed to update profile. Please try again.';
         header('Location: edit_profile.php');
         exit;
@@ -232,17 +221,14 @@ function handle_avatar_change()
         // Update database with consistent path format
         $relative_path = 'uploads/avatars/' . $filename;
 
-        $db = get_db_connection();
-        $stmt = $db->prepare('UPDATE community_users SET avatar = ? WHERE id = ?');
-        $stmt->bind_param('si', $relative_path, $user_id);
+        global $pdo;
+        $stmt = $pdo->prepare('UPDATE community_users SET avatar = ? WHERE id = ?');
 
-        if ($stmt->execute()) {
-            $stmt->close();
+        if ($stmt->execute([$relative_path, $user_id])) {
             $_SESSION['profile_success'] = 'Avatar updated successfully!';
             header('Location: edit_profile.php');
             exit;
         } else {
-            $stmt->close();
             // Clean up uploaded file on database error
             unlink($filepath);
             $_SESSION['profile_error'] = 'Failed to update avatar in database.';
@@ -273,17 +259,14 @@ function handle_avatar_removal()
         }
 
         // Update database
-        $db = get_db_connection();
-        $stmt = $db->prepare('UPDATE community_users SET avatar = NULL WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
+        global $pdo;
+        $stmt = $pdo->prepare('UPDATE community_users SET avatar = NULL WHERE id = ?');
 
-        if ($stmt->execute()) {
-            $stmt->close();
+        if ($stmt->execute([$user_id])) {
             $_SESSION['profile_success'] = 'Avatar removed successfully!';
             header('Location: edit_profile.php');
             exit;
         } else {
-            $stmt->close();
             $_SESSION['profile_error'] = 'Failed to remove avatar.';
             header('Location: edit_profile.php');
             exit;
@@ -321,15 +304,12 @@ function handle_email_change()
         exit;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Verify current password
-    $stmt = $db->prepare('SELECT password_hash FROM community_users WHERE id = ?');
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $password_data = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT password_hash FROM community_users WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $password_data = $stmt->fetch();
 
     if (!$password_data || !password_verify($password, $password_data['password_hash'])) {
         $_SESSION['profile_error'] = 'Current password is incorrect';
@@ -338,27 +318,21 @@ function handle_email_change()
     }
 
     // Check if new email is already used
-    $stmt = $db->prepare('SELECT id FROM community_users WHERE email = ? AND id != ?');
-    $stmt->bind_param('si', $new_email, $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($result->fetch_assoc()) {
-        $stmt->close();
+    $stmt = $pdo->prepare('SELECT id FROM community_users WHERE email = ? AND id != ?');
+    $stmt->execute([$new_email, $user_id]);
+    if ($stmt->fetch()) {
         $_SESSION['profile_error'] = 'This email address is already registered';
         header('Location: edit_profile.php');
         exit;
     }
-    $stmt->close();
 
     // Generate verification code
     $verification_code = generate_verification_code();
 
     // Store pending email change
-    $stmt = $db->prepare('UPDATE community_users SET verification_code = ?, email_verified = 0 WHERE id = ?');
-    $stmt->bind_param('si', $verification_code, $user_id);
+    $stmt = $pdo->prepare('UPDATE community_users SET verification_code = ?, email_verified = 0 WHERE id = ?');
 
-    if ($stmt->execute()) {
-        $stmt->close();
+    if ($stmt->execute([$verification_code, $user_id])) {
 
         // Send verification email to NEW email address
         $email_sent = send_verification_email($new_email, $verification_code, $user['username']);
@@ -376,7 +350,6 @@ function handle_email_change()
             exit;
         }
     } else {
-        $stmt->close();
         $_SESSION['profile_error'] = 'Failed to initiate email change. Please try again.';
         header('Location: edit_profile.php');
         exit;
@@ -402,15 +375,12 @@ function handle_email_verification()
         exit;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Check verification code
-    $stmt = $db->prepare('SELECT verification_code FROM community_users WHERE id = ?');
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $db_data = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT verification_code FROM community_users WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $db_data = $stmt->fetch();
 
     if (!$db_data || $db_data['verification_code'] !== $verification_code) {
         $_SESSION['profile_error'] = 'Invalid verification code';
@@ -420,22 +390,16 @@ function handle_email_verification()
 
     // Update email and verify
     $new_email = $_SESSION['pending_email'];
-    $stmt = $db->prepare('UPDATE community_users SET email = ?, email_verified = 1, verification_code = NULL WHERE id = ?');
-    $stmt->bind_param('si', $new_email, $user_id);
+    $stmt = $pdo->prepare('UPDATE community_users SET email = ?, email_verified = 1, verification_code = NULL WHERE id = ?');
 
-    if ($stmt->execute()) {
-        $stmt->close();
+    if ($stmt->execute([$new_email, $user_id])) {
 
         // Update email in posts and comments
-        $stmt = $db->prepare('UPDATE community_posts SET user_email = ? WHERE user_id = ?');
-        $stmt->bind_param('si', $new_email, $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE community_posts SET user_email = ? WHERE user_id = ?');
+        $stmt->execute([$new_email, $user_id]);
 
-        $stmt = $db->prepare('UPDATE community_comments SET user_email = ? WHERE user_id = ?');
-        $stmt->bind_param('si', $new_email, $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE community_comments SET user_email = ? WHERE user_id = ?');
+        $stmt->execute([$new_email, $user_id]);
 
         // Update session
         $_SESSION['email'] = $new_email;
@@ -446,7 +410,6 @@ function handle_email_verification()
         header('Location: edit_profile.php');
         exit;
     } else {
-        $stmt->close();
         $_SESSION['profile_error'] = 'Failed to update email address.';
         header('Location: edit_profile.php');
         exit;
@@ -480,15 +443,12 @@ function handle_password_change()
         exit;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Verify current password
-    $stmt = $db->prepare('SELECT password_hash FROM community_users WHERE id = ?');
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $password_data = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT password_hash FROM community_users WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $password_data = $stmt->fetch();
 
     if (!$password_data || !password_verify($current_password, $password_data['password_hash'])) {
         $_SESSION['profile_error'] = 'Current password is incorrect';
@@ -498,16 +458,13 @@ function handle_password_change()
 
     // Update password
     $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-    $stmt = $db->prepare('UPDATE community_users SET password_hash = ? WHERE id = ?');
-    $stmt->bind_param('si', $new_password_hash, $user_id);
+    $stmt = $pdo->prepare('UPDATE community_users SET password_hash = ? WHERE id = ?');
 
-    if ($stmt->execute()) {
-        $stmt->close();
+    if ($stmt->execute([$new_password_hash, $user_id])) {
         $_SESSION['profile_success'] = 'Password changed successfully!';
         header('Location: edit_profile.php');
         exit;
     } else {
-        $stmt->close();
         $_SESSION['profile_error'] = 'Failed to change password. Please try again.';
         header('Location: edit_profile.php');
         exit;

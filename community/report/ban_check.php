@@ -7,10 +7,10 @@
  */
 function is_user_banned($user_id)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Check for active ban that hasn't expired
-    $stmt = $db->prepare('
+    $stmt = $pdo->prepare('
         SELECT id, ban_reason, ban_duration, banned_at, expires_at
         FROM user_bans
         WHERE user_id = ?
@@ -20,11 +20,8 @@ function is_user_banned($user_id)
         LIMIT 1
     ');
 
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $ban = $result->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$user_id]);
+    $ban = $stmt->fetch() ?: null;
 
     return $ban;
 }

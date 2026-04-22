@@ -64,16 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role = $_SESSION['role'] ?? 'user';
 
     // Get the comment to verify ownership
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT * FROM community_comments WHERE id = ?');
-    $stmt->bind_param('i', $comment_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $comment = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT * FROM community_comments WHERE id = ?');
+    $stmt->execute([$comment_id]);
+    $comment = $stmt->fetch();
 
     if (!$comment) {
         $response['message'] = 'Comment not found';
-        $stmt->close();
         echo json_encode($response);
         exit;
     }
@@ -93,17 +89,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Update the comment with new content
-        $stmt = $db->prepare('UPDATE community_comments SET content = ? WHERE id = ?');
-        $stmt->bind_param('si', $comment_content, $comment_id);
+        $stmt = $pdo->prepare('UPDATE community_comments SET content = ? WHERE id = ?');
 
-        if ($stmt->execute()) {
+        try {
+            $stmt->execute([$comment_content, $comment_id]);
             // Get the updated comment
-            $stmt->close();
-            $stmt = $db->prepare('SELECT * FROM community_comments WHERE id = ?');
-            $stmt->bind_param('i', $comment_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $updated_comment = $result->fetch_assoc();
+            $stmt = $pdo->prepare('SELECT * FROM community_comments WHERE id = ?');
+            $stmt->execute([$comment_id]);
+            $updated_comment = $stmt->fetch();
 
             // Process the comment content using the proper mentions function
             $updated_comment['processed_content'] = process_mentions(htmlspecialchars($updated_comment['content']));
@@ -113,15 +106,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'message' => 'Comment updated successfully',
                 'comment' => $updated_comment
             ];
-        } else {
-            error_log('Error updating comment ' . $comment_id . ': ' . $db->error);
+        } catch (PDOException $e) {
+            error_log('Error updating comment ' . $comment_id . ': ' . $e->getMessage());
             $response['message'] = 'Error updating comment. Please try again.';
         }
     } else {
         $response['message'] = 'You do not have permission to edit this comment.';
     }
-
-    $stmt->close();
 }
 
 // Send the response

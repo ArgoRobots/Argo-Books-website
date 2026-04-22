@@ -228,7 +228,7 @@
                 </div>
                 <div class="highlight-item">
                     <h3>9</h3>
-                    <p>AI-generated insights per analysis cycle</p>
+                    <p>Insights per analysis cycle</p>
                 </div>
                 <div class="highlight-item">
                     <h3>0</h3>
@@ -300,7 +300,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Get forecasts and insights</h3>
-                    <p>View next-month predictions for revenue, expenses, and profit. Get AI-generated business insights, anomaly alerts, and growth opportunities.</p>
+                    <p>View next-month predictions for revenue, expenses, and profit. Get business insights, anomaly alerts, and growth opportunities.</p>
                 </div>
             </div>
         </div>
@@ -331,7 +331,7 @@
             <div class="feature-detail animate-on-scroll">
                 <div class="feature-detail-text">
                     <span class="section-label">Smart Insights</span>
-                    <h2>AI-generated insights that actually help</h2>
+                    <h2>Insights that actually help</h2>
                     <p>Predictive analytics in Argo Books doesn't just show you charts. It generates plain-language business insights by analyzing your data across multiple dimensions — revenue trends, expense patterns, anomalies, and growth opportunities.</p>
                     <p>Every insight comes with a specific recommendation. If revenue is growing, it tells you to investigate which products drove it. If return rates spike, it flags the affected products. If a seasonal peak is approaching, it suggests preparing inventory and marketing in advance.</p>
                     <ul class="feature-checklist">

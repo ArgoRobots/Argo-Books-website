@@ -9,7 +9,7 @@
 
 // Start session and include necessary files
 session_start();
-require_once '../../db_connect.php';
+require_once __DIR__ . '/../../db_connect.php';
 header('Content-Type: application/json');
 
 // Check if user is logged in

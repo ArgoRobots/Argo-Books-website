@@ -5,7 +5,7 @@ $pageDescription = 'Learn how to use the Version History modal in Argo Books to 
 $currentPage = 'history-modal';
 $pageCategory = 'features';
 
-include '../../docs-header.php';
+include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
@@ -45,4 +45,4 @@ include '../../docs-header.php';
             </div>
         </div>
 
-<?php include '../../docs-footer.php'; ?>
+<?php include __DIR__ . '/../../docs-footer.php'; ?>

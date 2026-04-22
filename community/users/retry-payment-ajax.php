@@ -6,13 +6,13 @@
 session_start();
 header('Content-Type: application/json');
 
-require_once '../../db_connect.php';
-require_once '../../email_sender.php';
-require_once '../../vendor/autoload.php';
-require_once '../community_functions.php';
-require_once 'user_functions.php';
-require_once '../../webhooks/paypal-helper.php';
-require_once '../../config/pricing.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../email_sender.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../community_functions.php';
+require_once __DIR__ . '/user_functions.php';
+require_once __DIR__ . '/../../webhooks/paypal-helper.php';
+require_once __DIR__ . '/../../config/pricing.php';
 
 // Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {

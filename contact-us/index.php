@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'contact_process.php';
+require_once __DIR__ . '/contact_process.php';
 
 require_once __DIR__ . '/../resources/icons.php';
 

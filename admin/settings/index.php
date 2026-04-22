@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
-require_once '2fa.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/2fa.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -67,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enable_2fa'])) {
     }
 }
 
-include '../admin_header.php';
+include __DIR__ . '/../admin_header.php';
 ?>
 
 <div class="container">

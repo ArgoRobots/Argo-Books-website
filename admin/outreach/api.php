@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
-require_once '../../email_sender.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../email_sender.php';
 
 // Admin auth check
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {

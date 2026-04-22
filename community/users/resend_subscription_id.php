@@ -4,9 +4,9 @@
  * This script handles retrieving and resending Premium subscription IDs to users
  */
 session_start();
-require_once '../../db_connect.php';
-require_once 'user_functions.php';
-require_once '../../email_sender.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/user_functions.php';
+require_once __DIR__ . '/../../email_sender.php';
 
 // Initialize response variables
 $success_message = '';

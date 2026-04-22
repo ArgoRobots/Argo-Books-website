@@ -10,8 +10,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-require_once '../db_connect.php';
-require_once 'users/user_functions.php';
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/users/user_functions.php';
 
 // Prepare response data
 $response = array(

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../../db_connect.php';
+require_once __DIR__ . '/../../db_connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -254,7 +254,7 @@ $total_visits = array_sum($source_visit_counts);
 $total_conversions = array_sum($source_conversion_counts);
 $conversion_rate = $total_visits > 0 ? round(($total_conversions / $total_visits) * 100, 1) : 0;
 
-include '../admin_header.php';
+include __DIR__ . '/../admin_header.php';
 ?>
 
 <link rel="stylesheet" href="style.css">

@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once '../db_connect.php';
-require_once 'community_functions.php';
-require_once 'users/user_functions.php';
+require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/community_functions.php';
+require_once __DIR__ . '/users/user_functions.php';
 require_once __DIR__ . '/rate_limit.php';
-require_once 'report/ban_check.php';
+require_once __DIR__ . '/report/ban_check.php';
 
 header('Content-Type: application/json');
 

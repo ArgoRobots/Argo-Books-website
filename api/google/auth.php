@@ -71,7 +71,7 @@ function handleInitiate(array $authContext, string $clientId): void
 
     store_google_oauth_state($authContext, $state);
 
-    $baseUrl = $_ENV['APP_URL'] ?? 'https://argorobots.com';
+    $baseUrl = env('SITE_URL', 'https://argorobots.com');
     $redirectUri = $baseUrl . '/api/google/callback';
 
     $scopes = implode(' ', [

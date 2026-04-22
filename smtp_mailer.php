@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/env_helper.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 
 /**
@@ -19,7 +21,7 @@ use PHPMailer\PHPMailer\PHPMailer;
  */
 function create_smtp_mailer()
 {
-    $host = $_ENV['SMTP_HOST'] ?? getenv('SMTP_HOST') ?: '';
+    $host = env('SMTP_HOST', '');
 
     if (empty($host)) {
         return null;
@@ -35,16 +37,16 @@ function create_smtp_mailer()
     $mail->Host       = $host;
     $mail->SMTPAuth   = true;
     $mail->AuthType   = 'LOGIN';
-    $mail->Username   = $_ENV['SMTP_USERNAME'] ?? getenv('SMTP_USERNAME') ?: '';
-    $mail->Password   = $_ENV['SMTP_PASSWORD'] ?? getenv('SMTP_PASSWORD') ?: '';
-    $port = (int) ($_ENV['SMTP_PORT'] ?? getenv('SMTP_PORT') ?: 587);
+    $mail->Username   = env('SMTP_USERNAME', '');
+    $mail->Password   = env('SMTP_PASSWORD', '');
+    $port = (int) env('SMTP_PORT', 587);
     $mail->Port       = $port;
     $mail->SMTPSecure = $port === 465 ? PHPMailer::ENCRYPTION_SMTPS : PHPMailer::ENCRYPTION_STARTTLS;
     $mail->CharSet    = 'UTF-8';
     $mail->isHTML(true);
 
-    $fromEmail = $_ENV['SMTP_FROM_EMAIL'] ?? getenv('SMTP_FROM_EMAIL') ?: 'noreply@argorobots.com';
-    $fromName  = $_ENV['SMTP_FROM_NAME'] ?? getenv('SMTP_FROM_NAME') ?: 'Argo Books';
+    $fromEmail = env('SMTP_FROM_EMAIL', 'noreply@argorobots.com');
+    $fromName  = env('SMTP_FROM_NAME', 'Argo Books');
     $mail->setFrom($fromEmail, $fromName);
 
     return $mail;

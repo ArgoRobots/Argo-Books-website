@@ -141,7 +141,7 @@ function handle_publish_invoice(): void
     $stmt->close();
     $db->close();
 
-    $portalBaseUrl = $_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com';
+    $portalBaseUrl = env('SITE_URL', 'https://argorobots.com');
     $invoiceUrl = $portalBaseUrl . '/invoice/' . $invoiceToken;
     $portalUrl = $portalBaseUrl . '/portal/' . $customerToken;
 

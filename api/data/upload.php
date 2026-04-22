@@ -27,7 +27,7 @@ function checkRateLimit($authIdentifier = null)
     // Use auth identifier in rate limiting to prevent key sharing abuse
     $api_key = $authIdentifier ?? $_SERVER['HTTP_X_LICENSE_KEY'] ?? 'unknown';
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $rate_key = md5($api_key . $ip); // Combine auth identifier and IP for rate limiting
+    $rate_key = hash('sha256', $api_key . $ip); // Combine auth identifier and IP for rate limiting
     $rate_file = sys_get_temp_dir() . '/upload_rate_' . $rate_key;
 
     $current_time = time();

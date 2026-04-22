@@ -67,7 +67,7 @@ $db->close();
 // Determine connected payment methods
 $paymentMethods = get_available_payment_methods($company);
 
-$portalBaseUrl = $_ENV['PORTAL_BASE_URL'] ?? 'https://argorobots.com/portal/';
+$portalBaseUrl = env('SITE_URL', 'https://argorobots.com');
 
 send_json_response(200, [
     'success' => true,

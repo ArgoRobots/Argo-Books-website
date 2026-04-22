@@ -34,7 +34,7 @@ if (empty($signature)) {
     exit;
 }
 
-$notificationUrl = ($_ENV['APP_URL'] ?? 'https://argorobots.com') . '/api/portal/webhooks/square';
+$notificationUrl = env('SITE_URL', 'https://argorobots.com') . '/api/portal/webhooks/square';
 $stringToSign = $notificationUrl . $payload;
 $expectedSignature = base64_encode(hash_hmac('sha256', $stringToSign, $webhookSignatureKey, true));
 

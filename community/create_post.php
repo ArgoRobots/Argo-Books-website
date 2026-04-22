@@ -3,7 +3,7 @@ session_start();
 require_once '../db_connect.php';
 require_once 'community_functions.php';
 require_once 'users/user_functions.php';
-include_once 'rate_limit.php';
+require_once __DIR__ . '/rate_limit.php';
 require_once 'formatting/formatting_functions.php';
 require_once 'report/ban_check.php';
 require_once __DIR__ . '/../resources/icons.php';

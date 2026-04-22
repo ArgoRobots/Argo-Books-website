@@ -14,6 +14,7 @@ require_once __DIR__ . '/smtp_mailer.php';
 function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [])
 {
     $css = file_get_contents(__DIR__ . '/email.css');
+    $site_url = site_url();
 
     // Map style keywords to CSS classes, or use inline style for backwards compatibility
     $header_class = '';
@@ -41,7 +42,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
         <body>
             <div class="container">
                 <div class="header {$header_class}" style="{$header_inline}">
-                    <img src="https://argorobots.com/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
+                    <img src="{$site_url}/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
                 </div>
                 <div class="content">
                     {$body_content}
@@ -100,6 +101,7 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
 {
     $billing_text = $billing_cycle === 'yearly' ? 'yearly' : 'monthly';
     $end_date_text = !empty($end_date) ? date('F j, Y', strtotime($end_date)) : 'N/A';
+    $site_url = site_url();
 
     $body = <<<HTML
         <h1>Your Premium License Key</h1>
@@ -120,11 +122,11 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
         </table>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">Manage Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">Manage Subscription</a>
         </div>
 
         <p>Keep this key safe. You may need it when contacting support about your subscription.</p>
-        <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>If you have any questions or need assistance, please don't hesitate to <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         HTML;
 
     return send_styled_email($to_email, 'Your Requested Argo Premium License Key', $body, 'purple');
@@ -160,7 +162,7 @@ function send_verification_email($email, $code, $username)
 
 /**
  * Community admin notification sender
- * 
+ *
  * @param string $type Notification type ('new_post', 'new_comment')
  * @param array $data Notification data
  * @return bool Success status
@@ -307,7 +309,7 @@ function send_password_reset_email($email, $token, $username)
 
 /**
  * Send account deletion scheduled email
- * 
+ *
  * @param string $email User's email address
  * @param string $username Username
  * @param string $scheduled_date Scheduled deletion date
@@ -316,8 +318,8 @@ function send_password_reset_email($email, $token, $username)
 function send_account_deletion_scheduled_email($email, $username, $scheduled_date)
 {
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
-    // Format the scheduled date nicely
     $formatted_date = date('F j, Y \a\t g:i A', strtotime($scheduled_date));
+    $site_url = site_url();
 
     $body = <<<HTML
         <h1>Account Deletion Scheduled</h1>
@@ -333,7 +335,7 @@ function send_account_deletion_scheduled_email($email, $username, $scheduled_dat
         </ul>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/login.php" class="button">Cancel Deletion - Login Now</a>
+            <a href="{$site_url}/community/users/login.php" class="button">Cancel Deletion - Login Now</a>
         </div>
 
         <p>If you did not request this deletion, please log into your account immediately to cancel it.</p>
@@ -356,6 +358,7 @@ function send_account_deletion_scheduled_email($email, $username, $scheduled_dat
 function send_account_deletion_cancelled_email($email, $username)
 {
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $site_url = site_url();
     $body = <<<HTML
         <h1>Account Deletion Cancelled</h1>
         <p>Hello {$username},</p>
@@ -372,7 +375,7 @@ function send_account_deletion_cancelled_email($email, $username)
         <p>remain intact and accessible.</p>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/profile.php" class="button">View Your Profile</a>
+            <a href="{$site_url}/community/users/profile.php" class="button">View Your Profile</a>
         </div>
 
         <p>If you decide to delete your account in the future, you can do so from your profile settings.</p>
@@ -399,6 +402,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
 {
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
     $ban_reason = htmlspecialchars($ban_reason, ENT_QUOTES, 'UTF-8');
+    $site_url = site_url();
     // Format duration text
     $duration_text = '';
 
@@ -433,7 +437,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
         $expiration_info = "<p>Your ban will expire on <strong>{$formatted_date}</strong>.</p>";
     }
 
-    $appeal_text = '<p>If you believe this ban was issued in error, you can <a href="https://argorobots.com/contact-us/">contact our support team</a> to request a review. Please include your username and explain why you believe the ban should be reconsidered.</p>';
+    $appeal_text = '<p>If you believe this ban was issued in error, you can <a href="' . $site_url . '/contact-us/">contact our support team</a> to request a review. Please include your username and explain why you believe the ban should be reconsidered.</p>';
 
     $body = <<<HTML
         <h1>Community Ban Notification</h1>
@@ -455,7 +459,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
 
         {$appeal_text}
 
-        <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
+        <p>Please review our <a href="{$site_url}/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
 
         <p>Best regards,<br>The Argo Team</p>
         HTML;
@@ -473,6 +477,7 @@ function send_ban_notification_email($email, $username, $ban_reason, $ban_durati
 function send_unban_notification_email($email, $username)
 {
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $site_url = site_url();
     $body = <<<HTML
         <h1>Account Unbanned</h1>
         <p>Hello {$username},</p>
@@ -481,13 +486,13 @@ function send_unban_notification_email($email, $username)
 
         <p>Please remember to:</p>
         <ul>
-            <li>Review and follow our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a></li>
+            <li>Review and follow our <a href="{$site_url}/community/guidelines.php">community guidelines</a></li>
             <li>Be respectful and helpful to other community members</li>
             <li>Future violations may result in another ban</li>
         </ul>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/" class="button">Visit Community</a>
+            <a href="{$site_url}/community/" class="button">Visit Community</a>
         </div>
 
         <p>Thank you for being part of the Argo community. We're glad to have you back!</p>
@@ -511,6 +516,7 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
 {
     $old_username = htmlspecialchars($old_username, ENT_QUOTES, 'UTF-8');
     $new_username = htmlspecialchars($new_username, ENT_QUOTES, 'UTF-8');
+    $site_url = site_url();
     // Format violation type
     $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
@@ -536,14 +542,14 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
 
         <p><strong>What you can do:</strong></p>
         <ul>
-            <li>You can change your username to something appropriate by visiting your <a href="https://argorobots.com/community/users/edit_profile.php">profile settings</a></li>
+            <li>You can change your username to something appropriate by visiting your <a href="{$site_url}/community/users/edit_profile.php">profile settings</a></li>
             <li>Your new username must comply with our community guidelines</li>
             <li>All your posts and comments have been updated with the new username</li>
         </ul>
 
-        <p>If you believe this action was taken in error, please <a href="https://argorobots.com/contact-us/">contact our support team</a> with your account details.</p>
+        <p>If you believe this action was taken in error, please <a href="{$site_url}/contact-us/">contact our support team</a> with your account details.</p>
 
-        <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
+        <p>Please review our <a href="{$site_url}/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
 
         <p>Best regards,<br>The Argo Team</p>
         HTML;
@@ -563,6 +569,7 @@ function send_username_reset_email($email, $old_username, $new_username, $violat
 function send_bio_cleared_email($email, $username, $violation_type, $additional_info = '')
 {
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+    $site_url = site_url();
     // Format violation type
     $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
 
@@ -585,14 +592,14 @@ function send_bio_cleared_email($email, $username, $violation_type, $additional_
 
         <p><strong>What you can do:</strong></p>
         <ul>
-            <li>You can add a new bio by visiting your <a href="https://argorobots.com/community/users/edit_profile.php">profile settings</a></li>
+            <li>You can add a new bio by visiting your <a href="{$site_url}/community/users/edit_profile.php">profile settings</a></li>
             <li>Your new bio must comply with our community guidelines</li>
             <li>Ensure your bio content is appropriate and respectful</li>
         </ul>
 
-        <p>If you believe this action was taken in error, please <a href="https://argorobots.com/contact-us/">contact our support team</a> with your account details.</p>
+        <p>If you believe this action was taken in error, please <a href="{$site_url}/contact-us/">contact our support team</a> with your account details.</p>
 
-        <p>Please review our <a href="https://argorobots.com/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
+        <p>Please review our <a href="{$site_url}/community/guidelines.php">community guidelines</a> to ensure future compliance.</p>
 
         <p>Best regards,<br>The Argo Team</p>
         HTML;
@@ -615,6 +622,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
 {
     $reporter_username = htmlspecialchars($reporter_username, ENT_QUOTES, 'UTF-8');
     $reported_username = htmlspecialchars($reported_username, ENT_QUOTES, 'UTF-8');
+    $site_url = site_url();
     // Format content type and violation type
     $content_type_text = ucfirst(htmlspecialchars($content_type, ENT_QUOTES, 'UTF-8'));
     $violation_text = ucfirst(str_replace('_', ' ', htmlspecialchars($violation_type, ENT_QUOTES, 'UTF-8')));
@@ -636,7 +644,7 @@ function send_new_report_notification($email, $report_id, $content_type, $violat
         <p>Please review this report in the admin panel and take appropriate action.</p>
 
         <div class="button-container">
-            <a href="https://argorobots.com/admin/reports/" class="button">View Reports</a>
+            <a href="{$site_url}/admin/reports/" class="button">View Reports</a>
         </div>
 
         <p>This report is currently in <strong>pending</strong> status and awaits your review.</p>
@@ -663,6 +671,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
     $renewalDate = date('F j, Y', strtotime($endDate));
     $paymentDate = date('F j, Y');
     $paymentMethodText = ucfirst($paymentMethod);
+    $site_url = site_url();
 
     $body = <<<HTML
         <h1>Payment Receipt</h1>
@@ -709,12 +718,12 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
             <li>✓ Priority support</li>
         </ul>
 
-        <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
+        <p>You can manage your subscription anytime from your <a href="{$site_url}/community/users/subscription.php">account settings</a>.</p>
 
         <div class="receipt-footer">
             <p>License Key: {$subscriptionId}</p>
             <p>Thank you for using Argo Books!</p>
-            <p><a href="https://argorobots.com">argorobots.com</a></p>
+            <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 
@@ -732,6 +741,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
 function send_premium_subscription_cancelled_email($email, $subscriptionId, $endDate)
 {
     $accessUntil = date('F j, Y', strtotime($endDate));
+    $site_url = site_url();
 
     $body = <<<HTML
         <h1>Subscription Cancelled</h1>
@@ -746,15 +756,15 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
         <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
         <div class="button-container">
-            <a href="https://argorobots.com/pricing/premium/" class="button button-purple">Resubscribe</a>
+            <a href="{$site_url}/pricing/premium/" class="button button-purple">Resubscribe</a>
         </div>
 
-        <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
             <p>License Key: {$subscriptionId}</p>
             <p>Thank you for trying Argo Premium!</p>
-            <p><a href="https://argorobots.com">argorobots.com</a></p>
+            <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 
@@ -773,6 +783,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 {
     $nextBillingDate = date('F j, Y', strtotime($endDate));
     $billingLabel = ucfirst($billingCycle);
+    $site_url = site_url();
 
     $body = <<<HTML
         <h1>Welcome Back!</h1>
@@ -815,14 +826,14 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
         </ul>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">View Subscription</a>
         </div>
 
-        <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
             <p>Thank you for continuing with Argo Premium!</p>
-            <p><a href="https://argorobots.com">argorobots.com</a></p>
+            <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 
@@ -841,6 +852,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 function send_free_subscription_key_email($email, $subscriptionKey, $durationMonths = 1, $note = '')
 {
     $durationText = $durationMonths == 0 ? 'permanent' : $durationMonths . ' month' . ($durationMonths > 1 ? 's' : '');
+    $site_url = site_url();
 
     $noteSection = '';
     if (!empty($note)) {
@@ -879,7 +891,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
             <li>Priority support</li>
         </ul>
 
-        <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>If you have any questions or need assistance, please don't hesitate to <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         <p>Thank you for being part of the Argo community!</p>
         HTML;
 
@@ -896,6 +908,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
  */
 function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
 {
+    $site_url = site_url();
     $errorDetail = '';
     if (!empty($errorMessage)) {
         $safeMessage = htmlspecialchars($errorMessage, ENT_QUOTES, 'UTF-8');
@@ -921,10 +934,10 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
         <p>If the payment continues to fail, your subscription may be suspended. Please update your payment method to avoid interruption of service.</p>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">Update Payment Method</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">Update Payment Method</a>
         </div>
 
-        <p>If you need assistance, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>If you need assistance, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
         HTML;
 
     return send_styled_email($email, 'Payment Failed - Argo Premium Subscription', $body, 'purple');
@@ -942,6 +955,7 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
 function send_free_credit_email($email, $creditAmount, $note = '', $subscriptionId = '')
 {
     $formattedAmount = number_format($creditAmount, 2);
+    $site_url = site_url();
     $noteSection = '';
     if (!empty($note)) {
         $noteSection = "
@@ -972,14 +986,14 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
         </ul>
 
         <div class="button-container">
-            <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">View Your Subscription</a>
+            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">View Your Subscription</a>
         </div>
 
-        <p>If you have any questions about your credit or subscription, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
+        <p>If you have any questions about your credit or subscription, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
             <p>Thank you for being an Argo Premium subscriber!</p>
-            <p><a href="https://argorobots.com">argorobots.com</a></p>
+            <p><a href="{$site_url}">argorobots.com</a></p>
         </div>
         HTML;
 

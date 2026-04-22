@@ -17,10 +17,10 @@ class InvoiceEmailSender
 
     public function __construct()
     {
-        $this->defaultFromEmail = $_ENV['INVOICE_DEFAULT_FROM_EMAIL'] ?? getenv('INVOICE_DEFAULT_FROM_EMAIL') ?: 'noreply@argorobots.com';
-        $this->defaultFromName = $_ENV['INVOICE_DEFAULT_FROM_NAME'] ?? getenv('INVOICE_DEFAULT_FROM_NAME') ?: 'Argo Books';
-        $this->logEnabled = filter_var($_ENV['INVOICE_LOG_ENABLED'] ?? getenv('INVOICE_LOG_ENABLED') ?? true, FILTER_VALIDATE_BOOLEAN);
-        $this->logFile = $_ENV['INVOICE_LOG_FILE'] ?? getenv('INVOICE_LOG_FILE') ?: __DIR__ . '/../../logs/invoice_emails.log';
+        $this->defaultFromEmail = env('INVOICE_DEFAULT_FROM_EMAIL', 'noreply@argorobots.com');
+        $this->defaultFromName = env('INVOICE_DEFAULT_FROM_NAME', 'Argo Books');
+        $this->logEnabled = filter_var(env('INVOICE_LOG_ENABLED', true), FILTER_VALIDATE_BOOLEAN);
+        $this->logFile = env('INVOICE_LOG_FILE', __DIR__ . '/../../logs/invoice_emails.log');
     }
 
     /**

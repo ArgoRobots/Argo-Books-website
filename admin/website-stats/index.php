@@ -38,7 +38,7 @@ function get_period_formatting($period)
  */
 function get_stats_by_period($table, $period = 'month', $limit = 12, $where_clause = '')
 {
-    $db = get_db_connection();
+    global $pdo;
     list($sql_period, $display_format) = get_period_formatting($period);
 
     $where = $where_clause ? "WHERE $where_clause" : '';
@@ -53,17 +53,14 @@ function get_stats_by_period($table, $period = 'month', $limit = 12, $where_clau
         ORDER BY period DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
-    $stmt->close();
     return $data;
 }
 
@@ -82,7 +79,7 @@ function get_registrations_by_period($period = 'month', $limit = 12)
 // Function to get page view statistics
 function get_page_views_by_period($period = 'month', $limit = 12)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     $sql_period = '';
     $display_format = '';
@@ -116,33 +113,30 @@ function get_page_views_by_period($period = 'month', $limit = 12)
         ORDER BY period DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
-    $stmt->close();
     return $data;
 }
 
 // Function to get community post views
 function get_community_post_views()
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
-        SELECT 
+        SELECT
             SUM(views) as total_views,
             AVG(views) as avg_views_per_post,
             MAX(views) as most_viewed
         FROM community_posts";
 
-    $result = $db->query($query);
-    $data = $result->fetch_assoc();
+    $stmt = $pdo->query($query);
+    $data = $stmt->fetch();
 
     return $data;
 }
@@ -150,19 +144,19 @@ function get_community_post_views()
 // Function to get community activity by post type
 function get_community_post_types()
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
-        SELECT 
+        SELECT
             post_type,
             COUNT(*) as count,
             SUM(views) as total_views
         FROM community_posts
         GROUP BY post_type";
 
-    $result = $db->query($query);
+    $stmt = $pdo->query($query);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
@@ -172,9 +166,9 @@ function get_community_post_types()
 // Function to get geographic distribution of users by page views
 function get_user_countries($limit = 10)
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
-        SELECT 
+        SELECT
             country_code,
             COUNT(DISTINCT ip_address) as count
         FROM statistics
@@ -183,17 +177,13 @@ function get_user_countries($limit = 10)
         ORDER BY count DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
-
-    $stmt->close();
 
     return $data;
 }
@@ -201,9 +191,9 @@ function get_user_countries($limit = 10)
 // Function to get downloads by country
 function get_downloads_by_country($limit = 10)
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
-        SELECT 
+        SELECT
             country_code,
             COUNT(*) as download_count
         FROM statistics
@@ -212,17 +202,13 @@ function get_downloads_by_country($limit = 10)
         ORDER BY download_count DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
-
-    $stmt->close();
 
     return $data;
 }
@@ -230,9 +216,9 @@ function get_downloads_by_country($limit = 10)
 // Function to get browser/platform statistics
 function get_user_agents()
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
-        SELECT 
+        SELECT
             CASE
                 WHEN user_agent LIKE '%Chrome%' THEN 'Chrome'
                 WHEN user_agent LIKE '%Firefox%' THEN 'Firefox'
@@ -247,10 +233,10 @@ function get_user_agents()
         GROUP BY browser
         ORDER BY count DESC";
 
-    $result = $db->query($query);
+    $stmt = $pdo->query($query);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 
@@ -260,17 +246,17 @@ function get_user_agents()
 // Function to get conversion rate data
 function get_conversion_data()
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Get total downloads (from statistics table)
     $download_query = "SELECT COUNT(*) as count FROM statistics WHERE event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')";
-    $download_result = $db->query($download_query);
-    $downloads = $download_result->fetch_assoc()['count'];
+    $download_stmt = $pdo->query($download_query);
+    $downloads = $download_stmt->fetch()['count'];
 
     // Get total registrations
     $reg_query = "SELECT COUNT(*) as count FROM community_users";
-    $reg_result = $db->query($reg_query);
-    $registrations = $reg_result->fetch_assoc()['count'];
+    $reg_stmt = $pdo->query($reg_query);
+    $registrations = $reg_stmt->fetch()['count'];
 
     return [
         'downloads' => $downloads,
@@ -281,9 +267,9 @@ function get_conversion_data()
 // Function to get most active users
 function get_most_active_users($limit = 5)
 {
-    $db = get_db_connection();
+    global $pdo;
     $query = "
-        SELECT 
+        SELECT
             u.username,
             u.email,
             COUNT(DISTINCT p.id) as post_count,
@@ -297,13 +283,11 @@ function get_most_active_users($limit = 5)
         ORDER BY activity_score DESC
         LIMIT ?";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param('i', $limit);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
 
     $data = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $data[] = $row;
     }
 

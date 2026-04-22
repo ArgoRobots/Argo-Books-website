@@ -47,19 +47,16 @@ function initiate_connect(array $company, string $provider): void
     $state = bin2hex(random_bytes(32));
 
     // Store state in DB with 10-minute expiry
-    $db = get_db_connection();
+    global $pdo;
     $expiresAt = date('Y-m-d H:i:s', time() + 600);
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'INSERT INTO portal_oauth_states (company_id, provider, state_token, expires_at)
          VALUES (?, ?, ?, ?)'
     );
-    $stmt->bind_param('isss', $company['id'], $provider, $state, $expiresAt);
-    $stmt->execute();
-    $stmt->close();
+    $stmt->execute([$company['id'], $provider, $state, $expiresAt]);
 
     // Clean up expired states
-    $db->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
-    $db->close();
+    $pdo->query('DELETE FROM portal_oauth_states WHERE expires_at <= NOW()');
 
     $authUrl = '';
 
@@ -77,15 +74,11 @@ function initiate_connect(array $company, string $provider): void
 
                 // Check if this company already has a Stripe Express account
                 $stripeAccountId = null;
-                $dbCheck = get_db_connection();
-                $stmtCheck = $dbCheck->prepare(
+                $stmtCheck = $pdo->prepare(
                     'SELECT stripe_account_id FROM portal_companies WHERE id = ?'
                 );
-                $stmtCheck->bind_param('i', $company['id']);
-                $stmtCheck->execute();
-                $row = $stmtCheck->get_result()->fetch_assoc();
-                $stmtCheck->close();
-                $dbCheck->close();
+                $stmtCheck->execute([$company['id']]);
+                $row = $stmtCheck->fetch();
 
                 if (!empty($row['stripe_account_id'])) {
                     // Verify the stored account exists and matches the current mode (live vs test)
@@ -103,14 +96,10 @@ function initiate_connect(array $company, string $provider): void
                     }
 
                     if (!$stripeAccountId) {
-                        $dbClear = get_db_connection();
-                        $stmtClear = $dbClear->prepare(
+                        $stmtClear = $pdo->prepare(
                             'UPDATE portal_companies SET stripe_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
                         );
-                        $stmtClear->bind_param('i', $company['id']);
-                        $stmtClear->execute();
-                        $stmtClear->close();
-                        $dbClear->close();
+                        $stmtClear->execute([$company['id']]);
                     }
                 }
 
@@ -126,14 +115,10 @@ function initiate_connect(array $company, string $provider): void
                     $stripeAccountId = $account->id;
 
                     // Store the account ID immediately
-                    $dbStore = get_db_connection();
-                    $stmtStore = $dbStore->prepare(
+                    $stmtStore = $pdo->prepare(
                         'UPDATE portal_companies SET stripe_account_id = ?, updated_at = NOW() WHERE id = ?'
                     );
-                    $stmtStore->bind_param('si', $stripeAccountId, $company['id']);
-                    $stmtStore->execute();
-                    $stmtStore->close();
-                    $dbStore->close();
+                    $stmtStore->execute([$stripeAccountId, $company['id']]);
                 }
 
                 // Create an Account Link for Express onboarding
@@ -203,47 +188,41 @@ function initiate_connect(array $company, string $provider): void
  */
 function disconnect_provider(array $company, string $provider): void
 {
-    $db = get_db_connection();
+    global $pdo;
 
     switch ($provider) {
         case 'stripe':
-            $stmt = $db->prepare(
+            $stmt = $pdo->prepare(
                 'UPDATE portal_companies SET stripe_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
             );
             break;
         case 'paypal':
-            $stmt = $db->prepare(
+            $stmt = $pdo->prepare(
                 'UPDATE portal_companies SET paypal_merchant_id = NULL, paypal_email = NULL, updated_at = NOW() WHERE id = ?'
             );
             break;
         case 'square':
-            $stmt = $db->prepare(
+            $stmt = $pdo->prepare(
                 'UPDATE portal_companies SET square_merchant_id = NULL, square_access_token = NULL, square_location_id = NULL, square_email = NULL, updated_at = NOW() WHERE id = ?'
             );
             break;
     }
 
-    $stmt->bind_param('i', $company['id']);
-    if (!$stmt->execute()) {
-        $error = $stmt->error;
-        $stmt->close();
-        $db->close();
-        error_log('Portal disconnect DB error (' . $provider . '): ' . $error);
+    try {
+        $stmt->execute([$company['id']]);
+    } catch (\PDOException $e) {
+        error_log('Portal disconnect DB error (' . $provider . '): ' . $e->getMessage());
         send_error_response(500, 'Failed to disconnect ' . $provider . '. Please try again.', 'DISCONNECT_FAILED');
     }
-    $stmt->close();
 
     // Re-fetch company to return the updated connected providers state
-    $stmtRefresh = $db->prepare(
+    $stmtRefresh = $pdo->prepare(
         'SELECT stripe_account_id, stripe_email, paypal_merchant_id, paypal_email,
                 square_merchant_id, square_email
          FROM portal_companies WHERE id = ? LIMIT 1'
     );
-    $stmtRefresh->bind_param('i', $company['id']);
-    $stmtRefresh->execute();
-    $updated = $stmtRefresh->get_result()->fetch_assoc();
-    $stmtRefresh->close();
-    $db->close();
+    $stmtRefresh->execute([$company['id']]);
+    $updated = $stmtRefresh->fetch();
 
     $connectedProviders = [
         'stripeConnected' => !empty($updated['stripe_account_id']),

@@ -35,15 +35,10 @@ if (empty($requested_username)) {
     $user = get_user($_SESSION['user_id']);
     $is_own_profile = true;
 } else {
-    $db = get_db_connection();
-
     // Only select needed columns - avoid exposing sensitive fields like password_hash, reset_token, etc.
-    $stmt = $db->prepare("SELECT id, username, email, bio, avatar, role, reputation, created_at, last_login, email_verified, deletion_scheduled_at FROM community_users WHERE username = ?");
-    $stmt->bind_param("s", $requested_username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare("SELECT id, username, email, bio, avatar, role, reputation, created_at, last_login, email_verified, deletion_scheduled_at FROM community_users WHERE username = ?");
+    $stmt->execute([$requested_username]);
+    $user = $stmt->fetch();
 
     if ($user) {
         $is_own_profile = ((int)$user['id'] === (int)$_SESSION['user_id']);
@@ -54,27 +49,22 @@ if (empty($requested_username)) {
 
 // If user found, get profile data
 if ($user) {
-    $db = get_db_connection();
-
     // MySQL prepared statement for getting post and comment counts
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             COUNT(DISTINCT p.id) AS post_count,
             COUNT(DISTINCT c.id) AS comment_count
-        FROM 
+        FROM
             community_users u
-        LEFT JOIN 
+        LEFT JOIN
             community_posts p ON u.id = p.user_id
-        LEFT JOIN 
+        LEFT JOIN
             community_comments c ON u.id = c.user_id
-        WHERE 
+        WHERE
             u.id = ?
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $profile = $result->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$user['id']]);
+    $profile = $stmt->fetch();
 
     if (!$profile) {
         // Create default profile if query fails
@@ -92,108 +82,93 @@ if ($user) {
     // For comment downvotes: -1 per downvote
 
     // First, calculate reputation from post votes received
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             COALESCE(SUM(CASE WHEN v.vote_type = 1 THEN 10 ELSE -5 END), 0) as post_vote_rep
-        FROM 
+        FROM
             community_posts p
-        LEFT JOIN 
+        LEFT JOIN
             community_votes v ON p.id = v.post_id
-        WHERE 
+        WHERE
             p.user_id = ? AND v.vote_type IS NOT NULL
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $post_rep_result = $result->fetch_assoc();
+    $stmt->execute([$user['id']]);
+    $post_rep_result = $stmt->fetch();
     $post_reputation = isset($post_rep_result['post_vote_rep']) ? $post_rep_result['post_vote_rep'] : 0;
-    $stmt->close();
 
     // Calculate reputation from downvotes cast by user
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             COUNT(*) * -2 as downvote_cost
-        FROM 
+        FROM
             community_votes
-        WHERE 
+        WHERE
             user_id = ? AND vote_type = -1
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $downvote_result = $result->fetch_assoc();
+    $stmt->execute([$user['id']]);
+    $downvote_result = $stmt->fetch();
     $downvote_reputation = isset($downvote_result['downvote_cost']) ? $downvote_result['downvote_cost'] : 0;
-    $stmt->close();
 
     // Calculate reputation from comment votes
     $comment_reputation = 0;
     $comment_votes_exist = false;
 
     // Check if comment_votes table exists
-    $result = $db->query("SHOW TABLES LIKE 'comment_votes'");
-    if ($result->num_rows > 0) {
+    $tables_check = $pdo->query("SHOW TABLES LIKE 'comment_votes'");
+    if ($tables_check->fetch() !== false) {
         $comment_votes_exist = true;
 
         // Calculate comment upvote reputation (+2 each)
-        $stmt = $db->prepare("
-            SELECT 
+        $stmt = $pdo->prepare("
+            SELECT
                 COALESCE(SUM(CASE WHEN cv.vote_type = 1 THEN 2 ELSE -1 END), 0) as comment_vote_rep
-            FROM 
+            FROM
                 community_comments c
-            LEFT JOIN 
+            LEFT JOIN
                 comment_votes cv ON c.id = cv.comment_id
-            WHERE 
+            WHERE
                 c.user_id = ? AND cv.vote_type IS NOT NULL
         ");
-        $stmt->bind_param("i", $user['id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $comment_rep_result = $result->fetch_assoc();
+        $stmt->execute([$user['id']]);
+        $comment_rep_result = $stmt->fetch();
         $comment_reputation = isset($comment_rep_result['comment_vote_rep']) ? $comment_rep_result['comment_vote_rep'] : 0;
-        $stmt->close();
     }
 
     // Total reputation
     $reputation = $post_reputation + $downvote_reputation + $comment_reputation;
 
     // Calculate impact (total views on posts)
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             COALESCE(SUM(views), 0) AS people_reached
-        FROM 
+        FROM
             community_posts
-        WHERE 
+        WHERE
             user_id = ?
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $impact_result = $result->fetch_assoc();
+    $stmt->execute([$user['id']]);
+    $impact_result = $stmt->fetch();
     $people_reached = isset($impact_result['people_reached']) ? $impact_result['people_reached'] : 0;
-    $stmt->close();
 
     // Get votes cast
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             COUNT(*) AS votes_cast
-        FROM 
+        FROM
             community_votes
-        WHERE 
+        WHERE
             user_id = ?
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $votes_result = $result->fetch_assoc();
+    $stmt->execute([$user['id']]);
+    $votes_result = $stmt->fetch();
     $votes_cast = isset($votes_result['votes_cast']) ? $votes_result['votes_cast'] : 0;
-    $stmt->close();
 
     // Get reputation history (will need to calculate from existing data)
     $reputation_history = [];
 
     // Post upvotes received - each worth +10
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             v.id,
             'post_upvote' as action_type,
             p.id as post_id,
@@ -201,26 +176,23 @@ if ($user) {
             v.created_at,
             p.title as post_title,
             10 as rep_change
-        FROM 
+        FROM
             community_votes v
-        JOIN 
+        JOIN
             community_posts p ON v.post_id = p.id
-        WHERE 
+        WHERE
             p.user_id = ? AND v.vote_type = 1
-        ORDER BY 
+        ORDER BY
             v.created_at DESC
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
+    $stmt->execute([$user['id']]);
+    while ($row = $stmt->fetch()) {
         $reputation_history[] = $row;
     }
-    $stmt->close();
 
     // Post downvotes received - each worth -5
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             v.id,
             'post_downvote' as action_type,
             p.id as post_id,
@@ -228,26 +200,23 @@ if ($user) {
             v.created_at,
             p.title as post_title,
             -5 as rep_change
-        FROM 
+        FROM
             community_votes v
-        JOIN 
+        JOIN
             community_posts p ON v.post_id = p.id
-        WHERE 
+        WHERE
             p.user_id = ? AND v.vote_type = -1
-        ORDER BY 
+        ORDER BY
             v.created_at DESC
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
+    $stmt->execute([$user['id']]);
+    while ($row = $stmt->fetch()) {
         $reputation_history[] = $row;
     }
-    $stmt->close();
 
     // Downvotes cast by user - each worth -2
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             v.id,
             'downvoted_other' as action_type,
             p.id as post_id,
@@ -255,28 +224,25 @@ if ($user) {
             v.created_at,
             p.title as post_title,
             -2 as rep_change
-        FROM 
+        FROM
             community_votes v
-        JOIN 
+        JOIN
             community_posts p ON v.post_id = p.id
-        WHERE 
+        WHERE
             v.user_id = ? AND v.vote_type = -1
-        ORDER BY 
+        ORDER BY
             v.created_at DESC
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
+    $stmt->execute([$user['id']]);
+    while ($row = $stmt->fetch()) {
         $reputation_history[] = $row;
     }
-    $stmt->close();
 
     // Add comment votes if the table exists
     if ($comment_votes_exist) {
         // Comment upvotes received - each worth +2
-        $stmt = $db->prepare("
-            SELECT 
+        $stmt = $pdo->prepare("
+            SELECT
                 cv.id,
                 'comment_upvote' as action_type,
                 p.id as post_id,
@@ -284,28 +250,25 @@ if ($user) {
                 cv.created_at,
                 p.title as post_title,
                 2 as rep_change
-            FROM 
+            FROM
                 comment_votes cv
-            JOIN 
+            JOIN
                 community_comments c ON cv.comment_id = c.id
             JOIN
                 community_posts p ON c.post_id = p.id
-            WHERE 
+            WHERE
                 c.user_id = ? AND cv.vote_type = 1
-            ORDER BY 
+            ORDER BY
                 cv.created_at DESC
         ");
-        $stmt->bind_param("i", $user['id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
+        $stmt->execute([$user['id']]);
+        while ($row = $stmt->fetch()) {
             $reputation_history[] = $row;
         }
-        $stmt->close();
 
         // Comment downvotes received - each worth -1
-        $stmt = $db->prepare("
-            SELECT 
+        $stmt = $pdo->prepare("
+            SELECT
                 cv.id,
                 'comment_downvote' as action_type,
                 p.id as post_id,
@@ -313,24 +276,21 @@ if ($user) {
                 cv.created_at,
                 p.title as post_title,
                 -1 as rep_change
-            FROM 
+            FROM
                 comment_votes cv
-            JOIN 
+            JOIN
                 community_comments c ON cv.comment_id = c.id
             JOIN
                 community_posts p ON c.post_id = p.id
-            WHERE 
+            WHERE
                 c.user_id = ? AND cv.vote_type = -1
-            ORDER BY 
+            ORDER BY
                 cv.created_at DESC
         ");
-        $stmt->bind_param("i", $user['id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
+        $stmt->execute([$user['id']]);
+        while ($row = $stmt->fetch()) {
             $reputation_history[] = $row;
         }
-        $stmt->close();
     }
 
     // Sort reputation history by date (newest first)
@@ -372,16 +332,13 @@ if ($user) {
         $sort_query
     ";
 
-    $stmt = $db->prepare($query);
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$user['id']]);
 
     $user_posts = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $user_posts[] = $row;
     }
-    $stmt->close();
 
     // Get user's comments
     $comment_sort = isset($_GET['comment_sort']) ? $_GET['comment_sort'] : 'newest';
@@ -400,31 +357,28 @@ if ($user) {
             break;
     }
 
-    $stmt = $db->prepare("
-        SELECT 
+    $stmt = $pdo->prepare("
+        SELECT
             c.id,
             c.content,
             c.created_at,
             c.votes,
             c.post_id,
             p.title as post_title
-        FROM 
+        FROM
             community_comments c
         JOIN
             community_posts p ON c.post_id = p.id
-        WHERE 
+        WHERE
             c.user_id = ?
         $comment_sort_query
     ");
-    $stmt->bind_param("i", $user['id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$user['id']]);
 
     $user_comments = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $user_comments[] = $row;
     }
-    $stmt->close();
 
     // Prepare data for reputation chart
     $rep_by_date = [];

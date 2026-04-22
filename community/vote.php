@@ -51,8 +51,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($vote_type !== 1 && $vote_type !== -1) {
         $response['message'] = 'Invalid vote type';
     } else {
-        $db = get_db_connection();
-
         if ($post_id > 0) {
             // Voting on a post
             // Verify post exists
@@ -75,10 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         // Connect vote to user account
                         if ($user_id > 0) {
                             // Update the vote record with user_id
-                            $stmt = $db->prepare('UPDATE community_votes SET user_id = ? WHERE post_id = ? AND user_email = ?');
-                            $stmt->bind_param('iis', $user_id, $post_id, $email);
-                            $stmt->execute();
-                            $stmt->close();
+                            $stmt = $pdo->prepare('UPDATE community_votes SET user_id = ? WHERE post_id = ? AND user_email = ?');
+                            $stmt->execute([$user_id, $post_id, $email]);
                         }
 
                         $response = [
@@ -95,12 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($comment_id > 0) {
             // Voting on a comment
             // Verify comment exists and check if user is the author
-            $stmt = $db->prepare('SELECT id, user_id FROM community_comments WHERE id = ?');
-            $stmt->bind_param('i', $comment_id);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $comment = $result->fetch_assoc();
-            $stmt->close();
+            $stmt = $pdo->prepare('SELECT id, user_id FROM community_comments WHERE id = ?');
+            $stmt->execute([$comment_id]);
+            $comment = $stmt->fetch();
 
             if (!$comment) {
                 $response['message'] = 'Comment not found';
@@ -117,10 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Connect vote to user account
                     if ($user_id > 0) {
                         // Update the vote record with user_id
-                        $stmt = $db->prepare('UPDATE comment_votes SET user_id = ? WHERE comment_id = ? AND user_email = ?');
-                        $stmt->bind_param('iis', $user_id, $comment_id, $email);
-                        $stmt->execute();
-                        $stmt->close();
+                        $stmt = $pdo->prepare('UPDATE comment_votes SET user_id = ? WHERE comment_id = ? AND user_email = ?');
+                        $stmt->execute([$user_id, $comment_id, $email]);
                     }
 
                     $response = [

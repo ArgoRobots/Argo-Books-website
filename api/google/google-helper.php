@@ -36,19 +36,16 @@ function authenticate_google_request(): ?array
  */
 function get_google_tokens(array $authContext): ?array
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Query device-based tokens
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'SELECT google_access_token, google_refresh_token, google_token_expires
          FROM google_oauth_tokens WHERE device_id_hash = ? LIMIT 1'
     );
-    $stmt->bind_param('s', $authContext['device_id_hash']);
-    $stmt->execute();
-    $row = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$authContext['device_id_hash']]);
+    $row = $stmt->fetch();
 
-    $db->close();
     return $row ?: null;
 }
 
@@ -57,16 +54,13 @@ function get_google_tokens(array $authContext): ?array
  */
 function update_google_access_token(array $authContext, string $encryptedAccessToken, string $expiresAt): void
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'UPDATE google_oauth_tokens SET google_access_token = ?, google_token_expires = ? WHERE device_id_hash = ?'
     );
-    $stmt->bind_param('sss', $encryptedAccessToken, $expiresAt, $authContext['device_id_hash']);
 
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    $stmt->execute([$encryptedAccessToken, $expiresAt, $authContext['device_id_hash']]);
 }
 
 /**
@@ -74,16 +68,13 @@ function update_google_access_token(array $authContext, string $encryptedAccessT
  */
 function clear_google_tokens(array $authContext): void
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'DELETE FROM google_oauth_tokens WHERE device_id_hash = ?'
     );
-    $stmt->bind_param('s', $authContext['device_id_hash']);
 
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    $stmt->execute([$authContext['device_id_hash']]);
 }
 
 /**
@@ -92,23 +83,18 @@ function clear_google_tokens(array $authContext): void
  */
 function store_google_oauth_state(array $authContext, string $state): void
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Clean up expired states for this device
-    $stmt = $db->prepare('DELETE FROM google_oauth_states WHERE device_id_hash = ? OR expires_at < NOW()');
-    $stmt->bind_param('s', $authContext['device_id_hash']);
-    $stmt->execute();
-    $stmt->close();
+    $stmt = $pdo->prepare('DELETE FROM google_oauth_states WHERE device_id_hash = ? OR expires_at < NOW()');
+    $stmt->execute([$authContext['device_id_hash']]);
 
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'INSERT INTO google_oauth_states (state_token, device_id_hash, expires_at)
          VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))'
     );
-    $stmt->bind_param('ss', $state, $authContext['device_id_hash']);
 
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    $stmt->execute([$state, $authContext['device_id_hash']]);
 }
 
 /**

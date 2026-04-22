@@ -38,38 +38,30 @@ if ($post_id <= 0 || !$post) {
 }
 
 // Check if metadata column exists
-$metadata_exists = false;
-$db = get_db_connection();
-$result = $db->query("SHOW COLUMNS FROM community_posts LIKE 'metadata'");
-$metadata_exists = ($result->num_rows > 0);
+$result = $pdo->query("SHOW COLUMNS FROM community_posts LIKE 'metadata'");
+$metadata_exists = ($result->fetch() !== false);
 
 if ($metadata_exists) {
     // Get metadata if it exists
-    $stmt = $db->prepare('SELECT metadata FROM community_posts WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT metadata FROM community_posts WHERE id = ?');
+    $stmt->execute([$post_id]);
+    $row = $stmt->fetch();
 
     if ($row && !empty($row['metadata'])) {
         $metadata = json_decode($row['metadata'], true);
         $has_metadata = !empty($metadata);
     }
-    $stmt->close();
 }
 
 // Get last edit for the post
-$stmt = $db->prepare('SELECT h.*, u.username 
+$stmt = $pdo->prepare('SELECT h.*, u.username
     FROM post_edit_history h
     LEFT JOIN community_users u ON h.user_id = u.id
     WHERE h.post_id = ?
     ORDER BY h.edited_at DESC
     LIMIT 1');
-$stmt->bind_param('i', $post_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$post_last_edit = $result->fetch_assoc();
-$stmt->close();
+$stmt->execute([$post_id]);
+$post_last_edit = $stmt->fetch();
 
 $current_user = $is_logged_in ? \CommunityUsers\get_current_user() : null;
 
@@ -79,11 +71,8 @@ $is_admin = $is_logged_in && (isset($current_user['role']) && $current_user['rol
 
 if (!$is_admin && !in_array($post_id, $viewed_posts)) {
     // Update view count in database
-    $db = get_db_connection();
-    $stmt = $db->prepare('UPDATE community_posts SET views = views + 1 WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $stmt->close();
+    $stmt = $pdo->prepare('UPDATE community_posts SET views = views + 1 WHERE id = ?');
+    $stmt->execute([$post_id]);
 
     // Add post to viewed posts in session
     $viewed_posts[] = $post_id;

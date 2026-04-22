@@ -45,16 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role = $_SESSION['role'] ?? 'user';
 
     // Get the post to verify ownership
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT * FROM community_posts WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $post = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT * FROM community_posts WHERE id = ?');
+    $stmt->execute([$post_id]);
+    $post = $stmt->fetch();
 
     if (!$post) {
         $response['message'] = 'Post not found';
-        $stmt->close();
         echo json_encode($response);
         exit;
     }
@@ -65,26 +61,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$can_delete) {
         $response['message'] = 'You do not have permission to delete this post.';
-        $stmt->close();
         echo json_encode($response);
         exit;
     }
 
     // Delete the post
-    $stmt = $db->prepare('DELETE FROM community_posts WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
+    $stmt = $pdo->prepare('DELETE FROM community_posts WHERE id = ?');
 
-    if ($stmt->execute()) {
+    try {
+        $stmt->execute([$post_id]);
         $response = [
             'success' => true,
             'message' => 'Post deleted successfully'
         ];
-    } else {
-        error_log('Error deleting post ' . $post_id . ': ' . $db->error);
+    } catch (PDOException $e) {
+        error_log('Error deleting post ' . $post_id . ': ' . $e->getMessage());
         $response['message'] = 'Error deleting post. Please try again.';
     }
-
-    $stmt->close();
 } else {
     $response['message'] = 'Invalid request method';
 }

@@ -67,29 +67,3 @@ function portal_decrypt(string $encoded): string
     }
     return $plaintext;
 }
-
-/**
- * Database connection function for MySQL (mysqli)
- */
-function get_db_connection()
-{
-    $host = $_ENV['DB_HOST'];
-    $username = $_ENV['DB_USERNAME'];
-    $password = $_ENV['DB_PASSWORD'];
-    $database = $_ENV['DB_NAME'];
-
-    // Create new connection
-    $db = new mysqli($host, $username, $password, $database);
-
-    // Check connection
-    if ($db->connect_error) {
-        error_log("Database connection error: " . $db->connect_error);
-        http_response_code(503);
-        die("Service temporarily unavailable. Please try again later.");
-    }
-
-    // Set character set
-    $db->set_charset("utf8mb4");
-
-    return $db;
-}

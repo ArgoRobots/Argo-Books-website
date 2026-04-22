@@ -35,18 +35,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
     $selected_ids = $_POST['selected_ids'] ?? [];
 
     if (!empty($selected_ids)) {
-        $db = get_db_connection();
         $success_count = 0;
         $fail_count = 0;
 
         if ($action === 'delete') {
             foreach ($selected_ids as $user_id) {
-                $stmt = $db->prepare('DELETE FROM community_users WHERE id = ?');
-                $stmt->bind_param('i', $user_id);
-                
-                if ($stmt->execute()) {
-                    $success_count++;
-                } else {
+                $stmt = $pdo->prepare('DELETE FROM community_users WHERE id = ?');
+
+                try {
+                    if ($stmt->execute([$user_id])) {
+                        $success_count++;
+                    } else {
+                        $fail_count++;
+                    }
+                } catch (Exception $e) {
                     $fail_count++;
                 }
             }
@@ -65,18 +67,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
         } elseif ($action === 'unban') {
             foreach ($selected_ids as $user_id) {
                 // Deactivate all active bans for this user
-                $stmt = $db->prepare('UPDATE user_bans SET is_active = 0, unbanned_at = NOW(), unbanned_by = NULL WHERE user_id = ? AND is_active = 1');
-                $stmt->bind_param('i', $user_id);
-                
-                if ($stmt->execute() && $stmt->affected_rows > 0) {
+                $stmt = $pdo->prepare('UPDATE user_bans SET is_active = 0, unbanned_at = NOW(), unbanned_by = NULL WHERE user_id = ? AND is_active = 1');
+
+                if ($stmt->execute([$user_id]) && $stmt->rowCount() > 0) {
                     // Get user info for email
-                    $stmt2 = $db->prepare('SELECT username, email FROM community_users WHERE id = ?');
-                    $stmt2->bind_param('i', $user_id);
-                    $stmt2->execute();
-                    $result = $stmt2->get_result();
-                    $user = $result->fetch_assoc();
-                    $stmt2->close();
-                    
+                    $stmt2 = $pdo->prepare('SELECT username, email FROM community_users WHERE id = ?');
+                    $stmt2->execute([$user_id]);
+                    $user = $stmt2->fetch();
+
                     if ($user) {
                         send_unban_notification_email($user['email'], $user['username']);
                         $success_count++;
@@ -112,30 +110,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
 // Function to get all users with optional filters
 function get_all_users($search = '', $date_from = '', $date_to = '', $ban_status = 'all')
 {
-    $db = get_db_connection();
+    global $pdo;
     $users = [];
 
     $query = 'SELECT u.* FROM community_users u WHERE 1=1';
-    $types = '';
     $params = [];
 
     if (!empty($search)) {
         $query .= ' AND (u.username LIKE ? OR u.email LIKE ?)';
         $search_param = '%' . $search . '%';
-        $types .= 'ss';
         $params[] = $search_param;
         $params[] = $search_param;
     }
 
     if (!empty($date_from)) {
         $query .= ' AND DATE(u.created_at) >= ?';
-        $types .= 's';
         $params[] = $date_from;
     }
 
     if (!empty($date_to)) {
         $query .= ' AND DATE(u.created_at) <= ?';
-        $types .= 's';
         $params[] = $date_to;
     }
 
@@ -149,19 +143,17 @@ function get_all_users($search = '', $date_from = '', $date_to = '', $ban_status
     $query .= ' ORDER BY u.created_at DESC';
 
     if (!empty($params)) {
-        $stmt = $db->prepare($query);
-        $stmt->bind_param($types, ...$params);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
 
-        while ($row = $result->fetch_assoc()) {
+        while ($row = $stmt->fetch()) {
             $row['is_banned'] = is_user_banned($row['id']);
             $users[] = $row;
         }
     } else {
-        $result = $db->query($query);
+        $stmt = $pdo->query($query);
 
-        while ($row = $result->fetch_assoc()) {
+        while ($row = $stmt->fetch()) {
             $row['is_banned'] = is_user_banned($row['id']);
             $users[] = $row;
         }
@@ -207,7 +199,6 @@ if (!empty($date_preset) && $date_preset !== 'custom') {
 $users = get_all_users($search, $date_from, $date_to, $ban_status);
 
 // Get user statistics for dashboard
-$db = get_db_connection();
 
 // Total users
 $total_users = count($users);

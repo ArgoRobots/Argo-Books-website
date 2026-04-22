@@ -96,16 +96,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($comment) {
                 // Connect comment to user account
-                $db = get_db_connection();
-
                 // Make sure we have a valid user ID
                 $user_id = isset($current_user['id']) ? intval($current_user['id']) : 0;
 
                 if ($user_id > 0) {
-                    $stmt = $db->prepare('UPDATE community_comments SET user_id = ? WHERE id = ?');
-                    $stmt->bind_param('ii', $user_id, $comment['id']);
-                    $stmt->execute();
-                    $stmt->close();
+                    $stmt = $pdo->prepare('UPDATE community_comments SET user_id = ? WHERE id = ?');
+                    $stmt->execute([$user_id, $comment['id']]);
                 }
 
                 $response = [

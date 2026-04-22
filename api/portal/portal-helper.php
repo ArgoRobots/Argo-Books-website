@@ -56,28 +56,17 @@ function authenticate_portal_request(): ?array
     }
 
     $apiKeyHash = hash('sha256', $providedApiKey);
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
-    if ($stmt === false) {
-        error_log('authenticate_portal_request: DB prepare failed: ' . $db->error);
-        $db->close();
+    try {
+        $stmt = $pdo->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');
+        $stmt->execute([$apiKeyHash]);
+        $company = $stmt->fetch();
+    } catch (PDOException $e) {
+        error_log('authenticate_portal_request: DB error: ' . $e->getMessage());
         return null;
     }
 
-    $stmt->bind_param('s', $apiKeyHash);
-
-    if (!$stmt->execute()) {
-        error_log('authenticate_portal_request: DB execute failed: ' . $stmt->error);
-        $stmt->close();
-        $db->close();
-        return null;
-    }
-
-    $company = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
-
-    $db->close();
     return $company ?: null;
 }
 
@@ -227,8 +216,8 @@ function enforce_payment_rate_limit(): void
  */
 function get_invoice_by_token(string $token): ?array
 {
-    $db = get_db_connection();
-    $stmt = $db->prepare(
+    global $pdo;
+    $stmt = $pdo->prepare(
         'SELECT pi.*, pc.company_name, pc.company_logo_url,
                 pc.stripe_account_id, pc.paypal_merchant_id,
                 pc.square_merchant_id
@@ -237,12 +226,8 @@ function get_invoice_by_token(string $token): ?array
          WHERE pi.invoice_token = ?
          LIMIT 1'
     );
-    $stmt->bind_param('s', $token);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $invoice = $result->fetch_assoc();
-    $stmt->close();
-    $db->close();
+    $stmt->execute([$token]);
+    $invoice = $stmt->fetch();
 
     if ($invoice && !empty($invoice['invoice_data'])) {
         $invoice['invoice_data'] = json_decode($invoice['invoice_data'], true);
@@ -259,10 +244,10 @@ function get_invoice_by_token(string $token): ?array
  */
 function get_invoices_by_customer_token(string $customerToken): array
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Get company info from the first matching invoice
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'SELECT pi.company_id, pc.company_name, pc.company_logo_url,
                 pc.stripe_account_id, pc.paypal_merchant_id,
                 pc.square_merchant_id
@@ -271,19 +256,15 @@ function get_invoices_by_customer_token(string $customerToken): array
          WHERE pi.customer_token = ?
          LIMIT 1'
     );
-    $stmt->bind_param('s', $customerToken);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $company = $result->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$customerToken]);
+    $company = $stmt->fetch();
 
     if (!$company) {
-        $db->close();
         return ['company' => null, 'invoices' => []];
     }
 
     // Get all invoices for this customer token
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'SELECT id, invoice_id, invoice_token, customer_name, customer_email,
                 invoice_data, status, total_amount, balance_due, currency,
                 due_date, created_at, updated_at
@@ -291,19 +272,15 @@ function get_invoices_by_customer_token(string $customerToken): array
          WHERE customer_token = ?
          ORDER BY due_date ASC'
     );
-    $stmt->bind_param('s', $customerToken);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$customerToken]);
 
     $invoices = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         if (!empty($row['invoice_data'])) {
             $row['invoice_data'] = json_decode($row['invoice_data'], true);
         }
         $invoices[] = $row;
     }
-    $stmt->close();
-    $db->close();
 
     return [
         'company' => $company,
@@ -327,7 +304,7 @@ function record_portal_payment(array $params): array
         return ['success' => false, 'error' => 'Negative amounts are only allowed for refunds'];
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     $companyId = $params['company_id'];
     $invoiceId = $params['invoice_id'];
@@ -345,7 +322,7 @@ function record_portal_payment(array $params): array
     // Use INSERT ... ON DUPLICATE KEY UPDATE to prevent race conditions on duplicate payments.
     // SCHEMA REQUIREMENT: A UNIQUE index on `provider_payment_id` is required in portal_payments
     // for this to work correctly. e.g.: ALTER TABLE portal_payments ADD UNIQUE INDEX (provider_payment_id);
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'INSERT INTO portal_payments
          (company_id, invoice_id, customer_name, amount, processing_fee,
           currency, payment_method, provider_payment_id, provider_transaction_id,
@@ -353,40 +330,33 @@ function record_portal_payment(array $params): array
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW())
          ON DUPLICATE KEY UPDATE id=id'
     );
-    $stmt->bind_param(
-        'issddsssssss',
-        $companyId, $invoiceId, $customerName, $amount, $processingFee,
-        $currency, $paymentMethod, $providerPaymentId, $providerTransactionId,
-        $referenceNumber, $status, $paymentEnvironment
-    );
 
-    if (!$stmt->execute()) {
-        $error = $stmt->error;
-        error_log('Portal payment DB error: ' . $error);
-        $stmt->close();
-        $db->close();
+    try {
+        $stmt->execute([
+            $companyId, $invoiceId, $customerName, $amount, $processingFee,
+            $currency, $paymentMethod, $providerPaymentId, $providerTransactionId,
+            $referenceNumber, $status, $paymentEnvironment
+        ]);
+    } catch (PDOException $e) {
+        error_log('Portal payment DB error: ' . $e->getMessage());
         return [
             'success' => false,
             'message' => 'Failed to record payment'
         ];
     }
 
-    // ON DUPLICATE KEY UPDATE sets affected_rows to 2 when a duplicate is found.
-    // affected_rows == 1 means a new row was inserted.
-    $affectedRows = $stmt->affected_rows;
-    $paymentId = $stmt->insert_id;
-    $stmt->close();
+    // ON DUPLICATE KEY UPDATE sets rowCount() to 2 when a duplicate is found.
+    // rowCount() == 1 means a new row was inserted.
+    $affectedRows = $stmt->rowCount();
+    $paymentId = $pdo->lastInsertId();
 
     if ($affectedRows !== 1 && !empty($providerPaymentId)) {
         // Duplicate payment detected — return existing reference
-        $stmt = $db->prepare(
+        $stmt = $pdo->prepare(
             'SELECT reference_number FROM portal_payments WHERE provider_payment_id = ? LIMIT 1'
         );
-        $stmt->bind_param('s', $providerPaymentId);
-        $stmt->execute();
-        $existing = $stmt->get_result()->fetch_assoc();
-        $stmt->close();
-        $db->close();
+        $stmt->execute([$providerPaymentId]);
+        $existing = $stmt->fetch();
         return [
             'success' => true,
             'reference_number' => $existing['reference_number'] ?? $referenceNumber,
@@ -399,7 +369,7 @@ function record_portal_payment(array $params): array
     // The processing fee covers payment provider costs and is not part of the invoice total.
     if ($status === 'completed') {
         $invoiceAmount = max(0, $amount - $processingFee);
-        $stmt = $db->prepare(
+        $stmt = $pdo->prepare(
             'UPDATE portal_invoices
              SET balance_due = GREATEST(0, balance_due - ?),
                  status = CASE
@@ -410,12 +380,8 @@ function record_portal_payment(array $params): array
                  updated_at = NOW()
              WHERE company_id = ? AND invoice_id = ?'
         );
-        $stmt->bind_param('dddis', $invoiceAmount, $invoiceAmount, $invoiceAmount, $companyId, $invoiceId);
-        $stmt->execute();
-        $stmt->close();
+        $stmt->execute([$invoiceAmount, $invoiceAmount, $invoiceAmount, $companyId, $invoiceId]);
     }
-
-    $db->close();
 
     return [
         'success' => true,

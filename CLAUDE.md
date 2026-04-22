@@ -67,7 +67,7 @@ cp ".env - sandbox" .env
 
 - MySQL with InnoDB, `utf8mb4`
 - Database name: `argo_books`
-- Connection via PDO in `db_connect.php`
+- Connection via PDO in `db_connect.php` (global `$pdo`; `PDO::ATTR_ERRMODE` is `ERRMODE_EXCEPTION`, default fetch mode is `FETCH_ASSOC`)
 - Schema file: `mysql_schema.sql` — update this when adding/modifying tables
 
 Key table groups:
@@ -98,16 +98,19 @@ Rules for any code that sends email:
 - SMTP config lives in `.env` under `SMTP_*` (see `smtp_mailer.php` docblock). In production and sandbox, `SMTP_HOST=smtp.resend.com`, `SMTP_USERNAME=resend`, `SMTP_PASSWORD` is the Resend API key.
 - For local development, set up MailHog (see `/read-me/Local email setup.md`) so mail() fallback works without hitting real inboxes.
 
-## Database Access — Two Interfaces
+## Database Access
 
-`db_connect.php` exports **both** a global `$pdo` (PDO) **and** a `get_db_connection()` function that returns a `mysqli` instance. Different layers of the codebase use different interfaces:
+All DB queries go through the global `$pdo` (PDO with `ATTR_ERRMODE => ERRMODE_EXCEPTION`, default fetch mode `FETCH_ASSOC`, `ATTR_EMULATE_PREPARES => false`). At script top-level, `$pdo` is already in scope once `db_connect.php` is required. Inside functions, declare `global $pdo;` before use.
 
-- **PDO (`$pdo`)**: newer code — `pricing/`, `webhooks/`, `cron/`, most of `admin/`
-- **mysqli (`get_db_connection()`)**: `community/*`, `admin/website-stats/*`, `api/portal/*`, `api/google/*`
+Conventions:
 
-The two interfaces are syntactically incompatible (`prepare/execute/fetch` vs `prepare/bind_param/get_result`). When editing a file, **match what's already there** — don't switch mid-file.
+- Always use prepared statements for any query touching user input. Pass params as an array to `execute([...])`; don't concatenate into SQL.
+- `$stmt->fetch()` returns `false` when there's no row — check that explicitly instead of treating it as an existence test.
+- PDO throws `PDOException` on error. Wrap in try/catch only at boundaries where you want a specific user-facing error response; otherwise let it bubble to the global handler.
+- For INSERT/UPDATE/DELETE, `$stmt->rowCount()` gives affected rows and `$pdo->lastInsertId()` gives the new id.
+- Transactions: `$pdo->beginTransaction()` / `$pdo->commit()` / `$pdo->rollBack()` (note the capital B).
 
-A future migration to PDO-everywhere is planned but out of scope for day-to-day changes — don't start converting files unless that's the explicit task.
+The old `mysqli` interface (`get_db_connection()`) was removed in the PDO migration — don't reintroduce it.
 
 ## Layout (Header / Footer)
 
@@ -136,12 +139,9 @@ Shared flat-file rate limiting helpers (`is_rate_limited`, `record_rate_limit_at
 
 ## Known Deferred Refactors
 
-Two pieces of consistent-but-dated state exist in the codebase. Don't "helpfully" clean them up mid-feature:
+One piece of consistent-but-dated state exists in the codebase. Don't "helpfully" clean it up mid-feature:
 
-- **`community/`, `api/portal/`, `api/google/`, and `admin/website-stats/` still use mysqli** via `get_db_connection()`. A full PDO migration is planned but not started.
-- **~150 `require_once` / `include_once` calls use relative paths** (not `__DIR__`-prefixed). The convention in new code is absolute paths, but the bulk conversion is pending.
-
-Both are low-risk in their current state. Leave them unless the task is explicitly the migration.
+- **~150 `require_once` / `include_once` calls use relative paths** (not `__DIR__`-prefixed). The convention in new code is absolute paths, but the bulk conversion is pending. Leave them unless the task is explicitly the migration.
 
 ## Cron Jobs
 
@@ -184,7 +184,7 @@ Files excluded from deployment: `.git`, `.github`, `README.md`, `composer.json`,
 - Admin requires TOTP 2FA — secret stored in `admin_users` table
 - Sensitive portal data encrypted with AES-256-GCM (`db_connect.php`)
 - `.htaccess` blocks direct access to `.env`, `.sql`, log files
-- Always sanitize user input; use PDO prepared statements (already the convention)
+- Always sanitize user input; use PDO prepared statements (`$pdo->prepare(...)->execute([...])`) for every SQL query touching user input — never concatenate into SQL
 - Rate limiting via flat files in `/resources/rate_limits/` (gitignored)
 
 ## Third-Party Services

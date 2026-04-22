@@ -14,13 +14,9 @@ if (!isset($_SESSION['temp_user_id'])) {
 $user_id = $_SESSION['temp_user_id'];
 
 // Get user details from database
-$db = get_db_connection();
-$stmt = $db->prepare('SELECT id, email, username, email_verified FROM community_users WHERE id = ?');
-$stmt->bind_param('i', $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
+$stmt = $pdo->prepare('SELECT id, email, username, email_verified FROM community_users WHERE id = ?');
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
 
 if (!$user) {
     header('Location: register.php?error=user_not_found');
@@ -37,10 +33,8 @@ if ($user['email_verified'] == 1) {
 $new_verification_code = generate_verification_code();
 
 // Update the database with the new verification code
-$stmt = $db->prepare('UPDATE community_users SET verification_code = ? WHERE id = ?');
-$stmt->bind_param('si', $new_verification_code, $user_id);
-$update_result = $stmt->execute();
-$stmt->close();
+$stmt = $pdo->prepare('UPDATE community_users SET verification_code = ? WHERE id = ?');
+$update_result = $stmt->execute([$new_verification_code, $user_id]);
 
 if (!$update_result) {
     header('Location: verify_code.php?error=update_failed');

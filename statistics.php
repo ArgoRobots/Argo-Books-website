@@ -8,7 +8,7 @@ require_once 'db_connect.php';
 
 /**
  * Track a statistical event
- * 
+ *
  * @param string $event_type Type of event (download, page_view, etc.)
  * @param string $event_data Additional event data
  * @return bool Success status
@@ -20,60 +20,53 @@ function track_event($event_type, $event_data = '')
         return false;
     }
 
-    $db = get_db_connection();
+    global $pdo;
     $ip_address = $_SERVER['REMOTE_ADDR'];
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-    // Only record one occurrence of an event per IP per day
-    $today_start = date('Y-m-d 00:00:00');
-    $exists_stmt = $db->prepare('SELECT 1 FROM statistics WHERE event_type = ? AND event_data = ? AND ip_address = ? AND created_at >= ? LIMIT 1');
-    $exists_stmt->bind_param('ssss', $event_type, $event_data, $ip_address, $today_start);
-    $exists_stmt->execute();
-    $exists_result = $exists_stmt->get_result();
-    if ($exists_result->num_rows > 0) {
-        $exists_stmt->close();
-        return false;
-    }
-    $exists_stmt->close();
+    try {
+        // Only record one occurrence of an event per IP per day
+        $today_start = date('Y-m-d 00:00:00');
+        $exists_stmt = $pdo->prepare('SELECT 1 FROM statistics WHERE event_type = ? AND event_data = ? AND ip_address = ? AND created_at >= ? LIMIT 1');
+        $exists_stmt->execute([$event_type, $event_data, $ip_address, $today_start]);
+        if ($exists_stmt->fetch() !== false) {
+            return false;
+        }
 
-    $country_code = null;
+        $country_code = null;
 
-    // Check if we already have this IP's country code in our database
-    $check_stmt = $db->prepare('SELECT country_code FROM statistics WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != "" LIMIT 1');
-    $check_stmt->bind_param('s', $ip_address);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
+        // Check if we already have this IP's country code in our database
+        $check_stmt = $pdo->prepare('SELECT country_code FROM statistics WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != "" LIMIT 1');
+        $check_stmt->execute([$ip_address]);
+        $row = $check_stmt->fetch();
 
-    if ($check_result->num_rows > 0) {
-        // We already have this IP's country code
-        $row = $check_result->fetch_assoc();
-        $country_code = $row['country_code'];
-        $check_stmt->close();
-    } else {
-        $check_stmt->close();
+        if ($row !== false) {
+            // We already have this IP's country code
+            $country_code = $row['country_code'];
+        } else {
+            // New IP or no country code yet, use cURL to contact the API
+            if (function_exists('curl_init')) {
+                $ch = curl_init("https://ipinfo.io/{$ip_address}/country");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'ArgoSalesTracker/1.0');
+                $response = curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        // New IP or no country code yet, use cURL to contact the API
-        if (function_exists('curl_init')) {
-            $ch = curl_init("https://ipinfo.io/{$ip_address}/country");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
-            curl_setopt($ch, CURLOPT_USERAGENT, 'ArgoSalesTracker/1.0');
-            $response = curl_exec($ch);
-            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-            if ($http_code == 200 && !empty($response)) {
-                $country_code = trim($response);
+                if ($http_code == 200 && !empty($response)) {
+                    $country_code = trim($response);
+                }
             }
         }
+
+        // Insert event
+        $stmt = $pdo->prepare('INSERT INTO statistics (event_type, event_data, ip_address, user_agent, country_code) VALUES (?, ?, ?, ?, ?)');
+        $result = $stmt->execute([$event_type, $event_data, $ip_address, $user_agent, $country_code]);
+
+        return $result;
+    } catch (PDOException $e) {
+        return false;
     }
-
-    // Insert event
-    $stmt = $db->prepare('INSERT INTO statistics (event_type, event_data, ip_address, user_agent, country_code) VALUES (?, ?, ?, ?, ?)');
-    $stmt->bind_param('sssss', $event_type, $event_data, $ip_address, $user_agent, $country_code);
-    $result = $stmt->execute();
-    $stmt->close();
-
-    return $result;
 }
 
 /**
@@ -101,7 +94,7 @@ function track_referral_visit($source_code, $page_url = '')
         return false;
     }
 
-    $db = get_db_connection();
+    global $pdo;
     $ip_address = $_SERVER['REMOTE_ADDR'];
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
@@ -110,54 +103,46 @@ function track_referral_visit($source_code, $page_url = '')
         $_SESSION['referral_source'] = $source_code;
     }
 
-    // Check if this IP already visited from this source today
-    $today_start = date('Y-m-d 00:00:00');
-    $exists_stmt = $db->prepare('SELECT 1 FROM referral_visits WHERE source_code = ? AND ip_address = ? AND visited_at >= ? LIMIT 1');
-    $exists_stmt->bind_param('sss', $source_code, $ip_address, $today_start);
-    $exists_stmt->execute();
-    $exists_result = $exists_stmt->get_result();
-    if ($exists_result->num_rows > 0) {
-        $exists_stmt->close();
-        return false; // Already tracked this IP for this source today
-    }
-    $exists_stmt->close();
+    try {
+        // Check if this IP already visited from this source today
+        $today_start = date('Y-m-d 00:00:00');
+        $exists_stmt = $pdo->prepare('SELECT 1 FROM referral_visits WHERE source_code = ? AND ip_address = ? AND visited_at >= ? LIMIT 1');
+        $exists_stmt->execute([$source_code, $ip_address, $today_start]);
+        if ($exists_stmt->fetch() !== false) {
+            return false; // Already tracked this IP for this source today
+        }
 
-    $country_code = null;
+        $country_code = null;
 
-    // Check if we already have this IP's country code
-    $check_stmt = $db->prepare('SELECT country_code FROM referral_visits WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != "" LIMIT 1');
-    $check_stmt->bind_param('s', $ip_address);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
+        // Check if we already have this IP's country code
+        $check_stmt = $pdo->prepare('SELECT country_code FROM referral_visits WHERE ip_address = ? AND country_code IS NOT NULL AND country_code != "" LIMIT 1');
+        $check_stmt->execute([$ip_address]);
+        $row = $check_stmt->fetch();
 
-    if ($check_result->num_rows > 0) {
-        $row = $check_result->fetch_assoc();
-        $country_code = $row['country_code'];
-        $check_stmt->close();
-    } else {
-        $check_stmt->close();
+        if ($row !== false) {
+            $country_code = $row['country_code'];
+        } else {
+            // New IP, get country code from API
+            if (function_exists('curl_init')) {
+                $ch = curl_init("https://ipinfo.io/{$ip_address}/country");
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 3);
+                curl_setopt($ch, CURLOPT_USERAGENT, 'ArgoSalesTracker/1.0');
+                $response = curl_exec($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-        // New IP, get country code from API
-        if (function_exists('curl_init')) {
-            $ch = curl_init("https://ipinfo.io/{$ip_address}/country");
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 3);
-            curl_setopt($ch, CURLOPT_USERAGENT, 'ArgoSalesTracker/1.0');
-            $response = curl_exec($ch);
-            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-            if ($http_code == 200 && !empty($response)) {
-                $country_code = trim($response);
+                if ($http_code == 200 && !empty($response)) {
+                    $country_code = trim($response);
+                }
             }
         }
+
+        // Insert referral visit
+        $stmt = $pdo->prepare('INSERT INTO referral_visits (source_code, page_url, ip_address, user_agent, country_code) VALUES (?, ?, ?, ?, ?)');
+        $result = $stmt->execute([$source_code, $page_url, $ip_address, $user_agent, $country_code]);
+
+        return $result;
+    } catch (PDOException $e) {
+        return false;
     }
-
-    // Insert referral visit
-    $stmt = $db->prepare('INSERT INTO referral_visits (source_code, page_url, ip_address, user_agent, country_code) VALUES (?, ?, ?, ?, ?)');
-    $stmt->bind_param('sssss', $source_code, $page_url, $ip_address, $user_agent, $country_code);
-    $result = $stmt->execute();
-    $stmt->close();
-
-    return $result;
 }
-

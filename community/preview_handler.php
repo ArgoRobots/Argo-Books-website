@@ -47,13 +47,9 @@ $bug_actual = isset($_POST['bug_actual']) ? trim($_POST['bug_actual']) : '';
 // Get current user info
 $current_user = null;
 if (isset($_SESSION['user_id'])) {
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT username, email, avatar FROM community_users WHERE id = ?');
-    $stmt->bind_param('i', $_SESSION['user_id']);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $current_user = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT username, email, avatar FROM community_users WHERE id = ?');
+    $stmt->execute([$_SESSION['user_id']]);
+    $current_user = $stmt->fetch() ?: null;
 }
 
 // Default user info if not logged in

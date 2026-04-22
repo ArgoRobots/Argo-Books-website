@@ -34,13 +34,9 @@ if (!isset($_SESSION['temp_user_id'])) {
 $user_id = $_SESSION['temp_user_id'];
 
 // Check if the user exists in the database
-$db = get_db_connection();
-$stmt = $db->prepare('SELECT id, verification_code FROM community_users WHERE id = ?');
-$stmt->bind_param('i', $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-$stmt->close();
+$stmt = $pdo->prepare('SELECT id, verification_code FROM community_users WHERE id = ?');
+$stmt->execute([$user_id]);
+$user = $stmt->fetch();
 
 if (!$user) {
     header('Location: register.php?error=user_not_found');
@@ -76,12 +72,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter a valid 6-digit verification code';
     } else {
         // Get the current verification code from database
-        $stmt = $db->prepare('SELECT verification_code FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $db_verification = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT verification_code FROM community_users WHERE id = ?');
+        $stmt->execute([$user_id]);
+        $db_verification = $stmt->fetch();
 
         if (!$db_verification) {
             $error = 'User not found. Please register again.';
@@ -89,19 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Compare the codes directly
             if ($db_verification['verification_code'] === $verification_code) {
                 // Update user as verified and clear verification code
-                $stmt = $db->prepare('UPDATE community_users SET email_verified = 1, verification_code = NULL WHERE id = ?');
-                $stmt->bind_param('i', $user_id);
-                $update_result = $stmt->execute();
-                $stmt->close();
+                $stmt = $pdo->prepare('UPDATE community_users SET email_verified = 1, verification_code = NULL WHERE id = ?');
+                $update_result = $stmt->execute([$user_id]);
 
                 if ($update_result) {
                     // Get the full user details to populate the session
-                    $stmt = $db->prepare('SELECT id, username, email, role, avatar FROM community_users WHERE id = ?');
-                    $stmt->bind_param('i', $user_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $verified_user = $result->fetch_assoc();
-                    $stmt->close();
+                    $stmt = $pdo->prepare('SELECT id, username, email, role, avatar FROM community_users WHERE id = ?');
+                    $stmt->execute([$user_id]);
+                    $verified_user = $stmt->fetch();
 
                     if ($verified_user) {
                         // Regenerate session ID to prevent session fixation

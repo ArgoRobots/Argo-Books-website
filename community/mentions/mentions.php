@@ -59,19 +59,15 @@ function extract_mentions($content)
  */
 function get_user_id_by_username($username)
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare('SELECT id FROM community_users WHERE username = ? LIMIT 1');
-    $stmt->bind_param('s', $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt = $pdo->prepare('SELECT id FROM community_users WHERE username = ? LIMIT 1');
+    $stmt->execute([$username]);
 
-    if ($row = $result->fetch_assoc()) {
-        $stmt->close();
+    if ($row = $stmt->fetch()) {
         return $row['id'];
     }
 
-    $stmt->close();
     return null;
 }
 
@@ -90,11 +86,11 @@ function create_mention_notifications($mentions, $post_id, $comment_id = 0, $aut
         return;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Check if notifications table exists, if not, create it
-    $result = $db->query("SHOW TABLES LIKE 'user_notifications'");
-    if ($result->num_rows == 0) {
+    $result = $pdo->query("SHOW TABLES LIKE 'user_notifications'");
+    if ($result->fetch() === false) {
         // Create notifications table
         $sql = "CREATE TABLE IF NOT EXISTS user_notifications (
             id INT PRIMARY KEY AUTO_INCREMENT,
@@ -107,11 +103,11 @@ function create_mention_notifications($mentions, $post_id, $comment_id = 0, $aut
             FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
 
-        $db->query($sql);
+        $pdo->query($sql);
     }
 
     // Insert notifications for each mentioned user
-    $insert_stmt = $db->prepare("
+    $insert_stmt = $pdo->prepare("
         INSERT INTO user_notifications (user_id, type, message, link, is_read)
         VALUES (?, 'mention', ?, ?, 0)
     ");
@@ -127,16 +123,12 @@ function create_mention_notifications($mentions, $post_id, $comment_id = 0, $aut
         // Get author username
         $author_name = 'Someone';
         if ($author_id) {
-            $author_stmt = $db->prepare('SELECT username FROM community_users WHERE id = ? LIMIT 1');
-            $author_stmt->bind_param('i', $author_id);
-            $author_stmt->execute();
-            $author_result = $author_stmt->get_result();
+            $author_stmt = $pdo->prepare('SELECT username FROM community_users WHERE id = ? LIMIT 1');
+            $author_stmt->execute([$author_id]);
 
-            if ($author_row = $author_result->fetch_assoc()) {
+            if ($author_row = $author_stmt->fetch()) {
                 $author_name = $author_row['username'];
             }
-
-            $author_stmt->close();
         }
 
         // Create notification message and link
@@ -149,9 +141,6 @@ function create_mention_notifications($mentions, $post_id, $comment_id = 0, $aut
         }
 
         // Insert notification
-        $insert_stmt->bind_param('iss', $user_id, $message, $link);
-        $insert_stmt->execute();
+        $insert_stmt->execute([$user_id, $message, $link]);
     }
-
-    $insert_stmt->close();
 }

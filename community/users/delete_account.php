@@ -30,16 +30,12 @@ if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) || !hash_equ
 }
 
 $user_id = $_SESSION['user_id'];
-$db = get_db_connection();
 
 try {
     // Get user information before scheduling deletion
-    $stmt = $db->prepare('SELECT username, email FROM community_users WHERE id = ?');
-    $stmt->bind_param('i', $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT username, email FROM community_users WHERE id = ?');
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch();
 
     if (!$user) {
         $response['message'] = 'User not found';
@@ -48,10 +44,8 @@ try {
     }
 
     $scheduledDate = date('Y-m-d H:i:s', strtotime('+30 days'));
-    $stmt = $db->prepare('UPDATE community_users SET deletion_scheduled_at = ? WHERE id = ?');
-    $stmt->bind_param('si', $scheduledDate, $user_id);
-    $stmt->execute();
-    $stmt->close();
+    $stmt = $pdo->prepare('UPDATE community_users SET deletion_scheduled_at = ? WHERE id = ?');
+    $stmt->execute([$scheduledDate, $user_id]);
 
     // Send account deletion scheduled email
     $email_sent = send_account_deletion_scheduled_email($user['email'], $user['username'], $scheduledDate);

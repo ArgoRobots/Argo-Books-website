@@ -169,24 +169,17 @@ function send_verification_email($email, $code, $username)
  */
 function send_notification_email($type, $data)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Get all admins with the corresponding notification enabled
     $notification_column = ($type === 'new_post') ? 'notify_new_posts' : 'notify_new_comments';
 
-    $stmt = $db->prepare("SELECT u.username, ans.notification_email
+    $stmt = $pdo->prepare("SELECT u.username, ans.notification_email
                          FROM admin_notification_settings ans
                          JOIN community_users u ON ans.user_id = u.id
                          WHERE u.role = 'admin' AND ans.$notification_column = 1");
     $stmt->execute();
-    $result = $stmt->get_result();
-
-    $recipients = [];
-    while ($row = $result->fetch_assoc()) {
-        $recipients[] = $row;
-    }
-
-    $stmt->close();
+    $recipients = $stmt->fetchAll();
 
     // If no admins have notifications enabled, exit early
     if (empty($recipients)) {

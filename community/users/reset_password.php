@@ -53,13 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Verify token is valid
-$db = get_db_connection();
-$stmt = $db->prepare('SELECT id FROM community_users WHERE reset_token = ? AND reset_token_expiry > CURRENT_TIMESTAMP');
-$stmt->bind_param('s', $token);
-$stmt->execute();
-$result = $stmt->get_result();
-$valid_token = ($result->num_rows > 0);
-$stmt->close();
+$stmt = $pdo->prepare('SELECT id FROM community_users WHERE reset_token = ? AND reset_token_expiry > CURRENT_TIMESTAMP');
+$stmt->execute([$token]);
+$valid_token = ($stmt->fetch() !== false);
 ?>
 <!DOCTYPE html>
 <html lang="en">

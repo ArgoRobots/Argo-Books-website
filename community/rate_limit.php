@@ -29,7 +29,7 @@ function check_rate_limit($user_id, $action_type)
         return false;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Check if rate limit is defined for this action type
     if (!isset($RATE_LIMITS[$action_type])) {
@@ -41,20 +41,15 @@ function check_rate_limit($user_id, $action_type)
     $long_limit  = $RATE_LIMITS[$action_type]['long'];
 
     // Retrieve existing rate limit row
-    $stmt = $db->prepare('SELECT count, period_start, last_action_at FROM rate_limits WHERE user_id = ? AND action_type = ?');
-    $stmt->bind_param('is', $user_id, $action_type);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row    = $result->fetch_assoc();
-    $stmt->close();
+    $stmt = $pdo->prepare('SELECT count, period_start, last_action_at FROM rate_limits WHERE user_id = ? AND action_type = ?');
+    $stmt->execute([$user_id, $action_type]);
+    $row = $stmt->fetch();
 
     if ($row) {
         // Reset count if the long-term window has passed
         if (strtotime($row['period_start']) <= $now - ($long_limit['hours'] * 3600)) {
-            $stmt = $db->prepare('UPDATE rate_limits SET count = 0, period_start = CURRENT_TIMESTAMP WHERE user_id = ? AND action_type = ?');
-            $stmt->bind_param('is', $user_id, $action_type);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('UPDATE rate_limits SET count = 0, period_start = CURRENT_TIMESTAMP WHERE user_id = ? AND action_type = ?');
+            $stmt->execute([$user_id, $action_type]);
 
             $row['count']        = 0;
             $row['period_start'] = date('Y-m-d H:i:s', $now);
@@ -79,16 +74,12 @@ function check_rate_limit($user_id, $action_type)
     // Record this action
     if ($row) {
         // Update existing record
-        $stmt = $db->prepare('UPDATE rate_limits SET count = count + 1, last_action_at = CURRENT_TIMESTAMP WHERE user_id = ? AND action_type = ?');
-        $stmt->bind_param('is', $user_id, $action_type);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE rate_limits SET count = count + 1, last_action_at = CURRENT_TIMESTAMP WHERE user_id = ? AND action_type = ?');
+        $stmt->execute([$user_id, $action_type]);
     } else {
         // Insert new record
-        $stmt = $db->prepare('INSERT INTO rate_limits (user_id, action_type, count, period_start, last_action_at) VALUES (?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');
-        $stmt->bind_param('is', $user_id, $action_type);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('INSERT INTO rate_limits (user_id, action_type, count, period_start, last_action_at) VALUES (?, ?, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)');
+        $stmt->execute([$user_id, $action_type]);
     }
 
     return false;

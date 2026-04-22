@@ -10,13 +10,10 @@ require_once __DIR__ . '/totp.php';
  */
 function get_user_by_username($username)
 {
-    $db = get_db_connection();
-    $stmt = $db->prepare('SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?)');
-    $stmt->bind_param('s', $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $user = $result->fetch_assoc();
-    $stmt->close();
+    global $pdo;
+    $stmt = $pdo->prepare('SELECT * FROM admin_users WHERE LOWER(username) = LOWER(?)');
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
     return $user;
 }
 
@@ -35,15 +32,12 @@ function save_2fa_secret($username, $secret)
     try {
         // Encrypt the 2FA secret before storing to protect against DB compromise
         $encrypted_secret = portal_encrypt($secret);
-        $db = get_db_connection();
-        $stmt = $db->prepare('UPDATE admin_users SET two_factor_secret = ?, two_factor_enabled = 1 WHERE username = ?');
-        $stmt->bind_param('ss', $encrypted_secret, $user['username']);
-        if (!$stmt->execute()) {
-            error_log("2FA setup failed: DB update error - " . $stmt->error);
-            $stmt->close();
+        global $pdo;
+        $stmt = $pdo->prepare('UPDATE admin_users SET two_factor_secret = ?, two_factor_enabled = 1 WHERE username = ?');
+        if (!$stmt->execute([$encrypted_secret, $user['username']])) {
+            error_log("2FA setup failed: DB update error");
             return false;
         }
-        $stmt->close();
         return true;
     } catch (Exception $e) {
         error_log("2FA setup failed: " . $e->getMessage());
@@ -63,11 +57,9 @@ function disable_2fa($username)
     if (!$user) return false;
 
     try {
-        $db = get_db_connection();
-        $stmt = $db->prepare('UPDATE admin_users SET two_factor_secret = NULL, two_factor_enabled = 0 WHERE username = ?');
-        $stmt->bind_param('s', $user['username']);
-        $success = $stmt->execute() && $stmt->affected_rows > 0;
-        $stmt->close();
+        global $pdo;
+        $stmt = $pdo->prepare('UPDATE admin_users SET two_factor_secret = NULL, two_factor_enabled = 0 WHERE username = ?');
+        $success = $stmt->execute([$user['username']]) && $stmt->rowCount() > 0;
         return $success;
     } catch (Exception $e) {
         return false;

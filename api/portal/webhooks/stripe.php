@@ -120,22 +120,19 @@ function handle_refund(\Stripe\Charge $charge): void
         return;
     }
 
-    $db = get_db_connection();
+    global $pdo;
 
     // Find the original payment
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'SELECT id, company_id, invoice_id, customer_name, currency
          FROM portal_payments
          WHERE provider_payment_id = ? AND status = "completed"
          LIMIT 1'
     );
-    $stmt->bind_param('s', $providerPaymentId);
-    $stmt->execute();
-    $originalPayment = $stmt->get_result()->fetch_assoc();
-    $stmt->close();
+    $stmt->execute([$providerPaymentId]);
+    $originalPayment = $stmt->fetch();
 
     if (!$originalPayment) {
-        $db->close();
         return;
     }
 
@@ -161,15 +158,13 @@ function handle_refund(\Stripe\Charge $charge): void
     ]);
 
     // Update the original payment status
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'UPDATE portal_payments SET status = "refunded" WHERE id = ?'
     );
-    $stmt->bind_param('i', $originalPayment['id']);
-    $stmt->execute();
-    $stmt->close();
+    $stmt->execute([$originalPayment['id']]);
 
     // Update invoice balance (add refund amount back)
-    $stmt = $db->prepare(
+    $stmt = $pdo->prepare(
         'UPDATE portal_invoices
          SET balance_due = LEAST(total_amount, balance_due + ?),
              status = CASE
@@ -179,12 +174,8 @@ function handle_refund(\Stripe\Charge $charge): void
              updated_at = NOW()
          WHERE company_id = ? AND invoice_id = ?'
     );
-    $stmt->bind_param(
-        'ddis',
+    $stmt->execute([
         $refundAmount, $refundAmount,
         $originalPayment['company_id'], $originalPayment['invoice_id']
-    );
-    $stmt->execute();
-    $stmt->close();
-    $db->close();
+    ]);
 }

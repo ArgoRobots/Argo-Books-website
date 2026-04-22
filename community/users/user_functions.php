@@ -6,7 +6,7 @@ namespace {
 
     /**
      * Register a new user with verification code
-     * 
+     *
      * @param string $username Username
      * @param string $email Email address
      * @param string $password Plain text password
@@ -14,27 +14,21 @@ namespace {
      */
     function register_user($username, $email, $password)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Check if username exists
-        $stmt = $db->prepare('SELECT id FROM community_users WHERE username = ?');
-        $stmt->bind_param('s', $username);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user_exists = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT id FROM community_users WHERE username = ?');
+        $stmt->execute([$username]);
+        $user_exists = $stmt->fetch();
 
         if ($user_exists) {
             return ['success' => false, 'message' => 'Username already exists'];
         }
 
         // Check if email exists
-        $stmt = $db->prepare('SELECT id FROM community_users WHERE email = ?');
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $email_exists = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT id FROM community_users WHERE email = ?');
+        $stmt->execute([$email]);
+        $email_exists = $stmt->fetch();
 
         if ($email_exists) {
             return ['success' => false, 'message' => 'Email already exists'];
@@ -44,14 +38,12 @@ namespace {
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
         // Insert new user
-        $stmt = $db->prepare('INSERT INTO community_users (username, email, password_hash, verification_code, email_verified) 
+        $stmt = $pdo->prepare('INSERT INTO community_users (username, email, password_hash, verification_code, email_verified)
                          VALUES (?, ?, ?, ?, 0)');
-        $stmt->bind_param('ssss', $username, $email, $password_hash, $verification_code);
-        $success = $stmt->execute();
-        $stmt->close();
+        $success = $stmt->execute([$username, $email, $password_hash, $verification_code]);
 
         if ($success) {
-            $user_id = $db->insert_id;
+            $user_id = $pdo->lastInsertId();
 
             // Send verification email with code
             send_verification_email($email, $verification_code, $username);
@@ -75,7 +67,7 @@ namespace {
      */
     function login_user($login, $password)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Check if login is email or username - use whitelist to prevent any injection
         $field = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
@@ -84,12 +76,9 @@ namespace {
         $sql = ($field === 'email')
             ? 'SELECT * FROM community_users WHERE email = ?'
             : 'SELECT * FROM community_users WHERE username = ?';
-        $stmt = $db->prepare($sql);
-        $stmt->bind_param('s', $login);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$login]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             return false;
@@ -111,10 +100,8 @@ namespace {
             $deletion_was_scheduled = !is_null($user['deletion_scheduled_at']);
 
             // Update last login time and cancel scheduled deletion
-            $stmt = $db->prepare('UPDATE community_users SET last_login = NOW(), deletion_scheduled_at = NULL WHERE id = ?');
-            $stmt->bind_param('i', $user['id']);
-            $stmt->execute();
-            $stmt->close();
+            $stmt = $pdo->prepare('UPDATE community_users SET last_login = NOW(), deletion_scheduled_at = NULL WHERE id = ?');
+            $stmt->execute([$user['id']]);
 
             // If deletion was scheduled, send cancellation email
             if ($deletion_was_scheduled) {
@@ -157,22 +144,17 @@ namespace {
                     return;
                 }
 
-                $db = get_db_connection();
+                global $pdo;
 
                 // Check if user had scheduled deletion
-                $stmt = $db->prepare('SELECT deletion_scheduled_at FROM community_users WHERE id = ?');
-                $stmt->bind_param('i', $user['id']);
-                $stmt->execute();
-                $result = $stmt->get_result();
-                $user_data = $result->fetch_assoc();
+                $stmt = $pdo->prepare('SELECT deletion_scheduled_at FROM community_users WHERE id = ?');
+                $stmt->execute([$user['id']]);
+                $user_data = $stmt->fetch();
                 $deletion_was_scheduled = !is_null($user_data['deletion_scheduled_at']);
-                $stmt->close();
 
                 // Update last login time and cancel scheduled deletion
-                $stmt = $db->prepare('UPDATE community_users SET last_login = NOW(), deletion_scheduled_at = NULL WHERE id = ?');
-                $stmt->bind_param('i', $user['id']);
-                $stmt->execute();
-                $stmt->close();
+                $stmt = $pdo->prepare('UPDATE community_users SET last_login = NOW(), deletion_scheduled_at = NULL WHERE id = ?');
+                $stmt->execute([$user['id']]);
 
                 // If deletion was scheduled, send cancellation email
                 if ($deletion_was_scheduled) {
@@ -199,30 +181,26 @@ namespace {
 
     /**
      * Generate a remember me token for a user
-     * 
+     *
      * @param int $user_id User ID
      * @return string|bool Token or false on failure
      */
     function generate_remember_token($user_id)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Create a unique token
         $token = bin2hex(random_bytes(32));
         $expires = date('Y-m-d H:i:s', time() + (30 * 24 * 60 * 60)); // 30 days
 
         // Remove any existing tokens for this user
-        $stmt = $db->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
+        $stmt->execute([$user_id]);
 
         // Store a hash of the token (never store raw tokens in the database)
         $token_hash = hash('sha256', $token);
-        $stmt = $db->prepare('INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)');
-        $stmt->bind_param('iss', $user_id, $token_hash, $expires);
-        $success = $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('INSERT INTO remember_tokens (user_id, token, expires_at) VALUES (?, ?, ?)');
+        $success = $stmt->execute([$user_id, $token_hash, $expires]);
 
         if ($success) {
             return $token;
@@ -233,24 +211,21 @@ namespace {
 
     /**
      * Validate a remember me token and get the associated user
-     * 
+     *
      * @param string $token Remember me token
      * @return array|bool User data or false if invalid
      */
     function validate_remember_token($token)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Hash the token to compare against the stored hash
         $token_hash = hash('sha256', $token);
-        $stmt = $db->prepare('SELECT rt.user_id, u.* FROM remember_tokens rt
+        $stmt = $pdo->prepare('SELECT rt.user_id, u.* FROM remember_tokens rt
                          JOIN community_users u ON rt.user_id = u.id
                          WHERE rt.token = ? AND rt.expires_at > NOW()');
-        $stmt->bind_param('s', $token_hash);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt->execute([$token_hash]);
+        $user = $stmt->fetch();
 
         if ($user) {
             // Don't return sensitive data
@@ -267,17 +242,15 @@ namespace {
 
     /**
      * Clear remember me token when logging out
-     * 
+     *
      * @param int $user_id User ID
      */
     function clear_remember_token($user_id)
     {
-        $db = get_db_connection();
+        global $pdo;
 
-        $stmt = $db->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('DELETE FROM remember_tokens WHERE user_id = ?');
+        $stmt->execute([$user_id]);
 
         // Clear the cookie
         setcookie('remember_me', '', time() - 3600, '/');
@@ -285,49 +258,38 @@ namespace {
 
     /**
      * Get user by ID
-     * 
+     *
      * @param int $user_id User ID
      * @return array|bool User data or false if not found
      */
     function get_user($user_id)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Use a new database connection for each call
-        $stmt = $db->prepare('SELECT id, username, email, bio, avatar, role, email_verified, created_at, last_login 
+        $stmt = $pdo->prepare('SELECT id, username, email, bio, avatar, role, email_verified, created_at, last_login
                         FROM community_users WHERE id = ?');
 
-        if (!$stmt) {
-            error_log("Database prepare error in get_user(): " . $db->error);
-            return false;
-        }
-
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
 
         return $user ? $user : false;
     }
 
     /**
      * Request password reset
-     * 
+     *
      * @param string $email User's email address
      * @return bool Success status
      */
     function request_password_reset($email)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Find user by email
-        $stmt = $db->prepare('SELECT id, username FROM community_users WHERE email = ?');
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT id, username FROM community_users WHERE email = ?');
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             return false;
@@ -340,10 +302,8 @@ namespace {
         $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
         // Update user with reset token
-        $stmt = $db->prepare('UPDATE community_users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?');
-        $stmt->bind_param('ssi', $reset_token, $expiry, $user['id']);
-        $success = $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE community_users SET reset_token = ?, reset_token_expiry = ? WHERE id = ?');
+        $success = $stmt->execute([$reset_token, $expiry, $user['id']]);
 
         if ($success) {
             return send_password_reset_email($email, $reset_token, $user['username']);
@@ -354,22 +314,19 @@ namespace {
 
     /**
      * Reset password using token
-     * 
+     *
      * @param string $token Reset token
      * @param string $new_password New password
      * @return bool Success status
      */
     function reset_password($token, $new_password)
     {
-        $db = get_db_connection();
+        global $pdo;
 
         // Find user by reset token and check expiry
-        $stmt = $db->prepare('SELECT id FROM community_users WHERE reset_token = ? AND reset_token_expiry > NOW()');
-        $stmt->bind_param('s', $token);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT id FROM community_users WHERE reset_token = ? AND reset_token_expiry > NOW()');
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             return false;
@@ -378,17 +335,15 @@ namespace {
         $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
 
         // Update user with new password and clear reset token
-        $stmt = $db->prepare('UPDATE community_users SET password_hash = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?');
-        $stmt->bind_param('si', $password_hash, $user['id']);
-        $success = $stmt->execute();
-        $stmt->close();
+        $stmt = $pdo->prepare('UPDATE community_users SET password_hash = ?, reset_token = NULL, reset_token_expiry = NULL WHERE id = ?');
+        $success = $stmt->execute([$password_hash, $user['id']]);
 
         return $success;
     }
 
     /**
      * Upload avatar image
-     * 
+     *
      * @param int $user_id User ID
      * @param array $file File data from $_FILES
      * @return string|bool Image path on success, false on failure
@@ -439,13 +394,11 @@ namespace {
         }
 
         // Get current avatar path before updating
-        $db = get_db_connection();
-        $stmt = $db->prepare('SELECT avatar FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $old_avatar = $result->fetch_assoc()['avatar'] ?? '';
-        $stmt->close();
+        global $pdo;
+        $stmt = $pdo->prepare('SELECT avatar FROM community_users WHERE id = ?');
+        $stmt->execute([$user_id]);
+        $old_avatar_row = $stmt->fetch();
+        $old_avatar = $old_avatar_row['avatar'] ?? '';
 
         // Generate unique filename
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -459,22 +412,20 @@ namespace {
 
             try {
                 // Begin transaction to reduce lock time
-                $db->begin_transaction();
+                $pdo->beginTransaction();
 
                 $avatar_path = 'uploads/avatars/' . $filename;
-                $stmt = $db->prepare('UPDATE community_users SET avatar = ?, updated_at = NOW() WHERE id = ?');
-                $stmt->bind_param('si', $avatar_path, $user_id);
-                $success = $stmt->execute();
-                $stmt->close();
+                $stmt = $pdo->prepare('UPDATE community_users SET avatar = ?, updated_at = NOW() WHERE id = ?');
+                $success = $stmt->execute([$avatar_path, $user_id]);
 
                 if (!$success) {
-                    $db->rollback();
-                    error_log("Failed to update avatar in database: " . $db->error);
+                    $pdo->rollBack();
+                    error_log("Failed to update avatar in database");
                     return false;
                 }
 
                 // Commit transaction
-                $db->commit();
+                $pdo->commit();
 
                 // Update session with avatar path
                 $_SESSION['avatar'] = $avatar_path;
@@ -490,7 +441,9 @@ namespace {
                 return $avatar_path;
             } catch (Exception $e) {
                 // Rollback on exception
-                $db->rollback();
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
                 error_log("Exception in avatar upload: " . $e->getMessage());
                 return false;
             }
@@ -502,7 +455,7 @@ namespace {
 
     /**
      * Check if user is logged in and exists in database
-     * 
+     *
      * @return bool True if user is logged in and exists in database
      */
     function is_user_logged_in()
@@ -514,23 +467,15 @@ namespace {
 
         // Then verify user exists in database
         try {
-            $db = get_db_connection();
-            if (!$db) {
+            global $pdo;
+            if (!$pdo) {
                 error_log('Database connection failed in is_user_logged_in');
                 return false;
             }
 
-            $stmt = $db->prepare('SELECT id FROM community_users WHERE id = ?');
-            if (!$stmt) {
-                error_log('Failed to prepare statement in is_user_logged_in: ' . $db->error);
-                return false;
-            }
-
-            $stmt->bind_param('i', $_SESSION['user_id']);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $user = $result->fetch_assoc();
-            $stmt->close();
+            $stmt = $pdo->prepare('SELECT id FROM community_users WHERE id = ?');
+            $stmt->execute([$_SESSION['user_id']]);
+            $user = $stmt->fetch();
 
             if (!$user) {
                 error_log('User with ID ' . $_SESSION['user_id'] . ' not found in database');
@@ -592,15 +537,12 @@ namespace CommunityUsers {
         }
 
         $user_id = $_SESSION['user_id'];
-        $db = get_db_connection();
+        global $pdo;
 
-        $stmt = $db->prepare('SELECT id, username, email, bio, avatar, role, email_verified, created_at, last_login 
+        $stmt = $pdo->prepare('SELECT id, username, email, bio, avatar, role, email_verified, created_at, last_login
                          FROM community_users WHERE id = ?');
-        $stmt->bind_param('i', $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-        $stmt->close();
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
 
         if (!$user) {
             // User ID in session but not found in database

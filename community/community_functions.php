@@ -8,15 +8,15 @@ require_once __DIR__ . '/../email_sender.php';
  */
 function get_all_posts()
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Join with users table to get avatar
-    $result = $db->query('SELECT p.*, u.avatar FROM community_posts p 
+    $stmt = $pdo->query('SELECT p.*, u.avatar FROM community_posts p 
                          LEFT JOIN community_users u ON p.user_id = u.id 
                          ORDER BY p.created_at DESC');
 
     $posts = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $posts[] = $row;
     }
 
@@ -31,18 +31,15 @@ function get_all_posts()
  */
 function get_post($post_id)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Join with users table to get avatar
-    $stmt = $db->prepare('SELECT p.*, u.avatar FROM community_posts p 
+    $stmt = $pdo->prepare('SELECT p.*, u.avatar FROM community_posts p 
                          LEFT JOIN community_users u ON p.user_id = u.id 
                          WHERE p.id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $post = $result->fetch_assoc();
+    $stmt->execute([$post_id]);
+    $post = $stmt->fetch();
 
-    $stmt->close();
     return $post;
 }
 
@@ -59,7 +56,7 @@ function get_post($post_id)
  */
 function add_post($user_id, $user_name, $user_email, $title, $content, $post_type)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Process @mentions if the mentions.php file exists
     $has_mentions = false;
@@ -73,15 +70,12 @@ function add_post($user_id, $user_name, $user_email, $title, $content, $post_typ
         $has_mentions = !empty($mentions);
     }
 
-    $stmt = $db->prepare('INSERT INTO community_posts 
+    $stmt = $pdo->prepare('INSERT INTO community_posts 
         (user_id, user_name, user_email, title, content, post_type, views) 
         VALUES (?, ?, ?, ?, ?, ?, 0)');
 
-    $stmt->bind_param('isssss', $user_id, $user_name, $user_email, $title, $content, $post_type);
-
-    if ($stmt->execute()) {
-        $post_id = $db->insert_id;
-        $stmt->close();
+    if ($stmt->execute([$user_id, $user_name, $user_email, $title, $content, $post_type])) {
+        $post_id = $pdo->lastInsertId();
 
         // Create notifications for mentioned users if applicable
         if ($has_mentions && function_exists('create_mention_notifications')) {
@@ -101,7 +95,6 @@ function add_post($user_id, $user_name, $user_email, $title, $content, $post_typ
         return $post_id;
     }
 
-    $stmt->close();
     return false;
 }
 
@@ -114,13 +107,11 @@ function add_post($user_id, $user_name, $user_email, $title, $content, $post_typ
  */
 function update_post_status($post_id, $status)
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare('UPDATE community_posts SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
-    $stmt->bind_param('si', $status, $post_id);
-    $result = $stmt->execute();
+    $stmt = $pdo->prepare('UPDATE community_posts SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+    $result = $stmt->execute([$status, $post_id]);
 
-    $stmt->close();
     return $result;
 }
 
@@ -132,22 +123,19 @@ function update_post_status($post_id, $status)
  */
 function get_post_comments($post_id)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Join with users table to get avatar
-    $stmt = $db->prepare('SELECT c.*, u.avatar FROM community_comments c 
+    $stmt = $pdo->prepare('SELECT c.*, u.avatar FROM community_comments c 
                          LEFT JOIN community_users u ON c.user_id = u.id 
                          WHERE c.post_id = ? ORDER BY c.created_at ASC');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $stmt->execute([$post_id]);
 
     $comments = [];
-    while ($row = $result->fetch_assoc()) {
+    while ($row = $stmt->fetch()) {
         $comments[] = $row;
     }
 
-    $stmt->close();
     return $comments;
 }
 
@@ -159,16 +147,13 @@ function get_post_comments($post_id)
  */
 function get_comment_count($post_id)
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare('SELECT COUNT(*) as count FROM community_comments WHERE post_id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT COUNT(*) as count FROM community_comments WHERE post_id = ?');
+    $stmt->execute([$post_id]);
+    $row = $stmt->fetch();
     $count = $row['count'];
 
-    $stmt->close();
     return $count;
 }
 
@@ -184,7 +169,7 @@ function get_comment_count($post_id)
  */
 function add_comment($post_id, $user_name, $user_email, $content, $user_id = null)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Process @mentions if the mentions.php file exists
     $has_mentions = false;
@@ -198,12 +183,11 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
         $has_mentions = !empty($mentions);
     }
 
-    $stmt = $db->prepare('INSERT INTO community_comments (post_id, user_name, user_email, content, votes, user_id) 
+    $stmt = $pdo->prepare('INSERT INTO community_comments (post_id, user_name, user_email, content, votes, user_id) 
                          VALUES (?, ?, ?, ?, 0, ?)');
-    $stmt->bind_param('isssi', $post_id, $user_name, $user_email, $content, $user_id);
 
-    if ($stmt->execute()) {
-        $comment_id = $db->insert_id;
+    if ($stmt->execute([$post_id, $user_name, $user_email, $content, $user_id])) {
+        $comment_id = $pdo->lastInsertId();
 
         // Get the post data
         $post = get_post($post_id);
@@ -214,13 +198,9 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
         }
 
         // Get the new comment
-        $stmt = $db->prepare('SELECT * FROM community_comments WHERE id = ?');
-        $stmt->bind_param('i', $comment_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $new_comment = $result->fetch_assoc();
-
-        $stmt->close();
+        $stmt = $pdo->prepare('SELECT * FROM community_comments WHERE id = ?');
+        $stmt->execute([$comment_id]);
+        $new_comment = $stmt->fetch();
 
         // Send notification email
         send_notification_email('new_comment', [
@@ -242,7 +222,6 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
         return $new_comment;
     }
 
-    $stmt->close();
     return false;
 }
 
@@ -256,58 +235,48 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
  */
 function vote_post($post_id, $user_email, $vote_type)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Check if user has already voted
-    $stmt = $db->prepare('SELECT vote_type FROM community_votes WHERE post_id = ? AND user_email = ?');
-    $stmt->bind_param('is', $post_id, $user_email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $existing_vote = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT vote_type FROM community_votes WHERE post_id = ? AND user_email = ?');
+    $stmt->execute([$post_id, $user_email]);
+    $existing_vote = $stmt->fetch();
 
     if ($existing_vote) {
         // User already voted, check if they're changing their vote
         if ($existing_vote['vote_type'] == $vote_type) {
             // Remove the vote (cancel)
-            $stmt = $db->prepare('DELETE FROM community_votes WHERE post_id = ? AND user_email = ?');
-            $stmt->bind_param('is', $post_id, $user_email);
-            $stmt->execute();
+            $stmt = $pdo->prepare('DELETE FROM community_votes WHERE post_id = ? AND user_email = ?');
+            $stmt->execute([$post_id, $user_email]);
 
             $user_vote = 0;
         } else {
             // Update the vote
-            $stmt = $db->prepare('UPDATE community_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP 
+            $stmt = $pdo->prepare('UPDATE community_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP 
                                  WHERE post_id = ? AND user_email = ?');
-            $stmt->bind_param('iis', $vote_type, $post_id, $user_email);
-            $stmt->execute();
+            $stmt->execute([$vote_type, $post_id, $user_email]);
 
             $user_vote = $vote_type;
         }
     } else {
         // Add new vote
-        $stmt = $db->prepare('INSERT INTO community_votes (post_id, user_email, vote_type) 
+        $stmt = $pdo->prepare('INSERT INTO community_votes (post_id, user_email, vote_type) 
                              VALUES (?, ?, ?)');
-        $stmt->bind_param('isi', $post_id, $user_email, $vote_type);
-        $stmt->execute();
+        $stmt->execute([$post_id, $user_email, $vote_type]);
 
         $user_vote = $vote_type;
     }
 
     // Update vote count in posts table
-    $stmt = $db->prepare('SELECT SUM(vote_type) as total_votes FROM community_votes WHERE post_id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT SUM(vote_type) as total_votes FROM community_votes WHERE post_id = ?');
+    $stmt->execute([$post_id]);
+    $row = $stmt->fetch();
 
     $total_votes = $row['total_votes'] ?? 0;
 
     // Update the post's vote count
-    $stmt = $db->prepare('UPDATE community_posts SET votes = ? WHERE id = ?');
-    $stmt->bind_param('ii', $total_votes, $post_id);
-    $stmt->execute();
-
-    $stmt->close();
+    $stmt = $pdo->prepare('UPDATE community_posts SET votes = ? WHERE id = ?');
+    $stmt->execute([$total_votes, $post_id]);
 
     return [
         'new_vote_count' => $total_votes,
@@ -324,16 +293,13 @@ function vote_post($post_id, $user_email, $vote_type)
  */
 function get_user_vote($post_id, $user_email)
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare('SELECT vote_type FROM community_votes WHERE post_id = ? AND user_email = ?');
-    $stmt->bind_param('is', $post_id, $user_email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT vote_type FROM community_votes WHERE post_id = ? AND user_email = ?');
+    $stmt->execute([$post_id, $user_email]);
+    $row = $stmt->fetch();
     $vote = $row ? $row['vote_type'] : 0;
 
-    $stmt->close();
     return $vote;
 }
 
@@ -347,58 +313,48 @@ function get_user_vote($post_id, $user_email)
  */
 function vote_comment($comment_id, $user_email, $vote_type)
 {
-    $db = get_db_connection();
+    global $pdo;
 
     // Check if user has already voted
-    $stmt = $db->prepare('SELECT vote_type FROM comment_votes WHERE comment_id = ? AND user_email = ?');
-    $stmt->bind_param('is', $comment_id, $user_email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $existing_vote = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT vote_type FROM comment_votes WHERE comment_id = ? AND user_email = ?');
+    $stmt->execute([$comment_id, $user_email]);
+    $existing_vote = $stmt->fetch();
 
     if ($existing_vote) {
         // User already voted, check if they're changing their vote
         if ($existing_vote['vote_type'] == $vote_type) {
             // Remove the vote (cancel)
-            $stmt = $db->prepare('DELETE FROM comment_votes WHERE comment_id = ? AND user_email = ?');
-            $stmt->bind_param('is', $comment_id, $user_email);
-            $stmt->execute();
+            $stmt = $pdo->prepare('DELETE FROM comment_votes WHERE comment_id = ? AND user_email = ?');
+            $stmt->execute([$comment_id, $user_email]);
 
             $user_vote = 0;
         } else {
             // Update the vote
-            $stmt = $db->prepare('UPDATE comment_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP 
+            $stmt = $pdo->prepare('UPDATE comment_votes SET vote_type = ?, created_at = CURRENT_TIMESTAMP 
                                  WHERE comment_id = ? AND user_email = ?');
-            $stmt->bind_param('iis', $vote_type, $comment_id, $user_email);
-            $stmt->execute();
+            $stmt->execute([$vote_type, $comment_id, $user_email]);
 
             $user_vote = $vote_type;
         }
     } else {
         // Add new vote
-        $stmt = $db->prepare('INSERT INTO comment_votes (comment_id, user_email, vote_type) 
+        $stmt = $pdo->prepare('INSERT INTO comment_votes (comment_id, user_email, vote_type) 
                              VALUES (?, ?, ?)');
-        $stmt->bind_param('isi', $comment_id, $user_email, $vote_type);
-        $stmt->execute();
+        $stmt->execute([$comment_id, $user_email, $vote_type]);
 
         $user_vote = $vote_type;
     }
 
     // Update vote count in comments table
-    $stmt = $db->prepare('SELECT SUM(vote_type) as total_votes FROM comment_votes WHERE comment_id = ?');
-    $stmt->bind_param('i', $comment_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT SUM(vote_type) as total_votes FROM comment_votes WHERE comment_id = ?');
+    $stmt->execute([$comment_id]);
+    $row = $stmt->fetch();
 
     $total_votes = $row['total_votes'] ?? 0;
 
     // Update the comment's vote count
-    $stmt = $db->prepare('UPDATE community_comments SET votes = ? WHERE id = ?');
-    $stmt->bind_param('ii', $total_votes, $comment_id);
-    $stmt->execute();
-
-    $stmt->close();
+    $stmt = $pdo->prepare('UPDATE community_comments SET votes = ? WHERE id = ?');
+    $stmt->execute([$total_votes, $comment_id]);
 
     return [
         'new_vote_count' => $total_votes,
@@ -415,16 +371,13 @@ function vote_comment($comment_id, $user_email, $vote_type)
  */
 function get_user_comment_vote($comment_id, $user_email)
 {
-    $db = get_db_connection();
+    global $pdo;
 
-    $stmt = $db->prepare('SELECT vote_type FROM comment_votes WHERE comment_id = ? AND user_email = ?');
-    $stmt->bind_param('is', $comment_id, $user_email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT vote_type FROM comment_votes WHERE comment_id = ? AND user_email = ?');
+    $stmt->execute([$comment_id, $user_email]);
+    $row = $stmt->fetch();
     $vote = $row ? $row['vote_type'] : 0;
 
-    $stmt->close();
     return $vote;
 }
 

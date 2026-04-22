@@ -126,20 +126,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($post_id) {
                 // Connect post to user account
-                $db = get_db_connection();
-                $stmt = $db->prepare('UPDATE community_posts SET user_id = ? WHERE id = ?');
-                $stmt->bind_param('ii', $current_user['id'], $post_id);
-                $stmt->execute();
+                $stmt = $pdo->prepare('UPDATE community_posts SET user_id = ? WHERE id = ?');
+                $stmt->execute([$current_user['id'], $post_id]);
 
                 // Save bug metadata as JSON in a separate field or table if needed
                 if ($post_type === 'bug' && !empty($bug_metadata)) {
                     $metadata_json = json_encode($bug_metadata);
-                    $stmt = $db->prepare('UPDATE community_posts SET metadata = ? WHERE id = ?');
-                    $stmt->bind_param('si', $metadata_json, $post_id);
-                    $stmt->execute();
+                    $stmt = $pdo->prepare('UPDATE community_posts SET metadata = ? WHERE id = ?');
+                    $stmt->execute([$metadata_json, $post_id]);
                 }
-
-                $stmt->close();
 
                 if ($is_ajax) {
                     // Return JSON success response for AJAX

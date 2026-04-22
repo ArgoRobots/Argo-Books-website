@@ -30,44 +30,35 @@ if (!$post) {
 }
 
 // Check if metadata column exists in post_edit_history
-$db = get_db_connection();
-$result = $db->query("SHOW COLUMNS FROM post_edit_history LIKE 'metadata'");
+$pdo->query("SHOW COLUMNS FROM post_edit_history LIKE 'metadata'");
 
 // Fetch the current post metadata
 $current_metadata = null;
-$metadata_exists = false;
-$result = $db->query("SHOW COLUMNS FROM community_posts LIKE 'metadata'");
-$metadata_exists = ($result->num_rows > 0);
+$result = $pdo->query("SHOW COLUMNS FROM community_posts LIKE 'metadata'");
+$metadata_exists = ($result->fetch() !== false);
 
 if ($metadata_exists) {
-    $stmt = $db->prepare('SELECT metadata FROM community_posts WHERE id = ?');
-    $stmt->bind_param('i', $post_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $row = $result->fetch_assoc();
+    $stmt = $pdo->prepare('SELECT metadata FROM community_posts WHERE id = ?');
+    $stmt->execute([$post_id]);
+    $row = $stmt->fetch();
 
     if ($row && !empty($row['metadata'])) {
         $current_metadata = $row['metadata'];
     }
-    $stmt->close();
 }
 
 // Fetch edit history ordered by newest first
-$stmt = $db->prepare('SELECT h.*, u.username 
+$stmt = $pdo->prepare('SELECT h.*, u.username
     FROM post_edit_history h
     LEFT JOIN community_users u ON h.user_id = u.id
     WHERE h.post_id = ?
     ORDER BY h.edited_at DESC');
-$stmt->bind_param('i', $post_id);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt->execute([$post_id]);
 
 $history = [];
-while ($row = $result->fetch_assoc()) {
+while ($row = $stmt->fetch()) {
     $history[] = $row;
 }
-
-$stmt->close();
 
 // The current version is not in the edit history, so add it as the most current version
 $current_post = [

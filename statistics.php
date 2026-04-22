@@ -21,6 +21,9 @@ function track_event($event_type, $event_data = '')
     }
 
     global $pdo;
+    if (!$pdo) {
+        return false;
+    }
     $ip_address = $_SERVER['REMOTE_ADDR'];
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
@@ -98,9 +101,13 @@ function track_referral_visit($source_code, $page_url = '')
     $ip_address = $_SERVER['REMOTE_ADDR'];
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
-    // Store source in session for conversion tracking
+    // Store source in session for conversion tracking (runs even if DB is down)
     if (!isset($_SESSION['referral_source'])) {
         $_SESSION['referral_source'] = $source_code;
+    }
+
+    if (!$pdo) {
+        return false;
     }
 
     try {

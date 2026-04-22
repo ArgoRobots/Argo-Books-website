@@ -57,6 +57,10 @@ function authenticate_portal_request(): ?array
 
     $apiKeyHash = hash('sha256', $providedApiKey);
     global $pdo;
+    if ($pdo === null) {
+        error_log('authenticate_portal_request: database connection unavailable');
+        return null;
+    }
 
     try {
         $stmt = $pdo->prepare('SELECT * FROM portal_companies WHERE api_key_hash = ? LIMIT 1');

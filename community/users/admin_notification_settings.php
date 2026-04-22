@@ -65,7 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $settings['notify_new_reports'] = $notify_new_reports;
             $settings['notification_email'] = $notification_email;
         } catch (PDOException $e) {
-            $error_message = 'Error updating notification settings: ' . $e->getMessage();
+            error_log('admin_notification_settings update failed: ' . $e->getMessage());
+            $error_message = 'Failed to update notification settings. Please try again.';
         }
     }
 }

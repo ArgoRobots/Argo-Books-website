@@ -221,6 +221,10 @@ function enforce_payment_rate_limit(): void
 function get_invoice_by_token(string $token): ?array
 {
     global $pdo;
+    if ($pdo === null) {
+        error_log('get_invoice_by_token: database connection unavailable');
+        return null;
+    }
     $stmt = $pdo->prepare(
         'SELECT pi.*, pc.company_name, pc.company_logo_url,
                 pc.stripe_account_id, pc.paypal_merchant_id,
@@ -249,6 +253,10 @@ function get_invoice_by_token(string $token): ?array
 function get_invoices_by_customer_token(string $customerToken): array
 {
     global $pdo;
+    if ($pdo === null) {
+        error_log('get_invoices_by_customer_token: database connection unavailable');
+        return ['company' => null, 'invoices' => []];
+    }
 
     // Get company info from the first matching invoice
     $stmt = $pdo->prepare(

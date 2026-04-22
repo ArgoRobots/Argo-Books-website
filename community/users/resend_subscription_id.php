@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
     $email_sent = resend_subscription_id_email($send_to, $subscription_id, $billing_cycle, $end_date);
 
     if ($email_sent) {
-        $success_message = 'Your subscription ID has been sent to your email address.';
+        $success_message = 'Your license key has been sent to your email address.';
     } else {
         $error_message = 'Failed to send email. Please try again later or <a href="../../contact-us/">contact support</a>.';
     }
@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Resend Subscription ID - Argo Community</title>
+    <title>Resend License Key - Argo Community</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
 
     <div class="auth-container">
         <div class="auth-card">
-            <h1>Resend Subscription ID</h1>
+            <h1>Resend License Key</h1>
 
             <?php if ($success_message): ?>
                 <div class="success-message">
@@ -106,17 +106,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $premium_subscription) {
                     <a href="../../pricing/premium/" class="btn btn-purple">Subscribe to Premium Features</a>
                 </div>
             <?php else: ?>
-                <p class="auth-subtitle">We'll send your Premium subscription ID to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
+                <p class="auth-subtitle">We'll send your Premium license key to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
 
                 <div class="subscription-info">
-                    <h3>Subscription ID Information</h3>
-                    <p>Your subscription ID is a unique identifier for your Premium subscription. Keep it safe for your records.</p>
-                    <p>You may need this ID when contacting support about billing or subscription issues.</p>
+                    <h3>License Key Information</h3>
+                    <p>Your license key is a unique identifier for your Premium subscription. Keep it safe for your records.</p>
+                    <p>You may need this key when contacting support about billing or subscription issues.</p>
                 </div>
 
                 <form method="post" class="auth-form">
                     <div class="form-actions centered">
-                        <button type="submit" class="btn btn-purple">Send Subscription ID</button>
+                        <button type="submit" class="btn btn-purple">Send License Key</button>
                         <a href="subscription.php" class="btn btn-black">Cancel</a>
                     </div>
                 </form>

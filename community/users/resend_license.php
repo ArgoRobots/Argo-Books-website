@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resend_subscription']
     $email_sent = resend_subscription_id_email($send_to, $subscription_id, $billing_cycle, $end_date);
 
     if ($email_sent) {
-        $subscription_success = 'Your subscription ID has been sent to your email address.';
+        $subscription_success = 'Your license key has been sent to your email address.';
     } else {
         $subscription_error = 'Failed to send email. Please try again later or <a href="../../contact-us/">contact support</a>.';
     }
@@ -49,7 +49,7 @@ if (!$has_premium_subscription) {
     exit;
 }
 
-$page_title = 'Resend Subscription ID';
+$page_title = 'Resend License Key';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -128,7 +128,7 @@ $page_title = 'Resend Subscription ID';
             <p class="auth-subtitle">We'll send your information to your registered email address: <strong><?php echo htmlspecialchars($email); ?></strong></p>
 
             <div class="resend-section subscription">
-                <h3>Premium Subscription ID</h3>
+                <h3>Premium License Key</h3>
 
                 <?php if ($subscription_success): ?>
                     <div class="success-message">
@@ -139,10 +139,10 @@ $page_title = 'Resend Subscription ID';
                         <?php echo $subscription_error; ?>
                     </div>
                 <?php else: ?>
-                    <p>Your Premium subscription ID is a unique identifier for your subscription. You may need it when contacting support.</p>
+                    <p>Your Premium license key is a unique identifier for your subscription. You may need it when contacting support.</p>
                     <form method="post">
                         <input type="hidden" name="resend_subscription" value="1">
-                        <button type="submit" class="btn btn-purple">Send Subscription ID</button>
+                        <button type="submit" class="btn btn-purple">Send License Key</button>
                     </form>
                 <?php endif; ?>
             </div>

@@ -571,7 +571,7 @@ function sendRenewalReceiptEmail($email, $subscriptionId, $billing, $amount, $ne
             <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
 
             <div class="footer" style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-                <p>Subscription ID: {$subscriptionId}</p>
+                <p>License Key: {$subscriptionId}</p>
                 <p>Thank you for using Argo Books!</p>
                 <p><a href="https://argorobots.com">argorobots.com</a></p>
             </div>
@@ -621,7 +621,7 @@ function sendPaymentFailedEmail($email, $subscriptionId, $errorMessage) {
             <p>We were unable to process your subscription renewal payment.</p>
 
             <div style="background: #fef2f2; border: 1px solid #fecaca; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; color: #991b1b;"><strong>Subscription ID:</strong> {$subscriptionId}</p>
+                <p style="margin: 0; color: #991b1b;"><strong>License Key:</strong> {$subscriptionId}</p>
             </div>
 
             <p><strong>What to do next:</strong></p>

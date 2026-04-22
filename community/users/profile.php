@@ -636,7 +636,7 @@ if ($is_own_profile) {
                                 <?php if ($has_premium_subscription): ?>
                                     <a href="resend_license.php" class="btn btn-blue">
                                         <?= svg_icon('lock', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
-                                        Resend Subscription ID
+                                        Resend License Key
                                     </a>
                                 <?php endif; ?>
 

@@ -373,7 +373,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                $_SESSION['message'] = "Subscription ID email resent to $sent of $count recipient(s).";
+                $_SESSION['message'] = "License key email resent to $sent of $count recipient(s).";
                 $_SESSION['message_type'] = $sent > 0 ? 'success' : 'error';
             } catch (PDOException $e) {
                 error_log("Error resending subscription emails: " . $e->getMessage());
@@ -566,7 +566,7 @@ include '../admin_header.php';
                                             <label for="subscription-select-all"></label>
                                         </div>
                                     </th>
-                                    <th>Subscription ID</th>
+                                    <th>License Key</th>
                                     <th>User</th>
                                     <th>Email</th>
                                     <th>Plan</th>
@@ -995,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const checked = document.querySelectorAll('.subscription-checkbox:checked');
             if (checked.length === 0) return;
 
-            if (confirm(`Resend subscription ID email to ${checked.length} recipient(s)?`)) {
+            if (confirm(`Resend license key email to ${checked.length} recipient(s)?`)) {
                 bulkSubscriptionActionInput.value = 'resend_email';
                 creditAmountInput.value = '0';
                 subscriptionBulkForm.submit();

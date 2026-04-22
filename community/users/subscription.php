@@ -127,9 +127,9 @@ if ($premium_subscription) {
                     <div class="subscription-details">
                         <div class="detail-grid">
                             <div class="detail-item">
-                                <span class="detail-label">Subscription ID</span>
+                                <span class="detail-label">License Key</span>
                                 <span class="detail-value">
-                                    <a href="resend_subscription_id.php" class="send-id-link" title="Send subscription ID to your email">
+                                    <a href="resend_subscription_id.php" class="send-id-link" title="Send license key to your email">
                                         <?= svg_icon('mail-alt', 16) ?>
                                         Send to Email
                                     </a>

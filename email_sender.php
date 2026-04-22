@@ -102,8 +102,8 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
     $end_date_text = !empty($end_date) ? date('F j, Y', strtotime($end_date)) : 'N/A';
 
     $body = <<<HTML
-        <h1>Your Premium Subscription ID</h1>
-        <p>As requested, here is your Argo Premium Subscription ID:</p>
+        <h1>Your Premium License Key</h1>
+        <p>As requested, here is your Argo Premium license key:</p>
 
         <div class="license-key">{$subscription_id}</div>
 
@@ -123,11 +123,11 @@ function resend_subscription_id_email($to_email, $subscription_id, $billing_cycl
             <a href="https://argorobots.com/community/users/subscription.php" class="button button-purple">Manage Subscription</a>
         </div>
 
-        <p>Keep this ID safe. You may need it when contacting support about your subscription.</p>
+        <p>Keep this key safe. You may need it when contacting support about your subscription.</p>
         <p>If you have any questions or need assistance, please don't hesitate to <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
         HTML;
 
-    return send_styled_email($to_email, 'Your Requested Argo Premium Subscription ID', $body, 'purple');
+    return send_styled_email($to_email, 'Your Requested Argo Premium License Key', $body, 'purple');
 }
 
 /**
@@ -712,7 +712,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
         <p>You can manage your subscription anytime from your <a href="https://argorobots.com/community/users/subscription.php">account settings</a>.</p>
 
         <div class="receipt-footer">
-            <p>Subscription ID: {$subscriptionId}</p>
+            <p>License Key: {$subscriptionId}</p>
             <p>Thank you for using Argo Books!</p>
             <p><a href="https://argorobots.com">argorobots.com</a></p>
         </div>
@@ -752,7 +752,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
         <p>If you have any questions, please <a href="https://argorobots.com/contact-us/">contact our support team</a>.</p>
 
         <div class="receipt-footer">
-            <p>Subscription ID: {$subscriptionId}</p>
+            <p>License Key: {$subscriptionId}</p>
             <p>Thank you for trying Argo Premium!</p>
             <p><a href="https://argorobots.com">argorobots.com</a></p>
         </div>
@@ -786,7 +786,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 
         <table class="details-table">
             <tr>
-                <td class="label">Subscription ID</td>
+                <td class="label">License Key</td>
                 <td class="value">{$subscriptionId}</td>
             </tr>
             <tr>
@@ -907,7 +907,7 @@ function send_payment_failed_email($email, $subscriptionId, $errorMessage = '')
         <p>We were unable to process your subscription renewal payment.</p>
 
         <div class="info-box info-box-warning">
-            <p><strong>Subscription ID:</strong> {$subscriptionId}</p>
+            <p><strong>License Key:</strong> {$subscriptionId}</p>
             {$errorDetail}
         </div>
 

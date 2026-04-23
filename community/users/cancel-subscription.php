@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../email_sender.php';
 require_once __DIR__ . '/../community_functions.php';
 require_once __DIR__ . '/user_functions.php';
 require_once __DIR__ . '/../../webhooks/paypal-helper.php';
+require_once __DIR__ . '/../../config/pricing.php';
 
 require_once __DIR__ . '/../../resources/icons.php';
 
@@ -100,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
 }
 
 $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
+$premium_features = get_plan_features()['premium']['features'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -160,12 +162,9 @@ $end_date = date('F j, Y', strtotime($premium_subscription['end_date']));
             <div class="info-box features-box">
                 <h3>Features you'll lose access to:</h3>
                 <ul>
-                    <li>Unlimited products</li>
-                    <li>Biometric login security</li>
-                    <li>Unlimited invoices & payments</li>
-                    <li>AI receipt scanning (500/month)</li>
-                    <li>Predictive analytics</li>
-                    <li>Priority support</li>
+                    <?php foreach ($premium_features as $feature): ?>
+                        <li><?= render_feature_label($feature) ?></li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
 

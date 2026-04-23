@@ -235,34 +235,12 @@ if ($premium_subscription) {
                 <div class="features-section">
                     <h3>Features Included</h3>
                     <div class="features-grid">
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>Everything in Free</span>
-                        </div>
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>Unlimited products</span>
-                        </div>
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>Biometric login security</span>
-                        </div>
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>Unlimited invoices & payments</span>
-                        </div>
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>AI receipt scanning <span>(500/month)</span></span>
-                        </div>
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>Predictive analytics</span>
-                        </div>
-                        <div class="feature-item">
-                            <?= svg_icon('check-pricing') ?>
-                            <span>Priority support</span>
-                        </div>
+                        <?php foreach (get_plan_features()['premium']['features'] as $feature): ?>
+                            <div class="feature-item">
+                                <?= svg_icon('check-pricing') ?>
+                                <span><?= render_feature_label($feature) ?></span>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 </div>
 

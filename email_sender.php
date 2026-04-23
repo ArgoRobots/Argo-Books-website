@@ -1,6 +1,22 @@
 <?php
 
 require_once __DIR__ . '/smtp_mailer.php';
+require_once __DIR__ . '/config/pricing.php';
+
+/**
+ * Build an HTML <li> list of Premium plan features from plans.json.
+ *
+ * @param string $prefix Optional string (e.g. "✓ ") prepended to each item
+ * @return string Concatenated <li>...</li> markup
+ */
+function _premium_feature_list_items($prefix = '')
+{
+    $items = '';
+    foreach (get_plan_features()['premium']['features'] as $feature) {
+        $items .= '<li>' . $prefix . render_feature_label($feature) . '</li>';
+    }
+    return $items;
+}
 
 /**
  * Base function to send an email with standard Argo styling
@@ -665,6 +681,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
     $paymentDate = date('F j, Y');
     $paymentMethodText = ucfirst($paymentMethod);
     $site_url = site_url();
+    $featureList = _premium_feature_list_items('✓ ');
 
     $body = <<<HTML
         <h1>Payment Receipt</h1>
@@ -702,13 +719,7 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
 
         <h3>What's Included:</h3>
         <ul class="feature-list">
-            <li>✓ Everything in Free</li>
-            <li>✓ Unlimited products</li>
-            <li>✓ Biometric login security</li>
-            <li>✓ Unlimited invoices & payments</li>
-            <li>✓ AI receipt scanning (500/month)</li>
-            <li>✓ Predictive analytics</li>
-            <li>✓ Priority support</li>
+            {$featureList}
         </ul>
 
         <p>You can manage your subscription anytime from your <a href="{$site_url}/community/users/subscription.php">account settings</a>.</p>
@@ -736,6 +747,14 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
     $accessUntil = date('F j, Y', strtotime($endDate));
     $site_url = site_url();
 
+    $featureLabels = array_column(get_plan_features()['premium']['features'], 'label');
+    if (count($featureLabels) > 1) {
+        $lastFeature = array_pop($featureLabels);
+        $featureSentence = implode(', ', $featureLabels) . ', and ' . $lastFeature;
+    } else {
+        $featureSentence = $featureLabels[0];
+    }
+
     $body = <<<HTML
         <h1>Subscription Cancelled</h1>
         <p>Your Argo Premium subscription has been cancelled as requested.</p>
@@ -744,7 +763,7 @@ function send_premium_subscription_cancelled_email($email, $subscriptionId, $end
             <p><strong>Important:</strong> You will continue to have access to Premium features until <strong>{$accessUntil}</strong>.</p>
         </div>
 
-        <p>After this date, Premium features including unlimited products, biometric login security, unlimited invoices & payments, AI receipt scanning, predictive analytics, and priority support will no longer be available.</p>
+        <p>After this date, Premium features including {$featureSentence} will no longer be available.</p>
 
         <p>Changed your mind? You can resubscribe anytime from your account settings.</p>
 
@@ -777,6 +796,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
     $nextBillingDate = date('F j, Y', strtotime($endDate));
     $billingLabel = ucfirst($billingCycle);
     $site_url = site_url();
+    $featureList = _premium_feature_list_items();
 
     $body = <<<HTML
         <h1>Welcome Back!</h1>
@@ -809,13 +829,7 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 
         <p>Features now available:</p>
         <ul class="styled-list">
-            <li>Everything in Free</li>
-            <li>Unlimited products</li>
-            <li>Biometric login security</li>
-            <li>Unlimited invoices & payments</li>
-            <li>AI receipt scanning (500/month)</li>
-            <li>Predictive analytics</li>
-            <li>Priority support</li>
+            {$featureList}
         </ul>
 
         <div class="button-container">
@@ -846,6 +860,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 {
     $durationText = $durationMonths == 0 ? 'permanent' : $durationMonths . ' month' . ($durationMonths > 1 ? 's' : '');
     $site_url = site_url();
+    $featureList = _premium_feature_list_items();
 
     $noteSection = '';
     if (!empty($note)) {
@@ -875,13 +890,7 @@ function send_free_subscription_key_email($email, $subscriptionKey, $durationMon
 
         <h2>What's Included:</h2>
         <ul>
-            <li>Everything in Free</li>
-            <li>Unlimited products</li>
-            <li>Biometric login security</li>
-            <li>Unlimited invoices & payments</li>
-            <li>AI receipt scanning (500/month)</li>
-            <li>Predictive analytics</li>
-            <li>Priority support</li>
+            {$featureList}
         </ul>
 
         <p>If you have any questions or need assistance, please don't hesitate to <a href="{$site_url}/contact-us/">contact our support team</a>.</p>

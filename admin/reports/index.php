@@ -11,7 +11,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 // Set page variables for the header
 $page_title = "Content Reports";
-$page_description = "Review and moderate reported posts and comments";
+$page_description = "Review and moderate reported posts and comments on the community page";
 
 // Get filter parameters
 $status_filter = $_GET['status'] ?? 'pending';

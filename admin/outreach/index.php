@@ -13,6 +13,27 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// Tab partials (load render + POST handlers)
+require_once __DIR__ . '/tabs/ab-tests.php';
+require_once __DIR__ . '/tabs/settings.php';
+
+// Dispatch POST submissions from tab-specific forms BEFORE any output so
+// redirects via header() still work.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
+    $postTab = $_POST['tab'];
+    if ($postTab === 'ab-tests') {
+        ab_tests_tab_handle_post($pdo);
+    } elseif ($postTab === 'settings') {
+        settings_tab_handle_post($pdo);
+    }
+}
+
+// Determine active tab from ?tab=
+$activeTab = $_GET['tab'] ?? 'leads';
+if (!in_array($activeTab, ['leads', 'ab-tests', 'settings'], true)) {
+    $activeTab = 'leads';
+}
+
 // Set page variables for the header
 $page_title = "Business Outreach";
 $page_description = "Find local businesses, generate outreach emails, and track leads";
@@ -24,6 +45,15 @@ include __DIR__ . '/../admin_header.php';
 <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
+
+<!-- Page-level tabs -->
+<div class="section-tabs">
+    <button class="section-tab <?php echo $activeTab === 'leads' ? 'active' : ''; ?>" data-tab="leads">Leads</button>
+    <button class="section-tab <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>" data-tab="ab-tests">A/B Tests</button>
+    <button class="section-tab <?php echo $activeTab === 'settings' ? 'active' : ''; ?>" data-tab="settings">Settings</button>
+</div>
+
+<div id="leads" class="tab-content <?php echo $activeTab === 'leads' ? 'active' : ''; ?>">
 
 <!-- Pipeline Running Banner -->
 <div id="pipelineBanner" style="display:none; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:6px; padding:12px 16px; margin-bottom:16px; font-weight:500;">
@@ -240,6 +270,16 @@ include __DIR__ . '/../admin_header.php';
             </tbody>
         </table>
     </div>
+</div>
+
+</div> <!-- /#leads -->
+
+<div id="ab-tests" class="tab-content <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>">
+    <?php ab_tests_tab_render($pdo, (int) ($_GET['test_id'] ?? 0)); ?>
+</div>
+
+<div id="settings" class="tab-content <?php echo $activeTab === 'settings' ? 'active' : ''; ?>">
+    <?php settings_tab_render($pdo); ?>
 </div>
 
 <!-- Lead Detail Modal -->

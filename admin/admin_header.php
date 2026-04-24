@@ -39,6 +39,7 @@ $base_path = $in_subdir ? '../' : '';
     </script>
     <script src="<?php echo $base_path; ?>../resources/notifications/notifications.js" defer></script>
     <script src="<?php echo $base_path; ?>pagination.js" defer></script>
+    <script src="<?php echo $base_path; ?>section-tabs.js" defer></script>
 
     <link rel="stylesheet" href="<?php echo $base_path; ?>common-style.css">
     <link rel="stylesheet" href="<?php echo $base_path; ?>../resources/styles/link.css">

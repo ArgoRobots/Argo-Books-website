@@ -822,37 +822,7 @@ function copyToClipboard(text, btn) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching
-    const tabs = document.querySelectorAll('.section-tab');
-    const contents = document.querySelectorAll('.tab-content');
-
-    // Check URL hash for active tab
-    const hash = window.location.hash.substring(1);
-    if (hash) {
-        tabs.forEach(t => t.classList.remove('active'));
-        contents.forEach(c => c.classList.remove('active'));
-
-        const targetTab = document.querySelector(`[data-tab="${hash}"]`);
-        const targetContent = document.getElementById(hash);
-        if (targetTab && targetContent) {
-            targetTab.classList.add('active');
-            targetContent.classList.add('active');
-        }
-    }
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const target = this.dataset.tab;
-
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
-
-            this.classList.add('active');
-            document.getElementById(target).classList.add('active');
-
-            history.replaceState(null, null, '#' + target);
-        });
-    });
+    // Tab switching is handled centrally by admin/section-tabs.js
 
     // Subscription Key Bulk Selection
     const subKeySelectAll = document.getElementById('sub-key-select-all');

@@ -551,6 +551,8 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     notes TEXT DEFAULT NULL,
     feedback_summary TEXT DEFAULT NULL,
     draft_subject VARCHAR(500) DEFAULT NULL,
+    ab_test_id INT DEFAULT NULL,
+    ab_variant_id INT DEFAULT NULL,
     draft_body TEXT DEFAULT NULL,
     drafted_at DATETIME DEFAULT NULL,
     approved_at DATETIME DEFAULT NULL,
@@ -565,8 +567,15 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     INDEX idx_outreach_city (city),
     INDEX idx_outreach_approval (approval_status),
     INDEX idx_outreach_company_size (company_size),
-    INDEX idx_unsubscribe_token (unsubscribe_token)
+    INDEX idx_unsubscribe_token (unsubscribe_token),
+    INDEX idx_outreach_ab (ab_test_id, ab_variant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the A/B columns:
+--   ALTER TABLE outreach_leads
+--     ADD COLUMN ab_test_id INT NULL AFTER draft_subject,
+--     ADD COLUMN ab_variant_id INT NULL AFTER ab_test_id,
+--     ADD INDEX idx_outreach_ab (ab_test_id, ab_variant_id);
 
 -- Email suppression list (unsubscribes, opt-outs across all email contexts)
 CREATE TABLE IF NOT EXISTS email_suppressions (
@@ -589,4 +598,31 @@ CREATE TABLE IF NOT EXISTS outreach_activity_log (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
     INDEX idx_outreach_activity_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- A/B tests for outreach email variants (subject lines in v1; body/sender/cta later)
+CREATE TABLE IF NOT EXISTS outreach_ab_tests (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(120) NOT NULL,
+    variant_type ENUM('subject','body','sender','cta') NOT NULL DEFAULT 'subject',
+    status ENUM('draft','active','paused','completed') NOT NULL DEFAULT 'draft',
+    notes TEXT DEFAULT NULL,
+    started_at DATETIME DEFAULT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    winner_variant_id INT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_ab_test_status (status),
+    INDEX idx_ab_test_type_status (variant_type, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Variants that belong to an A/B test
+CREATE TABLE IF NOT EXISTS outreach_ab_variants (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    test_id INT NOT NULL,
+    label VARCHAR(60) NOT NULL,
+    content TEXT NOT NULL,
+    is_default TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (test_id) REFERENCES outreach_ab_tests(id) ON DELETE CASCADE,
+    INDEX idx_ab_variant_test (test_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

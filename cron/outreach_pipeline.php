@@ -174,9 +174,23 @@ try {
     global $pdo;
     ensureStateTable($pdo);
 
+    // ─── Master kill-switch: admin can disable the entire outreach system
+    // from the Settings tab. When off, the server cron still fires but does
+    // nothing until re-enabled.
+    $outreachEnabled = getState($pdo, 'outreach_enabled', '1');
+    if ($outreachEnabled !== '1') {
+        logPipeline('Outreach is DISABLED via admin Settings (outreach_enabled != "1"). Pipeline exiting without running any steps.');
+        return;
+    }
+
     // ─── STEP 1 & 2: Discover + Import ───
     if ($runAll || $discoverOnly) {
         stepDiscover($pdo, $dryRun);
+    }
+
+    // ─── STEP 2.5: Manage A/B Tests (auto-promote winners, auto-create next cycle) ───
+    if ($runAll || $draftOnly) {
+        stepManageAbTests($pdo, $dryRun);
     }
 
     // ─── STEP 3: Generate AI Drafts ───
@@ -185,8 +199,14 @@ try {
     }
 
     // ─── STEP 4: Auto-Approve ───
-    if (($runAll || $draftOnly) && AUTO_APPROVE) {
+    // Runtime-toggled via outreach_pipeline_state.auto_send_mode
+    // ('auto' | 'review'); falls back to the OUTREACH_AUTO_APPROVE env seed
+    // on a DB that hasn't had the toggle set yet.
+    $autoSendMode = getState($pdo, 'auto_send_mode', AUTO_APPROVE ? 'auto' : 'review');
+    if (($runAll || $draftOnly) && $autoSendMode === 'auto') {
         stepAutoApprove($pdo, $dryRun);
+    } elseif (($runAll || $draftOnly) && $autoSendMode === 'review') {
+        logPipeline('Send mode: review — drafts generated but auto-approve skipped.');
     }
 
     // ─── STEP 5: Send Emails ───
@@ -371,6 +391,76 @@ function stepDiscover($pdo, $dryRun)
     setState($pdo, 'last_discovery_city', "$city, $province");
 }
 
+function stepManageAbTests($pdo, $dryRun)
+{
+    logPipeline('--- Step 2.5: Manage A/B Tests ---');
+
+    $enabled = getState($pdo, 'ab_auto_enabled', '1');
+    if ($enabled !== '1') {
+        logPipeline('A/B automation is OFF (ab_auto_enabled != 1). Skipping.');
+        return;
+    }
+
+    if ($dryRun) {
+        $active = get_active_ab_test($pdo, 'subject');
+        if ($active) {
+            logPipeline("[DRY RUN] Would evaluate active A/B test #{$active['test']['id']} '{$active['test']['name']}' for promotion.");
+        } else {
+            logPipeline('[DRY RUN] Would create a new auto-cycle subject-line test.');
+        }
+        return;
+    }
+
+    // 1) Evaluate the active test; promote if any exit criterion fires.
+    $evalResult = ab_check_and_promote_active_test($pdo);
+    if ($evalResult['action'] === 'promoted') {
+        logPipeline(sprintf(
+            "A/B auto-promoted winner: test #%d '%s' — variant %s wins (CTR %.2f%%) via %s after %d days.",
+            $evalResult['test_id'],
+            $evalResult['test_name'],
+            $evalResult['winner_label'],
+            $evalResult['winner_ctr'] * 100,
+            $evalResult['trigger'],
+            $evalResult['age_days']
+        ));
+    } elseif ($evalResult['action'] === 'paused_safety') {
+        logPipeline(sprintf(
+            "A/B auto-paused for safety: test #%d promoted variant %s but CTR %.2f%% fell below floor. ab_auto_enabled set to 0.",
+            $evalResult['test_id'],
+            $evalResult['winner_label'],
+            $evalResult['winner_ctr'] * 100
+        ), 'WARN');
+        return; // Don't start a new cycle — admin needs to review and Resume.
+    } elseif ($evalResult['action'] === 'none' && $evalResult['reason'] === 'criteria_not_met') {
+        logPipeline(sprintf(
+            "A/B test #%d '%s' still running (age %d days, min sent %d) — no promotion criteria met yet.",
+            $evalResult['test_id'] ?? 0,
+            $evalResult['test_name'] ?? '',
+            $evalResult['age_days'] ?? 0,
+            $evalResult['min_sent'] ?? 0
+        ));
+        return; // Test still in flight; don't start a new one.
+    }
+
+    // 2) Start a new cycle if nothing is active right now.
+    $active = get_active_ab_test($pdo, 'subject');
+    if (!$active) {
+        $newCycle = ab_start_new_cycle($pdo);
+        if ($newCycle['action'] === 'created') {
+            logPipeline(sprintf(
+                "A/B auto-created subject cycle: test #%d '%s' with %d variants (source: %s%s).",
+                $newCycle['test_id'],
+                $newCycle['test_name'],
+                $newCycle['variant_count'],
+                $newCycle['source'],
+                $newCycle['carried_winner'] ? ', prior winner carried forward' : ''
+            ));
+        } else {
+            logPipeline('A/B auto-create failed: ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
+        }
+    }
+}
+
 function stepGenerateDrafts($pdo, $dryRun)
 {
     logPipeline('--- Step 3: Generate AI Drafts ---');
@@ -499,7 +589,7 @@ function stepSendEmails($pdo, $dryRun)
 
     // Find approved leads with drafts that haven't been sent
     $stmt = $pdo->prepare("
-        SELECT id, business_name, email, draft_subject, draft_body
+        SELECT id, business_name, email, draft_subject, draft_body, unsubscribe_token, ab_test_id, ab_variant_id
         FROM outreach_leads
         WHERE approval_status = 'approved'
           AND draft_subject IS NOT NULL AND draft_subject != ''
@@ -536,8 +626,11 @@ function stepSendEmails($pdo, $dryRun)
 
         try {
             if (send_outreach_lead($pdo, $lead)) {
-                log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email);
-                logPipeline("Sent email to $businessName <$email> (lead #$id)");
+                $variantTag = !empty($lead['ab_variant_id'])
+                    ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
+                    : '';
+                log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email . $variantTag);
+                logPipeline("Sent email to $businessName <$email> (lead #$id)" . $variantTag);
                 $successCount++;
             } else {
                 log_activity($pdo, $id, 'email_failed', 'Pipeline email send failed for: ' . $email);

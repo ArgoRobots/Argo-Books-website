@@ -191,7 +191,8 @@ function get_leads($pdo)
     ];
     $orderBy = $orderMap[$sort] ?? 'ol.date_added DESC';
 
-    $stmt = $pdo->prepare("SELECT ol.*, MIN(rv.visited_at) AS clicked_at FROM outreach_leads ol LEFT JOIN referral_visits rv ON rv.source_code = CONCAT('outreach-', ol.id) $whereClause GROUP BY ol.id ORDER BY $orderBy");
+    // Match both legacy source codes ("outreach-42") and A/B-tagged ones ("outreach-42-v7")
+    $stmt = $pdo->prepare("SELECT ol.*, MIN(rv.visited_at) AS clicked_at FROM outreach_leads ol LEFT JOIN referral_visits rv ON (rv.source_code = CONCAT('outreach-', ol.id) OR rv.source_code LIKE CONCAT('outreach-', ol.id, '-v%')) $whereClause GROUP BY ol.id ORDER BY $orderBy");
     $stmt->execute($params);
     $leads = $stmt->fetchAll();
 
@@ -365,7 +366,9 @@ function get_stats($pdo)
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
 
-    $rows['clicked'] = $pdo->query("SELECT COUNT(DISTINCT rv.source_code) FROM referral_visits rv WHERE rv.source_code LIKE 'outreach-%'")->fetchColumn();
+    // Count distinct leads clicked. SUBSTRING_INDEX collapses "outreach-42-v7" → "outreach-42"
+    // so a lead that received multiple variants and had any of them clicked counts once.
+    $rows['clicked'] = $pdo->query("SELECT COUNT(DISTINCT SUBSTRING_INDEX(rv.source_code, '-v', 1)) FROM referral_visits rv WHERE rv.source_code LIKE 'outreach-%'")->fetchColumn();
 
     json_response([
         'success' => true,
@@ -520,8 +523,21 @@ function send_outreach_email($pdo)
         json_response(['success' => false, 'message' => 'No draft to send'], 400);
     }
 
+    // Guard against re-sending to the same lead. Cold-outreach resends are
+    // a spam-filter red flag and we never want this to happen by accident,
+    // whether from the detail modal, the bulk-send flow, or a stray API call.
+    if (!empty($lead['sent_at'])) {
+        json_response([
+            'success' => false,
+            'message' => 'This lead was already emailed on ' . $lead['sent_at'] . '. Outreach does not resend to the same address.'
+        ], 409);
+    }
+
     if (send_outreach_lead($pdo, $lead)) {
-        log_activity($pdo, $id, 'email_sent', 'Outreach email sent to: ' . $lead['email']);
+        $variantTag = !empty($lead['ab_variant_id'])
+            ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
+            : '';
+        log_activity($pdo, $id, 'email_sent', 'Outreach email sent to: ' . $lead['email'] . $variantTag);
         json_response(['success' => true, 'message' => 'Email sent successfully']);
     } else {
         log_activity($pdo, $id, 'email_failed', 'Email send failed for: ' . $lead['email']);

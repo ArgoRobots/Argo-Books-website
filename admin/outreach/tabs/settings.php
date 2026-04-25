@@ -140,7 +140,9 @@ function settings_tab_render($pdo)
     $logLines = [];
     $logPath = __DIR__ . '/../../../cron/logs/outreach_pipeline_' . date('Y-m-d') . '.log';
     if (is_readable($logPath)) {
-        // Read last ~200 lines then filter — avoid loading an enormous file entirely
+        // Logs are date-rotated daily so a single file stays small (typically a few KB
+        // per cron run). Load the day's file, take the last 200 lines, then filter
+        // for A/B-related events.
         $lines = @file($logPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if (is_array($lines)) {
             $tail = array_slice($lines, -200);
@@ -178,6 +180,7 @@ function settings_tab_render($pdo)
             <div class="segmented-toggle">
                 <form method="POST" style="display:contents;">
                     <input type="hidden" name="tab" value="settings">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <input type="hidden" name="action" value="set_outreach_enabled">
                     <input type="hidden" name="enabled" value="1">
                     <button type="submit" class="segmented-option <?php echo $outreachEnabled ? 'active' : ''; ?>">
@@ -187,6 +190,7 @@ function settings_tab_render($pdo)
                 </form>
                 <form method="POST" style="display:contents;">
                     <input type="hidden" name="tab" value="settings">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <input type="hidden" name="action" value="set_outreach_enabled">
                     <input type="hidden" name="enabled" value="0">
                     <button type="submit" class="segmented-option <?php echo !$outreachEnabled ? 'active' : ''; ?>">
@@ -209,6 +213,7 @@ function settings_tab_render($pdo)
             <div class="segmented-toggle">
                 <form method="POST" style="display:contents;">
                     <input type="hidden" name="tab" value="settings">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <input type="hidden" name="action" value="set_auto_send_mode">
                     <input type="hidden" name="mode" value="auto">
                     <button type="submit" class="segmented-option <?php echo $autoSendMode === 'auto' ? 'active' : ''; ?>">
@@ -218,6 +223,7 @@ function settings_tab_render($pdo)
                 </form>
                 <form method="POST" style="display:contents;">
                     <input type="hidden" name="tab" value="settings">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <input type="hidden" name="action" value="set_auto_send_mode">
                     <input type="hidden" name="mode" value="review">
                     <button type="submit" class="segmented-option <?php echo $autoSendMode === 'review' ? 'active' : ''; ?>">
@@ -256,6 +262,7 @@ function settings_tab_render($pdo)
             <div class="segmented-toggle">
                 <form method="POST" style="display:contents;">
                     <input type="hidden" name="tab" value="settings">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <input type="hidden" name="action" value="set_ab_auto_enabled">
                     <input type="hidden" name="enabled" value="1">
                     <button type="submit" class="segmented-option <?php echo $abAutoEnabled ? 'active' : ''; ?>">
@@ -265,6 +272,7 @@ function settings_tab_render($pdo)
                 </form>
                 <form method="POST" style="display:contents;">
                     <input type="hidden" name="tab" value="settings">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                     <input type="hidden" name="action" value="set_ab_auto_enabled">
                     <input type="hidden" name="enabled" value="0">
                     <button type="submit" class="segmented-option <?php echo !$abAutoEnabled ? 'active' : ''; ?>">

@@ -18,8 +18,16 @@ require_once __DIR__ . '/tabs/ab-tests.php';
 require_once __DIR__ . '/tabs/settings.php';
 
 // Dispatch POST submissions from tab-specific forms BEFORE any output so
-// redirects via header() still work.
+// redirects via header() still work. CSRF: every state-changing tab form
+// must include the session csrf_token; reject anything that doesn't match.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
+    $postedToken = $_POST['csrf_token'] ?? '';
+    $sessionToken = $_SESSION['csrf_token'] ?? '';
+    if (!$sessionToken || !$postedToken || !hash_equals($sessionToken, $postedToken)) {
+        $_SESSION['message'] = 'Session expired or invalid request token. Please try again.';
+        $_SESSION['message_type'] = 'error';
+        header('Location: index.php?tab=' . urlencode($_POST['tab'])); exit;
+    }
     $postTab = $_POST['tab'];
     if ($postTab === 'ab-tests') {
         ab_tests_tab_handle_post($pdo);

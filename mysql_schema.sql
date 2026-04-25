@@ -568,14 +568,18 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     INDEX idx_outreach_approval (approval_status),
     INDEX idx_outreach_company_size (company_size),
     INDEX idx_unsubscribe_token (unsubscribe_token),
-    INDEX idx_outreach_ab (ab_test_id, ab_variant_id)
+    INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
+    INDEX idx_outreach_ab_variant (ab_variant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- For existing installs, add the A/B columns:
 --   ALTER TABLE outreach_leads
 --     ADD COLUMN ab_test_id INT NULL AFTER draft_subject,
 --     ADD COLUMN ab_variant_id INT NULL AFTER ab_test_id,
---     ADD INDEX idx_outreach_ab (ab_test_id, ab_variant_id);
+--     ADD INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
+--     ADD INDEX idx_outreach_ab_variant (ab_variant_id);
+-- (Existing installs that already added idx_outreach_ab need only:
+--   ALTER TABLE outreach_leads ADD INDEX idx_outreach_ab_variant (ab_variant_id);)
 
 -- Email suppression list (unsubscribes, opt-outs across all email contexts)
 CREATE TABLE IF NOT EXISTS email_suppressions (

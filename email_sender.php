@@ -19,15 +19,19 @@ function _premium_feature_list_items($prefix = '')
 }
 
 /**
- * Base function to send an email with standard Argo styling
+ * Base function to send an email with standard Argo styling.
  *
- * @param string $to_email Recipient email address
- * @param string $subject Email subject
- * @param string $body_content HTML content for the email body (will be wrapped in template). When $format === 'plain', this is used as-is as plain text and no template is applied.
- * @param string $header_style Optional custom header style (default: blue gradient)
- * @param string|null $preheader Optional inbox-preview snippet; rendered as a hidden element so it appears next to the subject in most mail clients without being visible in the body. Ignored when $format === 'plain'.
- * @param string $format 'html' (default, full styled template) or 'plain' (no wrapper, sent as text/plain)
- * @return bool True if successful, false otherwise
+ * @param string      $to_email      Recipient email address
+ * @param string      $subject       Email subject
+ * @param string      $body_content  HTML content for the email body (will be wrapped in template). When $format === 'plain', this is used as-is as plain text and no template is applied.
+ * @param string      $header_style  Optional header style ('blue', 'purple', '' for default, or a raw inline style string for backwards compatibility)
+ * @param string|null $from_email    Sender email address; falls back to noreply@argorobots.com when null
+ * @param string|null $from_name     Sender display name; defaults to 'Argo Books' when null
+ * @param string|null $reply_to      Reply-To address; defaults to support@argorobots.com when null
+ * @param array       $extra_headers Optional associative array of additional headers (added to the SMTP message via addCustomHeader)
+ * @param string|null $preheader     Optional inbox-preview snippet; rendered as a hidden element so it appears next to the subject in most mail clients without being visible in the body. Ignored when $format === 'plain'.
+ * @param string      $format        'html' (default, full styled template) or 'plain' (no wrapper, sent as text/plain)
+ * @return bool                      True if successful, false otherwise
  */
 function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html')
 {

@@ -222,6 +222,7 @@ function ab_tests_tab_render_list($pdo)
             </p>
             <form method="POST" id="abCreateForm">
                 <input type="hidden" name="tab" value="ab-tests">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                 <input type="hidden" name="action" value="create">
 
                 <div class="form-row">
@@ -326,6 +327,7 @@ function ab_tests_tab_render_list($pdo)
                                         <?php if ($t['status'] === 'draft' || $t['status'] === 'paused'): ?>
                                             <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
                                                 <input type="hidden" name="tab" value="ab-tests">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                                 <input type="hidden" name="action" value="status_change">
                                                 <input type="hidden" name="test_id" value="<?php echo (int) $t['id']; ?>">
                                                 <input type="hidden" name="status" value="active">
@@ -334,6 +336,7 @@ function ab_tests_tab_render_list($pdo)
                                         <?php elseif ($t['status'] === 'active'): ?>
                                             <form method="POST" style="display:inline;">
                                                 <input type="hidden" name="tab" value="ab-tests">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                                 <input type="hidden" name="action" value="status_change">
                                                 <input type="hidden" name="test_id" value="<?php echo (int) $t['id']; ?>">
                                                 <input type="hidden" name="status" value="paused">
@@ -478,6 +481,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                 <?php if ($test['status'] === 'draft' || $test['status'] === 'paused'): ?>
                     <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
                         <input type="hidden" name="tab" value="ab-tests">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                         <input type="hidden" name="action" value="status_change">
                         <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                         <input type="hidden" name="status" value="active">
@@ -486,6 +490,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                 <?php elseif ($test['status'] === 'active'): ?>
                     <form method="POST" style="display:inline;">
                         <input type="hidden" name="tab" value="ab-tests">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                         <input type="hidden" name="action" value="status_change">
                         <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                         <input type="hidden" name="status" value="paused">
@@ -493,6 +498,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                     </form>
                     <form method="POST" style="display:inline;" onsubmit="return confirm('End this test without picking a winner? Existing leads keep their variant; new leads stop getting assigned.');">
                         <input type="hidden" name="tab" value="ab-tests">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                         <input type="hidden" name="action" value="status_change">
                         <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                         <input type="hidden" name="status" value="completed">
@@ -542,6 +548,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
 
             <form method="POST" style="margin-top:4px;">
                 <input type="hidden" name="tab" value="ab-tests">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                 <input type="hidden" name="action" value="update_notes">
                 <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                 <div class="form-group">
@@ -620,6 +627,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                                         <?php if ($test['status'] !== 'completed'): ?>
                                             <form method="POST" style="display:inline;" onsubmit="return confirm('Promote this variant and end the test? No more new leads will be assigned.');">
                                                 <input type="hidden" name="tab" value="ab-tests">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                                 <input type="hidden" name="action" value="promote">
                                                 <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                                                 <input type="hidden" name="variant_id" value="<?php echo (int) $v['id']; ?>">

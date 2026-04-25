@@ -729,17 +729,39 @@ function generate_draft_for_lead($pdo, $lead)
     // single match. Iterate over every known type so send-side variants
     // (sender / preheader / format) still get the lead-variant stamp here
     // even though they don't inject anything into the prompt.
+    //
+    // If the lead is already assigned to the currently-active test (e.g.
+    // admin clicked "Regenerate Draft" after the email went out), keep the
+    // existing variant. Re-running pick_ab_variant on a regenerate would
+    // skew round-robin balance and orphan any clicks already tracked under
+    // the lead's previous "?source=outreach-{id}-v{old}" URL.
     $abTestId = null;
     $abVariantId = null;
     $abSubjectOverride = '';
     $abBodyOverride = '';
     $abCtaOverride = '';
     $personalizationOff = false;
+    $existingAbTestId = isset($lead['ab_test_id']) ? (int) $lead['ab_test_id'] : 0;
+    $existingAbVariantId = isset($lead['ab_variant_id']) ? (int) $lead['ab_variant_id'] : 0;
     foreach (ab_known_variant_types() as $eligibleType) {
         $active = get_active_ab_test($pdo, $eligibleType);
         if (!$active) continue;
-        $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
-        $abTestId = (int) $active['test']['id'];
+        $activeTestId = (int) $active['test']['id'];
+
+        $variant = null;
+        if ($existingAbTestId === $activeTestId && $existingAbVariantId > 0) {
+            foreach ($active['variants'] as $candidate) {
+                if ((int) $candidate['id'] === $existingAbVariantId) {
+                    $variant = $candidate;
+                    break;
+                }
+            }
+        }
+        if ($variant === null) {
+            $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
+        }
+
+        $abTestId = $activeTestId;
         $abVariantId = (int) $variant['id'];
         $instruction = ab_instruction_for_variant($variant, $eligibleType);
         if ($eligibleType === 'subject') $abSubjectOverride = $instruction;
@@ -1106,7 +1128,6 @@ function generate_ab_subject_variants($pdo, $count = 3)
     return ['directives' => $directives, 'source' => 'ai'];
 }
 
-/**
 /**
  * Per-type variant generator dispatch. Returns
  *   ['directives' => [...], 'source' => 'ai'|'fallback'|'fixed', 'literal' => bool?]

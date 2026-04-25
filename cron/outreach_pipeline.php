@@ -401,63 +401,88 @@ function stepManageAbTests($pdo, $dryRun)
         return;
     }
 
+    $allTypes = ab_known_variant_types();
+
     if ($dryRun) {
-        $active = get_active_ab_test($pdo, 'subject');
-        if ($active) {
-            logPipeline("[DRY RUN] Would evaluate active A/B test #{$active['test']['id']} '{$active['test']['name']}' for promotion.");
-        } else {
+        $anyActive = false;
+        foreach ($allTypes as $type) {
+            $active = get_active_ab_test($pdo, $type);
+            if ($active) {
+                logPipeline("[DRY RUN] Would evaluate active $type test #{$active['test']['id']} '{$active['test']['name']}' for promotion.");
+                $anyActive = true;
+            }
+        }
+        if (!$anyActive) {
             logPipeline('[DRY RUN] Would create a new auto-cycle subject-line test.');
         }
         return;
     }
 
-    // 1) Evaluate the active test; promote if any exit criterion fires.
-    $evalResult = ab_check_and_promote_active_test($pdo);
-    if ($evalResult['action'] === 'promoted') {
-        logPipeline(sprintf(
-            "A/B auto-promoted winner: test #%d '%s' — variant %s wins (CTR %.2f%%) via %s after %d days.",
-            $evalResult['test_id'],
-            $evalResult['test_name'],
-            $evalResult['winner_label'],
-            $evalResult['winner_ctr'] * 100,
-            $evalResult['trigger'],
-            $evalResult['age_days']
-        ));
-    } elseif ($evalResult['action'] === 'paused_safety') {
-        logPipeline(sprintf(
-            "A/B auto-paused for safety: test #%d promoted variant %s but CTR %.2f%% fell below floor. ab_auto_enabled set to 0.",
-            $evalResult['test_id'],
-            $evalResult['winner_label'],
-            $evalResult['winner_ctr'] * 100
-        ), 'WARN');
-        return; // Don't start a new cycle — admin needs to review and Resume.
-    } elseif ($evalResult['action'] === 'none' && $evalResult['reason'] === 'criteria_not_met') {
-        logPipeline(sprintf(
-            "A/B test #%d '%s' still running (age %d days, min sent %d) — no promotion criteria met yet.",
-            $evalResult['test_id'] ?? 0,
-            $evalResult['test_name'] ?? '',
-            $evalResult['age_days'] ?? 0,
-            $evalResult['min_sent'] ?? 0
-        ));
-        return; // Test still in flight; don't start a new one.
+    // 1) Evaluate the active test of every known type. Today only subject can
+    //    be active (other types are admin-initiated until later phases enable
+    //    auto-creation), but iterating now means new types light up cleanly.
+    $anyStillRunning = false;
+    $anyPaused = false;
+    foreach ($allTypes as $type) {
+        $evalResult = ab_check_and_promote_active_test($pdo, $type);
+        $type = $evalResult['variant_type'] ?? $type;
+
+        if ($evalResult['action'] === 'promoted') {
+            logPipeline(sprintf(
+                "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (CTR %.2f%%) via %s after %d days.",
+                $type,
+                $evalResult['test_id'],
+                $evalResult['test_name'],
+                $evalResult['winner_label'],
+                $evalResult['winner_ctr'] * 100,
+                $evalResult['trigger'],
+                $evalResult['age_days']
+            ));
+        } elseif ($evalResult['action'] === 'paused_safety') {
+            logPipeline(sprintf(
+                "A/B auto-paused for safety: %s test #%d promoted variant %s but CTR %.2f%% fell below floor. ab_auto_enabled set to 0.",
+                $type,
+                $evalResult['test_id'],
+                $evalResult['winner_label'],
+                $evalResult['winner_ctr'] * 100
+            ), 'WARN');
+            $anyPaused = true;
+        } elseif ($evalResult['action'] === 'none' && ($evalResult['reason'] ?? '') === 'criteria_not_met') {
+            logPipeline(sprintf(
+                "A/B %s test #%d '%s' still running (age %d days, min sent %d) — no promotion criteria met yet.",
+                $type,
+                $evalResult['test_id'] ?? 0,
+                $evalResult['test_name'] ?? '',
+                $evalResult['age_days'] ?? 0,
+                $evalResult['min_sent'] ?? 0
+            ));
+            $anyStillRunning = true;
+        }
     }
 
-    // 2) Start a new cycle if nothing is active right now.
-    $active = get_active_ab_test($pdo, 'subject');
-    if (!$active) {
-        $newCycle = ab_start_new_cycle($pdo);
-        if ($newCycle['action'] === 'created') {
-            logPipeline(sprintf(
-                "A/B auto-created subject cycle: test #%d '%s' with %d variants (source: %s%s).",
-                $newCycle['test_id'],
-                $newCycle['test_name'],
-                $newCycle['variant_count'],
-                $newCycle['source'],
-                $newCycle['carried_winner'] ? ', prior winner carried forward' : ''
-            ));
-        } else {
-            logPipeline('A/B auto-create failed: ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
-        }
+    // Safety-pause shorts-circuits new-cycle creation across all types — admin
+    // needs to review and click Resume in Settings.
+    if ($anyPaused) return;
+
+    // If any test is still running (any type), don't start a new subject cycle
+    // yet — keep the one active test at a time invariant.
+    if ($anyStillRunning) return;
+
+    // 2) Auto-create the next subject cycle if nothing is active. Other types
+    //    (body/cta/sender/preheader/format/personalization) are admin-initiated
+    //    in v1 — see plan Phase 7 for optional cross-type auto-rotation.
+    $newCycle = ab_start_new_cycle($pdo, 'subject');
+    if ($newCycle['action'] === 'created') {
+        logPipeline(sprintf(
+            "A/B auto-created subject cycle: test #%d '%s' with %d variants (source: %s%s).",
+            $newCycle['test_id'],
+            $newCycle['test_name'],
+            $newCycle['variant_count'],
+            $newCycle['source'],
+            $newCycle['carried_winner'] ? ', prior winner carried forward' : ''
+        ));
+    } else {
+        logPipeline('A/B auto-create failed: ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
     }
 }
 

@@ -99,20 +99,54 @@ function pick_ab_variant($pdo, $test, $variants)
 }
 
 /**
- * Given a variant row for a 'subject' test, return a prompt instruction
- * that tells the AI how to handle the subject line.
- * - If content starts with 'directive:' the rest is a style instruction.
- * - Otherwise content is a literal subject the AI must use verbatim.
+ * Split a variant's `content` into ['mode' => 'directive'|'literal', 'text' => string].
+ * Helper used by every per-type instruction builder.
  */
-function ab_subject_instruction_for_variant($variant)
+function ab_parse_variant_content($variant)
 {
     $content = trim((string) $variant['content']);
     if (stripos($content, 'directive:') === 0) {
-        $directive = trim(substr($content, strlen('directive:')));
-        return "\n- SUBJECT LINE OVERRIDE: write a subject line that follows this directive exactly: \"" . $directive . "\". This overrides any other guidance about subject lines above.";
+        return [
+            'mode' => 'directive',
+            'text' => trim(substr($content, strlen('directive:'))),
+        ];
     }
-    // Literal subject
-    return "\n- SUBJECT LINE OVERRIDE: use exactly this subject line, word for word, with no changes: \"" . $content . "\". This overrides any other guidance about subject lines above.";
+    return ['mode' => 'literal', 'text' => $content];
+}
+
+/**
+ * Subject-line instruction builder (Phase 0 default; subject is the only
+ * wired variant type today). Returns a prompt fragment to splice into the
+ * system prompt's subject-line bullet.
+ */
+function ab_subject_instruction_for_variant($variant)
+{
+    $parsed = ab_parse_variant_content($variant);
+    if ($parsed['mode'] === 'directive') {
+        return "\n- SUBJECT LINE OVERRIDE: write a subject line that follows this directive exactly: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+    }
+    return "\n- SUBJECT LINE OVERRIDE: use exactly this subject line, word for word, with no changes: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+}
+
+/**
+ * Per-type prompt-injection dispatch. Future phases register new types here
+ * (body, cta, personalization). Send-side types (sender, preheader, format)
+ * apply at send time, not here, and return ['' for prompt injection.
+ *
+ * Returns a string to append to the system prompt — empty if the type has no
+ * prompt-side effect (or isn't wired yet).
+ */
+function ab_instruction_for_variant($variant, $variantType = 'subject')
+{
+    switch ($variantType) {
+        case 'subject':
+            return ab_subject_instruction_for_variant($variant);
+        // Phase 1: case 'body': return ab_body_instruction_for_variant($variant);
+        // Phase 2: case 'cta':  return ab_cta_instruction_for_variant($variant);
+        // Phase 6: case 'personalization': handled inline in generate_draft_for_lead, not here
+        default:
+            return '';
+    }
 }
 
 // ─── Activity Logging ───
@@ -775,26 +809,36 @@ Return ONLY the JSON, no other text.";
 // ─── A/B Test Automation (called from stepManageAbTests in outreach_pipeline.php) ───
 
 /**
- * Evaluate the active subject-line test and promote a winner if any exit
- * criterion is met. Side effect: on trigger, UPDATE the test row to completed
- * with winner_variant_id set; optionally self-pauses automation if the
- * winning CTR is below the configured safety floor.
+ * Variant types the A/B framework knows about. Each later phase that wires
+ * in a new type extends this list. The cron iterates over it when looking
+ * for tests to promote.
+ */
+function ab_known_variant_types()
+{
+    return ['subject', 'body', 'sender', 'cta'];
+}
+
+/**
+ * Evaluate the active test of a given variant type and promote a winner if
+ * any exit criterion is met. Side effect: on trigger, UPDATE the test row to
+ * completed with winner_variant_id set; optionally self-pauses automation if
+ * the winning CTR is below the configured safety floor.
  *
  * Returns one of:
- *   ['action' => 'none', 'reason' => '...', ...]
- *   ['action' => 'promoted', 'test_id' => N, ...]
- *   ['action' => 'paused_safety', 'test_id' => N, ...]
+ *   ['action' => 'none', 'reason' => '...', 'variant_type' => $variantType, ...]
+ *   ['action' => 'promoted', 'test_id' => N, 'variant_type' => $variantType, ...]
+ *   ['action' => 'paused_safety', 'test_id' => N, 'variant_type' => $variantType, ...]
  *
  * Exit criteria (any one triggers promotion):
  *   a) leader significant at p<0.05 vs EVERY other variant AND every variant sent >= 30
  *   b) test age >= 14 days AND every variant sent >= 20
  *   c) test age >= 28 days (force-close; leader by CTR, ties by assigned then lowest id)
  */
-function ab_check_and_promote_active_test($pdo)
+function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
 {
-    $active = get_active_ab_test($pdo, 'subject');
+    $active = get_active_ab_test($pdo, $variantType);
     if (!$active) {
-        return ['action' => 'none', 'reason' => 'no_active_test'];
+        return ['action' => 'none', 'reason' => 'no_active_test', 'variant_type' => $variantType];
     }
     $test = $active['test'];
 
@@ -848,6 +892,7 @@ function ab_check_and_promote_active_test($pdo)
         return [
             'action' => 'none',
             'reason' => 'criteria_not_met',
+            'variant_type' => $variantType,
             'age_days' => $ageDays,
             'min_sent' => $minSent,
             'test_id' => (int) $test['id'],
@@ -880,6 +925,7 @@ function ab_check_and_promote_active_test($pdo)
 
     return [
         'action' => $pausedForSafety ? 'paused_safety' : 'promoted',
+        'variant_type' => $variantType,
         'test_id' => (int) $test['id'],
         'test_name' => $test['name'],
         'winner_id' => (int) $winner['id'],
@@ -965,14 +1011,34 @@ function generate_ab_subject_variants($pdo, $count = 3)
 }
 
 /**
- * Start a new auto-cycle subject test. The previous winner (if any) is
- * carried forward as variant A so the established baseline keeps being
- * measured; newly-generated directives fill the other slots.
+ * Per-type variant generator dispatch. Phase 0 handles 'subject' only;
+ * later phases register additional types here. Returns the same shape
+ * generate_ab_subject_variants() returns: ['directives' => [...], 'source' => 'ai'|'fallback'].
  *
- * Returns ['action' => 'created', 'test_id' => N, ...]
- *      or ['action' => 'failed', 'error' => '...'].
+ * Returns ['directives' => [], 'source' => 'unsupported'] if no generator
+ * is registered for the requested type — caller should treat as failure.
  */
-function ab_start_new_cycle($pdo)
+function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
+{
+    switch ($variantType) {
+        case 'subject':
+            return generate_ab_subject_variants($pdo, $count);
+        // Phase 1: case 'body': return generate_ab_body_variants($pdo, $count);
+        // Phase 2: case 'cta':  return generate_ab_cta_variants($pdo, $count);
+        default:
+            return ['directives' => [], 'source' => 'unsupported'];
+    }
+}
+
+/**
+ * Start a new auto-cycle test for a given variant type. The previous winner
+ * for that type (if any) is carried forward as variant A so the established
+ * baseline keeps being measured; newly-generated directives fill the other slots.
+ *
+ * Returns ['action' => 'created', 'test_id' => N, 'variant_type' => ..., ...]
+ *      or ['action' => 'failed', 'variant_type' => ..., 'error' => '...'].
+ */
+function ab_start_new_cycle($pdo, $variantType = 'subject')
 {
     $count = 3;
 
@@ -980,27 +1046,31 @@ function ab_start_new_cycle($pdo)
         SELECT v.content
         FROM outreach_ab_tests t
         JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
-        WHERE t.status = 'completed' AND t.variant_type = 'subject'
+        WHERE t.status = 'completed' AND t.variant_type = ?
         ORDER BY t.completed_at DESC
         LIMIT 1
     ");
-    $priorStmt->execute();
+    $priorStmt->execute([$variantType]);
     $prior = $priorStmt->fetchColumn();
 
-    $gen = generate_ab_subject_variants($pdo, $count);
+    $gen = generate_ab_variants_for_type($pdo, $variantType, $count);
     $directives = $gen['directives'] ?? [];
     if (count($directives) < 2) {
-        return ['action' => 'failed', 'error' => 'Variant generation returned fewer than 2 directives'];
+        return [
+            'action' => 'failed',
+            'variant_type' => $variantType,
+            'error' => 'Variant generation returned fewer than 2 directives (source: ' . ($gen['source'] ?? 'unknown') . ')',
+        ];
     }
 
-    $name = 'Auto-cycle ' . date('Y-m-d H:i');
+    $name = 'Auto-cycle ' . $variantType . ' ' . date('Y-m-d H:i');
     $notes = 'Auto-generated by stepManageAbTests. Source: ' . ($gen['source'] ?? 'ai')
         . ($prior ? '. Prior winner carried forward as variant A.' : '.');
 
     $pdo->beginTransaction();
     try {
-        $pdo->prepare("INSERT INTO outreach_ab_tests (name, variant_type, status, started_at, notes) VALUES (?, 'subject', 'active', NOW(), ?)")
-            ->execute([$name, $notes]);
+        $pdo->prepare("INSERT INTO outreach_ab_tests (name, variant_type, status, started_at, notes) VALUES (?, ?, 'active', NOW(), ?)")
+            ->execute([$name, $variantType, $notes]);
         $testId = (int) $pdo->lastInsertId();
 
         $vStmt = $pdo->prepare("INSERT INTO outreach_ab_variants (test_id, label, content, is_default) VALUES (?, ?, ?, ?)");
@@ -1030,6 +1100,7 @@ function ab_start_new_cycle($pdo)
 
         return [
             'action' => 'created',
+            'variant_type' => $variantType,
             'test_id' => $testId,
             'test_name' => $name,
             'variant_count' => $variantCount,
@@ -1038,6 +1109,6 @@ function ab_start_new_cycle($pdo)
         ];
     } catch (Exception $e) {
         $pdo->rollBack();
-        return ['action' => 'failed', 'error' => $e->getMessage()];
+        return ['action' => 'failed', 'variant_type' => $variantType, 'error' => $e->getMessage()];
     }
 }

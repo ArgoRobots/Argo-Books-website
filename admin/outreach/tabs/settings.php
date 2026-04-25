@@ -100,10 +100,11 @@ function settings_tab_render($pdo)
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
     $ctrFloor = (float) settings_tab_get_state($pdo, 'ab_ctr_floor', '0.01');
 
-    // Active A/B test snapshot
+    // Active A/B test snapshot — show whichever variant_type is currently
+    // running (only one is active at a time, regardless of type).
     $active = null;
     try {
-        $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests WHERE status = 'active' AND variant_type = 'subject' ORDER BY started_at DESC, id DESC LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests WHERE status = 'active' ORDER BY started_at DESC, id DESC LIMIT 1");
         $stmt->execute();
         $active = $stmt->fetch();
     } catch (PDOException $e) {
@@ -269,6 +270,10 @@ function settings_tab_render($pdo)
                                 <?php echo htmlspecialchars($active['name']); ?>
                             </a>
                         </div>
+                    </div>
+                    <div class="meta-item">
+                        <div class="meta-label">Type</div>
+                        <div class="meta-value"><?php echo htmlspecialchars($active['variant_type']); ?></div>
                     </div>
                     <div class="meta-item">
                         <div class="meta-label">Running for</div>

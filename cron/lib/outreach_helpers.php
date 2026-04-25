@@ -157,12 +157,12 @@ function ab_cta_instruction_for_variant($variant)
 }
 
 /**
- * Per-type prompt-injection dispatch. Future phases register new types here
- * (body, cta, personalization). Send-side types (sender, preheader, format)
- * apply at send time, not here, and return ['' for prompt injection.
- *
- * Returns a string to append to the system prompt — empty if the type has no
- * prompt-side effect (or isn't wired yet).
+ * Per-type prompt-injection dispatch. Returns a string to append to the
+ * system prompt for prompt-side variant types (subject / body / cta).
+ * Send-side types (sender / preheader / format) apply at send time and
+ * return an empty string here. Personalization is handled inline in
+ * generate_draft_for_lead (it gates the OpenAI summary call rather than
+ * injecting into the prompt).
  */
 function ab_instruction_for_variant($variant, $variantType = 'subject')
 {
@@ -173,7 +173,6 @@ function ab_instruction_for_variant($variant, $variantType = 'subject')
             return ab_body_instruction_for_variant($variant);
         case 'cta':
             return ab_cta_instruction_for_variant($variant);
-        // Phase 6: case 'personalization': handled inline in generate_draft_for_lead, not here
         default:
             return '';
     }
@@ -903,9 +902,8 @@ Return ONLY the JSON, no other text.";
 // ─── A/B Test Automation (called from stepManageAbTests in outreach_pipeline.php) ───
 
 /**
- * Variant types the A/B framework knows about. Each later phase that wires
- * in a new type extends this list. The cron iterates over it when looking
- * for tests to promote.
+ * Variant types the A/B framework knows about. The cron iterates over this
+ * list when looking for active tests to promote.
  */
 function ab_known_variant_types()
 {
@@ -1105,12 +1103,13 @@ function generate_ab_subject_variants($pdo, $count = 3)
 }
 
 /**
- * Per-type variant generator dispatch. Phase 0 handles 'subject' only;
- * later phases register additional types here. Returns the same shape
- * generate_ab_subject_variants() returns: ['directives' => [...], 'source' => 'ai'|'fallback'].
- *
- * Returns ['directives' => [], 'source' => 'unsupported'] if no generator
- * is registered for the requested type — caller should treat as failure.
+/**
+ * Per-type variant generator dispatch. Returns
+ *   ['directives' => [...], 'source' => 'ai'|'fallback'|'fixed', 'literal' => bool?]
+ * 'literal' is true when the contents are stored verbatim (no 'directive: '
+ * prefix); ab_start_new_cycle uses that flag to decide whether to carry the
+ * prior winner forward. Returns ['directives' => [], 'source' => 'unsupported']
+ * for types with no generator — caller treats as failure.
  */
 function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
 {
@@ -1137,8 +1136,8 @@ function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
                 'literal' => true,
             ];
         // body / cta / preheader stay admin-initiated — they need carefully
-        // crafted copy and there's no AI generator yet. The rotation in
-        // stepManageAbTests skips types not represented here.
+        // crafted copy and have no AI generator. ab_auto_rotation_order()
+        // omits them so the cron's rotation never lands here.
         default:
             return ['directives' => [], 'source' => 'unsupported'];
     }

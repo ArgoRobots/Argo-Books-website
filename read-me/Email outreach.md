@@ -1,6 +1,6 @@
 # Email Outreach
 
-Argo Books has a built-in outreach system that finds local small businesses, writes them a personal-sounding email about trying Argo Books, and sends it. You can run it fully hands-off — the cron finds new leads, writes emails, tests subject lines, and learns which ones work — or flip it to 'Review before send' mode, where it still generates everything but waits for you to approve each draft in the Leads tab before anything goes out.
+Argo Books has a built-in outreach system that finds local small businesses, writes them a personal-sounding email about trying Argo Books, and sends it. You can run it fully hands-off — the cron finds new leads, writes emails, runs A/B tests to learn what works, and promotes the winners — or flip it to 'Review before send' mode, where it still generates everything but waits for you to approve each draft in the Leads tab before anything goes out.
 
 Everything lives in the admin dashboard under **Outreach**, which has three tabs: **Leads**, **A/B Tests**, and **Settings**.
 
@@ -11,7 +11,7 @@ Once a day the outreach cron does a routine:
 1. **Picks a city**, rotating through Saskatchewan first and then expanding outward into the rest of Canada.
 2. **Finds small businesses** there by category (plumbers, cafes, salons, and 90-odd other small-business types) and grabs their public contact email from their website.
 3. **Writes each one a short email** with OpenAI (currently `gpt-4o-mini`). The email references the kind of business they run and the everyday headaches that category tends to have.
-4. **Runs a quiet subject-line A/B test** alongside the send. It splits traffic across 2–4 variant styles and keeps the one that gets clicks.
+4. **Runs a quiet A/B test** alongside the send. It splits traffic across 2–4 variants and keeps the one that gets clicks. By default it tests subject lines; you can extend it to other things (body, CTA, sender name, preheader, HTML-vs-plain, with-vs-without personalization).
 5. **Sends the emails**, up to the daily cap (`OUTREACH_DAILY_SEND_LIMIT`), with a tracked link so clicks can be attributed back to the lead and variant.
 
 You decide whether to let all of that run on its own or pause at each step for you to review. Both modes are just a toggle.
@@ -32,18 +32,33 @@ Every outreach email's `argorobots.com` link is rewritten to include a `?source=
 
 ## The A/B Tests tab
 
-This is where the system runs experiments on your subject lines. You don't have to create tests yourself — when automation is on, it does it for you. But you can also run your own if you want to try a specific idea.
+This is where the system runs experiments on the things that affect open and click rate. You don't have to create tests yourself — when automation is on, it does it for you. But you can also run your own if you want to try a specific idea.
 
-### What it tests
+### What it can test
 
-Right now the system tests **subject lines only**. That's the biggest single factor in whether someone opens a cold email, so it's the most useful thing to optimise. The schema is ready for body / sender / CTA tests later.
+Each test targets one **variant type**:
 
-Each test has 2–4 variants. A variant can be either:
+- **Subject line** — the biggest single factor in whether a cold email gets opened.
+- **Email body** — the AI's writing style and structure for the message itself.
+- **CTA / offer** — the framing of what the recipient gets ("free 1-year license for feedback" vs other offers).
+- **Sender from-name** — the name the email appears to come from (e.g. `Evan` vs `Evan from Argo Books` vs `Argo Books`).
+- **Preheader** — the snippet most inboxes show next to the subject as a preview.
+- **Format** — full HTML email with logo and styling vs plain text. Plain text often outperforms styled HTML in cold outreach because it looks like a human's email rather than marketing.
+- **Personalization depth** — with vs without the AI-generated business summary (which costs an OpenAI call per lead). Use this to find out whether that extra call is worth keeping.
 
-- **A literal subject line** — used exactly as written for every email in that variant. Good for "I have a specific subject I want to try."
-- **A style directive** — a short instruction prefixed with `directive:` (e.g. `directive: ask a curiosity question referencing their city`). The AI writes a different subject for each lead but in that style. Good for testing *kinds* of subject lines, not specific wordings. Anything not prefixed with `directive:` is treated as a literal.
+Only one test can be active at a time, regardless of type — that keeps the math clean. The auto-loop creates the next cycle as soon as the current one promotes.
 
-When you create a test by hand, you can mix both. When the system creates a test automatically, it always uses directives (because they generalise across different businesses).
+### How variants work
+
+Each test has 2–4 variants. The way variant content is interpreted depends on the type:
+
+- **Subject / body / CTA** can be either:
+  - **A literal value** — used exactly as written for every email in that variant. Good for "I have a specific wording I want to try."
+  - **A style directive** prefixed with `directive:` (e.g. `directive: ask a curiosity question referencing their city`). The AI generates fresh content in that style for each lead. Good for testing *kinds* of writing, not specific wordings. Anything without the prefix is treated as a literal.
+- **Sender / preheader** are always literal strings.
+- **Format / personalization** use a fixed two-variant template (`html` vs `plain`, `on` vs `off`). The form fills these automatically when you pick the type — you don't author them.
+
+When you create a test by hand, the form adapts to the type you pick. When the system creates a test automatically, it uses directives for subject (so they generalise across different businesses) or the fixed pool for sender / format / personalization.
 
 ### How the experiment runs
 
@@ -59,7 +74,11 @@ With automation on, the cron ends a test and promotes the leader when **any** of
 - **Time-boxed** — the test is ≥14 days old and every variant has ≥20 sends.
 - **Hard timeout** — the test is ≥28 days old; leader picked by CTR so the loop doesn't stall on low volume.
 
-Once a winner is promoted, the cron immediately starts the next cycle. It carries the winning variant forward as variant A (so the current champion keeps being measured) and asks OpenAI for three new directive styles to test against it. If OpenAI errors, it falls back to a curated set of seed directives so the loop never stalls. The first-ever cycle has no prior winner, so it runs with three fresh directives only.
+Once a winner is promoted, the cron immediately starts the next cycle.
+
+For directive-style types (subject / body / CTA), it carries the winning variant forward as variant A so the current champion keeps being measured, and asks OpenAI for three new directive styles to test against it. If OpenAI errors, it falls back to a curated set of seed directives so the loop never stalls. The first-ever cycle has no prior winner, so it runs with three fresh directives only.
+
+For fixed-pool types (sender / format / personalization), the next cycle just re-runs the fixed variants — there's no carry-forward, since the pool itself is the test. Each new cycle is a fresh measurement against current conditions.
 
 You can also stop a test early, pause it, or promote a winner manually from the detail page.
 
@@ -84,8 +103,15 @@ You can flip between the two at any time. The next scheduled run honours whichev
 
 Two options: **On** or **Off**.
 
-- **On** — the system manages subject-line tests for you, as described above.
+- **On** — the system manages tests for you, as described above: it creates new cycles, picks winners, and starts the next one.
 - **Off** — any test that's currently running keeps running, but no new ones get started and no winners get promoted automatically. You can still run tests by hand from the A/B Tests tab.
+
+### A/B auto-rotation
+
+Two options: **On** or **Off**. Off by default.
+
+- **Off** — auto-cycles only run for subject-line tests. Other types stay admin-initiated; you start them manually from the A/B Tests tab.
+- **On** — completed cycles trigger the next type in rotation: **subject → sender → format → personalization → (loop)**. The Settings panel shows which type is queued next. Body / CTA / preheader stay admin-initiated either way (they need crafted copy and the system has no AI generator for them). Manual tests of any type still work in both modes — they just delay the rotation while they run, since only one test can be active at a time.
 
 ### Current status
 
@@ -101,7 +127,7 @@ Underneath the toggles you'll see a live read-out: active test, days running, va
 **The cautious setup:**
 
 1. Settings → **Review before send**, A/B automation **on**.
-2. You open each day's drafts in the Leads tab and approve/edit/send manually. The subject-line experiments still run, measured against whatever you actually send.
+2. You open each day's drafts in the Leads tab and approve/edit/send manually. The A/B experiments still run, measured against whatever you actually send.
 
 **The hands-on setup:**
 

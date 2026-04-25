@@ -352,22 +352,6 @@ function ab_tests_tab_render_list($pdo)
         </div>
     </div>
 
-    <div class="panel">
-        <div class="panel-header">
-            <h2>Ideas for future tests</h2>
-        </div>
-        <div class="panel-content">
-            <p class="hint" style="margin-top:0;">Once the subject-line loop is proven, good next candidates are:</p>
-            <ul class="idea-list">
-                <li><strong>Email body / opener</strong> &mdash; schema already supports <code>variant_type='body'</code>; prompt just swaps the body directive. Biggest remaining lever after subject.</li>
-                <li><strong>CTA framing</strong> &mdash; "free 1-year premium license for feedback" vs "15 min chat in exchange for a year free".</li>
-                <li><strong>Sender name</strong> &mdash; "Evan" vs "Evan at Argo Books" vs "Argo Books".</li>
-                <li><strong>Tone</strong> &mdash; casual local-developer vs professional founder (author as a body directive).</li>
-            </ul>
-            <p class="hint">Parked for now (too noisy at ~10 sends/day): send time of day, unsubscribe placement.</p>
-        </div>
-    </div>
-
     <script>
         (function() {
             if (window.__abVariantRowsInit) return;

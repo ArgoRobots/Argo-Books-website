@@ -600,7 +600,9 @@ CREATE TABLE IF NOT EXISTS outreach_activity_log (
     INDEX idx_outreach_activity_lead (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- A/B tests for outreach email variants (subject lines in v1; body/sender/cta later)
+-- A/B tests for outreach email variants. variant_type covers every test type
+-- the framework supports: subject, body, sender, cta, preheader, format,
+-- personalization. Only one test of any type can be active at a time.
 CREATE TABLE IF NOT EXISTS outreach_ab_tests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(120) NOT NULL,

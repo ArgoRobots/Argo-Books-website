@@ -927,16 +927,6 @@
     font-size: 12px;
 }
 
-.idea-list {
-    margin: 8px 0;
-    padding-left: 20px;
-}
-
-.idea-list li {
-    margin-bottom: 6px;
-    line-height: 1.45;
-}
-
 /* Variant rows in the "New A/B Test" form */
 .variant-row {
     background: var(--gray-50, #fafafa);
@@ -1233,10 +1223,6 @@
 [data-theme="dark"] .directive-pill {
     background: #312e81;
     color: #c7d2fe;
-}
-
-[data-theme="dark"] .idea-list {
-    color: var(--gray-200);
 }
 
 [data-theme="dark"] .segmented-option {

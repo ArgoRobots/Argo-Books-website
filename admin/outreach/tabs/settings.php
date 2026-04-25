@@ -155,7 +155,7 @@ function settings_tab_render($pdo)
         if (is_array($lines)) {
             $tail = array_slice($lines, -200);
             foreach ($tail as $line) {
-                if (preg_match('/A\/B|ab_auto|stepManageAbTests|subject cycle|Promoted variant/i', $line)) {
+                if (preg_match('/A\/B|ab_auto|stepManageAbTests|auto-cycle|auto-rotation|Promoted variant/i', $line)) {
                     $logLines[] = $line;
                 }
             }
@@ -245,9 +245,11 @@ function settings_tab_render($pdo)
         </div>
         <div class="panel-content">
             <p class="hint" style="margin-top:0;">
-                When on, the pipeline runs subject-line tests by itself: it auto-generates 3 variants with OpenAI each cycle,
-                promotes the winner when it has enough data (or after 14&ndash;28 days), and starts the next cycle.
-                It will self-pause if CTR drops below <?php echo number_format($ctrFloor * 100, 1); ?>%.
+                When on, the pipeline runs A/B cycles by itself: it auto-generates variants each cycle (or uses the
+                fixed pool for sender / format / personalization), promotes the winner when it has enough data (or
+                after 14&ndash;28 days), and starts the next cycle. By default it cycles only subject-line tests
+                &mdash; flip the auto-rotation toggle below to cycle across other types too.
+                It will self-pause if winner CTR drops below <?php echo number_format($ctrFloor * 100, 1); ?>%.
             </p>
             <div class="segmented-toggle">
                 <form method="POST" style="display:contents;">
@@ -354,7 +356,7 @@ function settings_tab_render($pdo)
                     </div>
                 </div>
             <?php else: ?>
-                <p class="empty-state">No active subject-line test.
+                <p class="empty-state">No active A/B test.
                     <?php if ($abAutoEnabled): ?>
                         The next pipeline run will create one.
                     <?php endif; ?>

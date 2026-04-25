@@ -426,9 +426,9 @@ function stepManageAbTests($pdo, $dryRun)
         return;
     }
 
-    // 1) Evaluate the active test of every known type. Today only subject can
-    //    be active (other types are admin-initiated until later phases enable
-    //    auto-creation), but iterating now means new types light up cleanly.
+    // 1) Evaluate the active test of every known type for promotion. Only
+    //    one test can be active at a time per the framework's invariant; the
+    //    loop is type-agnostic so any wired type can promote cleanly.
     $anyStillRunning = false;
     $anyPaused = false;
     foreach ($allTypes as $type) {
@@ -472,8 +472,8 @@ function stepManageAbTests($pdo, $dryRun)
     // needs to review and click Resume in Settings.
     if ($anyPaused) return;
 
-    // If any test is still running (any type), don't start a new subject cycle
-    // yet — keep the one active test at a time invariant.
+    // If any test is still running (any type), don't start a new cycle yet
+    // — keep the one-active-test-at-a-time invariant.
     if ($anyStillRunning) return;
 
     // 2) Auto-create the next cycle. By default this is subject-only; when

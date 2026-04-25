@@ -413,7 +413,15 @@ function stepManageAbTests($pdo, $dryRun)
             }
         }
         if (!$anyActive) {
-            logPipeline('[DRY RUN] Would create a new auto-cycle subject-line test.');
+            $rotationOn = getState($pdo, 'ab_auto_rotation', '0') === '1';
+            if ($rotationOn) {
+                $order = ab_auto_rotation_order();
+                $next = getState($pdo, 'ab_auto_next_type', $order[0]);
+                if (!in_array($next, $order, true)) $next = $order[0];
+                logPipeline("[DRY RUN] Would create a new auto-cycle for variant_type '$next' (rotation on).");
+            } else {
+                logPipeline('[DRY RUN] Would create a new auto-cycle subject-line test (rotation off).');
+            }
         }
         return;
     }
@@ -468,21 +476,51 @@ function stepManageAbTests($pdo, $dryRun)
     // yet — keep the one active test at a time invariant.
     if ($anyStillRunning) return;
 
-    // 2) Auto-create the next subject cycle if nothing is active. Other types
-    //    (body/cta/sender/preheader/format/personalization) are admin-initiated
-    //    in v1 — see plan Phase 7 for optional cross-type auto-rotation.
-    $newCycle = ab_start_new_cycle($pdo, 'subject');
+    // 2) Auto-create the next cycle. By default this is subject-only; when
+    //    ab_auto_rotation is on, the pointer ab_auto_next_type rotates across
+    //    the order returned by ab_auto_rotation_order() so the pipeline runs
+    //    cycles for each automatable type in turn. body/cta/preheader stay
+    //    admin-initiated either way (no AI generators wired for them yet).
+    $rotationOn = getState($pdo, 'ab_auto_rotation', '0') === '1';
+    if ($rotationOn) {
+        $order = ab_auto_rotation_order();
+        $nextType = getState($pdo, 'ab_auto_next_type', $order[0]);
+        if (!in_array($nextType, $order, true)) {
+            $nextType = $order[0];
+        }
+        $cycleType = $nextType;
+    } else {
+        $cycleType = 'subject';
+    }
+
+    $newCycle = ab_start_new_cycle($pdo, $cycleType);
     if ($newCycle['action'] === 'created') {
         logPipeline(sprintf(
-            "A/B auto-created subject cycle: test #%d '%s' with %d variants (source: %s%s).",
+            "A/B auto-created %s cycle: test #%d '%s' with %d variants (source: %s%s).",
+            $cycleType,
             $newCycle['test_id'],
             $newCycle['test_name'],
             $newCycle['variant_count'],
             $newCycle['source'],
             $newCycle['carried_winner'] ? ', prior winner carried forward' : ''
         ));
+        if ($rotationOn) {
+            $idx = array_search($cycleType, $order, true);
+            $advanced = $order[($idx + 1) % count($order)];
+            setState($pdo, 'ab_auto_next_type', $advanced);
+            logPipeline("A/B auto-rotation pointer advanced: next type will be '$advanced'.");
+        }
     } else {
-        logPipeline('A/B auto-create failed: ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
+        logPipeline('A/B auto-create failed for ' . $cycleType . ': ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
+        // Advance the pointer past an unsupported type so rotation doesn't
+        // get stuck. Other failure modes (DB error, OpenAI down) are retried
+        // on the next run with the same pointer.
+        if ($rotationOn && (strpos((string) ($newCycle['error'] ?? ''), 'unsupported') !== false)) {
+            $idx = array_search($cycleType, $order, true);
+            $advanced = $order[($idx + 1) % count($order)];
+            setState($pdo, 'ab_auto_next_type', $advanced);
+            logPipeline("A/B auto-rotation skipped unsupported type '$cycleType'; pointer advanced to '$advanced'.");
+        }
     }
 }
 

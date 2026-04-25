@@ -1117,11 +1117,40 @@ function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
     switch ($variantType) {
         case 'subject':
             return generate_ab_subject_variants($pdo, $count);
-        // Phase 1: case 'body': return generate_ab_body_variants($pdo, $count);
-        // Phase 2: case 'cta':  return generate_ab_cta_variants($pdo, $count);
+        case 'sender':
+            // Small fixed pool — content is the literal from-name.
+            return [
+                'directives' => ['Evan', 'Evan from Argo Books', 'Argo Books'],
+                'source' => 'fixed',
+                'literal' => true,
+            ];
+        case 'format':
+            return [
+                'directives' => ['html', 'plain'],
+                'source' => 'fixed',
+                'literal' => true,
+            ];
+        case 'personalization':
+            return [
+                'directives' => ['on', 'off'],
+                'source' => 'fixed',
+                'literal' => true,
+            ];
+        // body / cta / preheader stay admin-initiated — they need carefully
+        // crafted copy and there's no AI generator yet. The rotation in
+        // stepManageAbTests skips types not represented here.
         default:
             return ['directives' => [], 'source' => 'unsupported'];
     }
+}
+
+/**
+ * Rotation order used by stepManageAbTests when ab_auto_rotation is on.
+ * Every type listed here must have a generator in generate_ab_variants_for_type.
+ */
+function ab_auto_rotation_order()
+{
+    return ['subject', 'sender', 'format', 'personalization'];
 }
 
 /**
@@ -1136,25 +1165,34 @@ function ab_start_new_cycle($pdo, $variantType = 'subject')
 {
     $count = 3;
 
-    $priorStmt = $pdo->prepare("
-        SELECT v.content
-        FROM outreach_ab_tests t
-        JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
-        WHERE t.status = 'completed' AND t.variant_type = ?
-        ORDER BY t.completed_at DESC
-        LIMIT 1
-    ");
-    $priorStmt->execute([$variantType]);
-    $prior = $priorStmt->fetchColumn();
-
     $gen = generate_ab_variants_for_type($pdo, $variantType, $count);
-    $directives = $gen['directives'] ?? [];
-    if (count($directives) < 2) {
+    $items = $gen['directives'] ?? [];
+    $isLiteral = !empty($gen['literal']);
+
+    if (count($items) < 2) {
         return [
             'action' => 'failed',
             'variant_type' => $variantType,
-            'error' => 'Variant generation returned fewer than 2 directives (source: ' . ($gen['source'] ?? 'unknown') . ')',
+            'error' => 'Variant generation returned fewer than 2 entries (source: ' . ($gen['source'] ?? 'unknown') . ')',
         ];
+    }
+
+    // Carry-forward only makes sense for directive-style types where each
+    // cycle generates *new* candidate copy and we want the prior winner kept
+    // as a baseline. Literal types (sender / format / personalization) cycle
+    // over a fixed pool, so carry-forward would just duplicate one variant.
+    $prior = null;
+    if (!$isLiteral) {
+        $priorStmt = $pdo->prepare("
+            SELECT v.content
+            FROM outreach_ab_tests t
+            JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
+            WHERE t.status = 'completed' AND t.variant_type = ?
+            ORDER BY t.completed_at DESC
+            LIMIT 1
+        ");
+        $priorStmt->execute([$variantType]);
+        $prior = $priorStmt->fetchColumn() ?: null;
     }
 
     $name = 'Auto-cycle ' . $variantType . ' ' . date('Y-m-d H:i');
@@ -1178,8 +1216,8 @@ function ab_start_new_cycle($pdo, $variantType = 'subject')
             $isDefault = 0;
         }
 
-        foreach ($directives as $d) {
-            $content = 'directive: ' . $d;
+        foreach ($items as $d) {
+            $content = $isLiteral ? $d : ('directive: ' . $d);
             $vStmt->execute([$testId, $label, $content, $isDefault]);
             $isDefault = 0;
             if ($label === 'D') break;

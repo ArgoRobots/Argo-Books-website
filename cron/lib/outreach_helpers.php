@@ -143,6 +143,20 @@ function ab_body_instruction_for_variant($variant)
 }
 
 /**
+ * CTA / offer instruction builder. Replaces the standard "free 1-year
+ * premium license in exchange for feedback" offer with whatever wording
+ * (or directive) the variant specifies.
+ */
+function ab_cta_instruction_for_variant($variant)
+{
+    $parsed = ab_parse_variant_content($variant);
+    if ($parsed['mode'] === 'directive') {
+        return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. Instead, phrase the offer in line with this directive: \"" . $parsed['text'] . "\". Work it in naturally; do not list it like a bullet point.";
+    }
+    return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. The offer in this email must be exactly: \"" . $parsed['text'] . "\". Phrase it naturally inside the body — do not just paste it as a quoted line.";
+}
+
+/**
  * Per-type prompt-injection dispatch. Future phases register new types here
  * (body, cta, personalization). Send-side types (sender, preheader, format)
  * apply at send time, not here, and return ['' for prompt injection.
@@ -157,7 +171,8 @@ function ab_instruction_for_variant($variant, $variantType = 'subject')
             return ab_subject_instruction_for_variant($variant);
         case 'body':
             return ab_body_instruction_for_variant($variant);
-        // Phase 2: case 'cta':  return ab_cta_instruction_for_variant($variant);
+        case 'cta':
+            return ab_cta_instruction_for_variant($variant);
         // Phase 6: case 'personalization': handled inline in generate_draft_for_lead, not here
         default:
             return '';
@@ -711,7 +726,8 @@ function generate_draft_for_lead($pdo, $lead)
     $abVariantId = null;
     $abSubjectOverride = '';
     $abBodyOverride = '';
-    foreach (['subject', 'body'] as $promptType) {
+    $abCtaOverride = '';
+    foreach (['subject', 'body', 'cta'] as $promptType) {
         $active = get_active_ab_test($pdo, $promptType);
         if (!$active) continue;
         $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
@@ -720,6 +736,7 @@ function generate_draft_for_lead($pdo, $lead)
         $instruction = ab_instruction_for_variant($variant, $promptType);
         if ($promptType === 'subject') $abSubjectOverride = $instruction;
         elseif ($promptType === 'body') $abBodyOverride = $instruction;
+        elseif ($promptType === 'cta') $abCtaOverride = $instruction;
         break; // one-at-a-time invariant — first hit wins
     }
 
@@ -751,7 +768,7 @@ $painPointsInstruction
 
 - Briefly describe Argo Books as a simple bookkeeping and invoicing app that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
-- Mention offering a free 1-year premium license in exchange for feedback
+- Mention offering a free 1-year premium license in exchange for feedback$abCtaOverride
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions

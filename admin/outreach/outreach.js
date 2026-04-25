@@ -707,11 +707,12 @@ async function createLead() {
 
     try {
         const result = await api('create_lead', { method: 'POST', body: data });
-        notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             closeModal('addLeadModal');
             loadLeads();
             loadStats();
+        } else {
+            notify(result.message, 'error');
         }
     } catch (e) {
         notify(e.message, 'error');
@@ -968,12 +969,12 @@ async function sendEmail() {
         const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
         btn.textContent = 'Send Email';
 
-        notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             openLeadDetail(currentLeadId);
             loadLeads();
             loadStats();
         } else {
+            notify(result.message, 'error');
             btn.disabled = false;
         }
     } catch (e) {

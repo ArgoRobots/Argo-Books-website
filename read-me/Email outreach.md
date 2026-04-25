@@ -84,7 +84,7 @@ You can also stop a test early, pause it, or promote a winner manually from the 
 
 ### Safety pause
 
-If the cron's own pick turns out badly — winner CTR under the configured floor (default 1%, stored in `outreach_pipeline_state.ab_ctr_floor`) — automation sets `ab_auto_enabled = '0'` and surfaces a Resume banner in the Settings tab. This is so a run of bad cycles can't quietly drag CTR downward.
+If the cron's own pick turns out badly — winner CTR under the configured floor (default 1%, stored in `outreach_pipeline_state.ab_ctr_floor`) — automation sets `ab_auto_enabled = '0'` and shows an "A/B automation is off" banner at the top of the Settings tab with the pause reason. Flip the toggle below it to resume. This is so a run of bad cycles can't quietly drag CTR downward.
 
 ## The Settings tab
 
@@ -103,15 +103,8 @@ You can flip between the two at any time. The next scheduled run honours whichev
 
 Two options: **On** or **Off**.
 
-- **On** — the system manages tests for you, as described above: it creates new cycles, picks winners, and starts the next one.
+- **On** — the system manages tests for you: it creates new cycles, picks winners, and starts the next cycle as soon as one promotes. Successive cycles rotate across types in this order: **subject line → sender from-name → format (HTML vs plain) → personalization (with vs without business summary) → (loop back to subject)**. The Settings panel shows which type is queued next. Body, CTA, and preheader tests aren't in the rotation — those need wording you write yourself, so they're always started manually from the A/B Tests tab. Manual tests of any type still work — they just delay the rotation while they run, since only one test can be active at a time.
 - **Off** — any test that's currently running keeps running, but no new ones get started and no winners get promoted automatically. You can still run tests by hand from the A/B Tests tab.
-
-### A/B auto-rotation
-
-Two options: **On** or **Off**. Off by default.
-
-- **Off** — auto-cycles only run for subject-line tests. Other types stay admin-initiated; you start them manually from the A/B Tests tab.
-- **On** — completed cycles trigger the next type in rotation: **subject → sender → format → personalization → (loop)**. The Settings panel shows which type is queued next. Body / CTA / preheader stay admin-initiated either way (they need crafted copy and the system has no AI generator for them). Manual tests of any type still work in both modes — they just delay the rotation while they run, since only one test can be active at a time.
 
 ### Current status
 

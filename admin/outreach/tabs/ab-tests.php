@@ -100,13 +100,12 @@ function ab_tests_tab_handle_post($pdo)
         $newStatus = $_POST['status'] ?? '';
         if ($testId && in_array($newStatus, ['draft', 'active', 'paused', 'completed'], true)) {
             if ($newStatus === 'active') {
-                $typeStmt = $pdo->prepare("SELECT variant_type FROM outreach_ab_tests WHERE id = ?");
-                $typeStmt->execute([$testId]);
-                $type = $typeStmt->fetchColumn();
-                if ($type) {
-                    $pdo->prepare("UPDATE outreach_ab_tests SET status = 'paused' WHERE status = 'active' AND variant_type = ? AND id <> ?")
-                        ->execute([$type, $testId]);
-                }
+                // Only one test can be active at a time across the whole
+                // framework — the draft generator picks the first active
+                // test it finds, so a second active test of any other type
+                // would silently starve. Pause every other active test.
+                $pdo->prepare("UPDATE outreach_ab_tests SET status = 'paused' WHERE status = 'active' AND id <> ?")
+                    ->execute([$testId]);
                 $pdo->prepare("UPDATE outreach_ab_tests SET status = 'active', started_at = COALESCE(started_at, NOW()) WHERE id = ?")
                     ->execute([$testId]);
             } elseif ($newStatus === 'completed') {
@@ -325,7 +324,7 @@ function ab_tests_tab_render_list($pdo)
                                     <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['clicked_count']); ?></td>
                                     <td class="actions-cell">
                                         <?php if ($t['status'] === 'draft' || $t['status'] === 'paused'): ?>
-                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other active test of the same type will be paused.');">
+                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
                                                 <input type="hidden" name="tab" value="ab-tests">
                                                 <input type="hidden" name="action" value="status_change">
                                                 <input type="hidden" name="test_id" value="<?php echo (int) $t['id']; ?>">
@@ -477,7 +476,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
             </h2>
             <div>
                 <?php if ($test['status'] === 'draft' || $test['status'] === 'paused'): ?>
-                    <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other active test of the same type will be paused.');">
+                    <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
                         <input type="hidden" name="tab" value="ab-tests">
                         <input type="hidden" name="action" value="status_change">
                         <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">

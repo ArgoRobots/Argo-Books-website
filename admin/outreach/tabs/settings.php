@@ -82,15 +82,6 @@ function settings_tab_handle_post($pdo)
         header('Location: index.php?tab=settings'); exit;
     }
 
-    if ($action === 'set_ab_auto_rotation') {
-        $enabled = $_POST['enabled'] ?? '';
-        $val = ($enabled === '1') ? '1' : '0';
-        settings_tab_set_state($pdo, 'ab_auto_rotation', $val);
-        $_SESSION['message'] = 'A/B auto-rotation: ' . ($val === '1' ? 'ON' : 'OFF');
-        $_SESSION['message_type'] = 'success';
-        header('Location: index.php?tab=settings'); exit;
-    }
-
     header('Location: index.php?tab=settings'); exit;
 }
 
@@ -105,7 +96,6 @@ function settings_tab_render($pdo)
     if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = 'auto';
 
     $abAutoEnabled = settings_tab_get_state($pdo, 'ab_auto_enabled', '1') === '1';
-    $abAutoRotation = settings_tab_get_state($pdo, 'ab_auto_rotation', '0') === '1';
     require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
     $rotationOrder = ab_auto_rotation_order();
     $abNextType = settings_tab_get_state($pdo, 'ab_auto_next_type', $rotationOrder[0]);
@@ -245,11 +235,23 @@ function settings_tab_render($pdo)
         </div>
         <div class="panel-content">
             <p class="hint" style="margin-top:0;">
-                When on, the pipeline runs A/B cycles by itself: it auto-generates variants each cycle (or uses the
-                fixed pool for sender / format / personalization), promotes the winner when it has enough data (or
-                after 14&ndash;28 days), and starts the next cycle. By default it cycles only subject-line tests
-                &mdash; flip the auto-rotation toggle below to cycle across other types too.
+                When on, the pipeline runs A/B cycles by itself: it auto-generates variants each cycle (or uses the fixed pool for sender / format / personalization), promotes the winner when it has enough data (or after 14&ndash;28 days), and starts the next cycle &mdash; rotating across types so it tests one lever, then another, and so on.
                 It will self-pause if winner CTR drops below <?php echo number_format($ctrFloor * 100, 1); ?>%.
+            </p>
+            <p class="hint">
+                Rotation order:
+            </p>
+            <ol class="hint" style="margin-top:0;">
+                <li><strong>Subject line</strong> &mdash; AI-generated subject styles.</li>
+                <li><strong>Sender from-name</strong> &mdash; "Evan" vs "Evan from Argo Books" vs "Argo Books".</li>
+                <li><strong>Format</strong> &mdash; full HTML email vs plain text.</li>
+                <li><strong>Personalization</strong> &mdash; with vs without the AI-generated business summary.</li>
+            </ol>
+            <p class="hint">
+                Body, CTA, and preheader tests aren't in the rotation: those need wording you write yourself, so they're always started by hand from the A/B Tests tab. Manual tests still work either way &mdash; they just delay the rotation while they run.
+                <?php if ($abAutoEnabled): ?>
+                    <br><br>The next type the cron will start is <strong><?php echo htmlspecialchars($abNextType); ?></strong> (assuming nothing else is running by then).
+                <?php endif; ?>
             </p>
             <div class="segmented-toggle">
                 <form method="POST" style="display:contents;">
@@ -258,7 +260,7 @@ function settings_tab_render($pdo)
                     <input type="hidden" name="enabled" value="1">
                     <button type="submit" class="segmented-option <?php echo $abAutoEnabled ? 'active' : ''; ?>">
                         <span class="segmented-title">On</span>
-                        <span class="segmented-desc">Runs on every hourly cron.</span>
+                        <span class="segmented-desc">Runs in the daily outreach cron.</span>
                     </button>
                 </form>
                 <form method="POST" style="display:contents;">
@@ -268,42 +270,6 @@ function settings_tab_render($pdo)
                     <button type="submit" class="segmented-option <?php echo !$abAutoEnabled ? 'active' : ''; ?>">
                         <span class="segmented-title">Off</span>
                         <span class="segmented-desc">Active test keeps running; no new cycles start.</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-header">
-            <h2>A/B auto-rotation</h2>
-        </div>
-        <div class="panel-content">
-            <p class="hint" style="margin-top:0;">
-                When on, completed cycles trigger the next type in rotation:
-                <strong><?php echo htmlspecialchars(implode(' &rarr; ', $rotationOrder)); ?></strong> &rarr; (loop).
-                When off, only subject-line cycles auto-create. Body / CTA / preheader stay admin-initiated either way.
-                <?php if ($abAutoRotation): ?>
-                    <br>Next type the pipeline will start: <strong><?php echo htmlspecialchars($abNextType); ?></strong>.
-                <?php endif; ?>
-            </p>
-            <div class="segmented-toggle">
-                <form method="POST" style="display:contents;">
-                    <input type="hidden" name="tab" value="settings">
-                    <input type="hidden" name="action" value="set_ab_auto_rotation">
-                    <input type="hidden" name="enabled" value="1">
-                    <button type="submit" class="segmented-option <?php echo $abAutoRotation ? 'active' : ''; ?>">
-                        <span class="segmented-title">On</span>
-                        <span class="segmented-desc">Cycle across subject, sender, format, personalization.</span>
-                    </button>
-                </form>
-                <form method="POST" style="display:contents;">
-                    <input type="hidden" name="tab" value="settings">
-                    <input type="hidden" name="action" value="set_ab_auto_rotation">
-                    <input type="hidden" name="enabled" value="0">
-                    <button type="submit" class="segmented-option <?php echo !$abAutoRotation ? 'active' : ''; ?>">
-                        <span class="segmented-title">Off</span>
-                        <span class="segmented-desc">Subject-only auto-cycles (default).</span>
                     </button>
                 </form>
             </div>

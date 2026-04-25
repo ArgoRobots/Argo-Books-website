@@ -23,58 +23,65 @@ function _premium_feature_list_items($prefix = '')
  *
  * @param string $to_email Recipient email address
  * @param string $subject Email subject
- * @param string $body_content HTML content for the email body (will be wrapped in template)
+ * @param string $body_content HTML content for the email body (will be wrapped in template). When $format === 'plain', this is used as-is as plain text and no template is applied.
  * @param string $header_style Optional custom header style (default: blue gradient)
- * @param string|null $preheader Optional inbox-preview snippet; rendered as a hidden element so it appears next to the subject in most mail clients without being visible in the body
+ * @param string|null $preheader Optional inbox-preview snippet; rendered as a hidden element so it appears next to the subject in most mail clients without being visible in the body. Ignored when $format === 'plain'.
+ * @param string $format 'html' (default, full styled template) or 'plain' (no wrapper, sent as text/plain)
  * @return bool True if successful, false otherwise
  */
-function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null)
+function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html')
 {
-    $css = file_get_contents(__DIR__ . '/email.css');
-    $site_url = site_url();
+    $isPlain = ($format === 'plain');
 
-    $preheaderHtml = '';
-    if ($preheader !== null && trim((string) $preheader) !== '') {
-        $safePreheader = htmlspecialchars((string) $preheader, ENT_QUOTES, 'UTF-8');
-        $preheaderHtml = '<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:transparent;mso-hide:all;">' . $safePreheader . '</div>';
-    }
-
-    // Map style keywords to CSS classes, or use inline style for backwards compatibility
-    $header_class = '';
-    $header_inline = '';
-    if ($header_style === 'purple') {
-        $header_class = 'header-purple';
-    } elseif ($header_style === 'blue' || empty($header_style)) {
-        $header_class = 'header-blue';
+    if ($isPlain) {
+        $email_body = (string) $body_content;
     } else {
-        // Assume it's an inline style for backwards compatibility
-        $header_inline = $header_style;
-    }
+        $css = file_get_contents(__DIR__ . '/email.css');
+        $site_url = site_url();
 
-    $email_html = <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-            <title>{$subject}</title>
-            <style>
-                {$css}
-            </style>
-        </head>
-        <body>
-            {$preheaderHtml}
-            <div class="container">
-                <div class="header {$header_class}" style="{$header_inline}">
-                    <img src="{$site_url}/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
+        $preheaderHtml = '';
+        if ($preheader !== null && trim((string) $preheader) !== '') {
+            $safePreheader = htmlspecialchars((string) $preheader, ENT_QUOTES, 'UTF-8');
+            $preheaderHtml = '<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:transparent;mso-hide:all;">' . $safePreheader . '</div>';
+        }
+
+        // Map style keywords to CSS classes, or use inline style for backwards compatibility
+        $header_class = '';
+        $header_inline = '';
+        if ($header_style === 'purple') {
+            $header_class = 'header-purple';
+        } elseif ($header_style === 'blue' || empty($header_style)) {
+            $header_class = 'header-blue';
+        } else {
+            // Assume it's an inline style for backwards compatibility
+            $header_inline = $header_style;
+        }
+
+        $email_body = <<<HTML
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+                <title>{$subject}</title>
+                <style>
+                    {$css}
+                </style>
+            </head>
+            <body>
+                {$preheaderHtml}
+                <div class="container">
+                    <div class="header {$header_class}" style="{$header_inline}">
+                        <img src="{$site_url}/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
+                    </div>
+                    <div class="content">
+                        {$body_content}
+                    </div>
                 </div>
-                <div class="content">
-                    {$body_content}
-                </div>
-            </div>
-        </body>
-        </html>
-        HTML;
+            </body>
+            </html>
+            HTML;
+    }
 
     // Use SMTP relay if configured, otherwise fall back to mail()
     $mailer = create_smtp_mailer();
@@ -86,7 +93,10 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             $mailer->addAddress($to_email);
             $mailer->addReplyTo($reply_to ?? 'support@argorobots.com');
             $mailer->Subject = $subject;
-            $mailer->Body = $email_html;
+            if ($isPlain) {
+                $mailer->isHTML(false);
+            }
+            $mailer->Body = $email_body;
             if (!empty($extra_headers) && is_array($extra_headers)) {
                 foreach ($extra_headers as $name => $value) {
                     $mailer->addCustomHeader($name, $value);
@@ -101,15 +111,16 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
     }
 
     $actualFrom = $from_email ? ($from_name ?? 'Argo Books') . " <{$from_email}>" : 'Argo Books <noreply@argorobots.com>';
+    $contentType = $isPlain ? 'text/plain; charset=UTF-8' : 'text/html; charset=UTF-8';
     $headers = [
         'MIME-Version: 1.0',
-        'Content-Type: text/html; charset=UTF-8',
+        'Content-Type: ' . $contentType,
         'From: ' . $actualFrom,
         'Reply-To: ' . ($reply_to ?? 'support@argorobots.com'),
         'X-Mailer: PHP/' . phpversion()
     ];
 
-    return mail($to_email, $subject, $email_html, implode("\r\n", $headers));
+    return mail($to_email, $subject, $email_body, implode("\r\n", $headers));
 }
 
 /**

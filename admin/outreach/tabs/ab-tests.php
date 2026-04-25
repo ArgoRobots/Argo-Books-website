@@ -37,22 +37,31 @@ function ab_tests_tab_handle_post($pdo)
             header('Location: index.php?tab=ab-tests'); exit;
         }
 
-        if (!in_array($variantType, ['subject', 'body', 'sender', 'cta'], true)) {
+        if (!in_array($variantType, ['subject', 'body', 'sender', 'cta', 'preheader', 'format'], true)) {
             $variantType = 'subject';
         }
 
-        $rows = [];
-        foreach ($variantLabels as $i => $label) {
-            $label = trim((string) $label);
-            $content = trim((string) ($variantContents[$i] ?? ''));
-            if ($label === '' || $content === '') continue;
-            $rows[] = ['label' => $label, 'content' => $content, 'is_default' => ($i === $defaultIdx) ? 1 : 0];
-        }
+        if ($variantType === 'format') {
+            // Format tests are fixed: html (control) vs plain. Ignore any
+            // variant rows the form posted — the values are not user-authored.
+            $rows = [
+                ['label' => 'A', 'content' => 'html',  'is_default' => 1],
+                ['label' => 'B', 'content' => 'plain', 'is_default' => 0],
+            ];
+        } else {
+            $rows = [];
+            foreach ($variantLabels as $i => $label) {
+                $label = trim((string) $label);
+                $content = trim((string) ($variantContents[$i] ?? ''));
+                if ($label === '' || $content === '') continue;
+                $rows[] = ['label' => $label, 'content' => $content, 'is_default' => ($i === $defaultIdx) ? 1 : 0];
+            }
 
-        if (count($rows) < 2) {
-            $_SESSION['message'] = 'A/B tests need at least 2 variants (both label and content filled).';
-            $_SESSION['message_type'] = 'error';
-            header('Location: index.php?tab=ab-tests'); exit;
+            if (count($rows) < 2) {
+                $_SESSION['message'] = 'A/B tests need at least 2 variants (both label and content filled).';
+                $_SESSION['message_type'] = 'error';
+                header('Location: index.php?tab=ab-tests'); exit;
+            }
         }
 
         $pdo->beginTransaction();
@@ -220,6 +229,7 @@ function ab_tests_tab_render_list($pdo)
                             <option value="cta">CTA / offer</option>
                             <option value="sender">Sender from-name</option>
                             <option value="preheader">Preheader (inbox preview)</option>
+                            <option value="format">Format (HTML vs plain text)</option>
                         </select>
                     </div>
                 </div>
@@ -235,11 +245,16 @@ function ab_tests_tab_render_list($pdo)
                     Directives let the AI generate the value each time while staying in a style.
                     <span id="senderHintNote" style="display:none;"><br><strong>Sender variants are literal-only</strong> — the from-name string is used as-is in the email envelope, with no AI interpretation. Skip the <code>directive:</code> prefix here. Try things like <code>Evan</code> vs <code>Evan from Argo Books</code> vs <code>Argo Books</code>.</span>
                     <span id="preheaderHintNote" style="display:none;"><br><strong>Preheader variants are literal-only</strong> — this is the snippet most inboxes show next to the subject. Use short, scannable text. Try things like <code>Quick question about your business</code> vs <code>Free 1-year license inside</code> vs leave one variant blank to test the &ldquo;no preheader&rdquo; baseline.</span>
+                    <span id="formatHintNote" style="display:none;"><br><strong>Format is a fixed two-variant test</strong> — Variant A sends the full styled HTML email (current behaviour); Variant B sends the same content as plain text (no template, no logo, bare URLs). The variant rows below are not used for this test type.</span>
                 </p>
 
                 <div id="abVariantRows"></div>
 
-                <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
+                <div id="abFormatFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--border-color, #d1d5db); border-radius:6px; margin-top:8px;">
+                    Will create two variants automatically: <strong>A &mdash; <code>html</code></strong> (default) and <strong>B &mdash; <code>plain</code></strong>.
+                </div>
+
+                <div id="abVariantControls" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
                     <button type="button" class="btn btn-small btn-neutral" onclick="abAddVariantRow()">+ Add variant</button>
                     <span class="hint" id="abVariantCountHint">2 of up to 4 variants</span>
                 </div>
@@ -335,7 +350,7 @@ function ab_tests_tab_render_list($pdo)
                 <li><strong>Personalization depth</strong> &mdash; with vs without the AI-generated <code>business_summary</code>.</li>
                 <li><strong>Tone</strong> &mdash; casual local-developer vs professional founder (author as a body directive).</li>
             </ul>
-            <p class="hint">Parked for now (too noisy at ~10 sends/day): send time of day, HTML vs plain-text, unsubscribe placement.</p>
+            <p class="hint">Parked for now (too noisy at ~10 sends/day): send time of day, unsubscribe placement.</p>
         </div>
     </div>
 
@@ -405,10 +420,20 @@ function ab_tests_tab_render_list($pdo)
             var typeSelect = document.getElementById('abVariantType');
             var senderNote = document.getElementById('senderHintNote');
             var preheaderNote = document.getElementById('preheaderHintNote');
+            var formatNote = document.getElementById('formatHintNote');
+            var formatFixedNotice = document.getElementById('abFormatFixedNotice');
+            var variantRows = document.getElementById('abVariantRows');
+            var variantControls = document.getElementById('abVariantControls');
             if (typeSelect) {
                 var syncTypeNotes = function () {
-                    if (senderNote) senderNote.style.display = typeSelect.value === 'sender' ? 'inline' : 'none';
-                    if (preheaderNote) preheaderNote.style.display = typeSelect.value === 'preheader' ? 'inline' : 'none';
+                    var v = typeSelect.value;
+                    if (senderNote) senderNote.style.display = v === 'sender' ? 'inline' : 'none';
+                    if (preheaderNote) preheaderNote.style.display = v === 'preheader' ? 'inline' : 'none';
+                    if (formatNote) formatNote.style.display = v === 'format' ? 'inline' : 'none';
+                    var isFormat = (v === 'format');
+                    if (variantRows) variantRows.style.display = isFormat ? 'none' : '';
+                    if (variantControls) variantControls.style.display = isFormat ? 'none' : 'flex';
+                    if (formatFixedNotice) formatFixedNotice.style.display = isFormat ? 'block' : 'none';
                 };
                 typeSelect.addEventListener('change', syncTypeNotes);
                 syncTypeNotes();

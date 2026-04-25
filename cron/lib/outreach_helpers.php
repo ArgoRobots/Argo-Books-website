@@ -216,8 +216,8 @@ function send_outreach_lead($pdo, $lead)
         $tokStmt->execute([$unsubscribeToken, $id]);
     }
 
-    // Replace plain URL with a clickable "argorobots.com" link that carries the tracking param.
-    // If the lead was assigned to an A/B variant, append -v{variantId} so clicks can be attributed per variant.
+    // Build the per-lead tracking URL. If the lead was assigned to an A/B
+    // variant, append -v{variantId} so clicks can be attributed per variant.
     $sourceCode = 'outreach-' . $id;
     $variantId = isset($lead['ab_variant_id']) && $lead['ab_variant_id'] !== null && $lead['ab_variant_id'] !== ''
         ? (int) $lead['ab_variant_id']
@@ -226,34 +226,13 @@ function send_outreach_lead($pdo, $lead)
         $sourceCode .= '-v' . $variantId;
     }
     $trackedUrl = 'https://argorobots.com/?source=' . $sourceCode;
-    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
-
-    $escapedBody = htmlspecialchars($lead['draft_body']);
-    $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
-
-    // Replace {UNSUBSCRIBE_URL} placeholder with the tracked unsubscribe link
     $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
-    $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
-    $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
 
-    // Fallback: if the AI skipped the placeholder, inject a soft unsubscribe line before the sign-off
-    if (strpos($escapedBody, 'unsubscribe?t=') === false) {
-        $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
-        $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $escapedBody, 1);
-        if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
-            $escapedBody = $replaced;
-        } else {
-            $escapedBody .= $unsubLine;
-        }
-    }
-
-    $htmlBody = '<p>' . nl2br($escapedBody) . '</p>';
-
-    // Send-side A/B variants (sender from-name, preheader; format coming in a
-    // later phase). If the lead is assigned to a variant of any of these
-    // types, fetch the variant + test type and apply.
+    // Send-side A/B variants (sender, preheader, format). Look up first since
+    // format affects how the body is rendered below.
     $fromName = 'Argo Books';
     $preheader = null;
+    $format = 'html';
     if ($variantId) {
         $vStmt = $pdo->prepare("SELECT v.content, t.variant_type
             FROM outreach_ab_variants v
@@ -267,20 +246,61 @@ function send_outreach_lead($pdo, $lead)
                 $fromName = $vContent;
             } elseif ($vRow['variant_type'] === 'preheader') {
                 $preheader = $vContent;
+            } elseif ($vRow['variant_type'] === 'format') {
+                $format = ($vContent === 'plain') ? 'plain' : 'html';
             }
         }
+    }
+
+    if ($format === 'plain') {
+        // Plain text: keep URLs bare so they remain clickable in plain-text
+        // clients while still carrying the tracking source param. No HTML
+        // escaping, no <a> wrapping.
+        $body = (string) $lead['draft_body'];
+        $body = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $trackedUrl, $body);
+        $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
+        if (strpos($body, 'unsubscribe?t=') === false) {
+            $unsubLine = "\n\nNot interested? " . $unsubUrl . " and I'll stop emailing you.";
+            $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $body, 1);
+            if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
+                $body = $replaced;
+            } else {
+                $body .= $unsubLine;
+            }
+        }
+        $finalBody = $body;
+    } else {
+        $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
+        $escapedBody = htmlspecialchars($lead['draft_body']);
+        $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
+
+        $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
+        $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
+
+        if (strpos($escapedBody, 'unsubscribe?t=') === false) {
+            $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
+            $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $escapedBody, 1);
+            if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
+                $escapedBody = $replaced;
+            } else {
+                $escapedBody .= $unsubLine;
+            }
+        }
+
+        $finalBody = '<p>' . nl2br($escapedBody) . '</p>';
     }
 
     $result = send_styled_email(
         $email,
         $lead['draft_subject'],
-        $htmlBody,
+        $finalBody,
         '',
         'contact@argorobots.com',
         $fromName,
         'contact@argorobots.com',
         [],
-        $preheader
+        $preheader,
+        $format
     );
 
     if ($result) {
@@ -883,7 +903,7 @@ Return ONLY the JSON, no other text.";
  */
 function ab_known_variant_types()
 {
-    return ['subject', 'body', 'sender', 'cta', 'preheader'];
+    return ['subject', 'body', 'sender', 'cta', 'preheader', 'format'];
 }
 
 /**

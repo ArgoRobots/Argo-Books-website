@@ -115,9 +115,8 @@ function ab_parse_variant_content($variant)
 }
 
 /**
- * Subject-line instruction builder (Phase 0 default; subject is the only
- * wired variant type today). Returns a prompt fragment to splice into the
- * system prompt's subject-line bullet.
+ * Subject-line instruction builder. Returns a prompt fragment to splice
+ * into the system prompt's subject-line bullet.
  */
 function ab_subject_instruction_for_variant($variant)
 {
@@ -126,6 +125,21 @@ function ab_subject_instruction_for_variant($variant)
         return "\n- SUBJECT LINE OVERRIDE: write a subject line that follows this directive exactly: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
     }
     return "\n- SUBJECT LINE OVERRIDE: use exactly this subject line, word for word, with no changes: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+}
+
+/**
+ * Body instruction builder. The override controls body shape — paragraph
+ * count, opener style, tone, length — but explicitly preserves the
+ * non-negotiable structural elements (website URL, {UNSUBSCRIBE_URL}
+ * placeholder, three-line sign-off).
+ */
+function ab_body_instruction_for_variant($variant)
+{
+    $parsed = ab_parse_variant_content($variant);
+    if ($parsed['mode'] === 'directive') {
+        return "\n- BODY OVERRIDE: write the email body in the style described by this directive: \"" . $parsed['text'] . "\". This style guidance overrides the paragraph count, opener style, and tone rules above. You MUST still include the https://argorobots.com/ link, the {UNSUBSCRIBE_URL} placeholder line, and the \"All the best, / Evan / Argo Books\" sign-off exactly as specified.";
+    }
+    return "\n- BODY OVERRIDE: the email body must be exactly this text, word for word: \"" . $parsed['text'] . "\". The {UNSUBSCRIBE_URL} placeholder and the https://argorobots.com/ link inside this text will be processed before sending — keep them as written.";
 }
 
 /**
@@ -141,7 +155,8 @@ function ab_instruction_for_variant($variant, $variantType = 'subject')
     switch ($variantType) {
         case 'subject':
             return ab_subject_instruction_for_variant($variant);
-        // Phase 1: case 'body': return ab_body_instruction_for_variant($variant);
+        case 'body':
+            return ab_body_instruction_for_variant($variant);
         // Phase 2: case 'cta':  return ab_cta_instruction_for_variant($variant);
         // Phase 6: case 'personalization': handled inline in generate_draft_for_lead, not here
         default:
@@ -688,17 +703,24 @@ function generate_draft_for_lead($pdo, $lead)
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
-    // If there is an active subject-line A/B test, pick a variant round-robin
-    // and produce an override instruction the AI must obey.
+    // Find the single active prompt-side A/B test for this lead (only one
+    // type can be active at a time per the framework's invariant) and build
+    // the override fragment. Send-side types (sender/preheader/format) apply
+    // later in send_outreach_lead, not here.
     $abTestId = null;
     $abVariantId = null;
     $abSubjectOverride = '';
-    $active = get_active_ab_test($pdo, 'subject');
-    if ($active) {
+    $abBodyOverride = '';
+    foreach (['subject', 'body'] as $promptType) {
+        $active = get_active_ab_test($pdo, $promptType);
+        if (!$active) continue;
         $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
         $abTestId = (int) $active['test']['id'];
         $abVariantId = (int) $variant['id'];
-        $abSubjectOverride = ab_subject_instruction_for_variant($variant);
+        $instruction = ab_instruction_for_variant($variant, $promptType);
+        if ($promptType === 'subject') $abSubjectOverride = $instruction;
+        elseif ($promptType === 'body') $abBodyOverride = $instruction;
+        break; // one-at-a-time invariant — first hit wins
     }
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
@@ -738,7 +760,7 @@ $painPointsInstruction
 - You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
 - After that line, add ONE short, respectful unsubscribe line on its own paragraph, such as: \"Not interested? {UNSUBSCRIBE_URL} and I'll stop emailing you.\" The literal token {UNSUBSCRIBE_URL} will be replaced with a tracked unsubscribe link before sending — include it verbatim, do NOT invent or replace the placeholder yourself. Keep the tone soft, brief, and non-pushy.
-- Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
+- Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}

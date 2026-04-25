@@ -216,7 +216,7 @@ function ab_tests_tab_render_list($pdo)
                         <label for="abVariantType">Variant type</label>
                         <select id="abVariantType" name="variant_type">
                             <option value="subject" selected>Subject line</option>
-                            <option value="body" disabled>Body (not wired yet)</option>
+                            <option value="body">Email body</option>
                             <option value="sender" disabled>Sender (not wired yet)</option>
                             <option value="cta" disabled>CTA (not wired yet)</option>
                         </select>

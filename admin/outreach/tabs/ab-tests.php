@@ -218,7 +218,7 @@ function ab_tests_tab_render_list($pdo)
                             <option value="subject" selected>Subject line</option>
                             <option value="body">Email body</option>
                             <option value="cta">CTA / offer</option>
-                            <option value="sender" disabled>Sender (not wired yet)</option>
+                            <option value="sender">Sender from-name</option>
                         </select>
                     </div>
                 </div>
@@ -229,9 +229,10 @@ function ab_tests_tab_render_list($pdo)
                 </div>
 
                 <p class="hint">
-                    <strong>Subject content:</strong> Either a literal subject (used verbatim) OR a directive prefixed with
+                    <strong>Variant content:</strong> Either a literal value (used verbatim) OR a directive prefixed with
                     <code>directive:</code> (e.g. <code>directive: Ask a curiosity question referencing the business's city</code>).
-                    Directives let the AI generate a subject each time while staying in a style.
+                    Directives let the AI generate the value each time while staying in a style.
+                    <span id="senderHintNote" style="display:none;"><br><strong>Sender variants are literal-only</strong> — the from-name string is used as-is in the email envelope, with no AI interpretation. Skip the <code>directive:</code> prefix here. Try things like <code>Evan</code> vs <code>Evan from Argo Books</code> vs <code>Argo Books</code>.</span>
                 </p>
 
                 <div id="abVariantRows"></div>
@@ -398,6 +399,17 @@ function ab_tests_tab_render_list($pdo)
             container.appendChild(makeRow(0));
             container.appendChild(makeRow(1));
             refreshIndices();
+
+            // Show sender-specific note when 'sender' is selected as the variant type.
+            var typeSelect = document.getElementById('abVariantType');
+            var senderNote = document.getElementById('senderHintNote');
+            if (typeSelect && senderNote) {
+                var syncSenderNote = function () {
+                    senderNote.style.display = typeSelect.value === 'sender' ? 'inline' : 'none';
+                };
+                typeSelect.addEventListener('change', syncSenderNote);
+                syncSenderNote();
+            }
         })();
     </script>
     <?php

@@ -249,13 +249,29 @@ function send_outreach_lead($pdo, $lead)
 
     $htmlBody = '<p>' . nl2br($escapedBody) . '</p>';
 
+    // Send-side A/B variants (sender from-name today; preheader / format in
+    // later phases). If the lead is assigned to a variant of any of these
+    // types, fetch the variant + test type and apply.
+    $fromName = 'Argo Books';
+    if ($variantId) {
+        $vStmt = $pdo->prepare("SELECT v.content, t.variant_type
+            FROM outreach_ab_variants v
+            JOIN outreach_ab_tests t ON t.id = v.test_id
+            WHERE v.id = ?");
+        $vStmt->execute([$variantId]);
+        $vRow = $vStmt->fetch();
+        if ($vRow && $vRow['variant_type'] === 'sender' && trim((string) $vRow['content']) !== '') {
+            $fromName = trim((string) $vRow['content']);
+        }
+    }
+
     $result = send_styled_email(
         $email,
         $lead['draft_subject'],
         $htmlBody,
         '',
         'contact@argorobots.com',
-        'Argo Books',
+        $fromName,
         'contact@argorobots.com'
     );
 
@@ -727,17 +743,22 @@ function generate_draft_for_lead($pdo, $lead)
     $abSubjectOverride = '';
     $abBodyOverride = '';
     $abCtaOverride = '';
-    foreach (['subject', 'body', 'cta'] as $promptType) {
-        $active = get_active_ab_test($pdo, $promptType);
+    // Iterate over every wired type so a single lead can be assigned to any
+    // active test (one-at-a-time invariant). Send-side types (sender/preheader/
+    // format) get the assignment stamped here but apply at send time, so their
+    // dispatched instruction is empty and no prompt fragment is emitted.
+    foreach (['subject', 'body', 'cta', 'sender'] as $eligibleType) {
+        $active = get_active_ab_test($pdo, $eligibleType);
         if (!$active) continue;
         $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
         $abTestId = (int) $active['test']['id'];
         $abVariantId = (int) $variant['id'];
-        $instruction = ab_instruction_for_variant($variant, $promptType);
-        if ($promptType === 'subject') $abSubjectOverride = $instruction;
-        elseif ($promptType === 'body') $abBodyOverride = $instruction;
-        elseif ($promptType === 'cta') $abCtaOverride = $instruction;
-        break; // one-at-a-time invariant — first hit wins
+        $instruction = ab_instruction_for_variant($variant, $eligibleType);
+        if ($eligibleType === 'subject') $abSubjectOverride = $instruction;
+        elseif ($eligibleType === 'body') $abBodyOverride = $instruction;
+        elseif ($eligibleType === 'cta') $abCtaOverride = $instruction;
+        // sender: instruction is empty; assignment alone is what matters
+        break;
     }
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.

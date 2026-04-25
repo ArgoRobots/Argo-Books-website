@@ -604,7 +604,7 @@ CREATE TABLE IF NOT EXISTS outreach_activity_log (
 CREATE TABLE IF NOT EXISTS outreach_ab_tests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(120) NOT NULL,
-    variant_type ENUM('subject','body','sender','cta') NOT NULL DEFAULT 'subject',
+    variant_type ENUM('subject','body','sender','cta','preheader') NOT NULL DEFAULT 'subject',
     status ENUM('draft','active','paused','completed') NOT NULL DEFAULT 'draft',
     notes TEXT DEFAULT NULL,
     started_at DATETIME DEFAULT NULL,

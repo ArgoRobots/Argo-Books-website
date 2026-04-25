@@ -25,12 +25,19 @@ function _premium_feature_list_items($prefix = '')
  * @param string $subject Email subject
  * @param string $body_content HTML content for the email body (will be wrapped in template)
  * @param string $header_style Optional custom header style (default: blue gradient)
+ * @param string|null $preheader Optional inbox-preview snippet; rendered as a hidden element so it appears next to the subject in most mail clients without being visible in the body
  * @return bool True if successful, false otherwise
  */
-function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [])
+function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null)
 {
     $css = file_get_contents(__DIR__ . '/email.css');
     $site_url = site_url();
+
+    $preheaderHtml = '';
+    if ($preheader !== null && trim((string) $preheader) !== '') {
+        $safePreheader = htmlspecialchars((string) $preheader, ENT_QUOTES, 'UTF-8');
+        $preheaderHtml = '<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:transparent;mso-hide:all;">' . $safePreheader . '</div>';
+    }
 
     // Map style keywords to CSS classes, or use inline style for backwards compatibility
     $header_class = '';
@@ -56,6 +63,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             </style>
         </head>
         <body>
+            {$preheaderHtml}
             <div class="container">
                 <div class="header {$header_class}" style="{$header_inline}">
                     <img src="{$site_url}/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">

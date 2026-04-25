@@ -219,6 +219,7 @@ function ab_tests_tab_render_list($pdo)
                             <option value="body">Email body</option>
                             <option value="cta">CTA / offer</option>
                             <option value="sender">Sender from-name</option>
+                            <option value="preheader">Preheader (inbox preview)</option>
                         </select>
                     </div>
                 </div>
@@ -233,6 +234,7 @@ function ab_tests_tab_render_list($pdo)
                     <code>directive:</code> (e.g. <code>directive: Ask a curiosity question referencing the business's city</code>).
                     Directives let the AI generate the value each time while staying in a style.
                     <span id="senderHintNote" style="display:none;"><br><strong>Sender variants are literal-only</strong> — the from-name string is used as-is in the email envelope, with no AI interpretation. Skip the <code>directive:</code> prefix here. Try things like <code>Evan</code> vs <code>Evan from Argo Books</code> vs <code>Argo Books</code>.</span>
+                    <span id="preheaderHintNote" style="display:none;"><br><strong>Preheader variants are literal-only</strong> — this is the snippet most inboxes show next to the subject. Use short, scannable text. Try things like <code>Quick question about your business</code> vs <code>Free 1-year license inside</code> vs leave one variant blank to test the &ldquo;no preheader&rdquo; baseline.</span>
                 </p>
 
                 <div id="abVariantRows"></div>
@@ -329,10 +331,9 @@ function ab_tests_tab_render_list($pdo)
             <ul class="idea-list">
                 <li><strong>Email body / opener</strong> &mdash; schema already supports <code>variant_type='body'</code>; prompt just swaps the body directive. Biggest remaining lever after subject.</li>
                 <li><strong>CTA framing</strong> &mdash; "free 1-year premium license for feedback" vs "15 min chat in exchange for a year free".</li>
-                <li><strong>Preheader / preview text</strong> &mdash; the text next to the subject in the inbox.</li>
                 <li><strong>Sender name</strong> &mdash; "Evan" vs "Evan at Argo Books" vs "Argo Books".</li>
                 <li><strong>Personalization depth</strong> &mdash; with vs without the AI-generated <code>business_summary</code>.</li>
-                <li><strong>Tone</strong> &mdash; casual local-developer vs professional founder.</li>
+                <li><strong>Tone</strong> &mdash; casual local-developer vs professional founder (author as a body directive).</li>
             </ul>
             <p class="hint">Parked for now (too noisy at ~10 sends/day): send time of day, HTML vs plain-text, unsubscribe placement.</p>
         </div>
@@ -400,15 +401,17 @@ function ab_tests_tab_render_list($pdo)
             container.appendChild(makeRow(1));
             refreshIndices();
 
-            // Show sender-specific note when 'sender' is selected as the variant type.
+            // Show type-specific notes when the matching type is selected.
             var typeSelect = document.getElementById('abVariantType');
             var senderNote = document.getElementById('senderHintNote');
-            if (typeSelect && senderNote) {
-                var syncSenderNote = function () {
-                    senderNote.style.display = typeSelect.value === 'sender' ? 'inline' : 'none';
+            var preheaderNote = document.getElementById('preheaderHintNote');
+            if (typeSelect) {
+                var syncTypeNotes = function () {
+                    if (senderNote) senderNote.style.display = typeSelect.value === 'sender' ? 'inline' : 'none';
+                    if (preheaderNote) preheaderNote.style.display = typeSelect.value === 'preheader' ? 'inline' : 'none';
                 };
-                typeSelect.addEventListener('change', syncSenderNote);
-                syncSenderNote();
+                typeSelect.addEventListener('change', syncTypeNotes);
+                syncTypeNotes();
             }
         })();
     </script>

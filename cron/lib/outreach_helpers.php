@@ -249,10 +249,11 @@ function send_outreach_lead($pdo, $lead)
 
     $htmlBody = '<p>' . nl2br($escapedBody) . '</p>';
 
-    // Send-side A/B variants (sender from-name today; preheader / format in
-    // later phases). If the lead is assigned to a variant of any of these
+    // Send-side A/B variants (sender from-name, preheader; format coming in a
+    // later phase). If the lead is assigned to a variant of any of these
     // types, fetch the variant + test type and apply.
     $fromName = 'Argo Books';
+    $preheader = null;
     if ($variantId) {
         $vStmt = $pdo->prepare("SELECT v.content, t.variant_type
             FROM outreach_ab_variants v
@@ -260,8 +261,13 @@ function send_outreach_lead($pdo, $lead)
             WHERE v.id = ?");
         $vStmt->execute([$variantId]);
         $vRow = $vStmt->fetch();
-        if ($vRow && $vRow['variant_type'] === 'sender' && trim((string) $vRow['content']) !== '') {
-            $fromName = trim((string) $vRow['content']);
+        if ($vRow && trim((string) $vRow['content']) !== '') {
+            $vContent = trim((string) $vRow['content']);
+            if ($vRow['variant_type'] === 'sender') {
+                $fromName = $vContent;
+            } elseif ($vRow['variant_type'] === 'preheader') {
+                $preheader = $vContent;
+            }
         }
     }
 
@@ -272,7 +278,9 @@ function send_outreach_lead($pdo, $lead)
         '',
         'contact@argorobots.com',
         $fromName,
-        'contact@argorobots.com'
+        'contact@argorobots.com',
+        [],
+        $preheader
     );
 
     if ($result) {
@@ -875,7 +883,7 @@ Return ONLY the JSON, no other text.";
  */
 function ab_known_variant_types()
 {
-    return ['subject', 'body', 'sender', 'cta'];
+    return ['subject', 'body', 'sender', 'cta', 'preheader'];
 }
 
 /**

@@ -962,10 +962,30 @@
     cursor: pointer;
 }
 
+/* Neutral (no-color-modifier) button used inside the A/B create form. */
+.btn-neutral {
+    background: var(--white);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-border);
+}
+
+.btn-neutral:hover {
+    background: var(--gray-100, #f3f4f6);
+    color: var(--gray-800);
+}
+
 .variant-remove {
+    width: auto;
+    min-width: 0;
     padding: 2px 10px;
     font-size: 16px;
     line-height: 1;
+}
+
+.variant-remove:hover {
+    color: #dc2626;
+    border-color: #dc2626;
+    background: var(--white);
 }
 
 .variant-content-cell {
@@ -1241,4 +1261,21 @@
 
 [data-theme="dark"] .hint {
     color: var(--gray-400);
+}
+
+[data-theme="dark"] .btn-neutral {
+    background: var(--gray-800);
+    color: var(--gray-200);
+    border-color: var(--gray-700);
+}
+
+[data-theme="dark"] .btn-neutral:hover {
+    background: var(--gray-700);
+    color: var(--gray-100);
+}
+
+[data-theme="dark"] .variant-remove:hover {
+    color: #f87171;
+    border-color: #f87171;
+    background: var(--gray-800);
 }

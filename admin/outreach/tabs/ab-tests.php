@@ -237,7 +237,7 @@ function ab_tests_tab_render_list($pdo)
                 <div id="abVariantRows"></div>
 
                 <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
-                    <button type="button" class="btn btn-small" onclick="abAddVariantRow()">+ Add variant</button>
+                    <button type="button" class="btn btn-small btn-neutral" onclick="abAddVariantRow()">+ Add variant</button>
                     <span class="hint" id="abVariantCountHint">2 of up to 4 variants</span>
                 </div>
 
@@ -355,7 +355,7 @@ function ab_tests_tab_render_list($pdo)
                 row.innerHTML =
                     '<div class="variant-row-header">' +
                         '<label><input type="radio" name="default_variant" value="' + idx + '"' + (idx === 0 ? ' checked' : '') + '> Default</label>' +
-                        '<button type="button" class="btn btn-small variant-remove" title="Remove variant">&times;</button>' +
+                        '<button type="button" class="btn btn-small btn-neutral variant-remove" title="Remove variant">&times;</button>' +
                     '</div>' +
                     '<div class="form-row">' +
                         '<div class="form-group" style="flex:0 0 110px;">' +

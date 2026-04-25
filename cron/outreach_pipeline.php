@@ -471,7 +471,35 @@ function stepManageAbTests($pdo, $dryRun)
     // — keep the one-active-test-at-a-time invariant.
     if ($anyStillRunning) return;
 
-    // 2) Auto-create the next cycle. The ab_auto_next_type pointer rotates
+    // 2) Defensive backstop: never start a new cycle while ANY status='active'
+    //    test row exists, even one the per-type promotion sweep couldn't
+    //    evaluate (e.g. zero or one variant attached, which can't happen via
+    //    the UI but could from direct DB edits). Two active tests would
+    //    silently corrupt the one-active-test invariant.
+    $activeCheck = $pdo->query("SELECT id, name, variant_type,
+        (SELECT COUNT(*) FROM outreach_ab_variants v WHERE v.test_id = t.id) AS variant_count
+        FROM outreach_ab_tests t WHERE status = 'active' ORDER BY id ASC LIMIT 1")->fetch();
+    if ($activeCheck) {
+        if ((int) $activeCheck['variant_count'] < 2) {
+            logPipeline(sprintf(
+                "A/B auto-cycle blocked: active %s test #%d '%s' is misconfigured (%d variant(s)). Admin intervention required.",
+                $activeCheck['variant_type'],
+                (int) $activeCheck['id'],
+                $activeCheck['name'],
+                (int) $activeCheck['variant_count']
+            ), 'WARN');
+        } else {
+            logPipeline(sprintf(
+                "A/B auto-cycle blocked: active %s test #%d '%s' still exists. Not creating a second active test.",
+                $activeCheck['variant_type'],
+                (int) $activeCheck['id'],
+                $activeCheck['name']
+            ));
+        }
+        return;
+    }
+
+    // 3) Auto-create the next cycle. The ab_auto_next_type pointer rotates
     //    across ab_auto_rotation_order() so the pipeline tests one lever,
     //    then the next, and so on. body / cta / preheader aren't in the
     //    rotation — they need crafted copy and stay admin-initiated.

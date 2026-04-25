@@ -58,11 +58,24 @@ function ab_tests_tab_handle_post($pdo)
                 ['label' => 'B', 'content' => 'off', 'is_default' => 0],
             ];
         } else {
+            // Sender/preheader variants are applied verbatim at send time
+            // (no AI interpretation), so a "directive:" prefix would just be
+            // taken literally. Reject server-side so admins can't accidentally
+            // misconfigure it past the UI hint.
+            $literalOnlyTypes = ['sender', 'preheader'];
+
             $rows = [];
             foreach ($variantLabels as $i => $label) {
                 $label = trim((string) $label);
                 $content = trim((string) ($variantContents[$i] ?? ''));
                 if ($label === '' || $content === '') continue;
+
+                if (in_array($variantType, $literalOnlyTypes, true) && stripos($content, 'directive:') === 0) {
+                    $_SESSION['message'] = ucfirst($variantType) . ' variants are literal-only — remove the "directive:" prefix.';
+                    $_SESSION['message_type'] = 'error';
+                    header('Location: index.php?tab=ab-tests'); exit;
+                }
+
                 $rows[] = ['label' => $label, 'content' => $content, 'is_default' => ($i === $defaultIdx) ? 1 : 0];
             }
 
@@ -380,8 +393,8 @@ function ab_tests_tab_render_list($pdo)
                             '<input type="text" name="variant_label[]" value="' + renderLabel(idx) + '" required>' +
                         '</div>' +
                         '<div class="form-group" style="flex:1; min-width:240px;">' +
-                            '<label>Subject or <code>directive:</code> prompt</label>' +
-                            '<input type="text" name="variant_content[]" placeholder="e.g. Thought of you guys  OR  directive: Ask a curiosity question referencing the city" required>' +
+                            '<label>Variant content</label>' +
+                            '<input type="text" name="variant_content[]" placeholder="literal value, or directive: a style for the AI to follow" required>' +
                         '</div>' +
                     '</div>';
                 row.querySelector('.variant-remove').addEventListener('click', function() {

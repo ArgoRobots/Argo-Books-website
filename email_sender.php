@@ -61,13 +61,18 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             $header_inline = $header_style;
         }
 
+        // Subjects can be admin-authored or AI-generated; escape for the
+        // HTML <title> context. The raw subject still goes to SMTP/mail()
+        // as the email Subject header below.
+        $titleEscaped = htmlspecialchars((string) $subject, ENT_QUOTES, 'UTF-8');
+
         $email_body = <<<HTML
             <!DOCTYPE html>
             <html>
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-                <title>{$subject}</title>
+                <title>{$titleEscaped}</title>
                 <style>
                     {$css}
                 </style>

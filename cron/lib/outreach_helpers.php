@@ -65,7 +65,8 @@ require_once __DIR__ . '/ab_helpers.php';
 
 /**
  * Find the single active A/B test of a given variant type, or null if none.
- * Returns ['test' => row, 'variants' => [rows]] on hit.
+ * Returns ['test' => row, 'variants' => [rows]] on hit. Used by the cron's
+ * promotion sweep, which iterates per type.
  */
 function get_active_ab_test($pdo, $variantType)
 {
@@ -73,6 +74,29 @@ function get_active_ab_test($pdo, $variantType)
         WHERE status = 'active' AND variant_type = ?
         ORDER BY started_at DESC, id DESC LIMIT 1");
     $stmt->execute([$variantType]);
+    $test = $stmt->fetch();
+    if (!$test) return null;
+
+    $vStmt = $pdo->prepare("SELECT * FROM outreach_ab_variants WHERE test_id = ? ORDER BY id ASC");
+    $vStmt->execute([$test['id']]);
+    $variants = $vStmt->fetchAll();
+    if (empty($variants)) return null;
+
+    return ['test' => $test, 'variants' => $variants];
+}
+
+/**
+ * Find THE single active A/B test (any type) and its variants, or null. Use
+ * this when the caller doesn't care which type — the framework's invariant is
+ * one active test at a time, so iterating per-type is wasteful at draft time
+ * (worst case 7 queries per drafted lead just to find the active one).
+ */
+function get_single_active_ab_test($pdo)
+{
+    $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests
+        WHERE status = 'active'
+        ORDER BY started_at DESC, id DESC LIMIT 1");
+    $stmt->execute();
     $test = $stmt->fetch();
     if (!$test) return null;
 
@@ -242,7 +266,11 @@ function send_outreach_lead($pdo, $lead)
         if ($vRow && trim((string) $vRow['content']) !== '') {
             $vContent = trim((string) $vRow['content']);
             if ($vRow['variant_type'] === 'sender') {
-                $fromName = $vContent;
+                // Strip CR/LF defensively. PHPMailer sanitizes headers, but
+                // the mail() fallback path concatenates $fromName into the
+                // From: header verbatim — a stray newline could enable
+                // header injection if a variant's content was malformed.
+                $fromName = preg_replace('/[\r\n]+/', ' ', $vContent);
             } elseif ($vRow['variant_type'] === 'preheader') {
                 $preheader = $vContent;
             } elseif ($vRow['variant_type'] === 'format') {
@@ -725,10 +753,7 @@ function generate_draft_for_lead($pdo, $lead)
     // A/B variant lookup must happen before the summary block so a
     // personalization test can gate the OpenAI summary call entirely.
     // Only one test can be active at a time across the whole framework
-    // (enforced by the activation handler), so the break below picks the
-    // single match. Iterate over every known type so send-side variants
-    // (sender / preheader / format) still get the lead-variant stamp here
-    // even though they don't inject anything into the prompt.
+    // (enforced by the activation handler), so a single SELECT finds it.
     //
     // If the lead is already assigned to the currently-active test (e.g.
     // admin clicked "Regenerate Draft" after the email went out), keep the
@@ -743,10 +768,10 @@ function generate_draft_for_lead($pdo, $lead)
     $personalizationOff = false;
     $existingAbTestId = isset($lead['ab_test_id']) ? (int) $lead['ab_test_id'] : 0;
     $existingAbVariantId = isset($lead['ab_variant_id']) ? (int) $lead['ab_variant_id'] : 0;
-    foreach (ab_known_variant_types() as $eligibleType) {
-        $active = get_active_ab_test($pdo, $eligibleType);
-        if (!$active) continue;
+    $active = get_single_active_ab_test($pdo);
+    if ($active) {
         $activeTestId = (int) $active['test']['id'];
+        $eligibleType = (string) $active['test']['variant_type'];
 
         $variant = null;
         if ($existingAbTestId === $activeTestId && $existingAbVariantId > 0) {
@@ -772,7 +797,6 @@ function generate_draft_for_lead($pdo, $lead)
         }
         // sender / preheader / format: assignment alone is what matters;
         // their dispatched instruction is empty and they apply at send time.
-        break;
     }
 
     // Generate a business summary if we don't have one yet — unless the lead

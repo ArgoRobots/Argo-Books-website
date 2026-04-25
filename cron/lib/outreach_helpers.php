@@ -724,14 +724,18 @@ function generate_draft_for_lead($pdo, $lead)
 
     // A/B variant lookup must happen before the summary block so a
     // personalization test can gate the OpenAI summary call entirely.
-    // Only one type can be active at a time per the framework's invariant.
+    // Only one test can be active at a time across the whole framework
+    // (enforced by the activation handler), so the break below picks the
+    // single match. Iterate over every known type so send-side variants
+    // (sender / preheader / format) still get the lead-variant stamp here
+    // even though they don't inject anything into the prompt.
     $abTestId = null;
     $abVariantId = null;
     $abSubjectOverride = '';
     $abBodyOverride = '';
     $abCtaOverride = '';
     $personalizationOff = false;
-    foreach (['subject', 'body', 'cta', 'sender', 'personalization'] as $eligibleType) {
+    foreach (ab_known_variant_types() as $eligibleType) {
         $active = get_active_ab_test($pdo, $eligibleType);
         if (!$active) continue;
         $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
@@ -744,8 +748,8 @@ function generate_draft_for_lead($pdo, $lead)
         elseif ($eligibleType === 'personalization') {
             $personalizationOff = (trim((string) $variant['content']) === 'off');
         }
-        // sender / preheader / format: assignment alone is what matters; their
-        // dispatched instruction is empty and they apply at send time.
+        // sender / preheader / format: assignment alone is what matters;
+        // their dispatched instruction is empty and they apply at send time.
         break;
     }
 

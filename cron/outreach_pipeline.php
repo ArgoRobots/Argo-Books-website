@@ -463,8 +463,8 @@ function stepManageAbTests($pdo, $dryRun)
         }
     }
 
-    // Safety-pause shorts-circuits new-cycle creation across all types — admin
-    // needs to review and click Resume in Settings.
+    // Safety-pause short-circuits new-cycle creation across all types — admin
+    // needs to flip A/B automation back on in Settings before anything moves.
     if ($anyPaused) return;
 
     // If any test is still running (any type), don't start a new cycle yet

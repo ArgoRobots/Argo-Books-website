@@ -37,7 +37,7 @@ function ab_tests_tab_handle_post($pdo)
             header('Location: index.php?tab=ab-tests'); exit;
         }
 
-        if (!in_array($variantType, ['subject', 'body', 'sender', 'cta', 'preheader', 'format'], true)) {
+        if (!in_array($variantType, ['subject', 'body', 'sender', 'cta', 'preheader', 'format', 'personalization'], true)) {
             $variantType = 'subject';
         }
 
@@ -47,6 +47,15 @@ function ab_tests_tab_handle_post($pdo)
             $rows = [
                 ['label' => 'A', 'content' => 'html',  'is_default' => 1],
                 ['label' => 'B', 'content' => 'plain', 'is_default' => 0],
+            ];
+        } elseif ($variantType === 'personalization') {
+            // Personalization tests are fixed: on (current behaviour, includes
+            // the AI-generated business_summary) vs off (skip the summary call
+            // entirely). Variant content is the literal string read by
+            // generate_draft_for_lead.
+            $rows = [
+                ['label' => 'A', 'content' => 'on',  'is_default' => 1],
+                ['label' => 'B', 'content' => 'off', 'is_default' => 0],
             ];
         } else {
             $rows = [];
@@ -230,6 +239,7 @@ function ab_tests_tab_render_list($pdo)
                             <option value="sender">Sender from-name</option>
                             <option value="preheader">Preheader (inbox preview)</option>
                             <option value="format">Format (HTML vs plain text)</option>
+                            <option value="personalization">Personalization (with vs without business summary)</option>
                         </select>
                     </div>
                 </div>
@@ -246,12 +256,17 @@ function ab_tests_tab_render_list($pdo)
                     <span id="senderHintNote" style="display:none;"><br><strong>Sender variants are literal-only</strong> — the from-name string is used as-is in the email envelope, with no AI interpretation. Skip the <code>directive:</code> prefix here. Try things like <code>Evan</code> vs <code>Evan from Argo Books</code> vs <code>Argo Books</code>.</span>
                     <span id="preheaderHintNote" style="display:none;"><br><strong>Preheader variants are literal-only</strong> — this is the snippet most inboxes show next to the subject. Use short, scannable text. Try things like <code>Quick question about your business</code> vs <code>Free 1-year license inside</code> vs leave one variant blank to test the &ldquo;no preheader&rdquo; baseline.</span>
                     <span id="formatHintNote" style="display:none;"><br><strong>Format is a fixed two-variant test</strong> — Variant A sends the full styled HTML email (current behaviour); Variant B sends the same content as plain text (no template, no logo, bare URLs). The variant rows below are not used for this test type.</span>
+                    <span id="personalizationHintNote" style="display:none;"><br><strong>Personalization is a fixed two-variant test</strong> — Variant A keeps the AI-generated <code>business_summary</code> (current behaviour, costs an OpenAI call per lead). Variant B skips the summary entirely. Use it to find out whether the extra call actually moves CTR.</span>
                 </p>
 
                 <div id="abVariantRows"></div>
 
                 <div id="abFormatFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--border-color, #d1d5db); border-radius:6px; margin-top:8px;">
                     Will create two variants automatically: <strong>A &mdash; <code>html</code></strong> (default) and <strong>B &mdash; <code>plain</code></strong>.
+                </div>
+
+                <div id="abPersonalizationFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--border-color, #d1d5db); border-radius:6px; margin-top:8px;">
+                    Will create two variants automatically: <strong>A &mdash; <code>on</code></strong> (default, summary included) and <strong>B &mdash; <code>off</code></strong> (summary skipped).
                 </div>
 
                 <div id="abVariantControls" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
@@ -347,7 +362,6 @@ function ab_tests_tab_render_list($pdo)
                 <li><strong>Email body / opener</strong> &mdash; schema already supports <code>variant_type='body'</code>; prompt just swaps the body directive. Biggest remaining lever after subject.</li>
                 <li><strong>CTA framing</strong> &mdash; "free 1-year premium license for feedback" vs "15 min chat in exchange for a year free".</li>
                 <li><strong>Sender name</strong> &mdash; "Evan" vs "Evan at Argo Books" vs "Argo Books".</li>
-                <li><strong>Personalization depth</strong> &mdash; with vs without the AI-generated <code>business_summary</code>.</li>
                 <li><strong>Tone</strong> &mdash; casual local-developer vs professional founder (author as a body directive).</li>
             </ul>
             <p class="hint">Parked for now (too noisy at ~10 sends/day): send time of day, unsubscribe placement.</p>
@@ -421,7 +435,9 @@ function ab_tests_tab_render_list($pdo)
             var senderNote = document.getElementById('senderHintNote');
             var preheaderNote = document.getElementById('preheaderHintNote');
             var formatNote = document.getElementById('formatHintNote');
+            var personalizationNote = document.getElementById('personalizationHintNote');
             var formatFixedNotice = document.getElementById('abFormatFixedNotice');
+            var personalizationFixedNotice = document.getElementById('abPersonalizationFixedNotice');
             var variantRows = document.getElementById('abVariantRows');
             var variantControls = document.getElementById('abVariantControls');
             if (typeSelect) {
@@ -430,10 +446,12 @@ function ab_tests_tab_render_list($pdo)
                     if (senderNote) senderNote.style.display = v === 'sender' ? 'inline' : 'none';
                     if (preheaderNote) preheaderNote.style.display = v === 'preheader' ? 'inline' : 'none';
                     if (formatNote) formatNote.style.display = v === 'format' ? 'inline' : 'none';
-                    var isFormat = (v === 'format');
-                    if (variantRows) variantRows.style.display = isFormat ? 'none' : '';
-                    if (variantControls) variantControls.style.display = isFormat ? 'none' : 'flex';
-                    if (formatFixedNotice) formatFixedNotice.style.display = isFormat ? 'block' : 'none';
+                    if (personalizationNote) personalizationNote.style.display = v === 'personalization' ? 'inline' : 'none';
+                    var isFixed = (v === 'format' || v === 'personalization');
+                    if (variantRows) variantRows.style.display = isFixed ? 'none' : '';
+                    if (variantControls) variantControls.style.display = isFixed ? 'none' : 'flex';
+                    if (formatFixedNotice) formatFixedNotice.style.display = v === 'format' ? 'block' : 'none';
+                    if (personalizationFixedNotice) personalizationFixedNotice.style.display = v === 'personalization' ? 'block' : 'none';
                 };
                 typeSelect.addEventListener('change', syncTypeNotes);
                 syncTypeNotes();

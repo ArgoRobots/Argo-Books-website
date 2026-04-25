@@ -723,9 +723,42 @@ function generate_draft_for_lead($pdo, $lead)
 {
     $id = $lead['id'];
 
-    // Generate business summary if we don't have one yet
+    // A/B variant lookup must happen before the summary block so a
+    // personalization test can gate the OpenAI summary call entirely.
+    // Only one type can be active at a time per the framework's invariant.
+    $abTestId = null;
+    $abVariantId = null;
+    $abSubjectOverride = '';
+    $abBodyOverride = '';
+    $abCtaOverride = '';
+    $personalizationOff = false;
+    foreach (['subject', 'body', 'cta', 'sender', 'personalization'] as $eligibleType) {
+        $active = get_active_ab_test($pdo, $eligibleType);
+        if (!$active) continue;
+        $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
+        $abTestId = (int) $active['test']['id'];
+        $abVariantId = (int) $variant['id'];
+        $instruction = ab_instruction_for_variant($variant, $eligibleType);
+        if ($eligibleType === 'subject') $abSubjectOverride = $instruction;
+        elseif ($eligibleType === 'body') $abBodyOverride = $instruction;
+        elseif ($eligibleType === 'cta') $abCtaOverride = $instruction;
+        elseif ($eligibleType === 'personalization') {
+            $personalizationOff = (trim((string) $variant['content']) === 'off');
+        }
+        // sender / preheader / format: assignment alone is what matters; their
+        // dispatched instruction is empty and they apply at send time.
+        break;
+    }
+
+    // Generate a business summary if we don't have one yet — unless the lead
+    // is in the 'off' arm of an active personalization test, in which case we
+    // skip the OpenAI call entirely. If a stored summary exists from before
+    // the test started, mask it for this draft so the prompt truly operates
+    // without personalization.
     $summary = $lead['business_summary'] ?? null;
-    if (empty($summary) && !empty($lead['website'])) {
+    if ($personalizationOff) {
+        $summary = null;
+    } elseif (empty($summary) && !empty($lead['website'])) {
         $summary = summarize_business($lead['website']);
         if ($summary) {
             $stmt = $pdo->prepare("UPDATE outreach_leads SET business_summary = ? WHERE id = ?");
@@ -761,33 +794,6 @@ function generate_draft_for_lead($pdo, $lead)
     $painPointsInstruction = "\n- Small businesses in the '" . $categoryLabel . "' category commonly deal with things like:\n"
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
-
-    // Find the single active prompt-side A/B test for this lead (only one
-    // type can be active at a time per the framework's invariant) and build
-    // the override fragment. Send-side types (sender/preheader/format) apply
-    // later in send_outreach_lead, not here.
-    $abTestId = null;
-    $abVariantId = null;
-    $abSubjectOverride = '';
-    $abBodyOverride = '';
-    $abCtaOverride = '';
-    // Iterate over every wired type so a single lead can be assigned to any
-    // active test (one-at-a-time invariant). Send-side types (sender/preheader/
-    // format) get the assignment stamped here but apply at send time, so their
-    // dispatched instruction is empty and no prompt fragment is emitted.
-    foreach (['subject', 'body', 'cta', 'sender'] as $eligibleType) {
-        $active = get_active_ab_test($pdo, $eligibleType);
-        if (!$active) continue;
-        $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
-        $abTestId = (int) $active['test']['id'];
-        $abVariantId = (int) $variant['id'];
-        $instruction = ab_instruction_for_variant($variant, $eligibleType);
-        if ($eligibleType === 'subject') $abSubjectOverride = $instruction;
-        elseif ($eligibleType === 'body') $abBodyOverride = $instruction;
-        elseif ($eligibleType === 'cta') $abCtaOverride = $instruction;
-        // sender: instruction is empty; assignment alone is what matters
-        break;
-    }
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
@@ -903,7 +909,7 @@ Return ONLY the JSON, no other text.";
  */
 function ab_known_variant_types()
 {
-    return ['subject', 'body', 'sender', 'cta', 'preheader', 'format'];
+    return ['subject', 'body', 'sender', 'cta', 'preheader', 'format', 'personalization'];
 }
 
 /**

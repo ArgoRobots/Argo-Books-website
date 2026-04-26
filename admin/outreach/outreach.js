@@ -11,22 +11,23 @@ function getFilterParams() {
 }
 
 function updateUrlParams() {
-    const params = new URLSearchParams();
+    // Start from the current URL so non-filter params (tab, test_id, etc.) survive.
+    const params = new URLSearchParams(window.location.search);
     const search = document.getElementById('filterSearch').value.trim();
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
     const companySize = document.getElementById('filterCompanySize').value;
     const sort = document.getElementById('filterSort').value;
 
-    if (search) params.set('search', search);
-    if (status) params.set('status', status);
-    if (response) params.set('response', response);
-    if (companySize) params.set('company_size', companySize);
-    if (sort && sort !== 'date_added_desc') params.set('sort', sort);
+    const setOrDelete = (key, value) => value ? params.set(key, value) : params.delete(key);
+    setOrDelete('search', search);
+    setOrDelete('status', status);
+    setOrDelete('response', response);
+    setOrDelete('company_size', companySize);
+    setOrDelete('sort', sort && sort !== 'date_added_desc' ? sort : '');
 
-    const newUrl = params.toString()
-        ? window.location.pathname + '?' + params.toString()
-        : window.location.pathname;
+    const qs = params.toString();
+    const newUrl = qs ? window.location.pathname + '?' + qs : window.location.pathname;
     window.history.replaceState({}, '', newUrl);
 }
 
@@ -1047,11 +1048,9 @@ async function importCSV() {
 
     const formData = new FormData();
     formData.append('csv_file', fileInput.files[0]);
-    formData.append('action', 'import_csv');
 
     try {
-        const res = await fetch('api.php?action=import_csv', { method: 'POST', body: formData });
-        const result = await res.json();
+        const result = await api('import_csv', { method: 'POST', body: formData });
 
         notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {

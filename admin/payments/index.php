@@ -376,19 +376,19 @@ include __DIR__ . '/../admin_header.php';
     </div>
 
     <!-- Tab Navigation -->
-    <div class="tab-buttons">
-        <div class="tab-button active" onclick="switchTab('overview')">Overview</div>
-        <div class="tab-button" onclick="switchTab('transactions')">Transactions</div>
-        <div class="tab-button" onclick="switchTab('companies')">Companies</div>
-        <div class="tab-button" onclick="switchTab('invoices')">Invoices</div>
-        <div class="tab-button" onclick="switchTab('revenue')">Payment Analytics</div>
-        <div class="tab-button" onclick="switchTab('failures')">Failed & Refunds</div>
+    <div class="section-tabs">
+        <button class="section-tab active" data-tab="overview">Overview</button>
+        <button class="section-tab" data-tab="transactions">Transactions</button>
+        <button class="section-tab" data-tab="companies">Companies</button>
+        <button class="section-tab" data-tab="invoices">Invoices</button>
+        <button class="section-tab" data-tab="revenue">Payment Analytics</button>
+        <button class="section-tab" data-tab="failures">Failed & Refunds</button>
     </div>
 
     <!-- ============================================================ -->
     <!-- TAB 1: OVERVIEW -->
     <!-- ============================================================ -->
-    <div id="overview-tab" class="tab-content active">
+    <div id="overview" class="tab-content active">
         <!-- Stat Cards -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -495,7 +495,7 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <!-- TAB 2: TRANSACTIONS -->
     <!-- ============================================================ -->
-    <div id="transactions-tab" class="tab-content">
+    <div id="transactions" class="tab-content">
         <!-- Filters -->
         <div class="filters-bar">
             <form method="GET" class="filters-form" id="tx-filters-form">
@@ -591,7 +591,7 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <!-- TAB 3: COMPANIES -->
     <!-- ============================================================ -->
-    <div id="companies-tab" class="tab-content">
+    <div id="companies" class="tab-content">
         <div class="table-container">
             <div class="table-header">
                 <h2>Portal Companies</h2>
@@ -733,7 +733,7 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <!-- TAB 4: INVOICES -->
     <!-- ============================================================ -->
-    <div id="invoices-tab" class="tab-content">
+    <div id="invoices" class="tab-content">
         <!-- Filters -->
         <div class="filters-bar">
             <form method="GET" class="filters-form" id="inv-filters-form">
@@ -815,7 +815,7 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <!-- TAB 5: REVENUE ANALYTICS -->
     <!-- ============================================================ -->
-    <div id="revenue-tab" class="tab-content">
+    <div id="revenue" class="tab-content">
         <!-- Summary Metrics -->
         <div class="stats-grid">
             <div class="stat-card">
@@ -885,7 +885,7 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <!-- TAB 6: FAILED PAYMENTS & REFUNDS -->
     <!-- ============================================================ -->
-    <div id="failures-tab" class="tab-content">
+    <div id="failures" class="tab-content">
         <!-- Summary Stats -->
         <div class="stats-grid stats-grid-3">
             <div class="stat-card">
@@ -983,29 +983,7 @@ include __DIR__ . '/../admin_header.php';
 </div>
 
 <script>
-// ============================================================
-// Tab Switching
-// ============================================================
-function switchTab(tabName) {
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => content.classList.remove('active'));
-
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => button.classList.remove('active'));
-
-    const selectedTab = document.getElementById(tabName + '-tab');
-    if (selectedTab) selectedTab.classList.add('active');
-
-    event.target.classList.add('active');
-}
-
-// Restore tab from URL parameter
-const urlParams = new URLSearchParams(window.location.search);
-const tabParam = urlParams.get('tab');
-if (tabParam) {
-    const btn = document.querySelector(`.tab-button[onclick*="'${tabParam}'"]`);
-    if (btn) btn.click();
-}
+// Tab switching is handled centrally by admin/section-tabs.js
 
 // ============================================================
 // Company Detail Toggle

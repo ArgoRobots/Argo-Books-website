@@ -601,6 +601,7 @@ tbody tr:hover {
 
 .alert-success,
 .success-message {
+  text-align: center;
   background: var(--emerald-100);
   color: var(--emerald-800);
   border-color: var(--emerald-500);
@@ -1424,28 +1425,6 @@ tbody tr:hover {
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
-/* Dark theme - Tab buttons (payments, license) */
-[data-theme="dark"] .tab-buttons {
-  border-bottom-color: var(--gray-text-dark);
-}
-
-[data-theme="dark"] .tab-button {
-  background: var(--gray-800);
-  border-color: var(--gray-text-dark);
-  color: var(--gray-400);
-}
-
-[data-theme="dark"] .tab-button:hover {
-  background: var(--gray-700);
-  color: var(--gray-200);
-}
-
-[data-theme="dark"] .tab-button.active {
-  background: var(--gray-text-darker);
-  color: var(--gray-100);
-  box-shadow: 0 -2px 8px var(--overlay-light);
-}
-
 [data-theme="dark"] .section-tabs {
   border-bottom-color: var(--gray-text-dark);
 }
@@ -2007,5 +1986,76 @@ tbody tr:hover {
 [data-theme="dark"] .pg-num.pg-active {
   background: var(--blue-primary, #3b82f6);
   color: #fff;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   Section tabs — shared page-level tab style for all admin pages.
+   Markup:
+       <div class="section-tabs">
+           <button class="section-tab active" data-tab="foo">Foo</button>
+           <button class="section-tab"         data-tab="bar">Bar</button>
+       </div>
+       <div id="foo" class="tab-content active">...</div>
+       <div id="bar" class="tab-content">...</div>
+   Behaviour is handled by admin/section-tabs.js.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.section-tabs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    border-bottom: 2px solid var(--gray-border);
+    padding-bottom: 0;
+}
+
+.section-tab {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-text);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+}
+
+.section-tab:hover {
+    color: var(--gray-text-dark);
+}
+
+.section-tab.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+[data-theme="dark"] .section-tabs {
+    border-bottom-color: var(--gray-700);
+}
+
+[data-theme="dark"] .section-tab {
+    color: var(--gray-400);
+}
+
+[data-theme="dark"] .section-tab:hover {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .section-tab.active {
+    color: var(--primary-blue);
+    border-bottom-color: var(--primary-blue);
 }
 

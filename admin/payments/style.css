@@ -48,57 +48,7 @@
     color: var(--amber-800);
 }
 
-/* ============================================================
-   Tab Buttons (matches app-stats pattern)
-   ============================================================ */
-.tab-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid var(--gray-border);
-    justify-content: center;
-}
-
-.tab-button {
-    padding: 12px 20px;
-    background: var(--whiteBackground);
-    border: 1px solid var(--gray-input-border);
-    border-bottom: none;
-    border-radius: 8px 8px 0 0;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--gray-text);
-    transition: all 0.2s ease;
-    user-select: none;
-}
-
-.tab-button:hover {
-    background: var(--gray-bg-light);
-    color: var(--gray-text-dark);
-}
-
-.tab-button.active {
-    background: var(--white);
-    color: var(--gray-text-darker);
-    box-shadow: 0 -2px 8px var(--shadow-default);
-    font-weight: 600;
-}
-
-.tab-content {
-    display: none;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+/* Tab styles are shared across admin pages — see admin/common-style.css (.section-tabs / .section-tab / .tab-content) */
 
 /* ============================================================
    Stats Grid
@@ -496,11 +446,11 @@
         padding: 0;
     }
 
-    .tab-buttons {
+    .section-tabs {
         gap: 2px;
     }
 
-    .tab-button {
+    .section-tab {
         padding: 10px 12px;
         font-size: 0.8rem;
     }
@@ -521,7 +471,7 @@
 }
 
 @media (max-width: 480px) {
-    .tab-button {
+    .section-tab {
         padding: 8px 10px;
         font-size: 0.75rem;
     }

@@ -1,35 +1,5 @@
-.section-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 30px;
-    border-bottom: 2px solid var(--gray-border);
-    padding-bottom: 0;
-}
-.section-tab {
-    padding: 12px 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--gray-text);
-    border-bottom: 3px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.2s;
-}
-.section-tab:hover {
-    color: var(--gray-text-dark);
-}
-.section-tab.active {
-    color: var(--primary-blue);
-    border-bottom-color: var(--primary-blue);
-}
-.tab-content {
-    display: none;
-}
-.tab-content.active {
-    display: block;
-}
+/* Section-tab styles are now shared across admin pages — see admin/common-style.css */
+
 table th {
     white-space: nowrap;
 }

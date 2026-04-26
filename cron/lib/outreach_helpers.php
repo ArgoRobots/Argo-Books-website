@@ -42,6 +42,166 @@ const OUTREACH_CATEGORY_POOL = [
     'travel agencies', 'event venues', 'food trucks',
 ];
 
+// ─── Category Pain Points ───
+
+/**
+ * Look up 2-3 hand-curated pain points for a lead's category, falling back
+ * to a generic '_default' list if the category is not in the map.
+ * The map is loaded once per process.
+ */
+function get_category_pain_points($category)
+{
+    static $map = null;
+    if ($map === null) {
+        $map = require __DIR__ . '/category_pain_points.php';
+    }
+    $key = strtolower(trim((string) $category));
+    return $map[$key] ?? $map['_default'];
+}
+
+// ─── A/B Test Infrastructure ───
+
+require_once __DIR__ . '/ab_helpers.php';
+
+/**
+ * Find the single active A/B test of a given variant type, or null if none.
+ * Returns ['test' => row, 'variants' => [rows]] on hit. Used by the cron's
+ * promotion sweep, which iterates per type.
+ */
+function get_active_ab_test($pdo, $variantType)
+{
+    $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests
+        WHERE status = 'active' AND variant_type = ?
+        ORDER BY started_at DESC, id DESC LIMIT 1");
+    $stmt->execute([$variantType]);
+    $test = $stmt->fetch();
+    if (!$test) return null;
+
+    $vStmt = $pdo->prepare("SELECT * FROM outreach_ab_variants WHERE test_id = ? ORDER BY id ASC");
+    $vStmt->execute([$test['id']]);
+    $variants = $vStmt->fetchAll();
+    if (empty($variants)) return null;
+
+    return ['test' => $test, 'variants' => $variants];
+}
+
+/**
+ * Find THE single active A/B test (any type) and its variants, or null. Use
+ * this when the caller doesn't care which type — the framework's invariant is
+ * one active test at a time, so iterating per-type is wasteful at draft time
+ * (worst case 7 queries per drafted lead just to find the active one).
+ */
+function get_single_active_ab_test($pdo)
+{
+    $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests
+        WHERE status = 'active'
+        ORDER BY started_at DESC, id DESC LIMIT 1");
+    $stmt->execute();
+    $test = $stmt->fetch();
+    if (!$test) return null;
+
+    $vStmt = $pdo->prepare("SELECT * FROM outreach_ab_variants WHERE test_id = ? ORDER BY id ASC");
+    $vStmt->execute([$test['id']]);
+    $variants = $vStmt->fetchAll();
+    if (empty($variants)) return null;
+
+    return ['test' => $test, 'variants' => $variants];
+}
+
+/**
+ * Pick the next variant for an active test using deterministic round-robin.
+ * Counts how many leads are already assigned to this test and assigns the
+ * next lead to index (count % variant_count).
+ */
+function pick_ab_variant($pdo, $test, $variants)
+{
+    $cStmt = $pdo->prepare("SELECT COUNT(*) FROM outreach_leads WHERE ab_test_id = ?");
+    $cStmt->execute([$test['id']]);
+    $assignedSoFar = (int) $cStmt->fetchColumn();
+    $idx = $assignedSoFar % count($variants);
+    return $variants[$idx];
+}
+
+/**
+ * Split a variant's `content` into ['mode' => 'directive'|'literal', 'text' => string].
+ * Helper used by every per-type instruction builder.
+ */
+function ab_parse_variant_content($variant)
+{
+    $content = trim((string) $variant['content']);
+    if (stripos($content, 'directive:') === 0) {
+        return [
+            'mode' => 'directive',
+            'text' => trim(substr($content, strlen('directive:'))),
+        ];
+    }
+    return ['mode' => 'literal', 'text' => $content];
+}
+
+/**
+ * Subject-line instruction builder. Returns a prompt fragment to splice
+ * into the system prompt's subject-line bullet.
+ */
+function ab_subject_instruction_for_variant($variant)
+{
+    $parsed = ab_parse_variant_content($variant);
+    if ($parsed['mode'] === 'directive') {
+        return "\n- SUBJECT LINE OVERRIDE: The text inside the quotes below is a STYLE INSTRUCTION, not the subject itself. Generate your own original short subject line (under 60 characters, no em dashes) in the style described — do NOT copy, echo, paraphrase, or include any of the instruction's wording in your output. Style instruction: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+    }
+    return "\n- SUBJECT LINE OVERRIDE: use exactly this subject line, word for word, with no changes: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+}
+
+/**
+ * Body instruction builder. The override controls body shape — paragraph
+ * count, opener style, tone, length — but explicitly preserves the
+ * non-negotiable structural elements (website URL, {UNSUBSCRIBE_URL}
+ * placeholder, three-line sign-off).
+ */
+function ab_body_instruction_for_variant($variant)
+{
+    $parsed = ab_parse_variant_content($variant);
+    if ($parsed['mode'] === 'directive') {
+        return "\n- BODY OVERRIDE: write the email body in the style described by this directive: \"" . $parsed['text'] . "\". This style guidance overrides the paragraph count, opener style, and tone rules above. You MUST still include the https://argorobots.com/ link, the {UNSUBSCRIBE_URL} placeholder line, and the \"All the best, / Evan / Argo Books\" sign-off exactly as specified.";
+    }
+    return "\n- BODY OVERRIDE: the email body must be exactly this text, word for word: \"" . $parsed['text'] . "\". The {UNSUBSCRIBE_URL} placeholder and the https://argorobots.com/ link inside this text will be processed before sending — keep them as written.";
+}
+
+/**
+ * CTA / offer instruction builder. Replaces the standard "free 1-year
+ * premium license in exchange for feedback" offer with whatever wording
+ * (or directive) the variant specifies.
+ */
+function ab_cta_instruction_for_variant($variant)
+{
+    $parsed = ab_parse_variant_content($variant);
+    if ($parsed['mode'] === 'directive') {
+        return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. Instead, phrase the offer in line with this directive: \"" . $parsed['text'] . "\". Work it in naturally; do not list it like a bullet point.";
+    }
+    return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. The offer in this email must be exactly: \"" . $parsed['text'] . "\". Phrase it naturally inside the body — do not just paste it as a quoted line.";
+}
+
+/**
+ * Per-type prompt-injection dispatch. Returns a string to append to the
+ * system prompt for prompt-side variant types (subject / body / cta).
+ * Send-side types (sender / preheader / format) apply at send time and
+ * return an empty string here. Personalization is handled inline in
+ * generate_draft_for_lead (it gates the OpenAI summary call rather than
+ * injecting into the prompt).
+ */
+function ab_instruction_for_variant($variant, $variantType = 'subject')
+{
+    switch ($variantType) {
+        case 'subject':
+            return ab_subject_instruction_for_variant($variant);
+        case 'body':
+            return ab_body_instruction_for_variant($variant);
+        case 'cta':
+            return ab_cta_instruction_for_variant($variant);
+        default:
+            return '';
+    }
+}
+
 // ─── Activity Logging ───
 
 function log_activity($pdo, $lead_id, $action_type, $details = null)
@@ -79,40 +239,104 @@ function send_outreach_lead($pdo, $lead)
         $tokStmt->execute([$unsubscribeToken, $id]);
     }
 
-    // Replace plain URL with a clickable "argorobots.com" link that carries the tracking param
+    // Build the per-lead tracking URL. If the lead was assigned to an A/B
+    // variant, append -v{variantId} so clicks can be attributed per variant.
     $sourceCode = 'outreach-' . $id;
+    $variantId = isset($lead['ab_variant_id']) && $lead['ab_variant_id'] !== null && $lead['ab_variant_id'] !== ''
+        ? (int) $lead['ab_variant_id']
+        : null;
+    if ($variantId) {
+        $sourceCode .= '-v' . $variantId;
+    }
     $trackedUrl = 'https://argorobots.com/?source=' . $sourceCode;
-    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
-
-    $escapedBody = htmlspecialchars($lead['draft_body']);
-    $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
-
-    // Replace {UNSUBSCRIBE_URL} placeholder with the tracked unsubscribe link
     $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
-    $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
-    $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
 
-    // Fallback: if the AI skipped the placeholder, inject a soft unsubscribe line before the sign-off
-    if (strpos($escapedBody, 'unsubscribe?t=') === false) {
-        $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
-        $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $escapedBody, 1);
-        if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
-            $escapedBody = $replaced;
-        } else {
-            $escapedBody .= $unsubLine;
+    // Send-side A/B variants (sender, preheader, format). Look up first since
+    // format affects how the body is rendered below.
+    $fromName = 'Argo Books';
+    $preheader = null;
+    $format = 'html';
+    if ($variantId) {
+        $vStmt = $pdo->prepare("SELECT v.content, t.variant_type
+            FROM outreach_ab_variants v
+            JOIN outreach_ab_tests t ON t.id = v.test_id
+            WHERE v.id = ?");
+        $vStmt->execute([$variantId]);
+        $vRow = $vStmt->fetch();
+        if ($vRow && trim((string) $vRow['content']) !== '') {
+            $vContent = trim((string) $vRow['content']);
+            if ($vRow['variant_type'] === 'sender') {
+                // Strip CR/LF defensively. PHPMailer sanitizes headers, but
+                // the mail() fallback path concatenates $fromName into the
+                // From: header verbatim — a stray newline could enable
+                // header injection if a variant's content was malformed.
+                $fromName = preg_replace('/[\r\n]+/', ' ', $vContent);
+            } elseif ($vRow['variant_type'] === 'preheader') {
+                $preheader = $vContent;
+            } elseif ($vRow['variant_type'] === 'format') {
+                $format = ($vContent === 'plain') ? 'plain' : 'html';
+            }
         }
     }
 
-    $htmlBody = '<p>' . nl2br($escapedBody) . '</p>';
+    if ($format === 'plain') {
+        // Plain text: keep URLs bare so they remain clickable in plain-text
+        // clients while still carrying the tracking source param. No HTML
+        // escaping, no <a> wrapping.
+        $body = (string) $lead['draft_body'];
+        $body = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $trackedUrl, $body);
+        $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
+        if (strpos($body, 'unsubscribe?t=') === false) {
+            $unsubLine = "\n\nNot interested? " . $unsubUrl . " and I'll stop emailing you.";
+            $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $body, 1);
+            if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
+                $body = $replaced;
+            } else {
+                $body .= $unsubLine;
+            }
+        }
+        $finalBody = $body;
+    } else {
+        $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
+        $escapedBody = htmlspecialchars($lead['draft_body']);
+        $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
+
+        $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
+        // Drafts since the unsubscribe-URL fix carry the real bare URL in
+        // their body. Wrap any occurrences in the styled "unsubscribe" anchor.
+        $escapedBody = preg_replace(
+            '#https?://argorobots\.com/unsubscribe\?t=[a-f0-9]+#i',
+            $unsubAnchor,
+            $escapedBody
+        );
+        // Defensive: also handle the legacy {UNSUBSCRIBE_URL} placeholder for
+        // any drafts created before the substitution moved to draft time.
+        $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
+
+        if (strpos($escapedBody, 'unsubscribe?t=') === false) {
+            $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
+            $replaced = preg_replace('#(\nAll the best)#i', $unsubLine . "\n$1", $escapedBody, 1);
+            if ($replaced !== null && strpos($replaced, 'unsubscribe?t=') !== false) {
+                $escapedBody = $replaced;
+            } else {
+                $escapedBody .= $unsubLine;
+            }
+        }
+
+        $finalBody = '<p>' . nl2br($escapedBody) . '</p>';
+    }
 
     $result = send_styled_email(
         $email,
         $lead['draft_subject'],
-        $htmlBody,
+        $finalBody,
         '',
         'contact@argorobots.com',
-        'Argo Books',
-        'contact@argorobots.com'
+        $fromName,
+        'contact@argorobots.com',
+        [],
+        $preheader,
+        $format
     );
 
     if ($result) {
@@ -535,9 +759,71 @@ function generate_draft_for_lead($pdo, $lead)
 {
     $id = $lead['id'];
 
-    // Generate business summary if we don't have one yet
+    // A/B variant lookup must happen before the summary block so a
+    // personalization test can gate the OpenAI summary call entirely.
+    // Only one test can be active at a time across the whole framework
+    // (enforced by the activation handler), so a single SELECT finds it.
+    //
+    // If the lead is already assigned to the currently-active test (e.g.
+    // admin clicked "Regenerate Draft" after the email went out), keep the
+    // existing variant. Re-running pick_ab_variant on a regenerate would
+    // skew round-robin balance and orphan any clicks already tracked under
+    // the lead's previous "?source=outreach-{id}-v{old}" URL.
+    $abTestId = null;
+    $abVariantId = null;
+    $abSubjectOverride = '';
+    $abBodyOverride = '';
+    $abCtaOverride = '';
+    $personalizationOff = false;
+    $abSubjectDirectiveText = null; // captured for the post-generation echo check
+    $existingAbTestId = isset($lead['ab_test_id']) ? (int) $lead['ab_test_id'] : 0;
+    $existingAbVariantId = isset($lead['ab_variant_id']) ? (int) $lead['ab_variant_id'] : 0;
+    $active = get_single_active_ab_test($pdo);
+    if ($active) {
+        $activeTestId = (int) $active['test']['id'];
+        $eligibleType = (string) $active['test']['variant_type'];
+
+        $variant = null;
+        if ($existingAbTestId === $activeTestId && $existingAbVariantId > 0) {
+            foreach ($active['variants'] as $candidate) {
+                if ((int) $candidate['id'] === $existingAbVariantId) {
+                    $variant = $candidate;
+                    break;
+                }
+            }
+        }
+        if ($variant === null) {
+            $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
+        }
+
+        $abTestId = $activeTestId;
+        $abVariantId = (int) $variant['id'];
+        $instruction = ab_instruction_for_variant($variant, $eligibleType);
+        if ($eligibleType === 'subject') {
+            $abSubjectOverride = $instruction;
+            $parsedVariant = ab_parse_variant_content($variant);
+            if ($parsedVariant['mode'] === 'directive') {
+                $abSubjectDirectiveText = $parsedVariant['text'];
+            }
+        }
+        elseif ($eligibleType === 'body') $abBodyOverride = $instruction;
+        elseif ($eligibleType === 'cta') $abCtaOverride = $instruction;
+        elseif ($eligibleType === 'personalization') {
+            $personalizationOff = (trim((string) $variant['content']) === 'off');
+        }
+        // sender / preheader / format: assignment alone is what matters;
+        // their dispatched instruction is empty and they apply at send time.
+    }
+
+    // Generate a business summary if we don't have one yet — unless the lead
+    // is in the 'off' arm of an active personalization test, in which case we
+    // skip the OpenAI call entirely. If a stored summary exists from before
+    // the test started, mask it for this draft so the prompt truly operates
+    // without personalization.
     $summary = $lead['business_summary'] ?? null;
-    if (empty($summary) && !empty($lead['website'])) {
+    if ($personalizationOff) {
+        $summary = null;
+    } elseif (empty($summary) && !empty($lead['website'])) {
         $summary = summarize_business($lead['website']);
         if ($summary) {
             $stmt = $pdo->prepare("UPDATE outreach_leads SET business_summary = ? WHERE id = ?");
@@ -561,6 +847,18 @@ function generate_draft_for_lead($pdo, $lead)
     $inPersonInstruction = $isSaskatoon
         ? "\n- IMPORTANT: Since this business is in the Saskatoon area, you MUST include an offer for an in-person visit to help them get set up. Work it in naturally, e.g. \"Since I'm right here in Saskatoon, I'd be happy to stop by and help you get set up in person\" or \"I could even swing by to walk you through it\". This is a key selling point for local businesses."
         : "\n- Do NOT mention any in-person visits or stopping by. The business is not in Saskatoon.";
+
+    // Pull industry-level pain points for this category. These are typical
+    // day-to-day headaches for the trade, NOT claims about this business.
+    $painPoints = get_category_pain_points($lead['category'] ?? '');
+    $painPointsList = '';
+    foreach ($painPoints as $pp) {
+        $painPointsList .= "  * " . $pp . "\n";
+    }
+    $categoryLabel = !empty($lead['category']) ? $lead['category'] : 'this industry';
+    $painPointsInstruction = "\n- Small businesses in the '" . $categoryLabel . "' category commonly deal with things like:\n"
+        . $painPointsList
+        . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
@@ -586,19 +884,20 @@ PERSONALIZATION (this is critical):
 - Only reference Argo Books features that are relevant to their general industry. Do not list every feature
 - If a business summary is provided, use it ONLY to understand their industry and tailor which Argo features to mention. Do NOT parrot back details from the summary as if you personally know about their business
 - If no summary is available, keep it more general but still mention their industry/category if known
+$painPointsInstruction
 
 - Briefly describe Argo Books as a simple bookkeeping and invoicing app that requires no accounting knowledge. Do NOT just say \"check it out\" without explaining what it is
 - Mention you are looking for honest feedback from small business owners
-- Mention offering a free 1-year premium license in exchange for feedback
+- Mention offering a free 1-year premium license in exchange for feedback$abCtaOverride
 - Use a casual but professional tone
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
-- The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")
+- The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")$abSubjectOverride
 - You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
 - After that line, add ONE short, respectful unsubscribe line on its own paragraph, such as: \"Not interested? {UNSUBSCRIBE_URL} and I'll stop emailing you.\" The literal token {UNSUBSCRIBE_URL} will be replaced with a tracked unsubscribe link before sending — include it verbatim, do NOT invent or replace the placeholder yourself. Keep the tone soft, brief, and non-pushy.
-- Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)
+- Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
 
 Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
@@ -629,8 +928,8 @@ Return ONLY the JSON, no other text.";
     if (!$parsed || !isset($parsed['subject']) || !isset($parsed['body'])) {
         // AI returned invalid JSON — save with needs_review so it won't be auto-approved
         $fallbackSubject = "Quick question for {$lead['business_name']}";
-        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), approval_status = 'needs_review' WHERE id = ?");
-        $stmt->execute([$fallbackSubject, $content, $id]);
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review' WHERE id = ?");
+        $stmt->execute([$fallbackSubject, $content, $abTestId, $abVariantId, $id]);
 
         return ['success' => true, 'needs_review' => true, 'subject' => $fallbackSubject, 'body' => $content];
     }
@@ -659,9 +958,391 @@ Return ONLY the JSON, no other text.";
         }
     }
 
-    // Save draft to lead
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
-    $stmt->execute([$parsed['subject'], $parsed['body'], $id]);
+    // Defensive check: the AI is told a subject directive describes a STYLE
+    // and not to copy it, but it occasionally echoes the directive verbatim
+    // anyway. Catch the obvious failures and hold the draft for review
+    // instead of auto-sending an email whose subject is literally the prompt.
+    $needsReviewReason = null;
+    if ($abSubjectDirectiveText !== null) {
+        $genNorm = strtolower(rtrim(trim($parsed['subject']), '.!?'));
+        $dirNorm = strtolower(rtrim(trim($abSubjectDirectiveText), '.!?'));
+        if ($genNorm !== '' && $dirNorm !== '' && ($genNorm === $dirNorm || strpos($genNorm, $dirNorm) !== false)) {
+            $needsReviewReason = 'AI returned the subject directive verbatim instead of generating a subject in that style.';
+        }
+    }
 
-    return ['success' => true, 'subject' => $parsed['subject'], 'body' => $parsed['body']];
+    // Substitute the {UNSUBSCRIBE_URL} placeholder with the real per-lead URL
+    // now (was previously deferred to send time). Saving the real URL means
+    // the admin sees the actual link when reviewing the draft instead of the
+    // raw placeholder. The send-side still handles the placeholder defensively
+    // for any old drafts that pre-date this change.
+    $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+    if (empty($unsubscribeToken)) {
+        $unsubscribeToken = bin2hex(random_bytes(32));
+        $tokStmt = $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?");
+        $tokStmt->execute([$unsubscribeToken, $id]);
+    }
+    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+    $parsed['body'] = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $parsed['body']);
+
+    // Save draft to lead. If the directive-echo check tripped, mark the
+    // draft as needs_review so the auto-approve step skips it and the admin
+    // sees the issue before anything goes out.
+    if ($needsReviewReason !== null) {
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
+        log_activity($pdo, $id, 'draft_needs_review', $needsReviewReason);
+    } else {
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
+    }
+
+    return ['success' => true, 'subject' => $parsed['subject'], 'body' => $parsed['body'], 'ab_test_id' => $abTestId, 'ab_variant_id' => $abVariantId];
+}
+
+// ─── A/B Test Automation (called from stepManageAbTests in outreach_pipeline.php) ───
+
+/**
+ * Variant types the A/B framework knows about. The cron iterates over this
+ * list when looking for active tests to promote.
+ */
+function ab_known_variant_types()
+{
+    return ['subject', 'body', 'sender', 'cta', 'preheader', 'format', 'personalization'];
+}
+
+/**
+ * Evaluate the active test of a given variant type and promote a winner if
+ * any exit criterion is met. Side effect: on trigger, UPDATE the test row to
+ * completed with winner_variant_id set; optionally self-pauses automation if
+ * the winning CTR is below the configured safety floor.
+ *
+ * Returns one of:
+ *   ['action' => 'none', 'reason' => '...', 'variant_type' => $variantType, ...]
+ *   ['action' => 'promoted', 'test_id' => N, 'variant_type' => $variantType, ...]
+ *   ['action' => 'paused_safety', 'test_id' => N, 'variant_type' => $variantType, ...]
+ *
+ * Exit criteria (any one triggers promotion):
+ *   a) leader significant at p<0.05 vs EVERY other variant AND every variant sent >= 30
+ *   b) test age >= 14 days AND every variant sent >= 20
+ *   c) test age >= 28 days (force-close; leader by CTR, ties by assigned then lowest id)
+ */
+function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
+{
+    $active = get_active_ab_test($pdo, $variantType);
+    if (!$active) {
+        return ['action' => 'none', 'reason' => 'no_active_test', 'variant_type' => $variantType];
+    }
+    $test = $active['test'];
+
+    $variants = load_variants_with_stats($pdo, (int) $test['id']);
+    if (count($variants) < 2) {
+        return ['action' => 'none', 'reason' => 'too_few_variants'];
+    }
+
+    $leaderIdx = find_leader_idx($variants);
+    $startedAt = strtotime($test['started_at'] ?: $test['created_at']);
+    $ageDays = (int) floor((time() - $startedAt) / 86400);
+    $minSent = min(array_column($variants, 'sent_count'));
+
+    $trigger = null;
+
+    // Criterion (a)
+    if ($leaderIdx !== null && $minSent >= 30) {
+        $allSig = true;
+        foreach ($variants as $i => $v) {
+            if ($i === $leaderIdx) continue;
+            $c = confidence_vs_leader(
+                $variants[$leaderIdx]['sent_count'],
+                $variants[$leaderIdx]['clicked_count'],
+                $v['sent_count'],
+                $v['clicked_count']
+            );
+            if ($c['tag'] !== 'significant') { $allSig = false; break; }
+        }
+        if ($allSig) $trigger = 'significance';
+    }
+
+    // Criterion (b)
+    if (!$trigger && $leaderIdx !== null && $ageDays >= 14 && $minSent >= 20) {
+        $trigger = 'timebox';
+    }
+
+    // Criterion (c) — force-close even if nothing has been sent yet
+    if (!$trigger && $ageDays >= 28) {
+        $trigger = 'hard_timeout';
+        if ($leaderIdx === null) {
+            $leaderIdx = 0;
+            foreach ($variants as $i => $v) {
+                if ($v['assigned_count'] > $variants[$leaderIdx]['assigned_count']) {
+                    $leaderIdx = $i;
+                }
+            }
+        }
+    }
+
+    if (!$trigger) {
+        return [
+            'action' => 'none',
+            'reason' => 'criteria_not_met',
+            'variant_type' => $variantType,
+            'age_days' => $ageDays,
+            'min_sent' => $minSent,
+            'test_id' => (int) $test['id'],
+            'test_name' => $test['name'],
+        ];
+    }
+
+    $winner = $variants[$leaderIdx];
+    $pdo->prepare("UPDATE outreach_ab_tests SET winner_variant_id = ?, status = 'completed', completed_at = NOW() WHERE id = ?")
+        ->execute([$winner['id'], $test['id']]);
+
+    // Safety-floor check
+    $floorStmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'ab_ctr_floor'");
+    $floorStmt->execute();
+    $floorVal = $floorStmt->fetchColumn();
+    $floor = ($floorVal !== false) ? (float) $floorVal : 0.01;
+
+    $pausedForSafety = false;
+    if ($winner['sent_count'] >= 20 && $winner['ctr'] < $floor) {
+        $pauseStmt = $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)");
+        $pauseStmt->execute(['ab_auto_enabled', '0']);
+        $pauseStmt->execute([
+            'ab_auto_last_pause_reason',
+            'Winner CTR ' . number_format($winner['ctr'] * 100, 2) . '% below floor '
+                . number_format($floor * 100, 2) . '% on test #' . (int) $test['id'],
+        ]);
+        $pausedForSafety = true;
+    }
+
+    return [
+        'action' => $pausedForSafety ? 'paused_safety' : 'promoted',
+        'variant_type' => $variantType,
+        'test_id' => (int) $test['id'],
+        'test_name' => $test['name'],
+        'winner_id' => (int) $winner['id'],
+        'winner_label' => $winner['label'],
+        'winner_ctr' => $winner['ctr'],
+        'trigger' => $trigger,
+        'age_days' => $ageDays,
+    ];
+}
+
+/**
+ * Ask OpenAI for N fresh subject-line directives for the next A/B cycle.
+ * Seeds the prompt with the content of the most-recent winners so proven
+ * styles get reinforced. Falls back to a curated seed list if OpenAI errors.
+ *
+ * Returns ['directives' => [...strings...], 'source' => 'ai'|'fallback'].
+ */
+function generate_ab_subject_variants($pdo, $count = 3)
+{
+    $winStmt = $pdo->prepare("
+        SELECT v.content
+        FROM outreach_ab_tests t
+        JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
+        WHERE t.status = 'completed' AND t.variant_type = 'subject'
+        ORDER BY t.completed_at DESC
+        LIMIT 3
+    ");
+    $winStmt->execute();
+    $priorWinners = array_column($winStmt->fetchAll(), 'content');
+
+    $winnersText = '';
+    if (!empty($priorWinners)) {
+        $winnersText = "\n\nRecent winning subject strategies (most recent first):\n";
+        foreach ($priorWinners as $w) {
+            $winnersText .= "- " . trim((string) $w) . "\n";
+        }
+    }
+
+    $systemPrompt = "You generate subject-line directives for an A/B test on a small-business outreach email from Evan, a solo developer, about a simple bookkeeping app called Argo Books.\n\n"
+        . "Return STRICT JSON: { \"directives\": [\"directive 1\", \"directive 2\", ...] } with exactly $count entries.\n\n"
+        . "CRITICAL: Each directive describes a STYLE for the writer to follow when crafting one specific lead's subject — it is NOT the subject itself. A second AI will read your directive and generate a fresh subject in that style for each lead. Your directive must NOT look like a subject line.\n\n"
+        . "Bad examples (these read like subject lines, not styles): \"Lead with a personal touch about Argo Books\" / \"Quick question for {business}\" / \"Let's simplify your bookkeeping\"\n"
+        . "Good examples (these describe HOW to write, not WHAT to write): \"Open with a one-line curiosity question that mentions the recipient's industry, no product names\" / \"Frame as a peer-to-peer note from one local Saskatoon business owner to another, max 5 words\" / \"Reference a specific category-typical pain point as a question, avoid sounding salesy\"\n\n"
+        . "Rules for each directive:\n"
+        . "- Talk ABOUT the writing technique (Open with…, Frame as…, Reference…, Pose…), don't write the subject text.\n"
+        . "- 10 to 25 words. Concrete and specific about the technique.\n"
+        . "- Mention what to AVOID as well as what to do (e.g. 'avoid product names', 'no greeting', 'no question mark').\n"
+        . "- Each directive must be meaningfully different from the others in technique (question vs statement, local angle vs industry angle, ultra-short vs detail-rich, etc.).\n"
+        . "- Refer to placeholders generically: the business name, their industry, their city. Do not invent product names or facts.\n"
+        . "- Target cold B2B open rate: personal, curious, short. Avoid marketing-speak.";
+
+    $userPrompt = "Propose $count distinct subject-line directives for the next A/B cycle." . $winnersText;
+
+    $result = call_openai($systemPrompt, $userPrompt);
+    $directives = null;
+    if (!isset($result['error'])) {
+        $content = trim($result['content'] ?? '');
+        $content = preg_replace('/^```json\s*/i', '', $content);
+        $content = preg_replace('/\s*```$/', '', $content);
+        $parsed = json_decode($content, true);
+        if (is_array($parsed) && isset($parsed['directives']) && is_array($parsed['directives'])) {
+            $clean = [];
+            foreach ($parsed['directives'] as $d) {
+                $d = trim((string) $d);
+                if ($d !== '') $clean[] = mb_substr($d, 0, 500);
+            }
+            if (count($clean) >= 2) {
+                $directives = array_slice($clean, 0, $count);
+            }
+        }
+    }
+
+    if (!$directives) {
+        $fallback = [
+            'Ask a short curiosity question that references the business name without making claims about how they operate',
+            'Lead with a single concrete pain point the industry commonly has, phrased as a question',
+            'Reference the city casually to sound local, under 10 words, no exclamation marks',
+            'Keep it ultra-short (under 6 words) and intriguing without mentioning the product',
+            'Open with the industry name as a single-word hook then a brief follow-up question',
+        ];
+        shuffle($fallback);
+        return ['directives' => array_slice($fallback, 0, $count), 'source' => 'fallback'];
+    }
+
+    return ['directives' => $directives, 'source' => 'ai'];
+}
+
+/**
+ * Per-type variant generator dispatch. Returns
+ *   ['directives' => [...], 'source' => 'ai'|'fallback'|'fixed', 'literal' => bool?]
+ * 'literal' is true when the contents are stored verbatim (no 'directive: '
+ * prefix); ab_start_new_cycle uses that flag to decide whether to carry the
+ * prior winner forward. Returns ['directives' => [], 'source' => 'unsupported']
+ * for types with no generator — caller treats as failure.
+ */
+function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
+{
+    switch ($variantType) {
+        case 'subject':
+            return generate_ab_subject_variants($pdo, $count);
+        case 'sender':
+            // Small fixed pool — content is the literal from-name.
+            return [
+                'directives' => ['Evan', 'Evan from Argo Books', 'Argo Books'],
+                'source' => 'fixed',
+                'literal' => true,
+            ];
+        case 'format':
+            return [
+                'directives' => ['html', 'plain'],
+                'source' => 'fixed',
+                'literal' => true,
+            ];
+        case 'personalization':
+            return [
+                'directives' => ['on', 'off'],
+                'source' => 'fixed',
+                'literal' => true,
+            ];
+        // body / cta / preheader stay admin-initiated — they need carefully
+        // crafted copy and have no AI generator. ab_auto_rotation_order()
+        // omits them so the cron's rotation never lands here.
+        default:
+            return ['directives' => [], 'source' => 'unsupported'];
+    }
+}
+
+/**
+ * Rotation order used by stepManageAbTests when ab_auto_rotation is on.
+ * Every type listed here must have a generator in generate_ab_variants_for_type.
+ */
+function ab_auto_rotation_order()
+{
+    return ['subject', 'sender', 'format', 'personalization'];
+}
+
+/**
+ * Start a new auto-cycle test for a given variant type. The previous winner
+ * for that type (if any) is carried forward as variant A so the established
+ * baseline keeps being measured; newly-generated directives fill the other slots.
+ *
+ * Returns ['action' => 'created', 'test_id' => N, 'variant_type' => ..., ...]
+ *      or ['action' => 'failed', 'variant_type' => ..., 'error' => '...'].
+ */
+function ab_start_new_cycle($pdo, $variantType = 'subject')
+{
+    $count = 3;
+
+    $gen = generate_ab_variants_for_type($pdo, $variantType, $count);
+    $items = $gen['directives'] ?? [];
+    $isLiteral = !empty($gen['literal']);
+
+    if (count($items) < 2) {
+        return [
+            'action' => 'failed',
+            'variant_type' => $variantType,
+            'error' => 'Variant generation returned fewer than 2 entries (source: ' . ($gen['source'] ?? 'unknown') . ')',
+        ];
+    }
+
+    // Carry-forward only makes sense for directive-style types where each
+    // cycle generates *new* candidate copy and we want the prior winner kept
+    // as a baseline. Literal types (sender / format / personalization) cycle
+    // over a fixed pool, so carry-forward would just duplicate one variant.
+    $prior = null;
+    if (!$isLiteral) {
+        $priorStmt = $pdo->prepare("
+            SELECT v.content
+            FROM outreach_ab_tests t
+            JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
+            WHERE t.status = 'completed' AND t.variant_type = ?
+            ORDER BY t.completed_at DESC
+            LIMIT 1
+        ");
+        $priorStmt->execute([$variantType]);
+        $prior = $priorStmt->fetchColumn() ?: null;
+    }
+
+    $name = 'Auto-cycle ' . $variantType . ' ' . date('Y-m-d H:i');
+    $notes = 'Auto-generated by stepManageAbTests. Source: ' . ($gen['source'] ?? 'ai')
+        . ($prior ? '. Prior winner carried forward as variant A.' : '.');
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare("INSERT INTO outreach_ab_tests (name, variant_type, status, started_at, notes) VALUES (?, ?, 'active', NOW(), ?)")
+            ->execute([$name, $variantType, $notes]);
+        $testId = (int) $pdo->lastInsertId();
+
+        $vStmt = $pdo->prepare("INSERT INTO outreach_ab_variants (test_id, label, content, is_default) VALUES (?, ?, ?, ?)");
+
+        $label = 'A';
+        $isDefault = 1;
+
+        if ($prior) {
+            $vStmt->execute([$testId, $label, $prior, $isDefault]);
+            $label = 'B';
+            $isDefault = 0;
+        }
+
+        foreach ($items as $d) {
+            $content = $isLiteral ? $d : ('directive: ' . $d);
+            $vStmt->execute([$testId, $label, $content, $isDefault]);
+            $isDefault = 0;
+            if ($label === 'D') break;
+            $label = chr(ord($label) + 1);
+        }
+
+        $pdo->commit();
+
+        $varStmt = $pdo->prepare("SELECT COUNT(*) FROM outreach_ab_variants WHERE test_id = ?");
+        $varStmt->execute([$testId]);
+        $variantCount = (int) $varStmt->fetchColumn();
+
+        return [
+            'action' => 'created',
+            'variant_type' => $variantType,
+            'test_id' => $testId,
+            'test_name' => $name,
+            'variant_count' => $variantCount,
+            'carried_winner' => (bool) $prior,
+            'source' => $gen['source'] ?? 'ai',
+        ];
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        return ['action' => 'failed', 'variant_type' => $variantType, 'error' => $e->getMessage()];
+    }
 }

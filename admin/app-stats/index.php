@@ -234,57 +234,7 @@ include __DIR__ . '/../admin_header.php';
     margin-bottom: 2rem;
 }
 
-.tab-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-bottom: 1.5rem;
-    border-bottom: 2px solid #e5e7eb;
-    padding-bottom: 0;
-    justify-content: center;
-}
-
-.tab-button {
-    padding: 12px 20px;
-    background: #f9fafb;
-    border: 1px solid #d1d5db;
-    border-bottom: none;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    color: #6b7280;
-    border-radius: 8px 8px 0 0;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-
-.tab-button:hover {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.tab-button.active {
-    background: white;
-    color: #1f2937;
-    border-color: #9ca3af;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: -2px;
-    border-bottom: 2px solid white;
-}
-
-.tab-content {
-    display: none;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+/* Tab styles are shared across admin pages — see admin/common-style.css */
 
 .stats-grid {
     display: grid;
@@ -337,11 +287,11 @@ include __DIR__ . '/../admin_header.php';
 }
 
 @media (max-width: 768px) {
-    .tab-buttons {
+    .section-tabs {
         gap: 2px;
     }
 
-    .tab-button {
+    .section-tab {
         padding: 10px 14px;
         font-size: 13px;
     }
@@ -443,20 +393,20 @@ include __DIR__ . '/../admin_header.php';
         </div>
 
         <div class="tabs-container">
-            <div class="tab-buttons">
-                <div class="tab-button active" onclick="switchTab('active-users')">Active Users</div>
+            <div class="section-tabs">
+                <button class="section-tab active" data-tab="active-users">Active Users</button>
                 <?php if ($aggregatedData['geoLocationEnabled']): ?>
-                <div class="tab-button" onclick="switchTab('geographic')">Geographic</div>
+                <button class="section-tab" data-tab="geographic">Geographic</button>
                 <?php endif; ?>
-                <div class="tab-button" onclick="switchTab('versions')">Versions</div>
-                <div class="tab-button" onclick="switchTab('features')">Features</div>
-                <div class="tab-button" onclick="switchTab('errors')">Errors</div>
-                <div class="tab-button" onclick="switchTab('usage')">Usage</div>
-                <div class="tab-button" onclick="switchTab('api')">API Usage</div>
+                <button class="section-tab" data-tab="versions">Versions</button>
+                <button class="section-tab" data-tab="features">Features</button>
+                <button class="section-tab" data-tab="errors">Errors</button>
+                <button class="section-tab" data-tab="usage">Usage</button>
+                <button class="section-tab" data-tab="api">API Usage</button>
             </div>
 
             <!-- Active Users Tab -->
-            <div id="active-users-tab" class="tab-content active">
+            <div id="active-users" class="tab-content active">
                 <h2 class="section-title">Active Users</h2>
 
                 <div class="stats-grid" id="activeUsersKpiGrid">
@@ -532,7 +482,7 @@ include __DIR__ . '/../admin_header.php';
 
             <!-- Geographic Tab -->
             <?php if ($aggregatedData['geoLocationEnabled']): ?>
-            <div id="geographic-tab" class="tab-content">
+            <div id="geographic" class="tab-content">
                 <h2 class="section-title">Geographic Analytics</h2>
                 
                 <div class="chart-row">
@@ -571,7 +521,7 @@ include __DIR__ . '/../admin_header.php';
             <?php endif; ?>
 
             <!-- Versions Tab -->
-            <div id="versions-tab" class="tab-content">
+            <div id="versions" class="tab-content">
                 <h2 class="section-title">Version Analytics</h2>
 
                 <div class="chart-row">
@@ -605,7 +555,7 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <!-- Features Tab -->
-            <div id="features-tab" class="tab-content">
+            <div id="features" class="tab-content">
                 <h2 class="section-title">Feature Usage Analytics</h2>
 
                 <div class="chart-row">
@@ -624,7 +574,7 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <!-- Errors Tab -->
-            <div id="errors-tab" class="tab-content">
+            <div id="errors" class="tab-content">
                 <h2 class="section-title">Error Analysis</h2>
 
                 <div class="chart-row">
@@ -652,7 +602,7 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <!-- Usage Tab -->
-            <div id="usage-tab" class="tab-content">
+            <div id="usage" class="tab-content">
                 <h2 class="section-title">Usage Analytics</h2>
 
                 <div class="chart-row">
@@ -679,7 +629,7 @@ include __DIR__ . '/../admin_header.php';
             </div>
 
             <!-- API Usage Tab -->
-            <div id="api-tab" class="tab-content">
+            <div id="api" class="tab-content">
                 <h2 class="section-title">API Usage</h2>
 
                 <div class="chart-row">
@@ -765,30 +715,7 @@ include __DIR__ . '/../admin_header.php';
 </div>
 
 <script>
-// Tab switching functionality
-function switchTab(tabName) {
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Remove active class from all tab buttons
-    const tabButtons = document.querySelectorAll('.tab-button');
-    tabButtons.forEach(button => {
-        button.classList.remove('active');
-    });
-    
-    // Show selected tab content
-    const selectedTab = document.getElementById(tabName + '-tab');
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
-    
-    // Add active class to clicked button
-    event.target.classList.add('active');
-}
-
+// Tab switching is handled centrally by admin/section-tabs.js
 // Pass PHP data to JavaScript
 window.dashboardData = <?= $jsonData ?>;
 </script>

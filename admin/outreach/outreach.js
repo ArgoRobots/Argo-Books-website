@@ -558,8 +558,8 @@ async function openLeadDetail(id) {
         document.getElementById('draftBody').value = lead.draft_body || '';
         updateDraftStatus(lead);
 
-        // Reset to info tab
-        switchTab('tabInfo', document.querySelector('.tab'));
+        // Reset to info tab (scope to the modal — the page now has its own .tab bar)
+        switchTab('tabInfo', document.querySelector('#leadDetailModal .tab'));
 
         // Load activity
         loadActivity(id);
@@ -707,11 +707,12 @@ async function createLead() {
 
     try {
         const result = await api('create_lead', { method: 'POST', body: data });
-        notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             closeModal('addLeadModal');
             loadLeads();
             loadStats();
+        } else {
+            notify(result.message, 'error');
         }
     } catch (e) {
         notify(e.message, 'error');
@@ -968,12 +969,12 @@ async function sendEmail() {
         const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
         btn.textContent = 'Send Email';
 
-        notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             openLeadDetail(currentLeadId);
             loadLeads();
             loadStats();
         } else {
+            notify(result.message, 'error');
             btn.disabled = false;
         }
     } catch (e) {
@@ -1111,11 +1112,18 @@ document.addEventListener('keydown', function (e) {
     }
 });
 
-// ─── Tab Switching ───
+// ─── Modal tab switching (Info / Email Draft / Activity inside the lead-detail modal) ───
+// Page-level tabs are handled by admin/section-tabs.js. This function is only
+// for the modal's inner tabs (.tabs inside .modal-body) and is scoped to its
+// own container so it doesn't clobber the page-level section-tabs.
 function switchTab(tabId, btn) {
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
+    const tabsContainer = btn.closest('.tabs');
+    if (!tabsContainer) return;
+    const scope = tabsContainer.parentElement;
+    scope.querySelectorAll(':scope > .tab-content').forEach(t => t.classList.remove('active'));
+    tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add('active');
     btn.classList.add('active');
 }
 

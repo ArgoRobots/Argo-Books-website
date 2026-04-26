@@ -66,17 +66,9 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             $preheaderHtml = '<div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:transparent;mso-hide:all;">' . $safePreheader . '</div>';
         }
 
-        // Map style keywords to CSS classes, or use inline style for backwards compatibility
-        $header_class = '';
-        $header_inline = '';
-        if ($header_style === 'purple') {
-            $header_class = 'header-purple';
-        } elseif ($header_style === 'blue' || empty($header_style)) {
-            $header_class = 'header-blue';
-        } else {
-            // Assume it's an inline style for backwards compatibility
-            $header_inline = $header_style;
-        }
+        // Map style keywords to CSS classes. Only 'blue' (default) and 'purple'
+        // are in use across all callers.
+        $header_class = ($header_style === 'purple') ? 'header-purple' : 'header-blue';
 
         // Subjects can be admin-authored or AI-generated; escape for the
         // HTML <title> context. The raw subject still goes to SMTP/mail()
@@ -97,7 +89,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             <body>
                 {$preheaderHtml}
                 <div class="container">
-                    <div class="header {$header_class}" style="{$header_inline}">
+                    <div class="header {$header_class}">
                         <img src="{$site_url}/resources/images/argo-logo/argo-logo-white.png" alt="Argo Logo" width="140">
                     </div>
                     <div class="content">

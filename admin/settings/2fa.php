@@ -148,32 +148,14 @@ function verify_2fa_login_code($username, $code)
         return false;
     }
 
-    try {
-        global $pdo;
-        // Atomic compare-and-set: only succeeds if no code with this counter
-        // (or a later one) has already been claimed for this user.
-        $stmt = $pdo->prepare(
-            'UPDATE admin_users SET last_2fa_counter = ? WHERE LOWER(username) = LOWER(?) AND last_2fa_counter < ?'
-        );
-        $stmt->execute([$counter, $username, $counter]);
-        return $stmt->rowCount() > 0;
-    } catch (\PDOException $e) {
-        // ONLY fall back when the failure is the missing-column case (existing
-        // installs that haven't run the ALTER TABLE yet). For any other DB
-        // error — deadlock, lost connection, etc. — fail closed. Returning
-        // true on a transient DB hiccup would silently disable replay
-        // protection; this preserves the security property unless the
-        // operator-known migration is genuinely missing.
-        $sqlState = $e->errorInfo[0] ?? null;          // SQLSTATE 5-char code
-        $driverCode = $e->errorInfo[1] ?? null;        // MySQL error number
-        $isMissingColumn = $sqlState === '42S22' || $driverCode === 1054;
-        if ($isMissingColumn) {
-            error_log('verify_2fa_login_code: last_2fa_counter column missing — run the ALTER TABLE migration. Replay protection is disabled until then.');
-            return true;
-        }
-        error_log('verify_2fa_login_code: replay-check DB error (' . $e->getMessage() . ') — failing closed');
-        return false;
-    }
+    global $pdo;
+    // Atomic compare-and-set: only succeeds if no code with this counter
+    // (or a later one) has already been claimed for this user.
+    $stmt = $pdo->prepare(
+        'UPDATE admin_users SET last_2fa_counter = ? WHERE LOWER(username) = LOWER(?) AND last_2fa_counter < ?'
+    );
+    $stmt->execute([$counter, $username, $counter]);
+    return $stmt->rowCount() > 0;
 }
 
 /**

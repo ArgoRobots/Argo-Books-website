@@ -158,11 +158,21 @@ function verify_2fa_login_code($username, $code)
         $stmt->execute([$counter, $username, $counter]);
         return $stmt->rowCount() > 0;
     } catch (\PDOException $e) {
-        // Existing installs without the last_2fa_counter column will land here
-        // (column-missing error). Log so the operator notices and fall back to
-        // the unprotected check rather than locking everyone out.
-        error_log('verify_2fa_login_code: replay-check failed (' . $e->getMessage() . '); falling back to plain TOTP verify');
-        return true;
+        // ONLY fall back when the failure is the missing-column case (existing
+        // installs that haven't run the ALTER TABLE yet). For any other DB
+        // error — deadlock, lost connection, etc. — fail closed. Returning
+        // true on a transient DB hiccup would silently disable replay
+        // protection; this preserves the security property unless the
+        // operator-known migration is genuinely missing.
+        $sqlState = $e->errorInfo[0] ?? null;          // SQLSTATE 5-char code
+        $driverCode = $e->errorInfo[1] ?? null;        // MySQL error number
+        $isMissingColumn = $sqlState === '42S22' || $driverCode === 1054;
+        if ($isMissingColumn) {
+            error_log('verify_2fa_login_code: last_2fa_counter column missing — run the ALTER TABLE migration. Replay protection is disabled until then.');
+            return true;
+        }
+        error_log('verify_2fa_login_code: replay-check DB error (' . $e->getMessage() . ') — failing closed');
+        return false;
     }
 }
 

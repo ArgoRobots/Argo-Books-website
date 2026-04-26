@@ -188,7 +188,10 @@ function ab_tests_tab_render_list($pdo)
                 FROM outreach_leads ol
                 JOIN referral_visits rv
                   ON rv.source_code = CONCAT('outreach-', ol.id, '-v', ol.ab_variant_id)
-                WHERE ol.ab_test_id = t.id) AS clicked_count
+                WHERE ol.ab_test_id = t.id) AS clicked_count,
+            (SELECT COUNT(*) FROM outreach_leads ol
+                WHERE ol.ab_test_id = t.id
+                  AND ol.status IN ('replied','interested','onboarded')) AS replied_count
         FROM outreach_ab_tests t
         ORDER BY
             FIELD(t.status, 'active', 'paused', 'draft', 'completed'),
@@ -196,12 +199,13 @@ function ab_tests_tab_render_list($pdo)
     ");
     $tests = $testsQuery->fetchAll();
 
-    $stats = ['active' => 0, 'completed' => 0, 'assigned' => 0, 'clicked' => 0];
+    $stats = ['active' => 0, 'completed' => 0, 'assigned' => 0, 'clicked' => 0, 'replied' => 0];
     foreach ($tests as $t) {
         if ($t['status'] === 'active') $stats['active']++;
         if ($t['status'] === 'completed') $stats['completed']++;
         $stats['assigned'] += (int) $t['assigned_count'];
         $stats['clicked']  += (int) $t['clicked_count'];
+        $stats['replied']  += (int) $t['replied_count'];
     }
     ?>
 
@@ -221,6 +225,10 @@ function ab_tests_tab_render_list($pdo)
         <div class="stat-card">
             <div class="stat-label">Leads Clicked</div>
             <div class="stat-value stat-clicked-ab"><?php echo (int) $stats['clicked']; ?></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Leads Replied</div>
+            <div class="stat-value stat-replied-ab"><?php echo (int) $stats['replied']; ?></div>
         </div>
     </div>
 
@@ -312,7 +320,9 @@ function ab_tests_tab_render_list($pdo)
                                 <th>Variants</th>
                                 <th>Assigned</th>
                                 <th>Sent</th>
-                                <th>Clicked</th>
+                                <th>Replies</th>
+                                <th>Reply rate</th>
+                                <th>Clicks</th>
                                 <th>CTR</th>
                                 <th>Actions</th>
                             </tr>
@@ -334,6 +344,8 @@ function ab_tests_tab_render_list($pdo)
                                     <td><?php echo (int) $t['variant_count']; ?></td>
                                     <td><?php echo (int) $t['assigned_count']; ?></td>
                                     <td><?php echo (int) $t['sent_count']; ?></td>
+                                    <td><?php echo (int) $t['replied_count']; ?></td>
+                                    <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['replied_count']); ?></td>
                                     <td><?php echo (int) $t['clicked_count']; ?></td>
                                     <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['clicked_count']); ?></td>
                                     <td class="actions-cell">
@@ -472,12 +484,23 @@ function ab_tests_tab_render_detail($pdo, $testId)
     }
 
     $variants = load_variants_with_stats($pdo, $testId);
-    $leaderIdx = find_leader_idx($variants);
 
-    $chartLabels = array_map(fn($v) => $v['label'], $variants);
-    $chartCtrs   = array_map(fn($v) => round($v['ctr'] * 100, 2), $variants);
-    $chartClicks = array_map(fn($v) => (int) $v['clicked_count'], $variants);
-    $chartSent   = array_map(fn($v) => (int) $v['sent_count'], $variants);
+    // Score on reply rate when any variant has a reply, otherwise CTR. The
+    // automation in ab_check_and_promote_active_test() uses the same rule —
+    // mirroring it here keeps the leader badge / confidence column in sync
+    // with what would actually drive promotion.
+    $totalReplies = array_sum(array_column($variants, 'replied_count'));
+    $scoringMetric = $totalReplies > 0 ? 'reply_rate' : 'ctr';
+    $leaderIdx = find_leader_idx($variants, $scoringMetric);
+    $ctrLeaderIdx = find_leader_idx($variants, 'ctr');
+    $replyLeaderIdx = $totalReplies > 0 ? find_leader_idx($variants, 'reply_rate') : null;
+
+    $chartLabels  = array_map(fn($v) => $v['label'], $variants);
+    $chartCtrs    = array_map(fn($v) => round($v['ctr'] * 100, 2), $variants);
+    $chartReplies = array_map(fn($v) => round($v['reply_rate'] * 100, 2), $variants);
+    $chartClicks  = array_map(fn($v) => (int) $v['clicked_count'], $variants);
+    $chartReplyCounts = array_map(fn($v) => (int) $v['replied_count'], $variants);
+    $chartSent    = array_map(fn($v) => (int) $v['sent_count'], $variants);
     ?>
 
     <p style="margin-top:0;"><a href="?tab=ab-tests" class="link-strong">&larr; All tests</a></p>
@@ -583,6 +606,33 @@ function ab_tests_tab_render_detail($pdo, $testId)
             <?php if (empty($variants)): ?>
                 <p class="empty-state">No variants on this test.</p>
             <?php else: ?>
+                <p class="hint" style="margin-top:0;">
+                    <?php if ($scoringMetric === 'reply_rate'): ?>
+                        Leader scored by <strong>reply rate</strong>
+                        (<?php echo (int) $totalReplies; ?> total
+                        <?php echo $totalReplies === 1 ? 'reply' : 'replies'; ?>
+                        across variants). CTR shown for reference.
+                    <?php else: ?>
+                        Leader scored by <strong>CTR</strong> — no replies recorded yet.
+                        Once any variant gets a reply, scoring switches to reply rate.
+                    <?php endif; ?>
+                </p>
+                <?php if (
+                    $scoringMetric === 'reply_rate'
+                    && $ctrLeaderIdx !== null
+                    && $replyLeaderIdx !== null
+                    && $ctrLeaderIdx !== $replyLeaderIdx
+                ): ?>
+                    <p class="hint" style="margin-top:0; padding:8px 10px; border-left:3px solid #f59e0b; background:rgba(245,158,11,0.08);">
+                        Heads up: <strong><?php echo htmlspecialchars($variants[$ctrLeaderIdx]['label']); ?></strong>
+                        leads on CTR
+                        (<?php echo format_ctr((int) $variants[$ctrLeaderIdx]['sent_count'], (int) $variants[$ctrLeaderIdx]['clicked_count']); ?>)
+                        but <strong><?php echo htmlspecialchars($variants[$replyLeaderIdx]['label']); ?></strong>
+                        leads on reply rate
+                        (<?php echo format_ctr((int) $variants[$replyLeaderIdx]['sent_count'], (int) $variants[$replyLeaderIdx]['replied_count']); ?>) —
+                        promoting on reply rate.
+                    </p>
+                <?php endif; ?>
                 <div class="table-wrap">
                     <table class="data-table">
                         <thead>
@@ -591,7 +641,9 @@ function ab_tests_tab_render_detail($pdo, $testId)
                                 <th>Content</th>
                                 <th>Assigned</th>
                                 <th>Sent</th>
-                                <th>Clicked</th>
+                                <th>Replies</th>
+                                <th>Reply rate</th>
+                                <th>Clicks</th>
                                 <th>CTR</th>
                                 <th>Confidence vs leader</th>
                                 <th>Actions</th>
@@ -603,12 +655,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                                     $isLeader = ($i === $leaderIdx);
                                     $confidence = ['tag' => 'insufficient', 'label' => '—'];
                                     if ($leaderIdx !== null && !$isLeader) {
-                                        $confidence = confidence_vs_leader(
-                                            $variants[$leaderIdx]['sent_count'],
-                                            $variants[$leaderIdx]['clicked_count'],
-                                            $v['sent_count'],
-                                            $v['clicked_count']
-                                        );
+                                        $confidence = confidence_vs_leader_on($scoringMetric, $variants[$leaderIdx], $v);
                                     }
                                     $isDirective = stripos(trim((string) $v['content']), 'directive:') === 0;
                                     $isWinner = ((int) $test['winner_variant_id'] === (int) $v['id']);
@@ -625,6 +672,8 @@ function ab_tests_tab_render_detail($pdo, $testId)
                                     </td>
                                     <td><?php echo (int) $v['assigned_count']; ?></td>
                                     <td><?php echo (int) $v['sent_count']; ?></td>
+                                    <td><?php echo (int) $v['replied_count']; ?></td>
+                                    <td><?php echo format_ctr((int) $v['sent_count'], (int) $v['replied_count']); ?></td>
                                     <td><?php echo (int) $v['clicked_count']; ?></td>
                                     <td><?php echo format_ctr((int) $v['sent_count'], (int) $v['clicked_count']); ?></td>
                                     <td>
@@ -655,7 +704,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                 </div>
 
                 <div class="chart-card">
-                    <h3>CTR by variant (% of sent emails that got a click)</h3>
+                    <h3>Reply rate &amp; CTR by variant</h3>
                     <div class="chart-wrap">
                         <canvas id="abCtrChart"></canvas>
                     </div>
@@ -670,32 +719,47 @@ function ab_tests_tab_render_detail($pdo, $testId)
         if (!el || typeof Chart === 'undefined') return;
 
         var ctrs = <?php echo json_encode($chartCtrs); ?>;
+        var replies = <?php echo json_encode($chartReplies); ?>;
         var clicks = <?php echo json_encode($chartClicks); ?>;
+        var replyCounts = <?php echo json_encode($chartReplyCounts); ?>;
         var sent = <?php echo json_encode($chartSent); ?>;
         var leaderIdx = <?php echo $leaderIdx === null ? '-1' : (int) $leaderIdx; ?>;
+        var scoringMetric = <?php echo json_encode($scoringMetric); ?>;
+
+        // Highlight the leader bar in green for whichever metric is currently
+        // driving promotion. The other metric uses a neutral palette.
+        function leaderColors(arr, color) {
+            return arr.map(function(_, i) { return i === leaderIdx ? '#22c55e' : color; });
+        }
+
+        var datasets = scoringMetric === 'reply_rate'
+            ? [
+                { label: 'Reply rate %', data: replies, backgroundColor: leaderColors(replies, '#3b82f6'), borderRadius: 4 },
+                { label: 'CTR %',        data: ctrs,    backgroundColor: leaderColors(ctrs,    '#94a3b8'), borderRadius: 4 }
+              ]
+            : [
+                { label: 'CTR %',        data: ctrs,    backgroundColor: leaderColors(ctrs,    '#3b82f6'), borderRadius: 4 },
+                { label: 'Reply rate %', data: replies, backgroundColor: leaderColors(replies, '#94a3b8'), borderRadius: 4 }
+              ];
 
         new Chart(el.getContext('2d'), {
             type: 'bar',
             data: {
                 labels: <?php echo json_encode($chartLabels); ?>,
-                datasets: [{
-                    label: 'CTR %',
-                    data: ctrs,
-                    backgroundColor: ctrs.map(function(_, i) {
-                        return i === leaderIdx ? '#22c55e' : '#3b82f6';
-                    }),
-                    borderRadius: 4,
-                }]
+                datasets: datasets
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { display: false },
+                    legend: { display: true },
                     tooltip: {
                         callbacks: {
                             label: function(ctx) {
                                 var i = ctx.dataIndex;
+                                if (ctx.dataset.label === 'Reply rate %') {
+                                    return 'Reply rate: ' + replies[i].toFixed(1) + '% (' + replyCounts[i] + ' replies of ' + sent[i] + ' sent)';
+                                }
                                 return 'CTR: ' + ctrs[i].toFixed(1) + '% (' + clicks[i] + ' clicks of ' + sent[i] + ' sent)';
                             }
                         }

@@ -434,23 +434,31 @@ function stepManageAbTests($pdo, $dryRun)
         $type = $evalResult['variant_type'] ?? $type;
 
         if ($evalResult['action'] === 'promoted') {
+            $metric = $evalResult['metric'] ?? 'ctr';
             logPipeline(sprintf(
-                "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (CTR %.2f%%) via %s after %d days.",
+                "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (reply rate %.2f%%, CTR %.2f%%) via %s by %s after %d days.",
                 $type,
                 $evalResult['test_id'],
                 $evalResult['test_name'],
                 $evalResult['winner_label'],
+                ($evalResult['winner_reply_rate'] ?? 0) * 100,
                 $evalResult['winner_ctr'] * 100,
                 $evalResult['trigger'],
+                $metric,
                 $evalResult['age_days']
             ));
         } elseif ($evalResult['action'] === 'paused_safety') {
+            $metric = $evalResult['metric'] ?? 'ctr';
+            $rate = $metric === 'reply_rate'
+                ? ($evalResult['winner_reply_rate'] ?? 0)
+                : $evalResult['winner_ctr'];
             logPipeline(sprintf(
-                "A/B auto-paused for safety: %s test #%d promoted variant %s but CTR %.2f%% fell below floor. ab_auto_enabled set to 0.",
+                "A/B auto-paused for safety: %s test #%d promoted variant %s but %s %.2f%% fell below floor. ab_auto_enabled set to 0.",
                 $type,
                 $evalResult['test_id'],
                 $evalResult['winner_label'],
-                $evalResult['winner_ctr'] * 100
+                $metric === 'reply_rate' ? 'reply rate' : 'CTR',
+                $rate * 100
             ), 'WARN');
             $anyPaused = true;
         } elseif ($evalResult['action'] === 'none' && ($evalResult['reason'] ?? '') === 'criteria_not_met') {

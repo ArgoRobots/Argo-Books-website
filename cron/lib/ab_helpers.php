@@ -57,8 +57,15 @@ function format_ctr($sent, $clicks)
 }
 
 /**
- * Pull sends/clicks/assigned counts for every variant of a test.
- * Returns each variant row augmented with 'assigned_count', 'sent_count', 'clicked_count', 'ctr'.
+ * Pull sends/clicks/replies/assigned counts for every variant of a test.
+ * Returns each variant row augmented with 'assigned_count', 'sent_count',
+ * 'clicked_count', 'replied_count', 'ctr', 'reply_rate'.
+ *
+ * 'replied_count' counts leads whose status indicates a positive human
+ * response (replied / interested / onboarded). 'not_interested' is excluded
+ * because the unsubscribe flow can flip a lead to that status without it
+ * being a real reply, which would inflate variants whose recipients
+ * unsubscribed.
  */
 function load_variants_with_stats($pdo, $testId)
 {
@@ -71,7 +78,10 @@ function load_variants_with_stats($pdo, $testId)
                 FROM outreach_leads ol
                 JOIN referral_visits rv
                   ON rv.source_code = CONCAT('outreach-', ol.id, '-v', v.id)
-                WHERE ol.ab_variant_id = v.id) AS clicked_count
+                WHERE ol.ab_variant_id = v.id) AS clicked_count,
+            (SELECT COUNT(*) FROM outreach_leads ol
+                WHERE ol.ab_variant_id = v.id
+                  AND ol.status IN ('replied','interested','onboarded')) AS replied_count
         FROM outreach_ab_variants v
         WHERE v.test_id = ?
         ORDER BY v.id ASC
@@ -82,23 +92,40 @@ function load_variants_with_stats($pdo, $testId)
         $v['assigned_count'] = (int) $v['assigned_count'];
         $v['sent_count']     = (int) $v['sent_count'];
         $v['clicked_count']  = (int) $v['clicked_count'];
+        $v['replied_count']  = (int) $v['replied_count'];
         $v['ctr']            = $v['sent_count'] > 0 ? $v['clicked_count'] / $v['sent_count'] : 0.0;
+        $v['reply_rate']     = $v['sent_count'] > 0 ? $v['replied_count'] / $v['sent_count'] : 0.0;
     }
     return $rows;
 }
 
 /**
- * Find the leader index (highest CTR with sent_count > 0).
- * Returns null if no variant has any sends yet. Ties broken by lowest id.
+ * Find the leader index by the given metric (default 'ctr', also accepts
+ * 'reply_rate'). Returns null if no variant has any sends yet. Ties broken
+ * by lowest id.
  */
-function find_leader_idx($variants)
+function find_leader_idx($variants, $metricKey = 'ctr')
 {
     $leaderIdx = null;
     foreach ($variants as $i => $v) {
         if ($v['sent_count'] === 0) continue;
-        if ($leaderIdx === null || $v['ctr'] > $variants[$leaderIdx]['ctr']) {
+        if ($leaderIdx === null || $v[$metricKey] > $variants[$leaderIdx][$metricKey]) {
             $leaderIdx = $i;
         }
     }
     return $leaderIdx;
+}
+
+/**
+ * Two-proportion z-test on a chosen metric. Picks the right
+ * (count, sent) pair from the variant rows and delegates to
+ * confidence_vs_leader(). $metric is 'ctr' or 'reply_rate'.
+ */
+function confidence_vs_leader_on($metric, $leader, $other)
+{
+    $countKey = $metric === 'reply_rate' ? 'replied_count' : 'clicked_count';
+    return confidence_vs_leader(
+        $leader['sent_count'], $leader[$countKey],
+        $other['sent_count'],  $other[$countKey]
+    );
 }

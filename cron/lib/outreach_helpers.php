@@ -1077,24 +1077,26 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
         return ['action' => 'none', 'reason' => 'too_few_variants'];
     }
 
-    $leaderIdx = find_leader_idx($variants);
+    // Pick scoring metric: reply rate is the real conversion signal we want
+    // to optimize, but if no variant has any replies yet we fall back to
+    // CTR so low-volume tests can still promote on something.
+    $totalReplies = array_sum(array_column($variants, 'replied_count'));
+    $metric = $totalReplies > 0 ? 'reply_rate' : 'ctr';
+
+    $leaderIdx = find_leader_idx($variants, $metric);
     $startedAt = strtotime($test['started_at'] ?: $test['created_at']);
     $ageDays = (int) floor((time() - $startedAt) / 86400);
     $minSent = min(array_column($variants, 'sent_count'));
 
     $trigger = null;
 
-    // Criterion (a)
+    // Criterion (a) — leader is statistically significant on the chosen
+    // metric vs every other variant
     if ($leaderIdx !== null && $minSent >= 30) {
         $allSig = true;
         foreach ($variants as $i => $v) {
             if ($i === $leaderIdx) continue;
-            $c = confidence_vs_leader(
-                $variants[$leaderIdx]['sent_count'],
-                $variants[$leaderIdx]['clicked_count'],
-                $v['sent_count'],
-                $v['clicked_count']
-            );
+            $c = confidence_vs_leader_on($metric, $variants[$leaderIdx], $v);
             if ($c['tag'] !== 'significant') { $allSig = false; break; }
         }
         if ($allSig) $trigger = 'significance';
@@ -1125,6 +1127,7 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
             'variant_type' => $variantType,
             'age_days' => $ageDays,
             'min_sent' => $minSent,
+            'metric' => $metric,
             'test_id' => (int) $test['id'],
             'test_name' => $test['name'],
         ];
@@ -1134,22 +1137,38 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
     $pdo->prepare("UPDATE outreach_ab_tests SET winner_variant_id = ?, status = 'completed', completed_at = NOW() WHERE id = ?")
         ->execute([$winner['id'], $test['id']]);
 
-    // Safety-floor check
-    $floorStmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'ab_ctr_floor'");
+    // Safety-floor checks. CTR floor is always evaluated — it's a
+    // deliverability signal (CTR below 1% suggests the email isn't even
+    // reaching inboxes) regardless of which metric drove promotion. Reply
+    // floor is only evaluated when we promoted on reply rate.
+    $floorStmt = $pdo->prepare("SELECT state_key, state_value FROM outreach_pipeline_state WHERE state_key IN ('ab_ctr_floor','ab_reply_floor')");
     $floorStmt->execute();
-    $floorVal = $floorStmt->fetchColumn();
-    $floor = ($floorVal !== false) ? (float) $floorVal : 0.01;
+    $floorRows = $floorStmt->fetchAll();
+    $ctrFloor = 0.01;
+    $replyFloor = 0.005;
+    foreach ($floorRows as $row) {
+        if ($row['state_key'] === 'ab_ctr_floor')   $ctrFloor   = (float) $row['state_value'];
+        if ($row['state_key'] === 'ab_reply_floor') $replyFloor = (float) $row['state_value'];
+    }
 
     $pausedForSafety = false;
-    if ($winner['sent_count'] >= 20 && $winner['ctr'] < $floor) {
+    $pauseReason = null;
+    if ($winner['sent_count'] >= 20) {
+        if ($metric === 'reply_rate' && $winner['reply_rate'] < $replyFloor) {
+            $pauseReason = 'Winner reply rate ' . number_format($winner['reply_rate'] * 100, 2)
+                . '% below floor ' . number_format($replyFloor * 100, 2)
+                . '% on test #' . (int) $test['id'];
+        } elseif ($winner['ctr'] < $ctrFloor) {
+            $pauseReason = 'Winner CTR ' . number_format($winner['ctr'] * 100, 2)
+                . '% below floor ' . number_format($ctrFloor * 100, 2)
+                . '% on test #' . (int) $test['id'];
+        }
+    }
+    if ($pauseReason !== null) {
         $pauseStmt = $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES (?, ?)
             ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)");
         $pauseStmt->execute(['ab_auto_enabled', '0']);
-        $pauseStmt->execute([
-            'ab_auto_last_pause_reason',
-            'Winner CTR ' . number_format($winner['ctr'] * 100, 2) . '% below floor '
-                . number_format($floor * 100, 2) . '% on test #' . (int) $test['id'],
-        ]);
+        $pauseStmt->execute(['ab_auto_last_pause_reason', $pauseReason]);
         $pausedForSafety = true;
     }
 
@@ -1161,6 +1180,8 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
         'winner_id' => (int) $winner['id'],
         'winner_label' => $winner['label'],
         'winner_ctr' => $winner['ctr'],
+        'winner_reply_rate' => $winner['reply_rate'],
+        'metric' => $metric,
         'trigger' => $trigger,
         'age_days' => $ageDays,
     ];

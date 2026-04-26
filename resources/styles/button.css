@@ -133,7 +133,8 @@
 }
 
 .btn-small {
-  width: 100px;
-  padding: 5px 0;
+  width: auto;
+  min-width: 100px;
+  padding: 5px 12px;
   font-size: 12px;
 }

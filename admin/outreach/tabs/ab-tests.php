@@ -353,10 +353,10 @@ function ab_tests_tab_render_list($pdo)
                                                 <input type="hidden" name="action" value="status_change">
                                                 <input type="hidden" name="test_id" value="<?php echo (int) $t['id']; ?>">
                                                 <input type="hidden" name="status" value="paused">
-                                                <button type="submit" class="btn btn-small">Pause</button>
+                                                <button type="submit" class="btn btn-small btn-neutral">Pause</button>
                                             </form>
                                         <?php endif; ?>
-                                        <a href="?tab=ab-tests&test_id=<?php echo (int) $t['id']; ?>" class="btn btn-small">Details</a>
+                                        <a href="?tab=ab-tests&test_id=<?php echo (int) $t['id']; ?>" class="btn btn-small btn-neutral">Details</a>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
@@ -507,7 +507,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                         <input type="hidden" name="action" value="status_change">
                         <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                         <input type="hidden" name="status" value="paused">
-                        <button type="submit" class="btn btn-small">Pause</button>
+                        <button type="submit" class="btn btn-small btn-neutral">Pause</button>
                     </form>
                     <form method="POST" style="display:inline;" onsubmit="return confirm('End this test without picking a winner? Existing leads keep their variant; new leads stop getting assigned.');">
                         <input type="hidden" name="tab" value="ab-tests">
@@ -515,7 +515,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                         <input type="hidden" name="action" value="status_change">
                         <input type="hidden" name="test_id" value="<?php echo (int) $test['id']; ?>">
                         <input type="hidden" name="status" value="completed">
-                        <button type="submit" class="btn btn-small">End</button>
+                        <button type="submit" class="btn btn-small btn-neutral">End</button>
                     </form>
                 <?php endif; ?>
             </div>
@@ -569,7 +569,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                     <textarea id="abNotesField" name="notes" rows="2" placeholder="Why you ran this test, any context for later."><?php echo htmlspecialchars((string) $test['notes']); ?></textarea>
                 </div>
                 <div style="margin-top:8px;">
-                    <button type="submit" class="btn btn-small">Save notes</button>
+                    <button type="submit" class="btn btn-small btn-neutral">Save notes</button>
                 </div>
             </form>
         </div>

@@ -112,7 +112,7 @@ function generate_2fa_secret()
 
 /**
  * Verify a 2FA code
- * 
+ *
  * @param string $secret 2FA secret
  * @param string $code Code to verify
  * @return bool True if code is valid
@@ -120,6 +120,42 @@ function generate_2fa_secret()
 function verify_2fa_code($secret, $code)
 {
     return !empty($secret) && TOTP::verify($secret, $code);
+}
+
+/**
+ * Verify a 2FA login code with replay protection.
+ *
+ * A TOTP code is valid for ~90 seconds (current ±1 step). Without replay
+ * protection an attacker who intercepts a code can re-use it within that
+ * window. This atomically claims the matching counter so the same code
+ * cannot succeed twice for the same user.
+ *
+ * Returns true on first successful use, false if the code is invalid OR if
+ * a code with the same (or earlier) counter has already been consumed.
+ */
+function verify_2fa_login_code($username, $code)
+{
+    if (empty($username)) {
+        return false;
+    }
+    $secret = get_2fa_secret($username);
+    if (empty($secret)) {
+        return false;
+    }
+
+    $counter = TOTP::verifyAndGetCounter($secret, $code);
+    if ($counter === 0) {
+        return false;
+    }
+
+    global $pdo;
+    // Atomic compare-and-set: only succeeds if no code with this counter
+    // (or a later one) has already been claimed for this user.
+    $stmt = $pdo->prepare(
+        'UPDATE admin_users SET last_2fa_counter = ? WHERE LOWER(username) = LOWER(?) AND last_2fa_counter < ?'
+    );
+    $stmt->execute([$counter, $username, $counter]);
+    return $stmt->rowCount() > 0;
 }
 
 /**

@@ -113,8 +113,6 @@ function handle_confirm_sync(int $companyId): void
 
     $paymentIds = $data['paymentIds'] ?? $data['payment_ids'] ?? [];
 
-    error_log("Portal sync POST: company=$companyId, received keys=" . implode(',', array_keys($data ?? [])) . ", paymentIds=" . json_encode($paymentIds));
-
     if (empty($paymentIds) || !is_array($paymentIds)) {
         send_error_response(400, 'Missing or invalid payment_ids array.', 'MISSING_FIELDS');
     }
@@ -135,8 +133,6 @@ function handle_confirm_sync(int $companyId): void
     $params = array_merge([$companyId], $paymentIds);
     $stmt->execute($params);
     $affectedRows = $stmt->rowCount();
-
-    error_log("Portal sync POST: marked $affectedRows payments as synced for company=$companyId");
 
     send_json_response(200, [
         'success' => true,

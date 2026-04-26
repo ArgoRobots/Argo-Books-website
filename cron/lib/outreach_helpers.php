@@ -109,16 +109,29 @@ function get_single_active_ab_test($pdo)
 }
 
 /**
- * Pick the next variant for an active test using deterministic round-robin.
- * Counts how many leads are already assigned to this test and assigns the
- * next lead to index (count % variant_count).
+ * Pick a variant for the given lead, deterministically per-(lead, test).
+ *
+ * Previously this counted leads-already-assigned and used count % variants for
+ * exact round-robin — but the count was read before the caller persisted the
+ * assignment, so two concurrent draft-generation calls (the bulk-draft batch
+ * runs three at a time) would both read the same count and assign the same
+ * variant. Hashing (leadId, testId) instead is race-free and gives an even
+ * distribution across leads with no shared counter.
  */
-function pick_ab_variant($pdo, $test, $variants)
+function pick_ab_variant($pdo, $test, $variants, $lead = null)
 {
-    $cStmt = $pdo->prepare("SELECT COUNT(*) FROM outreach_leads WHERE ab_test_id = ?");
-    $cStmt->execute([$test['id']]);
-    $assignedSoFar = (int) $cStmt->fetchColumn();
-    $idx = $assignedSoFar % count($variants);
+    $count = count($variants);
+    $leadId = is_array($lead) && isset($lead['id']) ? (int) $lead['id'] : 0;
+    if ($leadId <= 0) {
+        // Defensive fallback for callers that don't pass a lead — pick a
+        // uniformly random variant rather than collapsing to index 0.
+        $idx = random_int(0, $count - 1);
+    } else {
+        // Mix the test ID in so the same lead doesn't always end up in the
+        // same slot across separate tests. crc32 keeps the math cheap and
+        // gives a uniform distribution at this scale.
+        $idx = abs(crc32($leadId . ':' . (int) $test['id'])) % $count;
+    }
     return $variants[$idx];
 }
 
@@ -221,11 +234,32 @@ function send_outreach_lead($pdo, $lead)
     $id = $lead['id'];
     $email = $lead['email'];
 
-    // Skip if this email is on the suppression list
+    // Atomic claim BEFORE sending. Without this, two simultaneous callers
+    // (admin "Send" tab + cron stepSendEmails, or two tabs) can both pass
+    // their pre-fetch sent_at check and both invoke SMTP.
+    //
+    // This sets sent_at = NOW() up front so only one process wins. If the
+    // SMTP send subsequently fails, we restore sent_at = NULL below so the
+    // lead remains sendable. The remaining failure mode is a process crash
+    // between this claim and the actual send — sent_at would stay set with
+    // no email having gone out. That's preferable to duplicate sends to a
+    // prospect, and is recoverable by manually clearing sent_at.
+    $claimStmt = $pdo->prepare(
+        "UPDATE outreach_leads SET sent_at = NOW() WHERE id = ? AND sent_at IS NULL"
+    );
+    $claimStmt->execute([$id]);
+    if ($claimStmt->rowCount() === 0) {
+        log_activity($pdo, $id, 'email_skipped_already_sent', 'Skipped send: lead already sent (race-condition guard)');
+        return false;
+    }
+
+    // Skip if this email is on the suppression list. Release the claim so the
+    // lead's state isn't misleadingly "sent" when nothing actually went out.
     if (!empty($email)) {
         $suppStmt = $pdo->prepare("SELECT 1 FROM email_suppressions WHERE email = ? AND context = 'outreach' LIMIT 1");
         $suppStmt->execute([strtolower(trim($email))]);
         if ($suppStmt->fetchColumn()) {
+            $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
             log_activity($pdo, $id, 'email_skipped_suppressed', 'Skipped send: email is on outreach suppression list (' . $email . ')');
             return false;
         }
@@ -340,8 +374,9 @@ function send_outreach_lead($pdo, $lead)
     );
 
     if ($result) {
+        // sent_at was already set by the upfront claim. Update the rest of
+        // the post-send fields here.
         $stmt = $pdo->prepare("UPDATE outreach_leads SET
-            sent_at = NOW(),
             status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
             first_contact_date = COALESCE(first_contact_date, NOW()),
             last_contact_date = NOW()
@@ -350,6 +385,8 @@ function send_outreach_lead($pdo, $lead)
         return true;
     }
 
+    // SMTP send failed — release the claim so retries / manual re-send work.
+    $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
     return false;
 }
 
@@ -793,7 +830,7 @@ function generate_draft_for_lead($pdo, $lead)
             }
         }
         if ($variant === null) {
-            $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
+            $variant = pick_ab_variant($pdo, $active['test'], $active['variants'], $lead);
         }
 
         $abTestId = $activeTestId;

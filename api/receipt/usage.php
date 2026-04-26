@@ -59,14 +59,33 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
     if (!empty($license_key)) {
         // Check if it's a Premium key (starts with PREM-)
         if (strpos($license_key, 'PREM-') === 0) {
-            // Check premium_subscription_keys table (unredeemed promo keys)
-            $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
+            // Look up the key and verify it has been redeemed before granting
+            // the premium scan limit. Without the redeemed_at check, anyone
+            // who obtained an unredeemed promo code (screenshot, support
+            // ticket, etc.) could claim premium quota.
+            $stmt = $pdo->prepare("
+                SELECT subscription_key, subscription_id, redeemed_at
+                FROM premium_subscription_keys
+                WHERE subscription_key = ?
+            ");
             $stmt->execute([$license_key]);
-            if ($stmt->fetch()) {
-                return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit'], 'identifier' => $license_key];
+            $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($premiumKey && $premiumKey['redeemed_at'] !== null) {
+                // Verify the linked subscription is active and not expired
+                $stmt = $pdo->prepare("
+                    SELECT id FROM premium_subscriptions
+                    WHERE subscription_id = ?
+                    AND status IN ('active', 'cancelled')
+                    AND end_date > NOW()
+                ");
+                $stmt->execute([$premiumKey['subscription_id']]);
+                if ($stmt->fetch()) {
+                    return ['tier' => 'premium', 'limit' => $config['receipt_scan_monthly_limit'], 'identifier' => $license_key];
+                }
             }
 
-            // Check premium_subscriptions table for active subscriptions
+            // Fallback: subscription_id may have been used directly as the license key
             $stmt = $pdo->prepare("
                 SELECT id FROM premium_subscriptions
                 WHERE subscription_id = ?
@@ -199,14 +218,24 @@ try {
             exit();
         }
 
-        // Increment the scan count
+        // Atomic conditional update so two concurrent requests can't both pass
+        // the read-then-check above and increment past the cap.
         $usage_month = date('Y-m-01');
         $stmt = $pdo->prepare("
             UPDATE receipt_scan_usage
             SET scan_count = scan_count + 1
-            WHERE license_key = ? AND usage_month = ?
+            WHERE license_key = ? AND usage_month = ? AND scan_count < ?
         ");
-        $stmt->execute([$identifier, $usage_month]);
+        $stmt->execute([$identifier, $usage_month, $monthly_limit]);
+
+        if ($stmt->rowCount() === 0) {
+            $response = buildResponse($scan_count, $monthly_limit, $tier, false);
+            $response['success'] = false;
+            $response['error'] = 'Monthly scan limit reached';
+            http_response_code(429);
+            echo json_encode($response);
+            exit();
+        }
 
         // Return updated status
         $new_scan_count = $scan_count + 1;

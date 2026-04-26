@@ -381,14 +381,25 @@ function record_portal_payment(array $params): array
     // The processing fee covers payment provider costs and is not part of the invoice total.
     if ($status === 'completed') {
         $invoiceAmount = max(0, $amount - $processingFee);
+
+        // Single atomic UPDATE so two concurrent payments can never read the
+        // same balance and overwrite each other (lost-update race).
+        //
+        // SET-clause order matters here: MySQL evaluates SET assignments
+        // left-to-right and references to a column in subsequent assignments
+        // see the NEW (just-assigned) value. We need the CASE to compare
+        // against the OLD balance_due, so `status = CASE …` MUST come BEFORE
+        // `balance_due = GREATEST(…)` — otherwise a $50 payment on a $100
+        // invoice would compute new_balance=50 then evaluate (50 - 50 <= 0)
+        // and incorrectly set status='paid' instead of 'partial'.
         $stmt = $pdo->prepare(
             'UPDATE portal_invoices
-             SET balance_due = GREATEST(0, balance_due - ?),
-                 status = CASE
+             SET status = CASE
                      WHEN balance_due - ? <= 0 THEN "paid"
                      WHEN balance_due - ? < total_amount THEN "partial"
                      ELSE status
                  END,
+                 balance_due = GREATEST(0, balance_due - ?),
                  updated_at = NOW()
              WHERE company_id = ? AND invoice_id = ?'
         );

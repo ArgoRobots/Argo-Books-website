@@ -153,3 +153,66 @@ function record_rate_limit_attempt(string $ip, string $prefix = 'portal', int $w
 
     write_rate_limits_unlock($handle, $rateLimits);
 }
+
+/**
+ * Atomically check the rate limit AND record the attempt under a single lock.
+ * Use for endpoints where TOCTOU between the check and the record could let
+ * concurrent requests slip past the cap (e.g. admin login). Every call counts
+ * toward the limit; pair with clear_rate_limit_attempts() on success if you
+ * want successful actions to reset the counter.
+ *
+ * @return bool True if the limit was already exceeded BEFORE this call (the
+ *              attempt is NOT counted in that case), false if the attempt was
+ *              recorded and processing should continue.
+ */
+function check_and_record_rate_limit(string $ip, int $maxAttempts, int $windowSeconds, string $prefix): bool
+{
+    $result = read_rate_limits_locked($windowSeconds);
+    $rateLimits = $result['rateLimits'];
+    $handle = $result['handle'];
+
+    if (!$handle) {
+        // Fail open if the lock/file isn't usable so we don't lock real users out.
+        return false;
+    }
+
+    $key = $prefix . '_' . hash('sha256', $ip);
+
+    if (isset($rateLimits[$key]) && $rateLimits[$key]['count'] >= $maxAttempts) {
+        write_rate_limits_unlock($handle, $rateLimits);
+        return true;
+    }
+
+    $now = time();
+    if (!isset($rateLimits[$key])) {
+        $rateLimits[$key] = [
+            'count' => 1,
+            'first_attempt' => $now
+        ];
+    } else {
+        $rateLimits[$key]['count']++;
+    }
+
+    write_rate_limits_unlock($handle, $rateLimits);
+    return false;
+}
+
+/**
+ * Clear all recorded attempts for this IP/prefix bucket.
+ * Call on a successful action so legitimate users don't accumulate counts.
+ */
+function clear_rate_limit_attempts(string $ip, string $prefix, int $windowSeconds = 900): void
+{
+    $result = read_rate_limits_locked($windowSeconds);
+    $rateLimits = $result['rateLimits'];
+    $handle = $result['handle'];
+
+    if (!$handle) {
+        return;
+    }
+
+    $key = $prefix . '_' . hash('sha256', $ip);
+    unset($rateLimits[$key]);
+
+    write_rate_limits_unlock($handle, $rateLimits);
+}

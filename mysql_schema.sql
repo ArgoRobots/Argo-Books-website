@@ -23,9 +23,14 @@ CREATE TABLE IF NOT EXISTS admin_users (
     email VARCHAR(100),
     two_factor_secret VARCHAR(100),
     two_factor_enabled TINYINT(1) DEFAULT 0,
+    last_2fa_counter BIGINT NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     last_login DATETIME
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, add the TOTP replay-prevention column:
+--   ALTER TABLE admin_users
+--     ADD COLUMN last_2fa_counter BIGINT NOT NULL DEFAULT 0 AFTER two_factor_enabled;
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS community_users (

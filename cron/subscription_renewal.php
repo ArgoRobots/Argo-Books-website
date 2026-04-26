@@ -198,6 +198,25 @@ foreach ($subscriptions as $subscription) {
     $transactionId = null;
 
     try {
+        // Idempotency guard: if a successful renewal payment already exists for
+        // this subscription within the last 23 hours, skip — this prevents a
+        // double-charge if the cron is fired twice (overlapping runs, retry,
+        // accidental re-invoke).
+        $stmt = $pdo->prepare("
+            SELECT 1 FROM premium_subscription_payments
+            WHERE subscription_id = ?
+              AND status = 'completed'
+              AND payment_type = 'renewal'
+              AND created_at > DATE_SUB(NOW(), INTERVAL 23 HOUR)
+            LIMIT 1
+        ");
+        $stmt->execute([$subscriptionId]);
+        if ($stmt->fetch()) {
+            logMessage("Skipping $subscriptionId - already renewed within the last 23 hours", 'INFO');
+            $skippedCount++;
+            continue;
+        }
+
         switch ($paymentMethod) {
             case 'stripe':
                 $stripeCustomerId = $subscription['stripe_customer_id'] ?? null;
@@ -232,23 +251,42 @@ foreach ($subscriptions as $subscription) {
             $newEndDate = calculateNewEndDate($subscription['end_date'], $billing);
             $newCreditBalance = $creditBalance - $creditUsed; // Deduct any used credit
 
-            $stmt = $pdo->prepare("
-                UPDATE premium_subscriptions
-                SET end_date = ?,
-                    credit_balance = ?,
-                    updated_at = NOW()
-                WHERE subscription_id = ?
-            ");
-            $stmt->execute([$newEndDate, $newCreditBalance, $subscriptionId]);
+            // Wrap the two writes in a transaction so we can never end up with
+            // an extended subscription but no payment record (or vice versa).
+            // The charge has already been made by this point — if the DB writes
+            // fail we log loudly so an operator can reconcile manually.
+            $pdo->beginTransaction();
+            try {
+                $stmt = $pdo->prepare("
+                    UPDATE premium_subscriptions
+                    SET end_date = ?,
+                        credit_balance = ?,
+                        updated_at = NOW()
+                    WHERE subscription_id = ?
+                ");
+                $stmt->execute([$newEndDate, $newCreditBalance, $subscriptionId]);
 
-            // Log payment (log the actual amount charged, not the full renewal amount)
-            $stmt = $pdo->prepare("
-                INSERT INTO premium_subscription_payments (
-                    subscription_id, amount, currency, payment_method,
-                    transaction_id, status, payment_type, created_at
-                ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'renewal', NOW())
-            ");
-            $stmt->execute([$subscriptionId, $amountToCharge, $paymentMethod, $transactionId]);
+                // Log payment (log the actual amount charged, not the full renewal amount)
+                $stmt = $pdo->prepare("
+                    INSERT INTO premium_subscription_payments (
+                        subscription_id, amount, currency, payment_method,
+                        transaction_id, status, payment_type, created_at
+                    ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'renewal', NOW())
+                ");
+                $stmt->execute([$subscriptionId, $amountToCharge, $paymentMethod, $transactionId]);
+
+                $pdo->commit();
+            } catch (Exception $dbEx) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                logMessage(
+                    "CRITICAL: charged $subscriptionId (txn $transactionId, $$amountToCharge) but DB write failed: "
+                    . $dbEx->getMessage() . " — manual reconciliation required",
+                    'ERROR'
+                );
+                throw $dbEx;
+            }
 
             // Send receipt email (only for actual charges, not credit-covered renewals)
             if ($amountToCharge > 0) {
@@ -473,10 +511,19 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
 }
 
 /**
- * Calculate new subscription end date
+ * Calculate new subscription end date.
+ *
+ * Bases the new period on the LATER of the existing end_date or NOW(). When a
+ * cron run is delayed and end_date is already in the past, extending from the
+ * stale end_date can leave the new end_date still in the past — causing the
+ * subscription to be picked up again and re-charged on the next run.
  */
 function calculateNewEndDate($currentEndDate, $billing) {
     $endDateTime = new DateTime($currentEndDate);
+    $now = new DateTime('now');
+    if ($endDateTime < $now) {
+        $endDateTime = $now;
+    }
 
     if ($billing === 'yearly') {
         $endDateTime->add(new DateInterval('P1Y'));

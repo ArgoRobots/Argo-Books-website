@@ -37,13 +37,28 @@ class InvoiceEmailSender
             // Get sender info
             $fromEmail = $data['from'] ?? $this->defaultFromEmail;
             $fromName = $data['fromName'] ?? $this->defaultFromName;
-            // Sanitize fromName to prevent email header injection
-            $fromName = preg_replace('/[\r\n\x00-\x1f]/', '', $fromName);
             $toEmail = $data['to'];
             $toName = $data['toName'] ?? '';
             $subject = $data['subject'];
             $htmlBody = $data['html'];
             $textBody = $data['text'] ?? strip_tags(str_replace(['<br>', '<br/>', '<br />', '</p>'], "\n", $htmlBody));
+
+            // Strip CR/LF + control bytes from every value that ends up in an
+            // email header. The desktop client supplies subject / to / from /
+            // replyTo / bcc and a malicious payload could otherwise inject
+            // Bcc: or other headers via the mail() fallback path.
+            $headerSafe = static fn($v) => preg_replace('/[\r\n\x00-\x1f]+/', ' ', (string) $v);
+            $fromEmail = $headerSafe($fromEmail);
+            $fromName = $headerSafe($fromName);
+            $toEmail = $headerSafe($toEmail);
+            $toName = $headerSafe($toName);
+            $subject = $headerSafe($subject);
+            if (!empty($data['replyTo'])) {
+                $data['replyTo'] = $headerSafe($data['replyTo']);
+            }
+            if (!empty($data['bcc'])) {
+                $data['bcc'] = $headerSafe($data['bcc']);
+            }
 
             // Generate unique message ID
             $messageId = $this->generateMessageId($data['invoiceId'] ?? 'invoice');

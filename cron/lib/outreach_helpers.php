@@ -318,7 +318,7 @@ function send_outreach_lead($pdo, $lead)
         // clients while still carrying the tracking source param. No HTML
         // escaping, no <a> wrapping.
         $body = (string) $lead['draft_body'];
-        $body = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $trackedUrl, $body);
+        $body = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $trackedUrl, $body);
         $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
         if (strpos($body, 'unsubscribe?t=') === false) {
             $unsubLine = "\n\nNot interested? " . $unsubUrl . " and I'll stop emailing you.";
@@ -333,7 +333,7 @@ function send_outreach_lead($pdo, $lead)
     } else {
         $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
         $escapedBody = htmlspecialchars($lead['draft_body']);
-        $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
+        $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $anchorHtml, $escapedBody);
 
         $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
         // Drafts since the unsubscribe-URL fix carry the real bare URL in

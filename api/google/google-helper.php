@@ -98,18 +98,51 @@ function store_google_oauth_state(array $authContext, string $state): void
 }
 
 /**
- * Encrypt a string using AES-256-GCM with a key derived from GOOGLE_CLIENT_SECRET.
- * This keeps Google OAuth token encryption independent of the payment portal.
+ * Resolve the AES key for Google OAuth token encryption.
+ *
+ * Prefers the dedicated GOOGLE_ENCRYPTION_KEY (64-char hex, like
+ * PORTAL_ENCRYPTION_KEY). Falls back to deriving from GOOGLE_CLIENT_SECRET
+ * for backwards compatibility with tokens encrypted before this env var
+ * existed. Returns [primaryKey, fallbackKey|null] — encrypt with primary,
+ * decrypt by trying primary first then fallback.
+ */
+function _google_encryption_keys(): array
+{
+    $dedicatedHex = trim($_ENV['GOOGLE_ENCRYPTION_KEY'] ?? '');
+    $dedicatedKey = null;
+    if ($dedicatedHex !== '') {
+        $dedicatedKey = @hex2bin($dedicatedHex);
+        if ($dedicatedKey === false || strlen($dedicatedKey) !== 32) {
+            throw new RuntimeException('GOOGLE_ENCRYPTION_KEY must be a 64-character hex string (256 bits).');
+        }
+    }
+
+    $secret = trim($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
+    $derivedKey = $secret !== '' ? hash('sha256', $secret, true) : null;
+
+    if ($dedicatedKey === null && $derivedKey === null) {
+        throw new RuntimeException('Neither GOOGLE_ENCRYPTION_KEY nor GOOGLE_CLIENT_SECRET is configured.');
+    }
+
+    // Use the dedicated key when available, falling back to the derived one.
+    // Both are returned for decryption so old ciphertext keeps working after
+    // GOOGLE_ENCRYPTION_KEY is introduced.
+    return [
+        'primary' => $dedicatedKey ?? $derivedKey,
+        'fallback' => $dedicatedKey !== null ? $derivedKey : null,
+    ];
+}
+
+/**
+ * Encrypt a string using AES-256-GCM. Uses GOOGLE_ENCRYPTION_KEY if set
+ * (dedicated, rotation-safe), otherwise falls back to a key derived from
+ * GOOGLE_CLIENT_SECRET (backwards-compatible default).
  */
 function google_encrypt(string $plaintext): string
 {
-    $secret = trim($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
-    if (empty($secret)) {
-        throw new RuntimeException('GOOGLE_CLIENT_SECRET is not configured.');
-    }
-    $key = hash('sha256', $secret, true); // 32 bytes
+    $keys = _google_encryption_keys();
     $iv = random_bytes(12);
-    $ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+    $ciphertext = openssl_encrypt($plaintext, 'aes-256-gcm', $keys['primary'], OPENSSL_RAW_DATA, $iv, $tag);
     if ($ciphertext === false) {
         throw new RuntimeException('Encryption failed.');
     }
@@ -117,15 +150,13 @@ function google_encrypt(string $plaintext): string
 }
 
 /**
- * Decrypt a string encrypted with google_encrypt().
+ * Decrypt a string encrypted with google_encrypt(). Tries the primary key
+ * first, then the fallback (so tokens encrypted under the old derived key
+ * keep working after GOOGLE_ENCRYPTION_KEY is introduced).
  */
 function google_decrypt(string $encoded): string
 {
-    $secret = trim($_ENV['GOOGLE_CLIENT_SECRET'] ?? '');
-    if (empty($secret)) {
-        throw new RuntimeException('GOOGLE_CLIENT_SECRET is not configured.');
-    }
-    $key = hash('sha256', $secret, true);
+    $keys = _google_encryption_keys();
     $data = base64_decode($encoded, true);
     if ($data === false || strlen($data) < 28) {
         throw new RuntimeException('Invalid encrypted data.');
@@ -133,7 +164,11 @@ function google_decrypt(string $encoded): string
     $iv = substr($data, 0, 12);
     $tag = substr($data, 12, 16);
     $ciphertext = substr($data, 28);
-    $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag);
+
+    $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $keys['primary'], OPENSSL_RAW_DATA, $iv, $tag);
+    if ($plaintext === false && $keys['fallback'] !== null) {
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', $keys['fallback'], OPENSSL_RAW_DATA, $iv, $tag);
+    }
     if ($plaintext === false) {
         throw new RuntimeException('Decryption failed.');
     }

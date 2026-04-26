@@ -45,37 +45,48 @@ class TOTP {
     
     /**
      * Verify a TOTP code with an expanded time window
-     * 
+     *
      * @param string $secret Base32 encoded secret
      * @param string $code TOTP code to verify
      * @return bool True if code is valid
      */
     public static function verify($secret, $code) {
+        return self::verifyAndGetCounter($secret, $code) !== 0;
+    }
+
+    /**
+     * Verify a TOTP code and return the counter value (floor(time/30)) of the
+     * matching window, or 0 if the code does not match any window.
+     *
+     * Login flows use the returned counter to detect replay: the same code
+     * cannot be accepted twice for the same admin within its validity window.
+     */
+    public static function verifyAndGetCounter($secret, $code) {
         // Clean inputs
         $secret = strtoupper(trim(str_replace(' ', '', $secret)));
         $code = trim($code);
-        
+
         // Validate code format
         if (!preg_match('/^\d{6}$/', $code)) {
-            return false;
+            return 0;
         }
-        
+
         // Get current time
         $currentTime = time();
-        
+
         // Use a tight time window (±1 step = ±30 seconds) to limit brute-force surface
         $window = 1;
-        
+
         for ($i = -$window; $i <= $window; $i++) {
             $checkTime = $currentTime + ($i * 30);
             $calculatedCode = self::getCode($secret, $checkTime);
-            
+
             if ($calculatedCode === $code) {
-                return true;
+                return (int) floor($checkTime / 30);
             }
         }
-        
-        return false;
+
+        return 0;
     }
     
     /**

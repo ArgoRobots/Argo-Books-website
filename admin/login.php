@@ -1,4 +1,14 @@
 <?php
+// Harden the admin session cookie before session_start. Secure must be off in
+// local dev (HTTP) but on in production (HTTPS) — gate on APP_ENV via env().
+require_once __DIR__ . '/../env_helper.php';
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'secure' => env('APP_ENV', 'sandbox') === 'production',
+    'httponly' => true,
+    'samesite' => 'Strict',
+]);
 session_start();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../rate_limit_helper.php';
@@ -12,47 +22,57 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
 
 $error = '';
 $show_2fa_form = false;
+$clientIp = get_client_ip();
 
 // Process 2FA verification
 if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
     $show_2fa_form = true;
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['verify_code'])) {
-        $verification_code = $_POST['verification_code'] ?? '';
-
-        if (empty($verification_code)) {
-            $error = 'Please enter the verification code.';
+        // Rate limit 2FA attempts (max 5 per 15 minutes, per IP). Without this,
+        // an attacker holding valid credentials could brute-force the 6-digit
+        // code at full speed. Atomic check+record so concurrent requests can't
+        // slip past the cap.
+        if (check_and_record_rate_limit($clientIp, 5, 900, 'admin_2fa')) {
+            $error = 'Too many verification attempts. Please wait 15 minutes before trying again.';
         } else {
-            $username = $_SESSION['temp_username'];
-            $secret = get_2fa_secret($username);
+            $verification_code = $_POST['verification_code'] ?? '';
 
-            if (empty($secret)) {
-                $error = "Authentication error: Unable to retrieve your 2FA secret.";
-            } else if (verify_2fa_code($secret, $verification_code)) {
-                // Code is valid, complete login
-                session_regenerate_id(true);
-                $_SESSION['awaiting_2fa'] = false;
-                $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_username'] = $username;
-                unset($_SESSION['temp_username']);
-
-                // Update last login time
-                $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
-                $stmt->execute([$username]);
-
-                header('Location: index.php');
-                exit;
+            if (empty($verification_code)) {
+                $error = 'Please enter the verification code.';
             } else {
-                $error = 'Invalid verification code. Please try again.';
+                $username = $_SESSION['temp_username'];
+
+                if (verify_2fa_login_code($username, $verification_code)) {
+                    // Code is valid, complete login
+                    session_regenerate_id(true);
+                    $_SESSION['awaiting_2fa'] = false;
+                    $_SESSION['admin_logged_in'] = true;
+                    $_SESSION['admin_username'] = $username;
+                    unset($_SESSION['temp_username']);
+
+                    // Successful login resets the failed-attempt counters.
+                    clear_rate_limit_attempts($clientIp, 'admin_2fa');
+                    clear_rate_limit_attempts($clientIp, 'admin_login');
+
+                    // Update last login time
+                    $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
+                    $stmt->execute([$username]);
+
+                    header('Location: index.php');
+                    exit;
+                } else {
+                    $error = 'Invalid verification code. Please try again.';
+                }
             }
         }
     }
 }
 // Process login form submission
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    // Rate limit login attempts (max 5 per 15 minutes, per IP, flat-file backed)
-    $clientIp = get_client_ip();
-    if (is_rate_limited($clientIp, 5, 900, 'admin_login')) {
+    // Atomic check+record so concurrent requests can't slip past the cap
+    // (5 per 15 minutes, per IP). Successful logins clear the bucket below.
+    if (check_and_record_rate_limit($clientIp, 5, 900, 'admin_login')) {
         $error = 'Too many login attempts. Please wait 15 minutes before trying again.';
     }
 
@@ -72,7 +92,9 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $actual_username = $user['username']; // Get actual username with correct case
 
             if (is_2fa_enabled($actual_username)) {
-                // 2FA is enabled, show the verification form
+                // 2FA is enabled, show the verification form. Don't clear the
+                // password-attempt counter yet — we only count this as success
+                // once 2FA also passes.
                 $_SESSION['awaiting_2fa'] = true;
                 $_SESSION['temp_username'] = $actual_username;
                 $show_2fa_form = true;
@@ -82,6 +104,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $actual_username;
 
+                clear_rate_limit_attempts($clientIp, 'admin_login');
+
                 // Update last login time
                 $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                 $stmt->execute([$actual_username]);
@@ -90,8 +114,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 exit;
             }
         } else {
-            // Count this failed attempt only on authentication failure
-            record_rate_limit_attempt($clientIp, 'admin_login');
             $error = 'Invalid username or password.';
         }
     }

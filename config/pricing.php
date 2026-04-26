@@ -9,6 +9,7 @@
  * Environment variables:
  *   PREMIUM_MONTHLY_PRICE       - Premium monthly subscription (default: 10.00)
  *   PREMIUM_YEARLY_PRICE        - Premium yearly subscription (default: 100.00)
+ *   PREMIUM_DISCOUNT            - Standard premium discount applied to credited subscriptions (default: 20.00)
  *   PROCESSING_FEE_PERCENT      - Payment processing fee percentage (default: 2.90)
  *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
  *   RECEIPT_SCAN_MONTHLY_LIMIT       - Monthly receipt scan limit for premium tier (default: 500)
@@ -38,6 +39,7 @@ function get_pricing_config() {
     $config = [
         'premium_monthly_price' => _pricing_parse_env('PREMIUM_MONTHLY_PRICE', 10.00),
         'premium_yearly_price'  => _pricing_parse_env('PREMIUM_YEARLY_PRICE', 100.00),
+        'premium_discount'       => _pricing_parse_env('PREMIUM_DISCOUNT', 20.00),
         'processing_fee_percent' => _pricing_parse_env('PROCESSING_FEE_PERCENT', 2.90),
         'processing_fee_fixed'   => _pricing_parse_env('PROCESSING_FEE_FIXED', 0.30),
         'receipt_scan_monthly_limit'      => _pricing_parse_int_env('RECEIPT_SCAN_MONTHLY_LIMIT', 500),

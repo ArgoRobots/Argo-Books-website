@@ -109,16 +109,29 @@ function get_single_active_ab_test($pdo)
 }
 
 /**
- * Pick the next variant for an active test using deterministic round-robin.
- * Counts how many leads are already assigned to this test and assigns the
- * next lead to index (count % variant_count).
+ * Pick a variant for the given lead, deterministically per-(lead, test).
+ *
+ * Previously this counted leads-already-assigned and used count % variants for
+ * exact round-robin — but the count was read before the caller persisted the
+ * assignment, so two concurrent draft-generation calls (the bulk-draft batch
+ * runs three at a time) would both read the same count and assign the same
+ * variant. Hashing (leadId, testId) instead is race-free and gives an even
+ * distribution across leads with no shared counter.
  */
-function pick_ab_variant($pdo, $test, $variants)
+function pick_ab_variant($pdo, $test, $variants, $lead = null)
 {
-    $cStmt = $pdo->prepare("SELECT COUNT(*) FROM outreach_leads WHERE ab_test_id = ?");
-    $cStmt->execute([$test['id']]);
-    $assignedSoFar = (int) $cStmt->fetchColumn();
-    $idx = $assignedSoFar % count($variants);
+    $count = count($variants);
+    $leadId = is_array($lead) && isset($lead['id']) ? (int) $lead['id'] : 0;
+    if ($leadId <= 0) {
+        // Defensive fallback for callers that don't pass a lead — pick a
+        // uniformly random variant rather than collapsing to index 0.
+        $idx = random_int(0, $count - 1);
+    } else {
+        // Mix the test ID in so the same lead doesn't always end up in the
+        // same slot across separate tests. crc32 keeps the math cheap and
+        // gives a uniform distribution at this scale.
+        $idx = abs(crc32($leadId . ':' . (int) $test['id'])) % $count;
+    }
     return $variants[$idx];
 }
 
@@ -220,6 +233,28 @@ function send_outreach_lead($pdo, $lead)
 {
     $id = $lead['id'];
     $email = $lead['email'];
+
+    // Atomic re-check: callers (admin "Send" button, cron stepSendEmails) all
+    // pre-check sent_at after fetching the row, but two simultaneous fetches
+    // can both pass that check before either has committed the post-send
+    // UPDATE. A short SELECT FOR UPDATE here closes most of that window.
+    try {
+        $pdo->beginTransaction();
+        $checkStmt = $pdo->prepare("SELECT sent_at FROM outreach_leads WHERE id = ? FOR UPDATE");
+        $checkStmt->execute([$id]);
+        $current = $checkStmt->fetch();
+        if (!$current || !empty($current['sent_at'])) {
+            $pdo->rollBack();
+            log_activity($pdo, $id, 'email_skipped_already_sent', 'Skipped send: lead already sent (race-condition guard)');
+            return false;
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        throw $e;
+    }
 
     // Skip if this email is on the suppression list
     if (!empty($email)) {
@@ -340,13 +375,19 @@ function send_outreach_lead($pdo, $lead)
     );
 
     if ($result) {
+        // Final defense: only set sent_at if it's still NULL. If another
+        // process raced past the FOR UPDATE check and set it first,
+        // rowCount() == 0 tells us a duplicate send happened.
         $stmt = $pdo->prepare("UPDATE outreach_leads SET
             sent_at = NOW(),
             status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
             first_contact_date = COALESCE(first_contact_date, NOW()),
             last_contact_date = NOW()
-            WHERE id = ?");
+            WHERE id = ? AND sent_at IS NULL");
         $stmt->execute([$id]);
+        if ($stmt->rowCount() === 0) {
+            log_activity($pdo, $id, 'email_double_sent', 'WARNING: send completed but lead was already marked sent — likely duplicate send');
+        }
         return true;
     }
 
@@ -793,7 +834,7 @@ function generate_draft_for_lead($pdo, $lead)
             }
         }
         if ($variant === null) {
-            $variant = pick_ab_variant($pdo, $active['test'], $active['variants']);
+            $variant = pick_ab_variant($pdo, $active['test'], $active['variants'], $lead);
         }
 
         $abTestId = $activeTestId;

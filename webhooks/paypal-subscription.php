@@ -54,21 +54,22 @@ $webhookId = $isProduction
     ? ($_ENV['PAYPAL_LIVE_WEBHOOK_ID'] ?? '')
     : ($_ENV['PAYPAL_SANDBOX_WEBHOOK_ID'] ?? '');
 
-// Verify webhook signature (mandatory in production)
+// Verify webhook signature — mandatory in BOTH sandbox and production. Without
+// a configured webhook ID we cannot verify the request and any unauthenticated
+// caller could POST fake billing events to extend subscriptions or insert
+// payment rows.
 if (empty($webhookId)) {
-    if ($isProduction) {
-        error_log("CRITICAL: PayPal webhook ID not configured in production - rejecting request");
-        http_response_code(500);
-        exit('Webhook not configured');
-    }
-    error_log("WARNING: PayPal webhook signature verification is disabled in development. Set PAYPAL_*_WEBHOOK_ID in environment.");
-} else {
-    $headers = getallheaders();
-    if (!verifyPayPalWebhookSignature($headers, $rawBody, $webhookId)) {
-        logPayPalWebhookEvent($event['event_type'] ?? 'UNKNOWN', $event, 'SIGNATURE_VERIFICATION_FAILED');
-        http_response_code(401);
-        exit('Invalid signature');
-    }
+    $envLabel = $isProduction ? 'production' : 'sandbox';
+    error_log("CRITICAL: PayPal webhook ID not configured in $envLabel - rejecting request");
+    http_response_code(500);
+    exit('Webhook not configured');
+}
+
+$headers = getallheaders();
+if (!verifyPayPalWebhookSignature($headers, $rawBody, $webhookId)) {
+    logPayPalWebhookEvent($event['event_type'] ?? 'UNKNOWN', $event, 'SIGNATURE_VERIFICATION_FAILED');
+    http_response_code(401);
+    exit('Invalid signature');
 }
 
 // Extract event details
@@ -297,14 +298,16 @@ function handlePaymentFailed($resource) {
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
-        // Log the failed payment
+        // Log the failed payment using the subscription's actual currency,
+        // not a hardcoded 'CAD' that misrepresents non-CAD subscriptions.
+        $subCurrency = $subscription['currency'] ?? 'CAD';
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, error_message, created_at
-            ) VALUES (?, 0, 'CAD', 'paypal', NULL, 'failed', 'renewal', 'PayPal payment failed', NOW())
+            ) VALUES (?, 0, ?, 'paypal', NULL, 'failed', 'renewal', 'PayPal payment failed', NOW())
         ");
-        $stmt->execute([$subscription['subscription_id']]);
+        $stmt->execute([$subscription['subscription_id'], $subCurrency]);
 
         logPayPalWebhookEvent('BILLING.SUBSCRIPTION.PAYMENT.FAILED', $resource, 'payment_failed_logged');
     }
@@ -423,14 +426,15 @@ function handlePaymentDenied($resource) {
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($subscription) {
-        // Log the failed payment
+        // Log the failed payment using the subscription's actual currency.
+        $subCurrency = $subscription['currency'] ?? 'CAD';
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, error_message, created_at
-            ) VALUES (?, 0, 'CAD', 'paypal', ?, 'failed', 'renewal', 'Payment denied by PayPal', NOW())
+            ) VALUES (?, 0, ?, 'paypal', ?, 'failed', 'renewal', 'Payment denied by PayPal', NOW())
         ");
-        $stmt->execute([$subscription['subscription_id'], $transactionId]);
+        $stmt->execute([$subscription['subscription_id'], $subCurrency, $transactionId]);
 
         // Send notification
         try {
@@ -467,24 +471,35 @@ function handlePaymentRefunded($resource) {
     $payment = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($payment) {
-        // Log the refund
+        // Log the refund using the original payment's currency, or fall back
+        // to the PayPal-supplied refund currency, never a hardcoded 'CAD'.
+        $refundCurrency = $payment['currency']
+            ?? $resource['amount']['currency']
+            ?? 'CAD';
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
                 transaction_id, status, payment_type, created_at
-            ) VALUES (?, ?, 'CAD', 'paypal', ?, 'refunded', 'renewal', NOW())
+            ) VALUES (?, ?, ?, 'paypal', ?, 'refunded', 'renewal', NOW())
         ");
-        $stmt->execute([$payment['subscription_id'], -$amount, $refundId]);
+        $stmt->execute([$payment['subscription_id'], -$amount, $refundCurrency, $refundId]);
 
         logPayPalWebhookEvent('PAYMENT.SALE.REFUNDED', $resource, 'refund_logged');
     }
 }
 
 /**
- * Calculate new subscription end date
+ * Calculate new subscription end date.
+ *
+ * Bases the new period on the LATER of the existing end_date or NOW() so a
+ * delayed renewal doesn't leave the new end_date still in the past.
  */
 function calculateNewEndDate($currentEndDate, $billing) {
     $endDateTime = new DateTime($currentEndDate);
+    $now = new DateTime('now');
+    if ($endDateTime < $now) {
+        $endDateTime = $now;
+    }
 
     if ($billing === 'yearly') {
         $endDateTime->add(new DateInterval('P1Y'));

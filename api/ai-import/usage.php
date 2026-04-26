@@ -193,14 +193,24 @@ try {
             exit();
         }
 
-        // Increment the import count
+        // Atomic conditional update so two concurrent requests can't both pass
+        // the read-then-check above and increment past the cap.
         $usage_month = date('Y-m-01');
         $stmt = $pdo->prepare("
             UPDATE ai_import_usage
             SET scan_count = scan_count + 1
-            WHERE license_key = ? AND usage_month = ?
+            WHERE license_key = ? AND usage_month = ? AND scan_count < ?
         ");
-        $stmt->execute([$license_key, $usage_month]);
+        $stmt->execute([$license_key, $usage_month, $monthly_limit]);
+
+        if ($stmt->rowCount() === 0) {
+            $response = buildResponse($import_count, $monthly_limit, $tier, false);
+            $response['success'] = false;
+            $response['error'] = 'Monthly import limit reached';
+            http_response_code(429);
+            echo json_encode($response);
+            exit();
+        }
 
         // Return updated status
         $new_import_count = $import_count + 1;

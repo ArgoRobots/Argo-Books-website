@@ -648,9 +648,25 @@ function import_csv($pdo)
     }
 
     $imported = 0;
+    $skipped = 0;
+    // Pre-prepare the dedup lookup so we don't re-prepare per row
+    $dedupStmt = $pdo->prepare("SELECT id FROM outreach_leads WHERE LOWER(email) = LOWER(?) LIMIT 1");
     while (($row = fgetcsv($file)) !== false) {
         $businessName = trim($row[$columnIndex['business_name']] ?? '');
         if (empty($businessName)) continue;
+
+        $email = isset($columnIndex['email']) ? trim($row[$columnIndex['email']] ?? '') : '';
+
+        // Dedup by email so re-importing the same CSV (or one that overlaps
+        // with previously imported leads) doesn't create duplicate rows that
+        // would each get their own outreach email.
+        if ($email !== '') {
+            $dedupStmt->execute([$email]);
+            if ($dedupStmt->fetchColumn()) {
+                $skipped++;
+                continue;
+            }
+        }
 
         $stmt = $pdo->prepare("INSERT INTO outreach_leads
             (business_name, contact_name, email, phone, website, address, category, city, source, notes)
@@ -659,7 +675,7 @@ function import_csv($pdo)
         $stmt->execute([
             $businessName,
             isset($columnIndex['contact_name']) ? trim($row[$columnIndex['contact_name']] ?? '') ?: null : null,
-            isset($columnIndex['email']) ? trim($row[$columnIndex['email']] ?? '') ?: null : null,
+            $email !== '' ? $email : null,
             isset($columnIndex['phone']) ? trim($row[$columnIndex['phone']] ?? '') ?: null : null,
             isset($columnIndex['website']) ? trim($row[$columnIndex['website']] ?? '') ?: null : null,
             isset($columnIndex['address']) ? trim($row[$columnIndex['address']] ?? '') ?: null : null,
@@ -674,7 +690,11 @@ function import_csv($pdo)
     }
 
     fclose($file);
-    json_response(['success' => true, 'imported' => $imported, 'message' => "Imported $imported leads from CSV"]);
+    $message = "Imported $imported leads from CSV";
+    if ($skipped > 0) {
+        $message .= " ($skipped skipped as duplicates)";
+    }
+    json_response(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'message' => $message]);
 }
 
 // ─── AI Company Size Classification ───

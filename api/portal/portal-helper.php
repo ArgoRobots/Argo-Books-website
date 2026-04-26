@@ -381,18 +381,48 @@ function record_portal_payment(array $params): array
     // The processing fee covers payment provider costs and is not part of the invoice total.
     if ($status === 'completed') {
         $invoiceAmount = max(0, $amount - $processingFee);
-        $stmt = $pdo->prepare(
-            'UPDATE portal_invoices
-             SET balance_due = GREATEST(0, balance_due - ?),
-                 status = CASE
-                     WHEN balance_due - ? <= 0 THEN "paid"
-                     WHEN balance_due - ? < total_amount THEN "partial"
-                     ELSE status
-                 END,
-                 updated_at = NOW()
+
+        // Compute the post-payment balance in PHP and pass it explicitly so the
+        // CASE doesn't have to reason about whether `balance_due` in a SET
+        // clause refers to the pre- or post-update value (MySQL evaluates SET
+        // assignments left-to-right, but mixing the OLD column reference and
+        // the NEW one in the same statement is brittle and was producing wrong
+        // statuses in the cap-to-zero overpayment case).
+        $balanceStmt = $pdo->prepare(
+            'SELECT balance_due, total_amount FROM portal_invoices
              WHERE company_id = ? AND invoice_id = ?'
         );
-        $stmt->execute([$invoiceAmount, $invoiceAmount, $invoiceAmount, $companyId, $invoiceId]);
+        $balanceStmt->execute([$companyId, $invoiceId]);
+        $invoice = $balanceStmt->fetch();
+
+        if ($invoice) {
+            $newBalance = max(0, (float) $invoice['balance_due'] - $invoiceAmount);
+            $totalAmount = (float) $invoice['total_amount'];
+
+            if ($newBalance <= 0) {
+                $newStatus = 'paid';
+            } elseif ($newBalance < $totalAmount) {
+                $newStatus = 'partial';
+            } else {
+                $newStatus = null; // leave status unchanged
+            }
+
+            if ($newStatus !== null) {
+                $stmt = $pdo->prepare(
+                    'UPDATE portal_invoices
+                     SET balance_due = ?, status = ?, updated_at = NOW()
+                     WHERE company_id = ? AND invoice_id = ?'
+                );
+                $stmt->execute([$newBalance, $newStatus, $companyId, $invoiceId]);
+            } else {
+                $stmt = $pdo->prepare(
+                    'UPDATE portal_invoices
+                     SET balance_due = ?, updated_at = NOW()
+                     WHERE company_id = ? AND invoice_id = ?'
+                );
+                $stmt->execute([$newBalance, $companyId, $invoiceId]);
+            }
+        }
     }
 
     return [

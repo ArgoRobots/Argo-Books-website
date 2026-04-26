@@ -35,6 +35,21 @@ function _premium_feature_list_items($prefix = '')
  */
 function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html')
 {
+    // Strip CR/LF from any value that ends up in an email header. PHPMailer
+    // sanitizes its own header inputs, but the mail() fallback path below
+    // concatenates these into the headers string verbatim — a stray newline
+    // would let an attacker inject Bcc/Cc/etc. via user-controlled fields
+    // (subject lines from community posts, contact-form reply-to, etc.).
+    $stripCrlf = static function ($value) {
+        if ($value === null) return null;
+        return preg_replace('/[\r\n\x00]+/', ' ', (string) $value);
+    };
+    $to_email = $stripCrlf($to_email);
+    $subject = (string) $stripCrlf($subject);
+    $from_email = $stripCrlf($from_email);
+    $from_name = $stripCrlf($from_name);
+    $reply_to = $stripCrlf($reply_to);
+
     $isPlain = ($format === 'plain');
 
     if ($isPlain) {

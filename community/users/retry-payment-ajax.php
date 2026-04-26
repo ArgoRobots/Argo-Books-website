@@ -226,7 +226,15 @@ try {
             ]);
 
             $paymentsApi = $client->getPaymentsApi();
-            $idempotencyKey = uniqid('retry_', true);
+            // Deterministic idempotency key per (subscription, calendar day) so a
+            // network retry, double-click, or accidental form re-submit on the
+            // same day reuses the same key and Square dedups instead of charging
+            // twice. Salt with the access token so dev/prod keys don't collide.
+            $idempotencyKey = substr(
+                hash('sha256', 'retry_' . $subscription_id . '_' . date('Y-m-d') . '_' . $squareAccessToken),
+                0,
+                45
+            );
 
             $amountMoney = new \Square\Models\Money();
             $amountMoney->setAmount(intval($amount * 100)); // Square uses cents
@@ -282,17 +290,37 @@ try {
 
     // If we got here, payment/reactivation was successful
     if ($reactivated) {
-        // Calculate new end date based on billing cycle
-        $interval = ($billing_cycle === 'yearly') ? '+1 year' : '+1 month';
-        $new_end_date = date('Y-m-d H:i:s', strtotime($interval));
+        // For Stripe/Square the card has been charged synchronously, so we can
+        // safely extend end_date here. For PayPal, activatePayPalSubscription
+        // only un-suspends the subscription — PayPal has NOT collected payment
+        // yet. Extending end_date now would give the user a free renewal
+        // period if the next PayPal billing attempt fails. For PayPal, only
+        // flip status back to active and let PAYMENT.SALE.COMPLETED (handled
+        // in webhooks/paypal-subscription.php) extend end_date when the real
+        // payment confirmation arrives.
+        $extendsEndDate = in_array($payment_method, ['stripe', 'square'], true);
 
-        // Update the subscription status in database and extend the end date
-        $stmt = $pdo->prepare("
-            UPDATE premium_subscriptions
-            SET status = 'active', auto_renew = 1, end_date = ?, updated_at = NOW()
-            WHERE user_id = ? AND status = 'payment_failed'
-        ");
-        $stmt->execute([$new_end_date, $user_id]);
+        if ($extendsEndDate) {
+            $interval = ($billing_cycle === 'yearly') ? '+1 year' : '+1 month';
+            $new_end_date = date('Y-m-d H:i:s', strtotime($interval));
+
+            $stmt = $pdo->prepare("
+                UPDATE premium_subscriptions
+                SET status = 'active', auto_renew = 1, end_date = ?, updated_at = NOW()
+                WHERE user_id = ? AND status = 'payment_failed'
+            ");
+            $stmt->execute([$new_end_date, $user_id]);
+        } else {
+            // PayPal: don't move end_date — webhook will handle it.
+            $new_end_date = $premium_subscription['end_date'];
+
+            $stmt = $pdo->prepare("
+                UPDATE premium_subscriptions
+                SET status = 'active', auto_renew = 1, updated_at = NOW()
+                WHERE user_id = ? AND status = 'payment_failed'
+            ");
+            $stmt->execute([$user_id]);
+        }
 
         if ($stmt->rowCount() > 0) {
             // Record the payment in premium_subscription_payments (for Stripe/Square)
@@ -310,7 +338,8 @@ try {
                 }
             }
 
-            // Send reactivation email with new end date
+            // Send reactivation email with end date (current end date for
+            // PayPal; newly-extended date for Stripe/Square).
             try {
                 send_premium_subscription_reactivated_email(
                     $premium_subscription['email'],

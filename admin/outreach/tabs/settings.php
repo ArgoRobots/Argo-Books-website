@@ -91,9 +91,16 @@ function settings_tab_render($pdo)
     // fresh install keeps behaving as before.
     $outreachEnabled = settings_tab_get_state($pdo, 'outreach_enabled', '1') === '1';
 
-    // Current state — default to 'auto' for send mode and '1' for A/B automation
-    $autoSendMode = settings_tab_get_state($pdo, 'auto_send_mode', 'auto');
-    if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = 'auto';
+    // Current state. Use the same fallback as the cron pipeline so the UI
+    // and the pipeline agree on the effective send mode before the admin
+    // explicitly chooses one. cron/outreach_pipeline.php derives the default
+    // from OUTREACH_AUTO_APPROVE (auto if truthy, review otherwise) — match
+    // that here so a fresh install with OUTREACH_AUTO_APPROVE=false doesn't
+    // show "Auto-send" in the UI while the cron actually behaves as Review.
+    $autoApproveRaw = strtolower(trim((string) ($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true')));
+    $defaultAutoSendMode = filter_var($autoApproveRaw, FILTER_VALIDATE_BOOLEAN) ? 'auto' : 'review';
+    $autoSendMode = settings_tab_get_state($pdo, 'auto_send_mode', $defaultAutoSendMode);
+    if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = $defaultAutoSendMode;
 
     $abAutoEnabled = settings_tab_get_state($pdo, 'ab_auto_enabled', '1') === '1';
     require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
@@ -228,7 +235,7 @@ function settings_tab_render($pdo)
                     <input type="hidden" name="mode" value="review">
                     <button type="submit" class="segmented-option <?php echo $autoSendMode === 'review' ? 'active' : ''; ?>">
                         <span class="segmented-title">Review before send</span>
-                        <span class="segmented-desc">Pipeline generates drafts and stops. You approve each from the Leads tab.</span>
+                        <span class="segmented-desc">Pipeline generates drafts and stops. Review or edit them in the Leads tab, then click Send Email (or use bulk send).</span>
                     </button>
                 </form>
             </div>

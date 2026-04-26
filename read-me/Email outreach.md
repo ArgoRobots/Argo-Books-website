@@ -1,6 +1,6 @@
 # Email Outreach
 
-Argo Books has a built-in outreach system that finds local small businesses, writes them a personal-sounding email about trying Argo Books, and sends it. You can run it fully hands-off — the cron finds new leads, writes emails, runs A/B tests to learn what works, and promotes the winners — or flip it to 'Review before send' mode, where it still generates everything but waits for you to approve each draft in the Leads tab before anything goes out.
+Argo Books has a built-in outreach system that finds local small businesses, writes them a personal-sounding email about trying Argo Books, and sends it. You can run it fully hands-off — the cron finds new leads, writes emails, runs A/B tests to learn what works, and promotes the winners — or flip it to 'Review before send' mode, where it still generates everything but waits for you to review (or edit) each draft in the Leads tab and click **Send Email** before anything goes out.
 
 Everything lives in the admin dashboard under **Outreach**, which has three tabs: **Leads**, **A/B Tests**, and **Settings**.
 
@@ -120,7 +120,7 @@ Underneath the toggles you'll see a live read-out: active test, days running, va
 **The cautious setup:**
 
 1. Settings → **Review before send**, A/B automation **on**.
-2. You open each day's drafts in the Leads tab and approve/edit/send manually. The A/B experiments still run, measured against whatever you actually send.
+2. You open each day's drafts in the Leads tab, review or edit them, then click Send Email (or use bulk send) to put them in the queue. The A/B experiments still run, measured against whatever you actually send.
 
 **The hands-on setup:**
 

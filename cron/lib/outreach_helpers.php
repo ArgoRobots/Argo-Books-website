@@ -146,7 +146,7 @@ function ab_subject_instruction_for_variant($variant)
 {
     $parsed = ab_parse_variant_content($variant);
     if ($parsed['mode'] === 'directive') {
-        return "\n- SUBJECT LINE OVERRIDE: write a subject line that follows this directive exactly: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+        return "\n- SUBJECT LINE OVERRIDE: The text inside the quotes below is a STYLE INSTRUCTION, not the subject itself. Generate your own original short subject line (under 60 characters, no em dashes) in the style described — do NOT copy, echo, paraphrase, or include any of the instruction's wording in your output. Style instruction: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
     }
     return "\n- SUBJECT LINE OVERRIDE: use exactly this subject line, word for word, with no changes: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
 }
@@ -302,6 +302,15 @@ function send_outreach_lead($pdo, $lead)
         $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
 
         $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
+        // Drafts since the unsubscribe-URL fix carry the real bare URL in
+        // their body. Wrap any occurrences in the styled "unsubscribe" anchor.
+        $escapedBody = preg_replace(
+            '#https?://argorobots\.com/unsubscribe\?t=[a-f0-9]+#i',
+            $unsubAnchor,
+            $escapedBody
+        );
+        // Defensive: also handle the legacy {UNSUBSCRIBE_URL} placeholder for
+        // any drafts created before the substitution moved to draft time.
         $escapedBody = str_replace('{UNSUBSCRIBE_URL}', $unsubAnchor, $escapedBody);
 
         if (strpos($escapedBody, 'unsubscribe?t=') === false) {
@@ -766,6 +775,7 @@ function generate_draft_for_lead($pdo, $lead)
     $abBodyOverride = '';
     $abCtaOverride = '';
     $personalizationOff = false;
+    $abSubjectDirectiveText = null; // captured for the post-generation echo check
     $existingAbTestId = isset($lead['ab_test_id']) ? (int) $lead['ab_test_id'] : 0;
     $existingAbVariantId = isset($lead['ab_variant_id']) ? (int) $lead['ab_variant_id'] : 0;
     $active = get_single_active_ab_test($pdo);
@@ -789,7 +799,13 @@ function generate_draft_for_lead($pdo, $lead)
         $abTestId = $activeTestId;
         $abVariantId = (int) $variant['id'];
         $instruction = ab_instruction_for_variant($variant, $eligibleType);
-        if ($eligibleType === 'subject') $abSubjectOverride = $instruction;
+        if ($eligibleType === 'subject') {
+            $abSubjectOverride = $instruction;
+            $parsedVariant = ab_parse_variant_content($variant);
+            if ($parsedVariant['mode'] === 'directive') {
+                $abSubjectDirectiveText = $parsedVariant['text'];
+            }
+        }
         elseif ($eligibleType === 'body') $abBodyOverride = $instruction;
         elseif ($eligibleType === 'cta') $abCtaOverride = $instruction;
         elseif ($eligibleType === 'personalization') {
@@ -942,9 +958,44 @@ Return ONLY the JSON, no other text.";
         }
     }
 
-    // Save draft to lead
-    $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
-    $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
+    // Defensive check: the AI is told a subject directive describes a STYLE
+    // and not to copy it, but it occasionally echoes the directive verbatim
+    // anyway. Catch the obvious failures and hold the draft for review
+    // instead of auto-sending an email whose subject is literally the prompt.
+    $needsReviewReason = null;
+    if ($abSubjectDirectiveText !== null) {
+        $genNorm = strtolower(rtrim(trim($parsed['subject']), '.!?'));
+        $dirNorm = strtolower(rtrim(trim($abSubjectDirectiveText), '.!?'));
+        if ($genNorm !== '' && $dirNorm !== '' && ($genNorm === $dirNorm || strpos($genNorm, $dirNorm) !== false)) {
+            $needsReviewReason = 'AI returned the subject directive verbatim instead of generating a subject in that style.';
+        }
+    }
+
+    // Substitute the {UNSUBSCRIBE_URL} placeholder with the real per-lead URL
+    // now (was previously deferred to send time). Saving the real URL means
+    // the admin sees the actual link when reviewing the draft instead of the
+    // raw placeholder. The send-side still handles the placeholder defensively
+    // for any old drafts that pre-date this change.
+    $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+    if (empty($unsubscribeToken)) {
+        $unsubscribeToken = bin2hex(random_bytes(32));
+        $tokStmt = $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?");
+        $tokStmt->execute([$unsubscribeToken, $id]);
+    }
+    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+    $parsed['body'] = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $parsed['body']);
+
+    // Save draft to lead. If the directive-echo check tripped, mark the
+    // draft as needs_review so the auto-approve step skips it and the admin
+    // sees the issue before anything goes out.
+    if ($needsReviewReason !== null) {
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
+        log_activity($pdo, $id, 'draft_needs_review', $needsReviewReason);
+    } else {
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
+    }
 
     return ['success' => true, 'subject' => $parsed['subject'], 'body' => $parsed['body'], 'ab_test_id' => $abTestId, 'ab_variant_id' => $abVariantId];
 }
@@ -1107,14 +1158,17 @@ function generate_ab_subject_variants($pdo, $count = 3)
     }
 
     $systemPrompt = "You generate subject-line directives for an A/B test on a small-business outreach email from Evan, a solo developer, about a simple bookkeeping app called Argo Books.\n\n"
-        . "Return STRICT JSON: { \"directives\": [\"...\", \"...\"] } with exactly $count entries.\n\n"
+        . "Return STRICT JSON: { \"directives\": [\"directive 1\", \"directive 2\", ...] } with exactly $count entries.\n\n"
+        . "CRITICAL: Each directive describes a STYLE for the writer to follow when crafting one specific lead's subject — it is NOT the subject itself. A second AI will read your directive and generate a fresh subject in that style for each lead. Your directive must NOT look like a subject line.\n\n"
+        . "Bad examples (these read like subject lines, not styles): \"Lead with a personal touch about Argo Books\" / \"Quick question for {business}\" / \"Let's simplify your bookkeeping\"\n"
+        . "Good examples (these describe HOW to write, not WHAT to write): \"Open with a one-line curiosity question that mentions the recipient's industry, no product names\" / \"Frame as a peer-to-peer note from one local Saskatoon business owner to another, max 5 words\" / \"Reference a specific category-typical pain point as a question, avoid sounding salesy\"\n\n"
         . "Rules for each directive:\n"
-        . "- Start with an imperative verb (Ask, Lead with, Reference, Keep, etc).\n"
-        . "- Describe a STYLE the AI should use when writing the subject for each lead; do NOT write a literal subject line.\n"
-        . "- 8 to 20 words. No em dashes.\n"
-        . "- Each directive must be meaningfully different from the others in tone, angle, or structure (question vs statement vs curiosity tease vs local angle vs ultra-short, etc.).\n"
-        . "- Do not invent product names or facts. Refer to placeholders generically: the business name, their industry, their city.\n"
-        . "- Optimise for cold B2B open rate: personal, curious, short. Avoid marketing-speak.";
+        . "- Talk ABOUT the writing technique (Open with…, Frame as…, Reference…, Pose…), don't write the subject text.\n"
+        . "- 10 to 25 words. Concrete and specific about the technique.\n"
+        . "- Mention what to AVOID as well as what to do (e.g. 'avoid product names', 'no greeting', 'no question mark').\n"
+        . "- Each directive must be meaningfully different from the others in technique (question vs statement, local angle vs industry angle, ultra-short vs detail-rich, etc.).\n"
+        . "- Refer to placeholders generically: the business name, their industry, their city. Do not invent product names or facts.\n"
+        . "- Target cold B2B open rate: personal, curious, short. Avoid marketing-speak.";
 
     $userPrompt = "Propose $count distinct subject-line directives for the next A/B cycle." . $winnersText;
 

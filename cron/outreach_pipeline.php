@@ -53,7 +53,6 @@ if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
-define('CATEGORIES_PER_RUN', 5);
 
 // Parse CLI flags ($argv is null under CGI, fall back to empty array)
 $args = array_slice($argv ?? [], 1);
@@ -254,28 +253,22 @@ function stepDiscover($pdo, $dryRun)
         logPipeline('All cities searched. Wrapping around to start.');
     }
 
-    // Track which categories we've searched for the current city.
-    // Each run searches CATEGORIES_PER_RUN categories starting from this offset.
-    // Only when we've cycled through ALL categories without finding
-    // new leads do we consider the city truly exhausted.
+    // Track which categories we've searched for the current city. We keep
+    // walking the pool starting from this offset and only stop when we've
+    // collected DAILY_SEND_LIMIT businesses or cycled through every
+    // category. Each run picks up where the last left off so the daily
+    // cap actually gets hit instead of being limited by an arbitrary
+    // categories-per-run constant.
     $categoryOffset = (int) getState($pdo, 'current_city_category_offset', '0');
 
     $target = $targetCities[$cityIndex];
     $city = $target['city'];
     $province = $target['province'];
 
-    // Pick the next batch of categories to search (wrapping around the pool)
-    $categoriesToSearch = [];
-    for ($i = 0; $i < CATEGORIES_PER_RUN; $i++) {
-        $categoriesToSearch[] = OUTREACH_CATEGORY_POOL[($categoryOffset + $i) % $totalCategories];
-    }
-
-    $endCategory = min($categoryOffset + CATEGORIES_PER_RUN, $totalCategories);
-    logPipeline("--- Step 1: Discovery for $city, $province (city #" . ($cityIndex + 1) . "/" . count($targetCities) . ", categories " . ($categoryOffset + 1) . "-$endCategory/$totalCategories) ---");
-    logPipeline("Searching categories: " . implode(', ', $categoriesToSearch));
+    logPipeline("--- Step 1: Discovery for $city, $province (city #" . ($cityIndex + 1) . "/" . count($targetCities) . ", starting at category " . ($categoryOffset + 1) . "/$totalCategories) ---");
 
     if ($dryRun) {
-        logPipeline("[DRY RUN] Would search Google Places for businesses in $city, $province");
+        logPipeline("[DRY RUN] Would search Google Places for businesses in $city, $province until cap of " . DAILY_SEND_LIMIT . " is reached or all $totalCategories categories are exhausted");
         return;
     }
 
@@ -284,19 +277,26 @@ function stepDiscover($pdo, $dryRun)
     $stmt->execute();
     $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
 
-    // Search each category individually and collect results.
-    // Pass maxRounds=1 since each category is already specific — we don't need
-    // 5 query variations per category like the admin dashboard does.
+    // Walk the category pool from $categoryOffset, wrapping at the end. Stop
+    // as soon as we have DAILY_SEND_LIMIT businesses OR have visited every
+    // category in the pool (which signals the city is exhausted for this
+    // pass). Pass maxRounds=1 since each category is already specific — we
+    // don't need 5 query variations per category like the admin dashboard.
     $businesses = [];
-    $roundsUsed = 0;
+    $categoriesSearched = 0;
     $apiErrors = 0;
+    $categoriesUsed = [];
 
-    foreach ($categoriesToSearch as $cat) {
+    for ($i = 0; $i < $totalCategories; $i++) {
         if (count($businesses) >= DAILY_SEND_LIMIT) break;
+
+        $catIdx = ($categoryOffset + $i) % $totalCategories;
+        $cat = OUTREACH_CATEGORY_POOL[$catIdx];
+        $categoriesUsed[] = $cat;
 
         $remaining = DAILY_SEND_LIMIT - count($businesses);
         $result = search_businesses_core($city, $province, $cat, $remaining, $apiKey, $existingPlaceIds, 1);
-        $roundsUsed++;
+        $categoriesSearched++;
 
         if (isset($result['error'])) {
             logPipeline("API error searching '$cat' in $city: {$result['error']}", 'WARN');
@@ -314,12 +314,12 @@ function stepDiscover($pdo, $dryRun)
     }
 
     // If every single API call failed, don't advance — retry same categories next run
-    if ($apiErrors === $roundsUsed) {
+    if ($apiErrors > 0 && $apiErrors === $categoriesSearched) {
         logPipeline("All $apiErrors API calls failed for $city. Will retry same categories next run.", 'ERROR');
         return;
     }
 
-    logPipeline("Discovered " . count($businesses) . " businesses with emails in $city ($roundsUsed category searches, $apiErrors errors)");
+    logPipeline("Discovered " . count($businesses) . " businesses with emails in $city ($categoriesSearched category searches: " . implode(', ', $categoriesUsed) . "; $apiErrors errors)");
 
     // Import discovered businesses
     $imported = 0;
@@ -368,23 +368,26 @@ function stepDiscover($pdo, $dryRun)
 
     logPipeline("Imported $imported new leads, skipped $skipped duplicates from $city");
 
-    // Advance the category offset for the next run
-    $newOffset = $categoryOffset + CATEGORIES_PER_RUN;
+    // Advance the category offset by however many categories we actually
+    // walked. If we hit the daily cap early, the pointer stays close to
+    // where we stopped so the next run picks up at the next category. If
+    // we cycled through the entire pool without hitting the cap, the city
+    // is considered exhausted and we move on.
+    $cycledThroughAll = ($categoriesSearched >= $totalCategories);
 
-    if ($newOffset >= $totalCategories) {
-        // We've cycled through every category for this city
+    if ($cycledThroughAll) {
         if ($imported === 0) {
             logPipeline("All $totalCategories categories searched for $city with no new leads. City exhausted, advancing.");
             setState($pdo, 'current_city_index', (string)($cityIndex + 1));
             setState($pdo, 'current_city_category_offset', '0');
         } else {
-            logPipeline("Completed full category cycle for $city but still finding leads. Resetting categories.");
+            logPipeline("Completed full category cycle for $city while still finding leads. Resetting offset for next run.");
             setState($pdo, 'current_city_category_offset', '0');
         }
     } else {
+        $newOffset = ($categoryOffset + $categoriesSearched) % $totalCategories;
         setState($pdo, 'current_city_category_offset', (string)$newOffset);
-        $nextEnd = min($newOffset + CATEGORIES_PER_RUN, $totalCategories);
-        logPipeline("Next run will search categories " . ($newOffset + 1) . "-$nextEnd/$totalCategories for $city.");
+        logPipeline("Hit daily cap after $categoriesSearched categories. Next run picks up at category " . ($newOffset + 1) . "/$totalCategories for $city.");
     }
 
     setState($pdo, 'last_discovery_date', date('Y-m-d'));

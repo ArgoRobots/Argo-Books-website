@@ -1300,20 +1300,50 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
  */
 function generate_ab_subject_variants($pdo, $count = 3)
 {
-    $winStmt = $pdo->prepare("
-        SELECT v.content
-        FROM outreach_ab_tests t
-        JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
-        WHERE t.status = 'completed' AND t.variant_type = 'subject'
-        ORDER BY t.completed_at DESC
-        LIMIT 3
+    // Prefer subjects that actually got a reply over subjects that just got
+    // clicks — replies are the conversion signal we now optimize for. Falls
+    // back to past CTR winners during cold-start (when the replied-subject
+    // pool is too small to seed three distinct examples).
+    $repliedStmt = $pdo->prepare("
+        SELECT DISTINCT draft_subject AS content
+        FROM outreach_leads
+        WHERE status IN ('replied','interested','onboarded')
+          AND draft_subject IS NOT NULL
+          AND draft_subject <> ''
+        ORDER BY last_contact_date DESC
+        LIMIT 5
     ");
-    $winStmt->execute();
-    $priorWinners = array_column($winStmt->fetchAll(), 'content');
+    $repliedStmt->execute();
+    $seeds = array_column($repliedStmt->fetchAll(), 'content');
+    $seedSource = 'replies';
+
+    if (count($seeds) < 3) {
+        $winStmt = $pdo->prepare("
+            SELECT v.content
+            FROM outreach_ab_tests t
+            JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
+            WHERE t.status = 'completed' AND t.variant_type = 'subject'
+            ORDER BY t.completed_at DESC
+            LIMIT 3
+        ");
+        $winStmt->execute();
+        foreach ($winStmt->fetchAll() as $row) {
+            if (!in_array($row['content'], $seeds, true)) {
+                $seeds[] = $row['content'];
+            }
+        }
+        $seedSource = empty($seeds) ? 'none' : (count($seeds) > 0 && count(array_filter($seeds)) > 0 ? 'replies+winners' : 'winners');
+    }
+    $priorWinners = $seeds; // variable name kept for downstream code compatibility
 
     $winnersText = '';
     if (!empty($priorWinners)) {
-        $winnersText = "\n\nRecent winning subject strategies (most recent first):\n";
+        $label = $seedSource === 'replies'
+            ? "Subjects that have actually gotten replies recently — generate variations in this register:"
+            : ($seedSource === 'replies+winners'
+                ? "Mix of subjects that got replies and past CTR winners (cold-start blend) — generate variations in this register:"
+                : "Recent winning subject strategies (most recent first):");
+        $winnersText = "\n\n" . $label . "\n";
         foreach ($priorWinners as $w) {
             $winnersText .= "- " . trim((string) $w) . "\n";
         }

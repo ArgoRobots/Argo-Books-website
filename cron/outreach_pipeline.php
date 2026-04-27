@@ -722,6 +722,7 @@ function stepSendEmails($pdo, $dryRun)
 
     $successCount = 0;
     $failCount = 0;
+    $skipCount = 0;
 
     foreach ($leads as $lead) {
         $id = $lead['id'];
@@ -729,21 +730,27 @@ function stepSendEmails($pdo, $dryRun)
         $email = $lead['email'];
 
         try {
-            if (send_outreach_lead($pdo, $lead)) {
+            $reason = null;
+            if (send_outreach_lead($pdo, $lead, $reason)) {
                 $variantTag = !empty($lead['ab_variant_id'])
                     ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
                     : '';
                 log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email . $variantTag);
                 logPipeline("Sent email to $businessName <$email> (lead #$id)" . $variantTag);
                 $successCount++;
+            } elseif ($reason === 'already_sent' || $reason === 'suppressed') {
+                // Skip outcomes are already logged inside send_outreach_lead;
+                // don't double-log as failures and don't count toward fail tally.
+                logPipeline("Skipped $businessName <$email> (lead #$id): $reason");
+                $skipCount++;
             } else {
-                log_activity($pdo, $id, 'email_failed', 'Pipeline email send failed for: ' . $email);
-                logPipeline("Failed to send email to $businessName <$email> (lead #$id)", 'ERROR');
+                log_activity($pdo, $id, 'email_failed', 'Pipeline email send failed for: ' . $email . ' (' . ($reason ?? 'unknown') . ')');
+                logPipeline("Failed to send email to $businessName <$email> (lead #$id): " . ($reason ?? 'unknown'), 'ERROR');
                 $failCount++;
             }
 
             // Brief pause between sends
-            if ($successCount + $failCount < count($leads)) {
+            if ($successCount + $failCount + $skipCount < count($leads)) {
                 sleep(2);
             }
 
@@ -754,7 +761,7 @@ function stepSendEmails($pdo, $dryRun)
         }
     }
 
-    logPipeline("Send complete. Sent: $successCount, Failed: $failCount");
+    logPipeline("Send complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
 }
 
 function stepSendFollowups($pdo, $dryRun)
@@ -803,19 +810,27 @@ function stepSendFollowups($pdo, $dryRun)
 
     $successCount = 0;
     $failCount = 0;
+    $skipCount = 0;
 
     foreach ($leads as $lead) {
         try {
-            if (send_outreach_followup($pdo, $lead)) {
+            $reason = null;
+            if (send_outreach_followup($pdo, $lead, $reason)) {
                 logPipeline("Follow-up sent to {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']})");
                 $successCount++;
+            } elseif ($reason === 'not_eligible') {
+                // Lead became ineligible between the SELECT and the atomic claim
+                // (replied, unsubscribed, or claimed by a concurrent run). Not a
+                // failure — the data outcome is correct.
+                logPipeline("Follow-up skipped for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']}): no longer eligible");
+                $skipCount++;
             } else {
-                logPipeline("Follow-up failed for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']})", 'WARN');
+                logPipeline("Follow-up failed for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']}): " . ($reason ?? 'unknown'), 'WARN');
                 $failCount++;
             }
 
             // Same brief pause between sends as the first-touch step.
-            if ($successCount + $failCount < count($leads)) {
+            if ($successCount + $failCount + $skipCount < count($leads)) {
                 sleep(2);
             }
         } catch (Exception $e) {
@@ -824,5 +839,5 @@ function stepSendFollowups($pdo, $dryRun)
         }
     }
 
-    logPipeline("Follow-ups complete. Sent: $successCount, Failed: $failCount");
+    logPipeline("Follow-ups complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
 }

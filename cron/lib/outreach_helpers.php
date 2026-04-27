@@ -228,8 +228,18 @@ function log_activity($pdo, $lead_id, $action_type, $details = null)
 /**
  * Send an outreach email for a lead and update its DB status.
  * Returns true on success, false on failure.
+ *
+ * The optional &$reason out-param disambiguates non-success outcomes for
+ * callers that need to distinguish a real send failure from a benign skip
+ * (race-condition guard, suppression list, invalid email). Possible values:
+ *   'sent'         — email delivered, lead marked contacted
+ *   'already_sent' — atomic claim lost (another process already sent it)
+ *   'suppressed'   — email is on the outreach suppression list
+ *   'invalid_email'— lead's email is missing or malformed
+ *   'smtp_failed'  — SMTP/transport failure (the only "real failure" reason)
+ * Existing callers that ignore the param still get the correct bool result.
  */
-function send_outreach_lead($pdo, $lead)
+function send_outreach_lead($pdo, $lead, &$reason = null)
 {
     $id = $lead['id'];
     $email = $lead['email'];
@@ -250,6 +260,7 @@ function send_outreach_lead($pdo, $lead)
     $claimStmt->execute([$id]);
     if ($claimStmt->rowCount() === 0) {
         log_activity($pdo, $id, 'email_skipped_already_sent', 'Skipped send: lead already sent (race-condition guard)');
+        $reason = 'already_sent';
         return false;
     }
 
@@ -261,6 +272,7 @@ function send_outreach_lead($pdo, $lead)
         if ($suppStmt->fetchColumn()) {
             $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
             log_activity($pdo, $id, 'email_skipped_suppressed', 'Skipped send: email is on outreach suppression list (' . $email . ')');
+            $reason = 'suppressed';
             return false;
         }
     }
@@ -389,11 +401,13 @@ function send_outreach_lead($pdo, $lead)
             next_followup_due_at = COALESCE(next_followup_due_at, DATE_ADD(NOW(), INTERVAL 5 DAY))
             WHERE id = ?");
         $stmt->execute([$messageId, $id]);
+        $reason = 'sent';
         return true;
     }
 
     // SMTP send failed — release the claim so retries / manual re-send work.
     $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
+    $reason = 'smtp_failed';
     return false;
 }
 
@@ -406,14 +420,22 @@ function send_outreach_lead($pdo, $lead)
  * Eligibility (status='contacted', followup_count=0, due-date passed) is
  * enforced via an atomic UPDATE-to-claim pattern so concurrent cron runs
  * can't double-send. Returns true on successful delivery, false otherwise.
+ *
+ * The optional &$reason out-param disambiguates non-success outcomes:
+ *   'sent'         — follow-up delivered
+ *   'not_eligible' — atomic claim lost (already followed up, replied,
+ *                    not yet due, or claimed by a concurrent run)
+ *   'invalid_email'— lead's email is missing or malformed
+ *   'smtp_failed'  — SMTP/transport failure (the only "real failure" reason)
  */
-function send_outreach_followup($pdo, array $lead): bool
+function send_outreach_followup($pdo, array $lead, ?string &$reason = null): bool
 {
     require_once __DIR__ . '/followup_template.php';
 
     $id = (int) $lead['id'];
     $email = trim((string) $lead['email']);
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $reason = 'invalid_email';
         return false;
     }
 
@@ -429,7 +451,8 @@ function send_outreach_followup($pdo, array $lead): bool
           AND next_followup_due_at <= NOW()");
     $claim->execute([$id]);
     if ($claim->rowCount() === 0) {
-        return false; // not eligible (already followed up, replied, etc.)
+        $reason = 'not_eligible';
+        return false; // already followed up, replied, not due, or race-lost
     }
 
     // Generate or reuse the unsubscribe token (same pattern as first send).
@@ -484,6 +507,7 @@ function send_outreach_followup($pdo, array $lead): bool
         // last_followup_at were already updated by the claim above.
         $pdo->prepare("UPDATE outreach_leads SET last_contact_date = NOW() WHERE id = ?")->execute([$id]);
         log_activity($pdo, $id, 'followup_sent', 'Follow-up #1 delivered');
+        $reason = 'sent';
         return true;
     }
 
@@ -491,6 +515,7 @@ function send_outreach_followup($pdo, array $lead): bool
     $pdo->prepare("UPDATE outreach_leads
         SET last_followup_at = NULL, followup_count = followup_count - 1
         WHERE id = ?")->execute([$id]);
+    $reason = 'smtp_failed';
     return false;
 }
 

@@ -57,7 +57,6 @@ define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 // should set OUTREACH_DAILY_FOLLOWUP_LIMIT explicitly to match domain
 // reputation (e.g. 75 during a backlog drain, 30 at steady state).
 define('DAILY_FOLLOWUP_LIMIT', (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30));
-define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
 
 // Parse CLI flags ($argv is null under CGI, fall back to empty array)
 $args = array_slice($argv ?? [], 1);
@@ -204,9 +203,9 @@ try {
 
     // ─── STEP 4: Auto-Approve ───
     // Runtime-toggled via outreach_pipeline_state.auto_send_mode
-    // ('auto' | 'review'); falls back to the OUTREACH_AUTO_APPROVE env seed
-    // on a DB that hasn't had the toggle set yet.
-    $autoSendMode = getState($pdo, 'auto_send_mode', AUTO_APPROVE ? 'auto' : 'review');
+    // ('auto' | 'review'). Defaults to 'auto' on a DB that hasn't had the
+    // toggle set yet — admin can flip to review-mode in the Settings tab.
+    $autoSendMode = getState($pdo, 'auto_send_mode', 'auto');
     if (($runAll || $draftOnly) && $autoSendMode === 'auto') {
         stepAutoApprove($pdo, $dryRun);
     } elseif (($runAll || $draftOnly) && $autoSendMode === 'review') {

@@ -218,10 +218,15 @@ try {
     }
 
     // ─── STEP 6: Send Follow-ups ───
-    // Runs whenever first-touch sends do, with its own daily cap so the
-    // backlog drains predictably without crowding out new sends.
-    if ($runAll || $sendOnly) {
+    // Same gate as Step 4: in review-before-send mode, the admin wants to
+    // approve outbound mail by hand, so the cron stays out of follow-ups
+    // too. (Step 5 doesn't need an explicit gate — it only sends leads with
+    // approval_status = 'approved', and review mode just doesn't auto-
+    // approve. Follow-ups have no approval workflow, so the gate is here.)
+    if (($runAll || $sendOnly) && $autoSendMode === 'auto') {
         stepSendFollowups($pdo, $dryRun);
+    } elseif (($runAll || $sendOnly) && $autoSendMode === 'review') {
+        logPipeline('Send mode: review — follow-ups skipped (no manual-trigger UI exists yet; flip to auto-send to resume).');
     }
 
     logPipeline('=== Outreach Pipeline Complete ===');

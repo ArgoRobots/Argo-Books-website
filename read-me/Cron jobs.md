@@ -87,8 +87,10 @@ php /home/argorobots/public_html/cron/account_purge.php
 |---|---|---|
 | `GOOGLE_PLACES_API_KEY` | — | Required for business discovery |
 | `OPENAI_API_KEY` | — | Required for AI draft generation |
-| `OUTREACH_DAILY_SEND_LIMIT` | 10 | Max emails sent per day (also controls discovery and draft batch sizes) |
-| `OUTREACH_AUTO_APPROVE` | true | Auto-approve generated drafts |
+| `OUTREACH_DAILY_SEND_LIMIT` | 10 | Max first-touch emails sent per day (also controls discovery and draft batch sizes) |
+| `OUTREACH_DAILY_FOLLOWUP_LIMIT` | 30 | Max follow-up emails sent per day (separate cap, oldest-due first) |
+
+The Auto-send vs Review-before-send mode is controlled at runtime via the **Settings tab** in the admin (writes to `outreach_pipeline_state.auto_send_mode`); no env var is needed.
 
 ### CLI Flags
 

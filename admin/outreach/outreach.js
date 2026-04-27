@@ -558,6 +558,7 @@ async function openLeadDetail(id) {
         document.getElementById('draftSubject').value = lead.draft_subject || '';
         document.getElementById('draftBody').value = lead.draft_body || '';
         updateDraftStatus(lead);
+        updateFollowupStatus(lead);
 
         // Reset to info tab (scope to the modal — the page now has its own .tab bar)
         switchTab('tabInfo', document.querySelector('#leadDetailModal .tab'));
@@ -609,6 +610,30 @@ function updateDraftStatus(lead) {
     let info = '';
     if (!lead.email) info = 'No email address — email sending is disabled for this lead.';
     document.getElementById('draftInfo').textContent = info;
+}
+
+function updateFollowupStatus(lead) {
+    const el = document.getElementById('followupStatus');
+    if (!el) return;
+
+    const replied = ['replied', 'interested', 'not_interested', 'onboarded'].includes(lead.status);
+
+    if ((lead.followup_count | 0) > 0 && lead.last_followup_at) {
+        el.textContent = 'Follow-up #' + lead.followup_count + ' sent ' + formatDateTime(lead.last_followup_at);
+    } else if (replied) {
+        el.textContent = 'Lead responded — no follow-up needed.';
+    } else if (lead.next_followup_due_at) {
+        const due = new Date(lead.next_followup_due_at);
+        if (due <= new Date()) {
+            el.textContent = 'Follow-up due now (will send on next pipeline run).';
+        } else {
+            el.textContent = 'Follow-up scheduled for ' + formatDateTime(lead.next_followup_due_at);
+        }
+    } else if (lead.sent_at) {
+        el.textContent = 'No follow-up scheduled (legacy send — backfill migration may not have run).';
+    } else {
+        el.textContent = 'Not sent yet — follow-up will be scheduled at send time.';
+    }
 }
 
 function openWebsite() {

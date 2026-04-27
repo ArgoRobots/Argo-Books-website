@@ -533,16 +533,34 @@ function send_outreach_email($pdo)
         ], 409);
     }
 
-    if (send_outreach_lead($pdo, $lead)) {
+    $reason = null;
+    if (send_outreach_lead($pdo, $lead, $reason)) {
         $variantTag = !empty($lead['ab_variant_id'])
             ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
             : '';
         log_activity($pdo, $id, 'email_sent', 'Outreach email sent to: ' . $lead['email'] . $variantTag);
         json_response(['success' => true, 'message' => 'Email sent successfully']);
-    } else {
-        log_activity($pdo, $id, 'email_failed', 'Email send failed for: ' . $lead['email']);
-        json_response(['success' => false, 'message' => 'Failed to send email. Check SMTP configuration.'], 500);
     }
+
+    // Skip outcomes (already sent / suppressed) are logged inside
+    // send_outreach_lead — don't double-log them as failures here. Map each
+    // to an honest user-facing message and HTTP code.
+    if ($reason === 'already_sent') {
+        json_response([
+            'success' => false,
+            'message' => 'This lead was just sent by the automated pipeline. No action needed.',
+        ], 409);
+    }
+    if ($reason === 'suppressed') {
+        json_response([
+            'success' => false,
+            'message' => 'This email is on the outreach suppression list (previous unsubscribe). Skipped.',
+        ], 409);
+    }
+
+    // Genuine failure (smtp_failed or unknown).
+    log_activity($pdo, $id, 'email_failed', 'Email send failed for: ' . $lead['email']);
+    json_response(['success' => false, 'message' => 'Failed to send email. Check SMTP configuration.'], 500);
 }
 
 // ─── Activity log ───

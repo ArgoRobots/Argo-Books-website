@@ -421,6 +421,10 @@ include __DIR__ . '/../admin_header.php';
                         <button class="btn btn-blue btn-small draft-copy-btn" onclick="copyDraft(this)">Copy</button>
                     </div>
                     <div class="draft-info" id="draftInfo"></div>
+                    <div class="form-group" style="margin-top:16px;">
+                        <label>Follow-up</label>
+                        <div id="followupStatus" class="text-muted" style="margin-top:4px; font-size:13px;">—</div>
+                    </div>
                 </div>
             </div>
 

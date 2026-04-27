@@ -28,12 +28,13 @@ function _premium_feature_list_items($prefix = '')
  * @param string|null $from_email    Sender email address; falls back to noreply@argorobots.com when null
  * @param string|null $from_name     Sender display name; defaults to 'Argo Books' when null
  * @param string|null $reply_to      Reply-To address; defaults to support@argorobots.com when null
- * @param array       $extra_headers Optional associative array of additional headers (added to the SMTP message via addCustomHeader)
+ * @param array       $extra_headers Optional associative array of additional headers (added to the SMTP message via addCustomHeader, and to the mail() fallback's header block)
  * @param string|null $preheader     Optional inbox-preview snippet; rendered as a hidden element so it appears next to the subject in most mail clients without being visible in the body. Ignored when $format === 'plain'.
  * @param string      $format        'html' (default, full styled template) or 'plain' (no wrapper, sent as text/plain)
+ * @param string|null &$message_id   Out-parameter: receives the RFC 822 Message-ID of the sent email (with angle brackets), or null if the send failed. Pass an existing variable to capture; ignore otherwise. Used by the outreach follow-up sender so a follow-up can thread to the original via In-Reply-To / References.
  * @return bool                      True if successful, false otherwise
  */
-function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html')
+function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html', &$message_id = null)
 {
     // Strip CR/LF and the rest of the ASCII control range from any value that
     // ends up in an email header. PHPMailer sanitizes its own header inputs,
@@ -101,6 +102,11 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
             HTML;
     }
 
+    // Synthesize the Message-ID up-front so both transport paths use the same
+    // value. Callers that want to thread a future reply (e.g. the outreach
+    // follow-up sender) capture this via the &$message_id out-param.
+    $generated_message_id = '<' . bin2hex(random_bytes(16)) . '@argorobots.com>';
+
     // Use SMTP relay if configured, otherwise fall back to mail()
     $mailer = create_smtp_mailer();
     if ($mailer) {
@@ -115,14 +121,17 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
                 $mailer->isHTML(false);
             }
             $mailer->Body = $email_body;
+            $mailer->MessageID = $generated_message_id;
             if (!empty($extra_headers) && is_array($extra_headers)) {
                 foreach ($extra_headers as $name => $value) {
                     $mailer->addCustomHeader($name, $value);
                 }
             }
             $mailer->send();
+            $message_id = $generated_message_id;
             return true;
         } catch (\Exception $e) {
+            $message_id = null;
             error_log("SMTP email failed for {$to_email}: " . $e->getMessage());
             return false;
         }
@@ -135,10 +144,21 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
         'Content-Type: ' . $contentType,
         'From: ' . $actualFrom,
         'Reply-To: ' . ($reply_to ?? 'support@argorobots.com'),
+        'Message-ID: ' . $generated_message_id,
         'X-Mailer: PHP/' . phpversion()
     ];
+    // Append extra headers to the fallback path too — without this, threading
+    // headers (In-Reply-To, References) only work when SMTP is configured.
+    if (!empty($extra_headers) && is_array($extra_headers)) {
+        foreach ($extra_headers as $name => $value) {
+            $sanitized = preg_replace('/[\r\n\x00-\x1f]+/', ' ', (string) $value);
+            $headers[] = $name . ': ' . $sanitized;
+        }
+    }
 
-    return mail($to_email, $subject, $email_body, implode("\r\n", $headers));
+    $sent = mail($to_email, $subject, $email_body, implode("\r\n", $headers));
+    $message_id = $sent ? $generated_message_id : null;
+    return $sent;
 }
 
 /**

@@ -91,16 +91,11 @@ function settings_tab_render($pdo)
     // fresh install keeps behaving as before.
     $outreachEnabled = settings_tab_get_state($pdo, 'outreach_enabled', '1') === '1';
 
-    // Current state. Use the same fallback as the cron pipeline so the UI
-    // and the pipeline agree on the effective send mode before the admin
-    // explicitly chooses one. cron/outreach_pipeline.php derives the default
-    // from OUTREACH_AUTO_APPROVE (auto if truthy, review otherwise) — match
-    // that here so a fresh install with OUTREACH_AUTO_APPROVE=false doesn't
-    // show "Auto-send" in the UI while the cron actually behaves as Review.
-    $autoApproveRaw = strtolower(trim((string) ($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true')));
-    $defaultAutoSendMode = filter_var($autoApproveRaw, FILTER_VALIDATE_BOOLEAN) ? 'auto' : 'review';
-    $autoSendMode = settings_tab_get_state($pdo, 'auto_send_mode', $defaultAutoSendMode);
-    if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = $defaultAutoSendMode;
+    // Current state. Default to 'auto' before the admin has explicitly picked
+    // a mode, matching the cron pipeline's default in
+    // cron/outreach_pipeline.php so the UI and the pipeline always agree.
+    $autoSendMode = settings_tab_get_state($pdo, 'auto_send_mode', 'auto');
+    if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = 'auto';
 
     $abAutoEnabled = settings_tab_get_state($pdo, 'ab_auto_enabled', '1') === '1';
     require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
@@ -111,7 +106,9 @@ function settings_tab_render($pdo)
     }
 
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
+    $followupLimit = (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30);
     $ctrFloor = (float) settings_tab_get_state($pdo, 'ab_ctr_floor', '0.01');
+    $replyFloor = (float) settings_tab_get_state($pdo, 'ab_reply_floor', '0.005');
 
     // Active A/B test snapshot — show whichever variant_type is currently
     // running (only one is active at a time, regardless of type).
@@ -128,18 +125,24 @@ function settings_tab_render($pdo)
     if ($active) {
         require_once __DIR__ . '/../../../cron/lib/ab_helpers.php';
         $variants = load_variants_with_stats($pdo, (int) $active['id']);
-        $leaderIdx = find_leader_idx($variants);
         $totalSent = array_sum(array_column($variants, 'sent_count'));
         $totalClicks = array_sum(array_column($variants, 'clicked_count'));
+        $totalReplies = array_sum(array_column($variants, 'replied_count'));
+        $scoringMetric = $totalReplies > 0 ? 'reply_rate' : 'ctr';
+        $leaderIdx = find_leader_idx($variants, $scoringMetric);
         $days = max(0, (int) floor((time() - strtotime($active['started_at'] ?: $active['created_at'])) / 86400));
         $activeStats = [
             'variants' => count($variants),
             'sent' => $totalSent,
             'clicked' => $totalClicks,
+            'replied' => $totalReplies,
             'days' => $days,
+            'metric' => $scoringMetric,
             'leader' => ($leaderIdx !== null) ? $variants[$leaderIdx]['label'] : null,
             'leader_ctr' => ($leaderIdx !== null && $variants[$leaderIdx]['sent_count'] > 0)
                 ? $variants[$leaderIdx]['ctr'] : null,
+            'leader_reply_rate' => ($leaderIdx !== null && $variants[$leaderIdx]['sent_count'] > 0)
+                ? $variants[$leaderIdx]['reply_rate'] : null,
         ];
     }
 
@@ -225,7 +228,7 @@ function settings_tab_render($pdo)
                     <input type="hidden" name="mode" value="auto">
                     <button type="submit" class="segmented-option <?php echo $autoSendMode === 'auto' ? 'active' : ''; ?>">
                         <span class="segmented-title">Auto-send</span>
-                        <span class="segmented-desc">Drafts are auto-approved and sent, up to <?php echo $dailyLimit; ?>/day.</span>
+                        <span class="segmented-desc">Drafts are auto-approved and sent, up to <?php echo $dailyLimit; ?>/day. Follow-ups have a separate cap of <?php echo $followupLimit; ?>/day, oldest-due first.</span>
                     </button>
                 </form>
                 <form method="POST" style="display:contents;">
@@ -249,7 +252,7 @@ function settings_tab_render($pdo)
         <div class="panel-content">
             <p class="hint" style="margin-top:0;">
                 When on, the pipeline runs A/B cycles by itself: it auto-generates variants each cycle (or uses the fixed pool for sender / format / personalization), promotes the winner when it has enough data (or after 14&ndash;28 days), and starts the next cycle &mdash; rotating across types so it tests one lever, then another, and so on.
-                It will self-pause if winner CTR drops below <?php echo number_format($ctrFloor * 100, 1); ?>%.
+                Promotion is scored on reply rate when any variant has a reply, falling back to CTR otherwise. It will self-pause if the winner's reply rate drops below <?php echo number_format($replyFloor * 100, 2); ?>% (when promoting on replies), or if CTR drops below <?php echo number_format($ctrFloor * 100, 1); ?>% (deliverability check, always evaluated).
             </p>
             <p class="hint">
                 Rotation order:
@@ -319,17 +322,23 @@ function settings_tab_render($pdo)
                         <div class="meta-value"><?php echo (int) $activeStats['variants']; ?></div>
                     </div>
                     <div class="meta-item">
-                        <div class="meta-label">Sent / clicked</div>
-                        <div class="meta-value"><?php echo (int) $activeStats['sent']; ?> / <?php echo (int) $activeStats['clicked']; ?></div>
+                        <div class="meta-label">Sent / replied / clicked</div>
+                        <div class="meta-value"><?php echo (int) $activeStats['sent']; ?> / <?php echo (int) $activeStats['replied']; ?> / <?php echo (int) $activeStats['clicked']; ?></div>
                     </div>
                     <div class="meta-item">
                         <div class="meta-label">Current leader</div>
                         <div class="meta-value">
                             <?php if ($activeStats['leader']): ?>
                                 <?php echo htmlspecialchars($activeStats['leader']); ?>
-                                <?php if ($activeStats['leader_ctr'] !== null): ?>
-                                    <span class="hint" style="margin:0; font-size:12px;">(<?php echo number_format($activeStats['leader_ctr'] * 100, 1); ?>% CTR)</span>
-                                <?php endif; ?>
+                                <span class="hint" style="margin:0; font-size:12px;">
+                                    (<?php
+                                        if ($activeStats['metric'] === 'reply_rate' && $activeStats['leader_reply_rate'] !== null) {
+                                            echo number_format($activeStats['leader_reply_rate'] * 100, 1) . '% reply rate';
+                                        } elseif ($activeStats['leader_ctr'] !== null) {
+                                            echo number_format($activeStats['leader_ctr'] * 100, 1) . '% CTR';
+                                        }
+                                    ?>)
+                                </span>
                             <?php else: ?>
                                 —
                             <?php endif; ?>

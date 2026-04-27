@@ -52,7 +52,11 @@ if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
 // ─── Configuration ───
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
-define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
+// Follow-ups have their own daily cap, separate from first-touch sends.
+// Default 30 errs on the conservative side for fresh installs; production
+// should set OUTREACH_DAILY_FOLLOWUP_LIMIT explicitly to match domain
+// reputation (e.g. 75 during a backlog drain, 30 at steady state).
+define('DAILY_FOLLOWUP_LIMIT', (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30));
 
 // Parse CLI flags ($argv is null under CGI, fall back to empty array)
 $args = array_slice($argv ?? [], 1);
@@ -199,9 +203,9 @@ try {
 
     // ─── STEP 4: Auto-Approve ───
     // Runtime-toggled via outreach_pipeline_state.auto_send_mode
-    // ('auto' | 'review'); falls back to the OUTREACH_AUTO_APPROVE env seed
-    // on a DB that hasn't had the toggle set yet.
-    $autoSendMode = getState($pdo, 'auto_send_mode', AUTO_APPROVE ? 'auto' : 'review');
+    // ('auto' | 'review'). Defaults to 'auto' on a DB that hasn't had the
+    // toggle set yet — admin can flip to review-mode in the Settings tab.
+    $autoSendMode = getState($pdo, 'auto_send_mode', 'auto');
     if (($runAll || $draftOnly) && $autoSendMode === 'auto') {
         stepAutoApprove($pdo, $dryRun);
     } elseif (($runAll || $draftOnly) && $autoSendMode === 'review') {
@@ -211,6 +215,18 @@ try {
     // ─── STEP 5: Send Emails ───
     if ($runAll || $sendOnly) {
         stepSendEmails($pdo, $dryRun);
+    }
+
+    // ─── STEP 6: Send Follow-ups ───
+    // Same gate as Step 4: in review-before-send mode, the admin wants to
+    // approve outbound mail by hand, so the cron stays out of follow-ups
+    // too. (Step 5 doesn't need an explicit gate — it only sends leads with
+    // approval_status = 'approved', and review mode just doesn't auto-
+    // approve. Follow-ups have no approval workflow, so the gate is here.)
+    if (($runAll || $sendOnly) && $autoSendMode === 'auto') {
+        stepSendFollowups($pdo, $dryRun);
+    } elseif (($runAll || $sendOnly) && $autoSendMode === 'review') {
+        logPipeline('Send mode: review — follow-ups skipped (no manual-trigger UI exists yet; flip to auto-send to resume).');
     }
 
     logPipeline('=== Outreach Pipeline Complete ===');
@@ -434,23 +450,31 @@ function stepManageAbTests($pdo, $dryRun)
         $type = $evalResult['variant_type'] ?? $type;
 
         if ($evalResult['action'] === 'promoted') {
+            $metric = $evalResult['metric'] ?? 'ctr';
             logPipeline(sprintf(
-                "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (CTR %.2f%%) via %s after %d days.",
+                "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (reply rate %.2f%%, CTR %.2f%%) via %s by %s after %d days.",
                 $type,
                 $evalResult['test_id'],
                 $evalResult['test_name'],
                 $evalResult['winner_label'],
+                ($evalResult['winner_reply_rate'] ?? 0) * 100,
                 $evalResult['winner_ctr'] * 100,
                 $evalResult['trigger'],
+                $metric,
                 $evalResult['age_days']
             ));
         } elseif ($evalResult['action'] === 'paused_safety') {
+            $metric = $evalResult['metric'] ?? 'ctr';
+            $rate = $metric === 'reply_rate'
+                ? ($evalResult['winner_reply_rate'] ?? 0)
+                : $evalResult['winner_ctr'];
             logPipeline(sprintf(
-                "A/B auto-paused for safety: %s test #%d promoted variant %s but CTR %.2f%% fell below floor. ab_auto_enabled set to 0.",
+                "A/B auto-paused for safety: %s test #%d promoted variant %s but %s %.2f%% fell below floor. ab_auto_enabled set to 0.",
                 $type,
                 $evalResult['test_id'],
                 $evalResult['winner_label'],
-                $evalResult['winner_ctr'] * 100
+                $metric === 'reply_rate' ? 'reply rate' : 'CTR',
+                $rate * 100
             ), 'WARN');
             $anyPaused = true;
         } elseif ($evalResult['action'] === 'none' && ($evalResult['reason'] ?? '') === 'criteria_not_met') {
@@ -698,6 +722,7 @@ function stepSendEmails($pdo, $dryRun)
 
     $successCount = 0;
     $failCount = 0;
+    $skipCount = 0;
 
     foreach ($leads as $lead) {
         $id = $lead['id'];
@@ -705,21 +730,27 @@ function stepSendEmails($pdo, $dryRun)
         $email = $lead['email'];
 
         try {
-            if (send_outreach_lead($pdo, $lead)) {
+            $reason = null;
+            if (send_outreach_lead($pdo, $lead, $reason)) {
                 $variantTag = !empty($lead['ab_variant_id'])
                     ? ' [A/B test #' . (int) $lead['ab_test_id'] . ', variant #' . (int) $lead['ab_variant_id'] . ']'
                     : '';
                 log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email . $variantTag);
                 logPipeline("Sent email to $businessName <$email> (lead #$id)" . $variantTag);
                 $successCount++;
+            } elseif ($reason === 'already_sent' || $reason === 'suppressed') {
+                // Skip outcomes are already logged inside send_outreach_lead;
+                // don't double-log as failures and don't count toward fail tally.
+                logPipeline("Skipped $businessName <$email> (lead #$id): $reason");
+                $skipCount++;
             } else {
-                log_activity($pdo, $id, 'email_failed', 'Pipeline email send failed for: ' . $email);
-                logPipeline("Failed to send email to $businessName <$email> (lead #$id)", 'ERROR');
+                log_activity($pdo, $id, 'email_failed', 'Pipeline email send failed for: ' . $email . ' (' . ($reason ?? 'unknown') . ')');
+                logPipeline("Failed to send email to $businessName <$email> (lead #$id): " . ($reason ?? 'unknown'), 'ERROR');
                 $failCount++;
             }
 
             // Brief pause between sends
-            if ($successCount + $failCount < count($leads)) {
+            if ($successCount + $failCount + $skipCount < count($leads)) {
                 sleep(2);
             }
 
@@ -730,5 +761,83 @@ function stepSendEmails($pdo, $dryRun)
         }
     }
 
-    logPipeline("Send complete. Sent: $successCount, Failed: $failCount");
+    logPipeline("Send complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
+}
+
+function stepSendFollowups($pdo, $dryRun)
+{
+    logPipeline('--- Step 6: Send Follow-ups ---');
+
+    $sentToday = (int) $pdo->query("
+        SELECT COUNT(*) FROM outreach_leads
+        WHERE DATE(last_followup_at) = CURDATE() AND followup_count > 0
+    ")->fetchColumn();
+    $remaining = DAILY_FOLLOWUP_LIMIT - $sentToday;
+
+    if ($remaining <= 0) {
+        logPipeline("Follow-up daily limit of " . DAILY_FOLLOWUP_LIMIT . " reached ($sentToday sent today). Skipping.");
+        return;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT id, email, business_name, draft_subject, original_message_id, unsubscribe_token
+        FROM outreach_leads
+        WHERE status = 'contacted'
+          AND followup_count = 0
+          AND next_followup_due_at IS NOT NULL
+          AND next_followup_due_at <= NOW()
+          AND email IS NOT NULL AND email <> ''
+        ORDER BY next_followup_due_at ASC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $remaining, PDO::PARAM_INT);
+    $stmt->execute();
+    $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($leads)) {
+        logPipeline('No follow-ups due.');
+        return;
+    }
+
+    logPipeline('Found ' . count($leads) . ' follow-up(s) due (cap: ' . DAILY_FOLLOWUP_LIMIT . '/day, ' . $sentToday . ' sent earlier today).');
+
+    if ($dryRun) {
+        foreach ($leads as $lead) {
+            logPipeline("[DRY RUN] Would send follow-up to: {$lead['business_name']} <{$lead['email']}>");
+        }
+        return;
+    }
+
+    $successCount = 0;
+    $failCount = 0;
+    $skipCount = 0;
+
+    foreach ($leads as $lead) {
+        try {
+            $reason = null;
+            if (send_outreach_followup($pdo, $lead, $reason)) {
+                logPipeline("Follow-up sent to {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']})");
+                $successCount++;
+            } elseif ($reason === 'not_eligible') {
+                // Lead became ineligible between the SELECT and the atomic claim
+                // (replied, unsubscribed, or claimed by a concurrent run). Not a
+                // failure — the data outcome is correct.
+                logPipeline("Follow-up skipped for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']}): no longer eligible");
+                $skipCount++;
+            } else {
+                logPipeline("Follow-up failed for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']}): " . ($reason ?? 'unknown'), 'WARN');
+                $failCount++;
+            }
+
+            // Same brief pause between sends as the first-touch step.
+            if ($successCount + $failCount + $skipCount < count($leads)) {
+                sleep(2);
+            }
+        } catch (Exception $e) {
+            logPipeline("Error sending follow-up to {$lead['business_name']} (lead #{$lead['id']}): " . $e->getMessage(), 'ERROR');
+            $failCount++;
+        }
+    }
+
+    logPipeline("Follow-ups complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
 }

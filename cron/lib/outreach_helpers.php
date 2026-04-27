@@ -228,8 +228,18 @@ function log_activity($pdo, $lead_id, $action_type, $details = null)
 /**
  * Send an outreach email for a lead and update its DB status.
  * Returns true on success, false on failure.
+ *
+ * The optional &$reason out-param disambiguates non-success outcomes for
+ * callers that need to distinguish a real send failure from a benign skip
+ * (race-condition guard, suppression list, invalid email). Possible values:
+ *   'sent'         — email delivered, lead marked contacted
+ *   'already_sent' — atomic claim lost (another process already sent it)
+ *   'suppressed'   — email is on the outreach suppression list
+ *   'invalid_email'— lead's email is missing or malformed
+ *   'smtp_failed'  — SMTP/transport failure (the only "real failure" reason)
+ * Existing callers that ignore the param still get the correct bool result.
  */
-function send_outreach_lead($pdo, $lead)
+function send_outreach_lead($pdo, $lead, &$reason = null)
 {
     $id = $lead['id'];
     $email = $lead['email'];
@@ -250,6 +260,7 @@ function send_outreach_lead($pdo, $lead)
     $claimStmt->execute([$id]);
     if ($claimStmt->rowCount() === 0) {
         log_activity($pdo, $id, 'email_skipped_already_sent', 'Skipped send: lead already sent (race-condition guard)');
+        $reason = 'already_sent';
         return false;
     }
 
@@ -261,6 +272,7 @@ function send_outreach_lead($pdo, $lead)
         if ($suppStmt->fetchColumn()) {
             $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
             log_activity($pdo, $id, 'email_skipped_suppressed', 'Skipped send: email is on outreach suppression list (' . $email . ')');
+            $reason = 'suppressed';
             return false;
         }
     }
@@ -318,7 +330,7 @@ function send_outreach_lead($pdo, $lead)
         // clients while still carrying the tracking source param. No HTML
         // escaping, no <a> wrapping.
         $body = (string) $lead['draft_body'];
-        $body = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $trackedUrl, $body);
+        $body = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $trackedUrl, $body);
         $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
         if (strpos($body, 'unsubscribe?t=') === false) {
             $unsubLine = "\n\nNot interested? " . $unsubUrl . " and I'll stop emailing you.";
@@ -333,7 +345,7 @@ function send_outreach_lead($pdo, $lead)
     } else {
         $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
         $escapedBody = htmlspecialchars($lead['draft_body']);
-        $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?])#', $anchorHtml, $escapedBody);
+        $escapedBody = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $anchorHtml, $escapedBody);
 
         $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
         // Drafts since the unsubscribe-URL fix carry the real bare URL in
@@ -360,6 +372,7 @@ function send_outreach_lead($pdo, $lead)
         $finalBody = '<p>' . nl2br($escapedBody) . '</p>';
     }
 
+    $messageId = null;
     $result = send_styled_email(
         $email,
         $lead['draft_subject'],
@@ -370,23 +383,139 @@ function send_outreach_lead($pdo, $lead)
         'contact@argorobots.com',
         [],
         $preheader,
-        $format
+        $format,
+        $messageId
     );
 
     if ($result) {
         // sent_at was already set by the upfront claim. Update the rest of
-        // the post-send fields here.
+        // the post-send fields here. The COALESCE on original_message_id and
+        // next_followup_due_at means a re-send (manual resend or retry after
+        // a transient failure) won't overwrite the original Message-ID or
+        // push out the follow-up schedule.
         $stmt = $pdo->prepare("UPDATE outreach_leads SET
             status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
             first_contact_date = COALESCE(first_contact_date, NOW()),
-            last_contact_date = NOW()
+            last_contact_date = NOW(),
+            original_message_id = COALESCE(original_message_id, ?),
+            next_followup_due_at = COALESCE(next_followup_due_at, DATE_ADD(NOW(), INTERVAL 5 DAY))
             WHERE id = ?");
-        $stmt->execute([$id]);
+        $stmt->execute([$messageId, $id]);
+        $reason = 'sent';
         return true;
     }
 
     // SMTP send failed — release the claim so retries / manual re-send work.
     $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
+    $reason = 'smtp_failed';
+    return false;
+}
+
+/**
+ * Send a follow-up email to a lead that was contacted but didn't reply.
+ * Threaded as a Re: reply to the original via In-Reply-To / References,
+ * so it lands in the recipient's existing inbox conversation rather than
+ * arriving as a fresh cold email.
+ *
+ * Eligibility (status='contacted', followup_count=0, due-date passed) is
+ * enforced via an atomic UPDATE-to-claim pattern so concurrent cron runs
+ * can't double-send. Returns true on successful delivery, false otherwise.
+ *
+ * The optional &$reason out-param disambiguates non-success outcomes:
+ *   'sent'         — follow-up delivered
+ *   'not_eligible' — atomic claim lost (already followed up, replied,
+ *                    not yet due, or claimed by a concurrent run)
+ *   'invalid_email'— lead's email is missing or malformed
+ *   'smtp_failed'  — SMTP/transport failure (the only "real failure" reason)
+ */
+function send_outreach_followup($pdo, array $lead, ?string &$reason = null): bool
+{
+    require_once __DIR__ . '/followup_template.php';
+
+    $id = (int) $lead['id'];
+    $email = trim((string) $lead['email']);
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $reason = 'invalid_email';
+        return false;
+    }
+
+    // Atomically claim the slot. Re-checks every eligibility predicate
+    // server-side, so two overlapping cron runs can't both send a follow-up
+    // for the same lead. The pipeline lock-file already serializes runs in
+    // practice, but be defensive.
+    $claim = $pdo->prepare("UPDATE outreach_leads
+        SET last_followup_at = NOW(), followup_count = followup_count + 1
+        WHERE id = ? AND followup_count = 0
+          AND status = 'contacted'
+          AND next_followup_due_at IS NOT NULL
+          AND next_followup_due_at <= NOW()");
+    $claim->execute([$id]);
+    if ($claim->rowCount() === 0) {
+        $reason = 'not_eligible';
+        return false; // already followed up, replied, not due, or race-lost
+    }
+
+    // Generate or reuse the unsubscribe token (same pattern as first send).
+    $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+    if (empty($unsubscribeToken)) {
+        $unsubscribeToken = bin2hex(random_bytes(32));
+        $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?")
+            ->execute([$unsubscribeToken, $id]);
+    }
+    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+
+    $followup = build_followup_email($lead, $unsubUrl);
+
+    // Threading headers: makes the follow-up land in the recipient's existing
+    // thread instead of arriving as a fresh cold email. Without these,
+    // reply-rate gains from following up are roughly halved.
+    $threadingHeaders = [];
+    $origMsgId = trim((string) ($lead['original_message_id'] ?? ''));
+    if ($origMsgId !== '') {
+        $threadingHeaders['In-Reply-To'] = $origMsgId;
+        $threadingHeaders['References']  = $origMsgId;
+    }
+
+    // Render body as HTML — same anchor-wrapping as the first-touch HTML
+    // branch so the bare argorobots.com mention and the unsubscribe URL get
+    // styled links instead of plain text.
+    $trackedUrl = 'https://argorobots.com/?source=outreach-' . $id . '-fu1';
+    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
+    $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
+    $escaped = htmlspecialchars($followup['body']);
+    $escaped = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $anchorHtml, $escaped);
+    $escaped = preg_replace('#https?://argorobots\.com/unsubscribe\?t=[a-f0-9]+#i', $unsubAnchor, $escaped);
+    $finalBody = '<p>' . nl2br($escaped) . '</p>';
+
+    $messageId = null;
+    $result = send_styled_email(
+        $email,
+        $followup['subject'],
+        $finalBody,
+        '',
+        'contact@argorobots.com',
+        'Evan',
+        'contact@argorobots.com',
+        $threadingHeaders,
+        $followup['preheader'],
+        'html',
+        $messageId
+    );
+
+    if ($result) {
+        // Update last_contact_date for timeline accuracy. followup_count and
+        // last_followup_at were already updated by the claim above.
+        $pdo->prepare("UPDATE outreach_leads SET last_contact_date = NOW() WHERE id = ?")->execute([$id]);
+        log_activity($pdo, $id, 'followup_sent', 'Follow-up #1 delivered');
+        $reason = 'sent';
+        return true;
+    }
+
+    // Send failed: roll back the claim so retries work next cron run.
+    $pdo->prepare("UPDATE outreach_leads
+        SET last_followup_at = NULL, followup_count = followup_count - 1
+        WHERE id = ?")->execute([$id]);
+    $reason = 'smtp_failed';
     return false;
 }
 
@@ -930,7 +1059,7 @@ $painPointsInstruction
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
-- The subject line should be about the recipient's business, NOT about Argo Books. Make it feel personal and curiosity-driven (e.g. \"Quick question about [business name]\", \"Thought of you guys\")$abSubjectOverride
+- The subject line should sound like a short personal email one human would send to one specific business owner — NOT marketing copy. Keep it under 7 words, reference the recipient's business if natural, and avoid clickbait hooks like \"A surprising way to...\", \"The secret to...\", \"How [business] can...\", or anything that pattern-matches as a sales template. Lowercase is fine. Good examples: \"Quick question about [business name]\", \"Thought of you guys\", \"feedback on Argo Books?\", \"[business name] — bookkeeping question\". Bad examples: \"A surprising way to save time for [business]\", \"Unlock growth for [business]\", \"Transform your bookkeeping today\"$abSubjectOverride
 - You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
 - After that line, add ONE short, respectful unsubscribe line on its own paragraph, such as: \"Not interested? {UNSUBSCRIBE_URL} and I'll stop emailing you.\" The literal token {UNSUBSCRIBE_URL} will be replaced with a tracked unsubscribe link before sending — include it verbatim, do NOT invent or replace the placeholder yourself. Keep the tone soft, brief, and non-pushy.
@@ -1077,24 +1206,26 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
         return ['action' => 'none', 'reason' => 'too_few_variants'];
     }
 
-    $leaderIdx = find_leader_idx($variants);
+    // Pick scoring metric: reply rate is the real conversion signal we want
+    // to optimize, but if no variant has any replies yet we fall back to
+    // CTR so low-volume tests can still promote on something.
+    $totalReplies = array_sum(array_column($variants, 'replied_count'));
+    $metric = $totalReplies > 0 ? 'reply_rate' : 'ctr';
+
+    $leaderIdx = find_leader_idx($variants, $metric);
     $startedAt = strtotime($test['started_at'] ?: $test['created_at']);
     $ageDays = (int) floor((time() - $startedAt) / 86400);
     $minSent = min(array_column($variants, 'sent_count'));
 
     $trigger = null;
 
-    // Criterion (a)
+    // Criterion (a) — leader is statistically significant on the chosen
+    // metric vs every other variant
     if ($leaderIdx !== null && $minSent >= 30) {
         $allSig = true;
         foreach ($variants as $i => $v) {
             if ($i === $leaderIdx) continue;
-            $c = confidence_vs_leader(
-                $variants[$leaderIdx]['sent_count'],
-                $variants[$leaderIdx]['clicked_count'],
-                $v['sent_count'],
-                $v['clicked_count']
-            );
+            $c = confidence_vs_leader_on($metric, $variants[$leaderIdx], $v);
             if ($c['tag'] !== 'significant') { $allSig = false; break; }
         }
         if ($allSig) $trigger = 'significance';
@@ -1125,6 +1256,7 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
             'variant_type' => $variantType,
             'age_days' => $ageDays,
             'min_sent' => $minSent,
+            'metric' => $metric,
             'test_id' => (int) $test['id'],
             'test_name' => $test['name'],
         ];
@@ -1134,22 +1266,38 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
     $pdo->prepare("UPDATE outreach_ab_tests SET winner_variant_id = ?, status = 'completed', completed_at = NOW() WHERE id = ?")
         ->execute([$winner['id'], $test['id']]);
 
-    // Safety-floor check
-    $floorStmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'ab_ctr_floor'");
+    // Safety-floor checks. CTR floor is always evaluated — it's a
+    // deliverability signal (CTR below 1% suggests the email isn't even
+    // reaching inboxes) regardless of which metric drove promotion. Reply
+    // floor is only evaluated when we promoted on reply rate.
+    $floorStmt = $pdo->prepare("SELECT state_key, state_value FROM outreach_pipeline_state WHERE state_key IN ('ab_ctr_floor','ab_reply_floor')");
     $floorStmt->execute();
-    $floorVal = $floorStmt->fetchColumn();
-    $floor = ($floorVal !== false) ? (float) $floorVal : 0.01;
+    $floorRows = $floorStmt->fetchAll();
+    $ctrFloor = 0.01;
+    $replyFloor = 0.005;
+    foreach ($floorRows as $row) {
+        if ($row['state_key'] === 'ab_ctr_floor')   $ctrFloor   = (float) $row['state_value'];
+        if ($row['state_key'] === 'ab_reply_floor') $replyFloor = (float) $row['state_value'];
+    }
 
     $pausedForSafety = false;
-    if ($winner['sent_count'] >= 20 && $winner['ctr'] < $floor) {
+    $pauseReason = null;
+    if ($winner['sent_count'] >= 20) {
+        if ($metric === 'reply_rate' && $winner['reply_rate'] < $replyFloor) {
+            $pauseReason = 'Winner reply rate ' . number_format($winner['reply_rate'] * 100, 2)
+                . '% below floor ' . number_format($replyFloor * 100, 2)
+                . '% on test #' . (int) $test['id'];
+        } elseif ($winner['ctr'] < $ctrFloor) {
+            $pauseReason = 'Winner CTR ' . number_format($winner['ctr'] * 100, 2)
+                . '% below floor ' . number_format($ctrFloor * 100, 2)
+                . '% on test #' . (int) $test['id'];
+        }
+    }
+    if ($pauseReason !== null) {
         $pauseStmt = $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES (?, ?)
             ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)");
         $pauseStmt->execute(['ab_auto_enabled', '0']);
-        $pauseStmt->execute([
-            'ab_auto_last_pause_reason',
-            'Winner CTR ' . number_format($winner['ctr'] * 100, 2) . '% below floor '
-                . number_format($floor * 100, 2) . '% on test #' . (int) $test['id'],
-        ]);
+        $pauseStmt->execute(['ab_auto_last_pause_reason', $pauseReason]);
         $pausedForSafety = true;
     }
 
@@ -1161,6 +1309,8 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
         'winner_id' => (int) $winner['id'],
         'winner_label' => $winner['label'],
         'winner_ctr' => $winner['ctr'],
+        'winner_reply_rate' => $winner['reply_rate'],
+        'metric' => $metric,
         'trigger' => $trigger,
         'age_days' => $ageDays,
     ];
@@ -1175,20 +1325,50 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
  */
 function generate_ab_subject_variants($pdo, $count = 3)
 {
-    $winStmt = $pdo->prepare("
-        SELECT v.content
-        FROM outreach_ab_tests t
-        JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
-        WHERE t.status = 'completed' AND t.variant_type = 'subject'
-        ORDER BY t.completed_at DESC
-        LIMIT 3
+    // Prefer subjects that actually got a reply over subjects that just got
+    // clicks — replies are the conversion signal we now optimize for. Falls
+    // back to past CTR winners during cold-start (when the replied-subject
+    // pool is too small to seed three distinct examples).
+    $repliedStmt = $pdo->prepare("
+        SELECT DISTINCT draft_subject AS content
+        FROM outreach_leads
+        WHERE status IN ('replied','interested','onboarded')
+          AND draft_subject IS NOT NULL
+          AND draft_subject <> ''
+        ORDER BY last_contact_date DESC
+        LIMIT 5
     ");
-    $winStmt->execute();
-    $priorWinners = array_column($winStmt->fetchAll(), 'content');
+    $repliedStmt->execute();
+    $seeds = array_column($repliedStmt->fetchAll(), 'content');
+    $seedSource = 'replies';
+
+    if (count($seeds) < 3) {
+        $winStmt = $pdo->prepare("
+            SELECT v.content
+            FROM outreach_ab_tests t
+            JOIN outreach_ab_variants v ON v.id = t.winner_variant_id
+            WHERE t.status = 'completed' AND t.variant_type = 'subject'
+            ORDER BY t.completed_at DESC
+            LIMIT 3
+        ");
+        $winStmt->execute();
+        foreach ($winStmt->fetchAll() as $row) {
+            if (!in_array($row['content'], $seeds, true)) {
+                $seeds[] = $row['content'];
+            }
+        }
+        $seedSource = empty($seeds) ? 'none' : (count($seeds) > 0 && count(array_filter($seeds)) > 0 ? 'replies+winners' : 'winners');
+    }
+    $priorWinners = $seeds; // variable name kept for downstream code compatibility
 
     $winnersText = '';
     if (!empty($priorWinners)) {
-        $winnersText = "\n\nRecent winning subject strategies (most recent first):\n";
+        $label = $seedSource === 'replies'
+            ? "Subjects that have actually gotten replies recently — generate variations in this register:"
+            : ($seedSource === 'replies+winners'
+                ? "Mix of subjects that got replies and past CTR winners (cold-start blend) — generate variations in this register:"
+                : "Recent winning subject strategies (most recent first):");
+        $winnersText = "\n\n" . $label . "\n";
         foreach ($priorWinners as $w) {
             $winnersText .= "- " . trim((string) $w) . "\n";
         }

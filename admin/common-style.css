@@ -1266,6 +1266,10 @@ tbody tr:hover {
   color: var(--gray-500);
 }
 
+[data-theme="dark"] input[type="password"]::-ms-reveal {
+  filter: invert(100%);
+}
+
 [data-theme="dark"] label {
   color: var(--gray-300);
 }

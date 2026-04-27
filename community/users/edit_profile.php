@@ -493,6 +493,8 @@ function handle_password_change()
     <link rel="stylesheet" href="../../resources/header/dark.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
     <link rel="stylesheet" href="../../resources/notifications/notifications.css">
+    <link rel="stylesheet" href="../../resources/styles/password-toggle.css">
+    <script src="../../resources/scripts/password-toggle.js" defer></script>
 </head>
 
 <body>

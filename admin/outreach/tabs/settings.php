@@ -111,6 +111,7 @@ function settings_tab_render($pdo)
     }
 
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
+    $followupLimit = (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30);
     $ctrFloor = (float) settings_tab_get_state($pdo, 'ab_ctr_floor', '0.01');
     $replyFloor = (float) settings_tab_get_state($pdo, 'ab_reply_floor', '0.005');
 
@@ -232,7 +233,7 @@ function settings_tab_render($pdo)
                     <input type="hidden" name="mode" value="auto">
                     <button type="submit" class="segmented-option <?php echo $autoSendMode === 'auto' ? 'active' : ''; ?>">
                         <span class="segmented-title">Auto-send</span>
-                        <span class="segmented-desc">Drafts are auto-approved and sent, up to <?php echo $dailyLimit; ?>/day.</span>
+                        <span class="segmented-desc">Drafts are auto-approved and sent, up to <?php echo $dailyLimit; ?>/day. Follow-ups have a separate cap of <?php echo $followupLimit; ?>/day, oldest-due first.</span>
                     </button>
                 </form>
                 <form method="POST" style="display:contents;">

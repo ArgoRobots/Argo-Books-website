@@ -326,6 +326,11 @@ code {
     box-sizing: border-box;
 }
 
+.form-group textarea {
+    resize: vertical;
+    max-height: 300px;
+}
+
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;

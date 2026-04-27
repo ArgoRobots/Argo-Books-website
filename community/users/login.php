@@ -133,14 +133,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <!-- Preconnect hints -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-
-    <!-- Font Awesome for password toggle icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="../../resources/styles/password-toggle.css">
+    <script src="../../resources/scripts/password-toggle.js" defer></script>
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/checkbox.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
@@ -180,13 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <div class="password-field-wrapper">
-                        <input type="password" id="password" name="password" required>
-                        <div class="toggle-password">
-                            <i class="fa fa-eye"></i>
-                            <i class="fa fa-eye-slash"></i>
-                        </div>
-                    </div>
+                    <input type="password" id="password" name="password" required>
                 </div>
 
                 <div class="checkbox">
@@ -210,20 +199,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="includeFooter"></div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get password field and toggle button
-            const passwordField = document.getElementById('password');
-            const togglePassword = document.querySelector('.toggle-password');
-
-            // Toggle password visibility
-            togglePassword.addEventListener('click', function() {
-                togglePassword.classList.toggle('active');
-                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordField.setAttribute('type', type);
-            });
-        });
-    </script>
 </body>
 
 </html>

@@ -91,14 +91,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <!-- Preconnect hints -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-
-    <!-- Font Awesome for password toggle icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
     <link rel="stylesheet" href="auth.css">
+    <link rel="stylesheet" href="../../resources/styles/password-toggle.css">
+    <script src="../../resources/scripts/password-toggle.js" defer></script>
     <link rel="stylesheet" href="register.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/checkbox.css">
@@ -142,13 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group" id="password-group">
                     <label for="password">Password</label>
-                    <div class="password-field-wrapper">
-                        <input type="password" id="password-field" name="password" required>
-                        <div class="toggle-password">
-                            <i class="fa fa-eye"></i>
-                            <i class="fa fa-eye-slash"></i>
-                        </div>
-                    </div>
+                    <input type="password" id="password" name="password" required>
 
                     <div class="password-policies">
                         <div class="policy-length">
@@ -168,13 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group" id="confirm-password-group">
                     <label for="password_confirm">Confirm Password</label>
-                    <div class="password-field-wrapper">
-                        <input type="password" id="password_confirm" name="password_confirm" required>
-                        <div class="toggle-password">
-                            <i class="fa fa-eye"></i>
-                            <i class="fa fa-eye-slash"></i>
-                        </div>
-                    </div>
+                    <input type="password" id="password_confirm" name="password_confirm" required>
                     <div class="validation-feedback" id="confirm-password-feedback"></div>
                 </div>
 
@@ -203,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Form elements
             const usernameField = document.getElementById('username');
             const emailField = document.getElementById('email');
-            const passwordField = document.getElementById('password-field');
+            const passwordField = document.getElementById('password');
             const passwordConfirm = document.getElementById('password_confirm');
             const submitButton = document.getElementById('submit-button');
             const registerForm = document.querySelector('.auth-form');
@@ -220,22 +203,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const termsGroup = document.getElementById('terms-group');
             const termsFeedback = document.getElementById('terms-feedback');
             const passwordPolicies = document.querySelector('.password-policies');
-
-            // Toggle password visibility for password field
-            const togglePassword = document.querySelectorAll('.toggle-password')[0];
-            togglePassword.addEventListener('click', function() {
-                togglePassword.classList.toggle('active');
-                const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordField.setAttribute('type', type);
-            });
-
-            // Toggle password visibility for confirm password field
-            const confirmTogglePassword = document.querySelectorAll('.toggle-password')[1];
-            confirmTogglePassword.addEventListener('click', function() {
-                confirmTogglePassword.classList.toggle('active');
-                const type = passwordConfirm.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordConfirm.setAttribute('type', type);
-            });
 
             // If there was a form error, password fields are intentionally NOT restored
             // for security reasons (prevents password leakage in page source).

@@ -138,6 +138,8 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <link rel="stylesheet" href="common-style.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../resources/styles/password-toggle.css">
+    <script src="../resources/scripts/password-toggle.js" defer></script>
 </head>
 
 <body>

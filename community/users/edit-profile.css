@@ -127,6 +127,7 @@
 .form-group textarea {
   resize: vertical;
   min-height: 100px;
+  max-height: 400px;
   display: block;
 }
 

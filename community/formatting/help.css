@@ -118,6 +118,8 @@ kbd {
   margin-bottom: 15px;
   border: 1px solid var(--gray-input-border);
   border-radius: 4px;
+  resize: vertical;
+  max-height: 400px;
 }
 
 .preview-container {

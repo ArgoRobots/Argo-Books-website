@@ -127,7 +127,9 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .form-group textarea {
+  resize: vertical;
   min-height: 200px;
+  max-height: 600px;
 }
 
 .form-group .field-hint {

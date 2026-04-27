@@ -552,6 +552,10 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
     first_contact_date DATETIME DEFAULT NULL,
     last_contact_date DATETIME DEFAULT NULL,
+    followup_count TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    last_followup_at DATETIME DEFAULT NULL,
+    next_followup_due_at DATETIME DEFAULT NULL,
+    original_message_id VARCHAR(255) DEFAULT NULL,
     offer_sent TINYINT(1) DEFAULT 0,
     notes TEXT DEFAULT NULL,
     feedback_summary TEXT DEFAULT NULL,
@@ -574,7 +578,8 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     INDEX idx_outreach_company_size (company_size),
     INDEX idx_unsubscribe_token (unsubscribe_token),
     INDEX idx_outreach_ab (ab_test_id, ab_variant_id),
-    INDEX idx_outreach_ab_variant (ab_variant_id)
+    INDEX idx_outreach_ab_variant (ab_variant_id),
+    INDEX idx_outreach_followup_due (next_followup_due_at, status, followup_count)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- For existing installs, add the A/B columns:

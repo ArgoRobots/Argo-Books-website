@@ -360,6 +360,7 @@ function send_outreach_lead($pdo, $lead)
         $finalBody = '<p>' . nl2br($escapedBody) . '</p>';
     }
 
+    $messageId = null;
     $result = send_styled_email(
         $email,
         $lead['draft_subject'],
@@ -370,23 +371,126 @@ function send_outreach_lead($pdo, $lead)
         'contact@argorobots.com',
         [],
         $preheader,
-        $format
+        $format,
+        $messageId
     );
 
     if ($result) {
         // sent_at was already set by the upfront claim. Update the rest of
-        // the post-send fields here.
+        // the post-send fields here. The COALESCE on original_message_id and
+        // next_followup_due_at means a re-send (manual resend or retry after
+        // a transient failure) won't overwrite the original Message-ID or
+        // push out the follow-up schedule.
         $stmt = $pdo->prepare("UPDATE outreach_leads SET
             status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
             first_contact_date = COALESCE(first_contact_date, NOW()),
-            last_contact_date = NOW()
+            last_contact_date = NOW(),
+            original_message_id = COALESCE(original_message_id, ?),
+            next_followup_due_at = COALESCE(next_followup_due_at, DATE_ADD(NOW(), INTERVAL 5 DAY))
             WHERE id = ?");
-        $stmt->execute([$id]);
+        $stmt->execute([$messageId, $id]);
         return true;
     }
 
     // SMTP send failed — release the claim so retries / manual re-send work.
     $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
+    return false;
+}
+
+/**
+ * Send a follow-up email to a lead that was contacted but didn't reply.
+ * Threaded as a Re: reply to the original via In-Reply-To / References,
+ * so it lands in the recipient's existing inbox conversation rather than
+ * arriving as a fresh cold email.
+ *
+ * Eligibility (status='contacted', followup_count=0, due-date passed) is
+ * enforced via an atomic UPDATE-to-claim pattern so concurrent cron runs
+ * can't double-send. Returns true on successful delivery, false otherwise.
+ */
+function send_outreach_followup($pdo, array $lead): bool
+{
+    require_once __DIR__ . '/followup_template.php';
+
+    $id = (int) $lead['id'];
+    $email = trim((string) $lead['email']);
+    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+
+    // Atomically claim the slot. Re-checks every eligibility predicate
+    // server-side, so two overlapping cron runs can't both send a follow-up
+    // for the same lead. The pipeline lock-file already serializes runs in
+    // practice, but be defensive.
+    $claim = $pdo->prepare("UPDATE outreach_leads
+        SET last_followup_at = NOW(), followup_count = followup_count + 1
+        WHERE id = ? AND followup_count = 0
+          AND status = 'contacted'
+          AND next_followup_due_at IS NOT NULL
+          AND next_followup_due_at <= NOW()");
+    $claim->execute([$id]);
+    if ($claim->rowCount() === 0) {
+        return false; // not eligible (already followed up, replied, etc.)
+    }
+
+    // Generate or reuse the unsubscribe token (same pattern as first send).
+    $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+    if (empty($unsubscribeToken)) {
+        $unsubscribeToken = bin2hex(random_bytes(32));
+        $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?")
+            ->execute([$unsubscribeToken, $id]);
+    }
+    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+
+    $followup = build_followup_email($lead, $unsubUrl);
+
+    // Threading headers: makes the follow-up land in the recipient's existing
+    // thread instead of arriving as a fresh cold email. Without these,
+    // reply-rate gains from following up are roughly halved.
+    $threadingHeaders = [];
+    $origMsgId = trim((string) ($lead['original_message_id'] ?? ''));
+    if ($origMsgId !== '') {
+        $threadingHeaders['In-Reply-To'] = $origMsgId;
+        $threadingHeaders['References']  = $origMsgId;
+    }
+
+    // Render body as HTML — same anchor-wrapping as the first-touch HTML
+    // branch so the bare argorobots.com mention and the unsubscribe URL get
+    // styled links instead of plain text.
+    $trackedUrl = 'https://argorobots.com/?source=outreach-' . $id . '-fu1';
+    $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
+    $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
+    $escaped = htmlspecialchars($followup['body']);
+    $escaped = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $anchorHtml, $escaped);
+    $escaped = preg_replace('#https?://argorobots\.com/unsubscribe\?t=[a-f0-9]+#i', $unsubAnchor, $escaped);
+    $finalBody = '<p>' . nl2br($escaped) . '</p>';
+
+    $messageId = null;
+    $result = send_styled_email(
+        $email,
+        $followup['subject'],
+        $finalBody,
+        '',
+        'contact@argorobots.com',
+        'Evan',
+        'contact@argorobots.com',
+        $threadingHeaders,
+        $followup['preheader'],
+        'html',
+        $messageId
+    );
+
+    if ($result) {
+        // Update last_contact_date for timeline accuracy. followup_count and
+        // last_followup_at were already updated by the claim above.
+        $pdo->prepare("UPDATE outreach_leads SET last_contact_date = NOW() WHERE id = ?")->execute([$id]);
+        log_activity($pdo, $id, 'followup_sent', 'Follow-up #1 delivered');
+        return true;
+    }
+
+    // Send failed: roll back the claim so retries work next cron run.
+    $pdo->prepare("UPDATE outreach_leads
+        SET last_followup_at = NULL, followup_count = followup_count - 1
+        WHERE id = ?")->execute([$id]);
     return false;
 }
 

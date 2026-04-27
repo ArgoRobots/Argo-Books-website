@@ -52,6 +52,11 @@ if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
 // ─── Configuration ───
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
+// Follow-ups have their own daily cap, separate from first-touch sends.
+// Default 30 errs on the conservative side for fresh installs; production
+// should set OUTREACH_DAILY_FOLLOWUP_LIMIT explicitly to match domain
+// reputation (e.g. 75 during a backlog drain, 30 at steady state).
+define('DAILY_FOLLOWUP_LIMIT', (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30));
 define('AUTO_APPROVE', filter_var($_ENV['OUTREACH_AUTO_APPROVE'] ?? 'true', FILTER_VALIDATE_BOOLEAN));
 
 // Parse CLI flags ($argv is null under CGI, fall back to empty array)
@@ -211,6 +216,13 @@ try {
     // ─── STEP 5: Send Emails ───
     if ($runAll || $sendOnly) {
         stepSendEmails($pdo, $dryRun);
+    }
+
+    // ─── STEP 6: Send Follow-ups ───
+    // Runs whenever first-touch sends do, with its own daily cap so the
+    // backlog drains predictably without crowding out new sends.
+    if ($runAll || $sendOnly) {
+        stepSendFollowups($pdo, $dryRun);
     }
 
     logPipeline('=== Outreach Pipeline Complete ===');
@@ -739,4 +751,74 @@ function stepSendEmails($pdo, $dryRun)
     }
 
     logPipeline("Send complete. Sent: $successCount, Failed: $failCount");
+}
+
+function stepSendFollowups($pdo, $dryRun)
+{
+    logPipeline('--- Step 6: Send Follow-ups ---');
+
+    $sentToday = (int) $pdo->query("
+        SELECT COUNT(*) FROM outreach_leads
+        WHERE DATE(last_followup_at) = CURDATE() AND followup_count > 0
+    ")->fetchColumn();
+    $remaining = DAILY_FOLLOWUP_LIMIT - $sentToday;
+
+    if ($remaining <= 0) {
+        logPipeline("Follow-up daily limit of " . DAILY_FOLLOWUP_LIMIT . " reached ($sentToday sent today). Skipping.");
+        return;
+    }
+
+    $stmt = $pdo->prepare("
+        SELECT id, email, business_name, draft_subject, original_message_id, unsubscribe_token
+        FROM outreach_leads
+        WHERE status = 'contacted'
+          AND followup_count = 0
+          AND next_followup_due_at IS NOT NULL
+          AND next_followup_due_at <= NOW()
+          AND email IS NOT NULL AND email <> ''
+        ORDER BY next_followup_due_at ASC
+        LIMIT ?
+    ");
+    $stmt->bindValue(1, $remaining, PDO::PARAM_INT);
+    $stmt->execute();
+    $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (empty($leads)) {
+        logPipeline('No follow-ups due.');
+        return;
+    }
+
+    logPipeline('Found ' . count($leads) . ' follow-up(s) due (cap: ' . DAILY_FOLLOWUP_LIMIT . '/day, ' . $sentToday . ' sent earlier today).');
+
+    if ($dryRun) {
+        foreach ($leads as $lead) {
+            logPipeline("[DRY RUN] Would send follow-up to: {$lead['business_name']} <{$lead['email']}>");
+        }
+        return;
+    }
+
+    $successCount = 0;
+    $failCount = 0;
+
+    foreach ($leads as $lead) {
+        try {
+            if (send_outreach_followup($pdo, $lead)) {
+                logPipeline("Follow-up sent to {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']})");
+                $successCount++;
+            } else {
+                logPipeline("Follow-up failed for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']})", 'WARN');
+                $failCount++;
+            }
+
+            // Same brief pause between sends as the first-touch step.
+            if ($successCount + $failCount < count($leads)) {
+                sleep(2);
+            }
+        } catch (Exception $e) {
+            logPipeline("Error sending follow-up to {$lead['business_name']} (lead #{$lead['id']}): " . $e->getMessage(), 'ERROR');
+            $failCount++;
+        }
+    }
+
+    logPipeline("Follow-ups complete. Sent: $successCount, Failed: $failCount");
 }

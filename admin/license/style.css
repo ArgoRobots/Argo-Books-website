@@ -30,6 +30,7 @@ table th {
 .form-group textarea {
     resize: vertical;
     min-height: 60px;
+    max-height: 300px;
     box-sizing: border-box;
 }
 .key-display {

@@ -361,6 +361,7 @@ header .header-inner .menu-container .menu .community:after {
 .form-group textarea {
   resize: vertical;
   min-height: 80px;
+  max-height: 400px;
 }
 
 /* Animation for loading new comments */
@@ -514,6 +515,7 @@ header .header-inner .menu-container .menu .community:after {
   font-family: inherit;
   font-size: 14px;
   min-height: 80px;
+  max-height: 400px;
   resize: vertical;
   background-color: var(--whiteBackground);
   box-sizing: border-box;

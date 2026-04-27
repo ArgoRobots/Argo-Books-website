@@ -284,6 +284,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 .form-group textarea {
   resize: vertical;
   min-height: 140px;
+  max-height: 400px;
 }
 
 .form-group select {

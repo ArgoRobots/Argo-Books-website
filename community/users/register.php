@@ -91,11 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
-    <!-- Preconnect hints -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
-
-    <!-- Font Awesome for password toggle icons -->
     <link rel="stylesheet" href="auth.css">
     <link rel="stylesheet" href="../../resources/styles/password-toggle.css">
     <script src="../../resources/scripts/password-toggle.js" defer></script>
@@ -142,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group" id="password-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password-field" name="password" required>
+                    <input type="password" id="password" name="password" required>
 
                     <div class="password-policies">
                         <div class="policy-length">
@@ -191,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Form elements
             const usernameField = document.getElementById('username');
             const emailField = document.getElementById('email');
-            const passwordField = document.getElementById('password-field');
+            const passwordField = document.getElementById('password');
             const passwordConfirm = document.getElementById('password_confirm');
             const submitButton = document.getElementById('submit-button');
             const registerForm = document.querySelector('.auth-form');

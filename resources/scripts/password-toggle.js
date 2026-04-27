@@ -23,6 +23,7 @@
         toggle.type = 'button';
         toggle.className = 'toggle-password';
         toggle.setAttribute('aria-label', 'Show password');
+        toggle.setAttribute('aria-pressed', 'false');
         toggle.innerHTML =
             '<span class="icon-show" aria-hidden="true">' + EYE_OPEN + '</span>' +
             '<span class="icon-hide" aria-hidden="true">' + EYE_CLOSED + '</span>';
@@ -32,6 +33,7 @@
             input.setAttribute('type', revealing ? 'text' : 'password');
             toggle.classList.toggle('active', revealing);
             toggle.setAttribute('aria-label', revealing ? 'Hide password' : 'Show password');
+            toggle.setAttribute('aria-pressed', revealing ? 'true' : 'false');
         });
 
         wrapper.appendChild(toggle);

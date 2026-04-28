@@ -12,7 +12,7 @@
     <meta name="description"
         content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta name="keywords"
-        content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, AI business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
+        content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, ML business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Predictive Analytics — Argo Books">
@@ -80,7 +80,7 @@
                     "name": "Can Argo Books detect seasonal patterns in my business?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. The AI automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast. This means your projections account for predictable fluctuations like holiday rushes or slow summer months, giving you a more realistic picture of what's ahead."
+                        "text": "Yes. Argo Books automatically detects bi-monthly and seasonal cycles in your revenue and expenses, and factors these patterns into every forecast. This means your projections account for predictable fluctuations like holiday rushes or slow summer months, giving you a more realistic picture of what's ahead."
                     }
                 },
                 {
@@ -147,7 +147,7 @@
                 <span>Predictive Analytics</span>
             </div>
             <h1 class="animate-fade-in">See what's coming before it happens</h1>
-            <p class="hero-subtitle animate-fade-in">AI-powered forecasting analyzes your revenue, expenses, and customer data to predict trends, detect seasonal patterns, and surface insights that help you make smarter business decisions — automatically.</p>
+            <p class="hero-subtitle animate-fade-in">AI-powered forecasting analyzes your data to predict trends, detect seasonal patterns, and surface insights that help you make smarter business decisions — automatically.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -186,7 +186,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>No data science skills needed — the AI handles everything</span>
+                            <span>No data science skills needed — Argo Books handles everything</span>
                         </li>
                     </ul>
                 </div>
@@ -201,8 +201,8 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Try predictive analytics free</h3>
-                <p>Download Argo Books and see your first forecast within minutes of entering your data. No credit card required.</p>
+                <h3>See what's coming — with Premium</h3>
+                <p>Predictive analytics is included in Argo Books Premium for $10/month. Download for free, add your data, and upgrade whenever you're ready to forecast.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -248,12 +248,12 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Under the Hood</span>
                     <h2>Machine learning that adapts to your business</h2>
-                    <p>Our forecasting system uses multiple ML algorithms — including Holt-Winters Additive and trend decomposition — to predict future revenue, expenses, and customer growth. It continuously tests predictions against actual outcomes and adapts its methods based on what works best for your specific business.</p>
+                    <p>Our forecasting system uses multiple ML algorithms to predict future revenue, expenses, and customer growth. It continuously tests predictions against actual outcomes and adapts its methods based on what works best for your specific business.</p>
                     <p>The system doesn't just look at averages. It detects whether your business is growing, stable, or declining. It identifies seasonal cycles — like higher sales in December or slower months in summer — and factors these patterns into every forecast.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Holt-Winters Additive model for seasonal forecasting</span>
+                            <span>Multiple ML algorithms for seasonal forecasting</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -290,11 +290,11 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Use Argo Books normally</h3>
-                    <p>Record your expenses, revenue, invoices, and customer data as you normally would. The more data you have, the better the forecasts become.</p>
+                    <p>Record your data as you normally would. The more data you have, the better the forecasts become.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
-                    <h3>AI analyzes your patterns</h3>
+                    <h3>ML analyzes your patterns</h3>
                     <p>The analytics engine processes your historical data, detects trends and seasonal patterns, and builds forecasting models tuned to your business.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
@@ -311,7 +311,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Stop guessing about next month</h3>
-                <p>Let AI forecast your revenue, flag anomalies, and surface opportunities you'd otherwise miss.</p>
+                <p>Let Argo Books forecast your revenue, flag anomalies, and surface opportunities you'd otherwise miss.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -334,24 +334,6 @@
                     <h2>Insights that actually help</h2>
                     <p>Predictive analytics in Argo Books doesn't just show you charts. It generates plain-language business insights by analyzing your data across multiple dimensions — revenue trends, expense patterns, anomalies, and growth opportunities.</p>
                     <p>Every insight comes with a specific recommendation. If revenue is growing, it tells you to investigate which products drove it. If return rates spike, it flags the affected products. If a seasonal peak is approaching, it suggests preparing inventory and marketing in advance.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Revenue trend analysis — growth, decline, and comparisons to prior periods</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Anomaly detection — flags unusual return rates, expense spikes, and outliers</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Opportunity identification — high-margin products, seasonal peaks, retention chances</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Configurable time periods — analyze the last 3 months, 6 months, or full history</span>
-                        </li>
-                    </ul>
                 </div>
                 <div class="feature-detail-visual">
                     <img src="../../resources/images/features/analytics-insights.svg" alt="Argo Books business insights panel showing revenue trends, anomaly detection, and opportunities" loading="lazy">
@@ -371,15 +353,11 @@
                     <span class="section-label">Accuracy You Can Verify</span>
                     <h2>Every prediction is tested against reality</h2>
                     <p>Most forecasting tools give you a number and ask you to trust it. Argo Books shows you exactly how accurate its predictions have been — so you can decide how much weight to give each forecast.</p>
-                    <p>The system tracks every past prediction and compares it to what actually happened. You can see the forecast vs. actual revenue and expenses for each month, along with accuracy percentages and confidence scores. Over time, the model improves as it learns from its own performance.</p>
+                    <p>The system tracks every past prediction and compares it to what actually happened. You can see the forecast vs. actual revenue and expenses for each month, along with the accuracy. Over time, the model improves as it learns from its own performance.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Backtesting validates predictions against historical data before you see them</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Per-month accuracy breakdown for both revenue and expense forecasts</span>
+                            <span>Backtesting validates predictions against historical data</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -406,7 +384,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
                 <h2 class="section-title">More than just forecasting</h2>
-                <p class="section-desc">Predictive analytics transforms how you plan, budget, and grow your business — even if you've never looked at a spreadsheet model.</p>
+                <p class="section-desc">Predictive analytics transforms how you plan, budget, and grow your business.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
@@ -449,7 +427,7 @@
                         <?= svg_icon('star', 22) ?>
                     </div>
                     <h3>Surface hidden opportunities</h3>
-                    <p>AI identifies high-margin products, customer retention opportunities, and approaching seasonal peaks — insights you'd miss from looking at raw numbers alone.</p>
+                    <p>Argo Books identifies high-margin products, customer retention opportunities, and approaching seasonal peaks — insights you'd miss from looking at raw numbers alone.</p>
                 </div>
             </div>
         </div>
@@ -460,7 +438,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Make data-driven decisions</h3>
-                <p>Join small business owners who replaced gut-feeling budgeting with AI-powered forecasts.</p>
+                <p>Join small business owners who replaced gut-feeling budgeting with Argo Books.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -511,7 +489,7 @@
                         <?= svg_icon('dollar', 22) ?>
                         Anyone planning a budget
                     </h3>
-                    <p>Stop building budgets from scratch every month. Let AI project your expected revenue and expenses, then adjust based on what you know. The forecast gives you a starting point grounded in real data.</p>
+                    <p>Stop building budgets from scratch every month. Let ML project your expected revenue and expenses, then adjust based on what you know. The forecast gives you a starting point grounded in real data.</p>
                 </div>
             </div>
         </div>
@@ -584,8 +562,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
                     <h2>Your financial data never leaves your computer</h2>
-                    <p>Unlike cloud-based analytics platforms that upload your financial data to third-party servers, Argo Books runs everything locally. Your revenue data, expense records, and forecasts stay on your machine — not on someone else's cloud.</p>
-                    <p>The AI processes your data directly on your computer. No data is sent to external servers for analysis. You get enterprise-grade predictive analytics with the privacy of a desktop application.</p>
+                    <p>Unlike cloud-based analytics platforms that upload your financial data to third-party servers, Argo Books runs everything on your machine — not on someone else's cloud.</p>
+                    <p>The ML processes your data directly on your computer. No data is sent to external servers for analysis. You get enterprise-grade predictive analytics with the privacy of a desktop application.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -634,14 +612,14 @@
                     <div class="related-card-icon">
                         <?= svg_icon('receipt-scan-detail', 22) ?>
                     </div>
-                    <h3>AI Receipt Scanning</h3>
+                    <h3>Receipt Scanning</h3>
                     <p>Scan receipts to capture detailed expense data. More granular data means better predictions and more useful anomaly detection.</p>
                 </a>
                 <a href="../spreadsheet-import/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('document-upload', 22) ?>
                     </div>
-                    <h3>AI Spreadsheet Import</h3>
+                    <h3>Spreadsheet Import</h3>
                     <p>Import your full transaction history to give the analytics engine a head start. More historical data means more accurate forecasts from day one.</p>
                 </a>
             </div>
@@ -657,7 +635,7 @@
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to predict your business future?</h2>
-                    <p>Download Argo Books and let AI forecast your revenue, flag anomalies, and surface growth opportunities. Free to get started — no credit card, no trial period.</p>
+                    <p>Download now and let Argo Books forecast your revenue, flag anomalies, and surface growth opportunities.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

@@ -53,7 +53,7 @@
   <!-- Info box -->
   <rect x="48" y="170" width="504" height="48" rx="10" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
   <circle cx="72" cy="194" r="10" fill="#3b82f6" opacity="0.15"/>
-  <text x="68" y="198" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="700" fill="#3b82f6">i</text>
+  <path d="M72 188 Q72.4 193.3 77 194 Q72.4 194.7 72 200 Q71.6 194.7 67 194 Q71.6 193.3 72 188 Z" fill="#3b82f6"/>
   <text x="90" y="190" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="#1e293b">How Auto-fix Works</text>
   <text x="90" y="206" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Missing references are auto-created as placeholders you can edit later.</text>
 

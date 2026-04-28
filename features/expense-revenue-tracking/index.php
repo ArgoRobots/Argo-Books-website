@@ -122,6 +122,7 @@
 
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
@@ -170,15 +171,11 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Spreadsheets weren't built for tracking your money</h2>
-                    <p>Most small businesses start with spreadsheets or shoebox receipts. Formulas break, transactions get missed, and you never know if you're actually profitable until it's too late. Argo Books gives you a purpose-built system for recording every purchase and every sale — with guided forms that make it impossible to miss a field.</p>
+                    <p>Most small businesses start with spreadsheets or shoebox receipts. Formulas break, transactions get missed, and you never know if you're actually profitable until it's too late. Argo Books gives you a purpose-built system for recording every purchase and sale — with guided forms that make it impossible to miss a field.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Separate expense and revenue pages with dedicated workflows</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Guided forms with smart defaults — supplier, product, date, and amount</span>
+                            <span>Guided forms in a simple interface that anyone can use</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -201,7 +198,7 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Start tracking expenses and revenue today</h3>
+                <h3>Start tracking your transactions today</h3>
                 <p>Download Argo Books and record your first transaction in under a minute. No credit card required.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -248,7 +245,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Revenue Tracking</span>
                     <h2>See every dollar coming into your business</h2>
-                    <p>The revenue page gives you a complete view of every sale and payment you've received. Each transaction shows the customer, product or service sold, date, total, and status — all in a clean, sortable table. Summary cards at the top show your monthly revenue, total transactions, unique customers, and returns at a glance.</p>
+                    <p>The revenue page gives you a complete view of every sale and payment you've received — all in a clean, sortable table. Summary cards at the top show your monthly revenue, total transactions, unique customers, and returns at a glance.</p>
                     <p>Need to add a sale? Click "Add Revenue" and fill in a guided form. Argo Books auto-populates customers and products from your records, validates amounts, and links the transaction to the right customer profile — so your books stay accurate without extra effort.</p>
                     <ul class="feature-checklist">
                         <li>
@@ -258,10 +255,6 @@
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Monthly revenue, transaction count, and unique customer summaries</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Invoice generation directly from revenue records</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -290,7 +283,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Record the transaction</h3>
-                    <p>Click "Add Expense" or "Add Revenue" and fill in a guided form. Suppliers, customers, and products auto-populate from your records.</p>
+                    <p>Click 'Add Expense' or 'Add Revenue' and fill in a guided form. Costs auto-populate from your product records.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
@@ -332,8 +325,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Expense Tracking</span>
                     <h2>Track every purchase, subscription, and cost</h2>
-                    <p>The expenses page mirrors the revenue layout — a clean, filterable table with every purchase your business has made. Each row shows the product or service, supplier, date, total, receipt status, and completion status. Summary cards show monthly spending, total transactions, receipts on file, and returns.</p>
-                    <p>Filter by supplier, date range, or amount to find any transaction instantly. Need to attach a receipt? Link it directly from the expense record, or use AI receipt scanning to auto-create the expense from a photo.</p>
+                    <p>The expenses page mirrors the revenue layout — a clean, filterable table with every purchase your business has made. Summary cards show monthly spending, total transactions, receipts on file, and returns.</p>
+                    <p>Filter by supplier, date range, or amount to find any transaction instantly. Need to attach a receipt? Link it directly to the expense record, or use <a href="../receipt-scanning/index.php" class="link">AI receipt scanning</a> to auto-create the expense from a photo.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -370,13 +363,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Receipt Archive</span>
                     <h2>Every receipt stored, organized, and searchable</h2>
-                    <p>Argo Books includes a dedicated receipt archive where all your receipts — both expense and revenue — are stored in one place. Each receipt card shows a thumbnail of the original document, the receipt ID, date, vendor or customer name, transaction type, and total.</p>
-                    <p>Switch between grid and list views, search by any field, and filter by type (expense or revenue). Summary cards at the top show total receipts, expense receipts, revenue receipts, and how many were created via AI scanning. It's a complete paper trail without the paper.</p>
+                    <p>Argo Books includes a dedicated receipt archive where all your receipts — both expense and revenue — are stored in one place. Search by any field, and filter by type (expense or revenue). It's a complete paper trail without the paper.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Grid and list views for browsing receipts visually or as a table</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Color-coded badges — green for revenue, red for expenses</span>
@@ -434,22 +422,22 @@
                     <div class="benefit-card-icon amber">
                         <?= svg_icon('bolt', 22) ?>
                     </div>
-                    <h3>Two-click transaction entry</h3>
-                    <p>Auto-populated suppliers, customers, and products mean you spend seconds per transaction, not minutes. Repeat purchases are even faster with remembered defaults.</p>
+                    <h3>Edit on the fly</h3>
+                    <p>Update any transaction straight from the row — change status, mark items as lost or returned, or jump to its receipt without opening a separate page.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
                         <?= svg_icon('shield', 22) ?>
                     </div>
                     <h3>Tax-ready records all year</h3>
-                    <p>Every transaction is timestamped, categorized, and linked to receipts. When tax season arrives, your records are already organized and audit-ready.</p>
+                    <p>Every transaction is timestamped and categorized, with the option to attach a receipt for proof. When tax season arrives, your records are already organized and audit-ready.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('clock', 22) ?>
                     </div>
                     <h3>Complete transaction history</h3>
-                    <p>Every edit, status change, and update is tracked. View the full history of any transaction to see what changed, when, and why — with undo support.</p>
+                    <p>Every edit, status change, and update is tracked. View the full history of any transaction to see what changed, when, and why — with undo/redo support.</p>
                 </div>
             </div>
         </div>
@@ -528,7 +516,7 @@
                     <span class="section-label">Privacy First</span>
                     <h2>Your financial data stays on your computer</h2>
                     <p>Unlike cloud-based bookkeeping tools that upload your revenue and expense data to third-party servers, Argo Books is a desktop application. Your transactions, receipts, and financial records are stored locally on your device — not on someone else's cloud.</p>
-                    <p>No monthly data fees, no vendor lock-in, no worrying about what happens if the service shuts down. Your data is yours, and it stays on your machine. Export anytime to CSV, Excel, or PDF for your accountant.</p>
+                    <p>No vendor lock-in, no worrying about what happens if the service shuts down. Your data is yours, and it stays on your machine. Export anytime to CSV, Excel, PNG, or PDF for your accountant.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -536,11 +524,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>No third-party cloud storage of your transactions or receipts</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Export to CSV, Excel, or PDF anytime — no vendor lock-in</span>
+                            <span>Export to CSV, Excel, PNG, or PDF anytime — no vendor lock-in</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -570,7 +554,7 @@
                     <div class="related-card-icon">
                         <?= svg_icon('receipt-scan-detail', 22) ?>
                     </div>
-                    <h3>AI Receipt Scanning</h3>
+                    <h3>Receipt Scanning</h3>
                     <p>Snap a photo of a receipt and let AI create the expense record for you. Every scanned receipt flows directly into your expense tracking.</p>
                 </a>
                 <a href="../predictive-analytics/" class="related-card animate-on-scroll">
@@ -578,14 +562,14 @@
                         <?= svg_icon('analytics', 22) ?>
                     </div>
                     <h3>Predictive Analytics</h3>
-                    <p>Your expense and revenue data powers AI forecasting. See predicted cash flow, seasonal trends, and spending patterns before they impact your bottom line.</p>
+                    <p>Your expense and revenue data powers ML forecasting. See predicted cash flow, seasonal trends, and spending patterns before they impact your bottom line.</p>
                 </a>
                 <a href="../invoicing/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Invoicing</h3>
-                    <p>Generate professional invoices directly from revenue records. Customer details, products, and amounts auto-populate from your tracked transactions.</p>
+                    <p>Create professional invoices in seconds, and let customers pay online. Track yout customer's payment status and get paid faster.</p>
                 </a>
             </div>
         </div>

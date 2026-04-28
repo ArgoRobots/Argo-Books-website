@@ -174,15 +174,15 @@
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Complete customer profiles with name, email, phone, and address</span>
+                            <span>Complete customer profiles</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Searchable, sortable customer table with instant filtering</span>
+                            <span>Searchable, sortable customer table</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Summary cards show total, active, and new customers at a glance</span>
+                            <span>Summary cards show key metrics at a glance</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -248,8 +248,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Add Customers</span>
                     <h2>Build complete customer profiles in seconds</h2>
-                    <p>Click "Add Customer" and fill in a clean, guided form. Enter a first name, last name, company, email, phone number with country code, and a full mailing address — street, city, state, postal code, and country. Each customer is uniquely identifiable from the start.</p>
-                    <p>Add notes to any customer profile for details that don't fit neatly into a form field — preferred contact method, special pricing agreements, or anything else you want to remember. Every field is optional except the name, so you can start with just a name and fill in details later as the relationship grows.</p>
+                    <p>Click "Add Customer" and fill in a clean, guided form. Each customer is uniquely identifiable from the start. Add notes to any customer profile for anything you want to remember</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -261,7 +260,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Free-text notes field for anything extra you need to remember</span>
+                            <span>Notes field for anything extra you need to remember</span>
                         </li>
                     </ul>
                 </div>
@@ -296,7 +295,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Use everywhere in Argo Books</h3>
-                    <p>Customer profiles flow into invoicing, revenue tracking, and rental management. Select a customer when creating an invoice and their details auto-populate — no retyping.</p>
+                    <p>Customer profiles flow into invoicing, revenue tracking, and rental management — no retyping.</p>
                 </div>
             </div>
         </div>
@@ -307,7 +306,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Stop losing track of your customers</h3>
-                <p>A complete customer database means faster invoicing, better follow-ups, and stronger relationships. Get started in minutes.</p>
+                <p>A complete customer database means faster invoicing, better follow-ups, and stronger relationships. Get started with Argo Books in minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -328,8 +327,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Customer Dashboard</span>
                     <h2>See your entire customer base at a glance</h2>
-                    <p>The customers page shows every customer in a clean, sortable table. Each row displays the customer's name and ID with a color-coded avatar, email address, phone number, street address, country, and last rental date. Summary cards at the top show your total customer count, active customers, banned customers, and how many were added this month.</p>
-                    <p>Use the search bar to find any customer by name, email, or ID. Click the filter button to narrow results by country, status, or date added. Inline action buttons let you view a customer's full profile, edit their details, or remove them — all without leaving the page. Pagination keeps things fast even with hundreds of customers.</p>
+                    <p>The customers page shows every customer in a clean, sortable table. Summary cards at the top show your total customers and other key metrics.</p>
+                    <p>Use the search bar to find any customer. Click the filter button to narrow results by country, status, or date added. Edit their details, or remove them — all in an easy-to-use interface.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -337,7 +336,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Color-coded avatars with customer initials for quick visual scanning</span>
+                            <span>Customer avatars for quick visual scanning</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -375,7 +374,7 @@
                         <?= svg_icon('search', 22) ?>
                     </div>
                     <h3>Find anyone instantly</h3>
-                    <p>Search across names, emails, phone numbers, and addresses. Every customer is indexed and findable in seconds — even if you have hundreds of records.</p>
+                    <p>Search across names, emails, phone numbers, and addresses. Every customer is findable in seconds — even if you have hundreds of records.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -436,7 +435,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
                 <h2 class="section-title">Built for every business that has customers</h2>
-                <p class="section-desc">Whether you have 10 regulars or 1,000 clients — customer management scales with your business.</p>
+                <p class="section-desc">Whether you have 10 or 10,000 clients — customer management scales with your business.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">

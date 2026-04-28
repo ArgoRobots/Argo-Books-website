@@ -88,7 +88,7 @@
   <line x1="120" y1="298" x2="480" y2="298" stroke="#f1f5f9" stroke-width="1"/>
 
   <!-- Totals -->
-  <rect x="310" y="310" width="170" height="60" rx="6" fill="#f8fafc"/>
+  <rect x="310" y="310" width="170" height="78" rx="6" fill="#f8fafc"/>
   <text x="326" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Subtotal</text>
   <text x="466" y="332" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#1e293b" font-weight="600" text-anchor="end">$85.00</text>
   <text x="326" y="350" font-family="system-ui, -apple-system, sans-serif" font-size="10" fill="#64748b">Tax (6%)</text>
@@ -99,8 +99,7 @@
 
   <!-- Payment link section -->
   <rect x="120" y="390" width="360" height="36" rx="8" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
-  <text x="140" y="412" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#3b82f6" font-weight="600">Online Payment Link Included</text>
-  <text x="340" y="412" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#64748b">Customer can pay via credit card</text>
+  <text x="300" y="412" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#3b82f6" font-weight="600" text-anchor="middle">Online Payment Link Included</text>
 
   <!-- Footer buttons -->
   <rect x="190" y="442" width="100" height="28" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>

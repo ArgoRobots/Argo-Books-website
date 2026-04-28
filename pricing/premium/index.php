@@ -37,14 +37,14 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
     <meta name="keywords"
         content="argo premium features, invoices payments, ai receipt scanning, predictive analytics, finance tracker, sales tracker subscription">
 
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Premium Subscription - Argo Books">
     <meta property="og:description"
-        content="Subscribe to Argo Books Premium. Get invoices & payments, AI-powered receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
+        content="Subscribe to Argo Books Premium. Get invoices & payments, AI receipt scanning, and predictive analytics. $<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year.">
     <meta property="og:url" content="https://argorobots.com/pricing/premium/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -97,7 +97,7 @@ if ($existing_subscription && in_array($existing_subscription['status'], ['activ
                     <div class="ai-feature-icon">
                         <?= svg_icon('calendar-dots') ?>
                     </div>
-                    <h3>AI Receipt Scanning</h3>
+                    <h3>Receipt Scanning</h3>
                     <p>Automatically extract data from receipts using advanced image recognition. Save hours of manual
                         data entry.</p>
                 </div>

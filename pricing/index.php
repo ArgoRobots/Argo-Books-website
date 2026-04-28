@@ -172,7 +172,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <!-- Premium Subscription Card -->
                 <a href="premium/" class="pricing-card-link">
                     <div class="pricing-card ai-card">
-                        <div class="card-badge ai-badge">AI-Powered</div>
+                        <div class="card-badge ai-badge">Most popular</div>
                         <h2>Premium</h2>
                         <div class="card-price">
                             <span class="currency">$</span>

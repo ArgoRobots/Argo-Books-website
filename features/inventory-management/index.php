@@ -170,19 +170,15 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Running out of stock costs you sales and customers</h2>
-                    <p>Most small businesses track inventory in spreadsheets — or worse, in their heads. You find out something is out of stock when a customer asks for it. Reorders happen too late, counts are wrong, and you have no idea what's sitting in which location. Argo Books gives you a real-time view of every product, every location, and every stock level — so you always know what you have and when it's time to reorder.</p>
+                    <p>Most small businesses track inventory in messy spreadsheets. You find out something is out of stock when a customer asks for it. Reorders happen too late, counts are wrong, and you have no idea what's sitting in which location. Argo Books gives you a real-time view of every product, every location, and every stock level — so you always know what you have and when it's time to reorder.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Real-time stock levels with in-stock, reserved, and available counts</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Automatic low-stock and out-of-stock status badges</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Configurable reorder points per product — get alerted before you run out</span>
+                            <span>Get alerted before you run out</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -248,13 +244,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Purchase Orders</span>
                     <h2>Order from suppliers and track every delivery</h2>
-                    <p>Create purchase orders directly in Argo Books. Select a supplier, add products and quantities, and Argo Books calculates line totals automatically. Each PO gets a unique number (PO-001, PO-002, etc.) and tracks through every stage — Draft, Sent, On Order, and Received.</p>
-                    <p>When an order arrives, mark it as received and stock levels update automatically. See the total value of all orders, how many are pending approval, and which are currently on order — all from the summary cards at the top of the page.</p>
+                    <p>Create purchase orders in seconds. Select a supplier, add products and quantities, and Argo Books calculates line totals automatically. When an order arrives, mark it as received and stock levels update automatically.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Full PO lifecycle — Draft, Sent, On Order, Received</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Automatic stock updates when orders are received</span>
@@ -311,7 +302,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Stop guessing what's in stock</h3>
-                <p>Real-time stock levels mean you always know what you have. Get started in minutes.</p>
+                <p>Real-time stock levels mean you always know what you have. Get started with Argo Books in minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -333,7 +324,6 @@
                     <span class="section-label">Stock Adjustments</span>
                     <h2>Every stock change is tracked with a reason</h2>
                     <p>Not every stock change comes from a sale or a purchase order. Items get damaged, returned, moved between locations, or counted during audits. The stock adjustments page gives you a complete, auditable log of every change — with the product, location, before and after quantities, and a written reason for each adjustment.</p>
-                    <p>Filter adjustments by type — Added, Removed, or Set — to see exactly how your stock levels have changed over time. Each adjustment links back to a purchase order or customer sale when applicable, so you always know why a number changed.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -342,10 +332,6 @@
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Before and after quantities for every stock change</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Filter by Added, Removed, or Set to find specific adjustments</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -370,26 +356,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Multi-Location</span>
                     <h2>Track stock across every warehouse, store, and office</h2>
-                    <p>Add as many locations as you need — warehouses, retail stores, offices, or storage units. Each location has a name, type, physical address, and assigned manager. The locations dashboard shows total stock items, total inventory value, and average capacity used across all your sites.</p>
-                    <p>Every product in your catalog is tracked per location, so you always know not just how many you have in total, but exactly where each unit is. When you create a stock adjustment or receive a purchase order, you specify the location — keeping your counts accurate across your entire operation.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Unlimited locations — warehouses, stores, offices, and more</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Per-location stock tracking with inventory value and capacity</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Location type, address, and manager assignment</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Summary cards — total locations, stock items, value, and capacity used</span>
-                        </li>
-                    </ul>
+                    <p>Add as many locations as you need — warehouses, retail stores, offices, or storage units. The locations dashboard shows total stock items, total inventory value, and other key metrics.</p>
+                    <p>Every product in your catalog is tracked per location, so you always know not just how many you have in total, but exactly where each unit is.</p>
                 </div>
                 <div class="feature-detail-visual">
                     <img src="../../resources/images/features/inventory-purchase-orders.svg" alt="Argo Books locations page showing warehouse locations with addresses, managers, stock counts, and capacity percentages" loading="lazy">
@@ -414,14 +382,14 @@
                         <?= svg_icon('bolt', 22) ?>
                     </div>
                     <h3>Never run out of stock</h3>
-                    <p>Configurable reorder points trigger low-stock alerts before you hit zero. See which products need attention at a glance with color-coded status badges.</p>
+                    <p>Configurable low-stock alerts before you hit zero. See which products need attention at a glance with color-coded status badges.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
                     <h3>Accurate counts, always</h3>
-                    <p>Every sale, purchase order, and stock adjustment updates your counts in real time. No end-of-day reconciliation, no manual spreadsheet updates — your numbers are always current.</p>
+                    <p>Every sale, purchase order, and stock adjustment updates your counts in real time. No manual spreadsheet updates — your numbers are always current.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -497,7 +465,7 @@
                         <?= svg_icon('calendar', 22) ?>
                         Rental businesses
                     </h3>
-                    <p>Track rental equipment availability, reserved units, and items out on loan. See what's available at each location and manage returns with stock adjustments.</p>
+                    <p>Track rental equipment availability, reserved units, and items being rented. See what's available at each location and manage returns with stock adjustments.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
@@ -527,8 +495,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
                     <h2>Your inventory data stays on your computer</h2>
-                    <p>Unlike cloud-based inventory systems that upload your product catalog, stock levels, and supplier details to third-party servers, Argo Books is a desktop application. Your inventory data — products, quantities, purchase orders, and locations — is stored locally on your device.</p>
-                    <p>No monthly data fees, no vendor lock-in, no worrying about what happens if the service shuts down. Export your inventory data anytime to CSV or Excel for your accountant or for import into other systems.</p>
+                    <p>Unlike cloud-based inventory systems that upload your product catalog, stock levels, and supplier details to third-party servers, Argo Books is a desktop application. Your data — products, quantities, and purchase orders — is stored locally on your device.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -585,7 +552,7 @@
                         <?= svg_icon('calendar', 22) ?>
                     </div>
                     <h3>Rental Management</h3>
-                    <p>Rental items are tracked in your inventory. See which units are available, which are out on loan, and when they're due back — all in one place.</p>
+                    <p>Rental items are tracked in your inventory. See which units are available, which are being rented, and when they're due back — all in one place.</p>
                 </a>
             </div>
         </div>

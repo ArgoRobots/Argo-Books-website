@@ -83,7 +83,7 @@ $plans = get_plan_features();
                     "name": "Does Argo Books support bank transaction imports?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for reconciliation. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now. Argo Books is always adding new features based on user feedback."
+                        "text": "Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for matching transactions against your books. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now. Argo Books is always adding new features based on user feedback."
                     }
                 },
                 {
@@ -428,7 +428,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for reconciliation. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now.</p>
+                            <p>Not yet. Wave's Pro plan includes automatic bank transaction imports, which is convenient for matching transactions against your books. If automatic bank feeds are critical for your workflow, Wave may be a better fit for now.</p>
                             <p>We're always adding new features based on user feedback.</p>
                         </div>
                     </div>

@@ -219,8 +219,8 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Try AI receipt scanning free</h3>
-                <p>Download Argo Books and scan your first receipt in under a minute. No credit card required.</p>
+                <h3>Try AI receipt scanning for free</h3>
+                <p>Download Argo Books and scan your first receipt in under a minute. No credit card or account required.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -245,7 +245,7 @@
                     <p>Accuracy on printed receipts</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>&lt; 3 seconds</h3>
+                    <h3>&lt; 5 seconds</h3>
                     <p>Average processing time per receipt</p>
                 </div>
                 <div class="highlight-item">
@@ -266,12 +266,12 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Under the Hood</span>
                     <h2>AI that reads receipts like a human — but faster</h2>
-                    <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model to understand your receipts contextually — not just reading characters, but understanding what they mean. It can handle faded thermal paper, and even read handwritten amounts.</p>
-                    <p>After scanning, the AI structures the data into clean, organized fields: vendor, date, individual items, quantities, prices, subtotal, tax, and total. You review the results, make any corrections, and save — all in under a minute.</p>
+                    <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model (LLM) to understand your receipts contextually — not just reading characters, but understanding what they mean. It can handle faded thermal paper, and even read handwritten amounts.</p>
+                    <p>After scanning, Argo Books structures the data into clean, organized fields: vendor, date, individual items, quantities, prices, subtotal, tax, and total. You review the results, make any corrections, and save — all in a few seconds.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>OCR + AI language model for contextual understanding</span>
+                            <span>OCR + LLM for a deeper understanding</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -332,7 +332,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Verify and save</h3>
-                    <p>The AI auto-categorizes each expense. Just confirm the details, make any quick corrections, and save.</p>
+                    <p>Argo Books auto-categorizes each expense. Just confirm the details, make any quick corrections, and save.</p>
                 </div>
             </div>
         </div>
@@ -373,10 +373,6 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Search by vendor, amount, date, or category</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
                             <span>Original receipt images stored alongside extracted data</span>
                         </li>
                         <li>
@@ -407,15 +403,15 @@
                     <div class="benefit-card-icon">
                         <?= svg_icon('clock', 22) ?>
                     </div>
-                    <h3>Save hours every month</h3>
-                    <p>Stop typing receipt data by hand. Most small business owners spend 3-5 hours per month on manual receipt entry. AI scanning cuts that to minutes.</p>
+                    <h3>Save hours every week</h3>
+                    <p>Stop typing receipt data by hand. Most small business owners spend several hours every week on manual receipt entry. Argo Books cuts that to minutes.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
                     <h3>Eliminate data entry errors</h3>
-                    <p>Manual entry leads to typos, wrong totals, and missing items. The AI reads receipts accurately and catches math errors humans miss.</p>
+                    <p>Manual entry leads to typos, wrong totals, and missing items. Argo Books reads receipts accurately and catches math errors humans miss.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -435,15 +431,15 @@
                     <div class="benefit-card-icon cyan">
                         <?= svg_icon('search', 22) ?>
                     </div>
-                    <h3>Find any receipt instantly</h3>
-                    <p>Search your expense records by vendor, amount, date, or category. No more digging through files — every receipt is digital and searchable.</p>
+                    <h3>Find any receipt</h3>
+                    <p>Search your records in seconds. No more digging through files — every receipt is digital and searchable.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
-                    <h3>Better expense insights</h3>
-                    <p>When all your receipts are digitized, you can see spending patterns you'd otherwise miss — like which vendors cost you the most or where costs are rising.</p>
+                    <h3>Better insights</h3>
+                    <p>When all your receipts are digitized, you can see spending patterns you'd otherwise miss — like which vendors cost you the most, and where you can save money.</p>
                 </div>
             </div>
         </div>
@@ -453,7 +449,7 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Save 3-5 hours every month</h3>
+                <h3>Start saving time with Argo Books today</h3>
                 <p>Join small business owners who eliminated manual receipt entry with Argo Books.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -484,7 +480,7 @@
                         <?= svg_icon('users', 22) ?>
                         Freelancers & consultants
                     </h3>
-                    <p>Track client-related expenses by scanning receipts on the go. Attach scanned receipts to invoices as proof of expenses for client reimbursement.</p>
+                    <p>Track client-related expenses by scanning receipts on the go. Every receipt is categorized and stored, so when it's time to bill a client you have a clean, searchable record to reference.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
@@ -521,7 +517,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
                     <h2>Your receipts stay on your computer</h2>
-                    <p>Unlike cloud-based receipt scanners that upload your financial data to third-party servers, Argo Books is a desktop application. Your receipts and expense data are stored locally on your device — not on someone else's cloud.</p>
+                    <p>Unlike cloud-based receipt scanners that store your financial data on third-party servers, Argo Books is a desktop application. Your receipts and expense data are stored locally on your device — not on someone else's cloud.</p>
                     <p>The AI processing happens securely, and your scanned receipt images are saved alongside your financial records on your own machine. You control your data, always.</p>
                     <ul class="feature-checklist">
                         <li>
@@ -535,10 +531,6 @@
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Receipt images stored locally alongside expense records</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Works offline — scan and save without internet</span>
                         </li>
                     </ul>
                 </div>
@@ -565,21 +557,21 @@
                         <?= svg_icon('dollar', 22) ?>
                     </div>
                     <h3>Expense & Revenue Tracking</h3>
-                    <p>Scanned receipts flow directly into your expense records. Every transaction is categorized and ready for reports.</p>
+                    <p>Scanned receipts flow directly into your records. Every transaction is categorized and ready for reports.</p>
                 </a>
                 <a href="../predictive-analytics/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('analytics', 22) ?>
                     </div>
                     <h3>Predictive Analytics</h3>
-                    <p>More expense data means better forecasts. AI scanning feeds your analytics engine with accurate, detailed financial data.</p>
+                    <p>More expense data means better forecasts. Receipt scanning feeds your analytics engine with accurate, detailed financial data.</p>
                 </a>
                 <a href="../spreadsheet-import/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('document-upload', 22) ?>
                     </div>
-                    <h3>AI Spreadsheet Import</h3>
-                    <p>Have existing receipt data in spreadsheets? Import it instantly with AI-powered column mapping — then scan new receipts going forward.</p>
+                    <h3>Spreadsheet Import</h3>
+                    <p>Have existing receipt data in spreadsheets? Import it instantly with Argo Book's spreadsheet importer — then scan new receipts going forward.</p>
                 </a>
             </div>
         </div>
@@ -594,7 +586,7 @@
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to ditch manual data entry?</h2>
-                    <p>Download Argo Books and start scanning receipts with AI. Free to get started — no credit card, no trial period.</p>
+                    <p>Download now and start scanning receipts with Argo Books. With a generous free tier, and no credit card or account required.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

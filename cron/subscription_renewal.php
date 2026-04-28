@@ -254,7 +254,7 @@ foreach ($subscriptions as $subscription) {
             // Wrap the two writes in a transaction so we can never end up with
             // an extended subscription but no payment record (or vice versa).
             // The charge has already been made by this point — if the DB writes
-            // fail we log loudly so an operator can reconcile manually.
+            // fail we log loudly so an operator can fix the DB state manually.
             $pdo->beginTransaction();
             try {
                 $stmt = $pdo->prepare("
@@ -282,7 +282,7 @@ foreach ($subscriptions as $subscription) {
                 }
                 logMessage(
                     "CRITICAL: charged $subscriptionId (txn $transactionId, $$amountToCharge) but DB write failed: "
-                    . $dbEx->getMessage() . " — manual reconciliation required",
+                    . $dbEx->getMessage() . " — manual fix required",
                     'ERROR'
                 );
                 throw $dbEx;

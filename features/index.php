@@ -110,7 +110,7 @@
                     <div class="feature-card-icon blue">
                         <?= svg_icon('receipt-scan-detail', 24) ?>
                     </div>
-                    <h3>AI Receipt Scanning</h3>
+                    <h3>Receipt Scanning</h3>
                     <p>Snap a photo of any receipt and let AI extract the details automatically. No more manual data entry — just scan, review, and save.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
@@ -180,7 +180,7 @@
                     <div class="feature-card-icon green">
                         <?= svg_icon('document-upload', 24) ?>
                     </div>
-                    <h3>AI Spreadsheet Import</h3>
+                    <h3>Spreadsheet Import</h3>
                     <p>Import data from any spreadsheet format. Our AI automatically maps columns, detects data types, and imports everything cleanly — no manual mapping required.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>

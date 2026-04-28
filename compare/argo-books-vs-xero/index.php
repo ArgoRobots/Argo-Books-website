@@ -83,7 +83,7 @@ $plans = get_plan_features();
                     "name": "Does Argo Books support bank connections?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Not yet. Xero connects directly to major Canadian banks for automatic transaction imports, which is convenient for reconciliation. If automatic bank feeds are critical for your workflow, Xero may be a better fit for now. Argo Books is always adding new features based on user feedback."
+                        "text": "Not yet. Xero connects directly to major Canadian banks for automatic transaction imports, which is convenient for matching transactions against your books. If automatic bank feeds are critical for your workflow, Xero may be a better fit for now. Argo Books is always adding new features based on user feedback."
                     }
                 },
                 {
@@ -443,7 +443,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Not yet. Xero connects directly to major Canadian banks for automatic transaction imports, which is convenient for reconciliation. If automatic bank feeds are critical for your workflow, Xero may be a better fit for now.</p>
+                            <p>Not yet. Xero connects directly to major Canadian banks for automatic transaction imports, which is convenient for matching transactions against your books. If automatic bank feeds are critical for your workflow, Xero may be a better fit for now.</p>
                             <p>We're always adding new features based on user feedback.</p>
                         </div>
                     </div>

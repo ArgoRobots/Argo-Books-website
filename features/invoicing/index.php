@@ -147,7 +147,7 @@
                 <span>Invoicing</span>
             </div>
             <h1 class="animate-fade-in">Create professional invoices and get paid faster</h1>
-            <p class="hero-subtitle animate-fade-in">Build polished invoices in seconds with customizable templates, automatic calculations, and built-in online payment links. Track every invoice from draft to paid — no chasing required.</p>
+            <p class="hero-subtitle animate-fade-in">Build polished invoices in seconds with customizable templates, automatic calculations, and built-in online payments. Track every invoice from draft to paid — no chasing required.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -182,7 +182,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Built-in online payment links — customers pay with a single click</span>
+                            <span>Built-in online payments — customers pay in seconds</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -223,12 +223,12 @@
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>&lt; 2 minutes</h3>
+                    <h3>1 minute</h3>
                     <p>To create and send a complete invoice</p>
                 </div>
                 <div class="highlight-item">
                     <h3>Online payments</h3>
-                    <p>Customers pay by credit card instantly</p>
+                    <p>Customers pay online with any card</p>
                 </div>
                 <div class="highlight-item">
                     <h3>Real-time</h3>
@@ -248,24 +248,20 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Create Invoices</span>
                     <h2>Build invoices in seconds, not hours</h2>
-                    <p>The invoice builder pulls in your customers, products, and services automatically. Select a customer, add line items from your product catalog, set quantities and prices, and Argo Books handles the rest — subtotals, tax calculations, and totals update in real time as you type.</p>
-                    <p>Choose from professional email templates, set issue and due dates, and add multiple line items with a single click. Save as a draft to finish later, or preview and send immediately. Every invoice gets a unique number and is automatically linked to the customer's profile.</p>
+                    <p>Select a customer, add your products or services, set quantities and prices, and Argo Books handles the rest — subtotals, tax calculations, and totals update in real time as you type.</p>
+                    <p>Customize professional email templates, set issue and due dates, and add multiple line items. Click send, and it's done. Every invoice is automatically linked to the customer's profile.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Auto-populated customers and products from your existing records</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Real-time subtotal, tax, and total calculations as you add items</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Multiple email templates — Professional, Simple, Detailed, and more</span>
+                            <span>Multiple customizable professional templates</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Save as draft or send immediately — your choice</span>
+                            <span>Customers can pay online with their preferred payment method</span>
                         </li>
                     </ul>
                 </div>
@@ -290,7 +286,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Build your invoice</h3>
-                    <p>Select a customer, add line items from your product catalog, set quantities and prices. Argo Books calculates subtotals, tax, and totals automatically.</p>
+                    <p>Select a customer and your products or services, set quantities and prices. Argo Books calculates subtotals, tax, and totals automatically.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
@@ -311,7 +307,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Stop chasing payments</h3>
-                <p>Built-in online payment links mean your customers can pay the moment they open the invoice. Get started in minutes.</p>
+                <p>Built-in online payment links mean your customers can pay the moment they open the invoice. Get started with Argo Books in minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -333,7 +329,6 @@
                     <span class="section-label">Professional Templates</span>
                     <h2>Invoices your clients will take seriously</h2>
                     <p>Every invoice is rendered as a clean, professional document with your company name, customer billing details, itemized line items, and a clear total. The layout is designed to look great both on screen and when printed — with your branding front and center.</p>
-                    <p>Before sending, preview exactly what your customer will see. The preview shows the complete invoice with the blue branded header, billing address, invoice number, dates, due date badge, and a line-item table with prices and amounts. Make any last changes before sending — you're always in control.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -371,7 +366,7 @@
                     <span class="section-label">Online Payments</span>
                     <h2>Let customers pay with a single click</h2>
                     <p>Every invoice includes a secure online payment link powered by Stripe, Square, or PayPal. When your customer opens the invoice email, they click the payment link and see a clean, simple payment page with the amount due, invoice details, and a credit card form. No account creation, no extra steps — just enter card details and pay.</p>
-                    <p>Payments are processed securely, and the invoice status updates to "Paid" automatically in Argo Books. You get notified when payment is received, and the transaction is recorded in your revenue tracking. No more back-and-forth about e-transfers or check deposits.</p>
+                    <p>Payments are processed securely, and the invoice status updates to "Paid" automatically in Argo Books. You get notified when payment is received, and the transaction is recorded. No more back-and-forth about e-transfers or check deposits.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -408,16 +403,12 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Invoice Management</span>
                     <h2>Track every invoice from draft to paid</h2>
-                    <p>The invoices dashboard gives you a complete view of every invoice you've ever sent. See all invoices in a sortable, searchable table with invoice numbers, customer names, issue dates, due dates, amounts, and status. Summary cards at the top show your total outstanding, paid this month, overdue amounts, and invoices due this week — at a glance.</p>
-                    <p>Filter by status to see only drafts, sent, paid, or overdue invoices. Click any invoice to view its details, resend the email, or record a manual payment. Color-coded status badges make it easy to spot which invoices need attention — green for paid, red for overdue, yellow for drafts.</p>
+                    <p>The invoices dashboard gives you a complete view of every invoice you've ever sent. See all invoices in a sortable, searchable table. Summary cards at the top show your total outstanding, paid this month, overdue amounts, and invoices due this week — at a glance.</p>
+                    <p>Filter by status to see only drafts, sent, paid, or overdue invoices. Click any invoice to view its details, resend the email, or record a manual payment.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Summary cards show outstanding, paid, overdue, and due-this-week totals</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Color-coded status badges — Draft, Sent, Paid, Overdue</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -452,14 +443,14 @@
                         <?= svg_icon('bolt', 22) ?>
                     </div>
                     <h3>Get paid faster</h3>
-                    <p>Built-in online payment links let customers pay the moment they open your invoice. No waiting for checks, no chasing e-transfers — payments go straight to your account.</p>
+                    <p>Built-in online payment links let customers pay the moment they open your invoice. No waiting for checks, no chasing e-transfers — payments go straight into your account.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
                     <h3>Look professional</h3>
-                    <p>Clean, branded invoice templates show your clients you're a serious business. Professional invoices build trust and credibility — and get paid faster than plain emails.</p>
+                    <p>Clean, branded invoice templates show your clients you're a serious business. Professional invoices build trust and credibility.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -473,21 +464,21 @@
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
                     <h3>Track payment status</h3>
-                    <p>Know which invoices are paid, pending, or overdue at a glance. Summary cards and color-coded badges give you a real-time view of your accounts receivable.</p>
+                    <p>Know which invoices are paid, pending, or overdue at a glance. Summary cards and color-coded badges give you a real-time overview.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
                         <?= svg_icon('shield', 22) ?>
                     </div>
                     <h3>Secure payment processing</h3>
-                    <p>Online payments are processed through Stripe — the same payment platform used by millions of businesses worldwide. PCI-compliant and encrypted end-to-end.</p>
+                    <p>Online payments are processed through Stripe, PayPal, and Square — the same payment platforms used by millions of businesses worldwide.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('dollar', 22) ?>
                     </div>
                     <h3>Automatic revenue recording</h3>
-                    <p>When an invoice is paid, the transaction is automatically recorded in your revenue tracking. No double entry, no missed payments — your books stay accurate.</p>
+                    <p>When an invoice is paid, the transaction is automatically recorded. No double entry, no missed payments — your books stay accurate.</p>
                 </div>
             </div>
         </div>
@@ -535,7 +526,7 @@
                         <?= svg_icon('package', 22) ?>
                         Retail &amp; e-commerce
                     </h3>
-                    <p>Generate invoices for wholesale orders, bulk purchases, and custom orders. Pull products directly from your inventory and let Argo Books calculate quantities, prices, and tax.</p>
+                    <p>Invoice customers for the products they ordered. Pull items directly from your inventory and let Argo Books calculate quantities, prices, and tax.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
@@ -566,7 +557,6 @@
                     <span class="section-label">Privacy First</span>
                     <h2>Your invoice data stays on your computer</h2>
                     <p>Unlike cloud-based invoicing tools that store your customer data and financial records on third-party servers, Argo Books is a desktop application. Your invoices, customer details, and payment records are stored locally on your device — not on someone else's cloud.</p>
-                    <p>Online payments are processed securely through Stripe and Square, but your customer database and invoice history stay on your machine. Export invoices to PDF anytime for your accountant, or back up your data on your own terms.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -574,11 +564,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Online payments processed securely through Stripe — PCI compliant</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Export invoices to PDF for your accountant or records</span>
+                            <span>Online payments processed securely through Stripe, PayPal, and Square</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -616,14 +602,14 @@
                         <?= svg_icon('users', 22) ?>
                     </div>
                     <h3>Customer Management</h3>
-                    <p>Invoice creation pulls customer details directly from your customer profiles. Billing addresses, email addresses, and purchase history are always up to date.</p>
+                    <p>Invoice creation pulls customer details directly from your customer profiles. Everything stays up to date.</p>
                 </a>
                 <a href="../predictive-analytics/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('analytics', 22) ?>
                     </div>
                     <h3>Predictive Analytics</h3>
-                    <p>Your invoice data feeds AI-powered forecasting. See predicted revenue, payment patterns, and cash flow trends based on your invoicing history.</p>
+                    <p>Your invoice data feeds ML-powered forecasting. See predicted revenue, profits, and cash flow trends based on your invoicing history.</p>
                 </a>
             </div>
         </div>

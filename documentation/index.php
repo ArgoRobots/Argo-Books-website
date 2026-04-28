@@ -282,14 +282,14 @@ $isDocsLanding = true;
                     <div class="card-icon">
                         <?= svg_icon('receipt-scan', 20) ?>
                     </div>
-                    <h3>AI Receipt Scanning</h3>
+                    <h3>Receipt Scanning</h3>
                     <p>Extract data from receipts with AI</p>
                 </a>
                 <a href="pages/features/spreadsheet-import.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('document-plus', 20) ?>
                     </div>
-                    <h3>AI Spreadsheet Import</h3>
+                    <h3>Spreadsheet Import</h3>
                     <p>Import from any Excel or CSV file with AI</p>
                 </a>
                 <a href="pages/features/spreadsheet-export.php" class="doc-card">

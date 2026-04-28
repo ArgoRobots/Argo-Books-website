@@ -147,7 +147,7 @@
                 <span>Spreadsheet Import</span>
             </div>
             <h1 class="animate-fade-in">Drop a spreadsheet, get clean records</h1>
-            <p class="hero-subtitle animate-fade-in">Import customers, products, expenses, and invoices from any Excel or CSV file. Argo Books reads your columns and puts everything in the right place — no manual setup.</p>
+            <p class="hero-subtitle animate-fade-in">Import customers, products, transactions, and more from any spreadsheet file. Argo Books handles the rest — no manual setup.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -323,8 +323,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Checked Before Import</span>
                     <h2>Catch problems before they hit your books</h2>
-                    <p>Before anything is imported, Argo Books checks your file for problems. A missing supplier on an expense? A customer name that doesn't exist yet? You'll see it — and you can create the missing records with one click.</p>
-                    <p>You decide what gets fixed and what gets skipped. Afterward, a summary shows what was added, updated, or skipped — and why. Every import creates an undo point, so you can roll back anytime.</p>
+                    <p>Before anything is imported, Argo Books checks your file for problems. A missing supplier on an expense? A customer name that doesn't exist yet? You'll see it — and you can create all the missing records with one click.</p>
+                    <p>Next, a summary shows what was added, updated, or skipped — and why. Every import creates an undo point, so you can roll back anytime.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -337,10 +337,6 @@
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Skips duplicates so records don't double up</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>One-click undo for every import</span>
                         </li>
                     </ul>
                 </div>
@@ -367,14 +363,14 @@
                         <?= svg_icon('clock', 22) ?>
                     </div>
                     <h3>Migrate in minutes, not days</h3>
-                    <p>Switching systems? Import years of data in one session — not weeks of typing.</p>
+                    <p>Switching systems? Import years of data in minutes — not weeks.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
                     <h3>No setup knowledge needed</h3>
-                    <p>You don't need to know field names or formats. Argo Books figures out what each column means, even with unusual headers.</p>
+                    <p>You don't need to know field names or formats. Argo Books figures it out.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -443,7 +439,7 @@
                         <?= svg_icon('users', 22) ?>
                         Switching from other software
                     </h3>
-                    <p>Export your data from QuickBooks, Wave, or anything else as a spreadsheet. Argo Books puts customers, invoices, expenses, and everything else in the right place.</p>
+                    <p>Export your data from QuickBooks, Wave, or anything else as a spreadsheet. Argo Books imports everything.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>

@@ -152,7 +152,7 @@
                     <div class="feature-icon">
                         <?= svg_icon('receipt-scan-detail', null, '', 1.5) ?>
                     </div>
-                    <h3>AI Receipt Scanning</h3>
+                    <h3>Receipt Scanning</h3>
                     <p>Snap a photo and let AI extract all the details automatically</p>
                 </div>
                 <div class="feature-item animate-on-scroll">

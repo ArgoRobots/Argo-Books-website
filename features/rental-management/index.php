@@ -170,12 +170,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Lost rentals and missed returns cost you money</h2>
-                    <p>Most rental businesses track bookings in spreadsheets or on paper. Items go out without proper records, return dates are forgotten, deposits aren't tracked, and overdue rentals slip through the cracks. Argo Books gives you a complete rental management system — every booking, every item, every customer, every date — so nothing gets missed.</p>
+                    <p>Most rental businesses track bookings in spreadsheets or on paper. Items go out without proper records, return dates are forgotten, deposits aren't tracked, and overdue rentals slip through the cracks. Argo Books gives you a complete rental management system — so nothing gets missed.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Full rental lifecycle — Active, Overdue, and Returned status tracking</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Deposit tracking with paid/unpaid status per rental</span>
@@ -248,26 +244,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Rental Items</span>
                     <h2>Manage your rental catalog with availability tracking</h2>
-                    <p>The rental items page shows every item in your rental catalog with total units, how many are currently available, how many are rented out, and pricing for daily and weekly rates. Each item has a status — Available or All Rented — so you can see at a glance what's ready to go out.</p>
-                    <p>Set deposit amounts per item, track availability across your entire fleet, and see summary cards showing total items, available units, rented-out counts, and items in maintenance. When a rental is created, available counts update automatically.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Available vs. rented counts update in real time</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Daily and weekly pricing per item</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Configurable deposit amounts for each rental item</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Status badges — Available, All Rented, In Maintenance</span>
-                        </li>
-                    </ul>
+                    <p>Argo Books shows every item in your rental catalog with total units, how many are currently available, how many are rented out, and pricing for daily and weekly rates. Set deposit amounts, track availability, and see summary cards showing key metrics.</p>
                 </div>
                 <div class="feature-detail-visual">
                     <img src="../../resources/images/features/rental-items.svg" alt="Argo Books rental items catalog showing equipment with availability counts, daily and weekly pricing, deposit amounts, and status badges" loading="lazy">
@@ -290,17 +267,17 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Add rental items</h3>
-                    <p>Add your equipment to the rental catalog with daily and weekly rates, deposit amounts, and total unit counts. Set up your fleet once and start renting.</p>
+                    <p>Add your equipment to the rental catalog with daily and weekly rates, deposit amounts, and total unit counts.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
                     <h3>Create rental bookings</h3>
-                    <p>Select an item and customer, set start and due dates, and specify the quantity. Argo Books tracks the rental from active to returned automatically.</p>
+                    <p>Select an item and customer, set start and due dates, and specify the quantity.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Track returns and revenue</h3>
-                    <p>Mark rentals as returned when items come back. Overdue rentals are flagged automatically. Revenue and deposit totals update in real time.</p>
+                    <p>Mark rentals as returned when items come back. Overdue rentals are flagged automatically. Revenue totals update in real time.</p>
                 </div>
             </div>
         </div>
@@ -311,7 +288,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Stop losing track of your rental equipment</h3>
-                <p>Real-time availability and overdue alerts mean you always know what's out and when it's due back. Get started in minutes.</p>
+                <p>Real-time availability and overdue alerts mean you always know what's out and when it's due back. Get started With Argo Books in minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -333,16 +310,7 @@
                     <span class="section-label">Rental Records</span>
                     <h2>Every rental tracked from start to return</h2>
                     <p>The rental records page gives you a complete view of every rental — past and present. See what's currently out, what's overdue, and what's been returned, all in one sortable table with summary cards at the top.</p>
-                    <p>Color-coded status badges make it easy to spot which rentals are active (green), overdue (red), or returned (blue). Filter by status to see only what needs attention. Click any rental to view full details, generate an invoice, or mark it as returned.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Summary cards — total rentals, active, overdue, and total revenue</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Color-coded status — Active (green), Overdue (red), Returned (blue)</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Deposit and payment tracking per rental</span>
@@ -397,7 +365,7 @@
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Integrated invoicing</h3>
-                    <p>Generate invoices directly from rental records. Customer details, item pricing, and rental dates auto-populate — send a professional invoice in seconds.</p>
+                    <p>Generate invoices directly from rental records. Customer details, item pricing, and rental dates auto-populate — send professional invoices in seconds.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
@@ -422,7 +390,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>Take control of your rental business</h3>
-                <p>Join rental businesses that stopped losing equipment and started tracking every booking with Argo Books.</p>
+                <p>Join rental businesses that stopped losing equipment and started tracking with Argo Books.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -444,7 +412,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
                 <h2 class="section-title">Built for every business that rents equipment</h2>
-                <p class="section-desc">Whether you rent out 5 items or 500 — rental management scales with your business.</p>
+                <p class="section-desc">Whether you rent out 5 items or 5000 — rental management scales with your business.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">

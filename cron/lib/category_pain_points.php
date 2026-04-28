@@ -15,7 +15,7 @@
 
 return [
     'restaurants' => [
-        'reconciling tip splits and daily cash drops',
+        'matching tip splits and daily cash drops',
         'matching supplier invoices against rising food costs',
         'end-of-month sales tax without a finance person',
     ],
@@ -30,7 +30,7 @@ return [
         'chasing payment from general contractors',
     ],
     'dentists' => [
-        'reconciling insurance payments against what was billed',
+        'matching insurance payments against what was billed',
         'tracking supply costs without a full accounting team',
         'month-end reports that do not take a whole evening',
     ],
@@ -60,14 +60,14 @@ return [
     'hair salons' => [
         'tracking product sales alongside service income',
         'managing booth-rental splits without a spreadsheet',
-        'weekly cash-vs-card reconciliation',
+        'weekly cash-vs-card matching',
     ],
     'fitness gyms' => [
         'tracking recurring memberships alongside one-off sales',
         'equipment expenses and vendor invoices in one place',
     ],
     'chiropractors' => [
-        'reconciling insurance claims against what patients paid',
+        'matching insurance claims against what patients paid',
         'tracking supplies and equipment without a full finance setup',
     ],
     'veterinarians' => [
@@ -105,7 +105,7 @@ return [
         'wholesale orders and walk-in sales in one place',
     ],
     'coffee shops' => [
-        'daily cash-vs-card reconciliation',
+        'daily cash-vs-card matching',
         'tracking bean and supply costs without spreadsheets',
     ],
     'pet stores' => [
@@ -133,11 +133,11 @@ return [
         'simple books for a solo practice',
     ],
     'optometrists' => [
-        'reconciling insurance against the frames and exam charges patients actually owe',
+        'matching insurance against the frames and exam charges patients actually owe',
         'tracking frame inventory simply',
     ],
     'pharmacies' => [
-        'reconciling third-party payer reimbursements against dispensed prescriptions',
+        'matching third-party payer reimbursements against dispensed prescriptions',
         'tracking front-shop retail sales alongside pharmacy income',
     ],
     'printing services' => [
@@ -158,7 +158,7 @@ return [
     ],
     'car dealerships' => [
         'tracking parts, service, and sales revenue separately',
-        'reconciling trade-ins and financing on the books',
+        'matching trade-ins and financing on the books',
     ],
     'tire shops' => [
         'inventory costs vs sale price per tire',
@@ -205,7 +205,7 @@ return [
         'invoicing fast enough to keep cash flowing',
     ],
     'physiotherapists' => [
-        'insurance-paid sessions reconciled against private pay',
+        'insurance-paid sessions matched against private pay',
         'simple books for a solo or small-team clinic',
     ],
     'psychologists' => [
@@ -285,7 +285,7 @@ return [
         'tracking material and notion costs against small-ticket jobs',
     ],
     'dry cleaners' => [
-        'daily ticket reconciliation without a headache',
+        'daily ticket matching without a headache',
         'tracking supply costs against service revenue',
     ],
     'spas' => [
@@ -306,11 +306,11 @@ return [
     ],
     'optical stores' => [
         'frame inventory vs exam revenue tracked separately',
-        'insurance reimbursements reconciled against patient charges',
+        'insurance reimbursements matched against patient charges',
     ],
     'hearing aid clinics' => [
         'device sales, fittings, and service fees in one ledger',
-        'insurance and direct-pay reconciliation',
+        'insurance and direct-pay matching',
     ],
     'home inspectors' => [
         'one-off report invoices that go out fast',
@@ -389,7 +389,7 @@ return [
         'vendor pass-throughs separate from your own revenue',
     ],
     'food trucks' => [
-        'daily cash-vs-card reconciliation',
+        'daily cash-vs-card matching',
         'tracking food and fuel costs against sales',
     ],
 

@@ -189,6 +189,16 @@ function ab_tests_tab_render_list($pdo)
                 JOIN referral_visits rv
                   ON rv.source_code = CONCAT('outreach-', ol.id, '-v', ol.ab_variant_id)
                 WHERE ol.ab_test_id = t.id) AS clicked_count,
+            (SELECT COUNT(DISTINCT ol.id)
+                FROM outreach_leads ol
+                JOIN outreach_email_events e
+                  ON e.lead_id = ol.id AND e.event_type = 'opened'
+                WHERE ol.ab_test_id = t.id) AS opened_count,
+            (SELECT COUNT(DISTINCT ol.id)
+                FROM outreach_leads ol
+                JOIN outreach_email_events e
+                  ON e.lead_id = ol.id AND e.event_type = 'bounced'
+                WHERE ol.ab_test_id = t.id) AS bounced_count,
             (SELECT COUNT(*) FROM outreach_leads ol
                 WHERE ol.ab_test_id = t.id
                   AND ol.status IN ('replied','interested','onboarded')) AS replied_count
@@ -199,12 +209,14 @@ function ab_tests_tab_render_list($pdo)
     ");
     $tests = $testsQuery->fetchAll();
 
-    $stats = ['active' => 0, 'completed' => 0, 'assigned' => 0, 'clicked' => 0, 'replied' => 0];
+    $stats = ['active' => 0, 'completed' => 0, 'assigned' => 0, 'clicked' => 0, 'opened' => 0, 'bounced' => 0, 'replied' => 0];
     foreach ($tests as $t) {
         if ($t['status'] === 'active') $stats['active']++;
         if ($t['status'] === 'completed') $stats['completed']++;
         $stats['assigned'] += (int) $t['assigned_count'];
         $stats['clicked']  += (int) $t['clicked_count'];
+        $stats['opened']   += (int) $t['opened_count'];
+        $stats['bounced']  += (int) $t['bounced_count'];
         $stats['replied']  += (int) $t['replied_count'];
     }
     ?>
@@ -223,12 +235,20 @@ function ab_tests_tab_render_list($pdo)
             <div class="stat-value"><?php echo (int) $stats['assigned']; ?></div>
         </div>
         <div class="stat-card">
+            <div class="stat-label">Leads Opened</div>
+            <div class="stat-value stat-opened-ab"><?php echo (int) $stats['opened']; ?></div>
+        </div>
+        <div class="stat-card">
             <div class="stat-label">Leads Clicked</div>
             <div class="stat-value stat-clicked-ab"><?php echo (int) $stats['clicked']; ?></div>
         </div>
         <div class="stat-card">
             <div class="stat-label">Leads Replied</div>
             <div class="stat-value stat-replied-ab"><?php echo (int) $stats['replied']; ?></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Leads Bounced</div>
+            <div class="stat-value stat-bounced-ab"><?php echo (int) $stats['bounced']; ?></div>
         </div>
     </div>
 
@@ -324,6 +344,10 @@ function ab_tests_tab_render_list($pdo)
                                 <th>Reply rate</th>
                                 <th>Clicks</th>
                                 <th>CTR</th>
+                                <th>Opens</th>
+                                <th>Open rate</th>
+                                <th>Bounces</th>
+                                <th>Bounce rate</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -348,6 +372,10 @@ function ab_tests_tab_render_list($pdo)
                                     <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['replied_count']); ?></td>
                                     <td><?php echo (int) $t['clicked_count']; ?></td>
                                     <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['clicked_count']); ?></td>
+                                    <td><?php echo (int) $t['opened_count']; ?></td>
+                                    <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['opened_count']); ?></td>
+                                    <td><?php echo (int) $t['bounced_count']; ?></td>
+                                    <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['bounced_count']); ?></td>
                                     <td class="actions-cell">
                                         <?php if ($t['status'] === 'draft' || $t['status'] === 'paused'): ?>
                                             <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
@@ -495,12 +523,16 @@ function ab_tests_tab_render_detail($pdo, $testId)
     $ctrLeaderIdx = find_leader_idx($variants, 'ctr');
     $replyLeaderIdx = $totalReplies > 0 ? find_leader_idx($variants, 'reply_rate') : null;
 
-    $chartLabels  = array_map(fn($v) => $v['label'], $variants);
-    $chartCtrs    = array_map(fn($v) => round($v['ctr'] * 100, 2), $variants);
-    $chartReplies = array_map(fn($v) => round($v['reply_rate'] * 100, 2), $variants);
-    $chartClicks  = array_map(fn($v) => (int) $v['clicked_count'], $variants);
-    $chartReplyCounts = array_map(fn($v) => (int) $v['replied_count'], $variants);
-    $chartSent    = array_map(fn($v) => (int) $v['sent_count'], $variants);
+    $chartLabels       = array_map(fn($v) => $v['label'], $variants);
+    $chartCtrs         = array_map(fn($v) => round($v['ctr'] * 100, 2), $variants);
+    $chartReplies      = array_map(fn($v) => round($v['reply_rate'] * 100, 2), $variants);
+    $chartOpens        = array_map(fn($v) => round($v['open_rate'] * 100, 2), $variants);
+    $chartBounces      = array_map(fn($v) => round($v['bounce_rate'] * 100, 2), $variants);
+    $chartClicks       = array_map(fn($v) => (int) $v['clicked_count'], $variants);
+    $chartReplyCounts  = array_map(fn($v) => (int) $v['replied_count'], $variants);
+    $chartOpenCounts   = array_map(fn($v) => (int) $v['opened_count'], $variants);
+    $chartBounceCounts = array_map(fn($v) => (int) $v['bounced_count'], $variants);
+    $chartSent         = array_map(fn($v) => (int) $v['sent_count'], $variants);
     ?>
 
     <p style="margin-top:0;"><a href="?tab=ab-tests" class="link-strong">&larr; All tests</a></p>
@@ -645,6 +677,10 @@ function ab_tests_tab_render_detail($pdo, $testId)
                                 <th>Reply rate</th>
                                 <th>Clicks</th>
                                 <th>CTR</th>
+                                <th>Opens</th>
+                                <th>Open rate</th>
+                                <th>Bounces</th>
+                                <th>Bounce rate</th>
                                 <th>Confidence vs leader</th>
                                 <th>Actions</th>
                             </tr>
@@ -676,6 +712,10 @@ function ab_tests_tab_render_detail($pdo, $testId)
                                     <td><?php echo format_ctr((int) $v['sent_count'], (int) $v['replied_count']); ?></td>
                                     <td><?php echo (int) $v['clicked_count']; ?></td>
                                     <td><?php echo format_ctr((int) $v['sent_count'], (int) $v['clicked_count']); ?></td>
+                                    <td><?php echo (int) $v['opened_count']; ?></td>
+                                    <td><?php echo format_ctr((int) $v['sent_count'], (int) $v['opened_count']); ?></td>
+                                    <td><?php echo (int) $v['bounced_count']; ?></td>
+                                    <td><?php echo format_ctr((int) $v['sent_count'], (int) $v['bounced_count']); ?></td>
                                     <td>
                                         <?php if ($isLeader): ?>
                                             <span class="hint" style="margin:0;">leader</span>
@@ -704,7 +744,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                 </div>
 
                 <div class="chart-card">
-                    <h3>Reply rate &amp; CTR by variant</h3>
+                    <h3>Engagement rates by variant</h3>
                     <div class="chart-wrap">
                         <canvas id="abCtrChart"></canvas>
                     </div>
@@ -720,27 +760,35 @@ function ab_tests_tab_render_detail($pdo, $testId)
 
         var ctrs = <?php echo json_encode($chartCtrs); ?>;
         var replies = <?php echo json_encode($chartReplies); ?>;
+        var opens = <?php echo json_encode($chartOpens); ?>;
+        var bounces = <?php echo json_encode($chartBounces); ?>;
         var clicks = <?php echo json_encode($chartClicks); ?>;
         var replyCounts = <?php echo json_encode($chartReplyCounts); ?>;
+        var openCounts = <?php echo json_encode($chartOpenCounts); ?>;
+        var bounceCounts = <?php echo json_encode($chartBounceCounts); ?>;
         var sent = <?php echo json_encode($chartSent); ?>;
         var leaderIdx = <?php echo $leaderIdx === null ? '-1' : (int) $leaderIdx; ?>;
         var scoringMetric = <?php echo json_encode($scoringMetric); ?>;
 
-        // Highlight the leader bar in green for whichever metric is currently
-        // driving promotion. The other metric uses a neutral palette.
+        // Highlight the leader bar in green only on the metric that is
+        // currently driving promotion (reply rate when any replies exist,
+        // otherwise CTR). Open rate / bounce rate are diagnostic — bars use
+        // a uniform color so they don't compete with the leader signal.
         function leaderColors(arr, color) {
             return arr.map(function(_, i) { return i === leaderIdx ? '#22c55e' : color; });
         }
 
+        var replyDs   = { label: 'Reply rate %',  data: replies, backgroundColor: scoringMetric === 'reply_rate' ? leaderColors(replies, '#3b82f6') : '#94a3b8', borderRadius: 4 };
+        var ctrDs     = { label: 'CTR %',         data: ctrs,    backgroundColor: scoringMetric === 'ctr'        ? leaderColors(ctrs,    '#3b82f6') : '#94a3b8', borderRadius: 4 };
+        var openDs    = { label: 'Open rate %',   data: opens,   backgroundColor: '#f59e0b', borderRadius: 4 };
+        var bounceDs  = { label: 'Bounce rate %', data: bounces, backgroundColor: '#ef4444', borderRadius: 4 };
+
+        // Order: scoring metric first (leader-highlighted), other primary
+        // metric next, then opens, then bounces — left-to-right roughly
+        // tracks importance for choosing a winner.
         var datasets = scoringMetric === 'reply_rate'
-            ? [
-                { label: 'Reply rate %', data: replies, backgroundColor: leaderColors(replies, '#3b82f6'), borderRadius: 4 },
-                { label: 'CTR %',        data: ctrs,    backgroundColor: leaderColors(ctrs,    '#94a3b8'), borderRadius: 4 }
-              ]
-            : [
-                { label: 'CTR %',        data: ctrs,    backgroundColor: leaderColors(ctrs,    '#3b82f6'), borderRadius: 4 },
-                { label: 'Reply rate %', data: replies, backgroundColor: leaderColors(replies, '#94a3b8'), borderRadius: 4 }
-              ];
+            ? [replyDs, ctrDs, openDs, bounceDs]
+            : [ctrDs, replyDs, openDs, bounceDs];
 
         new Chart(el.getContext('2d'), {
             type: 'bar',
@@ -757,10 +805,12 @@ function ab_tests_tab_render_detail($pdo, $testId)
                         callbacks: {
                             label: function(ctx) {
                                 var i = ctx.dataIndex;
-                                if (ctx.dataset.label === 'Reply rate %') {
-                                    return 'Reply rate: ' + replies[i].toFixed(1) + '% (' + replyCounts[i] + ' replies of ' + sent[i] + ' sent)';
-                                }
-                                return 'CTR: ' + ctrs[i].toFixed(1) + '% (' + clicks[i] + ' clicks of ' + sent[i] + ' sent)';
+                                var label = ctx.dataset.label;
+                                if (label === 'Reply rate %')  return 'Reply rate: '  + replies[i].toFixed(1) + '% (' + replyCounts[i]  + ' replies of '  + sent[i] + ' sent)';
+                                if (label === 'CTR %')         return 'CTR: '         + ctrs[i].toFixed(1)    + '% (' + clicks[i]       + ' clicks of '   + sent[i] + ' sent)';
+                                if (label === 'Open rate %')   return 'Open rate: '   + opens[i].toFixed(1)   + '% (' + openCounts[i]   + ' opens of '    + sent[i] + ' sent)';
+                                if (label === 'Bounce rate %') return 'Bounce rate: ' + bounces[i].toFixed(1) + '% (' + bounceCounts[i] + ' bounces of '  + sent[i] + ' sent)';
+                                return label + ': ' + ctx.parsed.y.toFixed(1) + '%';
                             }
                         }
                     }

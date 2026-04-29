@@ -81,7 +81,7 @@ try {
     $updateStmt = $pdo->prepare("UPDATE outreach_leads SET status = 'replied' WHERE id = ? AND status = 'contacted'");
     $suppressStmt = $pdo->prepare("INSERT IGNORE INTO email_suppressions (email, context, reason, source_id) VALUES (?, 'outreach', ?, ?)");
     $leadByEmailStmt = $pdo->prepare("SELECT id FROM outreach_leads WHERE LOWER(email) = ? ORDER BY sent_at DESC, id DESC LIMIT 1");
-    $markNotInterestedStmt = $pdo->prepare("UPDATE outreach_leads SET status = 'not_interested' WHERE id = ? AND status NOT IN ('replied','interested','not_interested','onboarded')");
+    $markNotInterestedStmt = $pdo->prepare("UPDATE outreach_leads SET status = 'not_interested' WHERE id = ? AND status NOT IN ('replied','interested','not_interested','onboarded','email_bounced')");
 
     foreach ($messages as $msg) {
         if (empty($msg['sender_email'])) continue;

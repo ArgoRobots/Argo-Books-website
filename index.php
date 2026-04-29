@@ -108,72 +108,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         }
     </script>
 
-    <!-- FAQ Schema -->
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "What is Argo Books?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books is desktop accounting and business management software for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts automatically, manage products and inventory, and run real-time financial reports — all from your own computer. Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "How does Argo Books work?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts automatically. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health. Premium users unlock predictive analytics, unlimited invoicing, and more."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Can I use Argo Books for free?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 receipt scans per month, and 100 spreadsheet imports per month. When your business is ready for more, you can upgrade to Premium at any time."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Is my business data secure?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Your data is stored locally on your computer — not on a remote server — so you always have full control. Argo Books uses AES-256-GCM encryption, the same standard used by banks and government agencies. Premium users can also enable biometric login via Windows Hello for an extra layer of security. We never store your business data on our servers."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Which plan is right for me — Free or Premium?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "The Free plan is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports. Upgrade to Premium if you need unlimited invoicing, higher scanning limits, predictive analytics, biometric security, and priority support. Premium is available monthly or yearly with savings on the annual plan."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "What platforms does Argo Books run on?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like receipt scanning, license activation, and software updates."
-                    }
-                },
-                {
-                    "@type": "Question",
-                    "name": "Does Argo Books offer customer support?",
-                    "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "All users have access to our documentation and community forum where you can ask questions, report bugs, and request features. Premium subscribers get priority support with faster response times. You can also reach us directly through our contact page — we're a small team and we read every message."
-                    }
-                }
-            ]
-        }
-    </script>
-
     <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books - Smart Business Management Software</title>
 
@@ -183,7 +117,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">
-    <link rel="stylesheet" href="resources/styles/faq.css">
     <link rel="stylesheet" href="resources/header/style.css">
     <link rel="stylesheet" href="resources/footer/style.css">
 </head>
@@ -766,7 +699,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         <div class="container">
             <div class="ai-import-header animate-on-scroll">
                 <span class="section-tag">Smart Import</span>
-                <h2 class="section-title">Import any spreadsheet — instantly</h2>
+                <h2 class="section-title">Import any spreadsheet in seconds</h2>
                 <p class="section-description">Drop your file in and Argo Books handles the rest. No reformatting, no manual mapping, no headaches.</p>
             </div>
 
@@ -840,7 +773,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <div class="ai-flow-dest">
                     <div class="ai-flow-card ai-flow-card-dest">
                         <div class="ai-flow-card-header ai-flow-card-header-dest">
-                            <span class="ai-flow-dest-title">Imported Fields</span>
+                            <span class="ai-flow-dest-title">Argo Books</span>
                             <span class="ai-flow-dest-badge" id="aiMatchBadge">0/4</span>
                         </div>
                         <div class="ai-flow-fields" id="aiFlowFields">
@@ -900,158 +833,315 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         </div>
     </section>
 
-    <!-- How It Works Section -->
-    <section class="how-it-works-section">
+    <!-- Tax-Ready / Reports Section -->
+    <section class="tax-ready-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">How It Works</span>
-                <h2 class="section-title">Up and running in minutes</h2>
-                <p class="section-description">Getting started with Argo Books is simple. No complicated setup, no learning curve.</p>
+                <span class="section-tag">Reports &amp; Insights</span>
+                <h2 class="section-title">Stay tax-ready with clean books and instant reports</h2>
+                <p class="section-description">Every transaction is categorized and matched to its receipt as you go. Generate any report you need in seconds — no spreadsheets, no scrambling at year-end.</p>
             </div>
 
-            <div class="steps-grid">
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">1</div>
-                    <div class="step-icon">
-                        <?= svg_icon('download', 32) ?>
+            <div class="tax-ready-grid">
+                <!-- Card 1: Reports -->
+                <div class="tax-ready-card animate-on-scroll">
+                    <div class="tax-ready-visual">
+                        <svg viewBox="0 0 320 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <!-- Back doc, tilted left: Cash Flow -->
+                            <g transform="translate(28 32) rotate(-8 75 95)">
+                                <rect width="150" height="190" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+                                <rect width="150" height="30" rx="10" fill="#eff6ff"/>
+                                <rect y="20" width="150" height="10" fill="#eff6ff"/>
+                                <text x="12" y="20" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#1d4ed8" letter-spacing="0.3">CASH FLOW</text>
+                                <text x="100" y="20" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#60a5fa">Q4 2025</text>
+                                <text x="12" y="48" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8" letter-spacing="0.3">INFLOW</text>
+                                <text x="12" y="62" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#15803d">$84.2k</text>
+                                <text x="80" y="48" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8" letter-spacing="0.3">OUTFLOW</text>
+                                <text x="80" y="62" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#dc2626">$36.0k</text>
+                                <line x1="12" y1="80" x2="138" y2="80" stroke="#f1f5f9"/>
+                                <line x1="12" y1="100" x2="138" y2="100" stroke="#f1f5f9"/>
+                                <line x1="12" y1="120" x2="138" y2="120" stroke="#f1f5f9"/>
+                                <line x1="12" y1="140" x2="138" y2="140" stroke="#f1f5f9"/>
+                                <polyline points="14,128 36,118 58,122 80,104 102,108 124,90 138,96" stroke="#22c55e" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="14" cy="128" r="1.5" fill="#22c55e"/>
+                                <circle cx="58" cy="122" r="1.5" fill="#22c55e"/>
+                                <circle cx="102" cy="108" r="1.5" fill="#22c55e"/>
+                                <circle cx="138" cy="96" r="1.5" fill="#22c55e"/>
+                                <polyline points="14,140 36,134 58,136 80,130 102,132 124,128 138,130" stroke="#fca5a5" stroke-width="1.4" fill="none" stroke-dasharray="2 2"/>
+                                <text x="14" y="154" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Oct</text>
+                                <text x="80" y="154" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Nov</text>
+                                <text x="124" y="154" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Dec</text>
+                                <line x1="12" y1="166" x2="138" y2="166" stroke="#e2e8f0"/>
+                                <text x="12" y="178" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Net change</text>
+                                <text x="138" y="178" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#15803d" text-anchor="end">+$48.2k</text>
+                            </g>
+                            <!-- Back doc, tilted right: Balance Sheet -->
+                            <g transform="translate(146 32) rotate(8 75 95)">
+                                <rect width="150" height="190" rx="10" fill="#ffffff" stroke="#e2e8f0"/>
+                                <rect width="150" height="30" rx="10" fill="#faf5ff"/>
+                                <rect y="20" width="150" height="10" fill="#faf5ff"/>
+                                <text x="12" y="20" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#7c3aed" letter-spacing="0.3">BALANCE SHEET</text>
+                                <text x="108" y="20" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#a78bfa">2025</text>
+                                <text x="12" y="46" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8" letter-spacing="0.3">ASSETS</text>
+                                <text x="138" y="46" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8" letter-spacing="0.3" text-anchor="end">LIABILITIES</text>
+                                <g font-family="-apple-system,system-ui,sans-serif" font-size="7">
+                                    <text x="12" y="62" fill="#334155">Cash</text>
+                                    <text x="76" y="62" text-anchor="end" font-weight="600" fill="#0f172a">$24,800</text>
+                                    <text x="82" y="62" fill="#334155">Loans</text>
+                                    <text x="138" y="62" text-anchor="end" font-weight="600" fill="#0f172a">$8,400</text>
+                                    <text x="12" y="78" fill="#334155">Receivable</text>
+                                    <text x="76" y="78" text-anchor="end" font-weight="600" fill="#0f172a">$12,300</text>
+                                    <text x="82" y="78" fill="#334155">Cards</text>
+                                    <text x="138" y="78" text-anchor="end" font-weight="600" fill="#0f172a">$3,210</text>
+                                    <text x="12" y="94" fill="#334155">Inventory</text>
+                                    <text x="76" y="94" text-anchor="end" font-weight="600" fill="#0f172a">$18,500</text>
+                                    <text x="82" y="94" fill="#334155">Tax owed</text>
+                                    <text x="138" y="94" text-anchor="end" font-weight="600" fill="#0f172a">$4,120</text>
+                                    <text x="12" y="110" fill="#334155">Equipment</text>
+                                    <text x="76" y="110" text-anchor="end" font-weight="600" fill="#0f172a">$9,200</text>
+                                    <text x="82" y="110" fill="#334155">Vendors</text>
+                                    <text x="138" y="110" text-anchor="end" font-weight="600" fill="#0f172a">$2,800</text>
+                                </g>
+                                <line x1="12" y1="120" x2="138" y2="120" stroke="#e2e8f0"/>
+                                <text x="12" y="134" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#0f172a">TOTAL</text>
+                                <text x="76" y="134" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#7c3aed" text-anchor="end">$64,800</text>
+                                <text x="138" y="134" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#7c3aed" text-anchor="end">$18,530</text>
+                                <text x="12" y="152" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8" letter-spacing="0.3">EQUITY RATIO</text>
+                                <text x="138" y="152" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#7c3aed" text-anchor="end">71%</text>
+                                <rect x="12" y="158" width="126" height="7" rx="3.5" fill="#f3e8ff"/>
+                                <rect x="12" y="158" width="89" height="7" rx="3.5" fill="#a78bfa"/>
+                                <text x="12" y="178" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8">Healthy &gt; 60%</text>
+                            </g>
+                            <!-- Front doc: Income Statement -->
+                            <g transform="translate(85 18)">
+                                <rect width="150" height="200" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+                                <rect width="150" height="32" rx="12" fill="#eff6ff"/>
+                                <rect y="22" width="150" height="10" fill="#eff6ff"/>
+                                <text x="12" y="20" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#1d4ed8" letter-spacing="0.3">INCOME STATEMENT</text>
+                                <text x="106" y="20" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#60a5fa">Q4 2025</text>
+                                <text x="14" y="52" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#94a3b8">Net income</text>
+                                <text x="14" y="76" font-family="-apple-system,system-ui,sans-serif" font-size="20" font-weight="700" fill="#0f172a">$48,210</text>
+                                <rect x="100" y="62" width="38" height="16" rx="8" fill="#dbeafe"/>
+                                <path d="M 106 73 l 3 -4 l 3 4 z" fill="#1d4ed8"/>
+                                <text x="115" y="73" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#1d4ed8">+18%</text>
+                                <line x1="14" y1="88" x2="136" y2="88" stroke="#e2e8f0"/>
+                                <rect x="16" y="118" width="14" height="34" rx="2" fill="#bfdbfe"/>
+                                <rect x="36" y="110" width="14" height="42" rx="2" fill="#93c5fd"/>
+                                <rect x="56" y="100" width="14" height="52" rx="2" fill="#60a5fa"/>
+                                <rect x="76" y="90" width="14" height="62" rx="2" fill="#3b82f6"/>
+                                <rect x="96" y="80" width="14" height="72" rx="2" fill="#2563eb"/>
+                                <rect x="116" y="86" width="14" height="66" rx="2" fill="#1d4ed8"/>
+                                <line x1="14" y1="152" x2="136" y2="152" stroke="#e2e8f0"/>
+                                <text x="22" y="160" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="middle">F</text>
+                                <text x="42" y="160" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="middle">M</text>
+                                <text x="62" y="160" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="middle">A</text>
+                                <text x="82" y="160" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="middle">M</text>
+                                <text x="102" y="160" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="middle">J</text>
+                                <text x="122" y="160" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="middle">J</text>
+                                <text x="14" y="174" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Revenue</text>
+                                <text x="136" y="174" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#0f172a" text-anchor="end">$128.4k</text>
+                                <text x="14" y="186" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Expenses</text>
+                                <text x="136" y="186" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#0f172a" text-anchor="end">$80.2k</text>
+                            </g>
+                        </svg>
                     </div>
-                    <h3>Download</h3>
-                    <p>Get Argo Books for free. Installation takes less than 2 minutes.</p>
+                    <h3>Automatic tax reports</h3>
+                    <p>Every statement and tax summary, generated in real time.</p>
                 </div>
-                <div class="step-connector animate-on-scroll"></div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">2</div>
-                    <div class="step-icon">
-                        <?= svg_icon('pencil', 32) ?>
+
+                <!-- Card 2: Dashboard -->
+                <div class="tax-ready-card animate-on-scroll">
+                    <div class="tax-ready-visual">
+                        <svg viewBox="0 0 320 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="dashAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.45"/>
+                                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                                </linearGradient>
+                                <linearGradient id="dashAreaGrad2" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.28"/>
+                                    <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- Window -->
+                            <rect x="12" y="14" width="296" height="212" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+                            <!-- Title bar -->
+                            <rect x="12" y="14" width="296" height="28" rx="14" fill="#f8fafc"/>
+                            <rect x="12" y="30" width="296" height="12" fill="#f8fafc"/>
+                            <line x1="12" y1="42" x2="308" y2="42" stroke="#e2e8f0"/>
+                            <circle cx="26" cy="28" r="3" fill="#cbd5e1"/>
+                            <circle cx="36" cy="28" r="3" fill="#cbd5e1"/>
+                            <circle cx="46" cy="28" r="3" fill="#cbd5e1"/>
+                            <text x="160" y="32" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="600" fill="#64748b" text-anchor="middle">Argo Books — Dashboard</text>
+                            <!-- Sidebar -->
+                            <rect x="12" y="42" width="42" height="184" fill="#fbfbfd"/>
+                            <line x1="54" y1="42" x2="54" y2="226" stroke="#f1f5f9"/>
+                            <!-- Sidebar nav: active -->
+                            <rect x="22" y="56" width="22" height="22" rx="6" fill="#eff6ff"/>
+                            <rect x="28" y="64" width="10" height="2" rx="1" fill="#1d4ed8"/>
+                            <rect x="28" y="68" width="10" height="2" rx="1" fill="#1d4ed8"/>
+                            <rect x="28" y="72" width="6" height="2" rx="1" fill="#1d4ed8"/>
+                            <!-- Sidebar nav: chart -->
+                            <rect x="27" y="98" width="3" height="6" rx="1" fill="#94a3b8"/>
+                            <rect x="32" y="94" width="3" height="10" rx="1" fill="#94a3b8"/>
+                            <rect x="37" y="90" width="3" height="14" rx="1" fill="#94a3b8"/>
+                            <!-- Sidebar nav: clock -->
+                            <circle cx="33" cy="123" r="6" stroke="#94a3b8" stroke-width="1.4" fill="none"/>
+                            <line x1="33" y1="119" x2="33" y2="123" stroke="#94a3b8" stroke-width="1.4"/>
+                            <line x1="33" y1="123" x2="36" y2="125" stroke="#94a3b8" stroke-width="1.4"/>
+                            <!-- Sidebar nav: trending -->
+                            <path d="M 27 154 l 6 -6 l 4 4 l 5 -6" stroke="#94a3b8" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Sidebar nav: profile -->
+                            <circle cx="33" cy="178" r="3" fill="#94a3b8"/>
+                            <path d="M 27 188 q 6 -7 12 0" stroke="#94a3b8" stroke-width="1.4" fill="none"/>
+                            <!-- Header -->
+                            <text x="64" y="62" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#0f172a">Welcome back</text>
+                            <text x="64" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" fill="#94a3b8">April 2026 — Q2 update</text>
+                            <rect x="252" y="60" width="46" height="14" rx="7" fill="#f1f5f9"/>
+                            <text x="275" y="70" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="600" fill="#475569" text-anchor="middle">Apr 2026</text>
+                            <!-- KPI tile: revenue -->
+                            <rect x="64" y="90" width="74" height="34" rx="8" fill="#eff6ff" stroke="#dbeafe"/>
+                            <text x="71" y="102" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#60a5fa" letter-spacing="0.3">REVENUE</text>
+                            <text x="71" y="117" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#1d4ed8">$12,840</text>
+                            <!-- KPI tile: expenses -->
+                            <rect x="146" y="90" width="74" height="34" rx="8" fill="#fef2f2" stroke="#fee2e2"/>
+                            <text x="153" y="102" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#fca5a5" letter-spacing="0.3">EXPENSES</text>
+                            <text x="153" y="117" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#b91c1c">$4,120</text>
+                            <!-- KPI tile: profit -->
+                            <rect x="228" y="90" width="74" height="34" rx="8" fill="#f0fdf4" stroke="#dcfce7"/>
+                            <text x="235" y="102" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#4ade80" letter-spacing="0.3">PROFIT</text>
+                            <text x="235" y="117" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#15803d">$8,720</text>
+                            <!-- Main chart panel -->
+                            <rect x="64" y="130" width="238" height="90" rx="9" fill="#fcfcfd" stroke="#f1f5f9"/>
+                            <text x="74" y="144" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#0f172a">Revenue this month</text>
+                            <circle cx="252" cy="142" r="2.5" fill="#3b82f6"/>
+                            <text x="258" y="144" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#64748b">2026</text>
+                            <circle cx="278" cy="142" r="2.5" fill="#a78bfa"/>
+                            <text x="284" y="144" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#64748b">2025</text>
+                            <line x1="80" y1="174" x2="296" y2="174" stroke="#f1f5f9"/>
+                            <line x1="80" y1="190" x2="296" y2="190" stroke="#f1f5f9"/>
+                            <line x1="80" y1="206" x2="296" y2="206" stroke="#f1f5f9"/>
+                            <text x="76" y="176" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="end">15k</text>
+                            <text x="76" y="192" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="end">10k</text>
+                            <text x="76" y="208" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8" text-anchor="end">5k</text>
+                            <!-- Previous year line -->
+                            <path d="M 84 200 L 102 196 L 120 198 L 138 192 L 156 194 L 174 188 L 192 190 L 210 184 L 228 186 L 246 180 L 264 182 L 282 178 L 296 180 L 296 210 L 84 210 Z" fill="url(#dashAreaGrad2)"/>
+                            <polyline points="84,200 102,196 120,198 138,192 156,194 174,188 192,190 210,184 228,186 246,180 264,182 282,178 296,180" stroke="#a78bfa" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Current year line -->
+                            <path d="M 84 198 L 102 192 L 120 194 L 138 184 L 156 186 L 174 174 L 192 178 L 210 164 L 228 168 L 246 156 L 264 160 L 282 152 L 296 156 L 296 210 L 84 210 Z" fill="url(#dashAreaGrad)"/>
+                            <polyline points="84,198 102,192 120,194 138,184 156,186 174,174 192,178 210,164 228,168 246,156 264,160 282,152 296,156" stroke="#3b82f6" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- X axis -->
+                            <text x="84" y="220" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Mon</text>
+                            <text x="138" y="220" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Wed</text>
+                            <text x="192" y="220" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Fri</text>
+                            <text x="246" y="220" font-family="-apple-system,system-ui,sans-serif" font-size="6" fill="#94a3b8">Sun</text>
+                        </svg>
                     </div>
-                    <h3>Set Up</h3>
-                    <p>Add your products, customers, and suppliers. Import existing data from any spreadsheet — the system handles the formatting automatically.</p>
+                    <h3>A dashboard worth checking</h3>
+                    <p>Revenue, expenses, and profit at a glance.</p>
                 </div>
-                <div class="step-connector animate-on-scroll"></div>
-                <div class="step-card animate-on-scroll">
-                    <div class="step-number">3</div>
-                    <div class="step-icon">
-                        <?= svg_icon('trending-up', 32) ?>
+
+                <!-- Card 3: Audit-ready -->
+                <div class="tax-ready-card animate-on-scroll">
+                    <div class="tax-ready-visual">
+                        <svg viewBox="0 0 320 240" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <!-- Container -->
+                            <rect x="14" y="14" width="292" height="212" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+                            <!-- Header -->
+                            <text x="28" y="38" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#0f172a">Transactions</text>
+                            <text x="28" y="52" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#94a3b8">April 2026 · 247 entries</text>
+                            <rect x="218" y="26" width="76" height="20" rx="10" fill="#dcfce7"/>
+                            <path d="M 228 36 l 3 3 l 6 -6" stroke="#15803d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <text x="246" y="40" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#15803d">All matched</text>
+                            <!-- Column headers -->
+                            <text x="28" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" font-weight="700" fill="#94a3b8" letter-spacing="0.3">DATE</text>
+                            <text x="74" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" font-weight="700" fill="#94a3b8" letter-spacing="0.3">DESCRIPTION</text>
+                            <text x="160" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" font-weight="700" fill="#94a3b8" letter-spacing="0.3">CATEGORY</text>
+                            <text x="288" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" font-weight="700" fill="#94a3b8" letter-spacing="0.3" text-anchor="end">AMOUNT</text>
+                            <line x1="28" y1="80" x2="292" y2="80" stroke="#e2e8f0"/>
+                            <!-- Row 1: Office -->
+                            <g transform="translate(0 92)">
+                                <text x="28" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Apr 12</text>
+                                <path d="M 60 -8 L 67 -8 L 70 -5 L 70 4 L 60 4 Z" fill="#ffffff" stroke="#cbd5e1"/>
+                                <path d="M 67 -8 L 67 -5 L 70 -5 Z" fill="#cbd5e1"/>
+                                <line x1="62" y1="-2" x2="68" y2="-2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="0" x2="68" y2="0" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="2" x2="65" y2="2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text x="74" y="-1" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#0f172a">Bright Office Co.</text>
+                                <text x="74" y="9" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8">Card •• 4242</text>
+                                <rect x="160" y="-8" width="40" height="14" rx="7" fill="#eff6ff"/>
+                                <circle cx="167" cy="-1" r="2" fill="#3b82f6"/>
+                                <text x="172" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#1d4ed8">Office</text>
+                                <text x="270" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#0f172a" text-anchor="end">$248.30</text>
+                                <circle cx="284" cy="-1" r="6" fill="#f0fdf4"/>
+                                <path d="M 281 -1 l 2 2 l 4 -4" stroke="#15803d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </g>
+                            <line x1="28" y1="106" x2="292" y2="106" stroke="#f1f5f9"/>
+                            <!-- Row 2: Travel -->
+                            <g transform="translate(0 122)">
+                                <text x="28" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Apr 14</text>
+                                <path d="M 60 -8 L 67 -8 L 70 -5 L 70 4 L 60 4 Z" fill="#ffffff" stroke="#cbd5e1"/>
+                                <path d="M 67 -8 L 67 -5 L 70 -5 Z" fill="#cbd5e1"/>
+                                <line x1="62" y1="-2" x2="68" y2="-2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="0" x2="68" y2="0" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="2" x2="65" y2="2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text x="74" y="-1" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#0f172a">Skyline Airways</text>
+                                <text x="74" y="9" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8">YYZ → SFO</text>
+                                <rect x="160" y="-8" width="40" height="14" rx="7" fill="#faf5ff"/>
+                                <circle cx="167" cy="-1" r="2" fill="#7c3aed"/>
+                                <text x="172" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#7c3aed">Travel</text>
+                                <text x="270" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#0f172a" text-anchor="end">$1,420.00</text>
+                                <circle cx="284" cy="-1" r="6" fill="#f0fdf4"/>
+                                <path d="M 281 -1 l 2 2 l 4 -4" stroke="#15803d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </g>
+                            <line x1="28" y1="136" x2="292" y2="136" stroke="#f1f5f9"/>
+                            <!-- Row 3: Meals -->
+                            <g transform="translate(0 152)">
+                                <text x="28" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Apr 18</text>
+                                <path d="M 60 -8 L 67 -8 L 70 -5 L 70 4 L 60 4 Z" fill="#ffffff" stroke="#cbd5e1"/>
+                                <path d="M 67 -8 L 67 -5 L 70 -5 Z" fill="#cbd5e1"/>
+                                <line x1="62" y1="-2" x2="68" y2="-2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="0" x2="68" y2="0" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="2" x2="65" y2="2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text x="74" y="-1" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#0f172a">The Corner Café</text>
+                                <text x="74" y="9" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8">Client meeting</text>
+                                <rect x="160" y="-8" width="36" height="14" rx="7" fill="#fffbeb"/>
+                                <circle cx="167" cy="-1" r="2" fill="#f59e0b"/>
+                                <text x="172" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#b45309">Meals</text>
+                                <text x="270" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#0f172a" text-anchor="end">$84.50</text>
+                                <circle cx="284" cy="-1" r="6" fill="#f0fdf4"/>
+                                <path d="M 281 -1 l 2 2 l 4 -4" stroke="#15803d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </g>
+                            <line x1="28" y1="166" x2="292" y2="166" stroke="#f1f5f9"/>
+                            <!-- Row 4: Software -->
+                            <g transform="translate(0 182)">
+                                <text x="28" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#64748b">Apr 22</text>
+                                <path d="M 60 -8 L 67 -8 L 70 -5 L 70 4 L 60 4 Z" fill="#ffffff" stroke="#cbd5e1"/>
+                                <path d="M 67 -8 L 67 -5 L 70 -5 Z" fill="#cbd5e1"/>
+                                <line x1="62" y1="-2" x2="68" y2="-2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="0" x2="68" y2="0" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <line x1="62" y1="2" x2="65" y2="2" stroke="#cbd5e1" stroke-width="0.8"/>
+                                <text x="74" y="-1" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" font-weight="700" fill="#0f172a">PixelSuite Pro</text>
+                                <text x="74" y="9" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" fill="#94a3b8">Monthly · auto-pay</text>
+                                <rect x="160" y="-8" width="50" height="14" rx="7" fill="#ecfeff"/>
+                                <circle cx="167" cy="-1" r="2" fill="#06b6d4"/>
+                                <text x="172" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="700" fill="#0369a1">Software</text>
+                                <text x="270" y="2" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#0f172a" text-anchor="end">$54.99</text>
+                                <circle cx="284" cy="-1" r="6" fill="#f0fdf4"/>
+                                <path d="M 281 -1 l 2 2 l 4 -4" stroke="#15803d" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </g>
+                            <line x1="28" y1="200" x2="292" y2="200" stroke="#f1f5f9"/>
+                            <!-- Footer -->
+                            <text x="28" y="216" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#94a3b8">Showing 4 of 247</text>
+                            <text x="292" y="216" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="600" fill="#3b82f6" text-anchor="end">Next →</text>
+                        </svg>
                     </div>
-                    <h3>Grow</h3>
-                    <p>Start tracking sales, managing inventory, and watch your business grow.</p>
+                    <h3>Know where every dollar goes</h3>
+                    <p>Every receipt matched, every transaction categorized.</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Mobile Experience Section - TEMPORARILY DISABLED
-    <section class="mobile-section">
-        <div class="container">
-            <div class="mobile-content">
-                <div class="mobile-visual animate-on-scroll">
-                    <div class="mobile-phones">
-                        <div class="mobile-phone phone-1">
-                            <div class="mobile-phone-screen">
-                                <div class="mobile-screen-placeholder">
-                                    <div class="mobile-screen-header">
-                                        <div class="mobile-screen-logo">A</div>
-                                        <span class="mobile-screen-title">Argo Books</span>
-                                    </div>
-                                    <div class="mobile-screen-stats">
-                                        <div class="mobile-stat-card">
-                                            <span class="stat-label">Today's Sales</span>
-                                            <span class="stat-value">$2,450</span>
-                                        </div>
-                                        <div class="mobile-stat-card">
-                                            <span class="stat-label">Growth</span>
-                                            <span class="stat-value positive">+18%</span>
-                                        </div>
-                                    </div>
-                                    <div class="mobile-screen-chart">
-                                        <span class="mobile-chart-title">Weekly Revenue</span>
-                                        <div class="mobile-chart-bars">
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mobile-phone phone-2">
-                            <div class="mobile-phone-screen">
-                                <div class="mobile-screen-placeholder">
-                                    <div class="mobile-screen-header">
-                                        <div class="mobile-screen-logo">Y</div>
-                                        <span class="mobile-screen-title">Your Company</span>
-                                    </div>
-                                    <div class="mobile-screen-stats">
-                                        <div class="mobile-stat-card">
-                                            <span class="stat-label">Scanned</span>
-                                            <span class="stat-value">24</span>
-                                        </div>
-                                        <div class="mobile-stat-card">
-                                            <span class="stat-label">This Month</span>
-                                            <span class="stat-value">$890</span>
-                                        </div>
-                                    </div>
-                                    <div class="mobile-screen-chart">
-                                        <span class="mobile-chart-title">Recent Receipts</span>
-                                        <div class="mobile-chart-bars">
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                            <div class="mobile-chart-bar"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mobile-text animate-on-scroll">
-                    <span class="section-tag">Mobile App</span>
-                    <h2 class="section-title text-left">Your business in your pocket</h2>
-                    <p class="section-description text-left">Access your business data anywhere with the Argo Books mobile app. Scan receipts on the go, check real-time analytics, and stay connected to your business 24/7.</p>
-
-                    <div class="mobile-features">
-                        <div class="mobile-feature-item">
-                            <div class="mobile-feature-icon">
-                                <?= svg_icon('receipt-scan', 24) ?>
-                            </div>
-                            <div class="mobile-feature-text">
-                                <h4>Snap & Scan Receipts</h4>
-                                <p>Take a photo of any receipt and extract all the details automatically</p>
-                            </div>
-                        </div>
-                        <div class="mobile-feature-item">
-                            <div class="mobile-feature-icon">
-                                <?= svg_icon('analytics', 24) ?>
-                            </div>
-                            <div class="mobile-feature-text">
-                                <h4>Real-time Dashboard</h4>
-                                <p>Monitor sales, inventory, and key metrics wherever you are</p>
-                            </div>
-                        </div>
-                        <div class="mobile-feature-item">
-                            <div class="mobile-feature-icon">
-                                <?= svg_icon('chat', 24) ?>
-                            </div>
-                            <div class="mobile-feature-text">
-                                <h4>Instant Notifications</h4>
-                                <p>Get alerts for low stock, large orders, and important business events</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-    -->
 
     <!-- Security Section -->
     <section class="security-section">
@@ -1122,7 +1212,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Pricing</span>
-                <h2 class="section-title">Simple, transparent pricing</h2>
+                <h2 class="section-title">Pick a plan that's right for you</h2>
                 <p class="section-description">Start free, upgrade when you need more. No hidden fees, no surprises.</p>
             </div>
 
@@ -1171,125 +1261,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <a href="pricing/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="faq-section">
-        <div class="container">
-            <div class="section-header animate-on-scroll">
-                <span class="section-tag">FAQ</span>
-                <h2 class="section-title">Frequently Asked Questions</h2>
-                <p class="section-description">Everything you need to know about Argo Books. Can't find the answer you're looking for? <a href="contact.php">Get in touch</a> — we read every message.</p>
-            </div>
-
-            <div class="faq-grid">
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>What is Argo Books?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Argo Books is desktop accounting and business management software built for small businesses, freelancers, and self-employed professionals. It lets you track income and expenses, create professional invoices, scan receipts automatically, manage products and inventory, and run real-time financial reports — all from your own computer.</p>
-                            <p>Unlike cloud-only tools, your data stays on your machine, giving you full control and privacy. Argo Books is available on Windows, macOS, and Linux.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>How does Argo Books work?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Download and install Argo Books on Windows, macOS, or Linux — no account required to get started. From the dashboard you can add products, record transactions, generate invoices, and scan receipts automatically. Your data is stored locally with AES-256 encryption, and real-time analytics give you an instant snapshot of your business health.</p>
-                            <p>Premium users unlock predictive analytics, unlimited invoicing, and priority support. <a href="downloads/">Download Argo Books</a> and start managing your business in minutes.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>Can I use Argo Books for free?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Yes — Argo Books has a free tier that you can use forever, no credit card required. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 receipt scans per month, and 100 spreadsheet imports per month.</p>
-                            <p>When your business is ready for more, you can upgrade to Premium at any time. <a href="pricing/">Compare plans</a></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>Is my business data secure?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Your data is stored locally on your computer — not on a remote server — so you always have full control. Argo Books uses AES-256-GCM encryption, the same standard used by banks and government agencies. Premium users can also enable biometric login via Windows Hello for an extra layer of security.</p>
-                            <p>We never store your business data on our servers. Your books are yours and yours alone.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>Which plan is right for me — Free or Premium?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>The <strong>Free plan</strong> is ideal if you're just getting started or run a small operation. It gives you everything you need to manage products, track income and expenses, and generate basic reports.</p>
-                            <p>Upgrade to <strong>Premium</strong> ($<?php echo number_format($monthlyPrice, 0); ?>/month or $<?php echo number_format($yearlyPrice, 0); ?>/year) if you need unlimited invoicing, higher scanning limits, predictive analytics, biometric security, and priority support. Save with the annual plan. <a href="pricing/">View pricing details</a></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>What platforms does Argo Books run on?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. It's a desktop application, so it works offline without an internet connection. You only need connectivity for features like receipt scanning, license activation, and software updates.</p>
-                            <p><a href="downloads/">Download for your platform</a></p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="faq-item animate-on-scroll">
-                    <div class="faq-question">
-                        <h3>Does Argo Books offer customer support?</h3>
-                        <div class="faq-icon">
-                            <?= svg_icon('chevron-down') ?>
-                        </div>
-                    </div>
-                    <div class="faq-answer">
-                        <div class="faq-answer-content">
-                            <p>All users have access to our <a href="documentation/">documentation</a> and <a href="community/">community forum</a> where you can ask questions, report bugs, and request features. Premium subscribers get priority support with faster response times.</p>
-                            <p>You can also reach us directly through our <a href="contact.php">contact page</a> — we're a small team and we read every message.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </section>
 
@@ -1535,13 +1506,17 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             // Run single scan pass
             scanLine.style.animation = 'none';
             scanLine.offsetHeight;
-            scanLine.style.animation = 'scanLine 2.5s ease-in-out 1 forwards';
+            scanLine.style.animation = 'scanLine 2.5s linear 1 forwards';
 
-            // Highlight each text line as scan passes over it
+            // Highlight each text line exactly when the scan line crosses it
             const scanDuration = 2500;
-            const lineCount = scanTexts.length;
-            scanTexts.forEach((el, i) => {
-                const highlightAt = (scanDuration / (lineCount + 1)) * (i + 1);
+            const containerRect = scanAnimation.getBoundingClientRect();
+            const containerHeight = containerRect.height || 1;
+            scanTexts.forEach((el) => {
+                const elRect = el.getBoundingClientRect();
+                const elCenterY = (elRect.top - containerRect.top) + (elRect.height / 2);
+                const progress = Math.max(0, Math.min(1, elCenterY / containerHeight));
+                const highlightAt = progress * scanDuration;
                 scanTimeouts.push(setTimeout(() => {
                     el.classList.add('highlighted');
                 }, highlightAt));
@@ -2092,16 +2067,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
             secObserver.observe(secTerminal);
         }
-
-        // FAQ Accordion
-        const faqItems = document.querySelectorAll('.faq-item');
-        faqItems.forEach(item => {
-            const question = item.querySelector('.faq-question');
-            question.addEventListener('click', () => {
-                // Toggle current item without closing others
-                item.classList.toggle('active');
-            });
-        });
     });
     </script>
 </body>

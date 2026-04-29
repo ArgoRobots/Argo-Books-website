@@ -356,7 +356,7 @@ a {
 }
 
 .btn-lg {
-    padding: 18px 36px;
+    padding: 22px 36px;
     font-size: 1.1rem;
 }
 
@@ -1087,7 +1087,7 @@ a {
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--blue-500), transparent);
     box-shadow: 0 0 12px 3px var(--blue-alpha-30);
-    animation: scanLine 2.5s ease-in-out 1 forwards;
+    animation: scanLine 2.5s linear 1 forwards;
     opacity: 1;
     transition: opacity 0.3s ease;
 }
@@ -2252,208 +2252,86 @@ a {
 }
 
 /* ========================================
-   Mobile Experience Section
+   Tax-Ready / Reports Section
    ======================================== */
-.mobile-section {
-    padding: 120px 0;
-    background: var(--white);
-    overflow: hidden;
+.tax-ready-section {
+    padding-bottom: 120px;
+    background: var(--gray-50);
 }
 
-.mobile-content {
+.tax-ready-section .container {
+    max-width: 1480px;
+}
+
+.tax-ready-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
 }
 
-.mobile-visual {
-    position: relative;
-    display: flex;
-    justify-content: center;
-}
-
-.mobile-phones {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-    height: 500px;
-}
-
-.mobile-phone {
-    position: absolute;
-    width: 240px;
-    background: linear-gradient(145deg, var(--gray-800), var(--gray-900));
-    border-radius: 32px;
-    padding: 8px;
-    box-shadow: 0 25px 50px -12px var(--overlay-medium);
-}
-
-.mobile-phone.phone-1 {
-    left: 0;
-    top: 40px;
-    z-index: 2;
-    transform: rotate(-5deg);
-}
-
-.mobile-phone.phone-2 {
-    right: 0;
-    top: 0;
-    z-index: 1;
-    transform: rotate(5deg);
-}
-
-.mobile-phone-screen {
+.tax-ready-card {
     background: var(--white);
-    border-radius: 26px;
-    overflow: hidden;
-    aspect-ratio: 9/17;
+    border: 1px solid var(--gray-200);
+    border-radius: 28px;
+    padding: 48px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.mobile-phone-screen img {
+.tax-ready-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 48px var(--shadow-default);
+    border-color: var(--gray-300);
+}
+
+.tax-ready-visual {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: linear-gradient(135deg, var(--gray-50), var(--white) 65%);
+    border-radius: 22px;
+    border: 1px solid var(--gray-100);
+    overflow: hidden;
+    margin-bottom: 40px;
+}
+
+.tax-ready-visual svg {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-}
-
-.mobile-screen-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(180deg, var(--gray-50) 0%, var(--gray-200) 100%);
-    display: flex;
-    flex-direction: column;
-    padding: 20px;
-}
-
-.mobile-screen-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.mobile-screen-logo {
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--white);
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.mobile-screen-title {
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.mobile-screen-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.mobile-stat-card {
-    background: var(--white);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px var(--shadow-sm);
-}
-
-.mobile-stat-card .stat-label {
-    font-size: 10px;
-    color: var(--gray-500);
     display: block;
-    margin-bottom: 4px;
 }
 
-.mobile-stat-card .stat-value {
-    font-size: 18px;
+.tax-ready-card h3 {
+    font-size: 1.65rem;
     font-weight: 700;
+    margin: 0 0 14px;
+    color: var(--gray-text-darker);
+    line-height: 1.25;
 }
 
-.mobile-stat-card .stat-value.positive {
-    color: var(--emerald-500);
-}
-
-.mobile-screen-chart {
-    flex: 1;
-    background: var(--white);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px var(--shadow-sm);
-}
-
-.mobile-chart-title {
-    font-size: 12px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-
-.mobile-chart-bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    height: 80px;
-}
-
-.mobile-chart-bar {
-    flex: 1;
-    background: linear-gradient(180deg, var(--blue-500) 0%, var(--blue-700) 100%);
-    border-radius: 4px 4px 0 0;
-    min-height: 20px;
-}
-
-.mobile-chart-bar:nth-child(1) { height: 40%; }
-.mobile-chart-bar:nth-child(2) { height: 65%; }
-.mobile-chart-bar:nth-child(3) { height: 50%; }
-.mobile-chart-bar:nth-child(4) { height: 80%; }
-.mobile-chart-bar:nth-child(5) { height: 70%; }
-.mobile-chart-bar:nth-child(6) { height: 90%; }
-.mobile-chart-bar:nth-child(7) { height: 75%; }
-
-.mobile-text .section-tag {
-    margin-bottom: 16px;
-}
-
-.mobile-features {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin-top: 40px;
-}
-
-.mobile-feature-item {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-}
-
-.mobile-feature-icon {
-    width: 48px;
-    height: 48px;
-    background: linear-gradient(135deg, var(--blue-100), var(--blue-200));
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--blue-700);
-    flex-shrink: 0;
-}
-
-.mobile-feature-text h4 {
+.tax-ready-card p {
     font-size: 1.1rem;
-    margin-bottom: 4px;
+    color: var(--gray-500);
+    line-height: 1.55;
+    margin: 0;
 }
 
-.mobile-feature-text p {
-    font-size: 0.95rem;
-    color: var(--gray-500);
-    margin: 0;
+@media (max-width: 968px) {
+    .tax-ready-section .container {
+        max-width: 1200px;
+    }
+
+    .tax-ready-grid {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .tax-ready-card {
+        padding: 36px;
+    }
+
+    .tax-ready-card h3 {
+        font-size: 1.4rem;
+    }
 }
 
 /* ========================================
@@ -2703,14 +2581,17 @@ a {
 }
 
 .pricing-tag {
-    display: inline-block;
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--gray-100);
     color: var(--gray-500);
-    padding: 6px 12px;
+    padding: 8px 20px;
     border-radius: 50px;
     font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 16px;
+    white-space: nowrap;
 }
 
 .pricing-tag.ai {
@@ -3195,32 +3076,6 @@ a {
         max-width: 400px;
     }
 
-    .mobile-content {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-
-    .mobile-visual {
-        order: -1;
-    }
-
-    .mobile-phones {
-        height: 480px;
-    }
-
-    .mobile-phone {
-        width: 200px;
-    }
-
-    .mobile-features {
-        align-items: center;
-    }
-
-    .mobile-feature-item {
-        text-align: left;
-        max-width: 400px;
-    }
-
 }
 
 @media (max-width: 768px) {
@@ -3357,7 +3212,7 @@ a {
     }
 
     .btn-lg {
-        padding: 16px 28px;
+        padding: 19px 28px;
         font-size: 1rem;
     }
 
@@ -3367,6 +3222,7 @@ a {
 
     .features-section,
     .how-it-works-section,
+    .tax-ready-section,
     .ai-import-section,
     .security-section,
     .pricing-section,

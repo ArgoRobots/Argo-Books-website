@@ -2,7 +2,7 @@
 .report-btn {
   background: none;
   border: none;
-  color: var(--gray-400);
+  color: var(--black);
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 4px;
@@ -145,7 +145,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: var(--gray-700);
+  color: var(--black);
   font-size: 14px;
 }
 

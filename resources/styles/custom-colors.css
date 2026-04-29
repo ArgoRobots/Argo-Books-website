@@ -26,16 +26,16 @@
   --gray-200: #e2e8f0;
   --gray-300: #cbd5e1;
   --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
+  --gray-500: #000000;
+  --gray-600: #000000;
   --gray-700: #334155;
   --gray-800: #1e293b;
   --gray-900: #0f172a;
   --gray-border: #e5e7eb;
-  --gray-text: #6b7280;
-  --gray-text-dark: #374151;
-  --gray-text-darker: #1f2937;
-  --gray-text-light: #4b5563;
+  --gray-text: #000000;
+  --gray-text-dark: #000000;
+  --gray-text-darker: #000000;
+  --gray-text-light: #000000;
   --gray-placeholder: #9ca3af;
   --gray-input-border: #d1d5db;
   --gray-bg-light: #f3f4f6;
@@ -125,8 +125,8 @@
   /* Additional neutrals */
   --black: #000000;
   --neutral-111827: #111827;
-  --neutral-4a5568: #4a5568;
-  --neutral-666: #666666;
+  --neutral-4a5568: #000000;
+  --neutral-666: #000000;
   --neutral-f8f9fa: #f8f9fa;
   --neutral-f7f7f8: #f7f7f8;
   --dark-1a1a2e: #1a1a2e;
@@ -245,8 +245,8 @@
   --neutral-eee: #eeeeee;
   --neutral-ddd: #dddddd;
   --neutral-cccfd5: #cccfd5;
-  --neutral-a3a3a3: #a3a3a3;
-  --neutral-656565: #656565;
+  --neutral-a3a3a3: #000000;
+  --neutral-656565: #000000;
 
   /* Slate/Navy */
   --slate-1a202c: #1a202c;
@@ -281,7 +281,7 @@
   /* Hero/Footer theme */
   --hero-gradient-start: #0f172a;
   --hero-gradient-end: #1e293b;
-  --hero-text-muted: rgba(255, 255, 255, 0.8);
+  --hero-text-muted: #ffffff;
   --hero-badge-bg: rgba(255, 255, 255, 0.1);
   --hero-badge-border: rgba(255, 255, 255, 0.2);
 }

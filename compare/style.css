@@ -351,7 +351,7 @@ body {
   padding: 16px 24px;
   border-bottom: 1px solid var(--gray-100);
   font-size: 0.95rem;
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 .comparison-table td:not(:first-child) {
@@ -484,13 +484,13 @@ body {
 
 .tier-period {
   font-size: 0.9rem;
-  color: var(--gray-400);
+  color: var(--black);
 }
 
 .tier-limit {
   display: block;
   font-size: 0.85rem;
-  color: var(--gray-400);
+  color: var(--black);
   font-style: italic;
 }
 

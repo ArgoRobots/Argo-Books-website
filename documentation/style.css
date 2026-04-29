@@ -65,7 +65,7 @@ body.docs-landing {
 
 .hero-subtitle {
   font-size: 1.25rem;
-  color: var(--white-alpha-70);
+  color: var(--white);
   margin: 0 0 40px;
   line-height: 1.5;
 }
@@ -87,7 +87,7 @@ body.docs-landing {
 .hero-search .search-icon {
   position: absolute;
   left: 20px;
-  color: var(--gray-400);
+  color: var(--black);
   pointer-events: none;
 }
 
@@ -104,7 +104,7 @@ body.docs-landing {
 }
 
 .hero-search input::placeholder {
-  color: var(--gray-400);
+  color: var(--black);
 }
 
 .hero-search input:focus {
@@ -183,7 +183,7 @@ body.docs-landing {
   gap: 8px;
   padding: 14px 24px;
   background: var(--white);
-  color: var(--gray-700);
+  color: var(--black);
   text-decoration: none;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -633,7 +633,7 @@ body.docs-page .account-avatar {
 
 .nav-chevron {
   flex-shrink: 0;
-  color: var(--gray-400);
+  color: var(--black);
   transition: transform 0.2s ease;
   width: 16px;
   height: 16px;
@@ -764,7 +764,7 @@ body.docs-page .account-avatar {
 }
 
 .docs-content p {
-  color: var(--gray-700);
+  color: var(--black);
   line-height: 1.7;
   margin-bottom: 16px;
   font-size: 0.9375rem;
@@ -772,12 +772,12 @@ body.docs-page .account-avatar {
 
 .docs-content ul {
   margin: 16px 0 16px 16px;
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 .docs-content ol {
   margin: 16px 0 16px 24px;
-  color: var(--gray-700);
+  color: var(--black);
   list-style: decimal;
   padding-left: 0;
 }
@@ -906,7 +906,7 @@ body.docs-page .account-avatar {
   border-radius: 12px;
   line-height: 1.7;
   font-size: 0.9375rem;
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 /* Make the label (Tip:/Note:/Info:) appear on its own line with outlined icon */
@@ -933,7 +933,7 @@ body.docs-page .account-avatar {
 
 .info-box p {
   margin: 4px 0;
-  color: var(--gray-700);
+  color: var(--black);
   font-size: 0.9375rem;
 }
 
@@ -945,7 +945,7 @@ body.docs-page .account-avatar {
   border-radius: 12px;
   line-height: 1.7;
   font-size: 0.9375rem;
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 .warning-box > strong:first-child,
@@ -1004,7 +1004,7 @@ body.docs-page .account-avatar {
   margin-bottom: 12px;
   line-height: 1.7;
   font-size: 0.9375rem;
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 .steps-list li::before {
@@ -1038,7 +1038,7 @@ body.docs-page .account-avatar {
 .comparison-table th {
   background: var(--gray-50);
   font-weight: 600;
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 .comparison-table th:first-child,
@@ -1149,7 +1149,7 @@ body.docs-page .account-avatar {
 }
 
 .feature-text {
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 /* Three-column version cards */
@@ -1509,7 +1509,7 @@ body.docs-page .account-avatar {
 .search-overlay .search-icon {
   position: absolute;
   left: 16px;
-  color: var(--gray-400);
+  color: var(--black);
   pointer-events: none;
 }
 

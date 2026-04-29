@@ -126,7 +126,7 @@
 
 .btn-gray {
   background-color: var(--gray-bg-light);
-  color: var(--gray-700);
+  color: var(--black);
   border: 1px solid var(--gray-text);
 }
 

@@ -264,7 +264,7 @@ header .header-inner .menu-container .menu .community:after {
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--gray-400);
+  color: var(--black);
   padding: 5px;
   transition: all 0.2s ease;
 }
@@ -384,7 +384,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-views svg {
   vertical-align: middle;
-  color: var(--gray-400);
+  color: var(--black);
 }
 
 .post-actions {

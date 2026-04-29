@@ -190,7 +190,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   justify-content: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: var(--gray-400);
+  color: var(--black);
 }
 
 .response-time svg {
@@ -251,7 +251,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   display: block;
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--gray-700);
+  color: var(--black);
   margin-bottom: 8px;
 }
 
@@ -278,7 +278,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: var(--gray-400);
+  color: var(--black);
 }
 
 .form-group textarea {

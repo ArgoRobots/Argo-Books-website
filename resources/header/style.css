@@ -322,7 +322,7 @@ header .header-inner .menu-container ul li a:hover::after {
   display: block;
   font-size: 0.7rem;
   font-weight: 700;
-  color: var(--gray-400);
+  color: var(--black);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0 8px 6px;

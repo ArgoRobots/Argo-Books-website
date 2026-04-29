@@ -200,7 +200,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 }
 
 .dropdown-arrow {
-  color: var(--gray-400);
+  color: var(--black);
   transition: transform 0.3s ease;
   flex-shrink: 0;
 }
@@ -230,7 +230,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 
 .release-post .intro {
   font-size: 1.1rem;
-  color: var(--gray-700);
+  color: var(--black);
   line-height: 1.7;
   margin-bottom: 28px;
   padding-bottom: 24px;
@@ -269,7 +269,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 }
 
 .changelog-intro {
-  color: var(--gray-700);
+  color: var(--black);
   font-size: 1rem;
   margin: 0 0 16px 0;
 }

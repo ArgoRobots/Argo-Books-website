@@ -427,7 +427,7 @@ body {
   align-items: flex-start;
   gap: 12px;
   font-size: 1rem;
-  color: var(--gray-700);
+  color: var(--black);
   padding: 8px 0;
   line-height: 1.5;
 }
@@ -492,7 +492,7 @@ body {
 }
 
 .inline-cta-buttons .btn-cta-outline {
-  color: var(--gray-700);
+  color: var(--black);
   border-color: var(--gray-300);
 }
 

@@ -279,7 +279,7 @@ body {
 }
 
 .free-card:hover .free-cta {
-  border-color: var(--gray-400);
+  border-color: var(--black);
 }
 
 .ai-cta {
@@ -506,7 +506,7 @@ body {
   align-items: flex-start;
   gap: 12px;
   font-size: 1rem;
-  color: var(--gray-700);
+  color: var(--black);
   padding: 8px 0;
   line-height: 1.5;
 }

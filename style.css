@@ -602,7 +602,7 @@ a {
 .hero-subtitle {
     font-size: 1.25rem;
     margin-bottom: 32px;
-    color: var(--white-alpha-80);
+    color: var(--white);
     line-height: 1.7;
     max-width: 500px;
 }
@@ -838,7 +838,7 @@ a {
 }
 
 .trusted-logo {
-    color: var(--gray-400);
+    color: var(--black);
     transition: color 0.3s ease;
 }
 
@@ -1441,7 +1441,7 @@ a {
 
 .cal-day.header {
     font-weight: 600;
-    color: var(--gray-400);
+    color: var(--black);
     font-size: 0.75rem;
 }
 
@@ -1551,7 +1551,7 @@ a {
 
 .customer-stats .stat-lbl {
     font-size: 0.75rem;
-    color: var(--gray-400);
+    color: var(--black);
 }
 
 /* Invoice Mockup */
@@ -1586,7 +1586,7 @@ a {
 
 .meta-label {
     font-size: 0.75rem;
-    color: var(--gray-400);
+    color: var(--black);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -1750,7 +1750,7 @@ a {
 .ai-flow-row-count {
     padding: 7px 14px;
     font-size: 0.72rem;
-    color: var(--gray-400);
+    color: var(--black);
     text-align: center;
     border-top: 1px solid var(--gray-100);
 }
@@ -1859,7 +1859,7 @@ a {
 .ai-flow-hub-label {
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--gray-400);
+    color: var(--black);
     white-space: nowrap;
     transition: color 0.5s;
 }
@@ -1965,7 +1965,7 @@ a {
 .ai-flow-field-label {
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--gray-700);
+    color: var(--black);
 }
 
 .ai-flow-field-value {

@@ -241,7 +241,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .preview-toggle button:not(.active):hover {
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 .preview-container {
@@ -326,7 +326,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .preview-content {
-  color: var(--gray-700);
+  color: var(--black);
   line-height: 1.6;
 }
 
@@ -348,7 +348,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .preview-bug-section-title {
   font-weight: 600;
-  color: var(--gray-700);
+  color: var(--black);
   margin-bottom: 8px;
   font-size: 14px;
   text-transform: uppercase;
@@ -366,7 +366,7 @@ header .header-inner .menu-container .menu .community:after {
 .preview-empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: var(--gray-400);
+  color: var(--black);
   font-style: italic;
 }
 

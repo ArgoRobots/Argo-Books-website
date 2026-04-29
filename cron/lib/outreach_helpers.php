@@ -394,7 +394,7 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
         // a transient failure) won't overwrite the original Message-ID or
         // push out the follow-up schedule.
         $stmt = $pdo->prepare("UPDATE outreach_leads SET
-            status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded') THEN 'contacted' ELSE status END,
+            status = CASE WHEN status NOT IN ('replied','interested','not_interested','onboarded','email_bounced') THEN 'contacted' ELSE status END,
             first_contact_date = COALESCE(first_contact_date, NOW()),
             last_contact_date = NOW(),
             original_message_id = COALESCE(original_message_id, ?),

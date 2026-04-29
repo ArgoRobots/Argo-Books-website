@@ -546,7 +546,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     category VARCHAR(100) DEFAULT NULL,
     city VARCHAR(100) DEFAULT NULL,
     source VARCHAR(100) DEFAULT 'manual',
-    status ENUM('new','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded') DEFAULT 'new',
+    status ENUM('new','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded','email_bounced') DEFAULT 'new',
     response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
     approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
     date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -590,6 +590,11 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 --     ADD INDEX idx_outreach_ab_variant (ab_variant_id);
 -- (Existing installs that already added idx_outreach_ab need only:
 --   ALTER TABLE outreach_leads ADD INDEX idx_outreach_ab_variant (ab_variant_id);)
+--
+-- Existing installs also need 'email_bounced' added to the status ENUM
+-- so the Resend webhook can flag bounced/complained recipients:
+--   ALTER TABLE outreach_leads
+--     MODIFY COLUMN status ENUM('new','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded','email_bounced') DEFAULT 'new';
 
 -- Email suppression list (unsubscribes, opt-outs across all email contexts)
 CREATE TABLE IF NOT EXISTS email_suppressions (
@@ -612,6 +617,23 @@ CREATE TABLE IF NOT EXISTS outreach_activity_log (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
     INDEX idx_outreach_activity_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-event delivery / engagement records from the Resend webhook
+-- (webhooks/resend.php). One row per (message_id, event_type); the unique key
+-- gives idempotency on Svix retries.
+CREATE TABLE IF NOT EXISTS outreach_email_events (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    lead_id INT NOT NULL,
+    event_type VARCHAR(40) NOT NULL,
+    message_id VARCHAR(255) DEFAULT NULL,
+    occurred_at DATETIME NOT NULL,
+    raw_payload TEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_message_event (message_id, event_type),
+    INDEX idx_email_events_lead_type (lead_id, event_type),
+    INDEX idx_email_events_occurred (occurred_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- A/B tests for outreach email variants. variant_type covers every test type

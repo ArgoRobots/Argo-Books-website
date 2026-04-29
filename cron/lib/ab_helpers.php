@@ -57,9 +57,16 @@ function format_ctr($sent, $clicks)
 }
 
 /**
- * Pull sends/clicks/replies/assigned counts for every variant of a test.
- * Returns each variant row augmented with 'assigned_count', 'sent_count',
- * 'clicked_count', 'replied_count', 'ctr', 'reply_rate'.
+ * Pull sends/clicks/opens/bounces/replies/assigned counts for every variant
+ * of a test. Returns each variant row augmented with 'assigned_count',
+ * 'sent_count', 'clicked_count', 'opened_count', 'bounced_count',
+ * 'replied_count', 'ctr', 'open_rate', 'bounce_rate', 'reply_rate'.
+ *
+ * 'opened_count' / 'bounced_count' come from outreach_email_events
+ * (populated by webhooks/resend.php) and count DISTINCT leads, so a single
+ * lead opening multiple times is one open. They will be zero for any test
+ * that ran before the Resend webhook was wired up, since events are only
+ * recorded going forward.
  *
  * 'replied_count' counts leads whose status indicates a positive human
  * response (replied / interested / onboarded). 'not_interested' is excluded
@@ -79,6 +86,16 @@ function load_variants_with_stats($pdo, $testId)
                 JOIN referral_visits rv
                   ON rv.source_code = CONCAT('outreach-', ol.id, '-v', v.id)
                 WHERE ol.ab_variant_id = v.id) AS clicked_count,
+            (SELECT COUNT(DISTINCT ol.id)
+                FROM outreach_leads ol
+                JOIN outreach_email_events e
+                  ON e.lead_id = ol.id AND e.event_type = 'opened'
+                WHERE ol.ab_variant_id = v.id) AS opened_count,
+            (SELECT COUNT(DISTINCT ol.id)
+                FROM outreach_leads ol
+                JOIN outreach_email_events e
+                  ON e.lead_id = ol.id AND e.event_type = 'bounced'
+                WHERE ol.ab_variant_id = v.id) AS bounced_count,
             (SELECT COUNT(*) FROM outreach_leads ol
                 WHERE ol.ab_variant_id = v.id
                   AND ol.status IN ('replied','interested','onboarded')) AS replied_count
@@ -92,8 +109,12 @@ function load_variants_with_stats($pdo, $testId)
         $v['assigned_count'] = (int) $v['assigned_count'];
         $v['sent_count']     = (int) $v['sent_count'];
         $v['clicked_count']  = (int) $v['clicked_count'];
+        $v['opened_count']   = (int) $v['opened_count'];
+        $v['bounced_count']  = (int) $v['bounced_count'];
         $v['replied_count']  = (int) $v['replied_count'];
         $v['ctr']            = $v['sent_count'] > 0 ? $v['clicked_count'] / $v['sent_count'] : 0.0;
+        $v['open_rate']      = $v['sent_count'] > 0 ? $v['opened_count']  / $v['sent_count'] : 0.0;
+        $v['bounce_rate']    = $v['sent_count'] > 0 ? $v['bounced_count'] / $v['sent_count'] : 0.0;
         $v['reply_rate']     = $v['sent_count'] > 0 ? $v['replied_count'] / $v['sent_count'] : 0.0;
     }
     return $rows;

@@ -582,7 +582,7 @@ function stepGenerateDrafts($pdo, $dryRun)
         WHERE email IS NOT NULL AND email != ''
           AND (draft_subject IS NULL OR draft_subject = '')
           AND sent_at IS NULL
-          AND status NOT IN ('contacted', 'replied', 'interested', 'not_interested', 'onboarded')
+          AND status NOT IN ('contacted', 'replied', 'interested', 'not_interested', 'onboarded', 'email_bounced')
         ORDER BY date_added ASC
         LIMIT ?
     ");

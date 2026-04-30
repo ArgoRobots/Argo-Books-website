@@ -43,7 +43,7 @@
 
 .state-unsubscribed .success-icon,
 .state-already_unsubscribed .success-icon {
-  background: linear-gradient(45deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(45deg, var(--primary-blue), var(--blue-700));
 }
 
 .state-resubscribed .success-icon {
@@ -78,7 +78,7 @@ h1 {
 
 .success-message {
   font-size: 1.1rem;
-  color: var(--neutral-4a5568);
+  color: var(--black);
   line-height: 1.6;
   margin-bottom: 30px;
   transform: translateY(20px);
@@ -118,7 +118,7 @@ h1 {
 }
 
 .info-box li {
-  color: var(--neutral-4a5568);
+  color: var(--black);
   margin-bottom: 8px;
   padding-left: 5px;
   font-size: 0.95rem;
@@ -131,7 +131,7 @@ h1 {
 /* Sign-off signature */
 .signature {
   font-style: italic;
-  color: var(--neutral-4a5568);
+  color: var(--black);
   font-size: 0.95rem;
   margin-bottom: 28px;
   transform: translateY(20px);
@@ -170,14 +170,14 @@ h1 {
 }
 
 .primary-btn:hover {
-  background: var(--blueHover);
+  background: var(--blue-700);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px var(--shadow-default);
 }
 
 .secondary-btn {
   background: var(--neutral-edf2f7);
-  color: var(--neutral-4a5568);
+  color: var(--black);
 }
 
 .secondary-btn:hover {
@@ -189,7 +189,7 @@ h1 {
 .undo-line {
   margin-top: 28px;
   font-size: 0.85rem;
-  color: var(--neutral-4a5568);
+  color: var(--black);
   opacity: 0;
   animation: fadeIn 0.5s ease-out forwards;
   animation-delay: 1.2s;

@@ -18,7 +18,7 @@
 
 .btn-white {
   background: var(--white);
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .btn-white:hover {
@@ -41,7 +41,7 @@
 }
 
 .btn-blue:hover {
-  background: var(--blueHover);
+  background: var(--blue-700);
 }
 
 .btn-red {
@@ -50,7 +50,7 @@
 }
 
 .btn-red:hover {
-  background: var(--redHover);
+  background: var(--red-600);
 }
 
 .btn-red:disabled {
@@ -116,7 +116,7 @@
 
 .back-button:hover {
   background-color: var(--gray-bg-light);
-  color: var(--blueText);
+  color: var(--blue-900);
   border-color: var(--gray-input-border);
 }
 
@@ -127,12 +127,12 @@
 .btn-gray {
   background-color: var(--gray-bg-light);
   color: var(--black);
-  border: 1px solid var(--gray-text);
+  border: 1px solid var(--gray-500);
 }
 
 .btn-gray:hover {
   background-color: var(--gray-200);
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
 }
 
 .btn-small {

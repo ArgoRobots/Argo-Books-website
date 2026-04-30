@@ -11,7 +11,7 @@
 }
 
 .reputation-help-header h1 {
-  color: var(--blueText);
+  color: var(--blue-900);
   font-size: 32px;
   margin: 10px 0;
 }
@@ -39,7 +39,7 @@
 }
 
 .reputation-section h2 {
-  color: var(--blueText);
+  color: var(--blue-900);
   font-size: 24px;
   margin-bottom: 20px;
   padding-bottom: 15px;
@@ -80,7 +80,7 @@
 }
 
 .rep-negative {
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 .rep-example {

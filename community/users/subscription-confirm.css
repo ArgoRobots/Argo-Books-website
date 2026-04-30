@@ -34,12 +34,12 @@
 
 .confirm-card h1 {
     font-size: 24px;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     margin: 0 0 16px 0;
 }
 
 .confirm-description {
-    color: var(--gray-text);
+    color: var(--black);
     margin-bottom: 24px;
     line-height: 1.6;
 }
@@ -104,11 +104,11 @@
 }
 
 .features-box h3 {
-    color: var(--gray-text-dark);
+    color: var(--gray-700);
 }
 
 .features-box li {
-    color: var(--gray-text-light);
+    color: var(--black);
 }
 
 /* Payment Method Box */
@@ -118,7 +118,7 @@
 }
 
 .payment-method-box h3 {
-    color: var(--gray-text-dark);
+    color: var(--gray-700);
     margin-bottom: 16px;
 }
 
@@ -131,7 +131,7 @@
 
 .change-payment-label {
     font-size: 13px;
-    color: var(--gray-text);
+    color: var(--black);
     margin: 0 0 12px 0;
 }
 
@@ -202,13 +202,13 @@
 
 .billing-cycle-name {
     font-weight: 600;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     font-size: 14px;
 }
 
 .billing-cycle-price {
     font-size: 12px;
-    color: var(--gray-text);
+    color: var(--black);
     margin-top: 2px;
 }
 

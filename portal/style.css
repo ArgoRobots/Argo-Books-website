@@ -158,7 +158,7 @@ body {
 
 .status-bar-detail {
     font-size: 14px;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 /* ============================================
@@ -221,7 +221,7 @@ body {
 
 .status-cancelled {
     background: var(--gray-100);
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .status-refunded {
@@ -259,7 +259,7 @@ body {
 
 .party-detail {
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 /* Dates */
@@ -318,7 +318,7 @@ body {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--gray-500);
+    color: var(--black);
     font-weight: 600;
     text-align: left;
     border-bottom: 1px solid var(--gray-200);
@@ -361,7 +361,7 @@ body {
     justify-content: space-between;
     padding: 6px 0;
     font-size: 14px;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 .total-row-main {
@@ -430,13 +430,13 @@ body {
 .payment-fee-note {
     font-size: 13px;
     font-weight: 400;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .conf-fee-note {
     font-size: 13px;
     font-weight: 400;
-    color: var(--gray-500);
+    color: var(--black);
     display: block;
     margin-top: 2px;
 }
@@ -452,7 +452,7 @@ body {
 
 .invoice-notes h3 {
     font-size: 14px;
-    color: var(--gray-500);
+    color: var(--black);
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -460,7 +460,7 @@ body {
 
 .invoice-notes p {
     font-size: 14px;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 /* ============================================
@@ -484,7 +484,7 @@ body {
 
 .payment-summary {
     font-size: 15px;
-    color: var(--gray-600);
+    color: var(--black);
     margin-bottom: 24px;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--gray-100);
@@ -501,7 +501,7 @@ body {
 
 .method-label {
     font-size: 14px;
-    color: var(--gray-500);
+    color: var(--black);
     margin-bottom: 12px;
     font-weight: 500;
 }
@@ -612,7 +612,7 @@ body {
 }
 
 .btn-submit:hover {
-    background: var(--blueHover);
+    background: var(--blue-700);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px var(--blue-alpha-30);
 }
@@ -654,7 +654,7 @@ body {
 
 .loading-payment p {
     margin-top: 12px;
-    color: var(--gray-500);
+    color: var(--black);
     font-size: 14px;
 }
 
@@ -693,7 +693,7 @@ body {
     border-radius: 12px;
     padding: 28px;
     text-align: center;
-    color: var(--gray-600);
+    color: var(--black);
     font-size: 14px;
 }
 
@@ -737,7 +737,7 @@ body {
 }
 
 .detail-row span:first-child {
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .detail-row span:last-child {
@@ -746,7 +746,7 @@ body {
 }
 
 .confirmation-note {
-    color: var(--gray-500);
+    color: var(--black);
     font-size: 13px;
     margin-top: 16px;
 }
@@ -819,7 +819,7 @@ body {
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
-    color: var(--gray-500);
+    color: var(--black);
     transition: all 0.2s ease;
     white-space: nowrap;
     display: flex;
@@ -847,7 +847,7 @@ body {
     border-radius: 10px;
     font-size: 11px;
     font-weight: 600;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 .tab-btn.active .tab-count {
@@ -904,7 +904,7 @@ body {
 
 .card-dates {
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .card-amounts {
@@ -950,7 +950,7 @@ body {
 }
 
 .btn-pay:hover {
-    background: var(--blueHover);
+    background: var(--blue-700);
     transform: translateY(-1px);
 }
 
@@ -991,7 +991,7 @@ body {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--gray-500);
+    color: var(--black);
     font-weight: 600;
     text-align: left;
     border-bottom: 1px solid var(--gray-200);
@@ -1014,7 +1014,7 @@ body {
     background: var(--gray-50);
     padding: 2px 6px;
     border-radius: 4px;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 .text-danger {
@@ -1039,7 +1039,7 @@ body {
 }
 
 .empty-state p {
-    color: var(--gray-500);
+    color: var(--black);
     font-size: 15px;
 }
 
@@ -1064,13 +1064,13 @@ body {
 }
 
 .processing-overlay h2 {
-    color: var(--blueText);
+    color: var(--blue-900);
     margin-bottom: 12px;
     font-size: 24px;
 }
 
 .processing-overlay p {
-    color: var(--gray-text-light);
+    color: var(--black);
     font-size: 15px;
 }
 
@@ -1135,7 +1135,7 @@ body {
     .invoice-table tbody td::before {
         content: attr(data-label);
         font-weight: 600;
-        color: var(--gray-500);
+        color: var(--black);
         font-size: 12px;
         text-transform: uppercase;
     }

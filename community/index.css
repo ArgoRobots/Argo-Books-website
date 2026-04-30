@@ -77,7 +77,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .hero p {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   margin-bottom: 24px;
 }
 
@@ -158,7 +158,7 @@ header .header-inner .menu-container .menu .community:after {
 /* Search Filter Label */
 .search-filter-label {
   text-align: center;
-  color: var(--gray-text-light);
+  color: var(--black);
   font-size: 14px;
   padding: 10px;
   margin-bottom: 15px;
@@ -208,7 +208,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .search-icon-button:hover {
-  background-color: var(--blueHover);
+  background-color: var(--blue-700);
 }
 
 /* Post listings */
@@ -278,14 +278,14 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .vote-btn.voted.downvote {
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 .vote-count {
   font-weight: bold;
   font-size: 18px;
   margin: 8px 0;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .post-content {
@@ -306,7 +306,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-title {
   font-size: 18px;
-  color: var(--blueText);
+  color: var(--blue-900);
   flex: 1;
 }
 
@@ -341,7 +341,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .post-status.in_progress {
-  background-color: var(--yellow-50);
+  background-color: var(--amber-100);
   color: var(--amber-600);
 }
 
@@ -352,7 +352,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-status.declined {
   background-color: var(--red-50);
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 .post-footer {
@@ -366,7 +366,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-info {
   font-size: 14px;
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 .post-author,
@@ -408,7 +408,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .delete-post-btn {
   background-color: var(--red-100);
-  color: var(--redHover);
+  color: var(--red-600);
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
@@ -455,7 +455,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .selected-count {
   font-size: 14px;
-  color: var(--blueText);
+  color: var(--blue-900);
   font-weight: 500;
 }
 
@@ -463,7 +463,7 @@ header .header-inner .menu-container .menu .community:after {
 #loading-indicator {
   text-align: center;
   padding: 20px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 .spinner {

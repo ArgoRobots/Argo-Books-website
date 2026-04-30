@@ -188,7 +188,7 @@ body.menu-open::after {
 }
 
 .hamburger-nav-menu ul li a.logout-link {
-  color: var(--redHover);
+  color: var(--red-600);
   font-weight: 500;
 }
 
@@ -254,7 +254,7 @@ body.menu-open::after {
 .header-link {
   padding: 0.5rem 0.75rem;
   text-decoration: none;
-  color: var(--neutral-666);
+  color: var(--black);
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 4px;
@@ -285,7 +285,7 @@ body.menu-open::after {
 
 .user-name {
   font-size: 0.9rem;
-  color: var(--neutral-666);
+  color: var(--black);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -296,7 +296,7 @@ body.menu-open::after {
   align-items: center;
   gap: 0.5rem;
   background: var(--gray-bg-light);
-  color: var(--gray-text);
+  color: var(--black);
   text-decoration: none;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
@@ -310,7 +310,7 @@ body.menu-open::after {
 
 .btn-home:hover {
   background: var(--gray-border);
-  color: var(--gray-text-dark);
+  color: var(--black);
   border-color: var(--gray-input-border);
 }
 
@@ -343,7 +343,7 @@ body.menu-open::after {
 }
 
 .page-description {
-  color: var(--neutral-666);
+  color: var(--black);
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.5;
@@ -351,19 +351,19 @@ body.menu-open::after {
 
 /* Typography */
 h1 {
-  color: var(--blueText);
+  color: var(--blue-900);
   margin: 0 0 1rem 0;
 }
 
 h2 {
-  color: var(--gray-text-dark);
+  color: var(--black);
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
 }
 
 h3 {
-  color: var(--gray-text-light);
+  color: var(--black);
   font-size: 1rem;
   font-weight: 500;
   margin: 0 0 0.5rem 0;
@@ -375,7 +375,7 @@ h3 {
 }
 
 .btn-green:hover {
-  background: var(--success-green-dark);
+  background: var(--emerald-600);
 }
 
 /* Forms */
@@ -484,7 +484,7 @@ tbody tr:hover {
 }
 
 .badge-pending {
-  background-color: var(--yellow-50);
+  background-color: var(--amber-100);
   color: var(--amber-800);
 }
 
@@ -495,7 +495,7 @@ tbody tr:hover {
 
 .badge-user {
   background-color: var(--gray-border);
-  color: var(--gray-text-light);
+  color: var(--black);
 }
 
 .badge-banned {
@@ -505,7 +505,7 @@ tbody tr:hover {
 
 .badge-active {
   background-color: var(--gray-bg-light);
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 /* Action Buttons */
@@ -528,7 +528,7 @@ tbody tr:hover {
 }
 
 .stat-card h3 {
-  color: var(--gray-text);
+  color: var(--black);
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -541,7 +541,7 @@ tbody tr:hover {
 .stat-card .value {
   font-size: 1.75rem;
   font-weight: bold;
-  color: var(--blueText);
+  color: var(--blue-900);
   margin: 0;
   line-height: 1.2;
 }
@@ -585,7 +585,7 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   height: 300px;
-  color: var(--gray-text);
+  color: var(--black);
   flex-direction: column;
   text-align: center;
 }
@@ -662,7 +662,7 @@ tbody tr:hover {
   padding: 8px 15px;
   background: var(--gray-bg-light);
   border-radius: 4px;
-  color: var(--gray-text-light);
+  color: var(--black);
   text-decoration: none;
   font-size: 14px;
   transition: all 0.2s ease;
@@ -700,7 +700,7 @@ tbody tr:hover {
 }
 
 .login-header h1 {
-  color: var(--blueText);
+  color: var(--blue-900);
   margin-bottom: 10px;
 }
 
@@ -763,7 +763,7 @@ tbody tr:hover {
 .verification-heading {
   margin-bottom: 15px;
   font-size: 18px;
-  color: var(--gray-text-dark);
+  color: var(--black);
 }
 
 .steps {
@@ -801,7 +801,7 @@ tbody tr:hover {
 .no-data {
   text-align: center;
   padding: 3rem 2rem;
-  color: var(--gray-text);
+  color: var(--black);
   background: linear-gradient(135deg, var(--whiteBackground) 0%, var(--gray-bg-light) 100%);
   border-radius: 12px;
   border: 2px dashed var(--gray-input-border);
@@ -811,7 +811,7 @@ tbody tr:hover {
 .no-data h3 {
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
-  color: var(--gray-text-dark);
+  color: var(--black);
   font-weight: 600;
 }
 
@@ -826,7 +826,7 @@ tbody tr:hover {
   border-radius: 4px;
   font-family: "Monaco", "Consolas", monospace;
   font-size: 0.875rem;
-  color: var(--gray-text-dark);
+  color: var(--black);
 }
 
 /* Table Responsive Wrapper */
@@ -1038,13 +1038,13 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 .theme-toggle:hover {
   background: var(--gray-bg-light);
   border-color: var(--gray-placeholder);
-  color: var(--gray-text-dark);
+  color: var(--black);
 }
 
 .theme-toggle svg {
@@ -1064,13 +1064,13 @@ tbody tr:hover {
    Dark Theme
    ============================================================ */
 [data-theme="dark"] .theme-toggle {
-  border-color: var(--gray-text-light);
+  border-color: var(--black);
   color: var(--gray-input-border);
 }
 
 [data-theme="dark"] .theme-toggle:hover {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--whiteBackground);
 }
 
@@ -1198,8 +1198,8 @@ tbody tr:hover {
 
 /* Dark theme - Tables */
 [data-theme="dark"] .table-container {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
@@ -1210,18 +1210,18 @@ tbody tr:hover {
 
 [data-theme="dark"] th,
 [data-theme="dark"] td {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
   color: var(--gray-200);
 }
 
 [data-theme="dark"] tbody tr:hover {
-  background-color: var(--gray-text-alpha-50) !important;
+  background-color: var(--gray-700-alpha-50) !important;
 }
 
 /* Dark theme - Stat cards */
 [data-theme="dark"] .stat-card {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
@@ -1240,8 +1240,8 @@ tbody tr:hover {
 
 /* Dark theme - Charts */
 [data-theme="dark"] .chart-container {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
@@ -1256,8 +1256,8 @@ tbody tr:hover {
 [data-theme="dark"] input[type="number"],
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text-light);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--gray-200);
 }
 
@@ -1322,7 +1322,7 @@ tbody tr:hover {
 
 /* Dark theme - Period selection */
 [data-theme="dark"] .period-selection {
-  background: var(--gray-text-darker);
+  background: var(--gray-800);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
@@ -1331,30 +1331,30 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .period-btn {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--gray-400);
 }
 
 [data-theme="dark"] .period-btn:hover {
-  background: var(--gray-text-light);
+  background: var(--gray-600);
 }
 
 [data-theme="dark"] .period-btn.active {
-  background: var(--gray-text-light);
+  background: var(--gray-600);
   color: var(--gray-100);
-  border-color: var(--gray-text);
+  border-color: var(--black);
 }
 
 /* Dark theme - Login */
 [data-theme="dark"] .login-container {
-  background: var(--gray-text-darker);
+  background: var(--gray-800);
   box-shadow: 0 4px 6px var(--overlay-light);
 }
 
 /* Dark theme - 2FA */
 [data-theme="dark"] .secret-key {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text-light);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--gray-200);
 }
 
@@ -1364,8 +1364,8 @@ tbody tr:hover {
 
 [data-theme="dark"] .verification-code,
 [data-theme="dark"] .verification-input {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text-light);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--gray-200);
 }
 
@@ -1378,7 +1378,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .no-data {
   color: var(--gray-400);
-  background: linear-gradient(135deg, var(--gray-text-darker) 0%, var(--gray-800) 100%);
+  background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-800) 100%);
   border-color: var(--gray-600);
 }
 
@@ -1387,7 +1387,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .no-data code {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--gray-200);
 }
 
@@ -1406,14 +1406,14 @@ tbody tr:hover {
 
 /* Dark theme - Filters bar (payments) */
 [data-theme="dark"] .filters-bar {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
 /* Dark theme - Env toggle (payments) */
 [data-theme="dark"] .env-toggle-bar {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
 }
 
 [data-theme="dark"] .env-toggle-btn {
@@ -1425,12 +1425,12 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .env-toggle-btn.active {
-  background: var(--gray-text-darker);
+  background: var(--gray-800);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
 [data-theme="dark"] .section-tabs {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .section-tab {
@@ -1509,12 +1509,12 @@ tbody tr:hover {
 /* Dark theme - Company detail (payments) */
 [data-theme="dark"] .company-detail {
   background: var(--gray-800);
-  border-top-color: var(--gray-text-dark);
+  border-top-color: var(--black);
 }
 
 [data-theme="dark"] .detail-section-title {
   color: var(--gray-300);
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .detail-label {
@@ -1526,7 +1526,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .provider-card {
-  border-color: var(--gray-text-dark);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .provider-card.provider-connected {
@@ -1536,7 +1536,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .provider-card.provider-disconnected {
   background: var(--gray-800);
-  border-color: var(--gray-text-dark);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .provider-card-name {
@@ -1552,7 +1552,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .detail-row td {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .provider-badge.connected {
@@ -1572,13 +1572,13 @@ tbody tr:hover {
 
 /* Dark theme - Btn outline */
 [data-theme="dark"] .btn-outline {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--gray-400);
-  border-color: var(--gray-text-light);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .btn-outline:hover {
-  background: var(--gray-text-light);
+  background: var(--gray-600);
   color: var(--gray-200);
 }
 
@@ -1596,8 +1596,8 @@ tbody tr:hover {
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .form-group textarea {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text-light);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--gray-200);
 }
 
@@ -1640,22 +1640,22 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .btn-secondary {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--gray-200);
-  border-color: var(--gray-text-light);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-  background: var(--gray-text-light);
+  background: var(--gray-600);
 }
 
 /* Dark theme - Modals */
 [data-theme="dark"] .modal-content {
-  background: var(--gray-text-darker);
+  background: var(--gray-800);
 }
 
 [data-theme="dark"] .modal-header {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .modal-header h3 {
@@ -1675,12 +1675,12 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .modal-note {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--gray-400);
 }
 
 [data-theme="dark"] .modal-footer {
-  border-top-color: var(--gray-text-dark);
+  border-top-color: var(--black);
   background: var(--gray-800);
 }
 
@@ -1698,11 +1698,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] table tbody tr:hover {
-  background: var(--gray-text-alpha-50);
+  background: var(--gray-700-alpha-50);
 }
 
 [data-theme="dark"] code {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--red-400);
 }
 
@@ -1718,12 +1718,12 @@ tbody tr:hover {
 
 /* Dark theme - Reports page */
 [data-theme="dark"] .reports-table {
-  background: var(--gray-text-darker);
+  background: var(--gray-800);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
 [data-theme="dark"] .report-row {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .report-title {
@@ -1749,7 +1749,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .status-badges .status-badge {
-  background: var(--gray-text-darker);
+  background: var(--gray-800);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
@@ -1763,8 +1763,8 @@ tbody tr:hover {
 
 /* Dark theme - Filter groups */
 [data-theme="dark"] .filter-group select {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text-light);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--gray-200);
 }
 
@@ -1775,12 +1775,12 @@ tbody tr:hover {
 
 /* Dark theme - Card (users) */
 [data-theme="dark"] .card {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .card-header {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .card-header h2 {
@@ -1788,25 +1788,25 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .search-input {
-  background: var(--gray-text-dark);
-  border-color: var(--gray-text-light);
+  background: var(--gray-700);
+  border-color: var(--black);
   color: var(--gray-200);
 }
 
 [data-theme="dark"] .clear-button {
-  background: var(--gray-text-dark);
+  background: var(--gray-700);
   color: var(--gray-400);
 }
 
 [data-theme="dark"] .clear-button:hover {
-  background: var(--gray-text-light);
+  background: var(--gray-600);
   color: var(--gray-200);
 }
 
 /* Dark theme - Bulk actions (users) */
 [data-theme="dark"] .bulk-actions-bar {
   background: var(--gray-800);
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .selection-info {
@@ -1815,8 +1815,8 @@ tbody tr:hover {
 
 /* Dark theme - Dashboard chart cards */
 [data-theme="dark"] .chart-card {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
   box-shadow: 0 4px 6px var(--shadow-xl);
 }
 
@@ -1831,7 +1831,7 @@ tbody tr:hover {
 
 /* Dark theme - Checkboxes */
 [data-theme="dark"] .checkbox input[type="checkbox"] {
-  background-color: var(--gray-text-darker);
+  background-color: var(--black);
   border-color: var(--indigo-500);
 }
 
@@ -1860,7 +1860,7 @@ tbody tr:hover {
 /* Dark theme - Bulk actions container (license, search) */
 [data-theme="dark"] .bulk-actions-container {
   background: var(--gray-800);
-  border-color: var(--gray-text-dark);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .bulk-actions-container .selection-info {
@@ -1873,8 +1873,8 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .error-details-table {
-  background: var(--gray-text-darker);
-  border-color: var(--gray-text-dark);
+  background: var(--gray-800);
+  border-color: var(--black);
 }
 
 [data-theme="dark"] .error-details-table th {
@@ -1883,7 +1883,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .error-details-table td {
-  border-bottom-color: var(--gray-text-dark);
+  border-bottom-color: var(--black);
   color: var(--gray-200);
 }
 
@@ -1962,7 +1962,7 @@ tbody tr:hover {
 }
 
 .pg-num.pg-active {
-  background: var(--blue-primary, #3b82f6);
+  background: var(--primary-blue);
   color: #fff;
   box-shadow: 0 1px 3px rgba(59, 130, 246, 0.4);
 }
@@ -1973,7 +1973,7 @@ tbody tr:hover {
   justify-content: center;
   min-width: 32px;
   height: 36px;
-  color: var(--text-muted, #6b7280);
+  color: var(--gray-500);
   font-size: 0.9rem;
 }
 
@@ -1988,7 +1988,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .pg-num.pg-active {
-  background: var(--blue-primary, #3b82f6);
+  background: var(--primary-blue);
   color: #fff;
 }
 
@@ -2022,7 +2022,7 @@ tbody tr:hover {
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--gray-text);
+    color: var(--black);
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     transition: color 0.2s, border-color 0.2s;
@@ -2030,7 +2030,7 @@ tbody tr:hover {
 }
 
 .section-tab:hover {
-    color: var(--gray-text-dark);
+    color: var(--black);
 }
 
 .section-tab.active {

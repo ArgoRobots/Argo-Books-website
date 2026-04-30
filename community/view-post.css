@@ -13,7 +13,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-status-label {
   font-weight: 500;
-  color: var(--gray-text-light);
+  color: var(--black);
 }
 
 .post-status-large {
@@ -109,7 +109,7 @@ header .header-inner .menu-container .menu .community:after {
   font-weight: bold;
   font-size: 18px;
   margin: 8px 0;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .post-content {
@@ -130,7 +130,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-title {
   font-size: 22px;
-  color: var(--blueText);
+  color: var(--blue-900);
   flex: 1;
   word-break: break-word;
 }
@@ -166,7 +166,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .post-status.in_progress {
-  background-color: var(--yellow-50);
+  background-color: var(--amber-100);
   color: var(--amber-600);
 }
 
@@ -177,7 +177,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-status.declined {
   background-color: var(--red-50);
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 .post-body {
@@ -197,7 +197,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-info {
   font-size: 14px;
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 .post-author,
@@ -241,7 +241,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .delete-post-btn {
   background-color: var(--red-100);
-  color: var(--redHover);
+  color: var(--red-600);
   border: none;
   padding: 5px 10px;
   border-radius: 4px;
@@ -262,7 +262,7 @@ header .header-inner .menu-container .menu .community:after {
 .comments-section h3 {
   font-size: 18px;
   margin-bottom: 15px;
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   padding-bottom: 10px;
   border-bottom: 1px solid var(--gray-border);
 }
@@ -292,7 +292,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .comment-date {
   margin-left: 10px;
-  color: var(--gray-text);
+  color: var(--black);
   white-space: nowrap;
 }
 
@@ -314,7 +314,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .delete-comment-btn {
   background-color: var(--red-100);
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 /* Comment form */
@@ -325,7 +325,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .comment-form h4 {
   margin-bottom: 10px;
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   font-size: 16px;
 }
 
@@ -334,7 +334,7 @@ header .header-inner .menu-container .menu .community:after {
   border: 1px solid var(--gray-border);
   border-radius: 6px;
   padding: 15px;
-  color: var(--gray-text);
+  color: var(--black);
   text-align: center;
   font-style: italic;
 }
@@ -342,7 +342,7 @@ header .header-inner .menu-container .menu .community:after {
 .form-group label {
   display: block;
   margin-bottom: 5px;
-  color: var(--gray-text-light);
+  color: var(--black);
   font-size: 14px;
   font-weight: 500;
 }
@@ -415,7 +415,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .comment-vote-btn.voted.downvote {
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 /* Vote count display */
@@ -423,7 +423,7 @@ header .header-inner .menu-container .menu .community:after {
   font-weight: bold;
   font-size: 14px;
   margin: 4px 0;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .comment-main {
@@ -484,7 +484,7 @@ header .header-inner .menu-container .menu .community:after {
 /* Comment content */
 .comment-content {
   line-height: 1.5;
-  color: var(--gray-text-light);
+  color: var(--black);
   word-break: break-word;
   margin: 5px 0 0 10px;
 }
@@ -696,7 +696,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .bug-report-header h3 {
   font-size: 18px;
-  color: var(--blueText);
+  color: var(--blue-900);
   margin: 0;
 }
 
@@ -724,7 +724,7 @@ header .header-inner .menu-container .menu .community:after {
 .bug-info-label {
   font-weight: 600;
   font-size: 14px;
-  color: var(--gray-text-light);
+  color: var(--black);
   margin-bottom: 5px;
 }
 
@@ -749,7 +749,7 @@ header .header-inner .menu-container .menu .community:after {
 .bug-info-section-title {
   font-weight: 600;
   font-size: 15px;
-  color: var(--gray-text-light);
+  color: var(--black);
   margin-bottom: 10px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--gray-border);

@@ -22,7 +22,7 @@
     margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-text);
+    color: var(--black);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -30,7 +30,7 @@
 .stat-card .value {
     font-size: 32px;
     font-weight: 700;
-    color: var(--gray-text-darker);
+    color: var(--black);
     margin-bottom: 4px;
 }
 
@@ -52,7 +52,7 @@
 
 .period-selection span {
     font-weight: 600;
-    color: var(--gray-text-light);
+    color: var(--black);
 }
 
 .period-buttons {
@@ -64,7 +64,7 @@
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
-    color: var(--gray-text-light);
+    color: var(--black);
     background: var(--gray-bg-light);
     font-weight: 500;
     transition: all 0.2s;
@@ -98,7 +98,7 @@
     margin: 0 0 20px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-text-darker);
+    color: var(--black);
 }
 
 .chart-container canvas {
@@ -124,7 +124,7 @@
     margin: 0;
     font-size: 20px;
     font-weight: 600;
-    color: var(--gray-text-darker);
+    color: var(--black);
 }
 
 .table-responsive {
@@ -145,7 +145,7 @@ table th {
     text-align: left;
     font-weight: 600;
     font-size: 13px;
-    color: var(--gray-text);
+    color: var(--black);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid var(--gray-border);
@@ -154,7 +154,7 @@ table th {
 table td {
     padding: 12px;
     border-bottom: 1px solid var(--gray-border);
-    color: var(--gray-text-dark);
+    color: var(--black);
 }
 
 table tbody tr:hover {
@@ -246,12 +246,12 @@ code {
 }
 
 .btn-gray {
-    background: var(--gray-text);
+    background: var(--gray-500);
     color: var(--white);
 }
 
 .btn-gray:hover {
-    background: var(--gray-text-light);
+    background: var(--gray-600);
 }
 
 .success-message {
@@ -295,13 +295,13 @@ code {
 }
 
 .modal-close:hover {
-    color: var(--gray-text-light);
+    color: var(--black);
 }
 
 #modalTitle {
     margin-top: 0;
     margin-bottom: 24px;
-    color: var(--gray-text-darker);
+    color: var(--black);
 }
 
 .form-group {
@@ -312,7 +312,7 @@ code {
     display: block;
     font-weight: 600;
     margin-bottom: 6px;
-    color: var(--gray-text-dark);
+    color: var(--black);
 }
 
 .form-group input[type="text"],
@@ -341,7 +341,7 @@ code {
 .form-group small {
     display: block;
     margin-top: 4px;
-    color: var(--gray-text);
+    color: var(--black);
     font-size: 13px;
 }
 

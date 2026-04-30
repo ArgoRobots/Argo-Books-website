@@ -77,7 +77,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .hero p {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   margin-bottom: 24px;
 }
 
@@ -100,7 +100,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-form h2 {
   margin-bottom: 20px;
-  color: var(--blueText);
+  color: var(--blue-900);
   border-bottom: 1px solid var(--gray-border);
   padding-bottom: 15px;
 }
@@ -135,7 +135,7 @@ header .header-inner .menu-container .menu .community:after {
 .form-group .field-hint {
   display: block;
   font-size: 13px;
-  color: var(--gray-500);
+  color: var(--black);
   margin-top: 4px;
 }
 
@@ -175,7 +175,7 @@ header .header-inner .menu-container .menu .community:after {
 .form-section-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--blueText);
+  color: var(--blue-900);
   margin-bottom: 15px;
   display: flex;
   align-items: center;
@@ -232,12 +232,12 @@ header .header-inner .menu-container .menu .community:after {
 
 .preview-toggle button.active {
   background: var(--white);
-  color: var(--blueText);
+  color: var(--blue-900);
   box-shadow: 0 1px 2px var(--shadow-default);
 }
 
 .preview-toggle button:not(.active) {
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 .preview-toggle button:not(.active):hover {
@@ -287,7 +287,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .preview-type-badge.bug {
   background-color: var(--red-50);
-  color: var(--redHover);
+  color: var(--red-600);
   border: 1px solid var(--red-200);
 }
 
@@ -303,7 +303,7 @@ header .header-inner .menu-container .menu .community:after {
   gap: 16px;
   margin-bottom: 20px;
   font-size: 14px;
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 .preview-author {
@@ -356,7 +356,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .preview-bug-section-content {
-  color: var(--gray-500);
+  color: var(--black);
   background: var(--white);
   padding: 12px;
   border-radius: 6px;
@@ -417,7 +417,7 @@ header .header-inner .menu-container .menu .community:after {
   border-left: 4px solid var(--primary-blue);
   padding-left: 16px;
   margin: 16px 0;
-  color: var(--gray-500);
+  color: var(--black);
   font-style: italic;
 }
 

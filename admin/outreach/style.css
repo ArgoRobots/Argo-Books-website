@@ -699,7 +699,7 @@
 
 .bulk-send-item-generating {
     font-size: 0.85rem;
-    color: var(--blue);
+    color: var(--primary-blue);
     font-style: italic;
 }
 
@@ -1029,7 +1029,7 @@
 
 .conf-insufficient {
     background: var(--gray-100, #f3f4f6);
-    color: var(--gray-text, #6b7280);
+    color: var(--gray-500, #6b7280);
 }
 
 .conf-trending {

@@ -76,7 +76,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 
 .hero p {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   max-width: 600px;
   margin: 0 auto 32px;
 }
@@ -91,7 +91,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 .hero .btn-primary {
   gap: 8px;
   padding: 14px 28px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
   border-radius: 12px;
   width: 220px;
@@ -195,7 +195,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 }
 
 .date-tag {
-  color: var(--gray-500);
+  color: var(--black);
   font-size: 0.9rem;
 }
 
@@ -249,7 +249,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 }
 
 .release-post p {
-  color: var(--gray-600);
+  color: var(--black);
   font-size: 0.95rem;
   line-height: 1.7;
   margin: 0 0 16px 0;
@@ -315,7 +315,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 .changelog-list li {
   position: relative;
   padding: 8px 0 8px 20px;
-  color: var(--gray-600);
+  color: var(--black);
   font-size: 0.95rem;
   line-height: 1.6;
 }
@@ -347,7 +347,7 @@ header .header-inner .menu-container .menu .whats-new:after {
 
 .documentation-link p {
   margin: 0;
-  color: var(--gray-500);
+  color: var(--black);
   font-size: 0.9rem;
 }
 

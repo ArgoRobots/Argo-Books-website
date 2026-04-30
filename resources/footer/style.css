@@ -129,7 +129,7 @@
 }
 
 .footer-section p {
-  color: var(--hero-text-muted);
+  color: var(--white);
   line-height: 1.6;
   margin-bottom: 16px;
   font-size: 0.95rem;
@@ -154,7 +154,7 @@
 }
 
 .footer-links a {
-  color: var(--hero-text-muted);
+  color: var(--white);
   text-decoration: none;
   transition: color 0.2s ease;
   font-size: 0.95rem;
@@ -175,7 +175,7 @@
 }
 
 .footer-bottom p {
-  color: var(--hero-text-muted);
+  color: var(--white);
   font-size: 0.875rem;
   margin: 0;
 }

@@ -15,7 +15,7 @@
 }
 
 .profile-header h1 {
-  color: var(--blueText);
+  color: var(--blue-900);
   font-size: 28px;
   display: flex;
   align-items: center;
@@ -130,12 +130,12 @@
 
 .profile-info h2 {
   margin-bottom: 10px;
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   font-size: 22px;
 }
 
 .profile-meta {
-  color: var(--gray-text);
+  color: var(--black);
   margin-bottom: 15px;
 }
 
@@ -154,7 +154,7 @@
   margin-top: 20px;
   font-size: 18px;
   font-weight: 600;
-  color: var(--blueText);
+  color: var(--blue-900);
   letter-spacing: 1px;
   display: flex;
   align-items: center;
@@ -182,7 +182,7 @@
   margin-bottom: 20px;
   padding: 14px 0 20px 0;
   border-bottom: 1px solid var(--gray-border);
-  color: var(--gray-text-light);
+  color: var(--black);
   line-height: 1.6;
   font-size: 15px;
 }
@@ -209,12 +209,12 @@
 .stat-value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .stat-label {
   font-size: 14px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 .profile-actions {
@@ -239,7 +239,7 @@
 }
 
 .impact-section h3 {
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   font-size: 18px;
   margin-bottom: 15px;
   border-bottom: 1px solid var(--gray-border);
@@ -277,12 +277,12 @@
 .impact-value {
   font-size: 18px;
   font-weight: 600;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .impact-label {
   font-size: 14px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 /* Profile content */
@@ -322,7 +322,7 @@
 
 .section-header h3 {
   margin: 0;
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   font-size: 18px;
   display: flex;
   align-items: center;
@@ -333,7 +333,7 @@
   align-items: center;
   gap: 10px;
   font-size: 14px;
-  color: var(--gray-text-light);
+  color: var(--black);
 }
 
 /* Sort buttons styling */
@@ -345,7 +345,7 @@
 .sort-option {
   padding: 4px 8px;
   border-radius: 4px;
-  color: var(--gray-text-light);
+  color: var(--black);
   border: 1px solid var(--gray-border);
   transition: all 0.2s ease;
   text-decoration: none;
@@ -423,7 +423,7 @@
   align-items: center;
   justify-content: center;
   min-width: 60px;
-  color: var(--blueText);
+  color: var(--blue-900);
   padding: 8px;
   background-color: var(--gray-bg-light);
   border-radius: 4px;
@@ -437,7 +437,7 @@
 
 .score-label {
   font-size: 12px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 .post-details,
@@ -471,7 +471,7 @@
 .post-views,
 .post-date,
 .comment-date {
-  color: var(--gray-text);
+  color: var(--black);
   display: flex;
   align-items: center;
   gap: 5px;
@@ -479,12 +479,12 @@
 
 .comment-content {
   font-size: 14px;
-  color: var(--gray-text-light);
+  color: var(--black);
   line-height: 1.5;
 }
 
 .comment-on {
-  color: var(--gray-text);
+  color: var(--black);
   font-size: 12px;
 }
 
@@ -504,7 +504,7 @@
 }
 
 .reputation-help-link svg:hover {
-  color: var(--blueHover);
+  color: var(--blue-700);
 }
 
 .reputation-history {
@@ -539,7 +539,7 @@
 
 .reputation-value.negative {
   background-color: var(--red-100);
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 .reputation-details {
@@ -551,7 +551,7 @@
 
 .reputation-description {
   font-size: 14px;
-  color: var(--gray-text-light);
+  color: var(--black);
 }
 
 .reputation-description a {
@@ -566,14 +566,14 @@
 
 .reputation-date {
   font-size: 12px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 /* Empty state styling */
 .empty-state {
   text-align: center;
   padding: 30px;
-  color: var(--gray-text);
+  color: var(--black);
   border-radius: 8px;
   border: 1px dashed var(--gray-border);
   height: 100%;
@@ -611,7 +611,7 @@
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--gray-border);
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   font-size: 18px;
 }
 
@@ -702,7 +702,7 @@
 
 .report-btn-user:hover {
   background-color: var(--red-100);
-  color: var(--redHover);
+  color: var(--red-600);
 }
 
 .report-btn-user svg {

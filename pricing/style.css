@@ -84,7 +84,7 @@ body {
 
 .hero-subtitle {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
 }
 
 @media (max-width: 768px) {
@@ -166,7 +166,7 @@ body {
   top: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
   padding: 8px 20px;
   border-radius: 20px;
@@ -182,7 +182,7 @@ body {
 .pricing-card h2 {
   font-size: 28px;
   margin: 16px 0;
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
 }
 
 .card-price {
@@ -195,13 +195,13 @@ body {
 
 .card-price .currency {
   font-size: 24px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 .card-price .amount {
   font-size: 56px;
   font-weight: 800;
-  color: var(--gray-text-darker);
+  color: var(--gray-800);
   line-height: 1;
 }
 
@@ -211,11 +211,11 @@ body {
 
 .card-price .period {
   font-size: 18px;
-  color: var(--gray-text);
+  color: var(--black);
 }
 
 .price-note {
-  color: var(--gray-text);
+  color: var(--black);
   font-size: 14px;
   margin-bottom: 24px;
 }
@@ -255,7 +255,7 @@ body {
 }
 
 .card-features span {
-  color: var(--gray-text-dark);
+  color: var(--gray-700);
   font-size: 15px;
 }
 
@@ -333,7 +333,7 @@ body {
 
 .premium-intro p {
     font-size: 1.1rem;
-    color: var(--gray-500);
+    color: var(--black);
     line-height: 1.7;
 }
 
@@ -443,7 +443,7 @@ body {
 
 .premium-showcase-header p {
   font-size: 1.1rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
 }
 
@@ -490,7 +490,7 @@ body {
 
 .feature-detail-text p {
   font-size: 1.05rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
   margin-bottom: 24px;
 }
@@ -551,7 +551,7 @@ body {
 
 .premium-cta-inner p {
   font-size: 1rem;
-  color: var(--gray-500);
+  color: var(--black);
   margin-bottom: 24px;
   line-height: 1.6;
 }
@@ -565,7 +565,7 @@ body {
   font-weight: 600;
   font-size: 1rem;
   text-decoration: none;
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }

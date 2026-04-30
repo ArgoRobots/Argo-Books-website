@@ -21,7 +21,7 @@
 
 .admin-settings-header h1 {
   font-size: 24px;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .admin-settings-form {
@@ -37,7 +37,7 @@
   margin-bottom: 15px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--gray-border);
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .checkbox {
@@ -101,6 +101,6 @@
 
 .email-field .hint {
   font-size: 14px;
-  color: var(--gray-500);
+  color: var(--black);
   margin-top: 6px;
 }

@@ -181,7 +181,7 @@
   font-weight: 600;
   background: var(--amber-100);
   color: var(--amber-800);
-  border: 1px solid var(--yellow-200);
+  border: 1px solid var(--amber-200);
 }
 
 .status-badge-inline {
@@ -195,7 +195,7 @@
 .status-badge-inline.pending {
   background: var(--amber-100);
   color: var(--amber-800);
-  border: 1px solid var(--yellow-200);
+  border: 1px solid var(--amber-200);
 }
 
 .status-badge-inline.resolved {
@@ -261,7 +261,7 @@
 }
 
 .btn-view:hover {
-  background: var(--blueHover);
+  background: var(--blue-700);
   transform: translateY(-1px);
 }
 
@@ -286,12 +286,12 @@
 }
 
 .btn-warning {
-  background: var(--yellow-500);
+  background: var(--amber-500);
   color: var(--white);
 }
 
 .btn-warning:hover {
-  background: var(--yellow-600);
+  background: var(--amber-600);
   transform: translateY(-1px);
 }
 
@@ -455,7 +455,7 @@
 .offense-indicator:has(.offense-dot.yellow) {
   color: var(--amber-600);
   background: var(--amber-100);
-  border-color: var(--yellow-200);
+  border-color: var(--amber-200);
 }
 
 .offense-dot.red {

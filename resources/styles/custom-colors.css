@@ -3,16 +3,10 @@
   --whiteBackground: #f9fafb;
   --primary-blue: #3b82f6;
   --blue-600: #2563eb;
-  --blueHover: #1d4ed8;
   --primary-blue-dark: #1e40af;
   --secondary-blue: #60a5fa;
-  --green: rgb(43, 190, 97);
   --success-green: #4ade80;
-  --success-green-dark: #059669;
-  --blueText: #1e3a8a;
-  --yellow-50: #fef3c7;
   --red: #ef4444;
-  --redHover: #dc2626;
   --red-50: #fef2f2;
   --red-800: #991b1b;
   --green-50: #f0fdf4;
@@ -26,16 +20,12 @@
   --gray-200: #e2e8f0;
   --gray-300: #cbd5e1;
   --gray-400: #94a3b8;
-  --gray-500: #000000;
-  --gray-600: #000000;
+  --gray-500: #64748b;
+  --gray-600: #475569;
   --gray-700: #334155;
   --gray-800: #1e293b;
   --gray-900: #0f172a;
   --gray-border: #e5e7eb;
-  --gray-text: #000000;
-  --gray-text-dark: #000000;
-  --gray-text-darker: #000000;
-  --gray-text-light: #000000;
   --gray-placeholder: #9ca3af;
   --gray-input-border: #d1d5db;
   --gray-bg-light: #f3f4f6;
@@ -53,6 +43,7 @@
   /* Emerald/Teal - Credit/success states */
   --emerald-50: #ecfdf5;
   --emerald-100: #d1fae5;
+  --emerald-200: #a7f3d0;
   --emerald-300: #6ee7b7;
   --emerald-400: #34d399;
   --emerald-500: #10b981;
@@ -103,9 +94,9 @@
   --sky-50: #f0f9ff;
   --sky-100: #e0f2fe;
   --sky-200: #bae6fd;
-  --sky-300: #7dd3fc;
   --sky-400: #38bdf8;
   --sky-500: #0ea5e9;
+  --sky-600: #0284c7;
   --sky-700: #0369a1;
 
   /* Indigo palette */
@@ -125,15 +116,12 @@
   /* Additional neutrals */
   --black: #000000;
   --neutral-111827: #111827;
-  --neutral-4a5568: #000000;
-  --neutral-666: #000000;
   --neutral-f8f9fa: #f8f9fa;
   --neutral-f7f7f8: #f7f7f8;
   --dark-1a1a2e: #1a1a2e;
   --warm-bg: #f9f1e9;
 
   /* Indigo extended */
-  --indigo-200: #c7d2fe;
   --indigo-400: #818cf8;
   --indigo-700: #4338ca;
 
@@ -150,7 +138,6 @@
   /* Blue extended */
   --blue-link: #0066cc;
   --blue-link-alt: #0078d4;
-  --blue-link-dark: #0366cc;
   --blue-e6f3ff: #e6f3ff;
   --blue-e3f2fd: #e3f2fd;
   --blue-90caf9: #90caf9;
@@ -182,7 +169,6 @@
   --white-alpha-40: rgba(255, 255, 255, 0.4);
   --white-alpha-50: rgba(255, 255, 255, 0.5);
   --white-alpha-60: rgba(255, 255, 255, 0.6);
-  --white-alpha-70: rgba(255, 255, 255, 0.7);
   --white-alpha-80: rgba(255, 255, 255, 0.8);
   --white-alpha-90: rgba(255, 255, 255, 0.9);
   --white-alpha-95: rgba(255, 255, 255, 0.95);
@@ -224,13 +210,11 @@
   --amber-alpha-20: rgba(245, 158, 11, 0.2);
 
   /* Gray alpha */
-  --gray-text-alpha-50: rgba(55, 65, 81, 0.5);
+  --gray-700-alpha-50: rgba(55, 65, 81, 0.5);
   --gray-alpha-20: rgba(107, 114, 128, 0.2);
-  --gray-bg-light-alpha-80: rgba(243, 244, 246, 0.8);
   --gray-rgb-border: rgb(225, 225, 225);
 
   /* Indigo alpha */
-  --indigo-alpha-12: rgba(99, 102, 241, 0.12);
   --indigo-alpha-20: rgba(99, 102, 241, 0.2);
 
   /* Blue-400 alpha */
@@ -245,13 +229,12 @@
   --neutral-eee: #eeeeee;
   --neutral-ddd: #dddddd;
   --neutral-cccfd5: #cccfd5;
-  --neutral-a3a3a3: #000000;
-  --neutral-656565: #000000;
+  --neutral-a3a3a3: #a3a3a3;
+  --neutral-656565: #656565;
 
   /* Slate/Navy */
   --slate-1a202c: #1a202c;
   --slate-2d3748: #2d3748;
-  --slate-253449: #253449;
   --slate-3f4f63: #3f4f63;
   --navy-1a365d: #1a365d;
   --navy-1e3a5f: #1e3a5f;
@@ -260,7 +243,6 @@
   --brand-yellow: #FCC624;
   --gradient-indigo: #667eea;
   --gradient-purple: #764ba2;
-  --yellow-50-alt: #fefce8;
   --purple-50-alt: #f5f3ff;
 
   /* Additional alpha */
@@ -281,7 +263,6 @@
   /* Hero/Footer theme */
   --hero-gradient-start: #0f172a;
   --hero-gradient-end: #1e293b;
-  --hero-text-muted: #ffffff;
   --hero-badge-bg: rgba(255, 255, 255, 0.1);
   --hero-badge-border: rgba(255, 255, 255, 0.2);
 }

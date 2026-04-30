@@ -302,11 +302,11 @@ function ab_tests_tab_render_list($pdo)
 
                 <div id="abVariantRows"></div>
 
-                <div id="abFormatFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--border-color, #d1d5db); border-radius:6px; margin-top:8px;">
+                <div id="abFormatFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--gray-input-border); border-radius:6px; margin-top:8px;">
                     Will create two variants automatically: <strong>A &mdash; <code>html</code></strong> (default) and <strong>B &mdash; <code>plain</code></strong>.
                 </div>
 
-                <div id="abPersonalizationFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--border-color, #d1d5db); border-radius:6px; margin-top:8px;">
+                <div id="abPersonalizationFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--gray-input-border); border-radius:6px; margin-top:8px;">
                     Will create two variants automatically: <strong>A &mdash; <code>on</code></strong> (default, summary included) and <strong>B &mdash; <code>off</code></strong> (summary skipped).
                 </div>
 

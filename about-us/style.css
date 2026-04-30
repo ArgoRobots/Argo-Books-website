@@ -174,7 +174,7 @@ body {
 
 .hero .hero-subtitle {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   max-width: 600px;
   margin: 0 auto;
 }
@@ -203,7 +203,7 @@ body {
 
 .mission-content > p {
   font-size: 1.1rem;
-  color: var(--gray-500);
+  color: var(--black);
   margin-bottom: 32px;
   line-height: 1.7;
 }
@@ -239,7 +239,7 @@ body {
 }
 
 .mission-point p {
-  color: var(--gray-600);
+  color: var(--black);
   font-size: 1rem;
   margin: 0;
 }
@@ -273,7 +273,7 @@ body {
 
 .overview-content p {
   font-size: 1.1rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
 }
 
@@ -347,7 +347,7 @@ body {
 
 .feature-item p {
   font-size: 0.9rem;
-  color: var(--gray-500);
+  color: var(--black);
   margin: 0;
   line-height: 1.5;
 }
@@ -388,7 +388,7 @@ body {
   border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--gray-600);
+  color: var(--black);
   box-shadow: 0 4px 12px var(--shadow-default);
 }
 
@@ -406,7 +406,7 @@ body {
 
 .story-content p {
   font-size: 1.1rem;
-  color: var(--gray-500);
+  color: var(--black);
   margin-bottom: 16px;
   line-height: 1.7;
 }
@@ -432,7 +432,7 @@ body {
 
 .stat-label {
   font-size: 0.875rem;
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 /* ========================================
@@ -517,7 +517,7 @@ body {
 
 .value-card p {
   font-size: 0.95rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.6;
   margin: 0;
 }
@@ -546,7 +546,7 @@ body {
 
 .future-content p {
   font-size: 1.1rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
   margin-bottom: 32px;
 }
@@ -594,7 +594,7 @@ body {
 
 .contact-card p {
   font-size: 1.1rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   margin-bottom: 32px;
   line-height: 1.7;
 }
@@ -610,7 +610,7 @@ body {
    ======================================== */
 .btn-primary {
   padding: 14px 28px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
   font-size: 1rem;
   font-weight: 600;

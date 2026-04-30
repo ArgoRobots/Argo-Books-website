@@ -66,7 +66,7 @@ body {
 
 .section-desc {
   font-size: 1.1rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
 }
 
@@ -168,7 +168,7 @@ body {
 
 .hero .hero-subtitle {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   max-width: 600px;
   margin: 0 auto 32px;
 }
@@ -196,7 +196,7 @@ body {
 }
 
 .btn-cta-primary {
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
 }
 
@@ -218,7 +218,7 @@ body {
 
 .btn-cta-ghost {
   background: transparent;
-  color: var(--hero-text-muted);
+  color: var(--white);
   border: 2px solid var(--white-alpha-20);
 }
 
@@ -308,7 +308,7 @@ body {
 
 .feature-card p {
   font-size: 0.9rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.6;
   margin-bottom: 12px;
 }
@@ -383,7 +383,7 @@ body {
 
 .why-card p {
   font-size: 0.95rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
 }
 
@@ -411,7 +411,7 @@ body {
 
 .feature-detail-text p {
   font-size: 1.05rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
   margin-bottom: 24px;
 }
@@ -479,7 +479,7 @@ body {
 
 .inline-cta-inner p {
   font-size: 1rem;
-  color: var(--gray-500);
+  color: var(--black);
   margin-bottom: 24px;
   line-height: 1.6;
 }
@@ -497,7 +497,7 @@ body {
 }
 
 .inline-cta-buttons .btn-cta-outline:hover {
-  border-color: var(--gray-500);
+  border-color: var(--black);
   background: var(--gray-50);
 }
 
@@ -586,7 +586,7 @@ body {
 
 .benefit-card p {
   font-size: 0.9rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
 }
 
@@ -617,7 +617,7 @@ body {
 
 .highlight-item p {
   font-size: 1rem;
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 /* ========================================
@@ -663,7 +663,7 @@ body {
 
 .use-case-card p {
   font-size: 0.9rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
   margin-left: 34px;
 }
@@ -701,7 +701,7 @@ body {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
   font-size: 1.25rem;
   font-weight: 700;
@@ -719,7 +719,7 @@ body {
 
 .step-card p {
   font-size: 0.95rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.7;
 }
 
@@ -776,7 +776,7 @@ body {
 
 .related-card p {
   font-size: 0.85rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.6;
 }
 
@@ -814,7 +814,7 @@ body {
 
 .cta-card p {
   font-size: 1.1rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   margin-bottom: 32px;
   line-height: 1.7;
 }
@@ -1131,6 +1131,18 @@ body {
 
   .feature-detail-text h2 {
     font-size: 1.5rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-buttons .btn-cta {
+    justify-content: center;
   }
 }
 

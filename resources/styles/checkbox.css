@@ -32,7 +32,7 @@
 }
 
 .checkbox input[type="checkbox"]:hover {
-  border-color: var(--blueText);
+  border-color: var(--blue-900);
 }
 
 .checkbox input[type="checkbox"]:focus {

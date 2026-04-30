@@ -44,7 +44,7 @@
 
 .subscription-section h2 {
     font-size: 18px;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     margin: 0 0 20px 0;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--gray-border);
@@ -68,13 +68,13 @@
     display: block;
     font-size: 20px;
     font-weight: 600;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
 }
 
 .subscription-plan .billing-cycle {
     display: block;
     font-size: 14px;
-    color: var(--gray-text);
+    color: var(--black);
     margin-top: 4px;
 }
 
@@ -122,7 +122,7 @@
 .detail-label {
     display: block;
     font-size: 12px;
-    color: var(--gray-text);
+    color: var(--black);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 4px;
@@ -131,7 +131,7 @@
 .detail-value {
     display: block;
     font-size: 16px;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     font-weight: 500;
 }
 
@@ -180,7 +180,7 @@
 
 .subscription-notice .notice-detail {
     font-weight: 400;
-    color: var(--gray-text);
+    color: var(--black);
     margin-top: 4px;
 }
 
@@ -220,7 +220,7 @@
 
 .features-section h3 {
     font-size: 14px;
-    color: var(--gray-text);
+    color: var(--black);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0 0 16px 0;
@@ -250,7 +250,7 @@
 
 .feature-item span {
     font-size: 14px;
-    color: var(--gray-text-dark);
+    color: var(--gray-700);
 }
 
 /* No Subscription Card */
@@ -271,12 +271,12 @@
 
 .no-subscription-card h3 {
     font-size: 20px;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     margin: 0 0 8px 0;
 }
 
 .no-subscription-card p {
-    color: var(--gray-text);
+    color: var(--black);
     margin: 0 0 20px 0;
     max-width: 400px;
     margin-left: auto;
@@ -300,7 +300,7 @@
 
 .pricing-preview .period {
     font-size: 14px;
-    color: var(--gray-text);
+    color: var(--black);
 }
 
 .pricing-preview .divider {
@@ -328,7 +328,7 @@
 .payment-history-table th {
     font-size: 12px;
     font-weight: 600;
-    color: var(--gray-text);
+    color: var(--black);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     background: var(--whiteBackground);
@@ -336,7 +336,7 @@
 
 .payment-history-table td {
     font-size: 14px;
-    color: var(--gray-text-dark);
+    color: var(--gray-700);
 }
 
 .payment-status {
@@ -428,7 +428,7 @@
 .no-payment-history {
     text-align: center;
     padding: 32px;
-    color: var(--gray-text);
+    color: var(--black);
 }
 
 /* Help Section */
@@ -445,7 +445,7 @@
 }
 
 .help-section p {
-    color: var(--gray-text);
+    color: var(--black);
     margin: 0 0 16px 0;
 }
 
@@ -568,13 +568,13 @@
     cursor: pointer;
     padding: 8px;
     border-radius: 8px;
-    color: var(--gray-text);
+    color: var(--black);
     transition: all 0.2s;
 }
 
 .modal-close:hover {
     background: var(--gray-100);
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
 }
 
 .modal-state {
@@ -618,12 +618,12 @@
 
 .modal-state h2 {
     font-size: 22px;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     margin: 0 0 12px 0;
 }
 
 .modal-description {
-    color: var(--gray-text);
+    color: var(--black);
     margin: 0 0 20px 0;
     line-height: 1.5;
 }
@@ -652,12 +652,12 @@
 
 .payment-method-badge .payment-text {
     font-weight: 600;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
 }
 
 .billing-info {
     font-size: 14px;
-    color: var(--gray-text);
+    color: var(--black);
     padding-left: 12px;
     border-left: 1px solid var(--gray-border);
 }

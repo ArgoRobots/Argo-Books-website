@@ -107,7 +107,7 @@ h1 {
 
 #stripe-submit-btn:hover,
 #square-submit-btn:hover {
-  background-color: var(--blueHover);
+  background-color: var(--blue-700);
 }
 
 .processing-overlay {
@@ -127,13 +127,13 @@ h1 {
 }
 
 .processing-overlay h2 {
-  color: var(--blueText);
+  color: var(--blue-900);
   margin-bottom: 15px;
   font-size: 28px;
 }
 
 .processing-overlay p {
-  color: var(--gray-text-light);
+  color: var(--black);
   margin-bottom: 30px;
   font-size: 18px;
 }

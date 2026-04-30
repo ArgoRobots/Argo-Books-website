@@ -11,7 +11,7 @@
 }
 
 .formatting-help-header h1 {
-  color: var(--blueText);
+  color: var(--blue-900);
   font-size: 32px;
   margin-top: 20px;
 }
@@ -31,7 +31,7 @@
 }
 
 .formatting-section h3 {
-  color: var(--blueText);
+  color: var(--blue-900);
   font-size: 20px;
   margin-bottom: 20px;
   padding-bottom: 10px;
@@ -199,7 +199,7 @@ kbd {
 .step-content strong {
   display: block;
   margin-bottom: 5px;
-  color: var(--blueText);
+  color: var(--blue-900);
 }
 
 .step-content p {

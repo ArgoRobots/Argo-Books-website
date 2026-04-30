@@ -142,7 +142,7 @@ a:hover {
 }
 
 .details-table .label {
-    color: var(--gray-text);
+    color: var(--gray-500);
 }
 
 .details-table .value {
@@ -254,7 +254,7 @@ a:hover {
 }
 
 .styled-list {
-    color: var(--gray-text-dark);
+    color: var(--gray-700);
     line-height: 1.8;
 }
 
@@ -264,7 +264,7 @@ a:hover {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid var(--gray-border);
-    color: var(--gray-text);
+    color: var(--gray-500);
     font-size: 14px;
 }
 
@@ -275,7 +275,7 @@ a:hover {
 
 /* Text colors */
 .text-muted {
-    color: var(--gray-text);
+    color: var(--gray-500);
 }
 
 /* Mobile responsive */

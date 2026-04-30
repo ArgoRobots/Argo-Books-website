@@ -96,7 +96,7 @@
 }
 
 .search-button:hover {
-  background: var(--blueHover);
+  background: var(--blue-700);
 }
 
 .search-button svg {
@@ -180,7 +180,7 @@
 }
 
 .apply-button:hover {
-  background: var(--blueHover);
+  background: var(--blue-700);
 }
 
 /* Bulk Actions Bar */

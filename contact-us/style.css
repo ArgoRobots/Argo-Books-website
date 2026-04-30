@@ -60,7 +60,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .hero .hero-subtitle {
   font-size: 1.25rem;
-  color: var(--hero-text-muted);
+  color: var(--white);
   margin: 0;
 }
 
@@ -163,7 +163,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .option-card p {
   font-size: 0.95rem;
-  color: var(--gray-500);
+  color: var(--black);
   margin-bottom: 16px;
   line-height: 1.6;
 }
@@ -233,7 +233,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 }
 
 .form-header p {
-  color: var(--gray-500);
+  color: var(--black);
   font-size: 1rem;
 }
 
@@ -303,7 +303,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   justify-content: center;
   gap: 10px;
   padding: 16px 32px;
-  background: linear-gradient(135deg, var(--primary-blue), var(--blueHover));
+  background: linear-gradient(135deg, var(--primary-blue), var(--blue-700));
   color: var(--white);
   font-size: 1rem;
   font-weight: 600;
@@ -363,7 +363,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .sidebar-card p {
   font-size: 0.9rem;
-  color: var(--gray-500);
+  color: var(--black);
   line-height: 1.6;
   margin-bottom: 12px;
 }
@@ -390,7 +390,7 @@ header .header-inner .menu-container .menu .contact-us:after {
   background: var(--white);
   border-radius: 20px;
   font-size: 0.85rem;
-  color: var(--gray-500);
+  color: var(--black);
   border: 1px solid var(--gray-border);
 }
 

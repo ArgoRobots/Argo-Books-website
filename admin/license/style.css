@@ -18,7 +18,7 @@ table th {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
-    color: var(--gray-text-dark);
+    color: var(--black);
 }
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
@@ -63,7 +63,7 @@ table th {
 }
 .badge-expired {
     background: var(--gray-bg-light);
-    color: var(--gray-text);
+    color: var(--black);
 }
 .btn-purple {
     background: var(--purple-500);
@@ -79,7 +79,7 @@ table th {
 }
 .btn-secondary {
     background: var(--gray-bg-light);
-    color: var(--gray-text-dark);
+    color: var(--black);
     border: 1px solid var(--gray-input-border);
 }
 .btn-secondary:hover {
@@ -135,14 +135,14 @@ table th {
     line-height: 1;
 }
 .modal-close:hover {
-    color: var(--gray-text-dark);
+    color: var(--black);
 }
 .modal-body {
     padding: 24px;
 }
 .modal-body p {
     margin: 0 0 20px 0;
-    color: var(--gray-text-light);
+    color: var(--black);
 }
 .modal-body .form-group {
     margin-bottom: 20px;
@@ -152,7 +152,7 @@ table th {
 }
 .modal-note {
     font-size: 0.875rem;
-    color: var(--gray-text);
+    color: var(--black);
     background: var(--gray-bg-light);
     padding: 12px;
     border-radius: 6px;

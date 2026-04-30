@@ -723,7 +723,7 @@ a {
 .floating-card-label {
     display: block;
     font-size: 0.8rem;
-    color: var(--gray-500);
+    color: var(--black);
     margin-bottom: 2px;
 }
 
@@ -822,7 +822,7 @@ a {
 
 .trusted-label {
     text-align: center;
-    color: var(--gray-500);
+    color: var(--black);
     font-size: 0.9rem;
     margin-bottom: 24px;
     text-transform: uppercase;
@@ -843,7 +843,7 @@ a {
 }
 
 .trusted-logo:hover {
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 /* ========================================
@@ -880,7 +880,7 @@ a {
 
 .section-description {
     font-size: 1.125rem;
-    color: var(--gray-500);
+    color: var(--black);
     line-height: 1.7;
 }
 
@@ -977,7 +977,7 @@ a {
 .tab-subtitle {
     display: block;
     font-size: 0.85rem;
-    color: var(--gray-500);
+    color: var(--black);
     transition: color 0.3s ease;
 }
 
@@ -1015,7 +1015,7 @@ a {
 
 .tab-content-text p {
     font-size: 1.1rem;
-    color: var(--gray-500);
+    color: var(--black);
     line-height: 1.7;
     margin-bottom: 24px;
 }
@@ -1034,7 +1034,7 @@ a {
     align-items: center;
     gap: 12px;
     font-size: 1rem;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 .feature-list li svg {
@@ -1142,7 +1142,7 @@ a {
     font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
     font-size: 0.76rem;
     font-weight: 600;
-    color: var(--gray-600);
+    color: var(--black);
     letter-spacing: 0.01em;
 }
 
@@ -1162,7 +1162,7 @@ a {
 
 .receipt-date {
     font-size: 0.7rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .receipt-items {
@@ -1179,7 +1179,7 @@ a {
 .receipt-item.receipt-tax {
     padding-top: 8px;
     border-top: 1px dashed var(--gray-300);
-    color: var(--gray-500);
+    color: var(--black);
     font-size: 0.72rem;
 }
 
@@ -1268,7 +1268,7 @@ a {
 
 .chart-period {
     font-size: 0.85rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .chart-area {
@@ -1301,7 +1301,7 @@ a {
 .prediction-text {
     display: block;
     font-size: 0.75rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 /* Inventory Mockup */
@@ -1332,7 +1332,7 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--gray-500);
+    color: var(--black);
     border: 1px solid var(--gray-200);
 }
 
@@ -1420,7 +1420,7 @@ a {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .calendar-grid {
@@ -1436,7 +1436,7 @@ a {
     justify-content: center;
     font-size: 0.85rem;
     border-radius: 8px;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 .cal-day.header {
@@ -1467,7 +1467,7 @@ a {
     align-items: center;
     gap: 6px;
     font-size: 0.8rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .legend-item .dot {
@@ -1530,7 +1530,7 @@ a {
 
 .customer-email {
     font-size: 0.85rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .customer-stats {
@@ -1605,7 +1605,7 @@ a {
 
 .total-label {
     font-size: 0.9rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .total-value {
@@ -1737,10 +1737,10 @@ a {
 .ai-flow-row-header {
     background: var(--gray-50);
     font-weight: 600;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
-.ai-flow-row:not(.ai-flow-row-header) { color: var(--gray-500); }
+.ai-flow-row:not(.ai-flow-row-header) { color: var(--black); }
 .ai-flow-row-faded { opacity: 0.45; }
 
 .ai-flow-row.ai-flow-row-highlight {
@@ -1970,7 +1970,7 @@ a {
 
 .ai-flow-field-value {
     font-size: 0.78rem;
-    color: var(--gray-500);
+    color: var(--black);
     font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
 }
 
@@ -2078,7 +2078,7 @@ a {
 
 .ai-pill-text span {
     font-size: 0.8rem;
-    color: var(--gray-500);
+    color: var(--black);
     line-height: 1.45;
 }
 
@@ -2126,7 +2126,7 @@ a {
 
 .field-label {
     font-size: 0.9rem;
-    color: var(--gray-500);
+    color: var(--black);
     font-weight: 500;
 }
 
@@ -2151,7 +2151,7 @@ a {
     padding: 2px 8px;
     font-size: 0.85rem;
     font-weight: 500;
-    color: var(--gray-500);
+    color: var(--black);
     border-radius: 6px;
     transition: all 0.2s ease;
 }
@@ -2240,7 +2240,7 @@ a {
 
 .step-card p {
     font-size: 0.95rem;
-    color: var(--gray-500);
+    color: var(--black);
     margin: 0;
 }
 
@@ -2303,13 +2303,13 @@ a {
     font-size: 1.65rem;
     font-weight: 700;
     margin: 0 0 14px;
-    color: var(--gray-text-darker);
+    color: var(--gray-800);
     line-height: 1.25;
 }
 
 .tax-ready-card p {
     font-size: 1.1rem;
-    color: var(--gray-500);
+    color: var(--black);
     line-height: 1.55;
     margin: 0;
 }
@@ -2377,7 +2377,7 @@ a {
 
 .security-stat-label {
     font-size: 0.78rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 /* Terminal */
@@ -2586,7 +2586,7 @@ a {
     left: 50%;
     transform: translateX(-50%);
     background: var(--gray-100);
-    color: var(--gray-500);
+    color: var(--black);
     padding: 8px 20px;
     border-radius: 50px;
     font-size: 0.8rem;
@@ -2606,7 +2606,7 @@ a {
 .pricing-amount .currency {
     font-size: 1.5rem;
     font-weight: 600;
-    color: var(--gray-500);
+    color: var(--black);
     vertical-align: top;
 }
 
@@ -2618,7 +2618,7 @@ a {
 
 .pricing-amount .period {
     font-size: 1rem;
-    color: var(--gray-500);
+    color: var(--black);
     margin-left: 4px;
 }
 
@@ -2631,7 +2631,7 @@ a {
 
 .pricing-description {
     font-size: 0.95rem;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .pricing-features {
@@ -2687,7 +2687,7 @@ a {
 
 .contact-header p {
     font-size: 1.15rem;
-    color: var(--gray-500);
+    color: var(--black);
     max-width: 500px;
     margin: 0 auto;
 }
@@ -2762,7 +2762,7 @@ a {
 
 .contact-card p {
     font-size: 0.95rem;
-    color: var(--gray-500);
+    color: var(--black);
     margin-bottom: 16px;
     line-height: 1.6;
 }
@@ -2801,7 +2801,7 @@ a {
 }
 
 .contact-cta p {
-    color: var(--gray-500);
+    color: var(--black);
     margin-bottom: 16px;
     font-size: 1rem;
 }
@@ -3188,7 +3188,15 @@ a {
 @media (max-width: 600px){
     .cta-buttons {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 40px;
+    }
+
+    .cta-buttons .btn {
+        justify-content: center;
     }
 
     .cta-features {

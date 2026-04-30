@@ -126,9 +126,8 @@ $premium_features = get_plan_features()['premium']['features'];
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/header/dark.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
-</head>
 
-<style>
+    <style>
 .cancel-page {
     max-width: 580px;
     margin: 0 auto;
@@ -323,7 +322,8 @@ $premium_features = get_plan_features()['premium']['features'];
         grid-row: 2;
     }
 }
-</style>
+    </style>
+</head>
 
 <body>
     <header>

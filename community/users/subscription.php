@@ -189,10 +189,17 @@ if ($premium_subscription) {
                     <?php if ($premium_subscription['status'] === 'active'): ?>
                         <?php
                             $switchTargetCycle = $premium_subscription['billing_cycle'] === 'monthly' ? 'Yearly' : 'Monthly';
-                            $isPaypalSubscription = strtolower($premium_subscription['payment_method'] ?? '') === 'paypal';
+                            // Cycle switching is only implemented for Stripe and Square. PayPal,
+                            // free_key, and any other payment_method don't see the button — the
+                            // AJAX endpoint would reject them anyway.
+                            $canSwitchCycle = in_array(
+                                strtolower($premium_subscription['payment_method'] ?? ''),
+                                ['stripe', 'square'],
+                                true
+                            );
                         ?>
                         <div class="subscription-actions">
-                            <?php if (!$isPaypalSubscription): ?>
+                            <?php if ($canSwitchCycle): ?>
                                 <a href="switch-billing-cycle.php" class="btn btn-purple">Switch to <?= htmlspecialchars($switchTargetCycle) ?></a>
                             <?php endif; ?>
                             <a href="cancel-subscription.php" class="btn btn-outline-red btn-cancel">Cancel Subscription</a>

@@ -607,11 +607,19 @@ namespace {
      * Compute proration for a mid-cycle billing-cycle switch (Stripe/Square only).
      *
      * Symmetric formula for both directions:
-     *   immediate_charge = max(0, new_base - prorated_credit - existing_credit) + fee
-     *   credit_balance_after = max(0, prorated_credit + existing_credit - new_base)
+     *   immediate_charge_base   = max(0, new_base - prorated_credit - existing_credit)
+     *   processing_fee          = (immediate_charge_base > 0) ? fee(immediate_charge_base) : 0
+     *   immediate_charge_total  = immediate_charge_base + processing_fee
+     *   credit_balance_after    = max(0, prorated_credit + existing_credit - new_base)
      *
      * Proration uses BASE prices from the pricing config — never the `amount`
      * column, which includes a processing fee from the prior period.
+     *
+     * Period length is derived from the *cycle* (end_date - 1 month or
+     * end_date - 1 year), not from (end_date - start_date). The renewal cron
+     * doesn't update start_date, so on a long-running subscription
+     * (end_date - start_date) drifts arbitrarily large and would skew the
+     * prorated credit toward zero.
      *
      * @param array  $subscription   Row from premium_subscriptions
      * @param string $newCycle       'monthly' | 'yearly'
@@ -630,10 +638,12 @@ namespace {
         $yearlyBase     = (float) $pricingConfig['premium_yearly_price'];
         $existingCredit = (float) ($subscription['credit_balance'] ?? 0);
 
-        $now           = time();
-        $start         = strtotime($subscription['start_date']);
-        $end           = strtotime($subscription['end_date']);
-        $periodSecs    = max(1, $end - $start);
+        $now            = time();
+        $end            = strtotime($subscription['end_date']);
+        $effectiveStart = ($oldCycle === 'yearly')
+            ? strtotime('-1 year', $end)
+            : strtotime('-1 month', $end);
+        $periodSecs    = max(1, $end - $effectiveStart);
         $remainingSecs = max(0, $end - $now);
         $fraction      = min(1.0, $remainingSecs / $periodSecs);
 

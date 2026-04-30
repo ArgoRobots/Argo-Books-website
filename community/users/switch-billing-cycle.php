@@ -43,6 +43,13 @@ if (!empty($premium_subscription['last_cycle_change_at'])
 $payment_method = strtolower($premium_subscription['payment_method'] ?? '');
 $is_paypal = ($payment_method === 'paypal');
 
+// Only Stripe, Square, and PayPal (with the coming-soon notice) reach this page.
+// free_key, manual, or unknown payment methods can't switch cycles — the AJAX
+// endpoint rejects them, so don't render a confirm UI that would inevitably fail.
+if (!in_array($payment_method, ['stripe', 'square', 'paypal'], true)) {
+    $redirect_with_error('Cycle switching is not available for this subscription type. Please contact support.');
+}
+
 $pricing_config = get_pricing_config();
 $monthly_base = $pricing_config['premium_monthly_price'];
 $yearly_base = $pricing_config['premium_yearly_price'];

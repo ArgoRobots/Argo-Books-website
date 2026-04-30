@@ -148,8 +148,21 @@ try {
                     $piMeta = $paymentIntent->metadata ?? null;
                     $metaSubId = $piMeta['subscription_id'] ?? null;
                     $metaUserId = $piMeta['user_id'] ?? null;
+                    $metaNewCycle = $piMeta['new_cycle'] ?? null;
                     if ($metaSubId !== $subscription_id || (string) $metaUserId !== (string) $user_id) {
                         echo json_encode(['success' => false, 'error' => 'Payment verification failed']);
+                        exit;
+                    }
+                    // Reject replay attacks where the PI was created for a
+                    // different cycle direction. Without this, a successful
+                    // monthly->yearly PI could be replayed with new_cycle=monthly
+                    // and the DB write would mix yearly amounts/end_date with
+                    // billing_cycle=monthly (free year exploit).
+                    if ($metaNewCycle !== $newCycle) {
+                        echo json_encode([
+                            'success' => false,
+                            'error'   => 'Payment verification failed: cycle mismatch'
+                        ]);
                         exit;
                     }
                     if ($paymentIntent->status !== 'succeeded') {

@@ -67,7 +67,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. Wave's free plan was discontinued in 2023 — it now starts at $16 CAD/month for basic accounting."
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $25 CAD/month, and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro)."
                     }
                 },
                 {
@@ -91,7 +91,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to Wave?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books offers a genuinely free plan forever. Wave discontinued its free plan in 2023 and now charges $16 CAD/month for Starter and $22/month for Pro. Argo Books Premium is just $10 CAD/month with unlimited invoicing, AI features, and predictive analytics — less than Wave's cheapest paid plan."
+                        "text": "Both offer free plans. Wave's Starter is free with manual transaction entry, and the Pro plan is $25 CAD/month for auto bank imports. Receipt scanning costs another $11/month or $96/year on Wave's free Starter plan (it's included on Pro). Argo Books Premium is just $10 CAD/month with unlimited invoicing, AI receipt scanning included, and predictive analytics — less than half of Wave's Pro plan."
                     }
                 },
                 {
@@ -299,7 +299,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Both are free to start — here's how they compare</h2>
-                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports and AI receipt scanning. Argo Books Premium is $10 CAD/month with inventory, AI, and more.</p>
+                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports — and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro). Argo Books Premium is $10 CAD/month with inventory, AI receipt scanning included, and more.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -349,6 +349,7 @@ $plans = get_plan_features();
                                     <span class="tier-period">free</span>
                                 </div>
                                 <span class="tier-limit">Manual transaction entry only</span>
+                                <span class="tier-limit">+ $11/month or $96/year for receipt scanning</span>
                             </div>
                             <div class="tier-divider"></div>
                             <div class="pricing-tier">
@@ -358,6 +359,7 @@ $plans = get_plan_features();
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Auto bank import, multi-user</span>
+                                <span class="tier-limit">Receipt scanning included</span>
                             </div>
                         </div>
                     </div>
@@ -398,8 +400,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
-                            <p>Wave's free plan was discontinued in 2023 — it now starts at $16 CAD/month for basic accounting.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $25 CAD/month, and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro).</p>
                         </div>
                     </div>
                 </div>
@@ -443,8 +445,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books offers a genuinely free plan forever. Wave discontinued its free plan in 2023 and now charges $16 CAD/month for Starter and $22/month for Pro.</p>
-                            <p>Argo Books Premium is just <strong>$10 CAD/month</strong> with unlimited invoicing, AI features, and predictive analytics — less than Wave's cheapest paid plan.</p>
+                            <p>Both offer free plans. Wave's Starter is free with manual transaction entry, and the Pro plan is $25 CAD/month for auto bank imports. Receipt scanning costs another $11/month or $96/year on Wave's free Starter plan (it's included on Pro).</p>
+                            <p>Argo Books Premium is just <strong>$10 CAD/month</strong> with unlimited invoicing, AI receipt scanning included, and predictive analytics — less than half of Wave's Pro plan.</p>
                         </div>
                     </div>
                 </div>

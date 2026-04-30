@@ -67,7 +67,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. Xero does not offer a free plan — pricing starts at $20 CAD/month after a short trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Xero does not offer a free plan — pricing starts at $25 CAD/month after a 30-day trial."
                     }
                 },
                 {
@@ -91,7 +91,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to Xero?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Xero starts at $20 CAD/month for Starter (limited to 20 invoices) and goes up to $68/month for Premium. Argo Books has no client limits or invoice caps on Premium."
+                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Xero starts at $25 CAD/month for Starter (limited to 20 invoices) and goes up to $80/month for Premium. Argo Books has no client limits or invoice caps on Premium."
                     }
                 },
                 {
@@ -157,7 +157,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why Switch?</span>
                 <h2>Built for business owners, not accountants</h2>
-                <p class="section-desc">Xero is polished and globally popular, but it's cloud-only, designed for businesses that already have an accountant, and its $25/month Starter plan caps you at just 20 invoices per month. Argo Books is built for non-accountants who want simplicity, privacy, and affordable pricing.</p>
+                <p class="section-desc">Xero is polished and globally popular, but it's cloud-only, designed for businesses that already have an accountant, and its Starter plan caps you at just 20 invoices per month. Argo Books is built for non-accountants who want simplicity, privacy, and affordable pricing.</p>
             </div>
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
@@ -165,7 +165,7 @@ $plans = get_plan_features();
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>No invoice caps</h3>
-                    <p>Xero's $25/month Starter plan limits you to 20 invoices per month, pushing most businesses to the $55/month Standard plan. Argo Books Premium includes unlimited invoicing for $10 CAD/month.</p>
+                    <p>Xero's Starter plan limits you to 20 invoices per month, pushing most businesses to the $60/month Standard plan. Argo Books Premium includes unlimited invoicing for $10 CAD/month.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -305,7 +305,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">Xero charges $25 to $75 CAD/month depending on the plan — and the Starter plan's 20-invoice cap means most businesses end up on the $55/month plan. Argo Books keeps it simple with affordable pricing.</p>
+                <p class="section-desc">Xero charges $25 to $80 CAD/month depending on the plan — and the Starter plan's 20-invoice cap means most businesses end up on the $60/month plan. Argo Books keeps it simple with affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -360,7 +360,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Standard</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$55</span>
+                                    <span class="tier-amount">$60</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Unlimited invoices &amp; bills</span>
@@ -369,7 +369,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$75</span>
+                                    <span class="tier-amount">$80</span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Multi-currency &amp; advanced reporting</span>
@@ -390,7 +390,7 @@ $plans = get_plan_features();
                 </div>
                 <h3>An honest take</h3>
                 <p>Xero is a polished, globally popular platform with strong app integrations, unlimited users on every plan, and a clean UI. If your business already works with an accountant or needs deep third-party integrations, Xero is a solid choice.</p>
-                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $55+/month for unlimited invoices — Argo Books is built for you.</p>
+                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $60+/month for unlimited invoices — Argo Books is built for you.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -413,8 +413,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
-                            <p>Xero does not offer a free plan — pricing starts at $20 CAD/month after a short trial.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Xero does not offer a free plan — pricing starts at $25 CAD/month after a 30-day trial.</p>
                         </div>
                     </div>
                 </div>
@@ -458,7 +458,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Xero starts at $20 CAD/month for Starter (limited to 20 invoices) and goes up to $68/month for Premium.</p>
+                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Xero starts at $25 CAD/month for Starter (limited to 20 invoices) and goes up to $80/month for Premium.</p>
                             <p>Argo Books has no client limits or invoice caps on Premium.</p>
                         </div>
                     </div>

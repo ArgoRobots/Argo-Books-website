@@ -67,7 +67,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. ZipBooks also has a free tier, but it's more limited in features — no AI capabilities, no inventory management, and no offline access."
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. ZipBooks also has a free tier, but it's more limited in features — no AI capabilities, no inventory management, and no offline access."
                     }
                 },
                 {
@@ -287,7 +287,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Both free to start — here's how they compare</h2>
-                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $20 CAD/month, while Argo Books Premium is $10 CAD/month with AI features, inventory, and predictive analytics included.</p>
+                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $20 CAD/month, while Argo Books Premium is $10 CAD/month with AI receipt scanning, inventory, and predictive analytics included.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -395,7 +395,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
                             <p>ZipBooks also has a free tier, but it's more limited — no AI capabilities, no inventory management, and no offline access.</p>
                         </div>
                     </div>

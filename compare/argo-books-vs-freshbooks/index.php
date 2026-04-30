@@ -67,7 +67,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $22 CAD/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $26 CAD/month."
                     }
                 },
                 {
@@ -91,7 +91,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to FreshBooks?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month (or $96/year). FreshBooks starts at $22 CAD/month for its Lite plan with a 5-client limit, and goes up to $55+/month for Premium. Argo Books has no client limits on any plan."
+                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month (or $96/year). FreshBooks starts at $26 CAD/month for its Lite plan with a 5-client limit, and goes up to $72/month for Premium. Argo Books has no client limits on any plan."
                     }
                 },
                 {
@@ -249,7 +249,7 @@ $plans = get_plan_features();
                             <td>AI receipt scanning</td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
                             <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
-                            <td><span class="check-yes"><?= svg_icon('check', 18) ?></span></td>
+                            <td><span class="check-no"><?= svg_icon('x', 18) ?></span></td>
                         </tr>
                         <tr>
                             <td>AI spreadsheet import</td>
@@ -407,8 +407,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
-                            <p>FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $22 CAD/month.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $26 CAD/month.</p>
                         </div>
                     </div>
                 </div>
@@ -452,7 +452,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong> (or $96/year). FreshBooks starts at $22 CAD/month for its Lite plan with a 5-client limit, and goes up to $55+/month for Premium.</p>
+                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong> (or $96/year). FreshBooks starts at $26 CAD/month for its Lite plan with a 5-client limit, and goes up to $72/month for Premium.</p>
                             <p>Argo Books has no client limits on any plan.</p>
                         </div>
                     </div>

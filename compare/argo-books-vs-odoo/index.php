@@ -67,7 +67,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features. Odoo's free plan is limited to a single app, and adding a second module starts at $31.10 CAD/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month."
                     }
                 },
                 {
@@ -91,7 +91,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to Odoo?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $31+ CAD/month per user. Costs escalate quickly as you add modules and users."
+                        "text": "Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $44+ CAD/user/month. Costs escalate quickly as you add modules and users."
                     }
                 },
                 {
@@ -357,7 +357,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Custom</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$68.50</span>
+                                    <span class="tier-amount">$69</span>
                                     <span class="tier-period">CAD/user/month</span>
                                 </div>
                                 <span class="tier-limit">All apps, multi-company, on-premise</span>
@@ -401,8 +401,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, and AI-powered features.</p>
-                            <p>Odoo's free plan is limited to a single app, and adding a second module starts at $31.10 CAD/month.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month.</p>
                         </div>
                     </div>
                 </div>
@@ -446,7 +446,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $31+ CAD/month per user.</p>
+                            <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $44+ CAD/user/month.</p>
                             <p>Costs escalate quickly as you add modules and users.</p>
                         </div>
                     </div>

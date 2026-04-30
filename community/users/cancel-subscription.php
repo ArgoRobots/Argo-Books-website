@@ -128,56 +128,248 @@ $premium_features = get_plan_features()['premium']['features'];
     <link rel="stylesheet" href="../../resources/footer/style.css">
 </head>
 
+<style>
+.cancel-page {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 60px 20px;
+    min-height: 80vh;
+}
+
+.cancel-card {
+    background: var(--white);
+    border-radius: 20px;
+    border: 1px solid var(--gray-border);
+    box-shadow: 0 20px 50px -20px var(--shadow-default);
+    padding: 48px 40px;
+}
+
+.cancel-hero {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.cancel-eyebrow {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--red-600);
+    background: var(--red-50);
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.cancel-hero h1 {
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 12px;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.cancel-hero p {
+    color: var(--gray-700);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 auto;
+    max-width: 420px;
+}
+
+.cancel-alert {
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    background: var(--red-100);
+    color: var(--red-800);
+    border: 1px solid var(--red-300);
+    font-size: 14px;
+}
+
+.access-end-card {
+    position: relative;
+    background: linear-gradient(135deg, var(--purple-50) 0%, var(--white) 100%);
+    border: 1px solid var(--purple-200);
+    border-left: 4px solid var(--purple-500);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 28px;
+    overflow: hidden;
+}
+
+.access-end-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--purple-600);
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.access-end-date {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gray-900);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+}
+
+.access-end-detail {
+    font-size: 13.5px;
+    color: var(--gray-700);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.cancel-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gray-700);
+    margin: 0 0 14px 0;
+}
+
+.cancel-feature-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.cancel-feature-grid li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--gray-bg-light);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--gray-800);
+    line-height: 1.3;
+}
+
+.cancel-feature-grid svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    stroke: var(--gray-500);
+}
+
+.cancel-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.cancel-actions > form,
+.cancel-actions > .btn {
+    width: 100%;
+}
+
+.cancel-actions form .btn {
+    width: 100%;
+}
+
+.cancel-actions .btn {
+    padding: 13px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cancel-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px var(--shadow-default);
+}
+
+.cancel-footnote {
+    text-align: center;
+    font-size: 13px;
+    color: var(--gray-600);
+    margin: 24px 0 0;
+    line-height: 1.5;
+}
+
+@media (max-width: 576px) {
+    .cancel-page {
+        padding: 24px 16px;
+    }
+    .cancel-card {
+        padding: 32px 24px;
+        border-radius: 16px;
+    }
+    .cancel-hero h1 {
+        font-size: 24px;
+    }
+    .access-end-date {
+        font-size: 22px;
+    }
+    .cancel-feature-grid {
+        grid-template-columns: 1fr;
+    }
+    .cancel-actions {
+        grid-template-columns: 1fr;
+    }
+    .cancel-actions > form {
+        grid-row: 2;
+    }
+}
+</style>
+
 <body>
     <header>
         <div id="includeHeader"></div>
     </header>
 
-    <div class="confirm-page-container">
-        <div class="confirm-card cancel-card">
-            <div class="confirm-icon cancel-icon">
-                <?= svg_icon('x-circle', 48) ?>
+    <main class="cancel-page">
+        <div class="cancel-card">
+            <div class="cancel-hero">
+                <span class="cancel-eyebrow">Argo Premium</span>
+                <h1>Are you sure you want to cancel?</h1>
+                <p>Your subscription will stay active until the end of your current billing period. You can resubscribe at any time.</p>
             </div>
-
-            <h1>Cancel Your Subscription?</h1>
 
             <?php if ($error_message): ?>
-                <div class="alert alert-error"><?php echo htmlspecialchars($error_message); ?></div>
+                <div class="cancel-alert"><?php echo htmlspecialchars($error_message); ?></div>
             <?php endif; ?>
 
-            <p class="confirm-description">
-                You're about to cancel your Argo Premium subscription. Please review the following before confirming:
-            </p>
-
-            <div class="info-box warning-box">
-                <h3>What happens when you cancel:</h3>
-                <ul>
-                    <li>You will retain access to Premium features until <strong><?php echo $end_date; ?></strong></li>
-                    <li>After this date, Premium features will be disabled</li>
-                    <li>Your subscription will not auto-renew</li>
-                    <li>You can resubscribe anytime to restore access</li>
-                </ul>
+            <div class="access-end-card">
+                <div class="access-end-label">Premium access ends</div>
+                <div class="access-end-date"><?php echo $end_date; ?></div>
+                <p class="access-end-detail">After this date your subscription will not auto-renew and Premium features will be disabled.</p>
             </div>
 
-            <div class="info-box features-box">
-                <h3>Features you'll lose access to:</h3>
-                <ul>
-                    <?php foreach ($premium_features as $feature): ?>
-                        <li><?= render_feature_label($feature) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            </div>
+            <h2 class="cancel-section-label">Features you'll lose access to</h2>
+            <ul class="cancel-feature-grid">
+                <?php foreach ($premium_features as $feature): ?>
+                    <li>
+                        <?= svg_icon('check-rounded') ?>
+                        <span><?= render_feature_label($feature) ?></span>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
 
-            <div class="confirm-actions">
+            <div class="cancel-actions">
                 <form method="post">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     <input type="hidden" name="confirm_cancel" value="1">
-                    <button type="submit" class="btn btn-red">Yes, Cancel My Subscription</button>
+                    <button type="submit" class="btn btn-outline-red">Yes, Cancel</button>
                 </form>
-                <a href="subscription.php" class="btn btn-outline">No, Keep My Subscription</a>
+                <a href="subscription.php" class="btn btn-purple">Keep My Subscription</a>
             </div>
+
+            <p class="cancel-footnote">Need help instead? <a class="link" href="../../contact-us/">Contact support</a> &mdash; we'd love to hear what's not working.</p>
         </div>
-    </div>
+    </main>
 
     <footer class="footer">
         <div id="includeFooter"></div>

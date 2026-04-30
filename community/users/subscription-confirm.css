@@ -12,20 +12,36 @@
     border-radius: 16px;
     padding: 40px;
     border: 1px solid var(--gray-border);
-    box-shadow: 0 4px 6px -1px var(--shadow-default);
+    box-shadow: 0 10px 25px -10px var(--shadow-default);
     text-align: center;
 }
 
 .confirm-icon {
-    margin-bottom: 24px;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .confirm-icon svg {
-    stroke-width: 1.5;
+    width: 40px;
+    height: 40px;
+    stroke-width: 1.75;
+}
+
+.cancel-icon {
+    background: var(--red-50);
 }
 
 .cancel-icon svg {
     stroke: var(--red-600);
+}
+
+.reactivate-icon {
+    background: var(--purple-50);
 }
 
 .reactivate-icon svg {
@@ -53,8 +69,10 @@
 }
 
 .info-box h3 {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     margin: 0 0 12px 0;
 }
 
@@ -73,8 +91,8 @@
 }
 
 .warning-box {
-    background: var(--amber-100);
-    border: 1px solid var(--amber-300);
+    background: var(--amber-50);
+    border: 1px solid var(--amber-200);
 }
 
 .warning-box h3 {
@@ -82,7 +100,7 @@
 }
 
 .warning-box li {
-    color: var(--amber-900);
+    color: var(--gray-800);
 }
 
 .success-box {
@@ -219,15 +237,36 @@
 /* Action Buttons */
 .confirm-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
     gap: 12px;
+    flex-wrap: wrap;
     margin-top: 32px;
 }
 
-.confirm-actions .btn {
+/* Form wrappers participate in the flex row alongside link buttons */
+.confirm-actions > form,
+.confirm-actions > .btn {
+    flex: 1;
+    min-width: 200px;
+}
+
+.confirm-actions form .btn {
     width: 100%;
-    padding: 14px 24px;
-    font-size: 16px;
+}
+
+.confirm-actions .btn {
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.confirm-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-default);
 }
 
 .btn-purple {

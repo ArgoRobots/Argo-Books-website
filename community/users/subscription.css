@@ -154,9 +154,53 @@
 
 /* Subscription Actions */
 .subscription-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
     margin-top: 24px;
     padding-top: 20px;
     border-top: 1px solid var(--gray-border);
+}
+
+.subscription-actions .btn {
+    min-width: 220px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.subscription-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--shadow-default);
+}
+
+.subscription-actions .btn-purple {
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    color: var(--white);
+    border: none;
+}
+
+.subscription-actions .btn-purple:hover {
+    background: linear-gradient(135deg, var(--purple-600), var(--purple-700));
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.28);
+}
+
+/* Scoped neutral cancel — softer than the global .btn-outline-red so it
+   doesn't compete with the primary Switch action. Red emerges on hover. */
+.subscription-actions .btn-outline-red {
+    background: var(--white);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-input-border);
+}
+
+.subscription-actions .btn-outline-red:hover {
+    color: var(--red-600);
+    border-color: var(--red-600);
+    background: var(--red-50);
 }
 
 /* Notice Styles */
@@ -396,6 +440,16 @@
     color: var(--emerald-800);
 }
 
+.payment-type.cycle_change {
+    background: var(--indigo-100);
+    color: var(--indigo-800);
+}
+
+.payment-type.retry {
+    background: var(--amber-100);
+    color: var(--amber-800);
+}
+
 /* Credit Balance Display */
 .detail-value.credit-balance {
     color: var(--emerald-600);
@@ -462,9 +516,7 @@
     text-align: center;
 }
 
-.btn-reactivate,
-.btn-subscribe,
-.btn-cancel {
+.btn-subscribe {
     width: 210px !important;
     margin: auto;
 }

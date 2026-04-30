@@ -587,13 +587,6 @@ if ($is_own_profile) {
 
                         <div class="profile-actions">
                             <?php if ($is_own_profile): ?>
-                                <?php if ($has_premium_subscription): ?>
-                                    <a href="resend_license.php" class="btn btn-blue">
-                                        <?= svg_icon('lock', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
-                                        Resend License Key
-                                    </a>
-                                <?php endif; ?>
-
                                 <?php if ($is_admin): ?>
                                     <a href="admin_notification_settings.php" class="btn btn-blue">
                                         <?= svg_icon('bell', 20) ?>
@@ -602,7 +595,7 @@ if ($is_own_profile) {
                                 <?php endif; ?>
 
                                 <a href="subscription.php" class="btn btn-blue">
-                                    <?= svg_icon('subscription', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                                    <?= svg_icon('credit-card', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Manage Subscription
                                 </a>
                                 <a href="edit_profile.php" class="btn btn-blue">

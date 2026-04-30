@@ -187,7 +187,14 @@ if ($premium_subscription) {
                     <?php endif; ?>
 
                     <?php if ($premium_subscription['status'] === 'active'): ?>
+                        <?php
+                            $switchTargetCycle = $premium_subscription['billing_cycle'] === 'monthly' ? 'Yearly' : 'Monthly';
+                            $isPaypalSubscription = strtolower($premium_subscription['payment_method'] ?? '') === 'paypal';
+                        ?>
                         <div class="subscription-actions">
+                            <?php if (!$isPaypalSubscription): ?>
+                                <a href="switch-billing-cycle.php" class="btn btn-purple">Switch to <?= htmlspecialchars($switchTargetCycle) ?></a>
+                            <?php endif; ?>
                             <a href="cancel-subscription.php" class="btn btn-outline-red btn-cancel">Cancel Subscription</a>
                         </div>
                     <?php elseif ($premium_subscription['status'] === 'cancelled'): ?>
@@ -237,7 +244,7 @@ if ($premium_subscription) {
                     <div class="features-grid">
                         <?php foreach (get_plan_features()['premium']['features'] as $feature): ?>
                             <div class="feature-item">
-                                <?= svg_icon('check-pricing') ?>
+                                <?= svg_icon('check-rounded') ?>
                                 <span><?= render_feature_label($feature) ?></span>
                             </div>
                         <?php endforeach; ?>
@@ -284,15 +291,20 @@ if ($premium_subscription) {
                             <tr>
                                 <td><?php echo date('M j, Y', strtotime($payment['created_at'])); ?></td>
                                 <td>
-                                    <span class="payment-type <?php echo $payment['payment_type'] ?? 'initial'; ?>">
-                                        <?php
-                                        $paymentTypeDisplay = $payment['payment_type'] ?? 'Initial';
-                                        if ($paymentTypeDisplay === 'credit') {
-                                            echo 'Credit Applied';
-                                        } else {
-                                            echo ucfirst($paymentTypeDisplay);
-                                        }
-                                        ?>
+                                    <?php
+                                    $paymentType = $payment['payment_type'] ?? 'initial';
+                                    $paymentTypeLabels = [
+                                        'initial'      => 'Initial',
+                                        'renewal'      => 'Renewal',
+                                        'manual'       => 'Manual',
+                                        'credit'       => 'Credit Applied',
+                                        'retry'        => 'Retry',
+                                        'cycle_change' => 'Plan Change',
+                                    ];
+                                    $paymentTypeLabel = $paymentTypeLabels[$paymentType] ?? ucfirst($paymentType);
+                                    ?>
+                                    <span class="payment-type <?php echo htmlspecialchars($paymentType); ?>">
+                                        <?php echo htmlspecialchars($paymentTypeLabel); ?>
                                     </span>
                                 </td>
                                 <td>

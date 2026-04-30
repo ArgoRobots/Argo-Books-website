@@ -132,8 +132,11 @@
                 ?>
                 <li><strong>Billing</strong>: Subscriptions are billed monthly ($<?php echo number_format($pricing['premium_monthly_price'], 0); ?> CAD) or yearly ($<?php echo number_format($pricing['premium_yearly_price'], 0); ?> CAD).</li>
                 <li><strong>Auto-Renewal</strong>: Subscriptions automatically renew unless cancelled before the billing date.</li>
-                <li><strong>Cancellation</strong>: You may cancel at any time. Access continues until the end of your billing period.</li>
-                <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square.</li>
+                <li><strong>Cancellation</strong>: You may cancel at any time. Access continues until the end of your billing period. Cancellation forfeits any account credit balance on your subscription.</li>
+                <li><strong>Plan Changes (Upgrade)</strong>: When upgrading from monthly to yearly billing, you will be charged the yearly amount immediately, less the prorated value of your current unused billing period and any existing account credit. The new yearly billing period begins on the date of upgrade.</li>
+                <li><strong>Plan Changes (Downgrade)</strong>: When downgrading from yearly to monthly billing, the prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. Any leftover value remains as account credit and is automatically applied to future monthly renewals until depleted.</li>
+                <li><strong>Account Credit</strong>: Account credit is non-refundable, has no cash value, and is forfeited upon cancellation. Credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
+                <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square. Plan changes are currently available for subscriptions paid via Stripe and Square; PayPal subscribers should contact support to change billing cycles.</li>
                 <li><strong>Usage Limits</strong>: AI Receipt Scanning is limited to 500 scans per month.</li>
             </ul>
             <p>We reserve the right to modify subscription pricing with 30 days notice to existing subscribers.</p>
@@ -209,7 +212,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: February 17, 2026</p>
+            <p class="last-updated">Last updated: April 30, 2026</p>
         </div>
     </div>
 

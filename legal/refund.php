@@ -76,7 +76,17 @@
             <ul>
                 <li>You can cancel your subscription at any time from your account settings.</li>
                 <li>After cancellation, you retain access to Premium features until the end of your current billing period.</li>
-                <li>Cancellations are not automatically refunded. If you believe you are entitled to a refund, you may request one separately.</li>
+                <li>Cancellations are not automatically refunded. If you believe you are entitled to a refund, you may request one separately. (Note: switching to a different billing cycle is handled separately &mdash; see "Plan Changes" below.)</li>
+                <li>Cancellation forfeits any account credit balance on your subscription.</li>
+            </ul>
+
+            <h2>Plan Changes</h2>
+            <p>You may switch your Argo Premium subscription between monthly and yearly billing at any time from your account settings. Plan changes are not refunds; they are handled automatically:</p>
+            <ul>
+                <li><strong>Upgrade (monthly to yearly)</strong>: You are charged the yearly amount immediately, less the prorated value of your current unused monthly period and any existing account credit. The new yearly billing period begins on the date of upgrade.</li>
+                <li><strong>Downgrade (yearly to monthly)</strong>: The prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. If the prorated value exceeds one month, the leftover remains as account credit and is automatically applied to future monthly renewals until depleted. No cash refund is issued.</li>
+                <li><strong>Account credit</strong>: Account credit is non-refundable, has no cash value, and cannot be transferred. It is forfeited if you cancel your subscription. Account credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
+                <li><strong>Plan changes for PayPal subscribers</strong>: At this time, plan changes are available for subscriptions paid via Stripe and Square only. PayPal subscribers who wish to change plans should contact support.</li>
             </ul>
 
             <h2>How to Request a Refund</h2>
@@ -129,7 +139,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: March 16, 2026</p>
+            <p class="last-updated">Last updated: April 30, 2026</p>
         </div>
     </div>
 

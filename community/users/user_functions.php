@@ -602,4 +602,84 @@ namespace {
             return null;
         }
     }
+
+    /**
+     * Compute proration for a mid-cycle billing-cycle switch (Stripe/Square only).
+     *
+     * Symmetric formula for both directions:
+     *   immediate_charge = max(0, new_base - prorated_credit - existing_credit) + fee
+     *   credit_balance_after = max(0, prorated_credit + existing_credit - new_base)
+     *
+     * Proration uses BASE prices from the pricing config — never the `amount`
+     * column, which includes a processing fee from the prior period.
+     *
+     * @param array  $subscription   Row from premium_subscriptions
+     * @param string $newCycle       'monthly' | 'yearly'
+     * @param array  $pricingConfig  Result of get_pricing_config()
+     * @return array See keys below
+     */
+    function calculate_cycle_switch_proration($subscription, $newCycle, $pricingConfig)
+    {
+        $oldCycle = $subscription['billing_cycle'] ?? 'monthly';
+
+        if ($oldCycle === $newCycle) {
+            return ['direction' => 'noop'];
+        }
+
+        $monthlyBase    = (float) $pricingConfig['premium_monthly_price'];
+        $yearlyBase     = (float) $pricingConfig['premium_yearly_price'];
+        $existingCredit = (float) ($subscription['credit_balance'] ?? 0);
+
+        $now           = time();
+        $start         = strtotime($subscription['start_date']);
+        $end           = strtotime($subscription['end_date']);
+        $periodSecs    = max(1, $end - $start);
+        $remainingSecs = max(0, $end - $now);
+        $fraction      = min(1.0, $remainingSecs / $periodSecs);
+
+        $oldBase        = ($oldCycle === 'yearly') ? $yearlyBase : $monthlyBase;
+        $proratedCredit = round($oldBase * $fraction, 2);
+
+        if ($newCycle === 'yearly') {
+            $newBase    = $yearlyBase;
+            $newEndDate = date('Y-m-d H:i:s', strtotime('+1 year'));
+            $direction  = 'upgrade';
+        } else {
+            $newBase    = $monthlyBase;
+            $newEndDate = date('Y-m-d H:i:s', strtotime('+1 month'));
+            $direction  = 'downgrade';
+        }
+
+        $totalDiscount    = $proratedCredit + $existingCredit;
+        $immediateBase    = max(0, round($newBase - $totalDiscount, 2));
+        $leftoverCredit   = max(0, round($totalDiscount - $newBase, 2));
+        // Processing fee applies to the actual charge amount (gateway charges fee on real $),
+        // so when the discount fully covers the new base, no charge and no fee.
+        $procFee = ($immediateBase > 0)
+            ? calculate_processing_fee($immediateBase)
+            : 0.00;
+        $immediateTotal   = round($immediateBase + $procFee, 2);
+        $existingConsumed = max(0, round($existingCredit - $leftoverCredit, 2));
+
+        // The amount column reflects the *renewal* amount of the new cycle (base + fee),
+        // matching the convention used by new-subscription writes.
+        $newRenewalFee   = calculate_processing_fee($newBase);
+        $newAmountColumn = round($newBase + $newRenewalFee, 2);
+
+        return [
+            'direction'                => $direction,
+            'old_cycle'                => $oldCycle,
+            'new_cycle'                => $newCycle,
+            'prorated_credit'          => $proratedCredit,
+            'existing_credit_consumed' => $existingConsumed,
+            'immediate_charge_base'    => $immediateBase,
+            'processing_fee'           => $procFee,
+            'immediate_charge_total'   => $immediateTotal,
+            'credit_balance_after'     => $leftoverCredit,
+            'new_end_date'             => $newEndDate,
+            'new_amount_column'        => $newAmountColumn,
+            'days_remaining'           => intdiv($remainingSecs, 86400),
+            'period_total_days'        => intdiv($periodSecs, 86400),
+        ];
+    }
 }

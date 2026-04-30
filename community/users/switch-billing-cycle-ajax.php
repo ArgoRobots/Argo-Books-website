@@ -139,9 +139,12 @@ try {
 
             try {
                 if ($confirmedPaymentIntentId) {
-                    // SCA retry path — fetch existing PI to verify it succeeded
+                    // SCA retry path — fetch existing PI, verify ownership and
+                    // status, then read the proration snapshot back from PI
+                    // metadata. Re-computing here would drift from what was
+                    // actually charged if the user took time to complete 3DS
+                    // (cents-level but breaks the audit trail).
                     $paymentIntent = \Stripe\PaymentIntent::retrieve($confirmedPaymentIntentId);
-                    // Verify ownership: PI metadata must match this subscription + user
                     $piMeta = $paymentIntent->metadata ?? null;
                     $metaSubId = $piMeta['subscription_id'] ?? null;
                     $metaUserId = $piMeta['user_id'] ?? null;
@@ -156,9 +159,19 @@ try {
                         ]);
                         exit;
                     }
+                    // Use the snapshot from metadata so the DB row matches the
+                    // amounts that were actually charged.
+                    $immediateChargeTotal = (float) ($piMeta['immediate_charge_total'] ?? $immediateChargeTotal);
+                    $creditBalanceAfter   = (float) ($piMeta['credit_balance_after']   ?? $creditBalanceAfter);
+                    $newEndDate           = $piMeta['new_end_date']                    ?? $newEndDate;
+                    $newAmountColumn      = (float) ($piMeta['new_amount_column']      ?? $newAmountColumn);
+                    $proration['prorated_credit']          = (float) ($piMeta['prorated_credit']          ?? $proration['prorated_credit']);
+                    $proration['existing_credit_consumed'] = (float) ($piMeta['existing_credit_consumed'] ?? $proration['existing_credit_consumed']);
                     $transaction_id = $paymentIntent->id;
                 } else {
-                    // Fresh charge
+                    // Fresh charge — embed the proration snapshot in PI metadata
+                    // so the SCA retry path can read it back instead of
+                    // recomputing (recomputation drifts as time passes).
                     $params = [
                         'amount'         => intval(round($immediateChargeTotal * 100)),
                         'currency'       => 'cad',
@@ -168,18 +181,40 @@ try {
                         'description'    => "Premium Subscription Cycle Switch ({$proration['old_cycle']}->{$proration['new_cycle']}) - $subscription_id",
                         'receipt_email'  => $premium_subscription['email'],
                         'metadata' => [
-                            'subscription_id' => $subscription_id,
-                            'user_id'         => $user_id,
-                            'type'            => 'cycle_change',
-                            'old_cycle'       => $proration['old_cycle'],
-                            'new_cycle'       => $proration['new_cycle']
+                            'subscription_id'          => $subscription_id,
+                            'user_id'                  => (string) $user_id,
+                            'type'                     => 'cycle_change',
+                            'old_cycle'                => $proration['old_cycle'],
+                            'new_cycle'                => $proration['new_cycle'],
+                            'prorated_credit'          => (string) $proration['prorated_credit'],
+                            'existing_credit_consumed' => (string) $proration['existing_credit_consumed'],
+                            'immediate_charge_total'   => (string) $immediateChargeTotal,
+                            'credit_balance_after'     => (string) $creditBalanceAfter,
+                            'new_end_date'             => $newEndDate,
+                            'new_amount_column'        => (string) $newAmountColumn,
                         ]
                     ];
                     if ($stripeCustomerId) {
                         $params['customer'] = $stripeCustomerId;
                     }
 
-                    $paymentIntent = \Stripe\PaymentIntent::create($params);
+                    // Deterministic idempotency key — same subscription + new
+                    // cycle + day always produces the same key, so a double-
+                    // click, two open tabs, or an SCA-abandon-then-retry within
+                    // 24h returns the original PaymentIntent instead of
+                    // creating a second one. Salted with the secret key so
+                    // dev/prod environments can never collide. Mirrors the
+                    // Square idempotency pattern below.
+                    $stripeIdempotencyKey = hash(
+                        'sha256',
+                        'cycleswitch_' . $subscription_id . '_' . $newCycle . '_'
+                            . date('Y-m-d') . '_' . $stripeSecretKey
+                    );
+
+                    $paymentIntent = \Stripe\PaymentIntent::create(
+                        $params,
+                        ['idempotency_key' => $stripeIdempotencyKey]
+                    );
 
                     if ($paymentIntent->status === 'succeeded') {
                         $transaction_id = $paymentIntent->id;

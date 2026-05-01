@@ -666,3 +666,17 @@ CREATE TABLE IF NOT EXISTS outreach_ab_variants (
     FOREIGN KEY (test_id) REFERENCES outreach_ab_tests(id) ON DELETE CASCADE,
     INDEX idx_ab_variant_test (test_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Cache of email-scrape results keyed by website URL. The same business often
+-- shows up under multiple search categories (e.g. "spa" and "massage
+-- therapists"), and many sites have no scrape-able email at all — without this
+-- cache the cron re-downloads the same dead-ends every run. A NULL email is a
+-- valid cached result meaning "we tried, found nothing"; entries refresh after
+-- 30 days so sites that later add an email get re-checked.
+CREATE TABLE IF NOT EXISTS outreach_scrape_cache (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    url VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) DEFAULT NULL,
+    last_attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_scrape_attempted (last_attempted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

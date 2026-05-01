@@ -27,6 +27,7 @@
     // Check if user already has an active subscription
     $existing_subscription = get_user_premium_subscription($user_id);
     $is_changing_method = isset($_GET['change_method']) && $_GET['change_method'] === '1';
+    $is_cycle_switch = isset($_GET['cycle_switch']) && $_GET['cycle_switch'] === '1';
 
     if ($existing_subscription && in_array($existing_subscription['status'], ['active', 'cancelled', 'payment_failed'])) {
         // User already has a subscription
@@ -95,6 +96,23 @@
     $renewalBase = ($billing === 'yearly') ? $yearlyPrice : $monthlyPrice;
     $renewalFee = calculate_processing_fee($renewalBase);
     $renewalTotal = $renewalBase + $renewalFee;
+
+    // Cycle-switch refund estimate for the disclosure banner
+    $cycleSwitchRefundEstimate = 0.0;
+    $cycleSwitchOldCycle = '';
+    if ($is_cycle_switch && $existing_subscription
+        && strtolower($existing_subscription['payment_method'] ?? '') === 'paypal') {
+        require_once __DIR__ . '/../../../community/users/user_functions.php';
+        $cycleSwitchOldCycle = $existing_subscription['billing_cycle'] ?? '';
+        $cycleSwitchProration = calculate_cycle_switch_proration($existing_subscription, $billing, $pricing);
+        if (($cycleSwitchProration['direction'] ?? '') !== 'noop') {
+            $cycleSwitchRefundEstimate = round(
+                (float) $cycleSwitchProration['prorated_credit']
+                + (float) ($existing_subscription['credit_balance'] ?? 0),
+                2
+            );
+        }
+    }
     ?>
 
     <!-- Payment processor keys -->
@@ -123,7 +141,8 @@
             totalCharge: <?php echo $totalToday; ?>,
             userId: <?php echo $user_id; ?>,
             userEmail: <?php echo json_encode($user_email, $je); ?>,
-            isUpdatingPaymentMethod: <?php echo $is_changing_method ? 'true' : 'false'; ?>
+            isUpdatingPaymentMethod: <?php echo $is_changing_method ? 'true' : 'false'; ?>,
+            isCycleSwitch: <?php echo $is_cycle_switch ? 'true' : 'false'; ?>
         };
     </script>
 
@@ -149,6 +168,29 @@
 
         <div class="checkout-form">
             <h2>Payment Details</h2>
+
+            <?php if ($is_cycle_switch && $cycleSwitchOldCycle && $cycleSwitchOldCycle !== $billing): ?>
+                <div class="cycle-switch-banner">
+                    <strong>Switching from <?php echo htmlspecialchars(ucfirst($cycleSwitchOldCycle)); ?> to <?php echo htmlspecialchars(ucfirst($billing)); ?>.</strong>
+                    PayPal will bill the new <?php echo htmlspecialchars($billing); ?> amount on activation.
+                    <?php if ($cycleSwitchRefundEstimate > 0): ?>
+                        Your prorated refund of about <strong>$<?php echo number_format($cycleSwitchRefundEstimate, 2); ?> CAD</strong> will appear in your PayPal account within 5–10 business days.
+                    <?php endif; ?>
+                </div>
+                <style>
+                .cycle-switch-banner {
+                    background: var(--purple-50, #faf5ff);
+                    border: 1px solid var(--purple-200, #e9d5ff);
+                    border-left: 4px solid var(--purple-500, #8b5cf6);
+                    border-radius: 10px;
+                    padding: 14px 18px;
+                    margin-bottom: 20px;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    color: var(--gray-800, #1f2937);
+                }
+                </style>
+            <?php endif; ?>
 
             <div class="order-summary ai-order-summary">
                 <h3>Order Summary</h3>

@@ -136,7 +136,7 @@
                 <li><strong>Plan Changes (Upgrade)</strong>: When upgrading from monthly to yearly billing, you will be charged the yearly amount immediately, less the prorated value of your current unused billing period and any existing account credit. The new yearly billing period begins on the date of upgrade.</li>
                 <li><strong>Plan Changes (Downgrade)</strong>: When downgrading from yearly to monthly billing, the prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. Any leftover value remains as account credit and is automatically applied to future monthly renewals until depleted.</li>
                 <li><strong>Account Credit</strong>: Account credit is non-refundable, has no cash value, and is forfeited upon cancellation. Credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
-                <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square. Plan changes are currently available for subscriptions paid via Stripe and Square; PayPal subscribers should contact support to change billing cycles.</li>
+                <li><strong>Payment Methods</strong>: We accept payments via Stripe, PayPal, and Square. PayPal plan changes are refunded to your PayPal account; Stripe and Square plan changes apply credits or partial charges directly.</li>
                 <li><strong>Usage Limits</strong>: AI Receipt Scanning is limited to 500 scans per month.</li>
             </ul>
             <p>We reserve the right to modify subscription pricing with 30 days notice to existing subscribers.</p>

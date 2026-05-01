@@ -297,6 +297,7 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     stripe_customer_id VARCHAR(255) COMMENT 'Stripe customer ID for recurring billing',
     auto_renew TINYINT(1) DEFAULT 1 COMMENT 'Whether to auto-renew the subscription',
     paypal_subscription_id VARCHAR(100) COMMENT 'PayPal subscription ID for recurring billing',
+    previous_paypal_subscription_id VARCHAR(100) DEFAULT NULL COMMENT 'Old PayPal sub-id during in-flight cycle switch; cancel webhook for this ID is ignored',
     discount_applied TINYINT(1) DEFAULT 0,
     credit_balance DECIMAL(10,2) DEFAULT 0 COMMENT 'Remaining credit balance from premium discount',
     original_credit DECIMAL(10,2) DEFAULT 0 COMMENT 'Original credit amount (to track if credit was used)',

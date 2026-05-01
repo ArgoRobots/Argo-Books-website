@@ -180,6 +180,29 @@ function handleSubscriptionCancelled($resource) {
         throw new Exception("Missing subscription ID in cancelled event");
     }
 
+    // Race fix for cycle-switch flow: when a user switches PayPal billing
+    // cycles, we cancel the old subscription server-side AFTER committing
+    // the new one to the DB. The cancel triggers a BILLING.SUBSCRIPTION.
+    // CANCELLED webhook for the OLD id. Without this guard, the handler
+    // below would mark the row (now pointing at the NEW sub) as cancelled
+    // and zero out credit_balance. The previous_paypal_subscription_id
+    // column is set in the same transaction as paypal_subscription_id, so
+    // this lookup is deterministic and survives webhook delivery delays.
+    $stmt = $pdo->prepare("
+        SELECT subscription_id FROM premium_subscriptions
+        WHERE previous_paypal_subscription_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$paypalSubscriptionId]);
+    if ($stmt->fetch()) {
+        logPayPalWebhookEvent(
+            'BILLING.SUBSCRIPTION.CANCELLED',
+            $resource,
+            'cycle_switch_old_sub_cancel_ignored'
+        );
+        return;
+    }
+
     // Find subscription in our database
     $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$paypalSubscriptionId]);

@@ -86,7 +86,7 @@
                 <li><strong>Upgrade (monthly to yearly)</strong>: You are charged the yearly amount immediately, less the prorated value of your current unused monthly period and any existing account credit. The new yearly billing period begins on the date of upgrade.</li>
                 <li><strong>Downgrade (yearly to monthly)</strong>: The prorated value of your unused yearly subscription is applied to reduce or fully cover the first new monthly charge. If the prorated value exceeds one month, the leftover remains as account credit and is automatically applied to future monthly renewals until depleted. No cash refund is issued.</li>
                 <li><strong>Account credit</strong>: Account credit is non-refundable, has no cash value, and cannot be transferred. It is forfeited if you cancel your subscription. Account credit is consumed automatically by future renewal charges and does not expire while your subscription remains active.</li>
-                <li><strong>Plan changes for PayPal subscribers</strong>: At this time, plan changes are available for subscriptions paid via Stripe and Square only. PayPal subscribers who wish to change plans should contact support.</li>
+                <li><strong>Plan changes for PayPal subscribers</strong>: The new subscription is billed by PayPal on activation, and the prorated value of your unused old period (plus any account credit) is refunded to your PayPal account within 5&ndash;10 business days.</li>
             </ul>
 
             <h2>How to Request a Refund</h2>

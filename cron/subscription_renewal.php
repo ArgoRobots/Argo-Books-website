@@ -363,6 +363,27 @@ try {
     logMessage("Error marking expired subscriptions: " . $e->getMessage(), 'ERROR');
 }
 
+// Cleanup: clear stale previous_paypal_subscription_id values from PayPal
+// cycle switches that happened more than 7 days ago. The column exists only
+// to let the cancel webhook recognize an expected cancel event for the
+// pre-switch subscription; once that event has had a week to arrive, we no
+// longer need the back-reference.
+try {
+    $stmt = $pdo->prepare("
+        UPDATE premium_subscriptions
+        SET previous_paypal_subscription_id = NULL
+        WHERE previous_paypal_subscription_id IS NOT NULL
+          AND updated_at < NOW() - INTERVAL 7 DAY
+    ");
+    $stmt->execute();
+    $cleared = $stmt->rowCount();
+    if ($cleared > 0) {
+        logMessage("Cleared previous_paypal_subscription_id on $cleared row(s)");
+    }
+} catch (PDOException $e) {
+    logMessage("Error clearing previous_paypal_subscription_id: " . $e->getMessage(), 'ERROR');
+}
+
 /**
  * Process Stripe renewal payment
  */

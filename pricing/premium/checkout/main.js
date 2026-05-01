@@ -133,11 +133,21 @@ document.addEventListener("DOMContentLoaded", function () {
               user_id: subscription.userId,
               is_paypal_subscription: true,
               update_payment_method: subscription.isUpdatingPaymentMethod || false,
+              cycle_switch: subscription.isCycleSwitch || false,
             }),
           })
             .then((response) => response.json())
             .then((result) => {
               if (result.success) {
+                // Cycle switch: surface any warnings, then return to
+                // subscription page (not the thank-you/welcome page).
+                if (subscription.isCycleSwitch) {
+                  if (Array.isArray(result.warnings) && result.warnings.length > 0) {
+                    alert(result.message + "\n\n" + result.warnings.join("\n\n"));
+                  }
+                  window.location.href = "../../../community/users/subscription.php";
+                  return;
+                }
                 window.location.href =
                   "../thank-you/?subscription_id=" +
                   result.subscription_id +

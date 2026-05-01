@@ -17,7 +17,7 @@ $errorMessage = '';
 $aggregatedData = [
     'dataPoints' => [
         'Export' => [],
-        'OpenAI' => [],
+        'Gemini' => [],
         'OpenExchangeRates' => [],
         'GoogleSheets' => [],
         'ReceiptScanning' => [],
@@ -90,8 +90,8 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
             $normalized['Success'] = $event['success'] ?? true;
 
             switch ($apiName) {
-                case 'OpenAI':
-                    return ['category' => 'OpenAI', 'data' => $normalized];
+                case 'Gemini':
+                    return ['category' => 'Gemini', 'data' => $normalized];
 
                 case 'OpenExchangeRates':
                     return ['category' => 'OpenExchangeRates', 'data' => $normalized];
@@ -99,7 +99,7 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
                 case 'GoogleSheets':
                     return ['category' => 'GoogleSheets', 'data' => $normalized];
 
-                case 'AzureDocumentIntelligence':
+                case 'ReceiptScanProxy':
                     return ['category' => 'ReceiptScanning', 'data' => $normalized];
 
                 default:
@@ -364,7 +364,7 @@ include __DIR__ . '/../admin_header.php';
     <?php elseif (
         empty($aggregatedData['dataPoints']) ||
         (count($aggregatedData['dataPoints']['Export']) == 0 &&
-            count($aggregatedData['dataPoints']['OpenAI']) == 0 &&
+            count($aggregatedData['dataPoints']['Gemini']) == 0 &&
             count($aggregatedData['dataPoints']['OpenExchangeRates']) == 0 &&
             count($aggregatedData['dataPoints']['GoogleSheets']) == 0 &&
             count($aggregatedData['dataPoints']['ReceiptScanning']) == 0 &&
@@ -634,12 +634,12 @@ include __DIR__ . '/../admin_header.php';
 
                 <div class="chart-row">
                     <div class="chart-container">
-                        <h2>OpenAI Success Rate</h2>
-                        <canvas id="openaiChart"></canvas>
+                        <h2>Gemini Success Rate</h2>
+                        <canvas id="geminiChart"></canvas>
                     </div>
                     <div class="chart-container">
-                        <h2>OpenAI Response Time</h2>
-                        <canvas id="openaiResponseTimeChart"></canvas>
+                        <h2>Gemini Response Time</h2>
+                        <canvas id="geminiResponseTimeChart"></canvas>
                     </div>
                 </div>
 
@@ -650,7 +650,7 @@ include __DIR__ . '/../admin_header.php';
                     </div>
                 </div>
 
-                <h2 class="section-title" style="margin-top: 2rem;">Receipt Scanning (Azure Document Intelligence)</h2>
+                <h2 class="section-title" style="margin-top: 2rem;">Receipt Scanning</h2>
 
                 <div class="chart-row">
                     <div class="chart-container">

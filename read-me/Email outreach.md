@@ -10,7 +10,7 @@ Once a day the outreach cron does a routine:
 
 1. **Picks a city**, rotating through Saskatchewan first and then expanding outward into the rest of Canada.
 2. **Finds small businesses** there by category (plumbers, cafes, salons, and 90-odd other small-business types) and grabs their public contact email from their website.
-3. **Writes each one a short email** with OpenAI (currently `gpt-4o-mini`). The email references the kind of business they run and the everyday headaches that category tends to have.
+3. **Writes each one a short email** with Gemini (currently `gemini-2.5-flash`). The email references the kind of business they run and the everyday headaches that category tends to have.
 4. **Runs a quiet A/B test** alongside the send. It splits traffic across 2–4 variants and keeps the one that gets clicks. By default it tests subject lines; you can extend it to other things (body, CTA, sender name, preheader, HTML-vs-plain, with-vs-without personalization).
 5. **Sends the emails**, up to the daily cap (`OUTREACH_DAILY_SEND_LIMIT`), with a tracked link so clicks can be attributed back to the lead and variant.
 
@@ -44,7 +44,7 @@ Each test targets one **variant type**:
 - **Sender from-name** — the name the email appears to come from (e.g. `Evan` vs `Evan from Argo Books` vs `Argo Books`).
 - **Preheader** — the snippet most inboxes show next to the subject as a preview.
 - **Format** — full HTML email with logo and styling vs plain text. Plain text often outperforms styled HTML in cold outreach because it looks like a human's email rather than marketing.
-- **Personalization depth** — with vs without the AI-generated business summary (which costs an OpenAI call per lead). Use this to find out whether that extra call is worth keeping.
+- **Personalization depth** — with vs without the AI-generated business summary (which costs a Gemini call per lead). Use this to find out whether that extra call is worth keeping.
 
 Only one test can be active at a time, regardless of type — that keeps the math clean. The auto-loop creates the next cycle as soon as the current one promotes.
 
@@ -76,7 +76,7 @@ With automation on, the cron ends a test and promotes the leader when **any** of
 
 Once a winner is promoted, the cron immediately starts the next cycle.
 
-For directive-style types (subject / body / CTA), it carries the winning variant forward as variant A so the current champion keeps being measured, and asks OpenAI for three new directive styles to test against it. If OpenAI errors, it falls back to a curated set of seed directives so the loop never stalls. The first-ever cycle has no prior winner, so it runs with three fresh directives only.
+For directive-style types (subject / body / CTA), it carries the winning variant forward as variant A so the current champion keeps being measured, and asks Gemini for three new directive styles to test against it. If Gemini errors, it falls back to a curated set of seed directives so the loop never stalls. The first-ever cycle has no prior winner, so it runs with three fresh directives only.
 
 For fixed-pool types (sender / format / personalization), the next cycle just re-runs the fixed variants — there's no carry-forward, since the pool itself is the test. Each new cycle is a fresh measurement against current conditions.
 
@@ -133,7 +133,7 @@ You can switch between these whenever — nothing about the data changes; only f
 
 Emails are short (2–3 short paragraphs, under 100 words), mention that Evan is a local Saskatchewan developer (or a Canadian developer if the business isn't in Saskatchewan), and reference the kind of business they run — in general industry terms, never with made-up specifics about the recipient. Every email includes a link to argorobots.com and a soft one-line unsubscribe. Sign-off is always Evan / Argo Books.
 
-If OpenAI returns invalid JSON (or leaves out the required fields), the draft is saved with `approval_status = 'needs_review'` and held back from auto-approve until an admin edits it.
+If Gemini returns invalid JSON (or leaves out the required fields), the draft is saved with `approval_status = 'needs_review'` and held back from auto-approve until an admin edits it.
 
 ## Pausing everything quickly
 

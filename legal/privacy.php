@@ -189,7 +189,7 @@
             <ul>
                 <li><strong>Export data</strong>: Type of export (Excel, Google Sheets, backup, etc.), duration of
                     export operation, and file size</li>
-                <li><strong>API usage</strong>: API type (Google Sheets, OpenAI, Microsoft Translator, Open Exchange
+                <li><strong>API usage</strong>: API type (Google Sheets, Google Gemini, Microsoft Translator, Open Exchange
                     Rates), model used (for AI functions), operation duration, and tokens used</li>
                 <li><strong>Error data</strong>: Error category, error code, timestamp, and anonymous context
                     information to help identify and fix software issues</li>

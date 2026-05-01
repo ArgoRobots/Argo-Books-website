@@ -25,6 +25,19 @@ try {
 }
 
 /**
+ * Returns the current runtime environment ('production' or 'sandbox') derived
+ * from APP_ENV in .env. Used to tag rows on insert (premium_subscriptions,
+ * premium_subscription_payments) and to filter admin reads so dev test data
+ * doesn't pollute prod stats — both environments share the same database.
+ * Anything other than 'production' is normalized to 'sandbox' to match the
+ * ENUM('production','sandbox') columns.
+ */
+function current_environment(): string
+{
+    return ($_ENV['APP_ENV'] ?? '') === 'production' ? 'production' : 'sandbox';
+}
+
+/**
  * Encrypt a string using AES-256-GCM.
  * Requires PORTAL_ENCRYPTION_KEY environment variable (64-char hex = 256 bits).
  */

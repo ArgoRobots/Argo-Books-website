@@ -159,6 +159,5 @@ Cron requests are authenticated via `CRON_SECRET` in `.env`.
 | Square | Payments | `SQUARE_` |
 | Resend | Email relay (SMTP) | `SMTP_` |
 | Google OAuth | Social login | `GOOGLE_` |
-| OpenAI | AI features | `OPENAI_` |
-| Azure Document Intelligence | Receipt scanning | `AZURE_` |
+| Google Gemini | AI features and receipt scanning | `GEMINI_` |
 | Open Exchange Rates | Currency conversion | `EXCHANGE_RATES_` |

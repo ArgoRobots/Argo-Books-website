@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   const exportData = rawData.dataPoints.Export || [];
-  const openaiData = rawData.dataPoints.OpenAI || [];
+  const geminiData = rawData.dataPoints.Gemini || [];
   const exchangeRatesData = rawData.dataPoints.OpenExchangeRates || [];
   const googleSheetsData = rawData.dataPoints.GoogleSheets || [];
   const receiptScanningData = rawData.dataPoints.ReceiptScanning || [];
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (isGeoEnabled) {
     generateCountryDistributionChart(
       exportData,
-      openaiData,
+      geminiData,
       exchangeRatesData,
       googleSheetsData,
       sessionData,
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     generateCityDistributionChart(
       exportData,
-      openaiData,
+      geminiData,
       exchangeRatesData,
       googleSheetsData,
       sessionData,
@@ -58,19 +58,19 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     generatePerformanceByCountryChart(
       exportData,
-      openaiData,
+      geminiData,
       exchangeRatesData
     );
     generateErrorRatesByCountryChart(
       errorData,
       exportData,
-      openaiData,
+      geminiData,
       exchangeRatesData
     );
     generateSessionDurationByRegionChart(sessionData);
     generateTimezoneChart(
       exportData,
-      openaiData,
+      geminiData,
       exchangeRatesData,
       googleSheetsData,
       sessionData,
@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   generateVersionDistributionChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
@@ -88,18 +88,18 @@ document.addEventListener("DOMContentLoaded", function () {
   );
   generateVersionTimeChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
     errorData
   );
-  generateVersionPerformanceChart(exportData, openaiData, exchangeRatesData);
+  generateVersionPerformanceChart(exportData, geminiData, exchangeRatesData);
   generateVersionSessionChart(sessionData);
   generateVersionErrorChart(
     errorData,
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     sessionData
   );
@@ -133,8 +133,8 @@ document.addEventListener("DOMContentLoaded", function () {
   generateExportDurationByTypeChart(exportData);
   generateExportFileSizeByTypeChart(exportData);
 
-  generateOpenAIChart(openaiData);
-  generateOpenAIResponseTimeChart(openaiData);
+  generateGeminiChart(geminiData);
+  generateGeminiResponseTimeChart(geminiData);
   generateExchangeRatesChart(exchangeRatesData);
 
   generateActiveUsersTab(rawData);
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Geographic Charts
   function generateCountryDistributionChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ) {
     const allData = [
       ...exportData,
-      ...openaiData,
+      ...geminiData,
       ...exchangeRatesData,
       ...googleSheetsData,
       ...sessionData,
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generateCityDistributionChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const allData = [
       ...exportData,
-      ...openaiData,
+      ...geminiData,
       ...exchangeRatesData,
       ...googleSheetsData,
       ...sessionData,
@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generatePerformanceByCountryChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData
   ) {
     const countryPerformance = {};
@@ -328,7 +328,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     addPerformanceData(exportData, "export");
-    addPerformanceData(openaiData, "openai");
+    addPerformanceData(geminiData, "gemini");
     addPerformanceData(exchangeRatesData, "exchangeRates");
 
     if (Object.keys(countryPerformance).length === 0) {
@@ -388,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateErrorRatesByCountryChart(
     errorData,
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData
   ) {
     if (errorData.length === 0) {
@@ -409,7 +409,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-    [...exportData, ...openaiData, ...exchangeRatesData].forEach((item) => {
+    [...exportData, ...geminiData, ...exchangeRatesData].forEach((item) => {
       const country = item.country || "Unknown";
       if (country !== "Unknown") {
         countryOperations[country] = (countryOperations[country] || 0) + 1;
@@ -543,7 +543,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generateTimezoneChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
@@ -551,7 +551,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ) {
     const allData = [
       ...exportData,
-      ...openaiData,
+      ...geminiData,
       ...exchangeRatesData,
       ...googleSheetsData,
       ...sessionData,
@@ -619,7 +619,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Version Charts
   function generateVersionDistributionChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
@@ -627,7 +627,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ) {
     const allData = [
       ...exportData,
-      ...openaiData,
+      ...geminiData,
       ...exchangeRatesData,
       ...googleSheetsData,
       ...sessionData,
@@ -707,7 +707,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generateVersionTimeChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     googleSheetsData,
     sessionData,
@@ -715,7 +715,7 @@ document.addEventListener("DOMContentLoaded", function () {
   ) {
     const allData = [
       ...exportData,
-      ...openaiData,
+      ...geminiData,
       ...exchangeRatesData,
       ...googleSheetsData,
       ...sessionData,
@@ -799,12 +799,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generateVersionPerformanceChart(
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData
   ) {
     const performanceData = {};
 
-    [...exportData, ...openaiData, ...exchangeRatesData].forEach((item) => {
+    [...exportData, ...geminiData, ...exchangeRatesData].forEach((item) => {
       const version = item.appVersion || "Unknown";
       const duration = parseFloat(item.DurationMS || 0);
 
@@ -979,7 +979,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateVersionErrorChart(
     errorData,
     exportData,
-    openaiData,
+    geminiData,
     exchangeRatesData,
     sessionData
   ) {
@@ -1001,7 +1001,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     [
       ...exportData,
-      ...openaiData,
+      ...geminiData,
       ...exchangeRatesData,
       ...sessionData,
     ].forEach((item) => {
@@ -1554,17 +1554,17 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // API Usage Charts
-  function generateOpenAIChart(openaiData) {
-    if (openaiData.length === 0) {
-      document.getElementById("openaiChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No OpenAI data available</div>';
+  function generateGeminiChart(geminiData) {
+    if (geminiData.length === 0) {
+      document.getElementById("geminiChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No Gemini data available</div>';
       return;
     }
 
-    const successful = openaiData.filter((d) => d.Success === true).length;
-    const failed = openaiData.filter((d) => d.Success === false).length;
+    const successful = geminiData.filter((d) => d.Success === true).length;
+    const failed = geminiData.filter((d) => d.Success === false).length;
 
-    new Chart(document.getElementById("openaiChart"), {
+    new Chart(document.getElementById("geminiChart"), {
       type: "doughnut",
       data: {
         labels: ["Successful", "Failed"],
@@ -1597,14 +1597,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function generateOpenAIResponseTimeChart(openaiData) {
-    const dataWithDuration = openaiData.filter(
+  function generateGeminiResponseTimeChart(geminiData) {
+    const dataWithDuration = geminiData.filter(
       (d) => d.DurationMS && d.DurationMS > 0
     );
 
     if (dataWithDuration.length === 0) {
-      document.getElementById("openaiResponseTimeChart").parentElement.innerHTML =
-        '<div class="chart-no-data">No OpenAI response time data available</div>';
+      document.getElementById("geminiResponseTimeChart").parentElement.innerHTML =
+        '<div class="chart-no-data">No Gemini response time data available</div>';
       return;
     }
 
@@ -1614,7 +1614,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
     const durations = recentData.map((d) => parseInt(d.DurationMS) || 0);
 
-    new Chart(document.getElementById("openaiResponseTimeChart"), {
+    new Chart(document.getElementById("geminiResponseTimeChart"), {
       type: "line",
       data: {
         labels: labels,

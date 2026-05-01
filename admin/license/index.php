@@ -39,8 +39,9 @@ function get_premium_subscriptions($search_filter = '')
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
             WHERE s.payment_method != 'free_key'
+              AND s.environment = ?
         ";
-        $params = [];
+        $params = [current_environment()];
 
         if (!empty($search_filter)) {
             $query .= " AND (s.email LIKE ? OR s.subscription_id LIKE ? OR u.username LIKE ?)";
@@ -106,15 +107,17 @@ function get_subscription_chart_data()
     $data = [];
 
     try {
-        $stmt = $pdo->query("
+        $stmt = $pdo->prepare("
             SELECT DATE(created_at) as date,
                    COUNT(*) as total,
                    SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active
             FROM premium_subscriptions
             WHERE payment_method != 'free_key'
+              AND environment = ?
             GROUP BY DATE(created_at)
             ORDER BY date
         ");
+        $stmt->execute([current_environment()]);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching subscription chart data: " . $e->getMessage());
@@ -310,26 +313,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email_success = 0;
 
             try {
-                // Update credit_balance for selected subscriptions
+                // Update credit_balance for selected subscriptions. Env filter
+                // prevents a stale prod form submit from mutating sandbox subs
+                // (and vice versa) — without it, only the follow-up SELECT was
+                // env-scoped, which is too late.
                 $stmt = $pdo->prepare("
                     UPDATE premium_subscriptions
                     SET credit_balance = credit_balance + ?
                     WHERE id IN ($placeholders)
+                      AND environment = ?
                 ");
-                $params = array_merge([$credit_amount], $subscription_ids);
+                $params = array_merge([$credit_amount], $subscription_ids, [current_environment()]);
                 $stmt->execute($params);
                 $success_count = $stmt->rowCount();
 
                 // Log the credit addition for debugging
                 error_log("Bulk credit: Added \$$credit_amount to " . count($subscription_ids) . " subscriptions. IDs: " . implode(',', $subscription_ids) . ". Rows affected: $success_count");
 
-                // Send emails to affected users and verify credit was saved
+                // Send emails to affected users and verify credit was saved.
+                // Env filter prevents a stale form submit from touching subs from a different environment.
                 $stmt = $pdo->prepare("
                     SELECT id, email, subscription_id, credit_balance
                     FROM premium_subscriptions
                     WHERE id IN ($placeholders)
+                      AND environment = ?
                 ");
-                $stmt->execute($subscription_ids);
+                $stmt->execute(array_merge($subscription_ids, [current_environment()]));
                 $subscriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 // Log the actual credit balances after update
@@ -362,8 +371,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     SELECT email, subscription_id, billing_cycle, end_date
                     FROM premium_subscriptions
                     WHERE id IN ($placeholders)
+                      AND environment = ?
                 ");
-                $stmt->execute($subscription_ids);
+                $stmt->execute(array_merge($subscription_ids, [current_environment()]));
                 $subscriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $sent = 0;

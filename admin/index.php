@@ -12,6 +12,12 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 try {
     global $pdo;
 
+    // Filter every query to the current runtime environment so the prod
+    // dashboard never includes sandbox test data (and vice versa). Both envs
+    // share the same DB; rows are tagged at insert time. Safe to interpolate
+    // because current_environment() returns one of 'production' or 'sandbox'.
+    $env = current_environment();
+
     // --- MRR (Monthly Recurring Revenue) last 12 months ---
     // Use actual completed payments, normalizing yearly payments to monthly equivalent (/12)
     $stmt = $pdo->query("
@@ -26,6 +32,7 @@ try {
         JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
         WHERE p.status = 'completed'
         AND s.payment_method != 'free_key'
+        AND s.environment = '$env'
         AND p.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
         GROUP BY DATE_FORMAT(p.created_at, '%Y-%m')
         ORDER BY month ASC
@@ -62,7 +69,7 @@ try {
                 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11
             ) nums
         ) months
-        LEFT JOIN premium_subscriptions s ON s.payment_method != 'free_key'
+        LEFT JOIN premium_subscriptions s ON s.payment_method != 'free_key' AND s.environment = '$env'
         GROUP BY months.month_date
         ORDER BY months.month_date ASC
     ");
@@ -83,6 +90,7 @@ try {
         FROM premium_subscriptions
         WHERE cancelled_at IS NOT NULL
         AND payment_method != 'free_key'
+        AND environment = '$env'
         AND cancelled_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
         GROUP BY DATE_FORMAT(cancelled_at, '%Y-%m')
         ORDER BY month ASC
@@ -108,6 +116,7 @@ try {
         LEFT JOIN premium_subscriptions s
             ON s.created_at < months.month_date
             AND s.payment_method != 'free_key'
+            AND s.environment = '$env'
             AND (s.cancelled_at IS NULL OR s.cancelled_at >= months.month_date)
             AND (s.end_date >= months.month_date OR s.end_date IS NULL)
         GROUP BY months.month_date
@@ -123,6 +132,7 @@ try {
     $stmt = $pdo->query("
         SELECT COUNT(*) as cnt FROM premium_subscriptions
         WHERE payment_method != 'free_key'
+        AND environment = '$env'
         AND (cancelled_at IS NULL)
         AND (end_date IS NULL OR end_date > NOW())
     ");
@@ -132,6 +142,7 @@ try {
     $stmt = $pdo->query("
         SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
         WHERE status = 'completed'
+        AND environment = '$env'
         AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
     ");
     $revenue_30d = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
@@ -140,6 +151,7 @@ try {
     $stmt = $pdo->query("
         SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
         WHERE status = 'completed'
+        AND environment = '$env'
         AND created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
     ");
     $revenue_365d = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
@@ -148,6 +160,7 @@ try {
     $stmt = $pdo->query("
         SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
         WHERE status = 'completed'
+        AND environment = '$env'
     ");
     $revenue_all = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
 

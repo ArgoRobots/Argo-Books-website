@@ -138,7 +138,7 @@
 
             <h2>5. Third-Party Services</h2>
             <p>The Software may use third-party services for certain functionality, including but not limited to Google
-                Sheets, OpenAI, Microsoft Translator, Open Exchange Rates, Stripe, PayPal, and Square. Your use of these services through the
+                Sheets, Google Gemini, Microsoft Translator, Open Exchange Rates, Stripe, PayPal, and Square. Your use of these services through the
                 Software is subject to the respective terms and conditions of those services.</p>
 
             <h2>6. Warranty Disclaimer</h2>

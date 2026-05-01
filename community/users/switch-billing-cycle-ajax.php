@@ -381,25 +381,28 @@ try {
     // intent_id submitted twice), Stripe idempotency-key dedup on rapid
     // double-click, or two-tab race on the same gateway-side payment id.
     $auditCurrency = $premium_subscription['currency'] ?? 'CAD';
+    // Env-scope the dedupe so a cycle_change row from the other environment
+    // doesn't suppress the audit row in this one (shared DB).
     $checkStmt = $pdo->prepare("
         SELECT id FROM premium_subscription_payments
-        WHERE transaction_id = ? AND payment_type = 'cycle_change'
+        WHERE transaction_id = ? AND payment_type = 'cycle_change' AND environment = ?
         LIMIT 1
     ");
-    $checkStmt->execute([$transaction_id]);
+    $checkStmt->execute([$transaction_id, current_environment()]);
     if (!$checkStmt->fetch()) {
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
-                transaction_id, status, payment_type, created_at
-            ) VALUES (?, ?, ?, ?, ?, 'completed', 'cycle_change', NOW())
+                transaction_id, status, payment_type, environment, created_at
+            ) VALUES (?, ?, ?, ?, ?, 'completed', 'cycle_change', ?, NOW())
         ");
         $stmt->execute([
             $subscription_id,
             $immediateChargeTotal,
             $auditCurrency,
             $payment_method,
-            $transaction_id
+            $transaction_id,
+            current_environment()
         ]);
     }
 

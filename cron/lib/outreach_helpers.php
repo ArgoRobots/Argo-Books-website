@@ -534,10 +534,14 @@ function scrape_email_from_website($url)
 {
     if (empty($url)) return null;
 
-    // Trim trailing slash so 'https://example.com' and 'https://example.com/'
-    // share a cache entry. URLs over 255 chars bypass the cache (column limit).
-    $cacheKey = rtrim(trim($url), '/');
-    $cacheable = (strlen($cacheKey) <= 255);
+    // Normalize once and use the same value for the cache key AND the live
+    // scrape — otherwise leading/trailing whitespace produces avoidable scrape
+    // failures and cache mismatches between what we look up and what we store.
+    $url = rtrim(trim($url), '/');
+    if ($url === '') return null;
+
+    // URLs over 255 chars bypass the cache (column limit) but still get scraped.
+    $cacheable = (strlen($url) <= 255);
 
     if ($cacheable) {
         global $pdo;
@@ -546,7 +550,7 @@ function scrape_email_from_website($url)
                 $stmt = $pdo->prepare("SELECT email FROM outreach_scrape_cache
                     WHERE url = ? AND last_attempted_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
                     LIMIT 1");
-                $stmt->execute([$cacheKey]);
+                $stmt->execute([$url]);
                 $row = $stmt->fetch();
                 if ($row !== false) {
                     return $row['email']; // string OR null — both are valid cached outcomes
@@ -566,7 +570,7 @@ function scrape_email_from_website($url)
                 $stmt = $pdo->prepare("INSERT INTO outreach_scrape_cache (url, email, last_attempted_at)
                     VALUES (?, ?, NOW())
                     ON DUPLICATE KEY UPDATE email = VALUES(email), last_attempted_at = NOW()");
-                $stmt->execute([$cacheKey, $email]);
+                $stmt->execute([$url, $email]);
             } catch (PDOException $e) {
                 // Cache write failure shouldn't fail the scrape itself.
             }
@@ -789,7 +793,10 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
         }
         if (isset($data['error'])) {
             $msg = $data['error']['message'] ?? ($data['error']['status'] ?? 'Unknown error');
-            return ['error' => 'Google Places API error: ' . $msg];
+            return [
+                'error' => 'Google Places API error: ' . $msg,
+                'status' => $data['error']['status'] ?? null,
+            ];
         }
         return [
             'places' => $data['places'] ?? [],
@@ -812,10 +819,12 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
         }
 
         $result = $callSearchText($body);
-        // The new API rejects unknown includedType values with 400. Retry once
-        // without the type filter so a stale entry in $placeTypeMap doesn't kill
-        // discovery for that round.
-        if (isset($result['error']) && isset($body['includedType'])) {
+        // Only retry on INVALID_ARGUMENT (the status returned for unknown
+        // includedType values) — retrying on auth/rate-limit/5xx errors would
+        // just double the cost without changing the outcome.
+        if (isset($result['error'])
+            && isset($body['includedType'])
+            && ($result['status'] ?? '') === 'INVALID_ARGUMENT') {
             unset($body['includedType']);
             $result = $callSearchText($body);
         }

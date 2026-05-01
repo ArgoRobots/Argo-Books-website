@@ -97,7 +97,12 @@
     $renewalFee = calculate_processing_fee($renewalBase);
     $renewalTotal = $renewalBase + $renewalFee;
 
-    // Cycle-switch refund estimate for the disclosure banner
+    // Cycle-switch refund disclosure banner — PayPal only. Stripe and
+    // Square cycle switches are handled entirely by switch-billing-cycle-
+    // ajax.php and never reach this checkout page; the banner below is
+    // therefore correctly suppressed for non-PayPal users because
+    // $cycleSwitchOldCycle stays empty and the render guard at line ~172
+    // checks it.
     $cycleSwitchRefundEstimate = 0.0;
     $cycleSwitchOldCycle = '';
     if ($is_cycle_switch && $existing_subscription
@@ -156,6 +161,22 @@
     <link rel="stylesheet" href="../../../resources/header/style.css">
     <link rel="stylesheet" href="../../../resources/header/dark.css">
     <link rel="stylesheet" href="../../../resources/footer/style.css">
+
+    <style>
+    /* Cycle-switch refund disclosure banner. Rendered only when the user
+       arrives via switch-billing-cycle.php with cycle_switch=1. */
+    .cycle-switch-banner {
+        background: var(--purple-50, #faf5ff);
+        border: 1px solid var(--purple-200, #e9d5ff);
+        border-left: 4px solid var(--purple-500, #8b5cf6);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--gray-800, #1f2937);
+    }
+    </style>
 </head>
 
 <body>
@@ -177,19 +198,6 @@
                         Your prorated refund of about <strong>$<?php echo number_format($cycleSwitchRefundEstimate, 2); ?> CAD</strong> will appear in your PayPal account within 5–10 business days.
                     <?php endif; ?>
                 </div>
-                <style>
-                .cycle-switch-banner {
-                    background: var(--purple-50, #faf5ff);
-                    border: 1px solid var(--purple-200, #e9d5ff);
-                    border-left: 4px solid var(--purple-500, #8b5cf6);
-                    border-radius: 10px;
-                    padding: 14px 18px;
-                    margin-bottom: 20px;
-                    font-size: 14px;
-                    line-height: 1.5;
-                    color: var(--gray-800, #1f2937);
-                }
-                </style>
             <?php endif; ?>
 
             <div class="order-summary ai-order-summary">

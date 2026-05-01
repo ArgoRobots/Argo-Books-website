@@ -145,6 +145,17 @@ try {
             if ($isPayPalSubscription) {
                 // PayPal Subscriptions API - recurring billing handled by PayPal
                 $paypalSubscriptionId = $input['paypal_subscription_id'] ?? $input['subscriptionID'] ?? '';
+                // Validate format at entry — the id ends up in the DB and in
+                // outbound URL paths to PayPal (cancel, refund). Reject
+                // anything that doesn't match the alphanumeric+hyphen format
+                // before it can persist or reach an API call.
+                require_once __DIR__ . '/../../../webhooks/paypal-helper.php';
+                if (!isValidPayPalResourceId($paypalSubscriptionId)) {
+                    $pdo->rollBack();
+                    error_log("Rejected PayPal subscription with invalid id format. user_id=$userId, raw_id=" . substr((string) $paypalSubscriptionId, 0, 64));
+                    echo json_encode(['success' => false, 'error' => 'Invalid PayPal subscription identifier']);
+                    exit();
+                }
                 $transactionId = $paypalSubscriptionId;
                 $paymentToken = $paypalSubscriptionId; // Store subscription ID as token
             } else {
@@ -391,6 +402,34 @@ try {
             require_once __DIR__ . '/../../../webhooks/paypal-helper.php';
             require_once __DIR__ . '/../../../community/users/user_functions.php';
 
+            // Re-read the row INSIDE the transaction with FOR UPDATE so a
+            // concurrent renewal webhook or admin edit between the line-100
+            // SELECT and this UPDATE can't be silently overwritten. Money-
+            // handling code: read fresh, hold the lock for the duration of
+            // the cycle-switch decision and write.
+            try {
+                $stmt = $pdo->prepare("
+                    SELECT * FROM premium_subscriptions
+                    WHERE subscription_id = ? AND user_id = ?
+                    FOR UPDATE
+                ");
+                $stmt->execute([$subscriptionId, $userId]);
+                $lockedSubscription = $stmt->fetch(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                $pdo->rollBack();
+                error_log("Cycle switch FOR UPDATE failed: " . $e->getMessage());
+                echo json_encode(['success' => false, 'error' => 'Could not lock subscription for update']);
+                exit();
+            }
+            if (!$lockedSubscription) {
+                $pdo->rollBack();
+                echo json_encode(['success' => false, 'error' => 'Subscription not found']);
+                exit();
+            }
+            // From here on, use $lockedSubscription for all reads — it's the
+            // authoritative row state under the row lock.
+            $existingSubscription = $lockedSubscription;
+
             // Defense-in-depth guards (confirm page also enforces these but
             // process-subscription.php is reachable via direct POST, so it
             // must enforce independently). All rejections happen before any
@@ -454,6 +493,8 @@ try {
                 ? date('Y-m-d H:i:s', strtotime('+1 year'))
                 : date('Y-m-d H:i:s', strtotime('+1 month'));
 
+            // Use the FRESH credit_balance from the locked row so a
+            // concurrent credit grant doesn't get blown away.
             $existingCreditBalance = (float) ($existingSubscription['credit_balance'] ?? 0);
             $refundAmount = min(
                 (float) $proration['prorated_credit'] + $existingCreditBalance,

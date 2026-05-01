@@ -247,11 +247,11 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
  *
  * @param string $saleId       PayPal sale ID (from premium_subscription_payments.transaction_id)
  * @param float  $amount       Refund amount
+ * @param string $currency     ISO currency code; MUST match the original sale's currency or PayPal will reject the refund
  * @param string $description  Buyer-facing description (PayPal v1 sale-refund field name)
- * @param string $currency     ISO currency code; defaults to CAD but should match the original sale's currency
  * @return array { success: bool, refund_id?: string|null, http_code?: int, error?: string }
  */
-function refundPayPalSale($saleId, $amount, $description = 'Cycle switch proration', $currency = 'CAD') {
+function refundPayPalSale($saleId, $amount, $currency, $description = 'Cycle switch proration') {
     if (!isValidPayPalResourceId($saleId)) {
         return ['success' => false, 'error' => 'Invalid sale id format'];
     }

@@ -376,15 +376,17 @@ try {
         exit;
     }
 
+    $auditCurrency = $premium_subscription['currency'] ?? 'CAD';
     $stmt = $pdo->prepare("
         INSERT INTO premium_subscription_payments (
             subscription_id, amount, currency, payment_method,
             transaction_id, status, payment_type, created_at
-        ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'cycle_change', NOW())
+        ) VALUES (?, ?, ?, ?, ?, 'completed', 'cycle_change', NOW())
     ");
     $stmt->execute([
         $subscription_id,
         $immediateChargeTotal,
+        $auditCurrency,
         $payment_method,
         $transaction_id
     ]);

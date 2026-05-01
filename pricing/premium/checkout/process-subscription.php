@@ -437,10 +437,11 @@ try {
         }
 
         if ($isPayPalCycleSwitch) {
-            // PayPal cycle-switch UPDATE: also writes
-            // previous_paypal_subscription_id (race fix for the cancel
-            // webhook), zeros credit_balance (consumed in refund),
-            // stamps last_cycle_change_at.
+            // PayPal cycle-switch UPDATE: writes previous_paypal_subscription_id
+            // (race fix for the cancel webhook) and stamps last_cycle_change_at.
+            // credit_balance is intentionally NOT touched here — it gets set
+            // post-commit based on refund outcome so a failed refund doesn't
+            // also wipe out the user's existing credit.
             $stmt = $pdo->prepare("
                 UPDATE premium_subscriptions
                 SET payment_method = ?,
@@ -452,7 +453,6 @@ try {
                     end_date = ?,
                     paypal_subscription_id = ?,
                     previous_paypal_subscription_id = ?,
-                    credit_balance = 0,
                     last_cycle_change_at = NOW(),
                     status = 'active',
                     auto_renew = 1,
@@ -475,15 +475,21 @@ try {
 
             // Audit row in payment history. The real $0 sale row gets
             // written by the PAYMENT.SALE.COMPLETED webhook when PayPal
-            // bills the new sub.
+            // bills the new sub. Skip if a row with this transaction_id
+            // already exists (rare double-submit guard).
             try {
-                $stmt = $pdo->prepare("
-                    INSERT INTO premium_subscription_payments (
-                        subscription_id, amount, currency, payment_method,
-                        transaction_id, status, payment_type, created_at
-                    ) VALUES (?, 0, 'CAD', 'paypal', ?, 'completed', 'cycle_change', NOW())
-                ");
-                $stmt->execute([$subscriptionId, $paypalSubscriptionId]);
+                $auditCurrency = $existingSubscription['currency'] ?? 'CAD';
+                $checkStmt = $pdo->prepare("SELECT id FROM premium_subscription_payments WHERE transaction_id = ? AND payment_type = 'cycle_change' LIMIT 1");
+                $checkStmt->execute([$paypalSubscriptionId]);
+                if (!$checkStmt->fetch()) {
+                    $stmt = $pdo->prepare("
+                        INSERT INTO premium_subscription_payments (
+                            subscription_id, amount, currency, payment_method,
+                            transaction_id, status, payment_type, created_at
+                        ) VALUES (?, 0, ?, 'paypal', ?, 'completed', 'cycle_change', NOW())
+                    ");
+                    $stmt->execute([$subscriptionId, $auditCurrency, $paypalSubscriptionId]);
+                }
             } catch (PDOException $e) {
                 error_log("Could not write cycle_change audit row: " . $e->getMessage());
             }
@@ -553,16 +559,18 @@ try {
             }
 
             // 2. Issue the prorated refund (skip if no sale to refund against).
-            //    Pass the original sale's currency so PayPal validates it
-            //    against the sale.
+            //    Pass the original sale's currency so PayPal validates it.
+            $refundSucceeded = false;
             if ($sw['refund_amount'] > 0 && !empty($sw['sale']['transaction_id'])) {
                 $refundResult = refundPayPalSale(
                     $sw['sale']['transaction_id'],
                     $sw['refund_amount'],
-                    'Cycle switch proration',
-                    $sw['sale']['currency'] ?? 'CAD'
+                    $sw['sale']['currency'] ?? ($existingSubscription['currency'] ?? 'CAD'),
+                    'Cycle switch proration'
                 );
-                if (!$refundResult['success']) {
+                if ($refundResult['success']) {
+                    $refundSucceeded = true;
+                } else {
                     error_log("CRITICAL: cycle switch refund failed. user_id=$userId, subscription_id=$subscriptionId, sale_id={$sw['sale']['transaction_id']}, refund_amount={$sw['refund_amount']}, error=" . ($refundResult['error'] ?? 'unknown'));
                     $switchWarnings[] = "Your prorated refund of $" . number_format($sw['refund_amount'], 2) . " is processing. If you don't see it within 10 business days, please contact support.";
                 }
@@ -571,7 +579,28 @@ try {
                 $switchWarnings[] = "We couldn't issue your prorated refund automatically because no recent PayPal payment was found. Please contact support if you expected a refund.";
             }
 
-            // 3. Send the cycle-changed email with refund details
+            // 3. Resolve credit_balance based on refund outcome:
+            //    - Refund succeeded: any unrefunded excess (refund cap > sale amount)
+            //      carries forward as credit. typically 0.
+            //    - Refund failed or skipped: restore the user's original credit so
+            //      they don't lose entitlement on top of missing the refund.
+            //    Done as a separate UPDATE post-commit so a failed refund leaves
+            //    credit intact.
+            $totalRefundableValue = (float) $sw['proration']['prorated_credit'] + $sw['existing_credit'];
+            if ($refundSucceeded) {
+                $creditBalanceAfter = max(0, round($totalRefundableValue - (float) $sw['refund_amount'], 2));
+            } else {
+                $creditBalanceAfter = (float) $sw['existing_credit'];
+            }
+            try {
+                $stmt = $pdo->prepare("UPDATE premium_subscriptions SET credit_balance = ?, updated_at = NOW() WHERE subscription_id = ?");
+                $stmt->execute([$creditBalanceAfter, $subscriptionId]);
+            } catch (PDOException $e) {
+                error_log("CRITICAL: failed to set credit_balance post-refund. user_id=$userId, subscription_id=$subscriptionId, intended_value=$creditBalanceAfter, error=" . $e->getMessage());
+            }
+
+            // 4. Send the cycle-changed email with refund details. Pass the
+            //    actual post-refund credit_balance so the user sees it accurately.
             try {
                 send_premium_subscription_cycle_changed_email(
                     $existingSubscription['email'] ?? $email,
@@ -582,10 +611,10 @@ try {
                     (float) $sw['existing_credit'],
                     (float) $newAmount,
                     $newEndDate,
-                    0.0,
+                    (float) $creditBalanceAfter,
                     (float) $pricingConfig['premium_monthly_price'],
-                    (float) $sw['refund_amount'],
-                    'PayPal'
+                    $refundSucceeded ? (float) $sw['refund_amount'] : 0.0,
+                    $refundSucceeded ? 'PayPal' : null
                 );
             } catch (Exception $e) {
                 error_log("Failed to send cycle change email: " . $e->getMessage());

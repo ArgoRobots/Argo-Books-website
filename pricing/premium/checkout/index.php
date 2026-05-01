@@ -172,7 +172,7 @@
             <?php if ($is_cycle_switch && $cycleSwitchOldCycle && $cycleSwitchOldCycle !== $billing): ?>
                 <div class="cycle-switch-banner">
                     <strong>Switching from <?php echo htmlspecialchars(ucfirst($cycleSwitchOldCycle)); ?> to <?php echo htmlspecialchars(ucfirst($billing)); ?>.</strong>
-                    PayPal will bill the new <?php echo htmlspecialchars($billing); ?> amount on activation.
+                    PayPal will bill <strong>$<?php echo number_format($basePrice, 2); ?> CAD</strong> on activation (subscription only — no processing fee on PayPal).
                     <?php if ($cycleSwitchRefundEstimate > 0): ?>
                         Your prorated refund of about <strong>$<?php echo number_format($cycleSwitchRefundEstimate, 2); ?> CAD</strong> will appear in your PayPal account within 5–10 business days.
                     <?php endif; ?>

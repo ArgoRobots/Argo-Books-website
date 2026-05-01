@@ -382,12 +382,23 @@ function handlePaymentCompleted($resource) {
 
     // Detect "first bill after a cycle switch": process-subscription.php
     // already set end_date and sent the cycle-changed email when the user
-    // approved the new PayPal sub. This webhook arrives seconds-to-minutes
-    // later when PayPal first bills the new sub. Without this guard, the
-    // renewal handler below would extend end_date a SECOND time (giving
-    // the user a free year/month of service) and send a duplicate email.
-    $cycleSwitchedRecently = !empty($subscription['last_cycle_change_at'])
-        && (time() - strtotime($subscription['last_cycle_change_at'])) < 600; // 10 min
+    // approved the new PayPal sub. This webhook arrives whenever PayPal
+    // first bills the new sub (usually seconds, but can be hours if PayPal
+    // is queued or having an outage). Without this guard, the renewal
+    // handler would extend end_date a SECOND time and send a duplicate.
+    //
+    // Detection is deterministic: real renewals fire when end_date is at
+    // or near NOW. A cycle switch resets end_date to today + full cycle,
+    // so for the first-bill-after-switch case end_date is far in the
+    // future. Threshold is 70% of the cycle to allow some slack — even
+    // an "early" PayPal renewal won't arrive when end_date is still 70%
+    // of a cycle out, but a freshly-switched sub will be ~100%.
+    $cycleSecs = ($subscription['billing_cycle'] === 'yearly')
+        ? 365 * 86400
+        : 30 * 86400;
+    $secsUntilEnd = strtotime($subscription['end_date']) - time();
+    $cycleSwitchFirstBill = !empty($subscription['last_cycle_change_at'])
+        && $secsUntilEnd > (0.7 * $cycleSecs);
 
     // Log the payment
     $stmt = $pdo->prepare("
@@ -404,7 +415,7 @@ function handlePaymentCompleted($resource) {
         $paymentType
     ]);
 
-    if ($cycleSwitchedRecently) {
+    if ($cycleSwitchFirstBill) {
         // First bill after a cycle switch — record the sale (above), but
         // don't extend end_date and don't send a renewal email. Both were
         // already handled when the user confirmed the switch.

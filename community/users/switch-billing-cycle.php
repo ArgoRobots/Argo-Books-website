@@ -212,9 +212,14 @@ $is_upgrade = ($new_cycle === 'yearly');
                 // PayPal flow: show the breakdown with refund-style copy,
                 // then send the user to checkout where they'll approve a
                 // new PayPal subscription with the new plan_id.
+                // PayPal subscription plans (see webhooks/setup-paypal-plans.php)
+                // are configured with the BASE price only — PayPal does NOT add
+                // our processing fee on top. So "charged today by PayPal" must
+                // show the base, not base+fee, or the user sees one number on
+                // our page and a different number on their PayPal statement.
                 $new_billed_base = ($new_cycle === 'yearly') ? $yearly_base : $monthly_base;
-                $new_billed_fee = function_exists('calculate_processing_fee') ? calculate_processing_fee($new_billed_base) : 0.0;
-                $new_billed_total = round($new_billed_base + $new_billed_fee, 2);
+                $new_billed_fee = 0.0;
+                $new_billed_total = round($new_billed_base, 2);
                 $existing_credit_used = (float) ($premium_subscription['credit_balance'] ?? 0);
                 $next_billing_date = date('F j, Y', strtotime(($new_cycle === 'yearly') ? '+1 year' : '+1 month'));
             ?>

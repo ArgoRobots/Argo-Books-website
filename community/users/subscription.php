@@ -189,9 +189,11 @@ if ($premium_subscription) {
                     <?php if ($premium_subscription['status'] === 'active'): ?>
                         <?php
                             $switchTargetCycle = $premium_subscription['billing_cycle'] === 'monthly' ? 'Yearly' : 'Monthly';
-                            // Cycle switching is only implemented for Stripe and Square. PayPal,
-                            // free_key, and any other payment_method don't see the button — the
-                            // AJAX endpoint would reject them anyway.
+                            // Cycle switching is implemented for Stripe, Square, and PayPal.
+                            // Stripe/Square go through switch-billing-cycle-ajax.php; PayPal goes
+                            // through the checkout redirect flow (process-subscription.php).
+                            // free_key and other payment_methods don't see the button — both
+                            // backends would reject them anyway.
                             $canSwitchCycle = in_array(
                                 strtolower($premium_subscription['payment_method'] ?? ''),
                                 ['stripe', 'square', 'paypal'],

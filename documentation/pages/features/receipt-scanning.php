@@ -10,20 +10,31 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <div class="info-box">
-                <p><strong>Premium Feature:</strong> AI Receipt Scanning is available with the Premium plan.
+                <p><strong>Plan limits:</strong> The Free plan includes 5 AI receipt scans per month. Premium includes 500 per month.
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
-            <p>Transform paper receipts into digital records instantly with our AI-powered scanner. Simply take a photo and let Argo Books do the rest. Our receipt scanner achieves 99% accuracy on printed receipts, and lets you quickly make adjustments.</p>
+            <p>Turn any receipt into a digital record in under 5 seconds with our AI-powered scanner. It achieves 99% accuracy and lets you quickly make adjustments before saving.</p>
 
             <img src="../../../resources/images/ai-receipt-scanner.webp" alt="AI Receipt Scanner" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
+            <h2>What You Can Scan</h2>
+            <p>The scanner isn't limited to paper. You can use:</p>
+            <ul>
+                <li><strong>Photos</strong> of printed or handwritten receipts</li>
+                <li><strong>Screenshots</strong> of digital receipts and email invoices</li>
+                <li><strong>Image files</strong> in common formats (JPG, PNG)</li>
+                <li><strong>PDFs</strong> of receipts or invoices</li>
+            </ul>
+            <p>It also handles faded thermal paper, wrinkled receipts, and poor lighting — and supports multi-currency for international purchases.</p>
+            <p>As a rule of thumb, if you can read the receipt in the image, Argo Books can too.</p>
+
             <h2>How It Works</h2>
             <ol class="steps-list">
-                <li>Take a photo of your receipt with your phone or upload an image</li>
+                <li>Take a photo of your receipt with your phone or upload an image or PDF</li>
                 <li>Our AI analyzes the receipt and extracts all relevant information</li>
                 <li>Review the extracted data and make any corrections</li>
-                <li>Save to automatically create an expense record</li>
+                <li>Save to automatically create a categorized expense record</li>
             </ol>
 
             <h2>What Gets Extracted</h2>
@@ -43,6 +54,9 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Flat Surface:</strong> Place the receipt on a flat surface to avoid distortion</li>
                 <li><strong>Clear Focus:</strong> Make sure the text is sharp and readable</li>
             </ul>
+
+            <h2>Privacy</h2>
+            <p>AI processing uses a secure API call to extract the data, but your receipt images and all extracted information are stored locally on your computer. No receipt data is kept on third-party servers after processing.</p>
 
             <div class="page-navigation">
                 <a href="receipts.php" class="nav-button prev">

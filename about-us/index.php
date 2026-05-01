@@ -144,7 +144,7 @@
                 <span class="section-label">The Product</span>
                 <h2>What We Build</h2>
                 <p>Argo Books is a free, easy-to-use, yet powerful cross-platform app built for small
-                    businesses, startups, and solo entrepreneurs who need an affordable solution to manage finances, track inventory,
+                    businesses, startups, and solo entrepreneurs who need an affordable solution to manage finances, automate everyday bookkeeping,
                     and grow their business.</p>
             </div>
             <div class="features-grid">
@@ -164,18 +164,24 @@
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon green">
-                        <?= svg_icon('package', null, '', 1.5) ?>
-                    </div>
-                    <h3>Inventory Management</h3>
-                    <p>Track stock levels and never run out of best-sellers</p>
-                </div>
-                <div class="feature-item animate-on-scroll">
-                    <div class="feature-icon amber">
                         <?= svg_icon('document', null, '', 1.5) ?>
                     </div>
                     <h3>Invoicing & Payments</h3>
                     <p>Create professional invoices and get paid faster</p>
                 </div>
+                <div class="feature-item animate-on-scroll">
+                    <div class="feature-icon amber">
+                        <?= svg_icon('package', null, '', 1.5) ?>
+                    </div>
+                    <h3>Inventory Management</h3>
+                    <p>Track stock levels and never run out of best-sellers</p>
+                </div>
+            </div>
+            <div class="features-cta animate-on-scroll">
+                <a href="../features/" class="features-cta-link">
+                    <span>View all features</span>
+                    <?= svg_icon('arrow-right', 18) ?>
+                </a>
             </div>
         </div>
     </section>

@@ -99,11 +99,6 @@ body {
   .hero-subtitle {
     font-size: 1.1rem;
   }
-
-  .pricing-cards-wrapper {
-    grid-template-columns: 1fr;
-    max-width: 450px;
-  }
 }
 
 /* Pricing Section */
@@ -118,6 +113,13 @@ body {
   gap: 32px;
   max-width: 900px;
   margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .pricing-cards-wrapper {
+    grid-template-columns: 1fr;
+    max-width: 450px;
+  }
 }
 
 .pricing-card-link {

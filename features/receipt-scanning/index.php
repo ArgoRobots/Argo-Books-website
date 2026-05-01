@@ -268,6 +268,7 @@
                     <h2>AI that reads receipts like a human — but faster</h2>
                     <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model (LLM) to understand your receipts contextually — not just reading characters, but understanding what they mean. It can handle faded thermal paper, and even read handwritten amounts.</p>
                     <p>After scanning, Argo Books structures the data into clean, organized fields: vendor, date, individual items, quantities, prices, subtotal, tax, and total. You review the results, make any corrections, and save — all in a few seconds.</p>
+                    <p>As a rule of thumb: if you can read the receipt in the image, Argo Books can too.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>

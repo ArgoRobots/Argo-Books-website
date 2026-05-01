@@ -10,6 +10,7 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <p>Keep your records organized by attaching and managing digital receipts for all transactions.</p>
+            <p>For faster entry, Argo Books can read details straight off a receipt photo and create the transaction for you. See <a class="link" href="receipt-scanning.php">AI Receipt Scanning</a> for how to use it.</p>
 
             <h2>Adding Receipts</h2>
             <p>When adding an expense or revenue entry, click the "Attach" button, then select the receipt from your computer.</p>

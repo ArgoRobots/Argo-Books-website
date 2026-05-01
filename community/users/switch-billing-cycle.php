@@ -43,11 +43,23 @@ if (!empty($premium_subscription['last_cycle_change_at'])
 $payment_method = strtolower($premium_subscription['payment_method'] ?? '');
 $is_paypal = ($payment_method === 'paypal');
 
-// Only Stripe, Square, and PayPal (with the coming-soon notice) reach this page.
-// free_key, manual, or unknown payment methods can't switch cycles — the AJAX
-// endpoint rejects them, so don't render a confirm UI that would inevitably fail.
+// Only Stripe, Square, and PayPal reach this page. free_key, manual, or
+// unknown payment methods can't switch cycles — redirect rather than
+// render a confirm UI that would inevitably fail.
 if (!in_array($payment_method, ['stripe', 'square', 'paypal'], true)) {
     $redirect_with_error('Cycle switching is not available for this subscription type. Please contact support.');
+}
+
+// PayPal-specific eligibility: must have at least one completed sale to
+// refund against (otherwise PayPal hasn't billed yet — the user just
+// subscribed seconds ago and the webhook hasn't arrived). Block here
+// rather than later in the flow.
+if ($is_paypal) {
+    require_once __DIR__ . '/../../webhooks/paypal-helper.php';
+    $paypal_recent_sale = getMostRecentPayPalSale($premium_subscription['subscription_id']);
+    if (!$paypal_recent_sale) {
+        $redirect_with_error('Your subscription is still being activated by PayPal. Please wait a few minutes after subscribing before changing cycles.');
+    }
 }
 
 $pricing_config = get_pricing_config();
@@ -56,11 +68,25 @@ $yearly_base = $pricing_config['premium_yearly_price'];
 $old_cycle = $premium_subscription['billing_cycle'];
 $new_cycle = ($old_cycle === 'monthly') ? 'yearly' : 'monthly';
 
-// Compute proration server-side. Even though the page is read-only, we recompute
-// on the AJAX endpoint to prevent any client tampering with displayed values.
-$proration = $is_paypal
-    ? null
-    : calculate_cycle_switch_proration($premium_subscription, $new_cycle, $pricing_config);
+// Compute proration server-side. Even though the page is read-only, the
+// AJAX endpoint (Stripe/Square) and process-subscription.php (PayPal)
+// recompute to prevent any client tampering with displayed values.
+$proration = calculate_cycle_switch_proration($premium_subscription, $new_cycle, $pricing_config);
+
+// PayPal-only refund estimate (same math used by checkout disclosure banner)
+$paypal_refund_estimate = 0.0;
+if ($is_paypal && ($proration['direction'] ?? '') !== 'noop') {
+    $paypal_refund_estimate = round(
+        (float) $proration['prorated_credit']
+        + (float) ($premium_subscription['credit_balance'] ?? 0),
+        2
+    );
+    // Cap at the most recent sale's amount (PayPal won't refund more
+    // than the original sale).
+    if ($paypal_recent_sale && $paypal_refund_estimate > (float) $paypal_recent_sale['amount']) {
+        $paypal_refund_estimate = (float) $paypal_recent_sale['amount'];
+    }
+}
 
 // Stripe publishable key for 3DS handling (only loaded when needed)
 $is_production = ($_ENV['APP_ENV'] ?? 'development') === 'production';
@@ -182,29 +208,84 @@ $is_upgrade = ($new_cycle === 'yearly');
                 <?= svg_icon('refresh', 48) ?>
             </div>
 
-            <?php if ($is_paypal): ?>
+            <?php if ($is_paypal):
+                // PayPal flow: show the breakdown with refund-style copy,
+                // then send the user to checkout where they'll approve a
+                // new PayPal subscription with the new plan_id.
+                $new_billed_base = ($new_cycle === 'yearly') ? $yearly_base : $monthly_base;
+                $new_billed_fee = function_exists('calculate_processing_fee') ? calculate_processing_fee($new_billed_base) : 0.0;
+                $new_billed_total = round($new_billed_base + $new_billed_fee, 2);
+                $existing_credit_used = (float) ($premium_subscription['credit_balance'] ?? 0);
+                $next_billing_date = date('F j, Y', strtotime(($new_cycle === 'yearly') ? '+1 year' : '+1 month'));
+            ?>
 
-                <h1>Cycle Switching for PayPal — Coming Soon</h1>
+                <h1>Switch to <?= htmlspecialchars(ucfirst($new_cycle)) ?> Billing?</h1>
 
                 <p class="confirm-description">
-                    Switching billing cycles for PayPal subscriptions is not yet available.
-                    To change your billing cycle, you can cancel your current subscription
-                    and resubscribe via the new cycle.
+                    You'll be redirected to PayPal to approve a new <?= htmlspecialchars($new_cycle) ?>
+                    subscription. PayPal will bill the new amount on activation, and the prorated
+                    value of your unused <?= htmlspecialchars($old_cycle) ?> period
+                    <?php if ($existing_credit_used > 0): ?>(plus your existing account credit) <?php endif; ?>will
+                    be refunded to your PayPal account within 5–10 business days.
                 </p>
 
-                <div class="info-box warning-box">
-                    <h3>Note</h3>
-                    <ul>
-                        <li>Cancelling your subscription will forfeit any account credit balance.</li>
-                        <li>Premium access continues until the end of your current billing period.</li>
-                        <li>If this affects you, please contact support before cancelling.</li>
-                    </ul>
+                <div class="proration-breakdown">
+                    <h3>Charge & Refund Breakdown</h3>
+
+                    <div class="proration-line">
+                        <span class="label">New <?= htmlspecialchars($new_cycle) ?> subscription</span>
+                        <span class="value">$<?= number_format($new_billed_base, 2) ?> CAD</span>
+                    </div>
+
+                    <?php if ($new_billed_fee > 0): ?>
+                    <div class="proration-line">
+                        <span class="label">Processing fee</span>
+                        <span class="value">$<?= number_format($new_billed_fee, 2) ?> CAD</span>
+                    </div>
+                    <?php endif; ?>
+
+                    <div class="proration-divider"></div>
+
+                    <div class="proration-total">
+                        <span>Charged today by PayPal</span>
+                        <span>$<?= number_format($new_billed_total, 2) ?> CAD</span>
+                    </div>
+
+                    <?php if ($paypal_refund_estimate > 0): ?>
+                        <div class="proration-divider"></div>
+
+                        <div class="proration-line discount">
+                            <span class="label">Prorated refund (5–10 business days)</span>
+                            <span class="value">-$<?= number_format($paypal_refund_estimate, 2) ?> CAD</span>
+                        </div>
+
+                        <?php if ($proration['prorated_credit'] > 0): ?>
+                        <div class="proration-line" style="font-size:13px; color:var(--gray-600); padding-left:12px;">
+                            <span class="label">— Unused <?= htmlspecialchars($old_cycle) ?> period</span>
+                            <span class="value">$<?= number_format($proration['prorated_credit'], 2) ?> CAD</span>
+                        </div>
+                        <?php endif; ?>
+
+                        <?php if ($existing_credit_used > 0): ?>
+                        <div class="proration-line" style="font-size:13px; color:var(--gray-600); padding-left:12px;">
+                            <span class="label">— Existing account credit</span>
+                            <span class="value">$<?= number_format($existing_credit_used, 2) ?> CAD</span>
+                        </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <div class="proration-divider"></div>
+
+                    <div class="proration-footer-line">
+                        <span>Next billing date</span>
+                        <span><?= htmlspecialchars($next_billing_date) ?></span>
+                    </div>
                 </div>
 
                 <div class="confirm-actions">
-                    <a href="cancel-subscription.php" class="btn btn-outline-red">Cancel Subscription</a>
-                    <a href="../../contact-us/" class="btn btn-outline">Contact Support</a>
-                    <a href="subscription.php" class="btn btn-outline">Go Back</a>
+                    <a href="../../pricing/premium/checkout/?method=paypal&billing=<?= urlencode($new_cycle) ?>&change_method=1&cycle_switch=1"
+                       class="btn btn-purple">Continue with PayPal →</a>
+                    <a href="subscription.php" class="btn btn-outline">Cancel</a>
                 </div>
 
             <?php else:

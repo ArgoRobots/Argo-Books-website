@@ -917,6 +917,8 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
  * @param string $newEndDate           New end_date (Y-m-d H:i:s)
  * @param float  $creditBalanceAfter   Remaining credit_balance after the switch
  * @param float  $monthlyBase          Monthly base price (for "covers N months" hint)
+ * @param float  $refundAmount         PayPal-only: prorated refund issued to the user's PayPal account (0 for Stripe/Square)
+ * @param string|null $refundProvider  PayPal-only: name of the refund provider rendered in the breakdown row (e.g. 'PayPal')
  * @return bool  Success status
  */
 function send_premium_subscription_cycle_changed_email(
@@ -929,7 +931,9 @@ function send_premium_subscription_cycle_changed_email(
     $immediateCharge,
     $newEndDate,
     $creditBalanceAfter,
-    $monthlyBase
+    $monthlyBase,
+    $refundAmount = 0.0,
+    $refundProvider = null
 ) {
     $site_url        = site_url();
     $oldCycleLabel   = ucfirst($oldCycle);
@@ -967,6 +971,14 @@ function send_premium_subscription_cycle_changed_email(
             : '';
         $rows .= '<tr><td class="label">Remaining credit balance</td>'
               . '<td class="value">$' . number_format($creditBalanceAfter, 2) . ' CAD' . $monthsHint . '</td></tr>';
+    }
+
+    // PayPal-only: prorated refund line. Refund processes asynchronously
+    // and shows up in the user's PayPal account within 5–10 business days.
+    if ($refundAmount > 0) {
+        $providerLabel = $refundProvider ? ' via ' . htmlspecialchars($refundProvider) : '';
+        $rows .= '<tr><td class="label">Prorated refund (5–10 business days)</td>'
+              . '<td class="value">$' . number_format($refundAmount, 2) . ' CAD' . $providerLabel . '</td></tr>';
     }
 
     $rows .= '<tr><td class="label">Next billing date</td>'

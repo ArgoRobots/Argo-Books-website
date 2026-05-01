@@ -194,7 +194,7 @@ if ($premium_subscription) {
                             // AJAX endpoint would reject them anyway.
                             $canSwitchCycle = in_array(
                                 strtolower($premium_subscription['payment_method'] ?? ''),
-                                ['stripe', 'square'],
+                                ['stripe', 'square', 'paypal'],
                                 true
                             );
                         ?>

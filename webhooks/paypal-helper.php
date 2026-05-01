@@ -239,6 +239,110 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
 }
 
 /**
+ * Issue a refund against a PayPal v1 sale.
+ *
+ * Used by the cycle-switch flow to return the prorated value of an
+ * unused billing period (and any pre-existing account credit) to the
+ * user's PayPal account when they switch monthly <-> yearly.
+ *
+ * @param string $saleId       PayPal sale ID (from premium_subscription_payments.transaction_id)
+ * @param float  $amount       Refund amount
+ * @param string $description  Buyer-facing description (PayPal v1 sale-refund field name)
+ * @param string $currency     ISO currency code; defaults to CAD but should match the original sale's currency
+ * @return array { success: bool, refund_id?: string|null, http_code?: int, error?: string }
+ */
+function refundPayPalSale($saleId, $amount, $description = 'Cycle switch proration', $currency = 'CAD') {
+    if (!isValidPayPalResourceId($saleId)) {
+        return ['success' => false, 'error' => 'Invalid sale id format'];
+    }
+    if (!is_numeric($amount) || $amount <= 0) {
+        return ['success' => false, 'error' => 'Refund amount must be positive'];
+    }
+
+    $accessToken = getPayPalAccessToken();
+    if (!$accessToken) {
+        return ['success' => false, 'error' => 'Failed to obtain PayPal access token'];
+    }
+
+    $baseUrl = getPayPalApiBaseUrl();
+    $url = "$baseUrl/v1/payments/sale/" . urlencode($saleId) . "/refund";
+
+    // PayPal v1 sale-refund field is `description`, not `reason`. The
+    // cancel-subscription endpoint uses `reason`; sale refund does not.
+    $body = json_encode([
+        'amount' => [
+            'total'    => number_format((float) $amount, 2, '.', ''),
+            'currency' => strtoupper($currency),
+        ],
+        'description' => $description,
+    ]);
+
+    // PayPal-Request-Id: deterministic per (sale, day) so an accidental
+    // retry inside a 24h window reuses the key and PayPal dedups.
+    $requestId = hash('sha256', 'refund_' . $saleId . '_' . date('Y-m-d'));
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $body,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $accessToken,
+            'PayPal-Request-Id: ' . $requestId,
+        ],
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_TIMEOUT        => 30,
+    ]);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($httpCode !== 201) {
+        error_log("PayPal refund failed for sale $saleId: HTTP $httpCode response=$response");
+        return [
+            'success'   => false,
+            'http_code' => $httpCode,
+            'error'     => 'Refund API returned HTTP ' . $httpCode,
+        ];
+    }
+
+    $decoded = json_decode($response, true);
+    return [
+        'success'   => true,
+        'refund_id' => $decoded['id'] ?? null,
+        'http_code' => $httpCode,
+    ];
+}
+
+/**
+ * Find the most recent successful PayPal sale for a subscription.
+ * Returns the row from premium_subscription_payments suitable for
+ * refundPayPalSale, or null if no completed sale exists yet (block
+ * the cycle switch in that case).
+ *
+ * @param string $subscriptionId Argo subscription_id
+ * @return array|null { transaction_id, amount, currency, created_at }
+ */
+function getMostRecentPayPalSale($subscriptionId) {
+    global $pdo;
+    $stmt = $pdo->prepare("
+        SELECT transaction_id, amount, currency, created_at
+        FROM premium_subscription_payments
+        WHERE subscription_id = ?
+          AND payment_method = 'paypal'
+          AND status = 'completed'
+          AND payment_type IN ('initial', 'renewal')
+        ORDER BY created_at DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$subscriptionId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ?: null;
+}
+
+/**
  * Log webhook event for debugging
  *
  * @param string $eventType The event type

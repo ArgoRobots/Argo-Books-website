@@ -521,7 +521,66 @@ function send_outreach_followup($pdo, array $lead, ?string &$reason = null): boo
 
 // ─── Email Scraping Helper ───
 
+/**
+ * Public entry point for scraping a contact email out of a website. Wraps the
+ * actual scraper with a 30-day result cache (table: outreach_scrape_cache) so
+ * the same URL doesn't get re-downloaded every cron run — many businesses show
+ * up under multiple search queries, and most sites have no scrape-able email
+ * at all. A cached NULL is a valid result ("tried, found nothing") so we don't
+ * re-attempt for 30 days; after that, the entry expires and we re-check (sites
+ * sometimes add an email later).
+ */
 function scrape_email_from_website($url)
+{
+    if (empty($url)) return null;
+
+    // Trim trailing slash so 'https://example.com' and 'https://example.com/'
+    // share a cache entry. URLs over 255 chars bypass the cache (column limit).
+    $cacheKey = rtrim(trim($url), '/');
+    $cacheable = (strlen($cacheKey) <= 255);
+
+    if ($cacheable) {
+        global $pdo;
+        if (isset($pdo)) {
+            try {
+                $stmt = $pdo->prepare("SELECT email FROM outreach_scrape_cache
+                    WHERE url = ? AND last_attempted_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+                    LIMIT 1");
+                $stmt->execute([$cacheKey]);
+                $row = $stmt->fetch();
+                if ($row !== false) {
+                    return $row['email']; // string OR null — both are valid cached outcomes
+                }
+            } catch (PDOException $e) {
+                // Table missing or query failed — fall through to live scrape.
+            }
+        }
+    }
+
+    $email = _scrape_email_from_website_uncached($url);
+
+    if ($cacheable) {
+        global $pdo;
+        if (isset($pdo)) {
+            try {
+                $stmt = $pdo->prepare("INSERT INTO outreach_scrape_cache (url, email, last_attempted_at)
+                    VALUES (?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE email = VALUES(email), last_attempted_at = NOW()");
+                $stmt->execute([$cacheKey, $email]);
+            } catch (PDOException $e) {
+                // Cache write failure shouldn't fail the scrape itself.
+            }
+        }
+    }
+
+    return $email;
+}
+
+/**
+ * Live email scraper. Don't call directly — use scrape_email_from_website()
+ * so results get cached.
+ */
+function _scrape_email_from_website_uncached($url)
 {
     if (empty($url)) return null;
 
@@ -643,6 +702,10 @@ function scrape_email_from_website($url)
 /**
  * Core business search logic. Returns array with 'businesses', 'count', 'rounds'.
  * Used by both the admin API endpoint and the cron pipeline.
+ *
+ * Uses Places API (New) at places.googleapis.com/v1/places:searchText with a
+ * FieldMask header so website + phone come back in the search response — no
+ * separate Place Details fan-out, which used to dominate the per-lead cost.
  */
 function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [], $maxRounds = 5)
 {
@@ -654,12 +717,6 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
         $seenPlaceIds[trim($id)] = true;
     }
     $roundsUsed = 0;
-
-    // Stream context with timeouts for all Google API calls
-    $httpContext = stream_context_create(['http' => [
-        'timeout' => 10,
-        'ignore_errors' => true,
-    ]]);
 
     // Build query variations to search across multiple rounds
     $queries = [];
@@ -703,43 +760,74 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
         'real estate' => 'real_estate_agency',
     ];
 
+    // POST helper. Returns ['places' => [...], 'nextPageToken' => ?] on success
+    // or ['error' => string] on failure. The FieldMask is what makes this cheap:
+    // we ask for website + phone in the search response so we never need to call
+    // Place Details. Highest tier in the mask (nationalPhoneNumber → Enterprise)
+    // sets the per-call price; result count doesn't.
+    $callSearchText = function (array $body) use ($apiKey) {
+        $fieldMask = 'places.id,places.displayName,places.formattedAddress,'
+            . 'places.websiteUri,places.nationalPhoneNumber,'
+            . 'places.googleMapsUri,places.businessStatus,places.types,'
+            . 'nextPageToken';
+        $context = stream_context_create(['http' => [
+            'method' => 'POST',
+            'timeout' => 10,
+            'ignore_errors' => true,
+            'header' => "Content-Type: application/json\r\n"
+                . "X-Goog-Api-Key: $apiKey\r\n"
+                . "X-Goog-FieldMask: $fieldMask\r\n",
+            'content' => json_encode($body),
+        ]]);
+        $resp = @file_get_contents('https://places.googleapis.com/v1/places:searchText', false, $context);
+        if ($resp === false) {
+            return ['error' => 'Failed to connect to Google Places API'];
+        }
+        $data = json_decode($resp, true);
+        if (!is_array($data)) {
+            return ['error' => 'Invalid response from Google Places API'];
+        }
+        if (isset($data['error'])) {
+            $msg = $data['error']['message'] ?? ($data['error']['status'] ?? 'Unknown error');
+            return ['error' => 'Google Places API error: ' . $msg];
+        }
+        return [
+            'places' => $data['places'] ?? [],
+            'nextPageToken' => $data['nextPageToken'] ?? null,
+        ];
+    };
+
     for ($round = 0; $round < $maxRounds && count($businesses) < $limit; $round++) {
         $query = $queries[$round] ?? null;
         if (!$query) break;
         $countBefore = count($businesses);
         $roundsUsed++;
 
-        // Initial search for this round
-        $params = ['query' => $query, 'key' => $apiKey];
-        // Try to match a Google Places type from the query for better results
+        $body = ['textQuery' => $query, 'pageSize' => 20];
         foreach ($placeTypeMap as $keyword => $type) {
             if (stripos($query, $keyword) !== false) {
-                $params['type'] = $type;
+                $body['includedType'] = $type;
                 break;
             }
         }
-        $url = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query($params);
 
-        $resp = @file_get_contents($url, false, $httpContext);
-        if ($resp === false) {
+        $result = $callSearchText($body);
+        // The new API rejects unknown includedType values with 400. Retry once
+        // without the type filter so a stale entry in $placeTypeMap doesn't kill
+        // discovery for that round.
+        if (isset($result['error']) && isset($body['includedType'])) {
+            unset($body['includedType']);
+            $result = $callSearchText($body);
+        }
+        if (isset($result['error'])) {
             if ($roundsUsed === 1) {
-                return ['error' => 'Failed to connect to Google Places API', 'businesses' => [], 'count' => 0, 'rounds' => 0];
+                return ['error' => $result['error'], 'businesses' => [], 'count' => 0, 'rounds' => 0];
             }
             break;
         }
 
-        $data = json_decode($resp, true);
-        $status = $data['status'] ?? '';
-        if ($status !== 'OK' && $status !== 'ZERO_RESULTS') {
-            if ($roundsUsed === 1) {
-                $errorMsg = $data['error_message'] ?? $status ?? 'Unknown error';
-                return ['error' => 'Google Places API error: ' . $errorMsg, 'businesses' => [], 'count' => 0, 'rounds' => 0];
-            }
-            break;
-        }
-
-        $candidates = $data['results'] ?? [];
-        $nextPageToken = $data['next_page_token'] ?? null;
+        $candidates = $result['places'];
+        $nextPageToken = $result['nextPageToken'];
         $maxPages = 3;
         $pagesUsed = 1;
 
@@ -748,41 +836,31 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
             foreach ($candidates as $place) {
                 if (count($businesses) >= $limit) break;
 
-                $placeId = $place['place_id'] ?? '';
+                $placeId = $place['id'] ?? '';
                 // Skip duplicates across rounds
                 if ($placeId && isset($seenPlaceIds[$placeId])) continue;
                 if ($placeId) $seenPlaceIds[$placeId] = true;
 
+                // Filter out closed / temporarily closed places — no useful contact info
+                $bizStatus = $place['businessStatus'] ?? 'OPERATIONAL';
+                if ($bizStatus !== 'OPERATIONAL') continue;
+
+                $website = $place['websiteUri'] ?? null;
+                // Skip immediately if no website — saves the email scrape attempt
+                if (empty($website)) continue;
+
+                $types = $place['types'] ?? [];
                 $business = [
                     'places_id' => $placeId,
-                    'business_name' => $place['name'] ?? '',
-                    'address' => $place['formatted_address'] ?? '',
-                    'category' => $category ?: ($queryCategories[$round] ?? (isset($place['types'][0]) ? ucfirst(str_replace('_', ' ', $place['types'][0])) : '')),
+                    'business_name' => $place['displayName']['text'] ?? '',
+                    'address' => $place['formattedAddress'] ?? '',
+                    'category' => $category ?: ($queryCategories[$round] ?? (isset($types[0]) ? ucfirst(str_replace('_', ' ', $types[0])) : '')),
                     'city' => $city,
-                    'phone' => null,
-                    'website' => null,
+                    'phone' => $place['nationalPhoneNumber'] ?? null,
+                    'website' => $website,
+                    'contact_page_url' => $place['googleMapsUri'] ?? null,
                     'email' => null,
                 ];
-
-                // Fetch place details for phone and website
-                if (!empty($placeId)) {
-                    $detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?' . http_build_query([
-                        'place_id' => $placeId,
-                        'fields' => 'formatted_phone_number,website,url',
-                        'key' => $apiKey,
-                    ]);
-                    $detailResp = @file_get_contents($detailUrl, false, $httpContext);
-                    if ($detailResp) {
-                        $detail = json_decode($detailResp, true);
-                        $r = $detail['result'] ?? [];
-                        $business['phone'] = $r['formatted_phone_number'] ?? null;
-                        $business['website'] = $r['website'] ?? null;
-                        $business['contact_page_url'] = $r['url'] ?? null;
-                    }
-                }
-
-                // Skip businesses without a website
-                if (empty($business['website'])) continue;
 
                 // Scrape email from business website and validate
                 $business['email'] = scrape_email_from_website($business['website']);
@@ -799,21 +877,15 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
             // If we have enough or no more pages, stop paging
             if (count($businesses) >= $limit || empty($nextPageToken) || $pagesUsed >= $maxPages) break;
 
-            // Google requires a short delay before next_page_token is valid
-            sleep(2);
+            // Pagination: the new API requires the same body as the original
+            // request plus pageToken. No propagation delay (legacy needed sleep(2)).
+            $pageBody = $body;
+            $pageBody['pageToken'] = $nextPageToken;
+            $pageResult = $callSearchText($pageBody);
+            if (isset($pageResult['error'])) break;
 
-            $nextUrl = 'https://maps.googleapis.com/maps/api/place/textsearch/json?' . http_build_query([
-                'pagetoken' => $nextPageToken,
-                'key' => $apiKey,
-            ]);
-            $nextResp = @file_get_contents($nextUrl, false, $httpContext);
-            if (!$nextResp) break;
-
-            $nextData = json_decode($nextResp, true);
-            if (($nextData['status'] ?? '') !== 'OK') break;
-
-            $candidates = $nextData['results'] ?? [];
-            $nextPageToken = $nextData['next_page_token'] ?? null;
+            $candidates = $pageResult['places'];
+            $nextPageToken = $pageResult['nextPageToken'];
             $pagesUsed++;
         }
 

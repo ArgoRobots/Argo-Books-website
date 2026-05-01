@@ -210,7 +210,6 @@ $is_upgrade = ($new_cycle === 'yearly');
             <?php else:
                 // Stripe / Square — render proration breakdown
                 $charge_today = $proration['immediate_charge_total'];
-                $charge_base = $proration['immediate_charge_base'];
                 $proc_fee = $proration['processing_fee'];
                 $prorated_credit = $proration['prorated_credit'];
                 $existing_credit_used = $proration['existing_credit_consumed'];

@@ -945,9 +945,7 @@ function send_premium_subscription_cycle_changed_email(
         ? 'Subscription upgraded to Yearly'
         : 'Subscription changed to Monthly';
 
-    $intro = $isUpgrade
-        ? "Your Argo Premium subscription has been switched from <strong>{$oldCycleLabel}</strong> to <strong>{$newCycleLabel}</strong>. The full breakdown is below."
-        : "Your Argo Premium subscription has been switched from <strong>{$oldCycleLabel}</strong> to <strong>{$newCycleLabel}</strong>. The full breakdown is below.";
+    $intro = "Your Argo Premium subscription has been switched from <strong>{$oldCycleLabel}</strong> to <strong>{$newCycleLabel}</strong>. The full breakdown is below.";
 
     // Build breakdown table rows conditionally
     $rows = '';

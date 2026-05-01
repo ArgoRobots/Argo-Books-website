@@ -433,13 +433,6 @@ if ($user) {
     $is_admin = isset($user['role']) && $user['role'] === 'admin';
 }
 
-// Check if user has a Premium subscription
-$has_premium_subscription = false;
-if ($is_own_profile) {
-    $premium_subscription = get_user_premium_subscription($user['id']);
-    $has_premium_subscription = ($premium_subscription !== null);
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">

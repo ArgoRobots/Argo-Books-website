@@ -327,10 +327,10 @@ function handlePaymentFailed($resource) {
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
-                transaction_id, status, payment_type, error_message, created_at
-            ) VALUES (?, 0, ?, 'paypal', NULL, 'failed', 'renewal', 'PayPal payment failed', NOW())
+                transaction_id, status, payment_type, error_message, environment, created_at
+            ) VALUES (?, 0, ?, 'paypal', NULL, 'failed', 'renewal', 'PayPal payment failed', ?, NOW())
         ");
-        $stmt->execute([$subscription['subscription_id'], $subCurrency]);
+        $stmt->execute([$subscription['subscription_id'], $subCurrency, current_environment()]);
 
         logPayPalWebhookEvent('BILLING.SUBSCRIPTION.PAYMENT.FAILED', $resource, 'payment_failed_logged');
     }
@@ -404,15 +404,16 @@ function handlePaymentCompleted($resource) {
     $stmt = $pdo->prepare("
         INSERT INTO premium_subscription_payments (
             subscription_id, amount, currency, payment_method,
-            transaction_id, status, payment_type, created_at
-        ) VALUES (?, ?, ?, 'paypal', ?, 'completed', ?, NOW())
+            transaction_id, status, payment_type, environment, created_at
+        ) VALUES (?, ?, ?, 'paypal', ?, 'completed', ?, ?, NOW())
     ");
     $stmt->execute([
         $subscription['subscription_id'],
         $amount,
         $currency,
         $transactionId,
-        $paymentType
+        $paymentType,
+        current_environment()
     ]);
 
     if ($cycleSwitchFirstBill) {
@@ -478,10 +479,10 @@ function handlePaymentDenied($resource) {
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
-                transaction_id, status, payment_type, error_message, created_at
-            ) VALUES (?, 0, ?, 'paypal', ?, 'failed', 'renewal', 'Payment denied by PayPal', NOW())
+                transaction_id, status, payment_type, error_message, environment, created_at
+            ) VALUES (?, 0, ?, 'paypal', ?, 'failed', 'renewal', 'Payment denied by PayPal', ?, NOW())
         ");
-        $stmt->execute([$subscription['subscription_id'], $subCurrency, $transactionId]);
+        $stmt->execute([$subscription['subscription_id'], $subCurrency, $transactionId, current_environment()]);
 
         // Send notification
         try {
@@ -526,10 +527,10 @@ function handlePaymentRefunded($resource) {
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
-                transaction_id, status, payment_type, created_at
-            ) VALUES (?, ?, ?, 'paypal', ?, 'refunded', 'renewal', NOW())
+                transaction_id, status, payment_type, environment, created_at
+            ) VALUES (?, ?, ?, 'paypal', ?, 'refunded', 'renewal', ?, NOW())
         ");
-        $stmt->execute([$payment['subscription_id'], -$amount, $refundCurrency, $refundId]);
+        $stmt->execute([$payment['subscription_id'], -$amount, $refundCurrency, $refundId, current_environment()]);
 
         logPayPalWebhookEvent('PAYMENT.SALE.REFUNDED', $resource, 'refund_logged');
     }

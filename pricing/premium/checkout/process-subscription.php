@@ -559,10 +559,10 @@ try {
                     $stmt = $pdo->prepare("
                         INSERT INTO premium_subscription_payments (
                             subscription_id, amount, currency, payment_method,
-                            transaction_id, status, payment_type, created_at
-                        ) VALUES (?, 0, ?, 'paypal', ?, 'completed', 'cycle_change', NOW())
+                            transaction_id, status, payment_type, environment, created_at
+                        ) VALUES (?, 0, ?, 'paypal', ?, 'completed', 'cycle_change', ?, NOW())
                     ");
-                    $stmt->execute([$subscriptionId, $auditCurrency, $paypalSubscriptionId]);
+                    $stmt->execute([$subscriptionId, $auditCurrency, $paypalSubscriptionId, current_environment()]);
                 }
             } catch (PDOException $e) {
                 error_log("Could not write cycle_change audit row: " . $e->getMessage());
@@ -722,11 +722,11 @@ try {
             INSERT INTO premium_subscriptions (
                 subscription_id, user_id, email, billing_cycle, amount, currency,
                 start_date, end_date, status, payment_method, transaction_id,
-                payment_token, stripe_customer_id, auto_renew, created_at
+                payment_token, stripe_customer_id, auto_renew, environment, created_at
             ) VALUES (
                 ?, ?, ?, ?, ?, ?,
                 ?, ?, 'active', ?, ?,
-                ?, ?, 1, NOW()
+                ?, ?, 1, ?, NOW()
             )
         ");
 
@@ -742,7 +742,8 @@ try {
             $paymentMethod,
             $transactionId,
             $paymentToken,
-            $stripeCustomerId
+            $stripeCustomerId,
+            current_environment()
         ]);
 
         // Update with PayPal subscription ID if applicable (column may not exist in older schema)
@@ -760,8 +761,8 @@ try {
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
-                transaction_id, status, payment_type, created_at
-            ) VALUES (?, ?, ?, ?, ?, 'completed', 'initial', NOW())
+                transaction_id, status, payment_type, environment, created_at
+            ) VALUES (?, ?, ?, ?, ?, 'completed', 'initial', ?, NOW())
         ");
 
         $stmt->execute([
@@ -769,7 +770,8 @@ try {
             $amount,
             $currency,
             $paymentMethod,
-            $transactionId
+            $transactionId,
+            current_environment()
         ]);
 
         $pdo->commit();

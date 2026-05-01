@@ -329,10 +329,10 @@ try {
                     $stmt = $pdo->prepare("
                         INSERT INTO premium_subscription_payments (
                             subscription_id, amount, currency, payment_method,
-                            transaction_id, status, payment_type, created_at
-                        ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'retry', NOW())
+                            transaction_id, status, payment_type, environment, created_at
+                        ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'retry', ?, NOW())
                     ");
-                    $stmt->execute([$subscription_id, $amount, $payment_method, $transaction_id]);
+                    $stmt->execute([$subscription_id, $amount, $payment_method, $transaction_id, current_environment()]);
                 } catch (Exception $e) {
                     error_log("Failed to record payment: " . $e->getMessage());
                 }

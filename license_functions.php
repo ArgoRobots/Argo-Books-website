@@ -139,11 +139,11 @@ function redeem_premium_key($key, $device_id) {
             INSERT INTO premium_subscriptions (
                 subscription_id, billing_cycle, amount, currency,
                 start_date, end_date, status, payment_method, transaction_id,
-                auto_renew, created_at
+                auto_renew, environment, created_at
             ) VALUES (
                 ?, ?, 0.00, 'CAD',
                 ?, ?, 'active', 'free_key', ?,
-                0, NOW()
+                0, ?, NOW()
             )
         ");
         $stmt->execute([
@@ -151,7 +151,8 @@ function redeem_premium_key($key, $device_id) {
             $billingCycle,
             $startDate,
             $endDate,
-            $key
+            $key,
+            current_environment()
         ]);
 
         // Mark the key as redeemed with device_id
@@ -319,11 +320,11 @@ function _recreate_subscription_for_key($key, $device_id) {
             INSERT INTO premium_subscriptions (
                 subscription_id, billing_cycle, amount, currency,
                 start_date, end_date, status, payment_method, transaction_id,
-                auto_renew, created_at
+                auto_renew, environment, created_at
             ) VALUES (
                 ?, ?, 0.00, 'CAD',
                 ?, ?, 'active', 'free_key', ?,
-                0, NOW()
+                0, ?, NOW()
             )
         ");
         $stmt->execute([
@@ -331,7 +332,8 @@ function _recreate_subscription_for_key($key, $device_id) {
             $billingCycle,
             $startDate,
             $endDate,
-            $key
+            $key,
+            current_environment()
         ]);
 
         // Update the key with the new subscription_id and device_id

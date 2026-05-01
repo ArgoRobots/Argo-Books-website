@@ -169,11 +169,11 @@ foreach ($subscriptions as $subscription) {
             $stmt = $pdo->prepare("
                 INSERT INTO premium_subscription_payments (
                     subscription_id, amount, currency, payment_method,
-                    transaction_id, status, payment_type, created_at
-                ) VALUES (?, 0, 'CAD', ?, ?, 'completed', 'credit', NOW())
+                    transaction_id, status, payment_type, environment, created_at
+                ) VALUES (?, 0, 'CAD', ?, ?, 'completed', 'credit', ?, NOW())
             ");
             $creditTransactionId = 'CREDIT_RENEWAL_' . strtoupper(bin2hex(random_bytes(8)));
-            $stmt->execute([$subscriptionId, $paymentMethod, $creditTransactionId]);
+            $stmt->execute([$subscriptionId, $paymentMethod, $creditTransactionId, current_environment()]);
 
             // DO NOT send receipt email for $0 credit-based renewals
             logMessage("Successfully renewed $subscriptionId using credit - new end date: $newEndDate, remaining credit: $$newCreditBalance");
@@ -270,10 +270,10 @@ foreach ($subscriptions as $subscription) {
                 $stmt = $pdo->prepare("
                     INSERT INTO premium_subscription_payments (
                         subscription_id, amount, currency, payment_method,
-                        transaction_id, status, payment_type, created_at
-                    ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'renewal', NOW())
+                        transaction_id, status, payment_type, environment, created_at
+                    ) VALUES (?, ?, 'CAD', ?, ?, 'completed', 'renewal', ?, NOW())
                 ");
-                $stmt->execute([$subscriptionId, $amountToCharge, $paymentMethod, $transactionId]);
+                $stmt->execute([$subscriptionId, $amountToCharge, $paymentMethod, $transactionId, current_environment()]);
 
                 $pdo->commit();
             } catch (Exception $dbEx) {
@@ -316,10 +316,10 @@ foreach ($subscriptions as $subscription) {
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscription_payments (
                 subscription_id, amount, currency, payment_method,
-                transaction_id, status, payment_type, error_message, created_at
-            ) VALUES (?, ?, 'CAD', ?, NULL, 'failed', 'renewal', ?, NOW())
+                transaction_id, status, payment_type, error_message, environment, created_at
+            ) VALUES (?, ?, 'CAD', ?, NULL, 'failed', 'renewal', ?, ?, NOW())
         ");
-        $stmt->execute([$subscriptionId, $amount, $paymentMethod, $e->getMessage()]);
+        $stmt->execute([$subscriptionId, $amount, $paymentMethod, $e->getMessage(), current_environment()]);
 
         // Send payment failed notification
         send_payment_failed_email($email, $subscriptionId, $e->getMessage());

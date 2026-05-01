@@ -180,6 +180,29 @@ function handleSubscriptionCancelled($resource) {
         throw new Exception("Missing subscription ID in cancelled event");
     }
 
+    // Race fix for cycle-switch flow: when a user switches PayPal billing
+    // cycles, we cancel the old subscription server-side AFTER committing
+    // the new one to the DB. The cancel triggers a BILLING.SUBSCRIPTION.
+    // CANCELLED webhook for the OLD id. Without this guard, the handler
+    // below would mark the row (now pointing at the NEW sub) as cancelled
+    // and zero out credit_balance. The previous_paypal_subscription_id
+    // column is set in the same transaction as paypal_subscription_id, so
+    // this lookup is deterministic and survives webhook delivery delays.
+    $stmt = $pdo->prepare("
+        SELECT subscription_id FROM premium_subscriptions
+        WHERE previous_paypal_subscription_id = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$paypalSubscriptionId]);
+    if ($stmt->fetch()) {
+        logPayPalWebhookEvent(
+            'BILLING.SUBSCRIPTION.CANCELLED',
+            $resource,
+            'cycle_switch_old_sub_cancel_ignored'
+        );
+        return;
+    }
+
     // Find subscription in our database
     $stmt = $pdo->prepare("SELECT * FROM premium_subscriptions WHERE paypal_subscription_id = ?");
     $stmt->execute([$paypalSubscriptionId]);
@@ -357,6 +380,26 @@ function handlePaymentCompleted($resource) {
 
     $paymentType = $paymentCount > 0 ? 'renewal' : 'initial';
 
+    // Detect "first bill after a cycle switch": process-subscription.php
+    // already set end_date and sent the cycle-changed email when the user
+    // approved the new PayPal sub. This webhook arrives whenever PayPal
+    // first bills the new sub (usually seconds, but can be hours if PayPal
+    // is queued or having an outage). Without this guard, the renewal
+    // handler would extend end_date a SECOND time and send a duplicate.
+    //
+    // Detection is deterministic: real renewals fire when end_date is at
+    // or near NOW. A cycle switch resets end_date to today + full cycle,
+    // so for the first-bill-after-switch case end_date is far in the
+    // future. Threshold is 70% of the cycle to allow some slack — even
+    // an "early" PayPal renewal won't arrive when end_date is still 70%
+    // of a cycle out, but a freshly-switched sub will be ~100%.
+    $cycleSecs = ($subscription['billing_cycle'] === 'yearly')
+        ? 365 * 86400
+        : 30 * 86400;
+    $secsUntilEnd = strtotime($subscription['end_date']) - time();
+    $cycleSwitchFirstBill = !empty($subscription['last_cycle_change_at'])
+        && $secsUntilEnd > (0.7 * $cycleSecs);
+
     // Log the payment
     $stmt = $pdo->prepare("
         INSERT INTO premium_subscription_payments (
@@ -372,8 +415,12 @@ function handlePaymentCompleted($resource) {
         $paymentType
     ]);
 
-    // Update subscription end date if this is a renewal
-    if ($paymentType === 'renewal') {
+    if ($cycleSwitchFirstBill) {
+        // First bill after a cycle switch — record the sale (above), but
+        // don't extend end_date and don't send a renewal email. Both were
+        // already handled when the user confirmed the switch.
+        logPayPalWebhookEvent('PAYMENT.SALE.COMPLETED', $resource, 'cycle_switch_first_bill_recorded');
+    } elseif ($paymentType === 'renewal') {
         $billing = $subscription['billing_cycle'];
         $newEndDate = calculateNewEndDate($subscription['end_date'], $billing);
 

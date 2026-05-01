@@ -905,6 +905,111 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
 }
 
 /**
+ * Send notification email when a user changes their subscription billing cycle.
+ *
+ * @param string $email                User's email address
+ * @param string $subscriptionId       Subscription ID (license key)
+ * @param string $oldCycle             Previous billing cycle ('monthly' or 'yearly')
+ * @param string $newCycle             New billing cycle
+ * @param float  $proratedCredit       Credit value of the unused old period
+ * @param float  $existingCreditUsed   Pre-existing credit_balance consumed today (0 if none)
+ * @param float  $immediateCharge      Amount charged to the gateway today (0 if covered by credit)
+ * @param string $newEndDate           New end_date (Y-m-d H:i:s)
+ * @param float  $creditBalanceAfter   Remaining credit_balance after the switch
+ * @param float  $monthlyBase          Monthly base price (for "covers N months" hint)
+ * @param float  $refundAmount         PayPal-only: prorated refund issued to the user's PayPal account (0 for Stripe/Square)
+ * @param string|null $refundProvider  PayPal-only: name of the refund provider rendered in the breakdown row (e.g. 'PayPal')
+ * @return bool  Success status
+ */
+function send_premium_subscription_cycle_changed_email(
+    $email,
+    $subscriptionId,
+    $oldCycle,
+    $newCycle,
+    $proratedCredit,
+    $existingCreditUsed,
+    $immediateCharge,
+    $newEndDate,
+    $creditBalanceAfter,
+    $monthlyBase,
+    $refundAmount = 0.0,
+    $refundProvider = null
+) {
+    $site_url        = site_url();
+    $oldCycleLabel   = ucfirst($oldCycle);
+    $newCycleLabel   = ucfirst($newCycle);
+    $nextBillingDate = date('F j, Y', strtotime($newEndDate));
+    $isUpgrade       = ($newCycle === 'yearly');
+
+    $subject = $isUpgrade
+        ? "You've upgraded to Argo Premium Yearly"
+        : "Your Argo Premium plan changed to Monthly";
+
+    $headline = $isUpgrade
+        ? 'Subscription upgraded to Yearly'
+        : 'Subscription changed to Monthly';
+
+    $intro = "Your Argo Premium subscription has been switched from <strong>{$oldCycleLabel}</strong> to <strong>{$newCycleLabel}</strong>. The full breakdown is below.";
+
+    // Build breakdown table rows conditionally
+    $rows = '';
+    $rows .= '<tr><td class="label">Prorated credit (unused ' . htmlspecialchars($oldCycleLabel) . ' period)</td>'
+          . '<td class="value">$' . number_format($proratedCredit, 2) . ' CAD</td></tr>';
+
+    if ($existingCreditUsed > 0) {
+        $rows .= '<tr><td class="label">Existing account credit applied</td>'
+              . '<td class="value">$' . number_format($existingCreditUsed, 2) . ' CAD</td></tr>';
+    }
+
+    $rows .= '<tr><td class="label">Charged today</td>'
+          . '<td class="value">$' . number_format($immediateCharge, 2) . ' CAD</td></tr>';
+
+    if ($creditBalanceAfter > 0) {
+        $monthsCovered = ($monthlyBase > 0) ? (int) floor($creditBalanceAfter / $monthlyBase) : 0;
+        $monthsHint = ($monthsCovered > 0)
+            ? ' (covers about ' . $monthsCovered . ' future renewal' . ($monthsCovered === 1 ? '' : 's') . ')'
+            : '';
+        $rows .= '<tr><td class="label">Remaining credit balance</td>'
+              . '<td class="value">$' . number_format($creditBalanceAfter, 2) . ' CAD' . $monthsHint . '</td></tr>';
+    }
+
+    // PayPal-only: prorated refund line. Refund processes asynchronously
+    // and shows up in the user's PayPal account within 5–10 business days.
+    if ($refundAmount > 0) {
+        $providerLabel = $refundProvider ? ' via ' . htmlspecialchars($refundProvider) : '';
+        $rows .= '<tr><td class="label">Prorated refund (5–10 business days)</td>'
+              . '<td class="value">$' . number_format($refundAmount, 2) . ' CAD' . $providerLabel . '</td></tr>';
+    }
+
+    $rows .= '<tr><td class="label">Next billing date</td>'
+          . '<td class="value">' . htmlspecialchars($nextBillingDate) . '</td></tr>';
+    $rows .= '<tr><td class="label">License Key</td>'
+          . '<td class="value">' . htmlspecialchars($subscriptionId) . '</td></tr>';
+
+    $body = <<<HTML
+        <h1>{$headline}</h1>
+        <p>{$intro}</p>
+
+        <table class="details-table">
+            {$rows}
+        </table>
+
+        <div class="button-container">
+            <a href="{$site_url}/community/users/subscription.php" class="button button-purple">View Subscription</a>
+        </div>
+
+        <p>If you have any questions, please <a href="{$site_url}/contact-us/">contact our support team</a>.</p>
+
+        <div class="receipt-footer">
+            <p>Thank you for being part of Argo Premium!</p>
+            <p><a href="{$site_url}">argorobots.com</a></p>
+        </div>
+        HTML;
+
+    return send_styled_email($email, $subject, $body, 'purple');
+}
+
+/**
  * Send free subscription key notification email
  *
  * @param string $email User's email address

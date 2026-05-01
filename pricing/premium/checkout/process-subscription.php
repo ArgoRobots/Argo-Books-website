@@ -552,12 +552,15 @@ try {
                 }
             }
 
-            // 2. Issue the prorated refund (skip if no sale to refund against)
+            // 2. Issue the prorated refund (skip if no sale to refund against).
+            //    Pass the original sale's currency so PayPal validates it
+            //    against the sale.
             if ($sw['refund_amount'] > 0 && !empty($sw['sale']['transaction_id'])) {
                 $refundResult = refundPayPalSale(
                     $sw['sale']['transaction_id'],
                     $sw['refund_amount'],
-                    'Cycle switch proration'
+                    'Cycle switch proration',
+                    $sw['sale']['currency'] ?? 'CAD'
                 );
                 if (!$refundResult['success']) {
                     error_log("CRITICAL: cycle switch refund failed. user_id=$userId, subscription_id=$subscriptionId, sale_id={$sw['sale']['transaction_id']}, refund_amount={$sw['refund_amount']}, error=" . ($refundResult['error'] ?? 'unknown'));

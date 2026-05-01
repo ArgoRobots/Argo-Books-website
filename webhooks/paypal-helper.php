@@ -245,12 +245,13 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
  * unused billing period (and any pre-existing account credit) to the
  * user's PayPal account when they switch monthly <-> yearly.
  *
- * @param string $saleId  PayPal sale ID (from premium_subscription_payments.transaction_id)
- * @param float  $amount  Refund amount in CAD
- * @param string $reason  Internal reason for logs / PayPal display
+ * @param string $saleId       PayPal sale ID (from premium_subscription_payments.transaction_id)
+ * @param float  $amount       Refund amount
+ * @param string $description  Buyer-facing description (PayPal v1 sale-refund field name)
+ * @param string $currency     ISO currency code; defaults to CAD but should match the original sale's currency
  * @return array { success: bool, refund_id?: string|null, http_code?: int, error?: string }
  */
-function refundPayPalSale($saleId, $amount, $reason = 'Cycle switch proration') {
+function refundPayPalSale($saleId, $amount, $description = 'Cycle switch proration', $currency = 'CAD') {
     if (!isValidPayPalResourceId($saleId)) {
         return ['success' => false, 'error' => 'Invalid sale id format'];
     }
@@ -266,12 +267,14 @@ function refundPayPalSale($saleId, $amount, $reason = 'Cycle switch proration') 
     $baseUrl = getPayPalApiBaseUrl();
     $url = "$baseUrl/v1/payments/sale/" . urlencode($saleId) . "/refund";
 
+    // PayPal v1 sale-refund field is `description`, not `reason`. The
+    // cancel-subscription endpoint uses `reason`; sale refund does not.
     $body = json_encode([
         'amount' => [
             'total'    => number_format((float) $amount, 2, '.', ''),
-            'currency' => 'CAD',
+            'currency' => strtoupper($currency),
         ],
-        'reason' => $reason,
+        'description' => $description,
     ]);
 
     // PayPal-Request-Id: deterministic per (sale, day) so an accidental

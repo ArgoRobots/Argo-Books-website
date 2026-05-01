@@ -917,6 +917,8 @@ function send_premium_subscription_reactivated_email($email, $subscriptionId, $e
  * @param string $newEndDate           New end_date (Y-m-d H:i:s)
  * @param float  $creditBalanceAfter   Remaining credit_balance after the switch
  * @param float  $monthlyBase          Monthly base price (for "covers N months" hint)
+ * @param float  $refundAmount         PayPal-only: prorated refund issued to the user's PayPal account (0 for Stripe/Square)
+ * @param string|null $refundProvider  PayPal-only: name of the refund provider rendered in the breakdown row (e.g. 'PayPal')
  * @return bool  Success status
  */
 function send_premium_subscription_cycle_changed_email(

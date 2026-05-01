@@ -380,6 +380,15 @@ function handlePaymentCompleted($resource) {
 
     $paymentType = $paymentCount > 0 ? 'renewal' : 'initial';
 
+    // Detect "first bill after a cycle switch": process-subscription.php
+    // already set end_date and sent the cycle-changed email when the user
+    // approved the new PayPal sub. This webhook arrives seconds-to-minutes
+    // later when PayPal first bills the new sub. Without this guard, the
+    // renewal handler below would extend end_date a SECOND time (giving
+    // the user a free year/month of service) and send a duplicate email.
+    $cycleSwitchedRecently = !empty($subscription['last_cycle_change_at'])
+        && (time() - strtotime($subscription['last_cycle_change_at'])) < 600; // 10 min
+
     // Log the payment
     $stmt = $pdo->prepare("
         INSERT INTO premium_subscription_payments (
@@ -395,8 +404,12 @@ function handlePaymentCompleted($resource) {
         $paymentType
     ]);
 
-    // Update subscription end date if this is a renewal
-    if ($paymentType === 'renewal') {
+    if ($cycleSwitchedRecently) {
+        // First bill after a cycle switch — record the sale (above), but
+        // don't extend end_date and don't send a renewal email. Both were
+        // already handled when the user confirmed the switch.
+        logPayPalWebhookEvent('PAYMENT.SALE.COMPLETED', $resource, 'cycle_switch_first_bill_recorded');
+    } elseif ($paymentType === 'renewal') {
         $billing = $subscription['billing_cycle'];
         $newEndDate = calculateNewEndDate($subscription['end_date'], $billing);
 

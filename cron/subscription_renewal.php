@@ -368,12 +368,17 @@ try {
 // to let the cancel webhook recognize an expected cancel event for the
 // pre-switch subscription; once that event has had a week to arrive, we no
 // longer need the back-reference.
+//
+// Cutoff is keyed on last_cycle_change_at, NOT updated_at — updated_at gets
+// auto-bumped by every renewal/admin edit (ON UPDATE CURRENT_TIMESTAMP), so
+// for monthly subs it would never reach the 7-day threshold.
 try {
     $stmt = $pdo->prepare("
         UPDATE premium_subscriptions
         SET previous_paypal_subscription_id = NULL
         WHERE previous_paypal_subscription_id IS NOT NULL
-          AND updated_at < NOW() - INTERVAL 7 DAY
+          AND last_cycle_change_at IS NOT NULL
+          AND last_cycle_change_at < NOW() - INTERVAL 7 DAY
     ");
     $stmt->execute();
     $cleared = $stmt->rowCount();

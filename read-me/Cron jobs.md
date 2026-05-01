@@ -85,7 +85,7 @@ php /home/argorobots/public_html/cron/account_purge.php
 
 | Variable | Default | Description |
 |---|---|---|
-| `GOOGLE_PLACES_API_KEY` | — | Required for business discovery |
+| `GOOGLE_PLACES_API_KEY` | — | Required for business discovery. Must have **Places API (New)** enabled in Google Cloud Console (uses `places.googleapis.com/v1/places:searchText`, not the legacy `maps.googleapis.com/maps/api/place/...` endpoints). |
 | `GEMINI_API_KEY` | — | Required for AI draft generation |
 | `OUTREACH_DAILY_SEND_LIMIT` | 10 | Max first-touch emails sent per day (also controls discovery and draft batch sizes) |
 | `OUTREACH_DAILY_FOLLOWUP_LIMIT` | 30 | Max follow-up emails sent per day (separate cap, oldest-due first) |

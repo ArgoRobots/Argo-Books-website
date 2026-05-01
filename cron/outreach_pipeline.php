@@ -408,6 +408,19 @@ function stepDiscover($pdo, $dryRun)
 
     setState($pdo, 'last_discovery_date', date('Y-m-d'));
     setState($pdo, 'last_discovery_city', "$city, $province");
+
+    // Prune expired scrape-cache rows so the table doesn't grow unbounded as
+    // discovery walks new URLs. Matches the 30-day TTL used at read time —
+    // older entries can never produce a hit anyway. Indexed scan, runs daily.
+    try {
+        $deleted = $pdo->exec("DELETE FROM outreach_scrape_cache
+            WHERE last_attempted_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
+        if ($deleted > 0) {
+            logPipeline("Pruned $deleted expired scrape-cache rows.");
+        }
+    } catch (PDOException $e) {
+        // Cleanup failure shouldn't fail the pipeline — table may not exist yet.
+    }
 }
 
 function stepManageAbTests($pdo, $dryRun)

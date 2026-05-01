@@ -95,13 +95,17 @@ $existingSubscription = null;
 $subscriptionStillValid = false;
 
 try {
+    // Env filter: same user_id can have a sandbox sub on dev and a production
+    // sub on prod (shared DB). Without this filter, prod checkout could pick
+    // up the dev sub and mistake it for an active production subscription.
     $stmt = $pdo->prepare("
         SELECT * FROM premium_subscriptions
         WHERE user_id = ? AND status IN ('active', 'cancelled', 'payment_failed')
+        AND environment = ?
         AND end_date > NOW()
         ORDER BY created_at DESC LIMIT 1
     ");
-    $stmt->execute([$userId]);
+    $stmt->execute([$userId, current_environment()]);
     $existingSubscription = $stmt->fetch(PDO::FETCH_ASSOC);
     $subscriptionStillValid = ($existingSubscription !== false);
 } catch (PDOException $e) {
@@ -553,8 +557,10 @@ try {
             // already exists (rare double-submit guard).
             try {
                 $auditCurrency = $existingSubscription['currency'] ?? 'CAD';
-                $checkStmt = $pdo->prepare("SELECT id FROM premium_subscription_payments WHERE transaction_id = ? AND payment_type = 'cycle_change' LIMIT 1");
-                $checkStmt->execute([$paypalSubscriptionId]);
+                // Env-scope the dedupe so a cycle_change row recorded by the
+                // other environment doesn't suppress the audit row in this one.
+                $checkStmt = $pdo->prepare("SELECT id FROM premium_subscription_payments WHERE transaction_id = ? AND payment_type = 'cycle_change' AND environment = ? LIMIT 1");
+                $checkStmt->execute([$paypalSubscriptionId, current_environment()]);
                 if (!$checkStmt->fetch()) {
                     $stmt = $pdo->prepare("
                         INSERT INTO premium_subscription_payments (

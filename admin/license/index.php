@@ -313,13 +313,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email_success = 0;
 
             try {
-                // Update credit_balance for selected subscriptions
+                // Update credit_balance for selected subscriptions. Env filter
+                // prevents a stale prod form submit from mutating sandbox subs
+                // (and vice versa) — without it, only the follow-up SELECT was
+                // env-scoped, which is too late.
                 $stmt = $pdo->prepare("
                     UPDATE premium_subscriptions
                     SET credit_balance = credit_balance + ?
                     WHERE id IN ($placeholders)
+                      AND environment = ?
                 ");
-                $params = array_merge([$credit_amount], $subscription_ids);
+                $params = array_merge([$credit_amount], $subscription_ids, [current_environment()]);
                 $stmt->execute($params);
                 $success_count = $stmt->rowCount();
 

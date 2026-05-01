@@ -330,7 +330,8 @@ CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     INDEX idx_subscription_id (subscription_id),
     INDEX idx_status (status),
     INDEX idx_created_at (created_at),
-    INDEX idx_payment_type (payment_type)
+    INDEX idx_payment_type (payment_type),
+    INDEX idx_env_status_created (environment, status, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Premium Subscription Keys table (free/promo keys)

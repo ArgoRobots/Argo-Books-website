@@ -80,6 +80,10 @@ $squareEnvironment = $isProduction ? 'production' : 'sandbox';
 
 // Find subscriptions due for renewal (within next 24 hours or already past due)
 try {
+    // Env filter prevents the cron in one environment from renewing
+    // subscriptions belonging to the other (dev/prod share a DB). Downstream
+    // queries are all scoped by subscription_id which is UNIQUE in the schema,
+    // so this single filter covers the whole pipeline.
     $stmt = $pdo->prepare("
         SELECT
             s.*,
@@ -88,11 +92,12 @@ try {
         FROM premium_subscriptions s
         JOIN community_users u ON s.user_id = u.id
         WHERE s.status = 'active'
+        AND s.environment = ?
         AND s.end_date <= DATE_ADD(NOW(), INTERVAL 1 DAY)
         AND s.auto_renew = 1
         ORDER BY s.end_date ASC
     ");
-    $stmt->execute();
+    $stmt->execute([current_environment()]);
     $subscriptions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     logMessage("Found " . count($subscriptions) . " subscriptions due for renewal");

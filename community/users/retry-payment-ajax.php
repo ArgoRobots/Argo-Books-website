@@ -304,12 +304,15 @@ try {
             $interval = ($billing_cycle === 'yearly') ? '+1 year' : '+1 month';
             $new_end_date = date('Y-m-d H:i:s', strtotime($interval));
 
+            // Env filter: same user_id can have a payment_failed sub on each
+            // environment (shared DB). Without this, a retry from one env could
+            // reactivate the wrong env's subscription.
             $stmt = $pdo->prepare("
                 UPDATE premium_subscriptions
                 SET status = 'active', auto_renew = 1, end_date = ?, updated_at = NOW()
-                WHERE user_id = ? AND status = 'payment_failed'
+                WHERE user_id = ? AND status = 'payment_failed' AND environment = ?
             ");
-            $stmt->execute([$new_end_date, $user_id]);
+            $stmt->execute([$new_end_date, $user_id, current_environment()]);
         } else {
             // PayPal: don't move end_date — webhook will handle it.
             $new_end_date = $premium_subscription['end_date'];
@@ -317,9 +320,9 @@ try {
             $stmt = $pdo->prepare("
                 UPDATE premium_subscriptions
                 SET status = 'active', auto_renew = 1, updated_at = NOW()
-                WHERE user_id = ? AND status = 'payment_failed'
+                WHERE user_id = ? AND status = 'payment_failed' AND environment = ?
             ");
-            $stmt->execute([$user_id]);
+            $stmt->execute([$user_id, current_environment()]);
         }
 
         if ($stmt->rowCount() > 0) {

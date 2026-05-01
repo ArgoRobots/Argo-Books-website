@@ -376,20 +376,32 @@ try {
         exit;
     }
 
+    // Idempotency: if a cycle_change row already exists for this transaction
+    // id, skip the insert. Triggered by SCA replay (same confirmed_payment_
+    // intent_id submitted twice), Stripe idempotency-key dedup on rapid
+    // double-click, or two-tab race on the same gateway-side payment id.
     $auditCurrency = $premium_subscription['currency'] ?? 'CAD';
-    $stmt = $pdo->prepare("
-        INSERT INTO premium_subscription_payments (
-            subscription_id, amount, currency, payment_method,
-            transaction_id, status, payment_type, created_at
-        ) VALUES (?, ?, ?, ?, ?, 'completed', 'cycle_change', NOW())
+    $checkStmt = $pdo->prepare("
+        SELECT id FROM premium_subscription_payments
+        WHERE transaction_id = ? AND payment_type = 'cycle_change'
+        LIMIT 1
     ");
-    $stmt->execute([
-        $subscription_id,
-        $immediateChargeTotal,
-        $auditCurrency,
-        $payment_method,
-        $transaction_id
-    ]);
+    $checkStmt->execute([$transaction_id]);
+    if (!$checkStmt->fetch()) {
+        $stmt = $pdo->prepare("
+            INSERT INTO premium_subscription_payments (
+                subscription_id, amount, currency, payment_method,
+                transaction_id, status, payment_type, created_at
+            ) VALUES (?, ?, ?, ?, ?, 'completed', 'cycle_change', NOW())
+        ");
+        $stmt->execute([
+            $subscription_id,
+            $immediateChargeTotal,
+            $auditCurrency,
+            $payment_method,
+            $transaction_id
+        ]);
+    }
 
     $pdo->commit();
 } catch (PDOException $e) {

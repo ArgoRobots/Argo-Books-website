@@ -391,6 +391,34 @@ try {
             require_once __DIR__ . '/../../../webhooks/paypal-helper.php';
             require_once __DIR__ . '/../../../community/users/user_functions.php';
 
+            // Defense-in-depth guards (confirm page also enforces these but
+            // process-subscription.php is reachable via direct POST, so it
+            // must enforce independently). All rejections happen before any
+            // DB writes or PayPal-side state changes.
+
+            // Status: cycle switch requires an active sub. The
+            // existingSubscription query at line 100 includes cancelled and
+            // payment_failed for general payment-method updates — must be
+            // stricter here.
+            if (($existingSubscription['status'] ?? '') !== 'active') {
+                $pdo->rollBack();
+                error_log("Cycle switch rejected: subscription not active. user_id=$userId, status=" . ($existingSubscription['status'] ?? 'unknown'));
+                echo json_encode(['success' => false, 'error' => 'Cycle switching requires an active subscription']);
+                exit();
+            }
+
+            // Cooldown: 5 min between cycle changes. Prevents two-tab races
+            // (PayPal generates distinct sub ids per approval, so the anti-
+            // replay check below doesn't catch concurrent approvals — the
+            // cooldown does) and rapid double-click double-billing.
+            if (!empty($existingSubscription['last_cycle_change_at'])
+                && (time() - strtotime($existingSubscription['last_cycle_change_at'])) < 300) {
+                $pdo->rollBack();
+                error_log("Cycle switch rejected: cooldown active. user_id=$userId, last_cycle_change_at={$existingSubscription['last_cycle_change_at']}");
+                echo json_encode(['success' => false, 'error' => 'Please wait a few minutes between billing cycle changes.']);
+                exit();
+            }
+
             $oldPaypalSubId = $existingSubscription['paypal_subscription_id'] ?? '';
 
             // Anti-replay: new sub id MUST differ from existing row's id.
@@ -409,23 +437,28 @@ try {
                 exit();
             }
 
+            // No-sale-yet hard reject. Without a completed PayPal sale we
+            // have nothing to refund against; proceeding would charge the
+            // user for the new cycle and silently forfeit the prorated value
+            // of the unused old period. Confirm page also guards this.
+            $sale = getMostRecentPayPalSale($subscriptionId);
+            if (!$sale) {
+                $pdo->rollBack();
+                error_log("Cycle switch rejected: no completed PayPal sale to refund against. user_id=$userId, subscription_id=$subscriptionId");
+                echo json_encode(['success' => false, 'error' => 'Your subscription is still being activated by PayPal. Please wait a few minutes after subscribing before changing cycles.']);
+                exit();
+            }
+
             // Override end_date — PayPal bills the new sub on activation
             $newEndDate = ($billing === 'yearly')
                 ? date('Y-m-d H:i:s', strtotime('+1 year'))
                 : date('Y-m-d H:i:s', strtotime('+1 month'));
 
-            // Look up the most recent PayPal sale to refund against. If
-            // none (rare — confirm page guards this), we'll skip the
-            // refund step and warn the user.
-            $sale = getMostRecentPayPalSale($subscriptionId);
             $existingCreditBalance = (float) ($existingSubscription['credit_balance'] ?? 0);
-            $refundAmount = 0.0;
-            if ($sale) {
-                $refundAmount = min(
-                    (float) $proration['prorated_credit'] + $existingCreditBalance,
-                    (float) $sale['amount']
-                );
-            }
+            $refundAmount = min(
+                (float) $proration['prorated_credit'] + $existingCreditBalance,
+                (float) $sale['amount']
+            );
 
             $paypalCycleSwitchData = [
                 'old_paypal_sub_id' => $oldPaypalSubId,

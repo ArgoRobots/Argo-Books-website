@@ -1,7 +1,7 @@
 <?php
 /**
  * Build a follow-up email body for a lead. Static template with light
- * personalization — no per-lead OpenAI call so cost stays at zero and
+ * personalization — no per-lead AI call so cost stays at zero and
  * voice stays consistent across the cohort.
  *
  * Returns ['subject' => ..., 'body' => ..., 'preheader' => ...].

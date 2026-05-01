@@ -12,7 +12,7 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 
 header('Content-Type: application/json');
 
-// Load shared outreach helpers (scrape_email_from_website, search_businesses_core, call_openai, etc.)
+// Load shared outreach helpers (scrape_email_from_website, search_businesses_core, call_gemini, etc.)
 require_once __DIR__ . '/../../cron/lib/outreach_helpers.php';
 
 // CSRF protection for state-changing (non-GET) requests
@@ -474,7 +474,7 @@ function import_leads($pdo)
 }
 
 // ─── AI Draft Generation ───
-// Core logic (call_openai, summarize_business, generate_draft_for_lead) lives in cron/lib/outreach_helpers.php
+// Core logic (call_gemini, summarize_business, generate_draft_for_lead) lives in cron/lib/outreach_helpers.php
 
 function generate_draft($pdo)
 {
@@ -750,7 +750,7 @@ Example: [\"small\", \"medium\", \"small\", \"large\"]";
 
     $userPrompt = "Classify these businesses by size:\n\n" . implode("\n", $businessList);
 
-    $result = call_openai($systemPrompt, $userPrompt);
+    $result = call_gemini($systemPrompt, $userPrompt);
 
     if (isset($result['error'])) {
         json_response(['success' => false, 'message' => $result['error']], 500);

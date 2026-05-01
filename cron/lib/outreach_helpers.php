@@ -4,7 +4,7 @@
  * Used by both the admin API (admin/outreach/api.php) and the cron pipeline.
  *
  * Contains: log_activity, send_outreach_lead, scrape_email_from_website,
- *           search_businesses_core, call_openai, summarize_business,
+ *           search_businesses_core, call_gemini, summarize_business,
  *           generate_draft_for_lead
  */
 
@@ -198,7 +198,7 @@ function ab_cta_instruction_for_variant($variant)
  * system prompt for prompt-side variant types (subject / body / cta).
  * Send-side types (sender / preheader / format) apply at send time and
  * return an empty string here. Personalization is handled inline in
- * generate_draft_for_lead (it gates the OpenAI summary call rather than
+ * generate_draft_for_lead (it gates the AI summary call rather than
  * injecting into the prompt).
  */
 function ab_instruction_for_variant($variant, $variantType = 'subject')
@@ -827,36 +827,38 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
     return ['businesses' => $businesses, 'count' => count($businesses), 'rounds' => $roundsUsed];
 }
 
-// ─── OpenAI Call ───
+// ─── Gemini Call ───
 
-function call_openai($systemPrompt, $userPrompt)
+function call_gemini($systemPrompt, $userPrompt)
 {
-    $apiKey = $_ENV['OPENAI_API_KEY'] ?? '';
+    $apiKey = $_ENV['GEMINI_API_KEY'] ?? '';
     if (empty($apiKey)) {
-        return ['error' => 'OpenAI API key not configured'];
+        return ['error' => 'Gemini API key not configured'];
     }
 
-    $model = $_ENV['OPENAI_MODEL'] ?? 'gpt-4o-mini';
+    $model = $_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
 
-    $payload = json_encode([
-        'model' => $model,
-        'messages' => [
-            ['role' => 'system', 'content' => $systemPrompt],
-            ['role' => 'user', 'content' => $userPrompt],
+    $payload = [
+        'contents' => [
+            ['role' => 'user', 'parts' => [['text' => $userPrompt]]],
         ],
-        'temperature' => 0.7,
-        'max_tokens' => 2000,
-    ]);
+        'generationConfig' => [
+            'temperature' => 0.7,
+            'maxOutputTokens' => 2000,
+        ],
+    ];
+    if (!empty($systemPrompt)) {
+        $payload['system_instruction'] = ['parts' => [['text' => $systemPrompt]]];
+    }
 
-    $ch = curl_init('https://api.openai.com/v1/chat/completions');
+    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
+
+    $ch = curl_init($url);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => $payload,
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $apiKey,
-        ],
+        CURLOPT_POSTFIELDS => json_encode($payload),
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
         CURLOPT_TIMEOUT => 60,
         CURLOPT_CONNECTTIMEOUT => 10,
     ]);
@@ -866,12 +868,12 @@ function call_openai($systemPrompt, $userPrompt)
 
     if ($response === false || $httpCode !== 200) {
         $errorData = json_decode($response, true);
-        $errorMsg = $errorData['error']['message'] ?? 'OpenAI request failed';
+        $errorMsg = $errorData['error']['message'] ?? 'Gemini request failed';
         return ['error' => $errorMsg];
     }
 
     $result = json_decode($response, true);
-    return ['content' => $result['choices'][0]['message']['content'] ?? ''];
+    return ['content' => $result['candidates'][0]['content']['parts'][0]['text'] ?? ''];
 }
 
 // ─── Business Summarization ───
@@ -902,7 +904,7 @@ function summarize_business($website)
 
     if (strlen($text) < 50) return null;
 
-    $result = call_openai(
+    $result = call_gemini(
         "You summarize businesses based on their website content. Respond with ONLY a concise summary (3-5 sentences) covering:
 1. What specific services or products they offer
 2. Who their typical customers are
@@ -926,7 +928,7 @@ function generate_draft_for_lead($pdo, $lead)
     $id = $lead['id'];
 
     // A/B variant lookup must happen before the summary block so a
-    // personalization test can gate the OpenAI summary call entirely.
+    // personalization test can gate the AI summary call entirely.
     // Only one test can be active at a time across the whole framework
     // (enforced by the activation handler), so a single SELECT finds it.
     //
@@ -983,7 +985,7 @@ function generate_draft_for_lead($pdo, $lead)
 
     // Generate a business summary if we don't have one yet — unless the lead
     // is in the 'off' arm of an active personalization test, in which case we
-    // skip the OpenAI call entirely. If a stored summary exists from before
+    // skip the AI call entirely. If a stored summary exists from before
     // the test started, mask it for this draft so the prompt truly operates
     // without personalization.
     $summary = $lead['business_summary'] ?? null;
@@ -1078,7 +1080,7 @@ Return ONLY the JSON, no other text.";
     if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
     if ($summary) $details .= "\nBusiness summary: $summary";
 
-    $result = call_openai($systemPrompt, $details);
+    $result = call_gemini($systemPrompt, $details);
 
     if (isset($result['error'])) {
         return ['error' => $result['error']];
@@ -1317,9 +1319,9 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
 }
 
 /**
- * Ask OpenAI for N fresh subject-line directives for the next A/B cycle.
+ * Ask Gemini for N fresh subject-line directives for the next A/B cycle.
  * Seeds the prompt with the content of the most-recent winners so proven
- * styles get reinforced. Falls back to a curated seed list if OpenAI errors.
+ * styles get reinforced. Falls back to a curated seed list if Gemini errors.
  *
  * Returns ['directives' => [...strings...], 'source' => 'ai'|'fallback'].
  */
@@ -1389,7 +1391,7 @@ function generate_ab_subject_variants($pdo, $count = 3)
 
     $userPrompt = "Propose $count distinct subject-line directives for the next A/B cycle." . $winnersText;
 
-    $result = call_openai($systemPrompt, $userPrompt);
+    $result = call_gemini($systemPrompt, $userPrompt);
     $directives = null;
     if (!isset($result['error'])) {
         $content = trim($result['content'] ?? '');

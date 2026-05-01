@@ -554,7 +554,7 @@ function stepManageAbTests($pdo, $dryRun)
     } else {
         logPipeline('A/B auto-create failed for ' . $cycleType . ': ' . ($newCycle['error'] ?? 'unknown'), 'ERROR');
         // Advance the pointer past an unsupported type so rotation doesn't
-        // get stuck. Other failure modes (DB error, OpenAI down) are retried
+        // get stuck. Other failure modes (DB error, Gemini down) are retried
         // on the next run with the same pointer.
         if (strpos((string) ($newCycle['error'] ?? ''), 'unsupported') !== false) {
             $idx = array_search($cycleType, $order, true);
@@ -569,9 +569,9 @@ function stepGenerateDrafts($pdo, $dryRun)
 {
     logPipeline('--- Step 3: Generate AI Drafts ---');
 
-    $openaiKey = $_ENV['OPENAI_API_KEY'] ?? '';
-    if (empty($openaiKey)) {
-        logPipeline('OpenAI API key not configured. Skipping draft generation.', 'WARN');
+    $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';
+    if (empty($geminiKey)) {
+        logPipeline('Gemini API key not configured. Skipping draft generation.', 'WARN');
         return;
     }
 
@@ -619,7 +619,7 @@ function stepGenerateDrafts($pdo, $dryRun)
                 $success++;
             }
 
-            // Rate limit: pause between OpenAI calls
+            // Rate limit: pause between Gemini calls
             sleep(1);
 
         } catch (Exception $e) {

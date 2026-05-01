@@ -232,9 +232,6 @@ php_value upload_max_filesize 10M
     # AI completions proxy
     RewriteRule ^api/ai/completions/?$ api/ai/completions.php [L,QSA]
 
-    # Receipt scanning proxy
-    RewriteRule ^api/receipt/scan/?$ api/receipt/scan.php [L,QSA]
-
     # Exchange rates proxy
     RewriteRule ^api/exchange-rates/?$ api/exchange-rates.php [L,QSA]
 

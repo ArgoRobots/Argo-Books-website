@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group" id="password-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
+                    <input type="password" id="password" name="password" value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') : ''; ?>" required>
 
                     <div class="password-policies">
                         <div class="policy-length">
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="form-group" id="confirm-password-group">
                     <label for="password_confirm">Confirm Password</label>
-                    <input type="password" id="password_confirm" name="password_confirm" required>
+                    <input type="password" id="password_confirm" name="password_confirm" value="<?php echo isset($_POST['password_confirm']) ? htmlspecialchars($_POST['password_confirm'], ENT_QUOTES, 'UTF-8') : ''; ?>" required>
                     <div class="validation-feedback" id="confirm-password-feedback"></div>
                 </div>
 
@@ -209,14 +209,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const termsGroup = document.getElementById('terms-group');
             const termsFeedback = document.getElementById('terms-feedback');
             const passwordPolicies = document.querySelector('.password-policies');
-
-            // If there was a form error, password fields are intentionally NOT restored
-            // for security reasons (prevents password leakage in page source).
-            // Update password policy indicators if user starts typing
-            if (<?php echo !empty($error) ? 'true' : 'false'; ?>) {
-                passwordField.setAttribute('placeholder', 'Please re-enter your password');
-                passwordConfirm.setAttribute('placeholder', 'Please re-enter your password');
-            }
 
             // Show password policies on focus
             passwordField.addEventListener('focus', function() {

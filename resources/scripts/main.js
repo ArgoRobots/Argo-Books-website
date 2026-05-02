@@ -11,7 +11,7 @@ function getBasePath() {
   var sitePaths = ['/features/', '/pricing/', '/community/', '/documentation/', '/about-us/',
                    '/contact-us/', '/whats-new/', '/admin/', '/legal/', '/resources/',
                    '/error-pages/', '/older-versions/', '/downloads/', '/portal/',
-                   '/invoice/', '/api/', '/compare/', '/unsubscribe/'];
+                   '/invoice/', '/api/', '/compare/', '/unsubscribe/', '/review/'];
 
   var isRootPath = sitePaths.some(function(p) { return path.startsWith(p); }) || path === '/' || path === '/index.php';
 

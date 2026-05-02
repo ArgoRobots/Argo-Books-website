@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $password_confirm) {
         $error = 'Passwords do not match';
     } elseif (!$terms_agreed) {
-        $error = 'You must agree to the terms and conditions';
+        $error = 'You must agree to the terms of service';
     } else {
         // Attempt to register user
         $result = register_user($username, $email, $password, $email_marketing_consent);

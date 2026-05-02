@@ -1,9 +1,14 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../email_marketing.php';
 require_once __DIR__ . '/user_functions.php';
 
 require_login();
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 $user_id = (int) $_SESSION['user_id'];
 $success_message = '';
@@ -29,32 +34,58 @@ $is_license_holder = (bool) $stmt->fetchColumn();
 
 // Process form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product_updates  = isset($_POST['email_pref_product_updates']) ? 1 : 0;
-    $tips_onboarding  = isset($_POST['email_pref_tips_onboarding']) ? 1 : 0;
-    $reviews          = isset($_POST['email_pref_reviews']) ? 1 : 0;
-    $promotions       = isset($_POST['email_pref_promotions']) ? 1 : 0;
-    $community_digest = isset($_POST['email_pref_community_digest']) ? 1 : 0;
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
+        $error_message = 'Invalid request. Please try again.';
+    } else {
+        $product_updates  = isset($_POST['email_pref_product_updates']) ? 1 : 0;
+        $tips_onboarding  = isset($_POST['email_pref_tips_onboarding']) ? 1 : 0;
+        $reviews          = isset($_POST['email_pref_reviews']) ? 1 : 0;
+        $promotions       = isset($_POST['email_pref_promotions']) ? 1 : 0;
+        $community_digest = isset($_POST['email_pref_community_digest']) ? 1 : 0;
 
-    try {
-        $stmt = $pdo->prepare('UPDATE community_users
-                               SET email_pref_product_updates = ?,
-                                   email_pref_tips_onboarding = ?,
-                                   email_pref_reviews = ?,
-                                   email_pref_promotions = ?,
-                                   email_pref_community_digest = ?
-                               WHERE id = ?');
-        $stmt->execute([$product_updates, $tips_onboarding, $reviews, $promotions, $community_digest, $user_id]);
+        try {
+            $stmt = $pdo->prepare('UPDATE community_users
+                                   SET email_pref_product_updates = ?,
+                                       email_pref_tips_onboarding = ?,
+                                       email_pref_reviews = ?,
+                                       email_pref_promotions = ?,
+                                       email_pref_community_digest = ?
+                                   WHERE id = ?');
+            $stmt->execute([$product_updates, $tips_onboarding, $reviews, $promotions, $community_digest, $user_id]);
 
-        $prefs['email_pref_product_updates']  = $product_updates;
-        $prefs['email_pref_tips_onboarding']  = $tips_onboarding;
-        $prefs['email_pref_reviews']          = $reviews;
-        $prefs['email_pref_promotions']       = $promotions;
-        $prefs['email_pref_community_digest'] = $community_digest;
+            // Sync suppressions: a previous one-click unsubscribe leaves a row in
+            // email_suppressions, and the send-time gate checks that table FIRST.
+            // When the user opts in here, those rows must be cleared or the
+            // pref column flip would have no effect.
+            $opted_in_contexts = [];
+            if ($product_updates)  $opted_in_contexts[] = 'product_updates';
+            if ($tips_onboarding)  $opted_in_contexts[] = 'tips_onboarding';
+            if ($reviews)          $opted_in_contexts[] = 'reviews';
+            if ($promotions)       $opted_in_contexts[] = 'promotions';
+            if ($community_digest) $opted_in_contexts[] = 'community_digest';
 
-        $success_message = 'Email preferences updated successfully.';
-    } catch (PDOException $e) {
-        error_log('email_preferences update failed: ' . $e->getMessage());
-        $error_message = 'Failed to update email preferences. Please try again.';
+            $email_lc = strtolower(trim($prefs['email']));
+            if (count($opted_in_contexts) > 0) {
+                // If any category is opted-in, the blanket suppression must go.
+                $del = $pdo->prepare("DELETE FROM email_suppressions WHERE email = ? AND context = 'all_marketing'");
+                $del->execute([$email_lc]);
+
+                $placeholders = implode(',', array_fill(0, count($opted_in_contexts), '?'));
+                $del = $pdo->prepare("DELETE FROM email_suppressions WHERE email = ? AND context IN ($placeholders)");
+                $del->execute(array_merge([$email_lc], $opted_in_contexts));
+            }
+
+            $prefs['email_pref_product_updates']  = $product_updates;
+            $prefs['email_pref_tips_onboarding']  = $tips_onboarding;
+            $prefs['email_pref_reviews']          = $reviews;
+            $prefs['email_pref_promotions']       = $promotions;
+            $prefs['email_pref_community_digest'] = $community_digest;
+
+            $success_message = 'Email preferences updated successfully.';
+        } catch (PDOException $e) {
+            error_log('email_preferences update failed: ' . $e->getMessage());
+            $error_message = 'Failed to update email preferences. Please try again.';
+        }
     }
 }
 ?>
@@ -101,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
 
             <form method="post" class="prefs-form">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div class="prefs-section">
                     <h2>Account &amp; transactional emails</h2>
                     <ul class="transactional-list">

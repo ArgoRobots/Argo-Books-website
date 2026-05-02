@@ -102,18 +102,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $email = $row['email'];
                     $variant = is_active_user($row['last_active_at']) ? 'active' : 'inactive';
 
+                    // Atomic claim: only proceed if no other request beat us to this row.
+                    // The IS NULL guard makes the operation idempotent under concurrent
+                    // admin sessions and protects against double-emailing the customer.
+                    $claim = $pdo->prepare("UPDATE license_keys
+                                            SET review_email_sent_at = NOW(),
+                                                review_email_variant = ?
+                                            WHERE id = ? AND review_email_sent_at IS NULL");
+                    $claim->execute([$variant, $licenseId]);
+                    if ($claim->rowCount() === 0) {
+                        // Already claimed by another request — skip silently.
+                        continue;
+                    }
+
                     $ok = ($variant === 'active')
                         ? send_review_request_email($licenseId, $email)
                         : send_feedback_request_email($licenseId, $email);
 
                     if ($ok) {
-                        $stmt = $pdo->prepare("UPDATE license_keys
-                                               SET review_email_sent_at = NOW(),
-                                                   review_email_variant = ?
-                                               WHERE id = ?");
-                        $stmt->execute([$variant, $licenseId]);
                         $sent++;
                     } else {
+                        // Best-effort revert so the admin can retry. Scoped by variant
+                        // so we only un-claim the row WE just claimed.
+                        $revert = $pdo->prepare("UPDATE license_keys
+                                                 SET review_email_sent_at = NULL,
+                                                     review_email_variant = NULL
+                                                 WHERE id = ? AND review_email_variant = ?");
+                        $revert->execute([$licenseId, $variant]);
                         $failed++;
                     }
                 }

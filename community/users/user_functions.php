@@ -10,6 +10,9 @@ namespace {
      * @param string $username Username
      * @param string $email Email address
      * @param string $password Plain text password
+     * @param bool $email_marketing_consent When true, opts the user in to all 5
+     *                                      email_pref_* marketing categories at
+     *                                      insert time. Defaults to false (off).
      * @return array Result with success, message, and user_id
      */
     function register_user($username, $email, $password, $email_marketing_consent = false)

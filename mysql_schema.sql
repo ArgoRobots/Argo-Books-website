@@ -12,7 +12,11 @@ CREATE TABLE IF NOT EXISTS license_keys (
     order_id VARCHAR(100),
     payment_method VARCHAR(50),
     payment_intent VARCHAR(100),
-    INDEX idx_license_keys_user_id (user_id)
+    review_email_sent_at DATETIME DEFAULT NULL,
+    review_email_variant VARCHAR(20) DEFAULT NULL COMMENT 'active, inactive, or manually_skipped',
+    review_email_token CHAR(48) DEFAULT NULL,
+    INDEX idx_license_keys_user_id (user_id),
+    UNIQUE KEY uk_review_email_token (review_email_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Admin users table
@@ -48,7 +52,14 @@ CREATE TABLE IF NOT EXISTS community_users (
     last_login DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deletion_scheduled_at DATETIME DEFAULT NULL
+    deletion_scheduled_at DATETIME DEFAULT NULL,
+    email_pref_product_updates BOOLEAN NOT NULL DEFAULT 0,
+    email_pref_tips_onboarding BOOLEAN NOT NULL DEFAULT 0,
+    email_pref_reviews BOOLEAN NOT NULL DEFAULT 0,
+    email_pref_promotions BOOLEAN NOT NULL DEFAULT 0,
+    email_pref_community_digest BOOLEAN NOT NULL DEFAULT 0,
+    email_pref_unsubscribe_token CHAR(48) DEFAULT NULL,
+    UNIQUE KEY uk_email_pref_unsubscribe_token (email_pref_unsubscribe_token)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Create posts table
@@ -602,6 +613,14 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 --     MODIFY COLUMN status ENUM('new','draft_generated','awaiting_approval','approved','contacted','replied','interested','not_interested','onboarded','email_bounced') DEFAULT 'new';
 
 -- Email suppression list (unsubscribes, opt-outs across all email contexts)
+-- Known context values:
+--   'outreach'           - cold outreach campaign
+--   'reviews'            - review-request emails to license-key holders
+--   'product_updates'    - release notes / feature announcements
+--   'tips_onboarding'    - how-to / getting-started nudges
+--   'promotions'         - discount codes / upsells
+--   'community_digest'   - replies / activity digest
+--   'all_marketing'      - blanket suppression of all marketing contexts
 CREATE TABLE IF NOT EXISTS email_suppressions (
     id INT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
@@ -611,6 +630,17 @@ CREATE TABLE IF NOT EXISTS email_suppressions (
     suppressed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY unique_email_context (email, context),
     INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Log of marketing emails actually sent (for debugging and de-duplication)
+CREATE TABLE IF NOT EXISTS email_marketing_log (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    context VARCHAR(50) NOT NULL,
+    sent_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    related_id INT DEFAULT NULL COMMENT 'license_keys.id for review emails, etc.',
+    INDEX idx_email_context (email, context),
+    INDEX idx_sent_at (sent_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Activity log for outreach leads

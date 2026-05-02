@@ -10,9 +10,12 @@ namespace {
      * @param string $username Username
      * @param string $email Email address
      * @param string $password Plain text password
+     * @param bool $email_marketing_consent When true, opts the user in to all 5
+     *                                      email_pref_* marketing categories at
+     *                                      insert time. Defaults to false (off).
      * @return array Result with success, message, and user_id
      */
-    function register_user($username, $email, $password)
+    function register_user($username, $email, $password, $email_marketing_consent = false)
     {
         global $pdo;
 
@@ -36,11 +39,19 @@ namespace {
 
         $verification_code = generate_verification_code();
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
+        $marketing = $email_marketing_consent ? 1 : 0;
 
-        // Insert new user
-        $stmt = $pdo->prepare('INSERT INTO community_users (username, email, password_hash, verification_code, email_verified)
-                         VALUES (?, ?, ?, ?, 0)');
-        $success = $stmt->execute([$username, $email, $password_hash, $verification_code]);
+        // Insert new user. Marketing prefs default to 0 in the schema; if the
+        // user ticked the signup checkbox, opt them in to all 5 categories.
+        $stmt = $pdo->prepare('INSERT INTO community_users
+                         (username, email, password_hash, verification_code, email_verified,
+                          email_pref_product_updates, email_pref_tips_onboarding,
+                          email_pref_reviews, email_pref_promotions, email_pref_community_digest)
+                         VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?)');
+        $success = $stmt->execute([
+            $username, $email, $password_hash, $verification_code,
+            $marketing, $marketing, $marketing, $marketing, $marketing
+        ]);
 
         if ($success) {
             $user_id = $pdo->lastInsertId();

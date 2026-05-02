@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $password_confirm = isset($_POST['password_confirm']) ? $_POST['password_confirm'] : '';
     $terms_agreed = isset($_POST['terms']);
+    $email_marketing_consent = isset($_POST['email_marketing']);
 
     // Define restricted terms for usernames
     $restricted_terms = ['argo', 'admin', 'moderator', 'mod', 'staff', 'support', 'system'];
@@ -61,10 +62,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $password_confirm) {
         $error = 'Passwords do not match';
     } elseif (!$terms_agreed) {
-        $error = 'You must agree to the terms and conditions';
+        $error = 'You must agree to the terms of service';
     } else {
         // Attempt to register user
-        $result = register_user($username, $email, $password);
+        $result = register_user($username, $email, $password, $email_marketing_consent);
 
         if ($result['success']) {
             // Store user_id temporarily for verification
@@ -163,7 +164,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="checkbox">
                     <input type="checkbox" id="terms" name="terms" <?php echo isset($_POST['terms']) ? 'checked' : ''; ?> required>
-                    <label for="terms">I agree to the <a href="../../legal/terms.php" target="_blank" class="link-no-underline">terms and conditions</a></label>
+                    <label for="terms">I agree to the <a href="../../legal/terms.php" target="_blank" class="link-no-underline">terms of service</a></label>
+                </div>
+
+                <div class="checkbox">
+                    <input type="checkbox" id="email_marketing" name="email_marketing" <?php echo isset($_POST['email_marketing']) ? 'checked' : ''; ?>>
+                    <label for="email_marketing">Send me marketing emails (change anytime)</label>
                 </div>
 
                 <div class="form-actions">

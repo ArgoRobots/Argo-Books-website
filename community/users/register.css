@@ -74,3 +74,17 @@ input {
 .form-group.invalid .validation-feedback {
   display: block;
 }
+
+/* Keep the checkbox box square and vertically centered against its label,
+   even when the label wraps on narrow viewports. */
+.auth-form .checkbox {
+  align-items: center;
+}
+
+.auth-form .checkbox input[type="checkbox"] {
+  flex-shrink: 0;
+}
+
+.auth-form .checkbox + .checkbox {
+  margin-top: 10px;
+}

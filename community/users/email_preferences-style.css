@@ -1,0 +1,135 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.prefs-container {
+  max-width: 700px;
+  width: 100%;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--shadow-default);
+  padding: 30px;
+}
+
+.prefs-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.prefs-header h1 {
+  font-size: 24px;
+  color: var(--blue-900);
+}
+
+.prefs-header .subtitle {
+  font-size: 14px;
+  color: var(--gray-600, #6b7280);
+  margin-top: 6px;
+}
+
+.prefs-form {
+  margin-top: 20px;
+}
+
+.prefs-section {
+  margin-bottom: 30px;
+}
+
+.prefs-section h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gray-border);
+  color: var(--blue-900);
+}
+
+.checkbox {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.setting-description {
+  margin-left: 28px;
+  font-size: 14px;
+  color: var(--gray-600, #6b7280);
+}
+
+.transactional-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px 0;
+}
+
+.transactional-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-100, #f3f4f6);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transactional-list li:last-child {
+  border-bottom: none;
+}
+
+.transactional-list .label {
+  font-weight: 500;
+}
+
+.always-on-tag {
+  background: var(--emerald-100);
+  color: var(--emerald-800);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.info-note {
+  background: var(--blue-50, #eff6ff);
+  border-left: 3px solid var(--primary-blue);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 12px;
+  color: var(--blue-900);
+}
+
+.review-note {
+  background: var(--amber-50, #fffbeb);
+  border-left: 3px solid var(--amber-500, #f59e0b);
+  padding: 12px 16px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.success-message {
+  background-color: var(--emerald-100);
+  color: var(--emerald-800);
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.error-message {
+  background-color: var(--red-100);
+  color: var(--red-700);
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  text-align: center;
+}

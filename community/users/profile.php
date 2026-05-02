@@ -595,6 +595,10 @@ if ($user) {
                                     <?= svg_icon('edit', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                                     Edit Account
                                 </a>
+                                <a href="email_preferences.php" class="btn btn-blue">
+                                    <?= svg_icon('mail', 20, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                                    Email Preferences
+                                </a>
                                 <a href="logout.php" class="btn btn-gray">Log Out</a>
                             <?php endif; ?>
                         </div>

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../email_sender.php';
+require_once __DIR__ . '/../email_marketing.php';
 
 /**
  * Get all posts with vote counts, ordered by creation date (newest first)
@@ -80,6 +81,18 @@ function add_post($user_id, $user_name, $user_email, $title, $content, $post_typ
         // Create notifications for mentioned users if applicable
         if ($has_mentions && function_exists('create_mention_notifications')) {
             create_mention_notifications($mentions, $post_id, 0, $user_id);
+
+            // Email each mentioned user (skipping the author themselves).
+            // Gated by community_digest preference inside send_mention_email().
+            foreach (array_unique($mentions) as $mention_username) {
+                $mentioned_id = function_exists('get_user_id_by_username')
+                    ? get_user_id_by_username($mention_username)
+                    : null;
+                if (!$mentioned_id || (int) $mentioned_id === (int) $user_id) {
+                    continue;
+                }
+                send_mention_email((int) $mentioned_id, (int) $post_id, 0, $user_name, $title, $content);
+            }
         }
 
         // Send notification email
@@ -192,9 +205,34 @@ function add_comment($post_id, $user_name, $user_email, $content, $user_id = nul
         // Get the post data
         $post = get_post($post_id);
 
+        // Track which users we've already emailed for this comment so the post
+        // author doesn't get both a "you were mentioned" and a "reply to your
+        // post" email when they're mentioned in a reply on their own post.
+        $emailed_user_ids = [];
+
         // Create notifications for mentioned users if applicable
         if ($has_mentions && function_exists('create_mention_notifications')) {
             create_mention_notifications($mentions, $post_id, $comment_id, $user_id);
+
+            foreach (array_unique($mentions) as $mention_username) {
+                $mentioned_id = function_exists('get_user_id_by_username')
+                    ? get_user_id_by_username($mention_username)
+                    : null;
+                if (!$mentioned_id || (int) $mentioned_id === (int) $user_id) {
+                    continue;
+                }
+                send_mention_email((int) $mentioned_id, (int) $post_id, (int) $comment_id, $user_name, $post['title'] ?? '', $content);
+                $emailed_user_ids[(int) $mentioned_id] = true;
+            }
+        }
+
+        // Email the post author about the new reply, unless they ARE the
+        // commenter or were already emailed via the @mention path above.
+        if ($post && !empty($post['user_id'])) {
+            $post_author_id = (int) $post['user_id'];
+            if ($post_author_id !== (int) $user_id && !isset($emailed_user_ids[$post_author_id])) {
+                send_post_reply_email($post_author_id, (int) $post_id, (int) $comment_id, $user_name, $post['title'] ?? '', $content);
+            }
         }
 
         // Get the new comment

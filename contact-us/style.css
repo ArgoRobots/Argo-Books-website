@@ -278,7 +278,7 @@ header .header-inner .menu-container .menu .contact-us:after {
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
-  color: var(--black);
+  color: var(--gray-placeholder);
 }
 
 .form-group textarea {

@@ -91,19 +91,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$post) {
             $response['message'] = 'Post not found';
         } else {
-            // Add the comment
-            $comment = add_comment($post_id, $username, $email, $content);
+            // Add the comment with the logged-in user_id so the row is
+            // associated correctly from the start (and so the post-author
+            // self-reply guard inside add_comment() works).
+            $comment = add_comment($post_id, $username, $email, $content, $user_id);
 
             if ($comment) {
-                // Connect comment to user account
-                // Make sure we have a valid user ID
-                $user_id = isset($current_user['id']) ? intval($current_user['id']) : 0;
-
-                if ($user_id > 0) {
-                    $stmt = $pdo->prepare('UPDATE community_comments SET user_id = ? WHERE id = ?');
-                    $stmt->execute([$user_id, $comment['id']]);
-                }
-
                 $response = [
                     'success' => true,
                     'message' => 'Comment added successfully',

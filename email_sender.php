@@ -2,7 +2,13 @@
 
 require_once __DIR__ . '/smtp_mailer.php';
 require_once __DIR__ . '/config/pricing.php';
-require_once __DIR__ . '/email_marketing.php';
+
+// Note: send_post_reply_email() and send_mention_email() defined below
+// call into helpers from email_marketing.php (should_send_marketing_email,
+// community_user_unsubscribe_url, mark_marketing_sent). Callers of those
+// senders must require_once email_marketing.php themselves. We don't
+// require it here to avoid a circular include — email_marketing.php
+// already requires this file.
 
 /**
  * Build an HTML <li> list of Premium plan features from plans.json.
@@ -1273,12 +1279,14 @@ function send_mention_email(int $mentionedUserId, int $postId, int $commentId, s
     $title_safe   = htmlspecialchars($postTitle, ENT_QUOTES, 'UTF-8');
     $name_safe    = htmlspecialchars($mentionerName, ENT_QUOTES, 'UTF-8');
     $excerpt_safe = htmlspecialchars(_community_excerpt($content), ENT_QUOTES, 'UTF-8');
-    $where = $commentId > 0 ? 'a comment on' : '';
+    // Build the location prefix so the post-body case ($commentId === 0)
+    // doesn't render with an awkward double-space ("in  Title").
+    $location_prefix = $commentId > 0 ? 'in a comment on ' : 'in ';
 
     $body = <<<HTML
         <h2>{$name_safe} mentioned you on Argo Community</h2>
         <p>Hi,</p>
-        <p><strong>{$name_safe}</strong> mentioned you in {$where} <a href="{$post_safe}">{$title_safe}</a>:</p>
+        <p><strong>{$name_safe}</strong> mentioned you {$location_prefix}<a href="{$post_safe}">{$title_safe}</a>:</p>
         <blockquote style="border-left:3px solid #2563eb;background:#f9fafb;padding:12px 16px;margin:16px 0;color:#374151;">{$excerpt_safe}</blockquote>
         <p style="margin: 24px 0;">
             <a href="{$post_safe}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Open in Argo Community</a>

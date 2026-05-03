@@ -136,12 +136,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="prefs-section">
                     <h2>Account &amp; transactional emails</h2>
                     <ul class="transactional-list">
-                        <li><span class="always-on-tag">Always on</span><span class="label">Email verification</span></li>
-                        <li><span class="always-on-tag">Always on</span><span class="label">Password reset</span></li>
                         <li><span class="always-on-tag">Always on</span><span class="label">Payment receipts</span></li>
-                        <li><span class="always-on-tag">Always on</span><span class="label">License key delivery</span></li>
-                        <li><span class="always-on-tag">Always on</span><span class="label">Subscription renewal &amp; payment-failed notices</span></li>
-                        <li><span class="always-on-tag">Always on</span><span class="label">Account deletion warnings</span></li>
+                        <li><span class="always-on-tag">Always on</span><span class="label">Subscription renewal &amp; failed payment notices</span></li>
                     </ul>
                     <div class="info-note">
                         These keep your account, payments, and recovery working &mdash; turning them off would break things like password resets and receipt delivery.
@@ -170,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                <?php echo $prefs['email_pref_reviews'] ? 'checked' : ''; ?>>
                         <label for="email_pref_reviews">Review requests</label>
                     </div>
-                    <p class="setting-description">An occasional ask to leave a review on Capterra or share feedback directly.</p>
+                    <p class="setting-description">An occasional ask to leave a review on Capterra or share feedback directly. Sent rarely.</p>
 
                     <?php if ($is_license_holder): ?>
                         <div class="review-note">
@@ -190,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                <?php echo $prefs['email_pref_community_digest'] ? 'checked' : ''; ?>>
                         <label for="email_pref_community_digest">Community digest</label>
                     </div>
-                    <p class="setting-description">Replies to your community posts and comments, plus interesting activity.</p>
+                    <p class="setting-description">Replies to your community posts and comments.</p>
                 </div>
 
                 <div class="form-actions">

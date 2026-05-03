@@ -3,6 +3,13 @@
 require_once __DIR__ . '/smtp_mailer.php';
 require_once __DIR__ . '/config/pricing.php';
 
+// Note: send_post_reply_email() and send_mention_email() defined below
+// call into helpers from email_marketing.php (should_send_marketing_email,
+// community_user_unsubscribe_url, mark_marketing_sent). Callers of those
+// senders must require_once email_marketing.php themselves. We don't
+// require it here to avoid a circular include — email_marketing.php
+// already requires this file.
+
 /**
  * Build an HTML <li> list of Premium plan features from plans.json.
  *
@@ -1162,4 +1169,148 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
         HTML;
 
     return send_styled_email($email, "You've Received Free Credit - Argo Premium", $body, 'purple');
+}
+
+/**
+ * Build a short plain-text excerpt from HTML/markdown content for use in
+ * notification emails. Strips tags, decodes entities, collapses whitespace,
+ * and truncates with an ellipsis.
+ */
+function _community_excerpt(string $content, int $max = 240): string
+{
+    $text = trim(html_entity_decode(strip_tags($content), ENT_QUOTES, 'UTF-8'));
+    $text = preg_replace('/\s+/u', ' ', $text);
+    if (mb_strlen($text) > $max) {
+        $text = mb_substr($text, 0, $max - 1) . '…';
+    }
+    return $text;
+}
+
+/**
+ * Send "someone replied to your post" email. Returns true on success.
+ * Caller is responsible for de-duplicating against mention emails so the
+ * post author doesn't receive both for the same comment.
+ *
+ * Gated by community_digest preference via should_send_marketing_email().
+ */
+function send_post_reply_email(int $postAuthorId, int $postId, int $commentId, string $commenterName, string $postTitle, string $commentContent): bool
+{
+    global $pdo;
+
+    $stmt = $pdo->prepare('SELECT email FROM community_users WHERE id = ?');
+    $stmt->execute([$postAuthorId]);
+    $email = $stmt->fetchColumn();
+    if (!$email) {
+        return false;
+    }
+
+    if (!should_send_marketing_email($email, 'community_digest')) {
+        return false;
+    }
+
+    $unsubscribe_url = community_user_unsubscribe_url($postAuthorId, 'community_digest');
+    $post_url = site_url('/community/view_post.php?id=' . $postId . '#comment-' . $commentId);
+
+    $unsub_safe   = htmlspecialchars($unsubscribe_url ?? '', ENT_QUOTES, 'UTF-8');
+    $post_safe    = htmlspecialchars($post_url, ENT_QUOTES, 'UTF-8');
+    $title_safe   = htmlspecialchars($postTitle, ENT_QUOTES, 'UTF-8');
+    $name_safe    = htmlspecialchars($commenterName, ENT_QUOTES, 'UTF-8');
+    $excerpt_safe = htmlspecialchars(_community_excerpt($commentContent), ENT_QUOTES, 'UTF-8');
+
+    $body = <<<HTML
+        <h2>{$name_safe} replied to your post</h2>
+        <p>Hi,</p>
+        <p><strong>{$name_safe}</strong> replied to your post &ldquo;<strong>{$title_safe}</strong>&rdquo; on Argo Community:</p>
+        <blockquote style="border-left:3px solid #2563eb;background:#f9fafb;padding:12px 16px;margin:16px 0;color:#374151;">{$excerpt_safe}</blockquote>
+        <p style="margin: 24px 0;">
+            <a href="{$post_safe}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">View the discussion</a>
+        </p>
+        <p>&mdash; Argo Community</p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">
+        <p style="font-size:12px;color:#6b7280;">
+            You're receiving this because you opted in to community notifications.
+            <a href="{$unsub_safe}">Unsubscribe</a>.
+        </p>
+        HTML;
+
+    $sent = send_styled_email(
+        $email,
+        $commenterName . ' replied to your post on Argo Community',
+        $body,
+        'blue',
+        'noreply@argorobots.com',
+        'Argo Community',
+        'support@argorobots.com'
+    );
+
+    if ($sent) {
+        mark_marketing_sent($email, 'community_digest', $commentId);
+    }
+    return $sent;
+}
+
+/**
+ * Send "you were mentioned" email. $commentId may be 0 if the mention is in
+ * the post body itself.
+ *
+ * Gated by community_digest preference via should_send_marketing_email().
+ */
+function send_mention_email(int $mentionedUserId, int $postId, int $commentId, string $mentionerName, string $postTitle, string $content): bool
+{
+    global $pdo;
+
+    $stmt = $pdo->prepare('SELECT email FROM community_users WHERE id = ?');
+    $stmt->execute([$mentionedUserId]);
+    $email = $stmt->fetchColumn();
+    if (!$email) {
+        return false;
+    }
+
+    if (!should_send_marketing_email($email, 'community_digest')) {
+        return false;
+    }
+
+    $unsubscribe_url = community_user_unsubscribe_url($mentionedUserId, 'community_digest');
+    $anchor = $commentId > 0 ? '#comment-' . $commentId : '';
+    $post_url = site_url('/community/view_post.php?id=' . $postId . $anchor);
+
+    $unsub_safe   = htmlspecialchars($unsubscribe_url ?? '', ENT_QUOTES, 'UTF-8');
+    $post_safe    = htmlspecialchars($post_url, ENT_QUOTES, 'UTF-8');
+    $title_safe   = htmlspecialchars($postTitle, ENT_QUOTES, 'UTF-8');
+    $name_safe    = htmlspecialchars($mentionerName, ENT_QUOTES, 'UTF-8');
+    $excerpt_safe = htmlspecialchars(_community_excerpt($content), ENT_QUOTES, 'UTF-8');
+    // Build the location prefix so the post-body case ($commentId === 0)
+    // doesn't render with an awkward double-space ("in  Title").
+    $location_prefix = $commentId > 0 ? 'in a comment on ' : 'in ';
+
+    $body = <<<HTML
+        <h2>{$name_safe} mentioned you on Argo Community</h2>
+        <p>Hi,</p>
+        <p><strong>{$name_safe}</strong> mentioned you {$location_prefix}<a href="{$post_safe}">{$title_safe}</a>:</p>
+        <blockquote style="border-left:3px solid #2563eb;background:#f9fafb;padding:12px 16px;margin:16px 0;color:#374151;">{$excerpt_safe}</blockquote>
+        <p style="margin: 24px 0;">
+            <a href="{$post_safe}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Open in Argo Community</a>
+        </p>
+        <p>&mdash; Argo Community</p>
+        <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">
+        <p style="font-size:12px;color:#6b7280;">
+            You're receiving this because you opted in to community notifications.
+            <a href="{$unsub_safe}">Unsubscribe</a>.
+        </p>
+        HTML;
+
+    $sent = send_styled_email(
+        $email,
+        $mentionerName . ' mentioned you on Argo Community',
+        $body,
+        'blue',
+        'noreply@argorobots.com',
+        'Argo Community',
+        'support@argorobots.com'
+    );
+
+    if ($sent) {
+        mark_marketing_sent($email, 'community_digest', $commentId ?: $postId);
+    }
+    return $sent;
 }

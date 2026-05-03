@@ -189,6 +189,18 @@
   justify-content: center;
 }
 
+.btn.btn-delete-outline {
+  background: var(--white);
+  color: var(--red-600);
+  border: 1px solid var(--red-600);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.btn.btn-delete-outline:hover {
+  background: var(--red-600);
+  color: var(--white);
+}
+
 /* Delete account modal */
 #delete-account-modal {
   position: fixed;

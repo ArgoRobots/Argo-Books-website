@@ -49,15 +49,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'change_avatar':
             handle_avatar_change();
             break;
-        case 'change_email':
-            handle_email_change();
-            break;
-        case 'change_password':
-            handle_password_change();
-            break;
-        case 'verify_email':
-            handle_email_verification();
-            break;
         case 'remove_avatar':
             handle_avatar_removal();
             break;
@@ -278,198 +269,6 @@ function handle_avatar_removal()
     }
 }
 
-// Function to handle email changes
-function handle_email_change()
-{
-    global $user_id, $user;
-
-    $new_email = trim($_POST['new_email'] ?? '');
-    $password = $_POST['email_password'] ?? '';
-
-    if (empty($new_email) || empty($password)) {
-        $_SESSION['profile_error'] = 'Email and password are required';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    if (!filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION['profile_error'] = 'Please enter a valid email address';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    if ($new_email === $user['email']) {
-        $_SESSION['profile_error'] = 'This is already your current email address';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    global $pdo;
-
-    // Verify current password
-    $stmt = $pdo->prepare('SELECT password_hash FROM community_users WHERE id = ?');
-    $stmt->execute([$user_id]);
-    $password_data = $stmt->fetch();
-
-    if (!$password_data || !password_verify($password, $password_data['password_hash'])) {
-        $_SESSION['profile_error'] = 'Current password is incorrect';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    // Check if new email is already used
-    $stmt = $pdo->prepare('SELECT id FROM community_users WHERE email = ? AND id != ?');
-    $stmt->execute([$new_email, $user_id]);
-    if ($stmt->fetch()) {
-        $_SESSION['profile_error'] = 'This email address is already registered';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    // Generate verification code
-    $verification_code = generate_verification_code();
-
-    // Store pending email change
-    $stmt = $pdo->prepare('UPDATE community_users SET verification_code = ?, email_verified = 0 WHERE id = ?');
-
-    if ($stmt->execute([$verification_code, $user_id])) {
-
-        // Send verification email to NEW email address
-        $email_sent = send_verification_email($new_email, $verification_code, $user['username']);
-
-        if ($email_sent) {
-            // Store the new email temporarily in session for verification
-            $_SESSION['pending_email'] = $new_email;
-            $_SESSION['email_change_pending'] = true;
-            $_SESSION['profile_success'] = 'Verification email sent to ' . htmlspecialchars($new_email) . '. Please check your email and enter the verification code below.';
-            header('Location: edit_profile.php');
-            exit;
-        } else {
-            $_SESSION['profile_error'] = 'Failed to send verification email. Please try again.';
-            header('Location: edit_profile.php');
-            exit;
-        }
-    } else {
-        $_SESSION['profile_error'] = 'Failed to initiate email change. Please try again.';
-        header('Location: edit_profile.php');
-        exit;
-    }
-}
-
-// Function to handle email verification for email changes
-function handle_email_verification()
-{
-    global $user_id, $user;
-
-    if (!isset($_SESSION['email_change_pending']) || !isset($_SESSION['pending_email'])) {
-        $_SESSION['profile_error'] = 'No email change pending';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    $verification_code = trim($_POST['email_verification_code'] ?? '');
-
-    if (empty($verification_code)) {
-        $_SESSION['profile_error'] = 'Verification code is required';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    global $pdo;
-
-    // Check verification code
-    $stmt = $pdo->prepare('SELECT verification_code FROM community_users WHERE id = ?');
-    $stmt->execute([$user_id]);
-    $db_data = $stmt->fetch();
-
-    if (!$db_data || $db_data['verification_code'] !== $verification_code) {
-        $_SESSION['profile_error'] = 'Invalid verification code';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    // Update email and verify
-    $new_email = $_SESSION['pending_email'];
-    $stmt = $pdo->prepare('UPDATE community_users SET email = ?, email_verified = 1, verification_code = NULL WHERE id = ?');
-
-    if ($stmt->execute([$new_email, $user_id])) {
-
-        // Update email in posts and comments
-        $stmt = $pdo->prepare('UPDATE community_posts SET user_email = ? WHERE user_id = ?');
-        $stmt->execute([$new_email, $user_id]);
-
-        $stmt = $pdo->prepare('UPDATE community_comments SET user_email = ? WHERE user_id = ?');
-        $stmt->execute([$new_email, $user_id]);
-
-        // Update session
-        $_SESSION['email'] = $new_email;
-        unset($_SESSION['pending_email']);
-        unset($_SESSION['email_change_pending']);
-
-        $_SESSION['profile_success'] = 'Email address updated successfully!';
-        header('Location: edit_profile.php');
-        exit;
-    } else {
-        $_SESSION['profile_error'] = 'Failed to update email address.';
-        header('Location: edit_profile.php');
-        exit;
-    }
-}
-
-// Function to handle password changes
-function handle_password_change()
-{
-    global $user_id;
-
-    $current_password = $_POST['current_password'] ?? '';
-    $new_password = $_POST['new_password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-
-    if (empty($current_password) || empty($new_password) || empty($confirm_password)) {
-        $_SESSION['profile_error'] = 'All password fields are required';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    if ($new_password !== $confirm_password) {
-        $_SESSION['profile_error'] = 'New passwords do not match';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    if (strlen($new_password) < 8) {
-        $_SESSION['profile_error'] = 'Password must be at least 8 characters long';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    global $pdo;
-
-    // Verify current password
-    $stmt = $pdo->prepare('SELECT password_hash FROM community_users WHERE id = ?');
-    $stmt->execute([$user_id]);
-    $password_data = $stmt->fetch();
-
-    if (!$password_data || !password_verify($current_password, $password_data['password_hash'])) {
-        $_SESSION['profile_error'] = 'Current password is incorrect';
-        header('Location: edit_profile.php');
-        exit;
-    }
-
-    // Update password
-    $new_password_hash = password_hash($new_password, PASSWORD_DEFAULT);
-    $stmt = $pdo->prepare('UPDATE community_users SET password_hash = ? WHERE id = ?');
-
-    if ($stmt->execute([$new_password_hash, $user_id])) {
-        $_SESSION['profile_success'] = 'Password changed successfully!';
-        header('Location: edit_profile.php');
-        exit;
-    } else {
-        $_SESSION['profile_error'] = 'Failed to change password. Please try again.';
-        header('Location: edit_profile.php');
-        exit;
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -486,6 +285,7 @@ function handle_password_change()
     <script src="../../resources/notifications/notifications.js" defer></script>
 
     <link rel="stylesheet" href="edit-profile.css">
+    <link rel="stylesheet" href="account-subpage.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
@@ -493,8 +293,6 @@ function handle_password_change()
     <link rel="stylesheet" href="../../resources/header/dark.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
     <link rel="stylesheet" href="../../resources/notifications/notifications.css">
-    <link rel="stylesheet" href="../../resources/styles/password-toggle.css">
-    <script src="../../resources/scripts/password-toggle.js" defer></script>
 </head>
 
 <body>
@@ -594,82 +392,40 @@ function handle_password_change()
             </form>
         </div>
 
-        <!-- Email Section -->
+        <!-- Account Security -->
         <div class="edit-section">
-            <h2>Email Address</h2>
-            <p class="current-email"><strong>Current Email:</strong> <?php echo htmlspecialchars($user['email']); ?></p>
-
-            <?php if (isset($_SESSION['email_change_pending']) && $_SESSION['email_change_pending']): ?>
-                <div class="verification-pending">
-                    <h4>Email Change Pending</h4>
-                    <p>We've sent a verification code to <strong><?php echo htmlspecialchars($_SESSION['pending_email']); ?></strong></p>
-                    <form method="post">
-                        <input type="hidden" name="action" value="verify_email">
-                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                        <div class="form-group">
-                            <label for="email_verification_code">Verification Code</label>
-                            <input type="text" id="email_verification_code" name="email_verification_code" class="verification-code-input" placeholder="Enter 6-digit code" maxlength="6" required>
-                        </div>
-                        <button type="submit" class="btn btn-blue">Verify Email</button>
-                    </form>
-                </div>
-            <?php else: ?>
-                <form method="post">
-                    <input type="hidden" name="action" value="change_email">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-
-                    <div class="form-group">
-                        <label for="new_email">New Email Address</label>
-                        <input type="email" id="new_email" name="new_email" required>
-                        <p class="info-text">You'll need to verify your new email address before the change takes effect.</p>
+            <h2>Account Security</h2>
+            <div class="account-link-cards">
+                <a href="change_email.php" class="account-link-card">
+                    <div class="card-icon">
+                        <?= svg_icon('mail', 22, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                     </div>
-
-                    <div class="form-group">
-                        <label for="email_password">Current Password</label>
-                        <input type="password" id="email_password" name="email_password" required>
-                        <p class="info-text">Enter your current password to confirm this change.</p>
+                    <div class="card-content">
+                        <h3>Change Email</h3>
+                        <p><?php echo htmlspecialchars($user['email']); ?></p>
                     </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-blue">Change Email</button>
+                    <div class="card-arrow">
+                        <?= svg_icon('arrow-right', 18, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
                     </div>
-                </form>
-            <?php endif; ?>
-        </div>
+                </a>
 
-        <!-- Password Section -->
-        <div class="edit-section">
-            <h2>Change Password</h2>
-            <form method="post">
-                <input type="hidden" name="action" value="change_password">
-                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-
-                <div class="form-group">
-                    <label for="current_password">Current Password</label>
-                    <input type="password" id="current_password" name="current_password" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="new_password">New Password</label>
-                    <input type="password" id="new_password" name="new_password" required oninput="checkPasswordStrength(this.value)">
-                    <div id="passwordStrength" class="password-strength"></div>
-                    <p class="info-text">Password must be at least 8 characters long.</p>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm_password">Confirm New Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" required oninput="checkPasswordMatch()">
-                    <div id="passwordMatch" class="password-strength"></div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-blue">Change Password</button>
-                </div>
-            </form>
+                <a href="change_password.php" class="account-link-card">
+                    <div class="card-icon">
+                        <?= svg_icon('lock', 22, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                    </div>
+                    <div class="card-content">
+                        <h3>Change Password</h3>
+                        <p>Update the password used to log in.</p>
+                    </div>
+                    <div class="card-arrow">
+                        <?= svg_icon('arrow-right', 18, '', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                    </div>
+                </a>
+            </div>
         </div>
 
         <div class="delete-account-section">
-            <button onclick="showDeleteModal()" class="btn btn-red">Delete Account</button>
+            <button onclick="showDeleteModal()" class="btn btn-delete-outline">Delete Account</button>
         </div>
     </div>
 
@@ -743,65 +499,6 @@ function handle_password_change()
                 counter.style.color = '#f59e0b';
             } else {
                 counter.style.color = '#6b7280';
-            }
-        }
-
-        // Password strength checker
-        function checkPasswordStrength(password) {
-            const strengthDiv = document.getElementById('passwordStrength');
-            let strength = 0;
-            let feedback = '';
-
-            if (password.length >= 8) strength++;
-            if (password.match(/[a-z]/)) strength++;
-            if (password.match(/[A-Z]/)) strength++;
-            if (password.match(/[0-9]/)) strength++;
-            if (password.match(/[^a-zA-Z0-9]/)) strength++;
-
-            switch (strength) {
-                case 0:
-                case 1:
-                    feedback = 'Very weak password';
-                    strengthDiv.className = 'password-strength strength-weak';
-                    break;
-                case 2:
-                    feedback = 'Weak password';
-                    strengthDiv.className = 'password-strength strength-weak';
-                    break;
-                case 3:
-                    feedback = 'Medium password';
-                    strengthDiv.className = 'password-strength strength-medium';
-                    break;
-                case 4:
-                    feedback = 'Strong password';
-                    strengthDiv.className = 'password-strength strength-strong';
-                    break;
-                case 5:
-                    feedback = 'Very strong password';
-                    strengthDiv.className = 'password-strength strength-strong';
-                    break;
-            }
-
-            strengthDiv.textContent = feedback;
-        }
-
-        // Password match checker
-        function checkPasswordMatch() {
-            const newPassword = document.getElementById('new_password').value;
-            const confirmPassword = document.getElementById('confirm_password').value;
-            const matchDiv = document.getElementById('passwordMatch');
-
-            if (confirmPassword === '') {
-                matchDiv.textContent = '';
-                return;
-            }
-
-            if (newPassword === confirmPassword) {
-                matchDiv.textContent = 'Passwords match';
-                matchDiv.className = 'password-strength strength-strong';
-            } else {
-                matchDiv.textContent = 'Passwords do not match';
-                matchDiv.className = 'password-strength strength-weak';
             }
         }
 

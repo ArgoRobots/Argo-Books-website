@@ -108,13 +108,13 @@ $valid_token = ($stmt->fetch() !== false);
 
                     <div class="form-group">
                         <label for="password">New Password</label>
-                        <input type="password" id="password" name="password" required>
+                        <input type="password" id="password" name="password" value="<?php echo isset($_POST['password']) ? htmlspecialchars($_POST['password'], ENT_QUOTES, 'UTF-8') : ''; ?>" required>
                         <small>At least 8 characters</small>
                     </div>
 
                     <div class="form-group">
                         <label for="password_confirm">Confirm New Password</label>
-                        <input type="password" id="password_confirm" name="password_confirm" required>
+                        <input type="password" id="password_confirm" name="password_confirm" value="<?php echo isset($_POST['password_confirm']) ? htmlspecialchars($_POST['password_confirm'], ENT_QUOTES, 'UTF-8') : ''; ?>" required>
                     </div>
 
                     <div class="form-actions">

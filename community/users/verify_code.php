@@ -226,7 +226,7 @@ if ($success) {
                 </div>
 
                 <div class="auth-links">
-                    <p>Didn't receive the code? <a href="resend_verification_code.php">Resend code</a></p>
+                    <p>Didn't receive the code? <a href="resend_verification_code.php" class="link-no-underline">Resend code</a></p>
                     <p>Back to <a href="login.php" class="link-no-underline">Login</a></p>
                 </div>
             </form>

@@ -4,7 +4,7 @@
 
 This is the website for [Argo Books](https://github.com/ArgoRobots/Argo-Books-Avalonia), accounting software with receipt scanning, predictive analytics, inventory management, and more. This website serves as a platform for users to download the software, purchase license keys, access documentation, and has an administrative system for managing licenses, user accounts, and viewing analytics.
 
-You can view the live website here: https://argorobots.com/
+You can view the live website here: www.argorobots.com.
 
 ## Technologies Used
 

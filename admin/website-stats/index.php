@@ -124,6 +124,107 @@ function get_page_views_by_period($period = 'month', $limit = 12)
     return $data;
 }
 
+/**
+ * Bounce rate = % of sessions with exactly one page view.
+ * A session is page views from the same (ip, user_agent) with no gap > 30 min.
+ * Both helpers rely on a shared session-building CTE.
+ */
+function bounce_sessions_cte()
+{
+    return "
+        WITH pv AS (
+            SELECT
+                ip_address,
+                user_agent,
+                created_at,
+                TIMESTAMPDIFF(MINUTE,
+                    LAG(created_at) OVER (PARTITION BY ip_address, user_agent ORDER BY created_at),
+                    created_at
+                ) AS gap_min
+            FROM statistics
+            WHERE event_type = 'page_view'
+              AND ip_address IS NOT NULL
+        ),
+        session_marks AS (
+            SELECT
+                ip_address,
+                user_agent,
+                created_at,
+                SUM(CASE WHEN gap_min IS NULL OR gap_min > 30 THEN 1 ELSE 0 END)
+                    OVER (PARTITION BY ip_address, user_agent ORDER BY created_at) AS session_id
+            FROM pv
+        ),
+        sessions AS (
+            SELECT
+                ip_address,
+                user_agent,
+                session_id,
+                MIN(created_at) AS session_start,
+                COUNT(*) AS pageview_count
+            FROM session_marks
+            GROUP BY ip_address, user_agent, session_id
+        )";
+}
+
+function get_bounce_rate_overall()
+{
+    global $pdo;
+    $cte = bounce_sessions_cte();
+    $query = "
+        $cte
+        SELECT
+            COUNT(*) AS total_sessions,
+            SUM(CASE WHEN pageview_count = 1 THEN 1 ELSE 0 END) AS bounced_sessions
+        FROM sessions";
+
+    $row = $pdo->query($query)->fetch();
+    $total = (int)($row['total_sessions'] ?? 0);
+    $bounced = (int)($row['bounced_sessions'] ?? 0);
+
+    return [
+        'total_sessions' => $total,
+        'bounced_sessions' => $bounced,
+        'bounce_rate' => $total > 0 ? round($bounced / $total * 100, 1) : 0.0,
+    ];
+}
+
+function get_bounce_rate_by_period($period = 'month', $limit = 12)
+{
+    global $pdo;
+
+    // Period expressions parallel to get_period_formatting() but bound to session_start
+    $period_exprs = [
+        'day'   => ['DATE(session_start)', 'DATE(session_start)'],
+        'week'  => ['YEARWEEK(session_start)', 'CONCAT("Week ", WEEK(session_start), ", ", YEAR(session_start))'],
+        'month' => ['DATE_FORMAT(session_start, "%Y-%m")', 'DATE_FORMAT(session_start, "%b %Y")'],
+        'year'  => ['YEAR(session_start)', 'YEAR(session_start)'],
+    ];
+    list($sql_period, $display_format) = $period_exprs[$period] ?? $period_exprs['month'];
+
+    $cte = bounce_sessions_cte();
+    $query = "
+        $cte
+        SELECT
+            $sql_period AS period,
+            $display_format AS display_period,
+            COUNT(*) AS total_sessions,
+            SUM(CASE WHEN pageview_count = 1 THEN 1 ELSE 0 END) AS bounced_sessions,
+            ROUND(SUM(CASE WHEN pageview_count = 1 THEN 1 ELSE 0 END) / COUNT(*) * 100, 1) AS bounce_rate
+        FROM sessions
+        GROUP BY period, display_period
+        ORDER BY period DESC
+        LIMIT ?";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$limit]);
+
+    $data = [];
+    while ($row = $stmt->fetch()) {
+        $data[] = $row;
+    }
+    return $data;
+}
+
 // Function to get community post views
 function get_community_post_views()
 {
@@ -311,6 +412,8 @@ $downloads_by_country = get_downloads_by_country();
 $user_agents = get_user_agents();
 $conversion_data = get_conversion_data();
 $active_users = get_most_active_users();
+$bounce_overall = get_bounce_rate_overall();
+$bounce_by_period = array_reverse(get_bounce_rate_by_period($period));
 
 // Prepare data for charts
 $chart_labels = [];
@@ -350,6 +453,29 @@ foreach ($page_views as $item) {
 foreach ($downloads as $index => $item) {
     $period_key = $item['period'];
     $page_views_data[] = isset($view_data[$period_key]) ? $view_data[$period_key] : 0;
+}
+
+// Align bounce rate data with download periods (null where no sessions in that period
+// so the line chart shows a gap instead of a misleading 0%)
+$bounce_lookup = [];
+foreach ($bounce_by_period as $item) {
+    $bounce_lookup[$item['period']] = [
+        'rate' => (float)$item['bounce_rate'],
+        'sessions' => (int)$item['total_sessions'],
+    ];
+}
+
+$bounce_rate_data = [];
+$bounce_sessions_data = [];
+foreach ($downloads as $item) {
+    $period_key = $item['period'];
+    if (isset($bounce_lookup[$period_key])) {
+        $bounce_rate_data[] = $bounce_lookup[$period_key]['rate'];
+        $bounce_sessions_data[] = $bounce_lookup[$period_key]['sessions'];
+    } else {
+        $bounce_rate_data[] = null;
+        $bounce_sessions_data[] = 0;
+    }
 }
 
 // Calculate growth rate
@@ -722,9 +848,16 @@ include __DIR__ . '/../admin_header.php';
 
     <div class="chart-row">
         <div class="chart-container">
+            <h2>Bounce Rate Over Time</h2>
+            <canvas id="bounceRateChart"></canvas>
+        </div>
+        <div class="chart-container">
             <h2>Community Post Types</h2>
             <canvas id="postTypeChart"></canvas>
         </div>
+    </div>
+
+    <div class="chart-row">
         <div class="chart-container">
             <h2>Post Views by Type</h2>
             <canvas id="postViewsChart"></canvas>
@@ -800,6 +933,10 @@ include __DIR__ . '/../admin_header.php';
         const downloadsCountryCounts = <?php echo json_encode($downloads_country_counts); ?>;
         const browserLabels = <?php echo json_encode($browser_labels); ?>;
         const browserCounts = <?php echo json_encode($browser_counts); ?>;
+        const bounceRateData = <?php echo json_encode($bounce_rate_data); ?>;
+        const bounceSessionsData = <?php echo json_encode($bounce_sessions_data); ?>;
+        const bounceRateOverall = <?php echo json_encode($bounce_overall['bounce_rate']); ?>;
+        const bounceSessionsTotal = <?php echo json_encode($bounce_overall['total_sessions']); ?>;
         const conversionData = <?php echo json_encode([
                                     $conversion_data['downloads'],
                                     $conversion_data['registrations']
@@ -849,6 +986,11 @@ include __DIR__ . '/../admin_header.php';
                     title: 'Page Views',
                     value: totalPageViews.toLocaleString(),
                     subtext: 'total views'
+                },
+                {
+                    title: 'Bounce Rate',
+                    value: bounceSessionsTotal > 0 ? bounceRateOverall.toFixed(1) + '%' : '—',
+                    subtext: bounceSessionsTotal.toLocaleString() + ' sessions (30-min window)'
                 }
             ];
 
@@ -949,6 +1091,64 @@ include __DIR__ . '/../admin_header.php';
                         callbacks: {
                             label: function(context) {
                                 return `Page Views: ${context.raw}`;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+
+        // Bounce Rate chart
+        const ctxBounce = document.getElementById('bounceRateChart').getContext('2d');
+        new Chart(ctxBounce, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Bounce Rate',
+                    data: bounceRateData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true,
+                    pointRadius: 4,
+                    pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                    spanGaps: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            padding: 10
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const rate = context.raw;
+                                const sessions = bounceSessionsData[context.dataIndex] || 0;
+                                if (rate === null) {
+                                    return 'No sessions';
+                                }
+                                return `Bounce: ${rate.toFixed(1)}% (${sessions.toLocaleString()} sessions)`;
                             }
                         }
                     },

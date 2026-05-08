@@ -1,0 +1,21 @@
+<?php
+declare(strict_types=1);
+
+namespace Tests\Unit\Portal;
+
+use PHPUnit\Framework\TestCase;
+
+final class GenerateReferenceNumberTest extends TestCase
+{
+    public function test_format_PAY_yyyymmdd_six_hex(): void
+    {
+        $ref = generate_reference_number();
+        $this->assertMatchesRegularExpression('/^PAY-\d{8}-[0-9A-F]{6}$/', $ref);
+    }
+
+    public function test_date_segment_is_today(): void
+    {
+        $ref = generate_reference_number();
+        $this->assertSame(date('Ymd'), substr($ref, 4, 8));
+    }
+}

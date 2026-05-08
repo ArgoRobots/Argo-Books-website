@@ -75,6 +75,40 @@ abstract class DatabaseTestCase extends TestCase
         return (int) $this->pdo->lastInsertId();
     }
 
+    /** @return int New community_users.id */
+    protected function seedCommunityUser(
+        ?string $username = null,
+        ?string $email = null,
+        ?string $deletionScheduledAt = null
+    ): int {
+        $suffix = bin2hex(random_bytes(4));
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO community_users
+             (username, email, password_hash, role, email_verified, deletion_scheduled_at, created_at)
+             VALUES (?, ?, 'fake_hash_for_testing', 'user', 1, ?, NOW())"
+        );
+        $stmt->execute([
+            $username ?? "test_user_{$suffix}",
+            $email ?? "test_{$suffix}@example.test",
+            $deletionScheduledAt,
+        ]);
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    /** Seed a portal_companies row keyed by SHA-256(api_key). Returns ['id' => int, 'api_key' => string]. */
+    protected function seedPortalCompanyWithApiKey(string $companyName = 'Test Co'): array
+    {
+        $apiKey = 'test_api_key_' . bin2hex(random_bytes(8));
+        $hash = hash('sha256', $apiKey);
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO portal_companies
+             (api_key_hash, company_name, environment, is_active, created_at)
+             VALUES (?, ?, 'sandbox', 1, NOW())"
+        );
+        $stmt->execute([$hash, $companyName]);
+        return ['id' => (int) $this->pdo->lastInsertId(), 'api_key' => $apiKey];
+    }
+
     protected function seedPortalInvoice(
         int $companyId,
         string $invoiceId,

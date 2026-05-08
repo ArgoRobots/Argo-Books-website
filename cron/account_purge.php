@@ -25,6 +25,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
 require_once __DIR__ . '/../db_connect.php';
+require_once __DIR__ . '/_purge_helpers.php';
 
 function logPurge($message, $type = 'INFO') {
     $timestamp = date('Y-m-d H:i:s');
@@ -46,59 +47,26 @@ logPurge('Starting account purge check...');
 try {
     global $pdo;
 
-    // Find accounts past their scheduled deletion date
-    $stmt = $pdo->prepare("
-        SELECT id, username, email, deletion_scheduled_at
-        FROM community_users
-        WHERE deletion_scheduled_at IS NOT NULL
-        AND deletion_scheduled_at <= NOW()
-    ");
-    $stmt->execute();
-    $accounts = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    $accounts = find_accounts_due_for_purge($pdo);
     logPurge("Found " . count($accounts) . " accounts due for deletion");
 
     $deletedCount = 0;
     $failedCount = 0;
 
     foreach ($accounts as $account) {
-        $userId = $account['id'];
+        $userId = (int) $account['id'];
         $username = $account['username'];
 
-        try {
-            $pdo->beginTransaction();
+        $result = purge_pending_account($pdo, $userId);
 
-            // Cancel any active premium subscriptions (no FK cascade on this table)
-            $stmt = $pdo->prepare("
-                UPDATE premium_subscriptions
-                SET status = 'cancelled',
-                    auto_renew = 0,
-                    cancelled_at = NOW(),
-                    updated_at = NOW()
-                WHERE user_id = ?
-                AND status = 'active'
-            ");
-            $stmt->execute([$userId]);
-            $cancelledSubs = $stmt->rowCount();
-
-            if ($cancelledSubs > 0) {
-                logPurge("Cancelled $cancelledSubs active subscription(s) for user $username (#$userId)");
+        if ($result['success']) {
+            if (($result['cancelled_subs'] ?? 0) > 0) {
+                logPurge("Cancelled {$result['cancelled_subs']} active subscription(s) for user $username (#$userId)");
             }
-
-            // Delete the user (FK cascades handle related community data)
-            $stmt = $pdo->prepare("DELETE FROM community_users WHERE id = ?");
-            $stmt->execute([$userId]);
-
-            $pdo->commit();
-
             logPurge("Deleted account: $username (#$userId) - scheduled at {$account['deletion_scheduled_at']}");
             $deletedCount++;
-
-        } catch (Exception $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            logPurge("Failed to delete account $username (#$userId): " . $e->getMessage(), 'ERROR');
+        } else {
+            logPurge("Failed to delete account $username (#$userId): " . ($result['error'] ?? 'unknown error'), 'ERROR');
             $failedCount++;
         }
     }

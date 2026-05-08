@@ -27,6 +27,7 @@ require_once PROJECT_ROOT . '/email_sender.php';
 require_once PROJECT_ROOT . '/api/portal/webhooks/_square_helpers.php';
 require_once PROJECT_ROOT . '/api/portal/webhooks/_stripe_refund_db.php';
 require_once PROJECT_ROOT . '/cron/_renewal_helpers.php';
+require_once PROJECT_ROOT . '/cron/_purge_helpers.php';
 
 // db_connect.php assigns $pdo at "top-level" of the included file, but when
 // included from a function/method scope (e.g. PHPUnit's TestRunner) that

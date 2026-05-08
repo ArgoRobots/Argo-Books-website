@@ -30,9 +30,12 @@ final class RateLimitStorageTest extends TestCase
 
     private function uniqueIp(string $tag): string
     {
-        // 192.0.2.0/24 is reserved for documentation (RFC 5737)
-        $hash = crc32($tag . microtime(true));
-        $ip = '192.0.2.' . (($hash % 254) + 1);
+        // 192.0.2.0/24 is reserved for documentation (RFC 5737). $tag is for
+        // human-readability in failures; uniqueness comes from random_int —
+        // crc32 can produce signed-negative values on 32-bit PHP builds,
+        // which would make the modulo calculation give an invalid IP.
+        unset($tag);
+        $ip = '192.0.2.' . random_int(1, 254);
         $this->touchedIps[] = $ip;
         return $ip;
     }
@@ -137,13 +140,18 @@ final class RateLimitStorageTest extends TestCase
         $key = self::PREFIX . '_' . hash('sha256', $ip);
 
         // Inject a back-dated entry directly into the file so we don't have
-        // to sleep waiting for the wall clock to age it out. The next read
-        // with a 60s window should prune it (1000s ago > 60s window).
+        // to sleep waiting for the wall clock to age it out. We use the
+        // production-default 900s window (matching what real rate-limit
+        // checks use) so this test doesn't prune unrelated dev-server
+        // entries that are younger than the window. The injected entry
+        // must be older than 900s to test the prune path — using 1200s.
         $result = read_rate_limits_locked(900);
+        $this->assertNotNull($result['handle'], 'rate-limit storage file must be lockable');
+
         $rateLimits = $result['rateLimits'];
-        $rateLimits[$key] = ['count' => 5, 'first_attempt' => time() - 1000];
+        $rateLimits[$key] = ['count' => 5, 'first_attempt' => time() - 1200];
         write_rate_limits_unlock($result['handle'], $rateLimits);
 
-        $this->assertFalse(is_rate_limited($ip, 1, 60, self::PREFIX));
+        $this->assertFalse(is_rate_limited($ip, 1, 900, self::PREFIX));
     }
 }

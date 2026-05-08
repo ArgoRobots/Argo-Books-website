@@ -9,6 +9,11 @@ final class GetClientIpTest extends TestCase
 {
     private array $serverBackup;
     private ?string $envBackup;
+    /** Process-level getenv() may have a value even when $_ENV doesn't —
+     *  vlucas/phpdotenv mirrors values into both. env() in env_helper.php
+     *  falls through to getenv() if $_ENV is unset, so we have to clear
+     *  both layers to make the "untrusted proxy" test deterministic. */
+    private string|false $getenvBackup;
 
     protected function setUp(): void
     {
@@ -18,7 +23,14 @@ final class GetClientIpTest extends TestCase
             'HTTP_X_FORWARDED_FOR' => $_SERVER['HTTP_X_FORWARDED_FOR'] ?? null,
         ];
         $this->envBackup = $_ENV['TRUSTED_PROXY_IPS'] ?? null;
-        unset($_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_X_FORWARDED_FOR'], $_ENV['TRUSTED_PROXY_IPS']);
+        $this->getenvBackup = getenv('TRUSTED_PROXY_IPS');
+
+        unset(
+            $_SERVER['REMOTE_ADDR'],
+            $_SERVER['HTTP_X_FORWARDED_FOR'],
+            $_ENV['TRUSTED_PROXY_IPS']
+        );
+        putenv('TRUSTED_PROXY_IPS');
     }
 
     protected function tearDown(): void
@@ -34,6 +46,11 @@ final class GetClientIpTest extends TestCase
             unset($_ENV['TRUSTED_PROXY_IPS']);
         } else {
             $_ENV['TRUSTED_PROXY_IPS'] = $this->envBackup;
+        }
+        if ($this->getenvBackup === false) {
+            putenv('TRUSTED_PROXY_IPS');
+        } else {
+            putenv('TRUSTED_PROXY_IPS=' . $this->getenvBackup);
         }
         parent::tearDown();
     }

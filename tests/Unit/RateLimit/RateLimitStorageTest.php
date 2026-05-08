@@ -134,10 +134,16 @@ final class RateLimitStorageTest extends TestCase
     public function test_stale_entries_pruned_during_read(): void
     {
         $ip = $this->uniqueIp('stale');
-        record_rate_limit_attempt($ip, self::PREFIX, 1);
-        // Wait past the window, then read with the same window. Stale entry
-        // should be pruned during read_rate_limits_locked.
-        sleep(2);
-        $this->assertFalse(is_rate_limited($ip, 1, 1, self::PREFIX));
+        $key = self::PREFIX . '_' . hash('sha256', $ip);
+
+        // Inject a back-dated entry directly into the file so we don't have
+        // to sleep waiting for the wall clock to age it out. The next read
+        // with a 60s window should prune it (1000s ago > 60s window).
+        $result = read_rate_limits_locked(900);
+        $rateLimits = $result['rateLimits'];
+        $rateLimits[$key] = ['count' => 5, 'first_attempt' => time() - 1000];
+        write_rate_limits_unlock($result['handle'], $rateLimits);
+
+        $this->assertFalse(is_rate_limited($ip, 1, 60, self::PREFIX));
     }
 }

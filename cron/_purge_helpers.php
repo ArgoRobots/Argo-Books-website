@@ -2,8 +2,10 @@
 declare(strict_types=1);
 
 /**
- * Pure helpers extracted from account_purge.php so the per-account purge
- * logic can be exercised without running the cron's top-level dispatch loop.
+ * Helpers extracted from account_purge.php so the per-account purge logic
+ * can be exercised without running the cron's top-level dispatch loop.
+ * These touch the database (writes + transaction management) — the goal is
+ * isolation and testability, not referential purity.
  *
  * - find_accounts_due_for_purge: SELECT for accounts past the deletion grace
  * - purge_pending_account: cancels active subs + DELETE the user row in a

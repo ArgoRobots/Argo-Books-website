@@ -42,6 +42,7 @@ require_once __DIR__ . '/../config/pricing.php';
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
+require_once __DIR__ . '/_renewal_helpers.php';
 
 // Configure logging
 function logMessage($message, $type = 'INFO') {
@@ -122,36 +123,22 @@ foreach ($subscriptions as $subscription) {
 
     logMessage("Processing renewal for subscription: $subscriptionId (User: $userId, Method: $paymentMethod, Credit: $$creditBalance)");
 
-    // Calculate renewal amount from centralized config
+    // Decide credit/charge split (and add processing fee). Single source of
+    // truth lives in cron/_renewal_helpers.php so it can be unit-tested.
     $pricingConfig = get_pricing_config();
-    $baseMonthly = $pricingConfig['premium_monthly_price'];
-    $baseYearly = $pricingConfig['premium_yearly_price'];
-    $amount = ($billing === 'yearly') ? $baseYearly : $baseMonthly;
+    $decision = decide_renewal_charge((float) $creditBalance, $billing, $pricingConfig);
+    $useCredit = $decision['useCredit'];
+    $creditUsed = $decision['creditUsed'];
+    $amount = $decision['baseAmount'];
+    $amountToCharge = $decision['amountToCharge'];
 
-    // Check if renewal can be covered by credit
-    $useCredit = false;
-    $creditUsed = 0;
-    $amountToCharge = $amount;
-
-    if ($creditBalance > 0) {
-        if ($creditBalance >= $amount) {
-            // Full renewal covered by credit - no charge needed
-            $useCredit = true;
-            $creditUsed = $amount;
-            $amountToCharge = 0;
-            logMessage("Renewal for $subscriptionId covered by credit balance ($$creditBalance)");
-        } else {
-            // Partial credit - charge the difference
-            $creditUsed = $creditBalance;
-            $amountToCharge = $amount - $creditBalance;
-            logMessage("Partial credit ($$creditBalance) applied for $subscriptionId, charging $$amountToCharge");
-        }
-    }
-
-    // Add processing fee on the amount actually charged to the card
-    if ($amountToCharge > 0) {
-        $processingFee = calculate_processing_fee($amountToCharge);
-        $amountToCharge += $processingFee;
+    if ($useCredit) {
+        logMessage("Renewal for $subscriptionId covered by credit balance ($$creditBalance)");
+    } elseif ($creditUsed > 0) {
+        // Log the pre-fee partial charge to match the original cron's wording
+        // (the post-fee value is also visible in subsequent payment logs).
+        $preFeeCharge = $amount - $creditUsed;
+        logMessage("Partial credit ($$creditBalance) applied for $subscriptionId, charging $$preFeeCharge");
     }
 
     // Skip payment processing if fully covered by credit
@@ -203,20 +190,9 @@ foreach ($subscriptions as $subscription) {
     $transactionId = null;
 
     try {
-        // Idempotency guard: if a successful renewal payment already exists for
-        // this subscription within the last 23 hours, skip — this prevents a
-        // double-charge if the cron is fired twice (overlapping runs, retry,
-        // accidental re-invoke).
-        $stmt = $pdo->prepare("
-            SELECT 1 FROM premium_subscription_payments
-            WHERE subscription_id = ?
-              AND status = 'completed'
-              AND payment_type = 'renewal'
-              AND created_at > DATE_SUB(NOW(), INTERVAL 23 HOUR)
-            LIMIT 1
-        ");
-        $stmt->execute([$subscriptionId]);
-        if ($stmt->fetch()) {
+        // Idempotency guard against double-charges (overlapping cron runs,
+        // manual retries). Single source of truth in _renewal_helpers.php.
+        if (recently_renewed($pdo, $subscriptionId)) {
             logMessage("Skipping $subscriptionId - already renewed within the last 23 hours", 'INFO');
             $skippedCount++;
             continue;
@@ -539,30 +515,6 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
             'error' => $e->getMessage()
         ];
     }
-}
-
-/**
- * Calculate new subscription end date.
- *
- * Bases the new period on the LATER of the existing end_date or NOW(). When a
- * cron run is delayed and end_date is already in the past, extending from the
- * stale end_date can leave the new end_date still in the past — causing the
- * subscription to be picked up again and re-charged on the next run.
- */
-function calculateNewEndDate($currentEndDate, $billing) {
-    $endDateTime = new DateTime($currentEndDate);
-    $now = new DateTime('now');
-    if ($endDateTime < $now) {
-        $endDateTime = $now;
-    }
-
-    if ($billing === 'yearly') {
-        $endDateTime->add(new DateInterval('P1Y'));
-    } else {
-        $endDateTime->add(new DateInterval('P1M'));
-    }
-
-    return $endDateTime->format('Y-m-d H:i:s');
 }
 
 /**

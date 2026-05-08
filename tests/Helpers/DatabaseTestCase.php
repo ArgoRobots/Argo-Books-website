@@ -1,0 +1,103 @@
+<?php
+declare(strict_types=1);
+
+namespace Tests\Helpers;
+
+use PDO;
+use PHPUnit\Framework\TestCase;
+
+abstract class DatabaseTestCase extends TestCase
+{
+    protected PDO $pdo;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->pdo = $GLOBALS['pdo'];
+        $this->pdo->beginTransaction();
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->pdo->inTransaction()) {
+            $this->pdo->rollBack();
+        }
+        parent::tearDown();
+    }
+
+    protected function seedPremiumKey(int $durationMonths = 1, ?string $email = null): string
+    {
+        $key = 'PREM-TEST-' . bin2hex(random_bytes(4));
+        $stmt = $this->pdo->prepare(
+            'INSERT INTO premium_subscription_keys
+             (subscription_key, email, duration_months, created_at)
+             VALUES (?, ?, ?, NOW())'
+        );
+        $stmt->execute([$key, $email, $durationMonths]);
+        return $key;
+    }
+
+    protected function seedRedeemedKey(string $deviceId, string $subscriptionId, int $durationMonths = 12): string
+    {
+        $key = $this->seedPremiumKey($durationMonths);
+        $stmt = $this->pdo->prepare(
+            'UPDATE premium_subscription_keys
+             SET redeemed_at = NOW(), device_id = ?, subscription_id = ?
+             WHERE subscription_key = ?'
+        );
+        $stmt->execute([$deviceId, $subscriptionId, $key]);
+        return $key;
+    }
+
+    protected function seedSubscription(
+        string $subscriptionId,
+        string $endDate,
+        string $status = 'active',
+        string $billingCycle = 'yearly'
+    ): void {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO premium_subscriptions
+             (subscription_id, billing_cycle, amount, currency, start_date, end_date,
+              status, payment_method, transaction_id, auto_renew, environment, created_at)
+             VALUES (?, ?, 0.00, 'CAD', NOW(), ?, ?, 'free_key', ?, 0, 'sandbox', NOW())"
+        );
+        $stmt->execute([$subscriptionId, $billingCycle, $endDate, $status, $subscriptionId]);
+    }
+
+    /** @return int New portal_companies.id */
+    protected function seedPortalCompany(string $companyName = 'Test Co'): int
+    {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO portal_companies (company_name, environment, is_active, created_at)
+             VALUES (?, 'sandbox', 1, NOW())"
+        );
+        $stmt->execute([$companyName]);
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    protected function seedPortalInvoice(
+        int $companyId,
+        string $invoiceId,
+        float $totalAmount,
+        ?float $balanceDue = null,
+        string $currency = 'USD',
+        string $status = 'sent'
+    ): void {
+        $stmt = $this->pdo->prepare(
+            "INSERT INTO portal_invoices
+             (company_id, invoice_id, invoice_token, customer_token, customer_name,
+              status, total_amount, balance_due, currency, environment, created_at)
+             VALUES (?, ?, ?, ?, 'Test Customer', ?, ?, ?, ?, 'sandbox', NOW())"
+        );
+        $stmt->execute([
+            $companyId,
+            $invoiceId,
+            bin2hex(random_bytes(24)),
+            bin2hex(random_bytes(24)),
+            $status,
+            $totalAmount,
+            $balanceDue ?? $totalAmount,
+            $currency,
+        ]);
+    }
+}

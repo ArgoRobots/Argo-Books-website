@@ -9,6 +9,7 @@
  */
 
 require_once __DIR__ . '/../portal-helper.php';
+require_once __DIR__ . '/_square_helpers.php';
 
 // Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -35,10 +36,7 @@ if (empty($signature)) {
 }
 
 $notificationUrl = site_url('/api/portal/webhooks/square');
-$stringToSign = $notificationUrl . $payload;
-$expectedSignature = base64_encode(hash_hmac('sha256', $stringToSign, $webhookSignatureKey, true));
-
-if (!hash_equals($expectedSignature, $signature)) {
+if (!verify_square_webhook_signature($notificationUrl, $payload, $webhookSignatureKey, $signature)) {
     error_log('Portal Square webhook: Invalid signature');
     http_response_code(400);
     exit;

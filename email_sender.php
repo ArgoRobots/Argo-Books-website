@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/smtp_mailer.php';
 require_once __DIR__ . '/config/pricing.php';
+require_once __DIR__ . '/_email_helpers.php';
 
 // Note: send_post_reply_email() and send_mention_email() defined below
 // call into helpers from email_marketing.php (should_send_marketing_email,
@@ -43,22 +44,14 @@ function _premium_feature_list_items($prefix = '')
  */
 function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html', &$message_id = null)
 {
-    // Strip CR/LF and the rest of the ASCII control range from any value that
-    // ends up in an email header. PHPMailer sanitizes its own header inputs,
-    // but the mail() fallback path below concatenates these into the headers
-    // string verbatim — a stray newline would let an attacker inject Bcc/Cc/
-    // etc. via user-controlled fields (subject lines from community posts,
-    // contact-form reply-to, etc.). Matches the policy used by
-    // api/invoice/invoice_email_sender.php for consistency.
-    $headerSafe = static function ($value) {
-        if ($value === null) return null;
-        return preg_replace('/[\r\n\x00-\x1f]+/', ' ', (string) $value);
-    };
-    $to_email = $headerSafe($to_email);
-    $subject = (string) $headerSafe($subject);
-    $from_email = $headerSafe($from_email);
-    $from_name = $headerSafe($from_name);
-    $reply_to = $headerSafe($reply_to);
+    // sanitize_header_value() (in _email_helpers.php) strips CR/LF and ASCII
+    // control chars so user-controlled fields can't inject Bcc/Cc/etc into
+    // the mail() fallback's concatenated header string.
+    $to_email = sanitize_header_value($to_email);
+    $subject = (string) sanitize_header_value($subject);
+    $from_email = sanitize_header_value($from_email);
+    $from_name = sanitize_header_value($from_name);
+    $reply_to = sanitize_header_value($reply_to);
 
     $isPlain = ($format === 'plain');
 
@@ -158,8 +151,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
     // headers (In-Reply-To, References) only work when SMTP is configured.
     if (!empty($extra_headers) && is_array($extra_headers)) {
         foreach ($extra_headers as $name => $value) {
-            $sanitized = preg_replace('/[\r\n\x00-\x1f]+/', ' ', (string) $value);
-            $headers[] = $name . ': ' . $sanitized;
+            $headers[] = $name . ': ' . sanitize_header_value((string) $value);
         }
     }
 

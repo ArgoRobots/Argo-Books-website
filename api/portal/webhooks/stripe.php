@@ -12,6 +12,7 @@
 
 require_once __DIR__ . '/../portal-helper.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once __DIR__ . '/_stripe_refund_db.php';
 
 // Only allow POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -113,69 +114,29 @@ function handle_payment_succeeded(\Stripe\PaymentIntent $paymentIntent): void
  */
 function handle_refund(\Stripe\Charge $charge): void
 {
-    global $is_production;
+    global $is_production, $pdo;
     $providerPaymentId = $charge->payment_intent;
 
     if (empty($providerPaymentId)) {
         return;
     }
 
-    global $pdo;
-
-    // Find the original payment
+    // Currency divisor logic stays here because it depends on the SDK Charge.
+    // Use the original payment's currency (already stored in our DB) so refunds
+    // honour the exact currency used at capture time even if Stripe normalised.
     $stmt = $pdo->prepare(
-        'SELECT id, company_id, invoice_id, customer_name, currency
-         FROM portal_payments
-         WHERE provider_payment_id = ? AND status = "completed"
-         LIMIT 1'
+        'SELECT currency FROM portal_payments
+         WHERE provider_payment_id = ? AND status = "completed" LIMIT 1'
     );
     $stmt->execute([$providerPaymentId]);
-    $originalPayment = $stmt->fetch();
-
-    if (!$originalPayment) {
+    $row = $stmt->fetch();
+    if (!$row) {
         return;
     }
-
-    // Calculate refund amount
-    $refundCurrency = strtoupper($originalPayment['currency'] ?? 'USD');
+    $refundCurrency = strtoupper($row['currency'] ?? 'USD');
     $zeroDecimalCurrencies = ['BIF','CLP','DJF','GNF','JPY','KMF','KRW','MGA','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
     $divisor = in_array($refundCurrency, $zeroDecimalCurrencies) ? 1 : 100;
     $refundAmount = $charge->amount_refunded / $divisor;
 
-    // Record the refund as a negative payment
-    record_portal_payment([
-        'company_id' => $originalPayment['company_id'],
-        'invoice_id' => $originalPayment['invoice_id'],
-        'customer_name' => $originalPayment['customer_name'],
-        'amount' => -$refundAmount,
-        'currency' => $originalPayment['currency'],
-        'payment_method' => 'stripe',
-        'provider_payment_id' => 'refund_' . $providerPaymentId,
-        'provider_transaction_id' => $charge->id,
-        'reference_number' => generate_reference_number(),
-        'status' => 'refunded',
-        'payment_environment' => $is_production ? 'production' : 'sandbox',
-    ]);
-
-    // Update the original payment status
-    $stmt = $pdo->prepare(
-        'UPDATE portal_payments SET status = "refunded" WHERE id = ?'
-    );
-    $stmt->execute([$originalPayment['id']]);
-
-    // Update invoice balance (add refund amount back)
-    $stmt = $pdo->prepare(
-        'UPDATE portal_invoices
-         SET balance_due = LEAST(total_amount, balance_due + ?),
-             status = CASE
-                 WHEN balance_due + ? >= total_amount THEN "sent"
-                 ELSE "partial"
-             END,
-             updated_at = NOW()
-         WHERE company_id = ? AND invoice_id = ?'
-    );
-    $stmt->execute([
-        $refundAmount, $refundAmount,
-        $originalPayment['company_id'], $originalPayment['invoice_id']
-    ]);
+    apply_stripe_refund_to_db($pdo, $providerPaymentId, $refundAmount, $charge->id, $is_production);
 }

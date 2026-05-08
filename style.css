@@ -1941,13 +1941,15 @@ a {
 
 /* Mapped fields */
 .ai-flow-fields {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr auto;
+    align-content: start;
 }
 
 .ai-flow-field {
     display: grid;
-    grid-template-columns: 1fr 1.2fr auto;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
     align-items: center;
     gap: 10px;
     padding: 11px 18px;
@@ -1979,8 +1981,9 @@ a {
     align-items: center;
     gap: 4px;
     font-size: 0.65rem;
+    line-height: 1;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 5px 8px 4px;
     border-radius: 50px;
     white-space: nowrap;
     text-transform: uppercase;
@@ -3181,8 +3184,11 @@ a {
         padding: 7px 10px;
     }
 
-    .ai-flow-field {
+    .ai-flow-fields {
         grid-template-columns: 1fr 1fr auto;
+    }
+
+    .ai-flow-field {
         padding: 9px 14px;
         gap: 8px;
     }

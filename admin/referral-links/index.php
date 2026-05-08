@@ -83,12 +83,13 @@ function get_visits_by_source($limit = 10)
     global $pdo;
     $query = "
         SELECT
-            source_code,
+            rv.source_code,
             COUNT(*) as visit_count,
-            SUM(CASE WHEN converted = 1 THEN 1 ELSE 0 END) as conversions,
-            COUNT(DISTINCT ip_address) as unique_visitors
-        FROM referral_visits
-        GROUP BY source_code
+            SUM(CASE WHEN rv.converted = 1 THEN 1 ELSE 0 END) as conversions,
+            COUNT(DISTINCT rv.ip_address) as unique_visitors
+        FROM referral_visits rv
+        INNER JOIN referral_links rl ON rl.source_code = rv.source_code
+        GROUP BY rv.source_code
         ORDER BY visit_count DESC
         LIMIT ?";
 
@@ -131,9 +132,10 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
                 $sql_period as period,
                 $display_format as display_period,
                 COUNT(*) as count,
-                SUM(CASE WHEN converted = 1 THEN 1 ELSE 0 END) as conversions
-            FROM referral_visits
-            WHERE source_code = ?
+                SUM(CASE WHEN rv.converted = 1 THEN 1 ELSE 0 END) as conversions
+            FROM referral_visits rv
+            INNER JOIN referral_links rl ON rl.source_code = rv.source_code
+            WHERE rv.source_code = ?
             GROUP BY period
             ORDER BY period DESC
             LIMIT ?";
@@ -146,8 +148,9 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
                 $sql_period as period,
                 $display_format as display_period,
                 COUNT(*) as count,
-                SUM(CASE WHEN converted = 1 THEN 1 ELSE 0 END) as conversions
-            FROM referral_visits
+                SUM(CASE WHEN rv.converted = 1 THEN 1 ELSE 0 END) as conversions
+            FROM referral_visits rv
+            INNER JOIN referral_links rl ON rl.source_code = rv.source_code
             GROUP BY period
             ORDER BY period DESC
             LIMIT ?";
@@ -170,12 +173,13 @@ function get_referral_countries($limit = 10)
     global $pdo;
     $query = "
         SELECT
-            country_code,
+            rv.country_code,
             COUNT(*) as visit_count,
-            SUM(CASE WHEN converted = 1 THEN 1 ELSE 0 END) as conversions
-        FROM referral_visits
-        WHERE country_code IS NOT NULL AND country_code != ''
-        GROUP BY country_code
+            SUM(CASE WHEN rv.converted = 1 THEN 1 ELSE 0 END) as conversions
+        FROM referral_visits rv
+        INNER JOIN referral_links rl ON rl.source_code = rv.source_code
+        WHERE rv.country_code IS NOT NULL AND rv.country_code != ''
+        GROUP BY rv.country_code
         ORDER BY visit_count DESC
         LIMIT ?";
 

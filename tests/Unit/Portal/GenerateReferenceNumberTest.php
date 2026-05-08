@@ -15,7 +15,12 @@ final class GenerateReferenceNumberTest extends TestCase
 
     public function test_date_segment_is_today(): void
     {
+        // Capture the date before AND after generation. If the day rolls
+        // over between calls (microsecond-window flake), accept either.
+        $before = date('Ymd');
         $ref = generate_reference_number();
-        $this->assertSame(date('Ymd'), substr($ref, 4, 8));
+        $after = date('Ymd');
+
+        $this->assertContains(substr($ref, 4, 8), [$before, $after]);
     }
 }

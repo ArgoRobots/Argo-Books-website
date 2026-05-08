@@ -4,24 +4,49 @@ declare(strict_types=1);
 namespace Tests\Unit\Renewal;
 
 use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * calculateNewEndDate() reads `now` internally, so multiple wall-clock reads
+ * in a single test (one for input, one for expectation, one inside the helper)
+ * could disagree across a midnight boundary. We capture a single immutable
+ * base in setUp() and derive everything from it; the helper is still free to
+ * read its own `now`, so we accept a small window via assertGreaterThan /
+ * assertLessThan rather than exact equality.
+ */
 final class RenewalHelpersTest extends TestCase
 {
+    private DateTimeImmutable $base;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->base = new DateTimeImmutable('now');
+    }
+
     public function test_yearly_adds_one_year_from_future_end_date(): void
     {
-        $futureEnd = (new DateTime('+30 days'))->format('Y-m-d H:i:s');
-        $expected = (new DateTime('+30 days'))->modify('+1 year')->format('Y-m-d');
-        $newEnd = calculateNewEndDate($futureEnd, 'yearly');
-        $this->assertSame($expected, substr($newEnd, 0, 10));
+        $futureEnd = $this->base->modify('+30 days')->format('Y-m-d H:i:s');
+        $minExpected = $this->base->modify('+1 year +29 days')->format('Y-m-d');
+        $maxExpected = $this->base->modify('+1 year +31 days')->format('Y-m-d');
+
+        $newEnd = substr(calculateNewEndDate($futureEnd, 'yearly'), 0, 10);
+
+        $this->assertGreaterThanOrEqual($minExpected, $newEnd);
+        $this->assertLessThanOrEqual($maxExpected, $newEnd);
     }
 
     public function test_monthly_adds_one_month_from_future_end_date(): void
     {
-        $futureEnd = (new DateTime('+10 days'))->format('Y-m-d H:i:s');
-        $expected = (new DateTime('+10 days'))->modify('+1 month')->format('Y-m-d');
-        $newEnd = calculateNewEndDate($futureEnd, 'monthly');
-        $this->assertSame($expected, substr($newEnd, 0, 10));
+        $futureEnd = $this->base->modify('+10 days')->format('Y-m-d H:i:s');
+        $minExpected = $this->base->modify('+1 month +9 days')->format('Y-m-d');
+        $maxExpected = $this->base->modify('+1 month +11 days')->format('Y-m-d');
+
+        $newEnd = substr(calculateNewEndDate($futureEnd, 'monthly'), 0, 10);
+
+        $this->assertGreaterThanOrEqual($minExpected, $newEnd);
+        $this->assertLessThanOrEqual($maxExpected, $newEnd);
     }
 
     public function test_extends_from_now_when_end_date_is_in_past(): void
@@ -29,27 +54,25 @@ final class RenewalHelpersTest extends TestCase
         // End date 30 days ago. Without the "stale end_date" guard, the new
         // end date would be 30 days ago + 1 month ≈ now, potentially still in
         // the past — risking another renewal pickup on the next cron run.
-        $pastEnd = (new DateTime('-30 days'))->format('Y-m-d H:i:s');
-        $expectedMin = (new DateTime('+27 days'))->format('Y-m-d');
-        $expectedMax = (new DateTime('+33 days'))->format('Y-m-d');
+        $pastEnd = $this->base->modify('-30 days')->format('Y-m-d H:i:s');
+        $expectedMin = $this->base->modify('+27 days')->format('Y-m-d');
+        $expectedMax = $this->base->modify('+33 days')->format('Y-m-d');
 
-        $newEnd = calculateNewEndDate($pastEnd, 'monthly');
-        $newEndDate = substr($newEnd, 0, 10);
+        $newEnd = substr(calculateNewEndDate($pastEnd, 'monthly'), 0, 10);
 
-        $this->assertGreaterThanOrEqual($expectedMin, $newEndDate);
-        $this->assertLessThanOrEqual($expectedMax, $newEndDate);
+        $this->assertGreaterThanOrEqual($expectedMin, $newEnd);
+        $this->assertLessThanOrEqual($expectedMax, $newEnd);
     }
 
     public function test_yearly_with_past_end_date_extends_from_now(): void
     {
-        $pastEnd = (new DateTime('-90 days'))->format('Y-m-d H:i:s');
-        $expectedMin = (new DateTime('+360 days'))->format('Y-m-d');
-        $expectedMax = (new DateTime('+370 days'))->format('Y-m-d');
+        $pastEnd = $this->base->modify('-90 days')->format('Y-m-d H:i:s');
+        $expectedMin = $this->base->modify('+360 days')->format('Y-m-d');
+        $expectedMax = $this->base->modify('+370 days')->format('Y-m-d');
 
-        $newEnd = calculateNewEndDate($pastEnd, 'yearly');
-        $newEndDate = substr($newEnd, 0, 10);
+        $newEnd = substr(calculateNewEndDate($pastEnd, 'yearly'), 0, 10);
 
-        $this->assertGreaterThanOrEqual($expectedMin, $newEndDate);
-        $this->assertLessThanOrEqual($expectedMax, $newEndDate);
+        $this->assertGreaterThanOrEqual($expectedMin, $newEnd);
+        $this->assertLessThanOrEqual($expectedMax, $newEnd);
     }
 }

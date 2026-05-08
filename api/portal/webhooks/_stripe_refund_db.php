@@ -22,6 +22,14 @@ declare(strict_types=1);
  *
  * Returns false when no matching completed original payment exists; true
  * after all four steps run.
+ *
+ * NOTE on the $pdo parameter: $pdo is used for the SELECT/UPDATE statements
+ * inside this function, but the call to record_portal_payment() reaches for
+ * `global $pdo` independently. Callers MUST ensure $GLOBALS['pdo'] points
+ * at the same connection passed in (production code does this via
+ * db_connect.php; tests do it via tests/bootstrap.php). Passing a different
+ * PDO would cause the negative-payment INSERT to land on a different
+ * connection than the rest of this function — don't do that.
  */
 function apply_stripe_refund_to_db(
     PDO $pdo,

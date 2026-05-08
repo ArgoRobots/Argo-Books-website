@@ -8,17 +8,25 @@ use RuntimeException;
 
 final class PortalEncryptDecryptTest extends TestCase
 {
+    private bool $hadOriginalKey;
     private string $originalKey;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->hadOriginalKey = isset($_ENV['PORTAL_ENCRYPTION_KEY']);
         $this->originalKey = $_ENV['PORTAL_ENCRYPTION_KEY'] ?? '';
     }
 
     protected function tearDown(): void
     {
-        $_ENV['PORTAL_ENCRYPTION_KEY'] = $this->originalKey;
+        // Restore the exact prior state — distinguish "set to empty string"
+        // from "unset" so later tests see the same env they would normally see.
+        if ($this->hadOriginalKey) {
+            $_ENV['PORTAL_ENCRYPTION_KEY'] = $this->originalKey;
+        } else {
+            unset($_ENV['PORTAL_ENCRYPTION_KEY']);
+        }
         parent::tearDown();
     }
 

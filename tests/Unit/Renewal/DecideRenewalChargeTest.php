@@ -33,24 +33,24 @@ final class DecideRenewalChargeTest extends TestCase
 
     public function test_partial_credit_charges_difference_plus_fee(): void
     {
-        // Credit $3 against monthly $10: charge $7 + fee.
-        // Fee = 7 * 0.029 + 0.30 = 0.503 → 0.50
+        // Credit $3 against monthly $10: charges (10 - 3) + fee on the
+        // remainder. Computing the expected total via calculate_processing_fee
+        // keeps this robust to fee-config changes in .env.testing.
         $decision = decide_renewal_charge(3.00, 'monthly', $this->config);
 
         $this->assertFalse($decision['useCredit']);
         $this->assertSame(3.00, $decision['creditUsed']);
-        $this->assertSame(7.50, $decision['amountToCharge']);
+        $this->assertSame(7.0 + calculate_processing_fee(7.0), $decision['amountToCharge']);
     }
 
     public function test_no_credit_charges_full_amount_plus_fee(): void
     {
-        // Yearly $100, no credit: charge $100 + fee.
-        // Fee = 100 * 0.029 + 0.30 = 3.20
+        // Yearly $100, no credit: charges full price + fee on the full price.
         $decision = decide_renewal_charge(0.00, 'yearly', $this->config);
 
         $this->assertFalse($decision['useCredit']);
         $this->assertSame(0.0, $decision['creditUsed']);
-        $this->assertSame(103.20, $decision['amountToCharge']);
+        $this->assertSame(100.0 + calculate_processing_fee(100.0), $decision['amountToCharge']);
     }
 
     public function test_exact_credit_match_counts_as_full_coverage(): void

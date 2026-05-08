@@ -135,7 +135,10 @@ foreach ($subscriptions as $subscription) {
     if ($useCredit) {
         logMessage("Renewal for $subscriptionId covered by credit balance ($$creditBalance)");
     } elseif ($creditUsed > 0) {
-        logMessage("Partial credit ($$creditBalance) applied for $subscriptionId, charging $$amountToCharge");
+        // Log the pre-fee partial charge to match the original cron's wording
+        // (the post-fee value is also visible in subsequent payment logs).
+        $preFeeCharge = $amount - $creditUsed;
+        logMessage("Partial credit ($$creditBalance) applied for $subscriptionId, charging $$preFeeCharge");
     }
 
     // Skip payment processing if fully covered by credit

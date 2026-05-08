@@ -151,8 +151,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
     // headers (In-Reply-To, References) only work when SMTP is configured.
     if (!empty($extra_headers) && is_array($extra_headers)) {
         foreach ($extra_headers as $name => $value) {
-            $sanitized = preg_replace('/[\r\n\x00-\x1f]+/', ' ', (string) $value);
-            $headers[] = $name . ': ' . $sanitized;
+            $headers[] = $name . ': ' . sanitize_header_value((string) $value);
         }
     }
 

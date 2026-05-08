@@ -366,3 +366,8 @@ code {
 .form-actions .btn {
     flex: 1;
 }
+
+[data-theme="dark"] .chart-container h2,
+[data-theme="dark"] .table-header-actions h2 {
+    color: var(--gray-200);
+}

@@ -205,6 +205,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <span class="tab-subtitle">Snap, scan, done</span>
                         </div>
                     </button>
+                    <button class="tab-btn" data-tab="invoices">
+                        <div class="tab-icon">
+                            <?= svg_icon('document', 24) ?>
+                        </div>
+                        <div class="tab-text">
+                            <span class="tab-title">Invoicing</span>
+                            <span class="tab-subtitle">Professional invoices</span>
+                        </div>
+                    </button>
                     <button class="tab-btn" data-tab="expenses">
                         <div class="tab-icon">
                             <?= svg_icon('dollar', 24) ?>
@@ -212,6 +221,15 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="tab-text">
                             <span class="tab-title">Expense & Revenue Tracking</span>
                             <span class="tab-subtitle">Track every dollar</span>
+                        </div>
+                    </button>
+                    <button class="tab-btn" data-tab="customers">
+                        <div class="tab-icon">
+                            <?= svg_icon('users', 24) ?>
+                        </div>
+                        <div class="tab-text">
+                            <span class="tab-title">Customer Management</span>
+                            <span class="tab-subtitle">Know your customers</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="predictive">
@@ -239,24 +257,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         <div class="tab-text">
                             <span class="tab-title">Rental Management</span>
                             <span class="tab-subtitle">Bookings made easy</span>
-                        </div>
-                    </button>
-                    <button class="tab-btn" data-tab="customers">
-                        <div class="tab-icon">
-                            <?= svg_icon('users', 24) ?>
-                        </div>
-                        <div class="tab-text">
-                            <span class="tab-title">Customer Management</span>
-                            <span class="tab-subtitle">Know your customers</span>
-                        </div>
-                    </button>
-                    <button class="tab-btn" data-tab="invoices">
-                        <div class="tab-icon">
-                            <?= svg_icon('document', 24) ?>
-                        </div>
-                        <div class="tab-text">
-                            <span class="tab-title">Invoicing</span>
-                            <span class="tab-subtitle">Professional invoices</span>
                         </div>
                     </button>
                 </div>
@@ -344,6 +344,54 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </div>
                     </div>
 
+                    <!-- Invoice Generation -->
+                    <div class="tab-content" id="tab-invoices">
+                        <div class="tab-content-inner">
+                            <div class="tab-content-text">
+                                <h3>Professional invoices in seconds</h3>
+                                <p>Create, send, and track invoices with ease. Customize templates, set payment terms, and get paid faster.</p>
+                                <ul class="feature-list">
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Customizable templates</span>
+                                    </li>
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Automatic numbering</span>
+                                    </li>
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Payment tracking</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-content-visual">
+                                <div class="feature-visual-card">
+                                    <div class="visual-mockup invoice-mockup">
+                                        <div class="invoice-header">
+                                            <div class="invoice-logo">INVOICE</div>
+                                        </div>
+                                        <div class="invoice-meta">
+                                            <div class="meta-item">
+                                                <span class="meta-label">Date</span>
+                                                <span class="meta-value">Nov 28, 2025</span>
+                                            </div>
+                                            <div class="meta-item">
+                                                <span class="meta-label">Due</span>
+                                                <span class="meta-value">Dec 28, 2025</span>
+                                            </div>
+                                        </div>
+                                        <div class="invoice-total">
+                                            <span class="total-label">Total Due</span>
+                                            <span class="total-value">$1,234.00</span>
+                                        </div>
+                                        <div class="invoice-status paid">Paid</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Expense Tracking -->
                     <div class="tab-content" id="tab-expenses">
                         <div class="tab-content-inner">
@@ -396,6 +444,70 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                             <div class="validation-check">
                                                 <?= svg_icon('check', 16) ?>
                                                 <span>Category selected</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Management -->
+                    <div class="tab-content" id="tab-customers">
+                        <div class="tab-content-inner">
+                            <div class="tab-content-text">
+                                <h3>Build lasting relationships</h3>
+                                <p>Keep track of customer information, purchase history, and preferences. Deliver personalized service that keeps them coming back.</p>
+                                <ul class="feature-list">
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Customer profiles</span>
+                                    </li>
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Purchase history</span>
+                                    </li>
+                                    <li>
+                                        <?= svg_icon('check', 20) ?>
+                                        <span>Notes and preferences</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="tab-content-visual">
+                                <div class="feature-visual-card">
+                                    <div class="visual-mockup customers-mockup">
+                                        <div class="customer-card">
+                                            <div class="customer-avatar">JD</div>
+                                            <div class="customer-info">
+                                                <span class="customer-name">Jane Doe</span>
+                                                <span class="customer-email">jane@company.com</span>
+                                            </div>
+                                            <div class="customer-stats">
+                                                <div class="stat">
+                                                    <span class="stat-val">$4,230</span>
+                                                    <span class="stat-lbl">Total Spent</span>
+                                                </div>
+                                                <div class="stat">
+                                                    <span class="stat-val">12</span>
+                                                    <span class="stat-lbl">Orders</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="customer-card">
+                                            <div class="customer-avatar alt">MS</div>
+                                            <div class="customer-info">
+                                                <span class="customer-name">Mike Smith</span>
+                                                <span class="customer-email">mike@store.com</span>
+                                            </div>
+                                            <div class="customer-stats">
+                                                <div class="stat">
+                                                    <span class="stat-val">$2,890</span>
+                                                    <span class="stat-lbl">Total Spent</span>
+                                                </div>
+                                                <div class="stat">
+                                                    <span class="stat-val">8</span>
+                                                    <span class="stat-lbl">Orders</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -571,118 +683,6 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                                             <span class="legend-item"><span class="dot booked"></span> Booked</span>
                                             <span class="legend-item"><span class="dot available"></span> Available</span>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Customer Management -->
-                    <div class="tab-content" id="tab-customers">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Build lasting relationships</h3>
-                                <p>Keep track of customer information, purchase history, and preferences. Deliver personalized service that keeps them coming back.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Customer profiles</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Purchase history</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Notes and preferences</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup customers-mockup">
-                                        <div class="customer-card">
-                                            <div class="customer-avatar">JD</div>
-                                            <div class="customer-info">
-                                                <span class="customer-name">Jane Doe</span>
-                                                <span class="customer-email">jane@company.com</span>
-                                            </div>
-                                            <div class="customer-stats">
-                                                <div class="stat">
-                                                    <span class="stat-val">$4,230</span>
-                                                    <span class="stat-lbl">Total Spent</span>
-                                                </div>
-                                                <div class="stat">
-                                                    <span class="stat-val">12</span>
-                                                    <span class="stat-lbl">Orders</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="customer-card">
-                                            <div class="customer-avatar alt">MS</div>
-                                            <div class="customer-info">
-                                                <span class="customer-name">Mike Smith</span>
-                                                <span class="customer-email">mike@store.com</span>
-                                            </div>
-                                            <div class="customer-stats">
-                                                <div class="stat">
-                                                    <span class="stat-val">$2,890</span>
-                                                    <span class="stat-lbl">Total Spent</span>
-                                                </div>
-                                                <div class="stat">
-                                                    <span class="stat-val">8</span>
-                                                    <span class="stat-lbl">Orders</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Invoice Generation -->
-                    <div class="tab-content" id="tab-invoices">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Professional invoices in seconds</h3>
-                                <p>Create, send, and track invoices with ease. Customize templates, set payment terms, and get paid faster.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Customizable templates</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Automatic numbering</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Payment tracking</span>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup invoice-mockup">
-                                        <div class="invoice-header">
-                                            <div class="invoice-logo">INVOICE</div>
-                                        </div>
-                                        <div class="invoice-meta">
-                                            <div class="meta-item">
-                                                <span class="meta-label">Date</span>
-                                                <span class="meta-value">Nov 28, 2025</span>
-                                            </div>
-                                            <div class="meta-item">
-                                                <span class="meta-label">Due</span>
-                                                <span class="meta-value">Dec 28, 2025</span>
-                                            </div>
-                                        </div>
-                                        <div class="invoice-total">
-                                            <span class="total-label">Total Due</span>
-                                            <span class="total-value">$1,234.00</span>
-                                        </div>
-                                        <div class="invoice-status paid">Paid</div>
                                     </div>
                                 </div>
                             </div>

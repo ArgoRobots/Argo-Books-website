@@ -7,6 +7,52 @@ if (session_status() === PHP_SESSION_NONE) {
 require_once __DIR__ . '/db_connect.php';
 
 /**
+ * Detects search engines, AI scrapers, social-preview fetchers, and HTTP-library
+ * traffic via the User-Agent string. Empty UA is treated as a bot.
+ *
+ * @param string $user_agent Raw User-Agent header
+ * @return bool True if the UA looks like a bot
+ */
+function is_likely_bot($user_agent)
+{
+    $ua = trim($user_agent);
+    if ($ua === '') {
+        return true;
+    }
+
+    // We list specific bot names rather than matching "bot" alone, because some
+    // legitimate UAs contain "bot" as a substring (e.g. Cubot phones).
+    static $patterns = [
+        // Search / SEO crawlers
+        'Googlebot', 'bingbot', 'DuckDuckBot', 'YandexBot', 'Baiduspider', 'Sogou',
+        'Slurp', 'Applebot', 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'rogerbot',
+        // AI / dataset crawlers
+        'GPTBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'anthropic-ai',
+        'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended',
+        'CCBot', 'Bytespider', 'Diffbot', 'Amazonbot', 'cohere-ai',
+        // Social / link-preview fetchers
+        'facebookexternalhit', 'meta-externalagent', 'Twitterbot', 'LinkedInBot',
+        'Slackbot', 'Discordbot', 'TelegramBot', 'WhatsApp',
+        // HTTP client libraries (real browsers don't send these)
+        'curl/', 'wget/', 'python-requests', 'python-urllib', 'Go-http-client',
+        'Java/', 'okhttp', 'libwww-perl', 'Apache-HttpClient', 'node-fetch',
+        // Headless / automation
+        'HeadlessChrome', 'PhantomJS', 'Selenium',
+        // Generic crawler verbs
+        'crawler', 'spider', 'scraper',
+        // Archives
+        'archive.org', 'Wayback',
+    ];
+
+    foreach ($patterns as $pattern) {
+        if (stripos($ua, $pattern) !== false) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Track a statistical event
  *
  * @param string $event_type Type of event (download, page_view, etc.)
@@ -20,12 +66,16 @@ function track_event($event_type, $event_data = '')
         return false;
     }
 
+    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    if (is_likely_bot($user_agent)) {
+        return false;
+    }
+
     global $pdo;
     if (!$pdo) {
         return false;
     }
     $ip_address = $_SERVER['REMOTE_ADDR'];
-    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
     try {
         // Only record one occurrence of an event per IP per day
@@ -97,9 +147,13 @@ function track_referral_visit($source_code, $page_url = '')
         return false;
     }
 
+    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    if (is_likely_bot($user_agent)) {
+        return false;
+    }
+
     global $pdo;
     $ip_address = $_SERVER['REMOTE_ADDR'];
-    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
 
     // Store source in session for conversion tracking (runs even if DB is down)
     if (!isset($_SESSION['referral_source'])) {

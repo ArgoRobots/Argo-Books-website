@@ -95,8 +95,73 @@ switch ($eventType) {
 
     case 'refund.created':
     case 'refund.updated':
-        $refundId = $data['data']['object']['refund']['id'] ?? 'unknown';
-        error_log("Portal Square webhook: Refund event - $refundId");
+        try {
+            $refund = $data['data']['object']['refund'] ?? [];
+            $refundId = $refund['id'] ?? 'unknown';
+            $status = $refund['status'] ?? '';
+            error_log("Portal Square webhook: Refund event $refundId status=$status");
+
+            // We only act on COMPLETED. Square fires updated events for every
+            // status transition (PENDING → COMPLETED → etc.).
+            if ($status !== 'COMPLETED') break;
+
+            $paymentId = $refund['payment_id'] ?? '';
+            $idempotencyKey = $refund['order_id'] ?? '';   // not always present
+            $amount = (int)($refund['amount_money']['amount'] ?? 0);
+            $currency = $refund['amount_money']['currency'] ?? 'USD';
+            // Argo set idempotency_key = 'argo_request_<id>' on issue; surfaced via reason note
+            $note = $refund['reason'] ?? '';
+
+            if (empty($paymentId)) break;
+
+            // Find original payment + insert negative-amount refund row (mirroring Stripe webhook)
+            $stmt = $pdo->prepare("SELECT * FROM portal_payments WHERE provider_payment_id = ? AND status = 'completed' AND amount > 0 LIMIT 1");
+            $stmt->execute([$paymentId]);
+            $original = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($original) {
+                $check = $pdo->prepare("SELECT id FROM portal_payments WHERE company_id = ? AND provider_payment_id = ? LIMIT 1");
+                $refundRow = 'refund_' . $paymentId;
+                $check->execute([$original['company_id'], $refundRow]);
+                if (!$check->fetch()) {
+                    record_portal_payment([
+                        'company_id' => $original['company_id'],
+                        'invoice_id' => $original['invoice_id'],
+                        'customer_name' => $original['customer_name'],
+                        'amount' => -($amount / 100.0),
+                        'currency' => strtoupper($currency),
+                        'payment_method' => 'square',
+                        'provider_payment_id' => $refundRow,
+                        'provider_transaction_id' => $refundId,
+                        'reference_number' => generate_reference_number(),
+                        'status' => 'refunded',
+                        'payment_environment' => ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
+                    ]);
+                    $pdo->prepare("UPDATE portal_payments SET status='refunded' WHERE id = ?")->execute([$original['id']]);
+                }
+
+                // Reconcile refund_requests by argo_request_id (we set this in the
+                // SDK's idempotency_key on issue; Square echoes it back as well
+                // as in some payload shapes).
+                $combined = ($refund['idempotency_key'] ?? '') . '|' . $note . '|' . ($refund['order_id'] ?? '');
+                if (preg_match('/argo_request_(\d+)/', $combined, $m)) {
+                    require_once __DIR__ . '/../_audit.php';
+                    $argoId = (int)$m[1];
+                    $rstmt = $pdo->prepare("SELECT id, state, company_id FROM refund_requests WHERE id = ?");
+                    $rstmt->execute([$argoId]);
+                    $rr = $rstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($rr && $rr['state'] !== 'completed' && $rr['state'] !== 'cancelled') {
+                        $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ?")
+                            ->execute([$refundId, $argoId]);
+                        audit_log($pdo, (int)$rr['company_id'], 'completed', 'webhook', null, $argoId, null, [
+                            'provider_refund_id' => $refundId,
+                            'reconciled_via_webhook' => true,
+                        ]);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log('SQUARE refund handler: ' . $e->getMessage());
+        }
         break;
 
     default:

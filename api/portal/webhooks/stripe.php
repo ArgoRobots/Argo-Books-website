@@ -139,4 +139,33 @@ function handle_refund(\Stripe\Charge $charge): void
     $refundAmount = $charge->amount_refunded / $divisor;
 
     apply_stripe_refund_to_db($pdo, $providerPaymentId, $refundAmount, $charge->id, $is_production);
+
+    // Reconcile against refund_requests if this refund was initiated by our
+    // /api/portal/refunds/ flow (refund metadata carries argo_request_id).
+    // Idempotent: no-op if already completed; transitions processing/cooling_off
+    // → completed otherwise. The companion record_into_portal_payments insert
+    // already happened at execute-time, so this is purely a state transition.
+    try {
+        if (isset($charge->refunds) && !empty($charge->refunds->data)) {
+            require_once __DIR__ . '/../_audit.php';
+            foreach ($charge->refunds->data as $refundObj) {
+                $argoRequestId = $refundObj->metadata['argo_request_id'] ?? null;
+                if ($argoRequestId !== null && is_numeric($argoRequestId)) {
+                    $stmt = $pdo->prepare("SELECT id, state, company_id FROM refund_requests WHERE id = ?");
+                    $stmt->execute([(int)$argoRequestId]);
+                    $req = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($req && $req['state'] !== 'completed' && $req['state'] !== 'cancelled') {
+                        $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ?")
+                            ->execute([$refundObj->id, (int)$argoRequestId]);
+                        audit_log($pdo, (int)$req['company_id'], 'completed', 'webhook', null, (int)$argoRequestId, null, [
+                            'provider_refund_id' => $refundObj->id,
+                            'reconciled_via_webhook' => true,
+                        ]);
+                    }
+                }
+            }
+        }
+    } catch (\Throwable $e) {
+        error_log('refund_requests reconciliation in stripe webhook failed: ' . $e->getMessage());
+    }
 }

@@ -147,7 +147,75 @@ switch ($eventType) {
         break;
 
     case 'PAYMENT.CAPTURE.REFUNDED':
+        // The resource is the capture itself; the refund metadata is in
+        // resource.links / resource.note_to_payer / resource.invoice_id.
+        // For refunds initiated via our /refunds/ flow we set invoice_id =
+        // 'argo_request_<id>' so we can reconcile back to refund_requests.
         error_log('Portal PayPal webhook: Payment refunded for capture ' . ($data['resource']['id'] ?? 'unknown'));
+
+        // Insert negative-amount portal_payments row + flip original (mirrors
+        // the Stripe webhook behavior). Best-effort — wrap in try/catch so a
+        // missing original row doesn't 500 the webhook.
+        try {
+            $captureId = $data['resource']['id'] ?? '';
+            $refundAmount = (float)($data['resource']['amount']['value'] ?? 0);
+            $refundCurrency = strtoupper($data['resource']['amount']['currency_code'] ?? 'USD');
+            $refundId = $data['resource']['id'] ?? null; // PayPal calls the refund itself a resource with its own id
+            $invoiceTag = $data['resource']['invoice_id'] ?? '';
+
+            // Find original payment by capture id (provider_transaction_id) OR by order id (provider_payment_id)
+            $stmt = $pdo->prepare("
+                SELECT * FROM portal_payments
+                WHERE (provider_transaction_id = ? OR provider_payment_id = ?)
+                  AND status = 'completed' AND amount > 0
+                LIMIT 1
+            ");
+            $stmt->execute([$captureId, $captureId]);
+            $original = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($original) {
+                // Idempotency: skip if a refund row with this provider_payment_id already exists
+                $check = $pdo->prepare("SELECT id FROM portal_payments WHERE company_id = ? AND provider_payment_id = ? LIMIT 1");
+                $refundProviderPaymentId = 'refund_' . $captureId;
+                $check->execute([$original['company_id'], $refundProviderPaymentId]);
+                if (!$check->fetch()) {
+                    record_portal_payment([
+                        'company_id' => $original['company_id'],
+                        'invoice_id' => $original['invoice_id'],
+                        'customer_name' => $original['customer_name'],
+                        'amount' => -$refundAmount,
+                        'currency' => $refundCurrency,
+                        'payment_method' => 'paypal',
+                        'provider_payment_id' => $refundProviderPaymentId,
+                        'provider_transaction_id' => $captureId,
+                        'reference_number' => generate_reference_number(),
+                        'status' => 'refunded',
+                        'payment_environment' => $is_production ? 'production' : 'sandbox',
+                    ]);
+                    $pdo->prepare("UPDATE portal_payments SET status = 'refunded' WHERE id = ?")
+                        ->execute([$original['id']]);
+                }
+
+                // Reconcile refund_requests if argo_request_id is in invoice_id
+                if (preg_match('/^argo_request_(\d+)$/', $invoiceTag, $m)) {
+                    require_once __DIR__ . '/../_audit.php';
+                    $argoId = (int)$m[1];
+                    $rstmt = $pdo->prepare("SELECT id, state, company_id FROM refund_requests WHERE id = ?");
+                    $rstmt->execute([$argoId]);
+                    $rr = $rstmt->fetch(PDO::FETCH_ASSOC);
+                    if ($rr && $rr['state'] !== 'completed' && $rr['state'] !== 'cancelled') {
+                        $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ?")
+                            ->execute([$refundId, $argoId]);
+                        audit_log($pdo, (int)$rr['company_id'], 'completed', 'webhook', null, $argoId, null, [
+                            'provider_refund_id' => $refundId,
+                            'reconciled_via_webhook' => true,
+                        ]);
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            error_log('PAYPAL refund handler: ' . $e->getMessage());
+        }
         break;
 
     default:

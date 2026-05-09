@@ -125,12 +125,37 @@ try {
     send_error_response(500, 'Failed to register company. Please try again.', 'DB_ERROR');
 }
 
-$companyId = $pdo->lastInsertId();
+$companyId = (int)$pdo->lastInsertId();
+
+// Issue an email verification code immediately. The desktop will collect it
+// from the user via the verify-email confirmation modal. Until verified,
+// portal_companies.email_verified_at stays NULL and refund endpoints will
+// return 412. Other endpoints (invoice publishing, sync) remain available.
+$emailVerificationRequired = false;
+if (!empty($ownerEmail)) {
+    try {
+        require_once __DIR__ . '/_audit.php';
+        require_once __DIR__ . '/_refund_helpers.php';
+        $verifyCode = refund_generate_code();
+        $verifyHash = refund_hash_code($verifyCode, (string)$companyId);
+        $vstmt = $pdo->prepare("INSERT INTO email_verifications (company_id, email, purpose, code_hash, expires_at) VALUES (?, ?, 'registration', ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))");
+        $vstmt->execute([$companyId, $ownerEmail, $verifyHash]);
+        audit_log($pdo, $companyId, 'code_sent', 'system', null, null, null, ['purpose' => 'registration']);
+        refund_email_send_registration_code($ownerEmail, $verifyCode);
+        $emailVerificationRequired = true;
+    } catch (\Throwable $e) {
+        // Don't fail registration if the verification email send fails — the user
+        // can request a resend via /api/portal/account/verify-email/request.php.
+        error_log('Portal registration: failed to send verification email: ' . $e->getMessage());
+        $emailVerificationRequired = true;
+    }
+}
 
 send_json_response(201, [
     'success' => true,
     'api_key' => $apiKey,
     'company_id' => $companyId,
+    'email_verification_required' => $emailVerificationRequired,
     'message' => 'Company registered successfully',
     'timestamp' => date('c')
 ]);

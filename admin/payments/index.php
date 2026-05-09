@@ -345,6 +345,30 @@ try {
     $total_refunded = $row['count'];
     $total_refund_amount = $row['total'];
 
+    // --- In-flight refund requests (state machine view) ---
+    $inflight_refunds = [];
+    $inflight_count = 0;
+    $held_for_review_count = 0;
+    try {
+        $stmt = $pdo->query("
+            SELECT r.id, r.invoice_number, r.customer_name, r.amount_cents, r.currency,
+                   r.provider, r.state, r.velocity_tier, r.state_reason,
+                   r.created_at, r.cooling_off_until,
+                   c.company_name, c.environment
+            FROM refund_requests r
+            LEFT JOIN portal_companies c ON c.id = r.company_id
+            WHERE r.state IN ('pending_code','code_verified','cooling_off','processing','cancelled','failed')
+            ORDER BY r.created_at DESC
+            LIMIT 100
+        ");
+        $inflight_refunds = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $inflight_count = (int)$pdo->query("SELECT COUNT(*) FROM refund_requests WHERE state IN ('pending_code','code_verified','cooling_off','processing')")->fetchColumn();
+        $held_for_review_count = (int)$pdo->query("SELECT COUNT(*) FROM refund_requests WHERE state IN ('cooling_off','failed') AND created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
+    } catch (PDOException $e) {
+        error_log('Refund requests admin query: ' . $e->getMessage());
+    }
+
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE $env_sql");
     $all_payments_count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
     $failure_rate = ($all_payments_count > 0) ? ($total_failed / $all_payments_count * 100) : 0;
@@ -903,6 +927,77 @@ include __DIR__ . '/../admin_header.php';
                 <div class="stat-value"><?php echo number_format($total_refunded); ?></div>
                 <div class="subtext">$<?php echo number_format($total_refund_amount, 2); ?> CAD</div>
             </div>
+            <div class="stat-card">
+                <h3>Refunds in Flight</h3>
+                <div class="stat-value"><?php echo number_format($inflight_count); ?></div>
+                <div class="subtext">Not yet completed</div>
+            </div>
+            <div class="stat-card">
+                <h3>Held for Review</h3>
+                <div class="stat-value"><?php echo number_format($held_for_review_count); ?></div>
+                <div class="subtext">Last 7d (cooling-off + failed)</div>
+            </div>
+        </div>
+
+        <!-- In-flight refund requests (state machine) -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>Refund Requests</h2>
+                <span class="subtext" style="color:#6b7280;font-size:.85rem;">In-flight orchestration. Completed refunds appear in "Refunded Payments" below.</span>
+            </div>
+            <?php if (empty($inflight_refunds)): ?>
+                <p style="text-align: center; color: #6b7280; padding: 1.5rem;">No in-flight refund requests.</p>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table data-paginate="25">
+                        <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Company</th>
+                                <th>Invoice</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Provider</th>
+                                <th>State</th>
+                                <th>Tier</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($inflight_refunds as $r): ?>
+                                <tr>
+                                    <td><?php echo date('M j g:i A', strtotime($r['created_at'])); ?></td>
+                                    <td><?php echo htmlspecialchars($r['company_name'] ?? '—'); ?></td>
+                                    <td><?php echo htmlspecialchars($r['invoice_number']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['customer_name'] ?? '—'); ?></td>
+                                    <td>$<?php echo number_format($r['amount_cents']/100, 2); ?> <?php echo htmlspecialchars($r['currency']); ?></td>
+                                    <td><?php echo htmlspecialchars(ucfirst($r['provider'])); ?></td>
+                                    <td><span class="badge badge-state-<?php echo htmlspecialchars($r['state']); ?>"><?php echo htmlspecialchars($r['state']); ?></span></td>
+                                    <td><?php echo htmlspecialchars($r['velocity_tier'] ?? '—'); ?></td>
+                                    <td>
+                                        <?php if (in_array($r['state'], ['pending_code','code_verified','cooling_off'], true)): ?>
+                                            <form method="post" action="../_actions/refund_admin_action.php" style="display:inline;">
+                                                <input type="hidden" name="action" value="cancel">
+                                                <input type="hidden" name="request_id" value="<?php echo (int)$r['id']; ?>">
+                                                <button type="submit" onclick="return confirm('Cancel this refund?')" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Cancel</button>
+                                            </form>
+                                        <?php elseif ($r['state'] === 'processing'): ?>
+                                            <form method="post" action="../_actions/refund_admin_action.php" style="display:inline;">
+                                                <input type="hidden" name="action" value="force_fail">
+                                                <input type="hidden" name="request_id" value="<?php echo (int)$r['id']; ?>">
+                                                <button type="submit" onclick="return confirm('Force-fail this refund?')" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Force fail</button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <?php if ($r['state_reason']): ?>
+                                            <small style="color:#6b7280;display:block;margin-top:2px;"><?php echo htmlspecialchars(substr($r['state_reason'], 0, 80)); ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Failed Payments Table -->

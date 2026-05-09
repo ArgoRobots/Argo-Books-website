@@ -8,6 +8,12 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+// Generate CSRF token if not present (used by the lock/unlock/revert forms in
+// the Companies tab and by the existing Failed & Refunds admin actions).
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Set page variables for the header
 $page_title = "Payment Portal";
 $page_description = "Monitor portal payments, companies, invoices, and payment analytics";
@@ -190,6 +196,26 @@ try {
     $companies = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     error_log("Companies error: " . $e->getMessage());
+}
+
+// --- Per-company email change history (last 10 per company) ---
+$email_changes_by_company = [];
+try {
+    $stmt = $pdo->query("
+        SELECT id, company_id, old_email, new_email, state,
+               created_at, completed_at, reverted_at, revert_until,
+               cancel_token IS NOT NULL AS has_revert_token
+        FROM email_change_requests
+        ORDER BY created_at DESC
+    ");
+    foreach ($stmt as $row) {
+        $cid = (int)$row['company_id'];
+        if (!isset($email_changes_by_company[$cid])) $email_changes_by_company[$cid] = [];
+        if (count($email_changes_by_company[$cid]) >= 10) continue;
+        $email_changes_by_company[$cid][] = $row;
+    }
+} catch (PDOException $e) {
+    error_log("Email changes error: " . $e->getMessage());
 }
 
 // --- Invoices (for Invoices tab) ---
@@ -743,6 +769,95 @@ include __DIR__ . '/../admin_header.php';
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Account Status (lock + verification) -->
+                                            <div class="detail-section">
+                                                <h4 class="detail-section-title">Account Status</h4>
+                                                <div class="detail-section-grid">
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Email Verified</span>
+                                                        <span class="detail-value"><?php echo !empty($company['email_verified_at']) ? '✓ ' . date('M j, Y', strtotime($company['email_verified_at'])) : '✗ Not verified'; ?></span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Account Locked</span>
+                                                        <span class="detail-value"><?php
+                                                            if (!empty($company['locked'])) {
+                                                                echo '<strong style="color:#dc2626;">Locked</strong>';
+                                                                if (!empty($company['locked_at'])) echo ' on ' . date('M j', strtotime($company['locked_at']));
+                                                                if (!empty($company['lock_reason'])) echo '<br><small style="color:#6b7280;">' . htmlspecialchars($company['lock_reason']) . '</small>';
+                                                            } else {
+                                                                echo 'Active';
+                                                            }
+                                                        ?></span>
+                                                    </div>
+                                                </div>
+                                                <div style="margin-top:0.6rem;">
+                                                    <?php if (!empty($company['locked'])): ?>
+                                                        <form method="post" action="../_actions/portal_company_action.php" style="display:inline;" onclick="event.stopPropagation();">
+                                                            <input type="hidden" name="action" value="unlock">
+                                                            <input type="hidden" name="company_id" value="<?php echo (int)$company['id']; ?>">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                            <input type="text" name="reason" placeholder="Unlock reason (required)" required style="padding:4px 8px;width:240px;margin-right:6px;">
+                                                            <button type="submit" onclick="event.stopPropagation();return confirm('Unlock this account? Refunds will be re-enabled.');" style="background:#059669;color:#fff;padding:6px 14px;border:none;border-radius:4px;cursor:pointer;">Unlock</button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <form method="post" action="../_actions/portal_company_action.php" style="display:inline;" onclick="event.stopPropagation();">
+                                                            <input type="hidden" name="action" value="lock">
+                                                            <input type="hidden" name="company_id" value="<?php echo (int)$company['id']; ?>">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                            <input type="text" name="reason" placeholder="Lock reason (required)" required style="padding:4px 8px;width:240px;margin-right:6px;">
+                                                            <button type="submit" onclick="event.stopPropagation();return confirm('Lock this account? Refunds will be disabled until unlocked.');" style="background:#dc2626;color:#fff;padding:6px 14px;border:none;border-radius:4px;cursor:pointer;">Lock</button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <!-- Email Change History -->
+                                            <?php $ec_changes = $email_changes_by_company[$company['id']] ?? []; ?>
+                                            <?php if (!empty($ec_changes)): ?>
+                                            <div class="detail-section">
+                                                <h4 class="detail-section-title">Email Change History (last 10)</h4>
+                                                <table style="width:100%;font-size:.9em;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:left;">When</th>
+                                                            <th style="text-align:left;">From → To</th>
+                                                            <th style="text-align:left;">State</th>
+                                                            <th style="text-align:left;">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($ec_changes as $ec): ?>
+                                                        <tr>
+                                                            <td><?php echo date('M j, Y g:i A', strtotime($ec['created_at'])); ?></td>
+                                                            <td>
+                                                                <?php echo htmlspecialchars($ec['old_email']); ?>
+                                                                <span style="color:#6b7280;"> → </span>
+                                                                <?php echo htmlspecialchars($ec['new_email']); ?>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge badge-state-<?php echo htmlspecialchars($ec['state']); ?>">
+                                                                    <?php echo htmlspecialchars($ec['state']); ?>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <?php if ($ec['state'] === 'completed' && !empty($ec['has_revert_token']) && (!$ec['revert_until'] || strtotime($ec['revert_until']) > time())): ?>
+                                                                    <form method="post" action="../_actions/portal_company_action.php" style="display:inline;" onclick="event.stopPropagation();">
+                                                                        <input type="hidden" name="action" value="revert_email">
+                                                                        <input type="hidden" name="email_change_id" value="<?php echo (int)$ec['id']; ?>">
+                                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                                        <input type="text" name="reason" placeholder="Revert reason" required style="padding:3px 6px;width:160px;margin-right:4px;">
+                                                                        <button type="submit" onclick="event.stopPropagation();return confirm('Admin-revert this email change? Both addresses will be notified.');" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Revert</button>
+                                                                    </form>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <?php endif; ?>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -979,12 +1094,14 @@ include __DIR__ . '/../admin_header.php';
                                             <form method="post" action="../_actions/refund_admin_action.php" style="display:inline;">
                                                 <input type="hidden" name="action" value="cancel">
                                                 <input type="hidden" name="request_id" value="<?php echo (int)$r['id']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                                 <button type="submit" onclick="return confirm('Cancel this refund?')" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Cancel</button>
                                             </form>
                                         <?php elseif ($r['state'] === 'processing'): ?>
                                             <form method="post" action="../_actions/refund_admin_action.php" style="display:inline;">
                                                 <input type="hidden" name="action" value="force_fail">
                                                 <input type="hidden" name="request_id" value="<?php echo (int)$r['id']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                                 <button type="submit" onclick="return confirm('Force-fail this refund?')" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Force fail</button>
                                             </form>
                                         <?php endif; ?>

@@ -23,6 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit('Method Not Allowed');
 }
 
+// CSRF protection (token is generated on /admin/payments/index.php load)
+if (empty($_POST['csrf_token']) || !isset($_SESSION['csrf_token'])
+    || !hash_equals($_SESSION['csrf_token'], (string)$_POST['csrf_token'])) {
+    http_response_code(403);
+    exit('Invalid CSRF token');
+}
+
 $action = $_POST['action'] ?? '';
 $request_id = (int)($_POST['request_id'] ?? 0);
 $reason = trim((string)($_POST['reason'] ?? ''));

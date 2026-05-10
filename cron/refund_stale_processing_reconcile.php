@@ -15,6 +15,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../api/portal/_audit.php';
+require_once __DIR__ . '/../api/portal/_refund_helpers.php';
 require_once __DIR__ . '/../api/portal/refunds/_provider_stripe.php';
 
 global $pdo;
@@ -65,6 +66,9 @@ foreach ($rows as $r) {
                     'reconciled_via_stale_cron' => true,
                     'provider_refund_id' => $found->id,
                 ]);
+                $r['state'] = 'completed';
+                $r['provider_refund_id'] = $found->id;
+                refund_notify_completion($pdo, $r);
                 $reconciled++;
             } elseif (in_array($found->status, ['failed','canceled'], true)) {
                 $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ?")

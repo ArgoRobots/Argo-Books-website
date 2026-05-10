@@ -199,8 +199,9 @@ switch ($eventType) {
                 // Reconcile refund_requests if argo_request_id is in invoice_id
                 if (preg_match('/^argo_request_(\d+)$/', $invoiceTag, $m)) {
                     require_once __DIR__ . '/../_audit.php';
+                    require_once __DIR__ . '/../_refund_helpers.php';
                     $argoId = (int)$m[1];
-                    $rstmt = $pdo->prepare("SELECT id, state, company_id FROM refund_requests WHERE id = ?");
+                    $rstmt = $pdo->prepare("SELECT * FROM refund_requests WHERE id = ?");
                     $rstmt->execute([$argoId]);
                     $rr = $rstmt->fetch(PDO::FETCH_ASSOC);
                     if ($rr && $rr['state'] !== 'completed' && $rr['state'] !== 'cancelled') {
@@ -210,6 +211,9 @@ switch ($eventType) {
                             'provider_refund_id' => $refundId,
                             'reconciled_via_webhook' => true,
                         ]);
+                        $rr['state'] = 'completed';
+                        $rr['provider_refund_id'] = $refundId;
+                        refund_notify_completion($pdo, $rr);
                     }
                 }
             }

@@ -137,6 +137,70 @@ HTML;
     send_styled_email($to, $subject, $body, 'blue');
 }
 
+/**
+ * Notification sent to the *customer* when a refund completes. Distinct from
+ * refund_email_send_issued (which goes to the business owner) — wording is
+ * customer-facing and tells them what to expect in their bank/card account.
+ */
+function refund_email_send_customer_refunded(string $to, ?string $customer_name, string $invoice_number, int $amount_cents, string $currency, ?string $business_name = null): void {
+    $amount_str    = htmlspecialchars(number_format($amount_cents / 100, 2) . ' ' . $currency);
+    $invoice_safe  = htmlspecialchars($invoice_number);
+    $greeting      = !empty($customer_name) ? 'Hi ' . htmlspecialchars($customer_name) . ',' : 'Hi,';
+    $business_safe = !empty($business_name) ? htmlspecialchars($business_name) : 'the merchant';
+    $subject       = "Your refund for invoice $invoice_safe has been issued";
+    $body = <<<HTML
+        <p>$greeting</p>
+        <p>A refund of <strong>$amount_str</strong> for invoice <strong>$invoice_safe</strong> has been issued by $business_safe.</p>
+        <p>The money will be returned to the same payment method you originally used. Most banks and card networks post the refund within 5–10 business days; some are faster.</p>
+        <p>If you don't see the refund after 10 business days, please contact $business_safe directly.</p>
+HTML;
+    send_styled_email($to, $subject, $body, 'blue');
+}
+
+/**
+ * Single point that fires *all* notifications when a refund_request transitions
+ * to 'completed'. Always emails the business owner; additionally emails the
+ * customer if portal_invoices has a customer_email on file. Safe to call
+ * multiple times — the underlying mailer sends per call, so callers should
+ * only invoke this once per actual state transition (i.e. inside the same
+ * `if (state was not yet completed)` guard that issues the UPDATE).
+ */
+function refund_notify_completion(PDO $pdo, array $req): void {
+    $stmt = $pdo->prepare("SELECT owner_email, name FROM portal_companies WHERE id = ?");
+    $stmt->execute([$req['company_id']]);
+    $company = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$company) return;
+
+    if (!empty($company['owner_email'])) {
+        refund_email_send_issued($company['owner_email'], $req);
+    }
+
+    // Look up the customer's email + name from the matching portal_invoices row.
+    $istmt = $pdo->prepare("SELECT customer_email, customer_name FROM portal_invoices WHERE company_id = ? AND invoice_id = ? LIMIT 1");
+    $istmt->execute([$req['company_id'], $req['invoice_id']]);
+    $invoice = $istmt->fetch(PDO::FETCH_ASSOC);
+    if ($invoice && !empty($invoice['customer_email'])) {
+        try {
+            refund_email_send_customer_refunded(
+                $invoice['customer_email'],
+                $invoice['customer_name'] ?? null,
+                (string)$req['invoice_number'],
+                (int)$req['amount_cents'],
+                (string)$req['currency'],
+                $company['name'] ?? null
+            );
+            audit_log($pdo, (int)$req['company_id'], 'customer_notified', 'system', null, (int)$req['id'], null, [
+                'to' => $invoice['customer_email'],
+            ]);
+        } catch (\Throwable $e) {
+            // Never let an SMTP hiccup roll back the refund. Log and move on;
+            // the owner has already been notified, so the operator can manually
+            // follow up with the customer if needed.
+            error_log('refund_notify_completion customer email failed: ' . $e->getMessage());
+        }
+    }
+}
+
 // ---------------------------------------------------------------
 // Email senders for email-verification + email-change flows
 // ---------------------------------------------------------------
@@ -240,7 +304,11 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         audit_log($pdo, (int)$company['id'], 'completed', 'system', null, $request_id, null, [
             'provider_refund_id' => $refund_id,
         ]);
-        refund_email_send_issued($company['owner_email'], $req);
+        // Re-fetch with the now-completed state so the notification reflects
+        // the final values (provider_refund_id, completed_at).
+        $req['state'] = 'completed';
+        $req['provider_refund_id'] = $refund_id;
+        refund_notify_completion($pdo, $req);
 
         // The provider's webhook (charge.refunded for Stripe; PAYMENT.CAPTURE.REFUNDED
         // for PayPal; refund.created for Square) is the canonical source for the

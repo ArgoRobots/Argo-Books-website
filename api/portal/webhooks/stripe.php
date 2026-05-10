@@ -148,10 +148,11 @@ function handle_refund(\Stripe\Charge $charge): void
     try {
         if (isset($charge->refunds) && !empty($charge->refunds->data)) {
             require_once __DIR__ . '/../_audit.php';
+            require_once __DIR__ . '/../_refund_helpers.php';
             foreach ($charge->refunds->data as $refundObj) {
                 $argoRequestId = $refundObj->metadata['argo_request_id'] ?? null;
                 if ($argoRequestId !== null && is_numeric($argoRequestId)) {
-                    $stmt = $pdo->prepare("SELECT id, state, company_id FROM refund_requests WHERE id = ?");
+                    $stmt = $pdo->prepare("SELECT * FROM refund_requests WHERE id = ?");
                     $stmt->execute([(int)$argoRequestId]);
                     $req = $stmt->fetch(PDO::FETCH_ASSOC);
                     if ($req && $req['state'] !== 'completed' && $req['state'] !== 'cancelled') {
@@ -161,6 +162,9 @@ function handle_refund(\Stripe\Charge $charge): void
                             'provider_refund_id' => $refundObj->id,
                             'reconciled_via_webhook' => true,
                         ]);
+                        $req['state'] = 'completed';
+                        $req['provider_refund_id'] = $refundObj->id;
+                        refund_notify_completion($pdo, $req);
                     }
                 }
             }

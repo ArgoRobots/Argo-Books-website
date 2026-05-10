@@ -79,6 +79,20 @@ function refund_ensure_company_active(array $company): void {
         ]);
         exit;
     }
+    // Refund verification codes are emailed to owner_email. Without it, the
+    // code goes nowhere and the user is stranded on the verify-code step.
+    // Catch this case explicitly with a clear message rather than silently
+    // issuing a code that can't be delivered.
+    if (empty($company['owner_email'])) {
+        http_response_code(412);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => false,
+            'error' => 'OWNER_EMAIL_NOT_SET',
+            'message' => 'No owner email is on file for this portal account, so we can\'t send the refund verification code. Set your owner email in Settings → Payment Portal first.',
+        ]);
+        exit;
+    }
 }
 
 /** Load a refund_request scoped to the company; 404 + exit if missing. */

@@ -1,0 +1,211 @@
+<?php
+require_once __DIR__ . '/../../../resources/icons.php';
+$pageTitle = 'How Numbers Are Calculated';
+$pageDescription = 'Plain-language reference for how Argo Books calculates revenue, net profit, tax, refunds, and currency conversion. Understand exactly what each figure on the dashboard means.';
+$currentPage = 'how-numbers-are-calculated';
+$pageCategory = 'reference';
+
+include __DIR__ . '/../../docs-header.php';
+?>
+
+        <div class="docs-content">
+            <p>This page explains how Argo Books arrives at every dollar figure you see — revenue, profit, tax, refunds — in plain language. If a number on your dashboard surprises you, this is the page to check.</p>
+
+            <h2>Quick answers</h2>
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Does tax count as revenue?</td>
+                            <td>Yes &mdash; "Total Revenue" includes it (gross). Profit excludes it.</td>
+                        </tr>
+                        <tr>
+                            <td>Does shipping the customer paid me count as profit?</td>
+                            <td>Yes. Record what you paid the courier as an Expense to balance it out.</td>
+                        </tr>
+                        <tr>
+                            <td>Why does the dashboard show $0 even though I have unpaid invoices?</td>
+                            <td>The dashboard shows money you've actually collected. Unpaid invoices appear in "Outstanding Invoices" instead.</td>
+                        </tr>
+                        <tr>
+                            <td>Why is my Net Profit smaller than my Total Revenue minus Expenses?</td>
+                            <td>Profit excludes sales tax (it's not yours to keep). See <a href="#net-profit" class="link">Net Profit</a> below.</td>
+                        </tr>
+                        <tr>
+                            <td>How are refunds handled?</td>
+                            <td>Subtracted from revenue on the day the refund was issued. See <a href="#refunds" class="link">Refunds</a> below.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2 id="revenue">Total Revenue</h2>
+            <p>Total Revenue is the full amount your customers paid you, including sales tax, shipping, and any fees. It matches the invoice totals you sent out.</p>
+
+            <p>What's <strong>in</strong>:</p>
+            <ul>
+                <li>The item or service amount the customer was charged</li>
+                <li>Sales tax you collected</li>
+                <li>Shipping the customer paid</li>
+                <li>Any custom fees you added (rush delivery, setup fee, etc.)</li>
+            </ul>
+
+            <p>What's <strong>out</strong>:</p>
+            <ul>
+                <li>Discounts (already subtracted before the total)</li>
+                <li>Refunds you've issued (subtracted from the day the refund was sent)</li>
+                <li>Unpaid invoices &mdash; the dashboard only counts money you've actually received</li>
+            </ul>
+
+            <h2 id="net-profit">Net Profit</h2>
+            <p>Net Profit answers a different question: <em>how much did the business actually keep?</em> So it deliberately excludes anything that isn't yours to keep.</p>
+
+            <p>The formula:</p>
+            <div class="info-box">
+                <strong>Net Profit&nbsp;=&nbsp;Revenue (excluding sales tax)&nbsp;&minus;&nbsp;Expenses&nbsp;&minus;&nbsp;Refunds</strong>
+            </div>
+
+            <p>The key thing to know: <strong>sales tax is not part of profit.</strong> When a customer pays you $11 on a $10 sale with 10% sales tax, you collected $11 but only $10 is yours &mdash; the $1 is owed to the government. Argo Books treats that $1 as a liability, not as profit.</p>
+
+            <p>Shipping the customer paid is in. If they paid you $8 for shipping, that's $8 in your pocket. If you then paid a courier $8 to actually ship the item, you'll record that as an Expense and it cancels out. Net effect on profit: zero. If you charged $8 but only paid $5 to ship, you keep $3 in margin.</p>
+
+            <div class="info-box">
+                <strong>Tip:</strong> If your profit looks higher than expected, double-check that you've recorded the shipping cost you paid (carrier invoices) as Expenses. The customer's payment is automatically in revenue; the carrier payment is not automatically in expenses &mdash; you have to add it.
+            </div>
+
+            <h2 id="refunds">Refunds</h2>
+            <p>A refund reduces your numbers on the day the refund was issued, not the day of the original payment. Same-day refund nets out to zero on that day; a refund issued a week later leaves the original day's revenue intact and shows a negative on the refund's day.</p>
+
+            <p>How refunds affect each number:</p>
+            <ul>
+                <li><strong>Total Revenue:</strong> reduced by the full refund amount.</li>
+                <li><strong>Net Profit:</strong> reduced by the refund amount <em>minus</em> the tax portion of that refund. The tax portion was never profit on the way in (it was always owed to the government), so it doesn't reduce profit on the way out either.</li>
+                <li><strong>Invoice status:</strong> flips to "Refunded" when the refund covers the full invoice value, or "Partially Refunded" if only part was returned (or if you paid, refunded, and paid again).</li>
+            </ul>
+
+            <p>If you pay a customer, get refunded, then pay them again, the invoice stays "Partially Refunded" so the refund history is still visible alongside the new payment.</p>
+
+            <h2 id="tax">Tax</h2>
+            <p>Argo Books tracks two tax numbers:</p>
+            <ul>
+                <li><strong>Tax Collected:</strong> the sales tax you charged customers on your invoices.</li>
+                <li><strong>Tax Paid:</strong> the sales tax you paid suppliers on your expenses (when you record it).</li>
+            </ul>
+            <p>Net tax liability is <strong>Tax Collected&nbsp;&minus;&nbsp;Tax Paid</strong>. Argo Books does not automatically file or remit tax &mdash; it shows you the number so you can hand it to your tax advisor or filing service.</p>
+
+            <h2 id="cash-vs-accrual">Cash basis (Dashboard) vs. accrual (Reports)</h2>
+            <p>This is the single biggest source of "why does the dashboard say X but the Revenue page says Y?" confusion. The two views answer different questions:</p>
+
+            <div class="comparison-table-wrapper">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Surface</th>
+                            <th>What it counts</th>
+                            <th>Use it for</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Dashboard, Analytics, charts</strong></td>
+                            <td>Cash basis &mdash; only invoices the customer has actually paid.</td>
+                            <td>"How is my business doing right now? What's in the bank?"</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Revenue page (list view)</strong></td>
+                            <td>All revenue rows you've recorded, paid or not.</td>
+                            <td>Reviewing or editing individual records.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Outstanding Invoices stat card</strong></td>
+                            <td>Only invoices that <em>haven't</em> been paid.</td>
+                            <td>Following up on what customers owe you.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reports (Income Statement, Balance Sheet)</strong></td>
+                            <td>Accrual basis &mdash; all invoiced revenue, paid or not.</td>
+                            <td>Filing taxes, sharing with an accountant, year-end reviews.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="info-box">
+                <strong>Why the difference?</strong> Cash basis answers "did money actually arrive?" Accrual basis answers "did I do the work that earned the money?" Both are valid views; small businesses usually want the cash-basis dashboard for day-to-day decisions and the accrual report for taxes and accountants.
+            </div>
+
+            <h2 id="currency">Currency display</h2>
+            <p>Argo Books stores every amount internally in US dollars so that businesses dealing in multiple currencies (e.g., invoicing some customers in EUR and others in USD) still get one consistent set of totals. The display currency is whatever you picked in Settings.</p>
+            <ul>
+                <li><strong>Stat cards, charts, totals:</strong> shown in your display currency.</li>
+                <li><strong>Invoices and customer emails:</strong> shown in the currency the invoice was issued in &mdash; what your customer expects to see.</li>
+                <li><strong>Spreadsheet exports of transactions:</strong> the original currency you entered, so the export is faithful to the source.</li>
+            </ul>
+
+            <h2 id="invoice-status">Invoice status meanings</h2>
+            <p>The status badge on each invoice is computed from the payment history:</p>
+            <ul>
+                <li><strong>Draft:</strong> being prepared, never sent.</li>
+                <li><strong>Pending:</strong> ready but not sent yet.</li>
+                <li><strong>Sent:</strong> sent to the customer, awaiting payment.</li>
+                <li><strong>Viewed:</strong> the customer opened it on the payment portal.</li>
+                <li><strong>Partial:</strong> the customer paid part of the invoice; some is still owed.</li>
+                <li><strong>Paid:</strong> the customer paid the full amount.</li>
+                <li><strong>Overdue:</strong> past the due date and not fully paid.</li>
+                <li><strong>Cancelled:</strong> voided by you.</li>
+                <li><strong>Refunded:</strong> the customer was paid fully, then fully refunded.</li>
+                <li><strong>Partially Refunded:</strong> the customer was paid fully, then refunded part of it &mdash; or paid, refunded, then paid again so the refund history stays visible.</li>
+            </ul>
+
+            <h2>Example</h2>
+            <p>Let's walk through a simple $110 sale:</p>
+            <ul>
+                <li>Product/service: <strong>$100</strong>.</li>
+                <li>Tax at 10%: <strong>+$10</strong>.</li>
+                <li>Invoice total the customer pays: <strong>$110</strong>.</li>
+            </ul>
+
+            <p>If the customer pays the invoice in full, Argo Books shows:</p>
+            <ul>
+                <li>Total Revenue stat card: <strong>$110</strong> (gross, what they paid you).</li>
+                <li>Net Profit (assuming no expenses): <strong>$100</strong> (revenue minus the $10 tax you owe the government)</li>
+                <li>Tax Collected: <strong>$10</strong>.</li>
+            </ul>
+
+            <p>When you open the refund modal, you choose exactly what to refund &mdash; you don't have to give the whole invoice back. Each line item on the invoice is a separate checkbox. Tax, fees, and security deposits each get their own row too.</p>
+
+            <p>What you see depends on how much you refunded:</p>
+
+            <p><strong>Full refund ($110)</strong> &mdash; you ticked everything:</p>
+            <ul>
+                <li>Revenue page: the sale's <strong>Total</strong> column shows <strong>$0</strong>; status badge becomes <strong>Refunded</strong>.</li>
+                <li>Payments page: the original $110 payment plus a separate &minus;$110 refund row.</li>
+                <li>Dashboard: Total Revenue <strong>$0</strong>, Net Profit <strong>$0</strong>.</li>
+            </ul>
+
+            <p><strong>Partial refund ($40)</strong> &mdash; you only refunded one item:</p>
+            <ul>
+                <li>Revenue page: the sale's <strong>Total</strong> column shows <strong>$70</strong> ($110 minus $40); status badge becomes <strong>Partially Refunded</strong>.</li>
+                <li>Payments page: the original $110 payment plus a &minus;$40 refund row.</li>
+                <li>Dashboard: Total Revenue <strong>$70</strong>. Net Profit drops by the pre-tax portion of the refund (the tax portion was never profit on the way in, so it doesn't reduce profit on the way out either).</li>
+            </ul>
+
+            <div class="page-navigation">
+                <a href="../features/history-modal.php" class="nav-button prev">
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Version History</span>
+                </a>
+                <a href="supported-currencies.php" class="nav-button next">
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Supported Currencies &rarr;</span>
+                </a>
+            </div>
+        </div>
+
+<?php include __DIR__ . '/../../docs-footer.php'; ?>

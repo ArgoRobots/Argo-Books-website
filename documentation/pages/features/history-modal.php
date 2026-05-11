@@ -38,9 +38,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Spreadsheet Export</span>
                 </a>
-                <a href="../reference/supported-currencies.php" class="nav-button next">
+                <a href="../reference/how-numbers-are-calculated.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Supported Currencies &rarr;</span>
+                    <span class="nav-title">How Numbers Are Calculated &rarr;</span>
                 </a>
             </div>
         </div>

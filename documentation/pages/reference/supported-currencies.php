@@ -65,9 +65,9 @@ include __DIR__ . '/../../docs-header.php';
             </div>
 
             <div class="page-navigation">
-                <a href="../features/spreadsheet-export.php" class="nav-button prev">
+                <a href="how-numbers-are-calculated.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>
-                    <span class="nav-title">&larr; Spreadsheet Export</span>
+                    <span class="nav-title">&larr; How Numbers Are Calculated</span>
                 </a>
                 <a href="supported-languages.php" class="nav-button next">
                     <span class="nav-label">Next</span>

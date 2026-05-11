@@ -37,6 +37,7 @@ class DocumentationSearch {
             { id: 'spreadsheet-export', title: 'Spreadsheet Export', category: 'Core Features', folder: 'features', keywords: 'export excel spreadsheet xlsx backup data currency conversion chart' },
 
             // Reference
+            { id: 'how-numbers-are-calculated', title: 'How Numbers Are Calculated', category: 'Reference', folder: 'reference', keywords: 'revenue profit net tax sales tax shipping refund refunds cash basis accrual currency calculations formula how computed gross subtotal total deduction discount fee invoice status overdue paid unpaid partially refunded' },
             { id: 'supported-currencies', title: 'Supported Currencies', category: 'Reference', folder: 'reference', keywords: 'currency currencies usd eur gbp cad jpy cny exchange rate convert' },
             { id: 'supported-languages', title: 'Supported Languages', category: 'Reference', folder: 'reference', keywords: 'language languages english spanish french german chinese arabic localization translation' },
 

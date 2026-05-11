@@ -51,6 +51,7 @@ $sidebarSections = [
     'Reference' => [
         'folder' => 'pages/reference',
         'pages' => [
+            'how-numbers-are-calculated' => ['title' => 'How Numbers Are Calculated'],
             'supported-currencies' => ['title' => 'Supported Currencies'],
             'supported-languages' => ['title' => 'Supported Languages'],
             'keyboard_shortcuts' => ['title' => 'Keyboard Shortcuts']

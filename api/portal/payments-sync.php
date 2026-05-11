@@ -61,7 +61,8 @@ function handle_pull_payments(int $companyId): void
         $stmt = $pdo->prepare(
             "SELECT pp.*, pi.invoice_token, pi.customer_token,
                     rr.id AS refund_request_id, rr.reason AS refund_reason,
-                    rr.provider AS refund_provider
+                    rr.provider AS refund_provider,
+                    rr.provider_payment_id AS refund_source_provider_payment_id
              FROM portal_payments pp
              LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
@@ -77,7 +78,8 @@ function handle_pull_payments(int $companyId): void
         $stmt = $pdo->prepare(
             "SELECT pp.*, pi.invoice_token, pi.customer_token,
                     rr.id AS refund_request_id, rr.reason AS refund_reason,
-                    rr.provider AS refund_provider
+                    rr.provider AS refund_provider,
+                    rr.provider_payment_id AS refund_source_provider_payment_id
              FROM portal_payments pp
              LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
@@ -98,15 +100,28 @@ function handle_pull_payments(int $companyId): void
 
         // For refund rows: figure out the originating payment's provider_payment_id
         // so the desktop can link the local refund Payment back to its source.
-        // Convention used by _stripe_refund_db.php: 'refund_<original_pi>'.
-        // Convention used by future provider adapters: refund_id directly,
-        // with original payment_intent stored in provider_transaction_id.
+        //
+        // Preferred source: the joined refund_requests row's provider_payment_id,
+        // which is exactly the original payment's provider_payment_id (set when
+        // the refund request was created via api/portal/refunds/request.php).
+        //
+        // Fallbacks for refunds that didn't originate through our flow
+        // (e.g. issued via the Stripe Dashboard and only seen via webhook):
+        //   - portal_payments.provider_transaction_id usually holds the charge
+        //     id (ch_xxx), which is best-effort; the desktop can match this
+        //     against the original payment's stored charge id when available.
+        //   - As a last resort, strip "refund_" — but note that for Stripe rows
+        //     keyed by individual refund id ("refund_<refundId>") this returns
+        //     the refund id, not the source payment id, so the link won't
+        //     resolve. Kept only for legacy single-full-refund rows.
         $refundedProviderPaymentId = null;
         if ($isRefund) {
-            if (str_starts_with((string)$row['provider_payment_id'], 'refund_')) {
-                $refundedProviderPaymentId = substr((string)$row['provider_payment_id'], strlen('refund_'));
-            } else {
+            if (!empty($row['refund_source_provider_payment_id'])) {
+                $refundedProviderPaymentId = $row['refund_source_provider_payment_id'];
+            } elseif (!empty($row['provider_transaction_id'])) {
                 $refundedProviderPaymentId = $row['provider_transaction_id'];
+            } elseif (str_starts_with((string)$row['provider_payment_id'], 'refund_')) {
+                $refundedProviderPaymentId = substr((string)$row['provider_payment_id'], strlen('refund_'));
             }
         }
 

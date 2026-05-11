@@ -11,6 +11,14 @@ declare(strict_types=1);
  *   * * * * * php /var/www/argo-books-website/cron/refund_cooling_off_promoter.php
  */
 
+// Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).
+// Without this, /cron/refund_cooling_off_promoter.php is web-reachable and
+// anyone could trigger refund promotion (and provider charges) over HTTP.
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI/cron.');
+}
+
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/_audit.php';
 require_once __DIR__ . '/../api/portal/_refund_helpers.php';
@@ -33,14 +41,18 @@ $auto_cancelled = 0;
 
 foreach ($rows as $row) {
     if ($row['locked']) {
-        // Stay in cooling_off until unlocked, OR auto-cancel after 24h
+        // Stay in cooling_off until unlocked, OR auto-cancel after 24h.
+        // CAS guard: only flip if still cooling_off so a concurrent
+        // user-cancel or webhook completion isn't overwritten.
         if (strtotime($row['updated_at']) < time() - 86400) {
-            $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='locked_account_auto_cancel', updated_at=NOW() WHERE id = ?")
-                ->execute([$row['id']]);
-            audit_log($pdo, (int)$row['company_id'], 'cancelled_by_user', 'system', null, (int)$row['id'], null, [
-                'reason' => 'locked_account_auto_cancel',
-            ]);
-            $auto_cancelled++;
+            $upd = $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='locked_account_auto_cancel', updated_at=NOW() WHERE id = ? AND state = 'cooling_off'");
+            $upd->execute([$row['id']]);
+            if ($upd->rowCount() > 0) {
+                audit_log($pdo, (int)$row['company_id'], 'cancelled_by_user', 'system', null, (int)$row['id'], null, [
+                    'reason' => 'locked_account_auto_cancel',
+                ]);
+                $auto_cancelled++;
+            }
         }
         continue;
     }
@@ -59,8 +71,15 @@ foreach ($rows as $row) {
         'customer_name' => $row['customer_name'] ?? null,
     ];
 
-    $pdo->prepare("UPDATE refund_requests SET state='processing', updated_at=NOW() WHERE id = ?")
-        ->execute([$row['id']]);
+    // CAS guard: only promote if the row is still cooling_off. Without
+    // this, a user-cancel between SELECT and UPDATE would be overwritten
+    // and we'd still execute the refund against the provider.
+    $upd = $pdo->prepare("UPDATE refund_requests SET state='processing', updated_at=NOW() WHERE id = ? AND state = 'cooling_off'");
+    $upd->execute([$row['id']]);
+    if ($upd->rowCount() === 0) {
+        // State changed under us (cancelled, completed, etc.) — skip.
+        continue;
+    }
     audit_log($pdo, (int)$row['company_id'], 'processing', 'system', null, (int)$row['id'], null, [
         'promoted_from' => 'cooling_off',
     ]);

@@ -359,9 +359,17 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
 
     } catch (\Throwable $e) {
         $msg = $e->getMessage();
-        $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ?")
-            ->execute([substr($msg, 0, 1000), $request_id]);
-        audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, ['error' => $msg]);
+        // CAS guard: only mark as failed if still in an in-flight state.
+        // Without this, if the provider call succeeded but a later step in
+        // the try block throws (timeout reading response, audit_log fails,
+        // etc.) AND the webhook concurrently completed the request, this
+        // UPDATE would overwrite 'completed' with 'failed'. Audit only on
+        // an actual transition.
+        $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+        $upd->execute([substr($msg, 0, 1000), $request_id]);
+        if ($upd->rowCount() > 0) {
+            audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, ['error' => $msg]);
+        }
     }
 }
 

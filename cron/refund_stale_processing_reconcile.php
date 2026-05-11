@@ -12,6 +12,14 @@ declare(strict_types=1);
  *   *\/5 * * * * php /var/www/argo-books-website/cron/refund_stale_processing_reconcile.php
  */
 
+// Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).
+// Without this, the provider-reconciliation loop and completion-notification
+// path is exposed over HTTP.
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI/cron.');
+}
+
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../api/portal/_audit.php';
@@ -75,13 +83,19 @@ foreach ($rows as $r) {
                     $reconciled++;
                 }
             } elseif (in_array($found->status, ['failed','canceled'], true)) {
-                $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ?")
-                    ->execute([$found->failure_reason ?? $found->status, $r['id']]);
-                audit_log($pdo, (int)$r['company_id'], 'failed', 'system', null, (int)$r['id'], null, [
-                    'reconciled_via_stale_cron' => true,
-                    'provider_status' => $found->status,
-                ]);
-                $reconciled++;
+                // CAS guard: same rationale as the success branch above —
+                // a webhook (or another reconciler) may have flipped this
+                // row to 'completed' between our SELECT and this UPDATE,
+                // and we must not overwrite that with 'failed'.
+                $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                $upd->execute([$found->failure_reason ?? $found->status, $r['id']]);
+                if ($upd->rowCount() > 0) {
+                    audit_log($pdo, (int)$r['company_id'], 'failed', 'system', null, (int)$r['id'], null, [
+                        'reconciled_via_stale_cron' => true,
+                        'provider_status' => $found->status,
+                    ]);
+                    $reconciled++;
+                }
             }
         }
     } catch (\Throwable $e) {

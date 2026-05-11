@@ -13,6 +13,13 @@ declare(strict_types=1);
  *   0 2 * * * php /var/www/argo-books-website/cron/refund_velocity_baseline_recompute.php
  */
 
+// Only allow CLI, or CGI cron (no REMOTE_ADDR means not a web request).
+// Without this, fraud-threshold baselines could be recomputed via HTTP.
+if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
+    http_response_code(403);
+    die('Access denied. This script can only be run via CLI/cron.');
+}
+
 require_once __DIR__ . '/../db_connect.php';
 
 global $pdo;
@@ -45,6 +52,7 @@ $pdo->exec("
           AND p.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
         GROUP BY p.company_id
     ) rev_stats ON rev_stats.company_id = c.id
+    WHERE c.is_active = 1
     ON DUPLICATE KEY UPDATE
         daily_avg_refund_cents = VALUES(daily_avg_refund_cents),
         daily_avg_refund_count = VALUES(daily_avg_refund_count),

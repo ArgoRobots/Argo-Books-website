@@ -25,11 +25,15 @@ $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
 $is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
 
-// Portal webhook secret (separate from the license sales webhook secret)
-$webhook_secret = $_ENV['PORTAL_STRIPE_WEBHOOK_SECRET'] ?? '';
+// Portal webhook secret — separate sandbox/live values mirror the API-key pair
+// below so all .env files can carry both. Falls back to the legacy single
+// PORTAL_STRIPE_WEBHOOK_SECRET name to avoid breaking existing deployments.
+$webhook_secret = $is_production
+    ? ($_ENV['STRIPE_LIVE_PORTAL_WEBHOOK_SECRET'] ?? $_ENV['PORTAL_STRIPE_WEBHOOK_SECRET'] ?? '')
+    : ($_ENV['STRIPE_SANDBOX_PORTAL_WEBHOOK_SECRET'] ?? $_ENV['PORTAL_STRIPE_WEBHOOK_SECRET'] ?? '');
 
 if (empty($webhook_secret)) {
-    error_log('Portal Stripe webhook: No webhook secret configured');
+    error_log('Portal Stripe webhook: No webhook secret configured (env: ' . ($is_production ? 'production' : 'sandbox') . ')');
     http_response_code(500);
     echo json_encode(['error' => 'Webhook not configured']);
     exit;

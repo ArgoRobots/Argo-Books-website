@@ -166,7 +166,7 @@ HTML;
  * `if (state was not yet completed)` guard that issues the UPDATE).
  */
 function refund_notify_completion(PDO $pdo, array $req): void {
-    $stmt = $pdo->prepare("SELECT owner_email, name FROM portal_companies WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT owner_email, company_name FROM portal_companies WHERE id = ?");
     $stmt->execute([$req['company_id']]);
     $company = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$company) return;
@@ -187,7 +187,7 @@ function refund_notify_completion(PDO $pdo, array $req): void {
                 (string)$req['invoice_number'],
                 (int)$req['amount_cents'],
                 (string)$req['currency'],
-                $company['name'] ?? null
+                $company['company_name'] ?? null
             );
             audit_log($pdo, (int)$req['company_id'], 'customer_notified', 'system', null, (int)$req['id'], null, [
                 'to' => $invoice['customer_email'],
@@ -308,7 +308,13 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         // the final values (provider_refund_id, completed_at).
         $req['state'] = 'completed';
         $req['provider_refund_id'] = $refund_id;
-        refund_notify_completion($pdo, $req);
+        // Notification is best-effort — Stripe has the money back already.
+        // If we let an SMTP/SQL hiccup propagate, the outer catch would mark
+        // the refund as 'failed' and the books would diverge from Stripe.
+        try { refund_notify_completion($pdo, $req); }
+        catch (\Throwable $notifyEx) {
+            error_log('refund_notify_completion threw after completed refund #' . $request_id . ': ' . $notifyEx->getMessage());
+        }
 
         // The provider's webhook (charge.refunded for Stripe; PAYMENT.CAPTURE.REFUNDED
         // for PayPal; refund.created for Square) is the canonical source for the

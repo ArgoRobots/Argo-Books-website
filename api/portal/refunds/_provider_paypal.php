@@ -49,6 +49,40 @@ function refund_paypal_base(array $company): string {
 }
 
 /**
+ * Resolve the primary capture ID for a PayPal order without exiting the
+ * request on failure — throws RuntimeException instead of echoing JSON
+ * and calling exit(). Used by background paths (cron, promoter) where
+ * the synchronous preflight isn't appropriate.
+ */
+function refund_paypal_resolve_capture_id(array $company, string $order_id): string {
+    if (!preg_match('/^[A-Za-z0-9\-]+$/', $order_id)) {
+        throw new RuntimeException('paypal_invalid_order_id');
+    }
+    $token = refund_paypal_token($company);
+    $base = refund_paypal_base($company);
+
+    $ch = curl_init("$base/v2/checkout/orders/" . urlencode($order_id));
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER => ["Authorization: Bearer $token", "Content-Type: application/json"],
+        CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_TIMEOUT => 15,
+    ]);
+    $resp = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($code === 404) throw new RuntimeException("paypal_order_not_found ($order_id)");
+    if ($code >= 400)  throw new RuntimeException("paypal_lookup_failed ($code)");
+
+    $order = json_decode($resp, true);
+    $capture = $order['purchase_units'][0]['payments']['captures'][0] ?? null;
+    if (!$capture || empty($capture['id'])) {
+        throw new RuntimeException('paypal_no_capture');
+    }
+    return (string)$capture['id'];
+}
+
+/**
  * Fetch the order, extract the primary capture, validate refundability.
  * Echoes JSON + exits on failure. Returns ['capture_id' => string,
  * 'refundable_cents' => int, 'currency' => string].
@@ -109,13 +143,16 @@ function refund_paypal_preflight(array $company, string $order_id, int $requeste
 
 function refund_paypal_issue(array $company, array $request): array {
     // If preflight already resolved a capture, use it; otherwise re-resolve.
+    // Background callers (cooling-off promoter, stale-processing cron) hit
+    // this path because preflight ran in a different request. We must NOT
+    // call refund_paypal_preflight here — it uses `exit` on every error
+    // path (transient HTTP failures, missing capture, etc.) which would
+    // abort the entire cron loop without ever marking the refund 'failed'.
+    // Use the silent resolver that THROWS instead so the outer
+    // refund_execute_against_provider catch can update state correctly.
     $capture_id = $GLOBALS['__paypal_preflight_capture_id'] ?? null;
     if (!$capture_id) {
-        // The cooling-off promoter or stale-processing reconciliation will hit
-        // this path because preflight ran in a different request. Resolve again.
-        refund_paypal_preflight($company, $request['provider_payment_id'], (int)$request['amount_cents']);
-        $capture_id = $GLOBALS['__paypal_preflight_capture_id'] ?? null;
-        if (!$capture_id) throw new RuntimeException('paypal_no_capture');
+        $capture_id = refund_paypal_resolve_capture_id($company, $request['provider_payment_id']);
     }
 
     $token = refund_paypal_token($company);

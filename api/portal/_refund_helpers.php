@@ -188,7 +188,12 @@ function refund_notify_completion(PDO $pdo, array $req): void {
     if (!$company) return;
 
     if (!empty($company['owner_email'])) {
-        refund_email_send_issued($company['owner_email'], $req);
+        // Wrap the owner-email send so an SMTP failure here can't block
+        // the customer-email send below. Each notification is independent.
+        try { refund_email_send_issued($company['owner_email'], $req); }
+        catch (\Throwable $e) {
+            error_log('refund_notify_completion owner email failed: ' . $e->getMessage());
+        }
     }
 
     // Look up the customer's email + name from the matching portal_invoices row.
@@ -316,8 +321,18 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
                 throw new RuntimeException("Unsupported provider: {$req['provider']}");
         }
 
-        $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ?")
-            ->execute([$refund_id, $request_id]);
+        // CAS-style transition: only flip if still in a pre-completed state.
+        // Guards against a race where the provider webhook arrives before
+        // this UPDATE commits and both paths would otherwise notify.
+        // Whichever runs first wins (rowCount=1) and owns the notify; the
+        // other's UPDATE affects 0 rows and skips the notify entirely.
+        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+        $upd->execute([$refund_id, $request_id]);
+        if ($upd->rowCount() === 0) {
+            // Already completed by another path (webhook race) — nothing
+            // more to do; notification has happened or will happen there.
+            return;
+        }
         audit_log($pdo, (int)$company['id'], 'completed', 'system', null, $request_id, null, [
             'provider_refund_id' => $refund_id,
         ]);

@@ -60,16 +60,20 @@ foreach ($rows as $r) {
 
         if ($found) {
             if ($found->status === 'succeeded') {
-                $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ?")
-                    ->execute([$found->id, $r['id']]);
-                audit_log($pdo, (int)$r['company_id'], 'completed', 'system', null, (int)$r['id'], null, [
-                    'reconciled_via_stale_cron' => true,
-                    'provider_refund_id' => $found->id,
-                ]);
-                $r['state'] = 'completed';
-                $r['provider_refund_id'] = $found->id;
-                refund_notify_completion($pdo, $r);
-                $reconciled++;
+                // CAS guard so a webhook arriving in the same window doesn't
+                // produce a second completion notification.
+                $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                $upd->execute([$found->id, $r['id']]);
+                if ($upd->rowCount() > 0) {
+                    audit_log($pdo, (int)$r['company_id'], 'completed', 'system', null, (int)$r['id'], null, [
+                        'reconciled_via_stale_cron' => true,
+                        'provider_refund_id' => $found->id,
+                    ]);
+                    $r['state'] = 'completed';
+                    $r['provider_refund_id'] = $found->id;
+                    refund_notify_completion($pdo, $r);
+                    $reconciled++;
+                }
             } elseif (in_array($found->status, ['failed','canceled'], true)) {
                 $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ?")
                     ->execute([$found->failure_reason ?? $found->status, $r['id']]);

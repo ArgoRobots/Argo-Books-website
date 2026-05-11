@@ -151,15 +151,20 @@ switch ($eventType) {
                     $rstmt->execute([$argoId]);
                     $rr = $rstmt->fetch(PDO::FETCH_ASSOC);
                     if ($rr && $rr['state'] !== 'completed' && $rr['state'] !== 'cancelled') {
-                        $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ?")
-                            ->execute([$refundId, $argoId]);
-                        audit_log($pdo, (int)$rr['company_id'], 'completed', 'webhook', null, $argoId, null, [
-                            'provider_refund_id' => $refundId,
-                            'reconciled_via_webhook' => true,
-                        ]);
-                        $rr['state'] = 'completed';
-                        $rr['provider_refund_id'] = $refundId;
-                        refund_notify_completion($pdo, $rr);
+                        // CAS guard: only the UPDATE that actually flips the
+                        // state notifies, so a race with the synchronous
+                        // execute path can't fire two completion emails.
+                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                        $upd->execute([$refundId, $argoId]);
+                        if ($upd->rowCount() > 0) {
+                            audit_log($pdo, (int)$rr['company_id'], 'completed', 'webhook', null, $argoId, null, [
+                                'provider_refund_id' => $refundId,
+                                'reconciled_via_webhook' => true,
+                            ]);
+                            $rr['state'] = 'completed';
+                            $rr['provider_refund_id'] = $refundId;
+                            refund_notify_completion($pdo, $rr);
+                        }
                     }
                 }
             }

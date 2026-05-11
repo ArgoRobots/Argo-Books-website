@@ -10,6 +10,7 @@
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../smtp_mailer.php';
 require_once __DIR__ . '/../../rate_limit_helper.php';
+require_once __DIR__ . '/../../config/pricing.php';
 
 /**
  * Generate a cryptographically secure token (48-character hex string = 192 bits of entropy)
@@ -334,13 +335,20 @@ function record_portal_payment(array $params): array
     // Use INSERT ... ON DUPLICATE KEY UPDATE to prevent race conditions on duplicate payments.
     // SCHEMA REQUIREMENT: A UNIQUE index on `provider_payment_id` is required in portal_payments
     // for this to work correctly. e.g.: ALTER TABLE portal_payments ADD UNIQUE INDEX (provider_payment_id);
+    //
+    // The two callers (process-payment.php and the Stripe webhook's
+    // payment_intent.succeeded handler) race in normal operation. The
+    // customer-portal call knows processing_fee; the webhook does not (it
+    // passes 0). GREATEST() lets the second insert backfill a previously-
+    // zero fee without ever overwriting a real value with zero.
     $stmt = $pdo->prepare(
         'INSERT INTO portal_payments
          (company_id, invoice_id, customer_name, amount, processing_fee,
           currency, payment_method, provider_payment_id, provider_transaction_id,
           reference_number, status, synced_to_argo, payment_environment, created_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, NOW())
-         ON DUPLICATE KEY UPDATE id=id'
+         ON DUPLICATE KEY UPDATE
+           processing_fee = GREATEST(processing_fee, VALUES(processing_fee))'
     );
 
     try {
@@ -538,6 +546,12 @@ function send_invoice_notification(array $params): array
     $currency = $params['currency'] ?? 'USD';
     $dueDate = $params['dueDate'] ?? '';
     $invoiceUrl = $params['invoiceUrl'] ?? '';
+    // Default to true to match the schema's column default (pass_processing_fee
+    // DEFAULT 1) — older callers that don't pass the flag still get the
+    // fee-inclusive headline number that the customer will see on the portal.
+    $passProcessingFee = !array_key_exists('passProcessingFee', $params)
+        ? true
+        : !empty($params['passProcessingFee']);
 
     if (empty($customerEmail) || empty($invoiceUrl)) {
         return ['success' => false, 'message' => 'Missing customer email or invoice URL'];
@@ -549,14 +563,26 @@ function send_invoice_notification(array $params): array
     $companyName = preg_replace('/[\r\n\x00-\x1F]/', '', $companyName);
 
     $currencySymbol = $currency === 'CAD' ? 'CA$' : '$';
-    $formattedAmount = $currencySymbol . number_format(floatval($balanceDue), 2) . ' ' . $currency;
+
+    // The customer will be charged balance + processing fee on the payment
+    // portal page. The headline amount in the email must match that number,
+    // otherwise the customer is surprised at checkout. When the company has
+    // chosen to absorb the fee (passProcessingFee=false), Amount Due stays
+    // at the raw balance.
+    $balanceFloat = floatval($balanceDue);
+    $processingFee = ($passProcessingFee && $balanceFloat > 0)
+        ? floatval(calculate_invoice_processing_fee($balanceFloat, $currency))
+        : 0.0;
+    $headlineAmount = $balanceFloat + $processingFee;
+    $headlineLabel = $processingFee > 0 ? 'Amount to Pay' : 'Amount Due';
+    $formattedAmount = $currencySymbol . number_format($headlineAmount, 2) . ' ' . $currency;
     $formattedDueDate = $dueDate ? date('F j, Y', strtotime($dueDate)) : '';
     $subject = "Invoice {$invoiceId} from {$companyName}";
 
     $safeCompany = htmlspecialchars($companyName);
     $detailRows = [
         ['Invoice', htmlspecialchars($invoiceId), 'padding: 8px 0; text-align: right; font-size: 14px; font-weight: 600; color: #111827;'],
-        ['Amount Due', htmlspecialchars($formattedAmount), 'padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;'],
+        [$headlineLabel, htmlspecialchars($formattedAmount), 'padding: 8px 0; text-align: right; font-size: 18px; font-weight: 700; color: #111827;'],
     ];
     if (!empty($formattedDueDate)) {
         $detailRows[] = ['Due Date', htmlspecialchars($formattedDueDate)];

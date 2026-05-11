@@ -151,6 +151,7 @@ function handle_publish_invoice(): void
                 'dueDate' => $dueDate,
                 'invoiceUrl' => $invoiceUrl,
                 'portalUrl' => $portalUrl,
+                'passProcessingFee' => (bool)$passProcessingFee,
             ]);
             $emailSent = $emailResult['success'];
         } catch (\Throwable $e) {

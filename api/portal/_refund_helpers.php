@@ -142,15 +142,31 @@ HTML;
  * refund_email_send_issued (which goes to the business owner) — wording is
  * customer-facing and tells them what to expect in their bank/card account.
  */
-function refund_email_send_customer_refunded(string $to, ?string $customer_name, string $invoice_number, int $amount_cents, string $currency, ?string $business_name = null): void {
+function refund_email_send_customer_refunded(string $to, ?string $customer_name, string $invoice_number, int $amount_cents, string $currency, ?string $business_name = null, ?string $reason = null): void {
     $amount_str    = htmlspecialchars(number_format($amount_cents / 100, 2) . ' ' . $currency);
     $invoice_safe  = htmlspecialchars($invoice_number);
     $greeting      = !empty($customer_name) ? 'Hi ' . htmlspecialchars($customer_name) . ',' : 'Hi,';
     $business_safe = !empty($business_name) ? htmlspecialchars($business_name) : 'the merchant';
     $subject       = "Your refund for invoice $invoice_safe has been issued";
+
+    // Optional reason from the merchant — surfaced in a quoted block so the
+    // customer sees the explanation the business owner typed. The UI tells
+    // the owner that this will be shown.
+    $reason_html = '';
+    if (!empty($reason)) {
+        $reason_safe = nl2br(htmlspecialchars(trim($reason)));
+        $reason_html = <<<HTML
+        <p>Reason from $business_safe:</p>
+        <blockquote style="border-left:3px solid #d1d5db;padding:8px 12px;margin:0 0 16px 0;color:#374151;background:#f9fafb;">
+            $reason_safe
+        </blockquote>
+HTML;
+    }
+
     $body = <<<HTML
         <p>$greeting</p>
         <p>A refund of <strong>$amount_str</strong> for invoice <strong>$invoice_safe</strong> has been issued by $business_safe.</p>
+        $reason_html
         <p>The money will be returned to the same payment method you originally used. Most banks and card networks post the refund within 5–10 business days; some are faster.</p>
         <p>If you don't see the refund after 10 business days, please contact $business_safe directly.</p>
 HTML;
@@ -187,7 +203,8 @@ function refund_notify_completion(PDO $pdo, array $req): void {
                 (string)$req['invoice_number'],
                 (int)$req['amount_cents'],
                 (string)$req['currency'],
-                $company['company_name'] ?? null
+                $company['company_name'] ?? null,
+                $req['reason'] ?? null
             );
             audit_log($pdo, (int)$req['company_id'], 'customer_notified', 'system', null, (int)$req['id'], null, [
                 'to' => $invoice['customer_email'],

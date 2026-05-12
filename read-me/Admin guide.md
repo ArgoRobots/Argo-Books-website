@@ -6,19 +6,19 @@
 
 ### Stripe
 
-- **Standard Rate:** 2.9% + $0.30 CAD per transaction
+- **Standard Rate:** 2.9% + \$0.30 CAD per transaction
 - **International Cards:** Additional 1.5%
 - **Currency Conversion:** Additional 1%
 
 ### PayPal
 
-- **Standard Rate:** 2.9% + $0.30 CAD per transaction
+- **Standard Rate:** 2.9% + \$0.30 CAD per transaction
 - **PayPal Account Payments:** Same rate
 - **International:** 4.4% + fixed fee
 
 ### Square
 
-- **Online Payments:** 2.9% + $0.30 CAD per transaction
+- **Online Payments:** 2.9% + \$0.30 CAD per transaction
 - **Card on File:** Same rate
 - **International:** Additional 1.5%
 

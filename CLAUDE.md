@@ -128,8 +128,6 @@ Located in `/cron/`. Must be scheduled on the server (see `/read-me/Cron jobs.md
 | `outreach_pipeline.php` | Hourly | Send bulk email campaigns |
 | `account_purge.php` | Daily | Delete accounts scheduled for deletion |
 
-Cron requests are authenticated via `CRON_SECRET` in `.env`.
-
 ## Git Workflow
 
 - If there is an active version branch (e.g., `V.2.0.5`) for the next release, then branch off this version branch, not `main`.

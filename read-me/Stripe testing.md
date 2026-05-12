@@ -24,7 +24,7 @@ https://dev.argorobots.com/pricing/checkout/index.php?method=stripe
    - **CVC**: Any 3 digits (e.g., 123)
    - **Email**: Your email address
 
-3. Click "Pay $20.00 CAD"
+3. Click "Pay \$20.00 CAD"
 
 4. Check results:
    - Should redirect to thank you page with license key

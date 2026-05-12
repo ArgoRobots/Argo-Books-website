@@ -101,23 +101,6 @@ if ($isProduction) {
     echo "PAYPAL_SANDBOX_YEARLY_PLAN_ID=$yearlyPlanId\n";
 }
 
-echo "\n===========================================\n";
-echo "Next Steps:\n";
-echo "===========================================\n";
-echo "1. Copy the Plan IDs above to your .env file\n";
-echo "2. Set up the webhook in PayPal Developer Dashboard:\n";
-echo "   - Go to: https://developer.paypal.com/dashboard/applications\n";
-echo "   - Click your app\n";
-echo "   - Scroll to 'Webhooks' and click 'Add Webhook'\n";
-echo "   - URL: https://yourdomain.com/webhooks/paypal-subscription.php\n";
-echo "   - Events: All BILLING.SUBSCRIPTION.* and PAYMENT.SALE.* events\n";
-echo "3. Copy the Webhook ID to your .env as:\n";
-if ($isProduction) {
-    echo "   PAYPAL_LIVE_WEBHOOK_ID=your_webhook_id\n";
-} else {
-    echo "   PAYPAL_SANDBOX_WEBHOOK_ID=your_webhook_id\n";
-}
-echo "\n";
 
 // === Helper Functions ===
 

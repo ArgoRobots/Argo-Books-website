@@ -21,10 +21,13 @@ $payload = file_get_contents('php://input');
 
 // Verify webhook signature (mandatory)
 $signature = $_SERVER['HTTP_X_SQUARE_HMACSHA256_SIGNATURE'] ?? '';
-$webhookSignatureKey = $_ENV['PORTAL_SQUARE_WEBHOOK_SIGNATURE_KEY'] ?? '';
+$is_production = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
+$webhookSignatureKey = $is_production
+    ? ($_ENV['SQUARE_LIVE_PORTAL_WEBHOOK_SIGNATURE_KEY'] ?? '')
+    : ($_ENV['SQUARE_SANDBOX_PORTAL_WEBHOOK_SIGNATURE_KEY'] ?? '');
 
 if (empty($webhookSignatureKey)) {
-    error_log('Portal Square webhook: PORTAL_SQUARE_WEBHOOK_SIGNATURE_KEY not configured - rejecting request');
+    error_log('Portal Square webhook: No webhook signature key configured (env: ' . ($is_production ? 'production' : 'sandbox') . ')');
     http_response_code(500);
     exit;
 }
@@ -52,10 +55,14 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 $eventType = $data['type'] ?? '';
 
 switch ($eventType) {
-    case 'payment.completed':
-        // Payment completed - handled primarily by checkout.php
-        // This webhook serves as a backup confirmation
+    case 'payment.created':
+    case 'payment.updated':
+        // Square fires payment.created/updated for any status transition.
+        // We only act on COMPLETED — this is the backup confirmation for
+        // payments whose synchronous handling in checkout.php was interrupted.
         $payment = $data['data']['object']['payment'] ?? [];
+        $paymentStatus = $payment['status'] ?? '';
+        if ($paymentStatus !== 'COMPLETED') break;
         $paymentId = $payment['id'] ?? 'unknown';
         error_log("Portal Square webhook: Payment completed - $paymentId");
 

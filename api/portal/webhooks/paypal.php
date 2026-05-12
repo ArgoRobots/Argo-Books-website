@@ -157,11 +157,28 @@ switch ($eventType) {
         // the Stripe webhook behavior). Best-effort — wrap in try/catch so a
         // missing original row doesn't 500 the webhook.
         try {
-            $captureId = $data['resource']['id'] ?? '';
+            // For PAYMENT.CAPTURE.REFUNDED, `resource` is the refund object;
+            // `links[rel=up]` points at the parent capture. Falling back to
+            // resource.id covers older webhook formats where the refund's
+            // own id is the only available identifier.
             $refundAmount = (float)($data['resource']['amount']['value'] ?? 0);
             $refundCurrency = strtoupper($data['resource']['amount']['currency_code'] ?? 'USD');
-            $refundId = $data['resource']['id'] ?? null; // PayPal calls the refund itself a resource with its own id
             $invoiceTag = $data['resource']['invoice_id'] ?? '';
+
+            $refundId = $data['resource']['id'] ?? null;
+            $captureId = null;
+            foreach (($data['resource']['links'] ?? []) as $lnk) {
+                if (($lnk['rel'] ?? '') === 'up' && !empty($lnk['href'])) {
+                    $parts = explode('/', rtrim($lnk['href'], '/'));
+                    $captureId = end($parts) ?: null;
+                    break;
+                }
+            }
+            if (empty($captureId)) {
+                // Best-effort fallback for payloads without an 'up' link.
+                $captureId = $data['resource']['supplementary_data']['related_ids']['capture_id']
+                    ?? $refundId;
+            }
 
             // Find original payment by capture id (provider_transaction_id) OR by order id (provider_payment_id)
             $stmt = $pdo->prepare("
@@ -174,26 +191,53 @@ switch ($eventType) {
             $original = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($original) {
-                // Idempotency: skip if a refund row with this provider_payment_id already exists
-                $check = $pdo->prepare("SELECT id FROM portal_payments WHERE company_id = ? AND provider_payment_id = ? LIMIT 1");
-                $refundProviderPaymentId = 'refund_' . $captureId;
-                $check->execute([$original['company_id'], $refundProviderPaymentId]);
-                if (!$check->fetch()) {
-                    record_portal_payment([
-                        'company_id' => $original['company_id'],
-                        'invoice_id' => $original['invoice_id'],
-                        'customer_name' => $original['customer_name'],
-                        'amount' => -$refundAmount,
-                        'currency' => $refundCurrency,
-                        'payment_method' => 'paypal',
-                        'provider_payment_id' => $refundProviderPaymentId,
-                        'provider_transaction_id' => $captureId,
-                        'reference_number' => generate_reference_number(),
-                        'status' => 'refunded',
-                        'payment_environment' => $is_production ? 'production' : 'sandbox',
-                    ]);
-                    $pdo->prepare("UPDATE portal_payments SET status = 'refunded' WHERE id = ?")
-                        ->execute([$original['id']]);
+                // Key the refund row by the refund's own id so multiple
+                // partial refunds against the same capture produce distinct
+                // rows (capture-id keying collides on the second refund).
+                $refundProviderPaymentId = 'refund_' . ($refundId ?: $captureId);
+                $recordResult = record_portal_payment([
+                    'company_id' => $original['company_id'],
+                    'invoice_id' => $original['invoice_id'],
+                    'customer_name' => $original['customer_name'],
+                    'amount' => -$refundAmount,
+                    'currency' => $refundCurrency,
+                    'payment_method' => 'paypal',
+                    'provider_payment_id' => $refundProviderPaymentId,
+                    'provider_transaction_id' => $captureId,
+                    'reference_number' => generate_reference_number(),
+                    'status' => 'refunded',
+                    'payment_environment' => $is_production ? 'production' : 'sandbox',
+                ]);
+                if (!empty($recordResult['inserted'])) {
+                    // Invoice reconciliation (mirrors apply_stripe_refund_to_db).
+                    // Scope cumulative-refund SUM to this specific capture so
+                    // refunds on a sibling capture can't flip the wrong payment.
+                    $sumStmt = $pdo->prepare(
+                        "SELECT COALESCE(SUM(amount), 0) AS refunded_total
+                         FROM portal_payments
+                         WHERE amount < 0 AND payment_method = 'paypal'
+                           AND provider_transaction_id = ?"
+                    );
+                    $sumStmt->execute([$captureId]);
+                    $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
+                    if ($refundedTotal + 0.01 >= (float)$original['amount']) {
+                        $pdo->prepare("UPDATE portal_payments SET status = 'refunded' WHERE id = ?")
+                            ->execute([$original['id']]);
+                    }
+
+                    // Update invoice balance/status. SET-clause order matters:
+                    // status CASE must see pre-update balance_due. Mirrors the
+                    // Stripe path.
+                    $pdo->prepare(
+                        'UPDATE portal_invoices
+                         SET status = CASE
+                                 WHEN balance_due + ? >= total_amount THEN "sent"
+                                 ELSE "partial"
+                             END,
+                             balance_due = LEAST(total_amount, balance_due + ?),
+                             updated_at = NOW()
+                         WHERE company_id = ? AND invoice_id = ?'
+                    )->execute([$refundAmount, $refundAmount, $original['company_id'], $original['invoice_id']]);
                 }
 
                 // Reconcile refund_requests if argo_request_id is in invoice_id

@@ -64,7 +64,13 @@ function apply_stripe_refund_to_db(
         ? 'refund_' . $refundId
         : 'refund_' . $providerPaymentId;
 
-    record_portal_payment([
+    // Capture whether the refund row was newly inserted. record_portal_payment
+    // is idempotent via the UNIQUE index on provider_payment_id; if Stripe
+    // retries the same Refund event, the second call no-ops here. We must
+    // also skip the invoice balance / original-payment-status updates below
+    // on those retries — otherwise the refund would be double-applied to
+    // the invoice.
+    $recordResult = record_portal_payment([
         'company_id' => $originalPayment['company_id'],
         'invoice_id' => $originalPayment['invoice_id'],
         'customer_name' => $originalPayment['customer_name'],
@@ -77,18 +83,26 @@ function apply_stripe_refund_to_db(
         'status' => 'refunded',
         'payment_environment' => $isProduction ? 'production' : 'sandbox',
     ]);
+    if (empty($recordResult['inserted'])) {
+        // Duplicate event (webhook retry, or refund already synced via the
+        // synchronous execute path). Books are already up to date.
+        return true;
+    }
 
     // Flip the original payment to 'refunded' only once cumulative refunds
-    // cover the original amount. Sum after the insert so the just-inserted
-    // negative row counts; tiny epsilon for cent-level float drift.
+    // cover the original amount. Scope the sum to refunds against THIS
+    // specific charge (provider_transaction_id = chargeId) — not the whole
+    // invoice — so refunds on a sibling payment for the same invoice can't
+    // inflate this total and incorrectly flip the wrong payment. Tiny
+    // epsilon for cent-level float drift.
     $sumStmt = $pdo->prepare(
         "SELECT COALESCE(SUM(amount), 0) AS refunded_total
          FROM portal_payments
-         WHERE company_id = ? AND invoice_id = ?
-           AND amount < 0
-           AND payment_method = 'stripe'"
+         WHERE amount < 0
+           AND payment_method = 'stripe'
+           AND provider_transaction_id = ?"
     );
-    $sumStmt->execute([$originalPayment['company_id'], $originalPayment['invoice_id']]);
+    $sumStmt->execute([$chargeId]);
     $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
     if ($refundedTotal + 0.01 >= (float)$originalPayment['amount']) {
         $stmt = $pdo->prepare(

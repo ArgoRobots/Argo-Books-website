@@ -52,6 +52,7 @@ function handle_pull_payments(int $companyId): void
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
                                           AND rr.state = 'completed'
                                           AND (rr.provider_refund_id = pp.provider_payment_id
+                                               OR pp.provider_payment_id = CONCAT('refund_', rr.provider_refund_id)
                                                OR pp.provider_payment_id = CONCAT('refund_', rr.provider_payment_id))
              WHERE pp.company_id = ?
              ORDER BY pp.created_at ASC"
@@ -68,6 +69,7 @@ function handle_pull_payments(int $companyId): void
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
                                           AND rr.state = 'completed'
                                           AND (rr.provider_refund_id = pp.provider_payment_id
+                                               OR pp.provider_payment_id = CONCAT('refund_', rr.provider_refund_id)
                                                OR pp.provider_payment_id = CONCAT('refund_', rr.provider_payment_id))
              WHERE pp.company_id = ?
                AND (pp.synced_to_argo = 0 OR pp.created_at > ?)
@@ -85,6 +87,7 @@ function handle_pull_payments(int $companyId): void
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id
                                           AND rr.state = 'completed'
                                           AND (rr.provider_refund_id = pp.provider_payment_id
+                                               OR pp.provider_payment_id = CONCAT('refund_', rr.provider_refund_id)
                                                OR pp.provider_payment_id = CONCAT('refund_', rr.provider_payment_id))
              WHERE pp.company_id = ? AND pp.synced_to_argo = 0
              ORDER BY pp.created_at ASC"

@@ -371,7 +371,10 @@ function record_portal_payment(array $params): array
     $paymentId = $pdo->lastInsertId();
 
     if ($affectedRows !== 1 && !empty($providerPaymentId)) {
-        // Duplicate payment detected — return existing reference
+        // Duplicate payment detected — return existing reference.
+        // 'inserted' => false lets callers (refund webhooks especially)
+        // skip follow-up updates that should only run on first insert,
+        // avoiding double-application on webhook retries.
         $stmt = $pdo->prepare(
             'SELECT reference_number FROM portal_payments WHERE provider_payment_id = ? LIMIT 1'
         );
@@ -379,6 +382,7 @@ function record_portal_payment(array $params): array
         $existing = $stmt->fetch();
         return [
             'success' => true,
+            'inserted' => false,
             'reference_number' => $existing['reference_number'] ?? $referenceNumber,
             'message' => 'Payment already recorded'
         ];
@@ -416,6 +420,7 @@ function record_portal_payment(array $params): array
 
     return [
         'success' => true,
+        'inserted' => true,
         'payment_id' => $paymentId,
         'reference_number' => $referenceNumber,
         'message' => 'Payment recorded successfully'

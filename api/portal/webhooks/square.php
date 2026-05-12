@@ -119,24 +119,56 @@ switch ($eventType) {
             $stmt->execute([$paymentId]);
             $original = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($original) {
-                $check = $pdo->prepare("SELECT id FROM portal_payments WHERE company_id = ? AND provider_payment_id = ? LIMIT 1");
-                $refundRow = 'refund_' . $paymentId;
-                $check->execute([$original['company_id'], $refundRow]);
-                if (!$check->fetch()) {
-                    record_portal_payment([
-                        'company_id' => $original['company_id'],
-                        'invoice_id' => $original['invoice_id'],
-                        'customer_name' => $original['customer_name'],
-                        'amount' => -($amount / 100.0),
-                        'currency' => strtoupper($currency),
-                        'payment_method' => 'square',
-                        'provider_payment_id' => $refundRow,
-                        'provider_transaction_id' => $refundId,
-                        'reference_number' => generate_reference_number(),
-                        'status' => 'refunded',
-                        'payment_environment' => ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
-                    ]);
-                    $pdo->prepare("UPDATE portal_payments SET status='refunded' WHERE id = ?")->execute([$original['id']]);
+                // Key the refund row by Square's own refund id so multiple
+                // partial refunds against the same payment produce distinct
+                // rows (paymentId-keying collides on the second refund and
+                // silently drops it).
+                $refundRow = 'refund_' . $refundId;
+                $refundAmount = $amount / 100.0;
+                $recordResult = record_portal_payment([
+                    'company_id' => $original['company_id'],
+                    'invoice_id' => $original['invoice_id'],
+                    'customer_name' => $original['customer_name'],
+                    'amount' => -$refundAmount,
+                    'currency' => strtoupper($currency),
+                    'payment_method' => 'square',
+                    'provider_payment_id' => $refundRow,
+                    'provider_transaction_id' => $paymentId,
+                    'reference_number' => generate_reference_number(),
+                    'status' => 'refunded',
+                    'payment_environment' => ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
+                ]);
+                if (!empty($recordResult['inserted'])) {
+                    // Cumulative-refund check: only flip the original payment
+                    // to 'refunded' once refunds cover the original amount.
+                    // Without this, even a partial refund flipped the original
+                    // to refunded and books would show it as fully refunded.
+                    $sumStmt = $pdo->prepare(
+                        "SELECT COALESCE(SUM(amount), 0) AS refunded_total
+                         FROM portal_payments
+                         WHERE amount < 0 AND payment_method = 'square'
+                           AND provider_transaction_id = ?"
+                    );
+                    $sumStmt->execute([$paymentId]);
+                    $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
+                    if ($refundedTotal + 0.01 >= (float)$original['amount']) {
+                        $pdo->prepare("UPDATE portal_payments SET status='refunded' WHERE id = ?")
+                            ->execute([$original['id']]);
+                    }
+
+                    // Update invoice balance/status (mirrors Stripe path).
+                    // SET-clause order matters: status CASE must see the
+                    // pre-update balance_due.
+                    $pdo->prepare(
+                        'UPDATE portal_invoices
+                         SET status = CASE
+                                 WHEN balance_due + ? >= total_amount THEN "sent"
+                                 ELSE "partial"
+                             END,
+                             balance_due = LEAST(total_amount, balance_due + ?),
+                             updated_at = NOW()
+                         WHERE company_id = ? AND invoice_id = ?'
+                    )->execute([$refundAmount, $refundAmount, $original['company_id'], $original['invoice_id']]);
                 }
 
                 // Reconcile refund_requests by argo_request_id (we set this in the

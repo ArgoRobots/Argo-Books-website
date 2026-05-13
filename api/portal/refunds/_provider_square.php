@@ -19,14 +19,16 @@ function refund_square_get_client(array $company)
         throw new RuntimeException('Square access token not configured for company.');
     }
     $token = portal_decrypt($company['square_access_token']);
-    $env = ($company['environment'] ?? 'production') === 'production'
-        ? \Square\Environments::Production
-        : \Square\Environments::Sandbox;
+    $isProduction = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
+    $baseUrl = $isProduction
+        ? \Square\Environments::Production->value
+        : \Square\Environments::Sandbox->value;
 
-    return new \Square\SquareClient([
-        'token' => $token,
-        'environment' => $env,
-    ]);
+    return new \Square\SquareClient(
+        token: $token,
+        version: '2026-01-22',
+        options: ['baseUrl' => $baseUrl],
+    );
 }
 
 /**
@@ -35,7 +37,9 @@ function refund_square_get_client(array $company)
 function refund_square_preflight(array $company, string $payment_id, int $requested_cents): int {
     try {
         $client = refund_square_get_client($company);
-        $resp = $client->payments->get(['payment_id' => $payment_id]);
+        $resp = $client->payments->get(
+            new \Square\Payments\Requests\GetPaymentsRequest(['paymentId' => $payment_id])
+        );
         $payment = $resp->getPayment();
     } catch (\Throwable $e) {
         http_response_code(404);
@@ -74,15 +78,15 @@ function refund_square_issue(array $company, array $request): array {
     $client = refund_square_get_client($company);
     $idempotency = 'argo_request_' . $request['id'];
 
-    $body = [
-        'idempotency_key' => $idempotency,
-        'amount_money' => [
+    $body = new \Square\Refunds\Requests\RefundPaymentRequest([
+        'idempotencyKey' => $idempotency,
+        'amountMoney' => new \Square\Types\Money([
             'amount' => (int)$request['amount_cents'],
-            'currency' => $request['currency'],
-        ],
-        'payment_id' => $request['provider_payment_id'],
+            'currency' => (string)$request['currency'],
+        ]),
+        'paymentId' => (string)$request['provider_payment_id'],
         'reason' => substr((string)($request['reason'] ?? 'Refund'), 0, 192),
-    ];
+    ]);
 
     try {
         $resp = $client->refunds->refundPayment($body);

@@ -254,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function () {
         body: JSON.stringify({
           invoice_token: invoiceToken,
           method: "paypal",
-          amount: balanceDue,
+          amount: totalWithFee,
         }),
       })
         .then(function (r) {
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
         body: JSON.stringify({
           invoice_token: invoiceToken,
           method: "paypal",
-          amount: balanceDue,
+          amount: totalWithFee,
         }),
       })
         .then(function (r) {
@@ -418,7 +418,7 @@ document.addEventListener("DOMContentLoaded", function () {
       body: JSON.stringify({
         invoice_token: invoiceToken,
         method: "square",
-        amount: balanceDue,
+        amount: totalWithFee,
       }),
     })
       .then(function (r) {

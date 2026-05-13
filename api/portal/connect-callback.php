@@ -268,7 +268,7 @@ function handle_square_callback(PDO $db, int $companyId, string $code, bool $is_
             'redirect_uri' => $redirectUri,
         ]),
         CURLOPT_HTTPHEADER => [
-            'Square-Version: 2025-10-16',
+            'Square-Version: 2026-01-22',
             'Content-Type: application/json',
         ],
         CURLOPT_SSL_VERIFYPEER => true,
@@ -300,7 +300,7 @@ function handle_square_callback(PDO $db, int $companyId, string $code, bool $is_
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => [
-            'Square-Version: 2025-10-16',
+            'Square-Version: 2026-01-22',
             "Authorization: Bearer $accessToken",
         ],
         CURLOPT_SSL_VERIFYPEER => true,

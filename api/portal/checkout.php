@@ -247,8 +247,10 @@ function process_square_payment(array $invoice, array $company, array $data, int
         : 'https://connect.squareupsandbox.com/v2';
 
     // Derive idempotency key from invoice+amount+source so retries reuse the same key,
-    // but clients cannot manipulate it (server-side HMAC with encryption key as secret)
-    $idempotencyKey = hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
+    // but clients cannot manipulate it (server-side HMAC with encryption key as secret).
+    // Truncated to 45 chars to fit Square's idempotency_key max length (180 bits of
+    // entropy retained — more than enough for uniqueness).
+    $idempotencyKey = substr(hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? ''), 0, 45);
     $referenceNumber = generate_reference_number();
 
     $paymentData = [
@@ -270,7 +272,7 @@ function process_square_payment(array $invoice, array $company, array $data, int
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS => json_encode($paymentData),
         CURLOPT_HTTPHEADER => [
-            "Square-Version: 2025-10-16",
+            "Square-Version: 2026-01-22",
             "Authorization: Bearer $accessToken",
             "Content-Type: application/json"
         ],

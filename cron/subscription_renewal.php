@@ -445,7 +445,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
-                "Square-Version: 2025-10-16",
+                "Square-Version: 2026-01-22",
                 "Authorization: Bearer $accessToken",
                 "Content-Type: application/json"
             ],
@@ -484,7 +484,7 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => json_encode($paymentData),
             CURLOPT_HTTPHEADER => [
-                "Square-Version: 2025-10-16",
+                "Square-Version: 2026-01-22",
                 "Authorization: Bearer $accessToken",
                 "Content-Type: application/json"
             ],

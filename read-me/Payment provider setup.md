@@ -264,7 +264,7 @@ Square calls webhooks **Webhook subscriptions** — same idea, different name. I
 3. **Notification URL:**
    - Sandbox tab: `https://dev.argorobots.com/api/portal/webhooks/square`
    - Production tab: `https://argorobots.com/api/portal/webhooks/square`
-4. **API version:** `2025-10-16` — this should match the `Square-Version` header the rest of the code sends (grep `Square-Version` to verify the current value). If the code's API version is later bumped, update existing subscriptions to match so payload shapes stay consistent.
+4. **API version:** `2026-01-22` — this should match the `Square-Version` header the rest of the code sends (grep `Square-Version` to verify the current value). If the code's API version is later bumped, update existing subscriptions to match so payload shapes stay consistent.
 5. **Event types** — subscribe to:
    - `payment.created`
    - `payment.updated`

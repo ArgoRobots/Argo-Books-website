@@ -165,13 +165,18 @@ function initiate_connect(array $company, string $provider): void
             $squareBase = $is_production
                 ? 'https://connect.squareup.com'
                 : 'https://connect.squareupsandbox.com';
-            $authUrl = "$squareBase/oauth2/authorize?" . http_build_query([
+            $squareParams = [
                 'client_id' => $appId,
                 'redirect_uri' => $callbackUrl,
                 'scope' => 'PAYMENTS_WRITE PAYMENTS_READ MERCHANT_PROFILE_READ',
-                'session' => 'false',
                 'state' => $state,
-            ], '', '&', PHP_QUERY_RFC3986);
+            ];
+            // Square's sandbox OAuth does not support the `session` parameter.
+            // Sending it there returns a blank authorize page. Production only.
+            if ($is_production) {
+                $squareParams['session'] = 'false';
+            }
+            $authUrl = "$squareBase/oauth2/authorize?" . http_build_query($squareParams, '', '&', PHP_QUERY_RFC3986);
             break;
     }
 

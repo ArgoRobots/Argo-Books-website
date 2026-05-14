@@ -425,13 +425,18 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     square_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected Square account',
     -- Metadata
     owner_email VARCHAR(100) DEFAULT NULL,
+    email_verified_at DATETIME DEFAULT NULL COMMENT 'Set when the owner verifies the registration code; required for refunds/email-change',
     environment VARCHAR(10) DEFAULT 'sandbox' COMMENT 'sandbox or production',
     is_active TINYINT(1) DEFAULT 1,
+    locked TINYINT(1) DEFAULT 0 COMMENT 'Auto-locked by the refund velocity engine on hard-block; manual review required to unlock',
+    lock_reason VARCHAR(255) DEFAULT NULL,
+    locked_at DATETIME DEFAULT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE INDEX idx_api_key_hash (api_key_hash),
     INDEX idx_is_active (is_active),
-    INDEX idx_environment (environment)
+    INDEX idx_environment (environment),
+    INDEX idx_locked (locked)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Google OAuth tokens (free feature, keyed by device ID)
@@ -525,6 +530,177 @@ CREATE TABLE IF NOT EXISTS portal_payments (
     INDEX idx_created_at (created_at),
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Refund Flow Tables
+-- ============================================
+
+-- A refund a merchant has initiated through Argo Books. State machine:
+--   pending_code → code_verified → (cooling_off →)? processing → completed | failed
+--   any state → cancelled (by owner or admin)
+-- Webhooks finalize completed/failed transitions when the provider call is
+-- async; the synchronous path can also finalize completed/failed for
+-- providers that return a terminal status inline.
+CREATE TABLE IF NOT EXISTS refund_requests (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    invoice_id VARCHAR(100) NOT NULL,
+    invoice_number VARCHAR(100) NOT NULL,
+    customer_name VARCHAR(255) DEFAULT NULL,
+    provider VARCHAR(20) NOT NULL COMMENT 'stripe, paypal, or square',
+    provider_payment_id VARCHAR(255) NOT NULL COMMENT 'Original payment ID being refunded',
+    provider_refund_id VARCHAR(255) DEFAULT NULL COMMENT 'Provider-returned refund ID; set on processing/completed',
+    amount_cents INT NOT NULL,
+    currency VARCHAR(3) NOT NULL,
+    line_items_json JSON DEFAULT NULL COMMENT 'Snapshot of which invoice items the merchant chose to refund',
+    reason VARCHAR(500) DEFAULT NULL,
+    state ENUM('pending_code','code_verified','cooling_off','processing','completed','failed','cancelled') NOT NULL DEFAULT 'pending_code',
+    state_reason VARCHAR(100) DEFAULT NULL COMMENT 'Free-text reason for the current state (e.g. hard_block, too_many_code_attempts)',
+    velocity_tier ENUM('normal','soft_warn','delayed','hard_block') DEFAULT NULL,
+    cooling_off_until DATETIME DEFAULT NULL,
+    cancel_token CHAR(64) DEFAULT NULL COMMENT 'Token for the public cancel link in the cooling-off email',
+    completed_at DATETIME DEFAULT NULL,
+    requested_ip VARCHAR(45) DEFAULT NULL,
+    requested_user_agent VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
+    INDEX idx_refund_company (company_id),
+    INDEX idx_refund_state (state),
+    INDEX idx_refund_company_state (company_id, state),
+    INDEX idx_refund_created (created_at),
+    INDEX idx_refund_cooling_off (state, cooling_off_until),
+    INDEX idx_refund_cancel_token (cancel_token),
+    INDEX idx_refund_provider_refund_id (provider_refund_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 6-digit verification codes emailed to the company owner before a refund
+-- can advance past pending_code. Codes are hashed (HMAC keyed by request id)
+-- and capped at 5 attempts + 10-minute expiry.
+CREATE TABLE IF NOT EXISTS refund_email_codes (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    refund_request_id INT NOT NULL,
+    code_hash CHAR(64) NOT NULL,
+    attempts INT NOT NULL DEFAULT 0,
+    expires_at DATETIME NOT NULL,
+    consumed_at DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (refund_request_id) REFERENCES refund_requests(id) ON DELETE CASCADE,
+    INDEX idx_refund_code_request (refund_request_id),
+    INDEX idx_refund_code_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Cached response bodies for Idempotency-Key replay on refund mutation
+-- endpoints. Lookups are scoped per (company_id, idempotency_key); a match
+-- with the same body_hash returns the cached response, a match with a
+-- different body_hash returns 409. Rows expire 24h after creation
+-- (enforced in the query, swept by the daily cron).
+CREATE TABLE IF NOT EXISTS refund_idempotency_cache (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    idempotency_key VARCHAR(128) NOT NULL,
+    body_hash CHAR(64) NOT NULL,
+    response_status SMALLINT UNSIGNED NOT NULL,
+    response_body LONGTEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_idempotency_company_key (company_id, idempotency_key),
+    INDEX idx_idempotency_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-company (or global default with company_id IS NULL) thresholds for
+-- the refund velocity engine. One row with company_id IS NULL provides
+-- the global default; per-company rows override.
+CREATE TABLE IF NOT EXISTS refund_velocity_config (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT DEFAULT NULL COMMENT 'NULL = global default',
+    soft_warn_multiplier DECIMAL(6,2) NOT NULL DEFAULT 3.00 COMMENT 'Daily total >= multiplier * baseline daily avg → soft_warn',
+    cooling_multiplier DECIMAL(6,2) NOT NULL DEFAULT 10.00 COMMENT 'Daily total >= multiplier * baseline daily avg → delayed',
+    cooling_revenue_pct DECIMAL(6,4) NOT NULL DEFAULT 0.2500 COMMENT 'Daily total >= pct * 30d revenue → delayed',
+    hard_revenue_pct DECIMAL(6,4) NOT NULL DEFAULT 0.5000 COMMENT 'Daily total >= pct * 30d revenue → hard_block',
+    cooling_off_minutes INT NOT NULL DEFAULT 15 COMMENT 'Minutes the refund waits in cooling_off before promotion',
+    new_account_floor_cents INT NOT NULL DEFAULT 500000 COMMENT 'First-week hard-block floor ($5000 default; must be > cooling)',
+    new_account_soft_cents INT NOT NULL DEFAULT 50000 COMMENT 'First-week soft-warn floor ($500 default)',
+    new_account_cooling_cents INT NOT NULL DEFAULT 100000 COMMENT 'First-week delayed floor ($1000 default; must be < hard)',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_velocity_company (company_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Materialized baseline stats per company that the velocity engine compares
+-- against on established accounts (>30 days old). Refreshed nightly by cron.
+CREATE TABLE IF NOT EXISTS refund_velocity_baselines (
+    company_id INT PRIMARY KEY,
+    daily_avg_refund_cents BIGINT NOT NULL DEFAULT 0 COMMENT 'Trailing-90d daily average refund amount in cents',
+    revenue_30d_cents BIGINT NOT NULL DEFAULT 0 COMMENT 'Trailing-30d gross payment revenue in cents',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Append-only audit log for every state-mutating refund + email-change event.
+-- Used by the admin payments page (recent activity), the refund cron
+-- (stale-processing detection), and the customer-portal owner page (history).
+CREATE TABLE IF NOT EXISTS refund_audit_log (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    refund_request_id INT DEFAULT NULL,
+    email_change_request_id INT DEFAULT NULL,
+    event_type VARCHAR(60) NOT NULL,
+    payload_json JSON DEFAULT NULL,
+    actor_type VARCHAR(20) NOT NULL COMMENT 'owner | admin | system | webhook',
+    actor_id VARCHAR(64) DEFAULT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    user_agent VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
+    INDEX idx_audit_company (company_id),
+    INDEX idx_audit_refund_request (refund_request_id),
+    INDEX idx_audit_email_change (email_change_request_id),
+    INDEX idx_audit_event_type (event_type),
+    INDEX idx_audit_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Email-change requests for the portal owner. 4-step flow:
+--   pending → (verify old email code) → old_verified
+--          → (verify new email code) → completed (+ 30-day revert window)
+--          → reverted (anytime within revert_until window)
+-- Verification codes are stored on this row directly (one per leg) with
+-- per-leg expiry + attempt counters that mirror the refund code flow.
+CREATE TABLE IF NOT EXISTS email_change_requests (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    old_email VARCHAR(255) NOT NULL,
+    new_email VARCHAR(255) NOT NULL,
+    password_verified TINYINT(1) NOT NULL DEFAULT 0,
+    state ENUM('pending','old_verified','completed','cancelled','reverted') NOT NULL DEFAULT 'pending',
+    old_email_code_hash CHAR(64) DEFAULT NULL,
+    old_email_code_expires_at DATETIME DEFAULT NULL,
+    old_email_code_attempts INT NOT NULL DEFAULT 0,
+    old_email_verified_at DATETIME DEFAULT NULL,
+    new_email_code_hash CHAR(64) DEFAULT NULL,
+    new_email_code_expires_at DATETIME DEFAULT NULL,
+    new_email_code_attempts INT NOT NULL DEFAULT 0,
+    new_email_verified_at DATETIME DEFAULT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    cancel_token CHAR(64) DEFAULT NULL COMMENT 'Revert token for the 30-day window after completion',
+    revert_until DATETIME DEFAULT NULL,
+    reverted_at DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
+    INDEX idx_echange_company (company_id),
+    INDEX idx_echange_state (state),
+    INDEX idx_echange_cancel_token (cancel_token),
+    INDEX idx_echange_completed (completed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Seed the global default for the velocity engine on a fresh install.
+INSERT IGNORE INTO refund_velocity_config
+    (company_id, soft_warn_multiplier, cooling_multiplier, cooling_revenue_pct, hard_revenue_pct,
+     cooling_off_minutes, new_account_floor_cents, new_account_soft_cents, new_account_cooling_cents)
+VALUES
+    (NULL, 3.00, 10.00, 0.2500, 0.5000, 15, 500000, 50000, 100000);
 
 -- Invoice send usage tracking for free-tier limits
 CREATE TABLE IF NOT EXISTS invoice_send_usage (

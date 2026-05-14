@@ -376,21 +376,37 @@ try {
     $inflight_count = 0;
     $held_for_review_count = 0;
     try {
+        // INNER JOIN + env filter so the sandbox/production toggle scopes
+        // refund_requests the same way it scopes payments/companies above.
+        // Without this, production view shows sandbox refunds (and vice
+        // versa), causing admins to act on rows from the wrong environment.
         $stmt = $pdo->query("
             SELECT r.id, r.invoice_number, r.customer_name, r.amount_cents, r.currency,
                    r.provider, r.state, r.velocity_tier, r.state_reason,
                    r.created_at, r.cooling_off_until,
                    c.company_name, c.environment
             FROM refund_requests r
-            LEFT JOIN portal_companies c ON c.id = r.company_id
+            INNER JOIN portal_companies c ON c.id = r.company_id
             WHERE r.state IN ('pending_code','code_verified','cooling_off','processing','cancelled','failed')
+              AND $env_sql_c
             ORDER BY r.created_at DESC
             LIMIT 100
         ");
         $inflight_refunds = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $inflight_count = (int)$pdo->query("SELECT COUNT(*) FROM refund_requests WHERE state IN ('pending_code','code_verified','cooling_off','processing')")->fetchColumn();
-        $held_for_review_count = (int)$pdo->query("SELECT COUNT(*) FROM refund_requests WHERE state IN ('cooling_off','failed') AND created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
+        $inflight_count = (int)$pdo->query("
+            SELECT COUNT(*) FROM refund_requests r
+            INNER JOIN portal_companies c ON c.id = r.company_id
+            WHERE r.state IN ('pending_code','code_verified','cooling_off','processing')
+              AND $env_sql_c
+        ")->fetchColumn();
+        $held_for_review_count = (int)$pdo->query("
+            SELECT COUNT(*) FROM refund_requests r
+            INNER JOIN portal_companies c ON c.id = r.company_id
+            WHERE r.state IN ('cooling_off','failed')
+              AND r.created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
+              AND $env_sql_c
+        ")->fetchColumn();
     } catch (PDOException $e) {
         error_log('Refund requests admin query: ' . $e->getMessage());
     }

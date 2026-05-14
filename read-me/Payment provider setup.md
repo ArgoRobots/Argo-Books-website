@@ -58,8 +58,7 @@ Stripe Checkout / Subscriptions.
    via **Manage sandboxes**). For live setup, click **Exit sandbox**.
    The dashboard reloads in the chosen environment — every step below
    must be repeated once per environment.
-3. Open **Developers > API keys** (easiest way: type "API keys" into the top search
-   bar.
+3. Open **Developers > API keys** (easiest way: type "API keys" into the top search bar).
    Copy the publishable and secret keys into `.env`:
    ```
    STRIPE_SANDBOX_SECRET_KEY=sk_test_...
@@ -76,13 +75,13 @@ Stripe Checkout / Subscriptions.
 2. **Countries** — click **Select all** in the top-right.
 3. No redirect URLs to whitelist — the server creates one-time onboarding
    URLs via Stripe Account Links.
-4. Search "Express Dashboard" in the top search bar, or go directly to **Settings -> Connect -> Express Dashboard**. Enter "Argo Books' for the name, and select the Argo Books logo.
+4. Search "Express Dashboard" in the top search bar, or go directly to **Settings -> Connect -> Express Dashboard**. Enter "Argo Books" for the name, and select the Argo Books logo.
 
 ### C. Portal payment webhook
 
 In the Stripe Dashboard (Test mode for sandbox, Live mode for live):
 
-1. Search "Webhooks" in the top search bar and click "ADd destintation.
+1. Search "Webhooks" in the top search bar and click "Add destination".
 2. **Endpoint URL:**
    - Sandbox: `https://dev.argorobots.com/api/portal/webhooks/stripe`
    - Live:    `https://argorobots.com/api/portal/webhooks/stripe`

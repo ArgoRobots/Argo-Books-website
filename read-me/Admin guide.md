@@ -2,7 +2,16 @@
 
 ## Payment Processor Fees
 
-**Note:** Fees vary by country, account type, and agreement. These are typical rates for Canadian online transactions. Check your actual merchant agreements for exact rates.
+Every online payment — whether it's a customer paying an invoice through the Payment Portal or a customer buying an Argo Premium subscription — adds **2.9% + \$0.30 CAD** on top of the base amount. That's the same number no matter which provider (Stripe, PayPal, or Square), no matter the country. It's hardcoded — set in `.env` via `PROCESSING_FEE_PERCENT` and `PROCESSING_FEE_FIXED`.
+
+Who actually pays the fee depends on the flow:
+
+- **Argo Premium subscriptions:** the customer always pays it. They see `$10.00 + $0.59` (or whatever the base price + fee works out to) at checkout.
+- **Invoices sent through the Payment Portal:** the merchant decides per invoice via the "pass processing fee" toggle:
+  - **Toggle on** → the merchant passes the cost on to the customer. Customer pays invoice total + 2.9% + \$0.30.
+  - **Toggle off** → customer pays just the invoice total. The merchant absorbs the cost.
+
+Argo Books, and the companies using Argo Books pay these fees when they move the money out of their Stripe/PayPal/Square account and into their normal bank account. Below are the rates that the payment providers charge:
 
 ### Stripe
 
@@ -87,7 +96,7 @@ APP_ENV=production
 
 ## Admin Scripts
 
-**Contact Evan Di Placido to obtain these scripts.**
+Contact Evan Di Placido to obtain these scripts.
 
 ### create_admin.php
 Creates admin users

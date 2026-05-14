@@ -440,9 +440,12 @@ function get_available_payment_methods(array $company): array
     if (!empty($company['stripe_account_id'])) {
         $methods[] = 'stripe';
     }
-    if (!empty($company['paypal_merchant_id'])) {
-        $methods[] = 'paypal';
-    }
+    // PayPal portal Connect is intentionally not exposed. The OAuth flow
+    // can't onboard Business merchants (Log in with PayPal userinfo refuses
+    // Business-account tokens), and proper onboarding requires PayPal
+    // Partner Referrals API which is gated behind Platforms & Marketplaces
+    // enrollment. Existing rows with paypal_merchant_id (from prior testing)
+    // are deliberately ignored here so PayPal won't appear as a pay option.
     if (!empty($company['square_merchant_id'])) {
         $methods[] = 'square';
     }

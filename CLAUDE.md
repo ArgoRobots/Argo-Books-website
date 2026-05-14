@@ -79,10 +79,11 @@ Key table groups:
 
 ## Payment Gateways
 
-Three gateways are supported — Stripe, PayPal, Square. Each has:
-- A checkout/payment page
-- A webhook handler in `/webhooks/`
-- Sandbox credentials in `.env - sandbox` (see `/read-me/` for testing guides)
+Two gateways are supported in the **portal Connect flow** (merchants accepting invoice payments): **Stripe** and **Square**. Each has a checkout/payment page, a webhook handler in `/webhooks/`, and sandbox credentials in `.env - sandbox` (see `/read-me/` for testing guides).
+
+**PayPal is NOT supported in the portal Connect flow.** PayPal's "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, and proper merchant onboarding requires PayPal Partner Referrals API which is gated behind Platforms & Marketplaces partner enrollment. The portal-side PayPal handlers (`api/portal/connect.php`, `connect-callback.php`, `checkout.php` `handle_paypal_checkout()`, `process-payment.php` `process_paypal_payment()`) all return 503 PROVIDER_UNSUPPORTED, and `get_available_payment_methods()` in `api/portal/portal-helper.php` deliberately omits PayPal even when `paypal_merchant_id` is set on a `portal_companies` row. The desktop app hides the PayPal Connect button. Re-enabling requires the Partner Referrals migration documented in the plan file.
+
+**PayPal IS still used** for the **SaaS subscription flow** (Argo Premium billing on argorobots.com) — that's a separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout page. Do not touch SaaS-subscription PayPal code when working on portal-related features.
 
 Processing fees are configurable via `.env` (`PROCESSING_FEE_PERCENT`, `PROCESSING_FEE_FIXED`).
 

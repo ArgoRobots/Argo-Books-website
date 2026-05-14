@@ -152,87 +152,18 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
 }
 
 /**
- * Handle PayPal OAuth callback.
- * Exchanges the authorization code for tokens, then retrieves the merchant/payer ID and email.
+ * PayPal portal Connect is not currently supported. The flow can't onboard
+ * Business merchants because PayPal's "Log in with PayPal" userinfo endpoint
+ * refuses tokens issued to Business accounts — confirmed against all three
+ * documented endpoint variants. Proper merchant onboarding requires PayPal
+ * Partner Referrals API, which is gated behind PayPal Platforms &
+ * Marketplaces enrollment. Until that's in place, the desktop app hides the
+ * PayPal Connect button; this stub catches any stale URL that still arrives
+ * (cached emails, old desktop builds, manual nav) and shows a clear message.
  */
 function handle_paypal_callback(PDO $db, int $companyId, string $code, bool $is_production): void
 {
-    $clientId = $is_production
-        ? $_ENV['PAYPAL_LIVE_CLIENT_ID']
-        : $_ENV['PAYPAL_SANDBOX_CLIENT_ID'];
-    $clientSecret = $is_production
-        ? $_ENV['PAYPAL_LIVE_CLIENT_SECRET']
-        : $_ENV['PAYPAL_SANDBOX_CLIENT_SECRET'];
-    $apiBase = $is_production
-        ? 'https://api-m.paypal.com'
-        : 'https://api-m.sandbox.paypal.com';
-
-    // Exchange authorization code for access token
-    $ch = curl_init("$apiBase/v1/oauth2/token");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_USERPWD => "$clientId:$clientSecret",
-        CURLOPT_POSTFIELDS => http_build_query([
-            'grant_type' => 'authorization_code',
-            'code' => $code,
-        ]),
-        CURLOPT_HTTPHEADER => [
-            'Content-Type: application/x-www-form-urlencoded',
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    if ($httpCode !== 200) {
-        $error = json_decode($response, true);
-        throw new Exception($error['error_description'] ?? 'PayPal token exchange failed.');
-    }
-
-    $tokenData = json_decode($response, true);
-    $accessToken = $tokenData['access_token'] ?? '';
-
-    if (empty($accessToken)) {
-        throw new Exception('No access token received from PayPal.');
-    }
-
-    // Get user info to extract merchant/payer ID and email
-    $ch = curl_init("$apiBase/v1/identity/openidconnect/userinfo?schema=openIdConnect");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer $accessToken",
-            'Content-Type: application/json',
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    if ($httpCode !== 200) {
-        throw new Exception('Failed to retrieve PayPal user info.');
-    }
-
-    $userInfo = json_decode($response, true);
-    $payerId = $userInfo['payer_id'] ?? $userInfo['user_id'] ?? '';
-    $email = $userInfo['email'] ?? null;
-
-    if (empty($payerId)) {
-        throw new Exception('No PayPal merchant/payer ID received.');
-    }
-
-    // Store credentials
-    $stmt = $db->prepare(
-        'UPDATE portal_companies
-         SET paypal_merchant_id = ?, paypal_email = ?, updated_at = NOW()
-         WHERE id = ?'
-    );
-    $stmt->execute([$payerId, $email, $companyId]);
+    throw new Exception('PayPal portal Connect is not currently supported. Use Stripe or Square instead.');
 }
 
 /**

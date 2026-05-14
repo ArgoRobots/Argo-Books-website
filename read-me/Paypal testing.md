@@ -42,17 +42,13 @@ https://dev.argorobots.com/pricing/checkout/index.php?method=paypal
 2. Make sure you're in **Sandbox Mode**
 3. Check the Payments section for your test payment
 
-## Portal Connect (OAuth)
+## Portal Connect — NOT CURRENTLY SUPPORTED
 
-Testing the portal Connect flow requires a PayPal sandbox **Business** test account — distinct from the Personal (buyer) account used for SaaS testing, and distinct from your real PayPal account (real credentials don't work on sandbox). The Business account represents the Argo Books user who's authorizing the website to receive payments into their PayPal.
+The PayPal portal Connect flow is **disabled**. PayPal's "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, so the flow can't onboard real merchants. The desktop app hides the PayPal Connect button under Settings -> Payment Portal, and the server-side `api/portal/connect/paypal` endpoint returns 503 PROVIDER_UNSUPPORTED.
 
-1. Go to [PayPal Developer Dashboard - Sandbox Accounts](https://developer.paypal.com/dashboard/accounts).
-2. Use the auto-created `sb-...@business.example.com` account or click **Create account** -> **Business** to make a new one.
-3. Find the password for that account (you will need it later).
-4. In the Argo Books desktop app (dev mode), open **Settings -> Payment Portal** and click **Connect** on PayPal.
-5. A new tab opens at `sandbox.paypal.com`. Sign in with the Business sandbox email (step 2) and password (step 3).
-   - If it asks for a verification code Click "Use a different method" and choose "Password" instead.
-6. Click 'Agree and connect'.
+Re-enabling requires migrating to **PayPal Partner Referrals API** after approval into PayPal Platforms & Marketplaces — see `read-me/Admin guide.md` for the program details. There is no portal Connect test to run for PayPal today; test Stripe and Square portal Connect instead.
+
+Only the SaaS subscription PayPal flow above is testable.
 
 ## Switch to Production
 

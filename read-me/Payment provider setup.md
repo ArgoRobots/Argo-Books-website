@@ -103,11 +103,13 @@ Nothing to set up — `cron/subscription_renewal.php` handles renewals against t
 
 ## PayPal
 
-The portal Connect flow uses "Log in with PayPal" (`signin/authorize` with `scope=openid email`). Subscription billing goes through PayPal Subscriptions; Plan records live in PayPal and the site stores their IDs.
+> **Status:** Only the SaaS subscription billing side of PayPal is active. The portal Connect flow (merchants accepting invoice payments through their own PayPal) is **currently disabled** — PayPal's OAuth identity endpoint doesn't support Business-account onboarding, so the flow can't actually connect real merchants. Re-enabling requires migrating to PayPal Partner Referrals API after approval into PayPal Platforms & Marketplaces (see Admin guide for the application process). Until then, the portal runs on Stripe and Square only.
+
+Subscription billing goes through PayPal Subscriptions; Plan records live in PayPal and the site stores their IDs.
 
 ### A. Create the apps
 
-Do this once per environment.
+Still required for the SaaS subscription side. Do this once per environment.
 
 1. Sandbox: https://developer.paypal.com/dashboard/applications/sandbox
 2. Live:    https://developer.paypal.com/dashboard/applications/live
@@ -120,21 +122,18 @@ Do this once per environment.
    PAYPAL_LIVE_CLIENT_SECRET=...
    ```
 
-### B. Enable "Log in with PayPal" (payment portal)
+### B. Enable "Log in with PayPal" (payment portal) — NOT CURRENTLY ACTIVE
 
-Click on each app then:
+> **Skip this section.** The portal Connect flow for PayPal is disabled in the code (see `api/portal/connect.php` and `api/portal/connect-callback.php`). The steps below are retained for reference / future re-enablement only — when migrating to Partner Referrals API, this section will be replaced with **Enable Commerce Platform** setup, not Log in with PayPal.
+
+Historical steps (do not action):
 
 1. Scroll to the **Features** section.
 2. Check **Log in with PayPal**.
 3. Click **Manage** under that checkbox.
-4. Under **Return URL**, add the redirect that matches that app's
-   environment:
-   - Sandbox app: `https://dev.argorobots.com/api/portal/connect/callback/paypal`
-   - Live app:    `https://argorobots.com/api/portal/connect/callback/paypal`
-5. Under **Information requested from customers**, check:
-   - Full Name
-   - Email
-6. Fill in **Privacy Policy URL** and **User Agreement URL** (use the existing argorobots.com legal pages).
+4. Under **Return URL**, add the redirect that matches that app's environment.
+5. Under **Information requested from customers**, check Full Name and Email.
+6. Fill in **Privacy Policy URL** and **User Agreement URL**.
 7. **Save** at the bottom of the sub-form.
 
 ### C. Subscription plans (SaaS billing)
@@ -192,18 +191,18 @@ PAYPAL_SANDBOX_WEBHOOK_ID=...
 PAYPAL_LIVE_WEBHOOK_ID=...
 ```
 
-#### D2. Portal payment webhook
+#### D2. Portal payment webhook — NOT CURRENTLY ACTIVE
 
-Same dashboard navigation as D1 — but you're adding a **second** webhook on each app (sandbox + live), pointing to a different URL and subscribing to different events.
+> **Skip this section.** The portal Connect flow for PayPal is disabled, so this webhook will never fire. Steps retained for reference only — when migrating to Partner Referrals API, this webhook will be re-added with additional merchant-lifecycle events (`MERCHANT.ONBOARDING.COMPLETED`, `MERCHANT.PARTNER-CONSENT.REVOKED`, etc.) on top of the capture events listed below.
+
+Historical steps (do not action):
 
 - **Webhook URL:**
   - Sandbox app: `https://dev.argorobots.com/api/portal/webhooks/paypal`
   - Live app:    `https://argorobots.com/api/portal/webhooks/paypal`
-- **Event types** — check these:
+- **Event types:**
   - `PAYMENT.CAPTURE.COMPLETED`
   - `PAYMENT.CAPTURE.REFUNDED`
-
-Click **Save**. After saving, copy the **Webhook ID** into the `.env`:
 
 ```
 PAYPAL_PORTAL_SANDBOX_WEBHOOK_ID=...

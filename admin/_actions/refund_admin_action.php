@@ -54,9 +54,21 @@ if ($action === 'cancel') {
         header('Location: /admin/payments/index.php?msg=cannot_cancel');
         exit;
     }
-    $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason = ?, updated_at = NOW() WHERE id = ?")
-        ->execute(['admin_cancelled' . ($reason ? ': ' . $reason : ''), $request_id]);
-    audit_log($pdo, (int)$r['company_id'], 'cancelled_by_user', 'admin', $admin_id, $request_id, null, [
+    // State-guarded UPDATE: the cooling-off promoter cron can flip this row
+    // to 'processing' (and fire the gateway) between the SELECT above and
+    // this UPDATE. Without the predicate, the admin's cancel would clobber
+    // an already-finalized refund.
+    $upd = $pdo->prepare("
+        UPDATE refund_requests
+        SET state='cancelled', state_reason = ?, cancel_token = NULL, updated_at = NOW()
+        WHERE id = ? AND state IN ('pending_code','code_verified','cooling_off')
+    ");
+    $upd->execute(['admin_cancelled' . ($reason ? ': ' . $reason : ''), $request_id]);
+    if ($upd->rowCount() === 0) {
+        header('Location: /admin/payments/index.php?msg=state_conflict');
+        exit;
+    }
+    audit_log($pdo, (int)$r['company_id'], 'cancelled_by_admin', 'admin', $admin_id, $request_id, null, [
         'reason' => $reason ?: 'admin_cancelled',
     ]);
     header('Location: /admin/payments/index.php?msg=cancelled');
@@ -68,8 +80,21 @@ if ($action === 'force_fail') {
         header('Location: /admin/payments/index.php?msg=invalid_state');
         exit;
     }
-    $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ?")
-        ->execute(['admin_force_failed' . ($reason ? ': ' . $reason : ''), $request_id]);
+    // Same state-guard pattern as the cancel branch above. cancel_token = NULL
+    // closes a narrow race: the cooling-off promoter cron can flip cooling_off
+    // → processing between our SELECT and this UPDATE, carrying the token
+    // forward. Clearing it here keeps the public cancel link from leaking
+    // terminal state after force_fail.
+    $upd = $pdo->prepare("
+        UPDATE refund_requests
+        SET state='failed', state_reason = ?, cancel_token = NULL, updated_at = NOW()
+        WHERE id = ? AND state = 'processing'
+    ");
+    $upd->execute(['admin_force_failed' . ($reason ? ': ' . $reason : ''), $request_id]);
+    if ($upd->rowCount() === 0) {
+        header('Location: /admin/payments/index.php?msg=state_conflict');
+        exit;
+    }
     audit_log($pdo, (int)$r['company_id'], 'failed', 'admin', $admin_id, $request_id, null, [
         'reason' => $reason ?: 'admin_force_failed',
     ]);

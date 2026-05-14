@@ -39,11 +39,11 @@ foreach ($rows as $r) {
     // and this UPDATE would have their (now cooling_off) request cancelled
     // out from under them. Audit only on an actual transition.
     $upd = $pdo->prepare("UPDATE refund_requests
-        SET state='cancelled', state_reason='code_window_expired', updated_at = NOW()
+        SET state='cancelled', state_reason='code_window_expired', cancel_token = NULL, updated_at = NOW()
         WHERE id = ? AND state = 'pending_code' AND created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
     $upd->execute([$r['id']]);
     if ($upd->rowCount() > 0) {
-        audit_log($pdo, (int)$r['company_id'], 'cancelled_by_user', 'system', null, (int)$r['id'], null, [
+        audit_log($pdo, (int)$r['company_id'], 'cancelled_by_system', 'system', null, (int)$r['id'], null, [
             'reason' => 'code_window_expired',
         ]);
         $cancelled++;

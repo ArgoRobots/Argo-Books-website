@@ -63,16 +63,18 @@ curl_setopt_array($ch, [
 ]);
 $response = curl_exec($ch);
 if ($response === false) {
+    // 503 forces PayPal to retry — acknowledging without verification would let
+    // a forged payload through whenever the token endpoint is briefly unhealthy.
     error_log('PayPal token request failed: ' . curl_error($ch));
-    send_json_response(200, ['received' => true]); // acknowledge to prevent retries
+    http_response_code(503);
     exit;
 }
 $tokenResponse = json_decode($response, true);
 
 if (empty($tokenResponse['access_token'])) {
+    // Same reasoning: no token → no signature verification → don't ack.
     error_log('Portal PayPal webhook: Failed to get access token');
-    http_response_code(200);
-    echo json_encode(['received' => true]);
+    http_response_code(503);
     exit;
 }
 
@@ -99,7 +101,16 @@ curl_setopt_array($ch, [
     CURLOPT_SSL_VERIFYPEER => true,
     CURLOPT_SSL_VERIFYHOST => 2,
 ]);
-$verifyResponse = json_decode(curl_exec($ch), true);
+$verifyRaw = curl_exec($ch);
+if ($verifyRaw === false) {
+    // Network failure during verification — 503 forces a retry rather than
+    // either acknowledging an unverified payload or 400-ing a payload that
+    // might actually be legitimate.
+    error_log('Portal PayPal webhook: verify-webhook-signature request failed: ' . curl_error($ch));
+    http_response_code(503);
+    exit;
+}
+$verifyResponse = json_decode($verifyRaw, true);
 
 if (($verifyResponse['verification_status'] ?? '') !== 'SUCCESS') {
     error_log('Portal PayPal webhook: Signature verification failed');
@@ -209,7 +220,10 @@ switch ($eventType) {
                     'provider_transaction_id' => $captureId,
                     'reference_number' => generate_reference_number(),
                     'status' => 'refunded',
-                    'payment_environment' => $is_production ? 'production' : 'sandbox',
+                    // Inherit the original payment's environment so a misconfigured
+                    // APP_ENV can't tag a refund with a different env than the
+                    // payment it offsets.
+                    'payment_environment' => $original['payment_environment'] ?? ($is_production ? 'production' : 'sandbox'),
                 ]);
                 if (!empty($recordResult['inserted'])) {
                     // Invoice reconciliation (mirrors apply_stripe_refund_to_db).
@@ -222,8 +236,11 @@ switch ($eventType) {
                            AND provider_transaction_id = ?"
                     );
                     $sumStmt->execute([$captureId]);
-                    $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
-                    if ($refundedTotal + 0.01 >= (float)$original['amount']) {
+                    // Compare in integer cents so a chain of partial refunds
+                    // can't drift past the threshold via repeated float rounding.
+                    $refundedCents = (int)round(abs((float)$sumStmt->fetch()['refunded_total']) * 100);
+                    $originalCents = (int)round((float)$original['amount'] * 100);
+                    if ($refundedCents >= $originalCents) {
                         $pdo->prepare("UPDATE portal_payments SET status = 'refunded' WHERE id = ?")
                             ->execute([$original['id']]);
                     }
@@ -255,7 +272,7 @@ switch ($eventType) {
                         // CAS guard: only the UPDATE that actually flips the
                         // state notifies, so a race with the synchronous
                         // execute path can't fire two completion emails.
-                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
                         $upd->execute([$refundId, $argoId]);
                         if ($upd->rowCount() > 0) {
                             audit_log($pdo, (int)$rr['company_id'], 'completed', 'webhook', null, $argoId, null, [

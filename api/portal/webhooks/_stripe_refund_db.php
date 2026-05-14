@@ -103,8 +103,11 @@ function apply_stripe_refund_to_db(
            AND provider_transaction_id = ?"
     );
     $sumStmt->execute([$chargeId]);
-    $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
-    if ($refundedTotal + 0.01 >= (float)$originalPayment['amount']) {
+    // Compare in integer cents so a chain of partial refunds can't drift past
+    // the threshold via repeated float rounding.
+    $refundedCents = (int)round(abs((float)$sumStmt->fetch()['refunded_total']) * 100);
+    $originalCents = (int)round((float)$originalPayment['amount'] * 100);
+    if ($refundedCents >= $originalCents) {
         $stmt = $pdo->prepare(
             'UPDATE portal_payments SET status = "refunded" WHERE id = ?'
         );

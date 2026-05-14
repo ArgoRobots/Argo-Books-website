@@ -48,12 +48,11 @@ Testing the portal Connect flow requires a PayPal sandbox **Business** test acco
 
 1. Go to [PayPal Developer Dashboard - Sandbox Accounts](https://developer.paypal.com/dashboard/accounts).
 2. Use the auto-created `sb-...@business.example.com` account or click **Create account** -> **Business** to make a new one.
-3. Get the password for that account: click the **...** menu next to the account -> **View/edit account** -> copy the **System Generated Password**. Keep this tab open — you'll paste the password in the next step.
+3. Find the password for that account (you will need it later).
 4. In the Argo Books desktop app (dev mode), open **Settings -> Payment Portal** and click **Connect** on PayPal.
 5. A new tab opens at `sandbox.paypal.com`. Sign in with the Business sandbox email (step 2) and password (step 3).
-   - **If you see "Invalid email or password":** double-check you're using the sandbox account from step 2, not your live PayPal account. Sandbox passwords are NOT the same as your real account password.
-   - **If it asks for a verification code:** Click "Use a different method" and choose "Password" instead.
-6. Approve the access request. PayPal redirects back to the callback and PayPal will show as connected in the app.
+   - If it asks for a verification code Click "Use a different method" and choose "Password" instead.
+6. Click 'Agree and connect'.
 
 ## Switch to Production
 

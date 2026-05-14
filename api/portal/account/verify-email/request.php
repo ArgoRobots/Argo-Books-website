@@ -26,15 +26,22 @@ if (!empty($company['email_verified_at'])) {
 
 global $pdo;
 
+// Rolling 24h window. A lifetime cap is wrong here because — unlike the
+// refund flow, where the request advances out of pending_code on successful
+// code entry — an unverified company stays unverified forever. A lifetime
+// cap eventually walls off legitimate users (typo on first registration,
+// missed inbox, account left dormant) with no recovery path. The window
+// matches the email-change resend-throttle pattern.
 $stmt = $pdo->prepare("
     SELECT COUNT(*) AS c, MAX(created_at) AS latest
     FROM email_verifications
     WHERE company_id = ? AND purpose = 'registration'
+      AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
 ");
 $stmt->execute([$company['id']]);
 $row = $stmt->fetch(PDO::FETCH_ASSOC);
 if ((int)$row['c'] >= 3) {
-    send_error_response(429, 'Maximum verification attempts reached. Contact support.', 'MAX_RESENDS');
+    send_error_response(429, 'Maximum verification attempts reached. Try again later.', 'MAX_RESENDS');
 }
 if ($row['latest'] && (time() - strtotime($row['latest'])) < 60) {
     send_error_response(429, 'Please wait at least 60 seconds between resends.', 'TOO_SOON');

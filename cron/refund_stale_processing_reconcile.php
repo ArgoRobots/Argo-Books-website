@@ -70,7 +70,7 @@ foreach ($rows as $r) {
             if ($found->status === 'succeeded') {
                 // CAS guard so a webhook arriving in the same window doesn't
                 // produce a second completion notification.
-                $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
                 $upd->execute([$found->id, $r['id']]);
                 if ($upd->rowCount() > 0) {
                     audit_log($pdo, (int)$r['company_id'], 'completed', 'system', null, (int)$r['id'], null, [
@@ -87,7 +87,7 @@ foreach ($rows as $r) {
                 // a webhook (or another reconciler) may have flipped this
                 // row to 'completed' between our SELECT and this UPDATE,
                 // and we must not overwrite that with 'failed'.
-                $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
                 $upd->execute([$found->failure_reason ?? $found->status, $r['id']]);
                 if ($upd->rowCount() > 0) {
                     audit_log($pdo, (int)$r['company_id'], 'failed', 'system', null, (int)$r['id'], null, [

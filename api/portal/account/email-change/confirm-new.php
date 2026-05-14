@@ -52,7 +52,7 @@ if (empty($row['new_email_code_expires_at']) || strtotime($row['new_email_code_e
 if ((int)$row['new_email_code_attempts'] >= 5) {
     $pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE id = ? AND state = 'old_verified'")
         ->execute([$change_id]);
-    audit_log($pdo, (int)$company['id'], 'cancelled_by_user', 'system', null, null, $change_id, [
+    audit_log($pdo, (int)$company['id'], 'cancelled_by_system', 'system', null, null, $change_id, [
         'target' => 'new', 'reason' => 'too_many_code_attempts',
     ]);
     send_error_response(429, 'Too many wrong code attempts. Start a new email change.', 'TOO_MANY_ATTEMPTS');

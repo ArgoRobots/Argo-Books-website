@@ -622,6 +622,9 @@ CREATE TABLE IF NOT EXISTS refund_velocity_config (
     new_account_floor_cents INT NOT NULL DEFAULT 500000 COMMENT 'First-week hard-block floor ($5000 default; must be > cooling)',
     new_account_soft_cents INT NOT NULL DEFAULT 50000 COMMENT 'First-week soft-warn floor ($500 default)',
     new_account_cooling_cents INT NOT NULL DEFAULT 100000 COMMENT 'First-week delayed floor ($1000 default; must be < hard)',
+    young_account_floor_cents INT NOT NULL DEFAULT 1000000 COMMENT 'Days 7-30 hard-block floor ($10000 default; must be > cooling)',
+    young_account_soft_cents INT NOT NULL DEFAULT 100000 COMMENT 'Days 7-30 soft-warn floor ($1000 default)',
+    young_account_cooling_cents INT NOT NULL DEFAULT 300000 COMMENT 'Days 7-30 delayed floor ($3000 default; must be < hard)',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
@@ -698,9 +701,29 @@ CREATE TABLE IF NOT EXISTS email_change_requests (
 -- Seed the global default for the velocity engine on a fresh install.
 INSERT IGNORE INTO refund_velocity_config
     (company_id, soft_warn_multiplier, cooling_multiplier, cooling_revenue_pct, hard_revenue_pct,
-     cooling_off_minutes, new_account_floor_cents, new_account_soft_cents, new_account_cooling_cents)
+     cooling_off_minutes, new_account_floor_cents, new_account_soft_cents, new_account_cooling_cents,
+     young_account_floor_cents, young_account_soft_cents, young_account_cooling_cents)
 VALUES
-    (NULL, 3.00, 10.00, 0.2500, 0.5000, 15, 500000, 50000, 100000);
+    (NULL, 3.00, 10.00, 0.2500, 0.5000, 15, 500000, 50000, 100000, 1000000, 100000, 300000);
+
+-- Verification codes used during portal registration and "set initial email" flows.
+-- One-row-per-issued-code; the most-recent unconsumed row for a given
+-- (company_id, purpose) is the active code. Capped at 5 attempts + 10-minute
+-- expiry, with a rolling rate-limit enforced in PHP.
+CREATE TABLE IF NOT EXISTS email_verifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    purpose VARCHAR(40) NOT NULL DEFAULT 'registration',
+    code_hash CHAR(64) NOT NULL,
+    attempts INT NOT NULL DEFAULT 0,
+    expires_at DATETIME NOT NULL,
+    consumed_at DATETIME DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES portal_companies(id) ON DELETE CASCADE,
+    INDEX idx_emailver_company_purpose (company_id, purpose),
+    INDEX idx_emailver_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Invoice send usage tracking for free-tier limits
 CREATE TABLE IF NOT EXISTS invoice_send_usage (

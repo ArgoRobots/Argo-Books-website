@@ -46,7 +46,8 @@ function handle_pull_payments(int $companyId): void
         $stmt = $pdo->prepare(
             "SELECT pp.*, pi.invoice_token, pi.customer_token,
                     rr.id AS refund_request_id, rr.reason AS refund_reason,
-                    rr.provider AS refund_provider
+                    rr.provider AS refund_provider,
+                    rr.provider_payment_id AS refund_source_provider_payment_id
              FROM portal_payments pp
              LEFT JOIN portal_invoices pi ON pp.company_id = pi.company_id AND pp.invoice_id = pi.invoice_id
              LEFT JOIN refund_requests rr ON rr.company_id = pp.company_id

@@ -375,6 +375,10 @@ function refund_record_ledger(PDO $pdo, array $req, string $refund_id, ?array $c
     // only once refunds cover its full amount. Without this guard, a
     // partial refund flips the original to 'refunded' and the books read
     // as fully refunded.
+    //
+    // Compare in integer cents so a chain of partial refunds can't drift
+    // past the threshold due to repeated float rounding (e.g., three
+    // refunds of $0.10 each summing to $0.30000000000000004 in float).
     if ($original) {
         $sumStmt = $pdo->prepare(
             "SELECT COALESCE(SUM(amount), 0) AS refunded_total
@@ -383,8 +387,9 @@ function refund_record_ledger(PDO $pdo, array $req, string $refund_id, ?array $c
                AND provider_transaction_id = ?"
         );
         $sumStmt->execute([$req['provider'], $req['provider_payment_id']]);
-        $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
-        if ($refundedTotal + 0.01 >= (float)$original['amount']) {
+        $refundedCents = (int)round(abs((float)$sumStmt->fetch()['refunded_total']) * 100);
+        $originalCents = (int)round((float)$original['amount'] * 100);
+        if ($refundedCents >= $originalCents) {
             $pdo->prepare("UPDATE portal_payments SET status='refunded' WHERE id = ?")
                 ->execute([$original['id']]);
         }
@@ -462,7 +467,9 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         }
 
         if ($outcome === 'failed') {
-            $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+            // cancel_token = NULL because the public /cancel-refund.php link
+            // must not reveal terminal state to anyone holding a leaked email.
+            $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
             $upd->execute(["Provider returned terminal status: " . (string)$status, $request_id]);
             if ($upd->rowCount() > 0) {
                 audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, [
@@ -503,7 +510,8 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         // refund_record_ledger above and this UPDATE — in that case the
         // webhook's CAS update wins, this one is a no-op, and notification
         // fires once over there.
-        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+        // cancel_token = NULL alongside the terminal transition (see /failed/ note above).
+        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
         $upd->execute([$refund_id, $request_id]);
         if ($upd->rowCount() === 0) {
             return;
@@ -529,7 +537,7 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         // etc.) AND the webhook concurrently completed the request, this
         // UPDATE would overwrite 'completed' with 'failed'. Audit only on
         // an actual transition.
-        $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+        $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
         $upd->execute([substr($msg, 0, 1000), $request_id]);
         if ($upd->rowCount() > 0) {
             audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, ['error' => $msg]);

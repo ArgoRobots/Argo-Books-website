@@ -94,6 +94,10 @@ function refund_stripe_issue(array $company, array $request): array {
     refund_stripe_init($company);
     $stripe_account = $company['stripe_account_id'] ?? null;
     $opts = $stripe_account ? ['stripe_account' => $stripe_account] : [];
+    // Stripe matches idempotency keys up to 255 chars, but PayPal/Square cap at
+    // 45 — match the 45-char ceiling across providers so a single retry policy
+    // works uniformly. 'argo_request_' is 13 chars; an int id fits the remaining 32.
+    $opts['idempotency_key'] = substr('argo_request_' . (string)$request['id'], 0, 45);
 
     $refund = \Stripe\Refund::create([
         'payment_intent' => $request['provider_payment_id'],

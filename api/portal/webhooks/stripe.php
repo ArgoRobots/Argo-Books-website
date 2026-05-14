@@ -190,7 +190,7 @@ function handle_refund(\Stripe\Charge $charge): void
                         // CAS guard so a race with the synchronous execute
                         // path can't fire two completion notifications. Only
                         // the UPDATE that flips the state actually notifies.
-                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
                         $upd->execute([$refundObj->id, (int)$argoRequestId]);
                         if ($upd->rowCount() > 0) {
                             audit_log($pdo, (int)$req['company_id'], 'completed', 'webhook', null, (int)$argoRequestId, null, [

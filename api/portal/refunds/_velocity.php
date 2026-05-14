@@ -25,10 +25,10 @@ function refund_load_velocity_config(PDO $pdo, int $company_id): array {
         $cfg = $stmt->fetch(PDO::FETCH_ASSOC);
     }
     // Final fallback if config table is empty (shouldn't happen post-migration).
-    // The new_account_floor_cents MUST be strictly greater than
-    // new_account_cooling_cents — when they're equal, the hard-block check
-    // ($today_cents >= floor) catches every request that the cooling check
-    // would catch, and the 'delayed' tier is unreachable.
+    // The *_floor_cents value MUST be strictly greater than *_cooling_cents in
+    // both age brackets — when they're equal, the hard-block check ($today_cents
+    // >= floor) catches every request that the cooling check would catch, and
+    // the 'delayed' tier is unreachable.
     if (!$cfg) {
         return [
             'soft_warn_multiplier' => 3.0,
@@ -36,11 +36,20 @@ function refund_load_velocity_config(PDO $pdo, int $company_id): array {
             'cooling_revenue_pct' => 0.25,
             'hard_revenue_pct' => 0.50,
             'cooling_off_minutes' => 15,
-            'new_account_floor_cents' => 500000,    // $5,000/day hard-block
-            'new_account_soft_cents' => 50000,      //   $500/day soft warn
-            'new_account_cooling_cents' => 100000,  // $1,000/day cooling
+            'new_account_floor_cents' => 500000,      // $5,000/day hard-block
+            'new_account_soft_cents' => 50000,        //   $500/day soft warn
+            'new_account_cooling_cents' => 100000,    // $1,000/day cooling
+            'young_account_floor_cents' => 1000000,   // $10,000/day hard-block
+            'young_account_soft_cents' => 100000,     // $1,000/day soft warn
+            'young_account_cooling_cents' => 300000,  // $3,000/day cooling
         ];
     }
+    // Pre-existing rows from before the young_account_* columns were added
+    // may return NULL for those keys; fall back to the documented defaults so
+    // an unmigrated row can't silently disable the 7-30d bracket.
+    $cfg['young_account_floor_cents']   = $cfg['young_account_floor_cents']   ?? 1000000;
+    $cfg['young_account_soft_cents']    = $cfg['young_account_soft_cents']    ?? 100000;
+    $cfg['young_account_cooling_cents'] = $cfg['young_account_cooling_cents'] ?? 300000;
     return $cfg;
 }
 
@@ -79,16 +88,13 @@ function refund_assess_velocity(PDO $pdo, array $company, int $amount_cents): ar
     }
 
     if ($age_days < 30) {
-        $soft = 100000;     // $1k/day
-        $cool = 300000;     // $3k/day
-        $hard = 1000000;    // $10k/day
-        if ($today_cents >= $hard) {
+        if ($today_cents >= (int)$cfg['young_account_floor_cents']) {
             return ['tier' => 'hard_block', 'cooling_off_seconds' => 0, 'reason' => 'young_account_hard', 'today_cents' => $today_cents, 'hour_count' => $hour_count];
         }
-        if ($today_cents >= $cool) {
+        if ($today_cents >= (int)$cfg['young_account_cooling_cents']) {
             return ['tier' => 'delayed', 'cooling_off_seconds' => (int)$cfg['cooling_off_minutes'] * 60, 'reason' => 'young_account_cool', 'today_cents' => $today_cents, 'hour_count' => $hour_count];
         }
-        if ($today_cents >= $soft) {
+        if ($today_cents >= (int)$cfg['young_account_soft_cents']) {
             return ['tier' => 'soft_warn', 'cooling_off_seconds' => 0, 'reason' => 'young_account_soft', 'today_cents' => $today_cents, 'hour_count' => $hour_count];
         }
         return ['tier' => 'normal', 'cooling_off_seconds' => 0, 'today_cents' => $today_cents, 'hour_count' => $hour_count];

@@ -143,7 +143,10 @@ switch ($eventType) {
                     'provider_transaction_id' => $paymentId,
                     'reference_number' => generate_reference_number(),
                     'status' => 'refunded',
-                    'payment_environment' => ($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox',
+                    // Inherit the original payment's environment so a misconfigured
+                    // APP_ENV can't tag a refund with a different env than the
+                    // payment it offsets.
+                    'payment_environment' => $original['payment_environment'] ?? (($_ENV['APP_ENV'] ?? 'sandbox') === 'production' ? 'production' : 'sandbox'),
                 ]);
                 if (!empty($recordResult['inserted'])) {
                     // Cumulative-refund check: only flip the original payment
@@ -157,8 +160,11 @@ switch ($eventType) {
                            AND provider_transaction_id = ?"
                     );
                     $sumStmt->execute([$paymentId]);
-                    $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
-                    if ($refundedTotal + 0.01 >= (float)$original['amount']) {
+                    // Compare in integer cents so a chain of partial refunds
+                    // can't drift past the threshold via repeated float rounding.
+                    $refundedCents = (int)round(abs((float)$sumStmt->fetch()['refunded_total']) * 100);
+                    $originalCents = (int)round((float)$original['amount'] * 100);
+                    if ($refundedCents >= $originalCents) {
                         $pdo->prepare("UPDATE portal_payments SET status='refunded' WHERE id = ?")
                             ->execute([$original['id']]);
                     }
@@ -193,7 +199,7 @@ switch ($eventType) {
                         // CAS guard: only the UPDATE that actually flips the
                         // state notifies, so a race with the synchronous
                         // execute path can't fire two completion emails.
-                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+                        $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), cancel_token = NULL, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
                         $upd->execute([$refundId, $argoId]);
                         if ($upd->rowCount() > 0) {
                             audit_log($pdo, (int)$rr['company_id'], 'completed', 'webhook', null, $argoId, null, [

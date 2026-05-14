@@ -19,7 +19,11 @@ function refund_square_get_client(array $company)
         throw new RuntimeException('Square access token not configured for company.');
     }
     $token = portal_decrypt($company['square_access_token']);
-    $isProduction = ($_ENV['APP_ENV'] ?? 'sandbox') === 'production';
+    // Key off the company row (matches Stripe + PayPal) so a server-wide
+    // APP_ENV flip doesn't cause sandbox companies to hit live Square or
+    // vice-versa. The access token is already per-company, but the base URL
+    // must match the token's environment.
+    $isProduction = ($company['environment'] ?? 'sandbox') === 'production';
     $baseUrl = $isProduction
         ? \Square\Environments::Production->value
         : \Square\Environments::Sandbox->value;
@@ -76,7 +80,9 @@ function refund_square_preflight(array $company, string $payment_id, int $reques
  */
 function refund_square_issue(array $company, array $request): array {
     $client = refund_square_get_client($company);
-    $idempotency = 'argo_request_' . $request['id'];
+    // Square caps idempotency_key at 45 chars; substr keeps us safe even if
+    // refund_requests.id ever grows past 32 digits (it won't, but be explicit).
+    $idempotency = substr('argo_request_' . (string)$request['id'], 0, 45);
 
     $body = new \Square\Refunds\Requests\RefundPaymentRequest([
         'idempotencyKey' => $idempotency,

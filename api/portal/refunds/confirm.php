@@ -66,7 +66,7 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
     if ((int)$code_row['attempts'] >= 5) {
         $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='too_many_code_attempts', updated_at=NOW() WHERE id = ?")
             ->execute([$request_id]);
-        audit_log($pdo, (int)$company['id'], 'cancelled_by_user', 'system', null, $request_id, null, ['reason' => 'too_many_code_attempts']);
+        audit_log($pdo, (int)$company['id'], 'cancelled_by_system', 'system', null, $request_id, null, ['reason' => 'too_many_code_attempts']);
         http_response_code(429);
         echo json_encode(['success' => false, 'error' => 'TOO_MANY_ATTEMPTS']);
         return;

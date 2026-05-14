@@ -45,10 +45,10 @@ foreach ($rows as $row) {
         // CAS guard: only flip if still cooling_off so a concurrent
         // user-cancel or webhook completion isn't overwritten.
         if (strtotime($row['updated_at']) < time() - 86400) {
-            $upd = $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='locked_account_auto_cancel', updated_at=NOW() WHERE id = ? AND state = 'cooling_off'");
+            $upd = $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='locked_account_auto_cancel', cancel_token = NULL, updated_at=NOW() WHERE id = ? AND state = 'cooling_off'");
             $upd->execute([$row['id']]);
             if ($upd->rowCount() > 0) {
-                audit_log($pdo, (int)$row['company_id'], 'cancelled_by_user', 'system', null, (int)$row['id'], null, [
+                audit_log($pdo, (int)$row['company_id'], 'cancelled_by_system', 'system', null, (int)$row['id'], null, [
                     'reason' => 'locked_account_auto_cancel',
                 ]);
                 $auto_cancelled++;

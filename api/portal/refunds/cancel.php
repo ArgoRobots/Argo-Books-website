@@ -39,7 +39,7 @@ refund_assert_state($req['state'], ['pending_code', 'code_verified', 'cooling_of
 // 409 so the desktop can re-fetch the current state.
 $upd = $pdo->prepare("
     UPDATE refund_requests
-    SET state='cancelled', state_reason='cancelled_by_user', updated_at=NOW()
+    SET state='cancelled', state_reason='cancelled_by_user', cancel_token = NULL, updated_at=NOW()
     WHERE id = ? AND state IN ('pending_code','code_verified','cooling_off')
 ");
 $upd->execute([$id]);

@@ -37,7 +37,14 @@ if (!in_array($row['state'], ['pending','old_verified'], true)) {
     send_error_response(409, 'Cannot cancel in state ' . $row['state'], 'WRONG_STATE');
 }
 
-$pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE id = ?")->execute([$change_id]);
+// State-guarded UPDATE: confirm-old.php / confirm-new.php can transition this
+// row between the SELECT above and this UPDATE. Without the predicate, the
+// cancel would silently overwrite a row that has already moved on.
+$upd = $pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE id = ? AND state IN ('pending','old_verified')");
+$upd->execute([$change_id]);
+if ($upd->rowCount() === 0) {
+    send_error_response(409, 'Email change was finalized before the cancellation could complete.', 'STATE_CONFLICT');
+}
 audit_log($pdo, (int)$company['id'], 'cancelled_by_user', 'owner', null, null, $change_id, []);
 
 send_json_response(200, ['success' => true, 'state' => 'cancelled']);

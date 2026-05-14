@@ -38,8 +38,22 @@ if (!in_array($req['state'], ['pending_code','code_verified','cooling_off'], tru
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $pdo->prepare("UPDATE refund_requests SET state='cancelled', state_reason='cancelled_by_email_link', cancel_token = NULL, updated_at = NOW() WHERE id = ?")
-        ->execute([$req['id']]);
+    // State-guarded UPDATE: the cooling-off promoter cron can transition this
+    // row to 'processing' or 'completed' between the SELECT above and this
+    // UPDATE. Without the state predicate, this clobbers a finalized refund
+    // back to 'cancelled' and the books diverge from the provider.
+    $upd = $pdo->prepare("
+        UPDATE refund_requests
+        SET state='cancelled', state_reason='cancelled_by_email_link', cancel_token = NULL, updated_at = NOW()
+        WHERE id = ? AND state IN ('pending_code','code_verified','cooling_off')
+    ");
+    $upd->execute([$req['id']]);
+    if ($upd->rowCount() === 0) {
+        http_response_code(409);
+        echo cancel_refund_layout('Already finalized',
+            '<p>This refund was finalized before the cancellation could complete. The page may have been left open while the cooling-off window expired.</p>');
+        exit;
+    }
     audit_log(
         $pdo, (int)$req['company_id'], 'cancelled_by_email_link', 'owner', null,
         (int)$req['id'], null,

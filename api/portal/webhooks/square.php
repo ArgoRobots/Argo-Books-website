@@ -121,8 +121,13 @@ switch ($eventType) {
 
             if (empty($paymentId)) break;
 
-            // Find original payment + insert negative-amount refund row (mirroring Stripe webhook)
-            $stmt = $pdo->prepare("SELECT * FROM portal_payments WHERE provider_payment_id = ? AND status = 'completed' AND amount > 0 LIMIT 1");
+            // Find original payment + insert negative-amount refund row.
+            // No status filter — once cumulative refunds cover the original, the row
+            // flips to 'refunded' (see refund_record_ledger). A subsequent webhook
+            // (out-of-order redelivery, late dashboard refund, etc.) must still find
+            // the row or the negative-amount insert silently no-ops. amount > 0 still
+            // excludes sibling refund rows. Mirrors the Stripe path.
+            $stmt = $pdo->prepare("SELECT * FROM portal_payments WHERE provider_payment_id = ? AND amount > 0 LIMIT 1");
             $stmt->execute([$paymentId]);
             $original = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($original) {

@@ -194,11 +194,17 @@ switch ($eventType) {
                     ?? $refundId;
             }
 
-            // Find original payment by capture id (provider_transaction_id) OR by order id (provider_payment_id)
+            // Find original payment by capture id (provider_transaction_id) OR by order id (provider_payment_id).
+            // No status filter: once cumulative refunds cover the original, the row
+            // flips to 'refunded' (see refund_record_ledger). A subsequent webhook —
+            // an out-of-order redelivery, a late goodwill refund, or a refund issued
+            // via the PayPal dashboard after the flip — must still find the row,
+            // otherwise the negative-amount insert silently no-ops and books drift.
+            // amount > 0 still excludes sibling refund rows. Mirrors the Stripe path.
             $stmt = $pdo->prepare("
                 SELECT * FROM portal_payments
                 WHERE (provider_transaction_id = ? OR provider_payment_id = ?)
-                  AND status = 'completed' AND amount > 0
+                  AND amount > 0
                 LIMIT 1
             ");
             $stmt->execute([$captureId, $captureId]);

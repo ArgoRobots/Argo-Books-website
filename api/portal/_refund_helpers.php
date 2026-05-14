@@ -290,9 +290,134 @@ HTML;
 // ---------------------------------------------------------------
 
 /**
+ * Map a provider's refund-API response status to one of:
+ *   'completed'  — terminal success; money is back on the customer's card
+ *   'failed'     — terminal failure; refund will not happen
+ *   'processing' — non-terminal (PENDING etc.); webhook/cron must finalize
+ *
+ * Critically: a non-throwing provider call is NOT proof of success. PayPal and
+ * Square frequently return PENDING for bank-funded refunds that later fail or
+ * settle hours later. Treating PENDING as completed notifies the customer
+ * prematurely.
+ */
+function refund_classify_provider_status(string $provider, ?string $status): string {
+    if ($status === null) {
+        // No status field returned — be conservative.
+        return 'processing';
+    }
+    switch ($provider) {
+        case 'stripe':
+            // Refund.status: succeeded | pending | requires_action | failed | canceled
+            if ($status === 'succeeded') return 'completed';
+            if ($status === 'failed' || $status === 'canceled') return 'failed';
+            return 'processing';
+        case 'paypal':
+            // Capture refund: COMPLETED | PENDING | FAILED | CANCELLED
+            $s = strtoupper($status);
+            if ($s === 'COMPLETED') return 'completed';
+            if ($s === 'FAILED' || $s === 'CANCELLED') return 'failed';
+            return 'processing';
+        case 'square':
+            // PaymentRefund.status: PENDING | COMPLETED | REJECTED | FAILED
+            $s = strtoupper($status);
+            if ($s === 'COMPLETED') return 'completed';
+            if ($s === 'REJECTED' || $s === 'FAILED') return 'failed';
+            return 'processing';
+        default:
+            return 'processing';
+    }
+}
+
+/**
+ * Idempotently write the negative-amount portal_payments row + flip the
+ * original payment's status + update the invoice balance. Mirrors what
+ * the provider webhook does. Safe to call from both the synchronous path
+ * and the webhook — record_portal_payment is keyed on provider_payment_id
+ * ('refund_' . $refund_id) so the second call is a no-op.
+ *
+ * Returns true if this call inserted a new ledger row, false if it was
+ * already there.
+ */
+function refund_record_ledger(PDO $pdo, array $req, string $refund_id, ?array $company = null): bool {
+    require_once __DIR__ . '/portal-helper.php'; // record_portal_payment + generate_reference_number
+
+    // Look up the original payment so the cumulative-refund check has a
+    // total to compare against. Missing original (manual entries, edge
+    // cases) just means we skip the status flip.
+    $stmt = $pdo->prepare(
+        "SELECT * FROM portal_payments
+         WHERE company_id = ? AND provider_payment_id = ? LIMIT 1"
+    );
+    $stmt->execute([$req['company_id'], $req['provider_payment_id']]);
+    $original = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $env = $company['environment'] ?? ($_ENV['APP_ENV'] ?? 'sandbox');
+    $refundAmount = (int)$req['amount_cents'] / 100.0;
+
+    $recordResult = record_portal_payment([
+        'company_id' => $req['company_id'],
+        'invoice_id' => $req['invoice_id'],
+        'customer_name' => $req['customer_name'] ?? ($original['customer_name'] ?? null),
+        'amount' => -$refundAmount,
+        'currency' => $req['currency'],
+        'payment_method' => $req['provider'],
+        'provider_payment_id' => 'refund_' . $refund_id,
+        'provider_transaction_id' => $req['provider_payment_id'],
+        'reference_number' => generate_reference_number(),
+        'status' => 'refunded',
+        'payment_environment' => $env,
+    ]);
+    if (empty($recordResult['inserted'])) {
+        return false; // webhook (or a prior call) already wrote this row
+    }
+
+    // Cumulative-refund check — flip the original payment to 'refunded'
+    // only once refunds cover its full amount. Without this guard, a
+    // partial refund flips the original to 'refunded' and the books read
+    // as fully refunded.
+    if ($original) {
+        $sumStmt = $pdo->prepare(
+            "SELECT COALESCE(SUM(amount), 0) AS refunded_total
+             FROM portal_payments
+             WHERE amount < 0 AND payment_method = ?
+               AND provider_transaction_id = ?"
+        );
+        $sumStmt->execute([$req['provider'], $req['provider_payment_id']]);
+        $refundedTotal = abs((float)$sumStmt->fetch()['refunded_total']);
+        if ($refundedTotal + 0.01 >= (float)$original['amount']) {
+            $pdo->prepare("UPDATE portal_payments SET status='refunded' WHERE id = ?")
+                ->execute([$original['id']]);
+        }
+    }
+
+    // Update invoice balance/status. SET-clause order matters: the status
+    // CASE must see the pre-update balance_due.
+    $pdo->prepare(
+        'UPDATE portal_invoices
+         SET status = CASE
+                 WHEN balance_due + ? >= total_amount THEN "sent"
+                 ELSE "partial"
+             END,
+             balance_due = LEAST(total_amount, balance_due + ?),
+             updated_at = NOW()
+         WHERE company_id = ? AND invoice_id = ?'
+    )->execute([$refundAmount, $refundAmount, $req['company_id'], $req['invoice_id']]);
+
+    return true;
+}
+
+/**
  * Invoke the provider's refund API for a request currently in 'processing'.
- * Updates state to 'completed' (with provider_refund_id) on success or
- * 'failed' (with state_reason) on error.
+ * Branches on the provider's returned status:
+ *   - terminal success → write ledger row, mark 'completed', notify
+ *   - terminal failure → mark 'failed', no notify
+ *   - non-terminal (PENDING etc.) → stay in 'processing', let the webhook
+ *     (or the stale-processing cron) finalize. provider_refund_id is stored
+ *     so cron lookups can correlate the request to the provider's refund.
+ *
+ * A non-throwing provider call is NOT sufficient for completion: PayPal /
+ * Square can return PENDING for bank-funded refunds that later fail or
+ * settle hours later. We notify only on terminal success.
  */
 function refund_execute_against_provider(PDO $pdo, array $company, int $request_id): void {
     $stmt = $pdo->prepare("SELECT * FROM refund_requests WHERE id = ?");
@@ -301,61 +426,100 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
     if (!$req) return;
 
     try {
+        $refund_id = null;
+        $status = null;
         switch ($req['provider']) {
             case 'stripe':
                 require_once __DIR__ . '/refunds/_provider_stripe.php';
                 $result = refund_stripe_issue($company, $req);
                 $refund_id = $result['id'] ?? null;
+                $status = $result['status'] ?? null;
                 break;
             case 'paypal':
                 require_once __DIR__ . '/refunds/_provider_paypal.php';
                 $result = refund_paypal_issue($company, $req);
                 $refund_id = $result['id'] ?? null;
+                $status = $result['status'] ?? null;
                 break;
             case 'square':
                 require_once __DIR__ . '/refunds/_provider_square.php';
                 $result = refund_square_issue($company, $req);
                 $refund_id = $result['refund']['id'] ?? null;
+                $status = $result['refund']['status'] ?? null;
                 break;
             default:
                 throw new RuntimeException("Unsupported provider: {$req['provider']}");
         }
 
+        $outcome = refund_classify_provider_status($req['provider'], $status);
+
+        // Always persist the provider_refund_id (even when staying in
+        // processing) so the webhook and the stale-processing cron can
+        // correlate this request to the provider's record.
+        if ($refund_id) {
+            $pdo->prepare("UPDATE refund_requests SET provider_refund_id = ?, updated_at = NOW() WHERE id = ? AND provider_refund_id IS NULL")
+                ->execute([$refund_id, $request_id]);
+        }
+
+        if ($outcome === 'failed') {
+            $upd = $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason = ?, updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
+            $upd->execute(["Provider returned terminal status: " . (string)$status, $request_id]);
+            if ($upd->rowCount() > 0) {
+                audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, [
+                    'provider_status' => $status,
+                    'provider_refund_id' => $refund_id,
+                ]);
+            }
+            return;
+        }
+
+        if ($outcome === 'processing') {
+            // Non-terminal status — the request stays in 'processing'.
+            // The provider webhook will flip to completed (and write the
+            // ledger row) when the money actually moves. If the webhook
+            // is lost, the stale-processing cron picks the request up
+            // 30 minutes after updated_at and reconciles via the
+            // provider's API. NO customer notification is sent here —
+            // we don't tell the customer the refund is done until it is.
+            audit_log($pdo, (int)$company['id'], 'provider_pending', 'system', null, $request_id, null, [
+                'provider_status' => $status,
+                'provider_refund_id' => $refund_id,
+            ]);
+            return;
+        }
+
+        // outcome === 'completed' — write the negative-amount portal_payments
+        // row + invoice balance update BEFORE marking the refund_request
+        // completed. record_portal_payment is keyed on provider_payment_id
+        // ('refund_' . $refund_id) and is idempotent, so the webhook arriving
+        // after this is a no-op. This guarantees the desktop's books include
+        // the refund even when the webhook is delayed or lost.
+        if ($refund_id) {
+            refund_record_ledger($pdo, $req, $refund_id, $company);
+        }
+
         // CAS-style transition: only flip if still in a pre-completed state.
-        // Guards against a race where the provider webhook arrives before
-        // this UPDATE commits and both paths would otherwise notify.
-        // Whichever runs first wins (rowCount=1) and owns the notify; the
-        // other's UPDATE affects 0 rows and skips the notify entirely.
+        // Guards against a race where the provider webhook arrives between
+        // refund_record_ledger above and this UPDATE — in that case the
+        // webhook's CAS update wins, this one is a no-op, and notification
+        // fires once over there.
         $upd = $pdo->prepare("UPDATE refund_requests SET state='completed', provider_refund_id = ?, completed_at = NOW(), updated_at = NOW() WHERE id = ? AND state IN ('processing','cooling_off')");
         $upd->execute([$refund_id, $request_id]);
         if ($upd->rowCount() === 0) {
-            // Already completed by another path (webhook race) — nothing
-            // more to do; notification has happened or will happen there.
             return;
         }
         audit_log($pdo, (int)$company['id'], 'completed', 'system', null, $request_id, null, [
             'provider_refund_id' => $refund_id,
+            'provider_status' => $status,
         ]);
-        // Re-fetch with the now-completed state so the notification reflects
-        // the final values (provider_refund_id, completed_at).
         $req['state'] = 'completed';
         $req['provider_refund_id'] = $refund_id;
-        // Notification is best-effort — Stripe has the money back already.
-        // If we let an SMTP/SQL hiccup propagate, the outer catch would mark
-        // the refund as 'failed' and the books would diverge from Stripe.
+        // Notification is best-effort — the money is already back.
+        // SMTP/SQL hiccups must not propagate to the outer catch.
         try { refund_notify_completion($pdo, $req); }
         catch (\Throwable $notifyEx) {
             error_log('refund_notify_completion threw after completed refund #' . $request_id . ': ' . $notifyEx->getMessage());
         }
-
-        // The provider's webhook (charge.refunded for Stripe; PAYMENT.CAPTURE.REFUNDED
-        // for PayPal; refund.created for Square) is the canonical source for the
-        // negative-amount portal_payments row + invoice balance flip + original
-        // payment status update — all already wired up in api/portal/webhooks/.
-        // The webhook also reconciles refund_requests state to 'completed' (no-op
-        // if we already set it here). Inserting from this path AND the webhook
-        // would double-count the refund in books. Webhooks usually arrive within
-        // seconds; the desktop sees the refund on its next payments-sync after that.
 
     } catch (\Throwable $e) {
         $msg = $e->getMessage();
@@ -372,7 +536,3 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         }
     }
 }
-
-// Note: portal_payments insertion is handled exclusively by the provider
-// webhook handlers (api/portal/webhooks/) to avoid double-counting refunds
-// in books. See refund_execute_against_provider above for rationale.

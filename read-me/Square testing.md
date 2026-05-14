@@ -30,7 +30,7 @@ https://dev.argorobots.com/pricing/checkout/index.php?method=square
    - **Postal Code**: Any valid postal code
    - **Email**: Your email address
 
-3. Click "Pay \$20.00 CAD"
+3. Click "Pay"
 
 4. Check results:
    - Should redirect to thank you page with license key

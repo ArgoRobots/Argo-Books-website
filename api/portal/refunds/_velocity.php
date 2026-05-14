@@ -24,7 +24,11 @@ function refund_load_velocity_config(PDO $pdo, int $company_id): array {
         $stmt = $pdo->query("SELECT * FROM refund_velocity_config WHERE company_id IS NULL LIMIT 1");
         $cfg = $stmt->fetch(PDO::FETCH_ASSOC);
     }
-    // Final fallback if config table is empty (shouldn't happen post-migration)
+    // Final fallback if config table is empty (shouldn't happen post-migration).
+    // The new_account_floor_cents MUST be strictly greater than
+    // new_account_cooling_cents — when they're equal, the hard-block check
+    // ($today_cents >= floor) catches every request that the cooling check
+    // would catch, and the 'delayed' tier is unreachable.
     if (!$cfg) {
         return [
             'soft_warn_multiplier' => 3.0,
@@ -32,9 +36,9 @@ function refund_load_velocity_config(PDO $pdo, int $company_id): array {
             'cooling_revenue_pct' => 0.25,
             'hard_revenue_pct' => 0.50,
             'cooling_off_minutes' => 15,
-            'new_account_floor_cents' => 100000,
-            'new_account_soft_cents' => 50000,
-            'new_account_cooling_cents' => 100000,
+            'new_account_floor_cents' => 500000,    // $5,000/day hard-block
+            'new_account_soft_cents' => 50000,      //   $500/day soft warn
+            'new_account_cooling_cents' => 100000,  // $1,000/day cooling
         ];
     }
     return $cfg;

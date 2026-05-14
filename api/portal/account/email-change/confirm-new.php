@@ -40,9 +40,32 @@ if ($row['state'] !== 'old_verified') {
     send_error_response(409, 'Change request is in state ' . $row['state'], 'WRONG_STATE');
 }
 
+// Expiry check — same 10-minute window as the old-email code.
+if (empty($row['new_email_code_expires_at']) || strtotime($row['new_email_code_expires_at']) < time()) {
+    audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, [
+        'target' => 'new', 'reason' => 'expired',
+    ]);
+    send_error_response(410, 'Code expired. Resend a new one.', 'CODE_EXPIRED');
+}
+
+// Attempt-counter check — 5 wrong tries cancels the change request.
+if ((int)$row['new_email_code_attempts'] >= 5) {
+    $pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE id = ? AND state = 'old_verified'")
+        ->execute([$change_id]);
+    audit_log($pdo, (int)$company['id'], 'cancelled_by_user', 'system', null, null, $change_id, [
+        'target' => 'new', 'reason' => 'too_many_code_attempts',
+    ]);
+    send_error_response(429, 'Too many wrong code attempts. Start a new email change.', 'TOO_MANY_ATTEMPTS');
+}
+
 $expected = refund_hash_code($code, 'echange-new-' . $change_id);
 if (!hash_equals($row['new_email_code_hash'], $expected)) {
-    audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, ['target' => 'new']);
+    $pdo->prepare("UPDATE email_change_requests SET new_email_code_attempts = new_email_code_attempts + 1 WHERE id = ?")
+        ->execute([$change_id]);
+    audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, [
+        'target' => 'new',
+        'attempts' => (int)$row['new_email_code_attempts'] + 1,
+    ]);
     send_error_response(401, 'Wrong code.', 'WRONG_CODE');
 }
 

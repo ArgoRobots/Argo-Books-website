@@ -58,7 +58,14 @@ $change_id = (int)$pdo->lastInsertId();
 
 $code = refund_generate_code();
 $hash = refund_hash_code($code, 'echange-old-' . $change_id);
-$pdo->prepare("UPDATE email_change_requests SET old_email_code_hash = ? WHERE id = ?")->execute([$hash, $change_id]);
+// 10-minute expiry + attempt counter reset, mirroring the refund-code flow.
+$pdo->prepare("
+    UPDATE email_change_requests
+    SET old_email_code_hash = ?,
+        old_email_code_expires_at = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
+        old_email_code_attempts = 0
+    WHERE id = ?
+")->execute([$hash, $change_id]);
 
 audit_log($pdo, (int)$company['id'], 'email_change_requested', 'owner', null, null, $change_id, [
     'new_email' => $new_email,

@@ -40,12 +40,31 @@ if ($row['state'] !== $expected_state) {
     send_error_response(409, 'Wrong state for this resend target.', 'WRONG_STATE');
 }
 
+// Per-change-request throttle. Count code_sent audit entries (initial issue +
+// any resends) in the last hour for this change_id. 5 codes/hour gives the
+// user enough room to retry both legs while preventing inbox-spam.
+$stmt = $pdo->prepare("
+    SELECT COUNT(*) FROM refund_audit_log
+    WHERE email_change_request_id = ?
+      AND event_type = 'code_sent'
+      AND created_at > DATE_SUB(NOW(), INTERVAL 1 HOUR)
+");
+$stmt->execute([$change_id]);
+if ((int)$stmt->fetchColumn() >= 5) {
+    send_error_response(429, 'Too many verification codes requested in the past hour. Please wait.', 'TOO_MANY_CODES');
+}
+
 $code = refund_generate_code();
 $salt = ($target === 'old' ? 'echange-old-' : 'echange-new-') . $change_id;
 $hash = refund_hash_code($code, $salt);
-$col = $target === 'old' ? 'old_email_code_hash' : 'new_email_code_hash';
+$hashCol = $target === 'old' ? 'old_email_code_hash' : 'new_email_code_hash';
+$expiresCol = $target === 'old' ? 'old_email_code_expires_at' : 'new_email_code_expires_at';
+$attemptsCol = $target === 'old' ? 'old_email_code_attempts' : 'new_email_code_attempts';
 
-$pdo->prepare("UPDATE email_change_requests SET $col = ? WHERE id = ?")->execute([$hash, $change_id]);
+// Reset expiry to the standard 10-minute window and zero the attempt counter
+// so the user starts fresh against the new code.
+$pdo->prepare("UPDATE email_change_requests SET $hashCol = ?, $expiresCol = DATE_ADD(NOW(), INTERVAL 10 MINUTE), $attemptsCol = 0 WHERE id = ?")
+    ->execute([$hash, $change_id]);
 audit_log($pdo, (int)$company['id'], 'code_sent', 'owner', null, null, $change_id, [
     'target' => $target,
     'resend' => true,

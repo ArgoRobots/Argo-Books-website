@@ -39,9 +39,36 @@ if ($row['state'] !== 'pending') {
     send_error_response(409, 'Change request is in state ' . $row['state'], 'WRONG_STATE');
 }
 
+// Expiry check — mirrors the refund-code flow. A nullable expires_at means
+// the code was never issued (or this row predates the expiry column); reject
+// safely rather than letting an unbounded code be used.
+if (empty($row['old_email_code_expires_at']) || strtotime($row['old_email_code_expires_at']) < time()) {
+    audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, [
+        'target' => 'old', 'reason' => 'expired',
+    ]);
+    send_error_response(410, 'Code expired. Request a new one.', 'CODE_EXPIRED');
+}
+
+// Attempt-counter check — 5 wrong tries cancels the change request, matching
+// refunds/confirm.php. Without this an API-key holder can brute-force the
+// 6-digit code indefinitely.
+if ((int)$row['old_email_code_attempts'] >= 5) {
+    $pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE id = ? AND state = 'pending'")
+        ->execute([$change_id]);
+    audit_log($pdo, (int)$company['id'], 'cancelled_by_user', 'system', null, null, $change_id, [
+        'target' => 'old', 'reason' => 'too_many_code_attempts',
+    ]);
+    send_error_response(429, 'Too many wrong code attempts. Start a new email change.', 'TOO_MANY_ATTEMPTS');
+}
+
 $expected = refund_hash_code($code, 'echange-old-' . $change_id);
 if (!hash_equals($row['old_email_code_hash'], $expected)) {
-    audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, ['target' => 'old']);
+    $pdo->prepare("UPDATE email_change_requests SET old_email_code_attempts = old_email_code_attempts + 1 WHERE id = ?")
+        ->execute([$change_id]);
+    audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, [
+        'target' => 'old',
+        'attempts' => (int)$row['old_email_code_attempts'] + 1,
+    ]);
     send_error_response(401, 'Wrong code.', 'WRONG_CODE');
 }
 
@@ -49,11 +76,16 @@ $pdo->beginTransaction();
 $pdo->prepare("UPDATE email_change_requests SET state='old_verified', old_email_verified_at = NOW() WHERE id = ?")
     ->execute([$change_id]);
 
-// Issue NEW-email code
+// Issue NEW-email code with the same 10-minute expiry + zeroed attempt counter.
 $new_code = refund_generate_code();
 $new_hash = refund_hash_code($new_code, 'echange-new-' . $change_id);
-$pdo->prepare("UPDATE email_change_requests SET new_email_code_hash = ? WHERE id = ?")
-    ->execute([$new_hash, $change_id]);
+$pdo->prepare("
+    UPDATE email_change_requests
+    SET new_email_code_hash = ?,
+        new_email_code_expires_at = DATE_ADD(NOW(), INTERVAL 10 MINUTE),
+        new_email_code_attempts = 0
+    WHERE id = ?
+")->execute([$new_hash, $change_id]);
 
 audit_log($pdo, (int)$company['id'], 'email_change_old_verified', 'owner', null, null, $change_id, []);
 audit_log($pdo, (int)$company['id'], 'code_sent', 'system', null, null, $change_id, ['target' => 'new']);

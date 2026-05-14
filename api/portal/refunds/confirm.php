@@ -31,6 +31,8 @@ refund_ensure_company_active($company);
 global $pdo;
 $raw = file_get_contents('php://input') ?: '';
 
+// require_key=true: code confirmation can trigger the provider refund call.
+// A retry without the header could fire the provider call twice.
 with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company, $raw) {
     $body = json_decode($raw, true);
     $request_id = (int)($body['request_id'] ?? 0);
@@ -153,4 +155,4 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
         'message' => $final['state_reason'] ?? null,
         'providerRefundId' => $final['provider_refund_id'] ?? null,
     ]);
-});
+}, true);

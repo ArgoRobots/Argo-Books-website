@@ -38,8 +38,24 @@ if ($row['revert_until'] && strtotime($row['revert_until']) < time()) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $pdo->beginTransaction();
-    $pdo->prepare("UPDATE portal_companies SET owner_email = ? WHERE id = ?")
-        ->execute([$row['old_email'], $row['company_id']]);
+    // Stale-token guard: only revert if the company is currently on the
+    // new_email from THIS change request. Without this predicate, a 30-day-old
+    // revert link can silently undo a later legitimate change
+    // (A->B then B->C; the old A->B link stomps owner back to A).
+    $upd = $pdo->prepare(
+        "UPDATE portal_companies SET owner_email = ?
+         WHERE id = ? AND owner_email = ?"
+    );
+    $upd->execute([$row['old_email'], $row['company_id'], $row['new_email']]);
+    if ($upd->rowCount() !== 1) {
+        $pdo->rollBack();
+        http_response_code(409);
+        echo revert_layout(
+            'Cannot revert',
+            '<p>This email change has been superseded by a newer one. The portal owner email is no longer ' . htmlspecialchars($row['new_email']) . ', so this revert link can no longer be used.</p>'
+        );
+        exit;
+    }
     $pdo->prepare("UPDATE email_change_requests SET state='reverted', reverted_at = NOW(), cancel_token = NULL WHERE id = ?")
         ->execute([$row['id']]);
     audit_log($pdo, (int)$row['company_id'], 'email_reverted', 'owner', null, null, (int)$row['id'], [

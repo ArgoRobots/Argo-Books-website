@@ -75,8 +75,21 @@ switch ($action) {
         }
 
         $pdo->beginTransaction();
-        $pdo->prepare("UPDATE portal_companies SET owner_email = ? WHERE id = ?")
-            ->execute([$row['old_email'], $row['company_id']]);
+        // Stale-token guard: only revert if the company is currently on the
+        // new_email from THIS change request. Without this predicate, admin
+        // reverting an older completed request can stomp a newer email
+        // change (A->B then B->C; reverting the A->B record sets owner back
+        // to A even though the user is now legitimately on C).
+        $upd = $pdo->prepare(
+            "UPDATE portal_companies SET owner_email = ?
+             WHERE id = ? AND owner_email = ?"
+        );
+        $upd->execute([$row['old_email'], $row['company_id'], $row['new_email']]);
+        if ($upd->rowCount() !== 1) {
+            $pdo->rollBack();
+            header('Location: /admin/payments/index.php?msg=revert_superseded#companies');
+            exit;
+        }
         $pdo->prepare("UPDATE email_change_requests SET state='reverted', reverted_at = NOW(), cancel_token = NULL WHERE id = ?")
             ->execute([$changeId]);
         audit_log($pdo, (int)$row['company_id'], 'email_reverted', 'admin', $admin_id, null, $changeId, [

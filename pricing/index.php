@@ -70,6 +70,14 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 },
                 {
                     "@type": "Question",
+                    "name": "I have multiple companies. Do I need to pay extra?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "No. Argo Books supports an unlimited number of companies — even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized. There's no per-company fee, no upgrade required, and no cap on how many businesses you can run."
+                    }
+                },
+                {
+                    "@type": "Question",
                     "name": "Can I cancel or change my plan anytime?",
                     "acceptedAnswer": {
                         "@type": "Answer",
@@ -90,6 +98,14 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "acceptedAnswer": {
                         "@type": "Answer",
                         "text": "Absolutely. All payments are processed through Stripe, PayPal, or Square — we never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide. Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "Do I still need an accountant?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books — it keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare. If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in report generator can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries — everything an accountant typically asks for."
                     }
                 },
                 {
@@ -421,6 +437,21 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
                 <div class="faq-item">
                     <div class="faq-question">
+                        <h3>I have multiple companies. Do I need to pay extra?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>No. Argo Books supports an unlimited number of companies — even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized.</p>
+                            <p>There's no per-company fee, no upgrade required, and no cap on how many businesses you can run.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
                         <h3>Can I cancel or change my plan anytime?</h3>
                         <div class="faq-icon">
                             <?= svg_icon('chevron-down') ?>
@@ -460,6 +491,21 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <div class="faq-answer-content">
                             <p>Absolutely. All payments are processed through Stripe, PayPal, or Square — we never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide.</p>
                             <p>Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>Do I still need an accountant?</h3>
+                        <div class="faq-icon">
+                            <?= svg_icon('chevron-down') ?>
+                        </div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            <p>For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books — it keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare.</p>
+                            <p>If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in <a href="../documentation/pages/features/report-generator.php">report generator</a> can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries — everything an accountant typically asks for.</p>
                         </div>
                     </div>
                 </div>

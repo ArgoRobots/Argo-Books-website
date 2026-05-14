@@ -29,11 +29,11 @@ include __DIR__ . '/../../docs-header.php';
             </ol>
 
             <div class="info-box">
-                <p><strong>Note:</strong> A standard <strong>Stripe</strong>, <strong>PayPal Business</strong>, or <strong>Square seller</strong> account is all you need — there's no special developer or merchant setup required. If you don't already have one, you can create it during the "Connect" step. Argo Books connects to your account - we never store your payment credentials.</p>
+                <p><strong>Note:</strong> A standard <strong>Stripe</strong>, <strong>PayPal Business</strong>, or <strong>Square seller</strong> account is all you need. If you don't already have one, you can create it during the "Connect" step. Argo Books connects to your account - we never store your payment credentials.</p>
             </div>
 
             <h2>Creating Invoices</h2>
-            <p>Generate professional invoices with just a few clicks:</p>
+            <p>Now that your payment integration is set up, you can now generate professional invoices with just a few clicks:</p>
             <ol class="steps-list">
                 <li>Go to "Invoices" in the navigation menu (under Transactions)</li>
                 <li>Click "Create Invoice"</li>
@@ -42,6 +42,14 @@ include __DIR__ . '/../../docs-header.php';
                 <li>Set payment terms and due date</li>
                 <li>Preview and send</li>
             </ol>
+
+            <h2>Payment Portal</h2>
+            <p>When you connect a payment provider, customers can pay invoices online:</p>
+            <ul>
+                <li>Customers receive an email with their invoice and a link to your payment portal</li>
+                <li>They can pay securely using their preferred payment method</li>
+                <li>Payments sync automatically with your Argo Books company</li>
+            </ul>
 
             <h2>Payment Tracking</h2>
             <p>Keep track of all your invoices and their payment status:</p>
@@ -54,19 +62,17 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Cancelled:</strong> Invoice has been cancelled</li>
             </ul>
 
-            <h2>Payment Portal</h2>
-            <p>When you connect a payment provider, customers can pay invoices online:</p>
+            <h2>Payment processing fees</h2>
+            <p>Payment processing fees are charged by the payment provider, not Argo Books. Most providers typically charge around 2.9% + $0.30 per transaction, including Stripe, PayPal, and Square. Because the exact rate depends on many different factors, Argo Books adds the 2.9% + $0.30 for every transaction.</p>
+            <p>You decide if you want to pass this fee onto your customer, or take the cost yourself. There is a "pass processing fee" toggle:</p>
             <ul>
-                <li>Customers receive an email with their invoice and a link to your payment portal</li>
-                <li>They can pay securely using their preferred payment method</li>
-                <li>Payments sync automatically with your Argo Books company</li>
+                <li><strong>Toggle on</strong> → passes the cost on to the customer. Customer pays invoice total + 2.9% + $0.30.</li>
+                <li><strong>Toggle off</strong> → customer pays just the invoice total. You absorb the fee.</li>
             </ul>
-
-            <h2>Transaction Fees</h2>
-            <p>Payment processing fees are charged by the payment provider, not Argo Books. Most providers typically charge around 2.9% + $0.30 per transaction, including Stripe, PayPal, and Square.</p>
+            <p>When your customers pay the invoices, the total amount and the fee go into your account. It's when you take the money out of your Stripe/PayPal/Square account and move it into your normal bank account that they charge you. The fee may be slightly different than the 2.9% + $0.30, especially if your customer is in a different country.</p>
 
             <div class="info-box">
-                <p><strong>Tip:</strong> Transaction fees are optionally passed on to the customer at checkout. To absorb the fees yourself instead, create an invoice template, go to the "Display" tab, and uncheck "Pass processing fees to customers".</p>
+                <p><strong>Tip:</strong> Payment processing fees are optionally passed on to the customer at checkout. To absorb the fees yourself instead, create an invoice template, go to the "Display" tab, and uncheck "Pass processing fees to customers".</p>
             </div>
 
             <h2>Payment Dashboard</h2>
@@ -81,7 +87,7 @@ include __DIR__ . '/../../docs-header.php';
             <h2>Payment Security</h2>
             <p>Your payment data is protected:</p>
             <ul>
-                <li>All payment processing happens on provider's secure servers</li>
+                <li>All payment processing happens on the payment provider's secure servers</li>
                 <li>Argo Books never stores card numbers or bank details</li>
                 <li>PCI DSS compliant through certified providers</li>
                 <li>End-to-end encryption for all transactions</li>

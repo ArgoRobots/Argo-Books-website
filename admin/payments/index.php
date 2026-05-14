@@ -8,6 +8,12 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+// Generate CSRF token if not present (used by the lock/unlock/revert forms in
+// the Companies tab and by the existing Failed & Refunds admin actions).
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Set page variables for the header
 $page_title = "Payment Portal";
 $page_description = "Monitor portal payments, companies, invoices, and payment analytics";
@@ -192,6 +198,26 @@ try {
     error_log("Companies error: " . $e->getMessage());
 }
 
+// --- Per-company email change history (last 10 per company) ---
+$email_changes_by_company = [];
+try {
+    $stmt = $pdo->query("
+        SELECT id, company_id, old_email, new_email, state,
+               created_at, completed_at, reverted_at, revert_until,
+               cancel_token IS NOT NULL AS has_revert_token
+        FROM email_change_requests
+        ORDER BY created_at DESC
+    ");
+    foreach ($stmt as $row) {
+        $cid = (int)$row['company_id'];
+        if (!isset($email_changes_by_company[$cid])) $email_changes_by_company[$cid] = [];
+        if (count($email_changes_by_company[$cid]) >= 10) continue;
+        $email_changes_by_company[$cid][] = $row;
+    }
+} catch (PDOException $e) {
+    error_log("Email changes error: " . $e->getMessage());
+}
+
 // --- Invoices (for Invoices tab) ---
 $invoices = [];
 $inv_search = $_GET['inv_search'] ?? '';
@@ -344,6 +370,46 @@ try {
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     $total_refunded = $row['count'];
     $total_refund_amount = $row['total'];
+
+    // --- In-flight refund requests (state machine view) ---
+    $inflight_refunds = [];
+    $inflight_count = 0;
+    $held_for_review_count = 0;
+    try {
+        // INNER JOIN + env filter so the sandbox/production toggle scopes
+        // refund_requests the same way it scopes payments/companies above.
+        // Without this, production view shows sandbox refunds (and vice
+        // versa), causing admins to act on rows from the wrong environment.
+        $stmt = $pdo->query("
+            SELECT r.id, r.invoice_number, r.customer_name, r.amount_cents, r.currency,
+                   r.provider, r.state, r.velocity_tier, r.state_reason,
+                   r.created_at, r.cooling_off_until,
+                   c.company_name, c.environment
+            FROM refund_requests r
+            INNER JOIN portal_companies c ON c.id = r.company_id
+            WHERE r.state IN ('pending_code','code_verified','cooling_off','processing','cancelled','failed')
+              AND $env_sql_c
+            ORDER BY r.created_at DESC
+            LIMIT 100
+        ");
+        $inflight_refunds = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $inflight_count = (int)$pdo->query("
+            SELECT COUNT(*) FROM refund_requests r
+            INNER JOIN portal_companies c ON c.id = r.company_id
+            WHERE r.state IN ('pending_code','code_verified','cooling_off','processing')
+              AND $env_sql_c
+        ")->fetchColumn();
+        $held_for_review_count = (int)$pdo->query("
+            SELECT COUNT(*) FROM refund_requests r
+            INNER JOIN portal_companies c ON c.id = r.company_id
+            WHERE r.state IN ('cooling_off','failed')
+              AND r.created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
+              AND $env_sql_c
+        ")->fetchColumn();
+    } catch (PDOException $e) {
+        error_log('Refund requests admin query: ' . $e->getMessage());
+    }
 
     $stmt = $pdo->query("SELECT COUNT(*) as count FROM portal_payments WHERE $env_sql");
     $all_payments_count = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
@@ -719,6 +785,95 @@ include __DIR__ . '/../admin_header.php';
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <!-- Account Status (lock + verification) -->
+                                            <div class="detail-section">
+                                                <h4 class="detail-section-title">Account Status</h4>
+                                                <div class="detail-section-grid">
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Email Verified</span>
+                                                        <span class="detail-value"><?php echo !empty($company['email_verified_at']) ? '✓ ' . date('M j, Y', strtotime($company['email_verified_at'])) : '✗ Not verified'; ?></span>
+                                                    </div>
+                                                    <div class="detail-item">
+                                                        <span class="detail-label">Account Locked</span>
+                                                        <span class="detail-value"><?php
+                                                            if (!empty($company['locked'])) {
+                                                                echo '<strong style="color:#dc2626;">Locked</strong>';
+                                                                if (!empty($company['locked_at'])) echo ' on ' . date('M j', strtotime($company['locked_at']));
+                                                                if (!empty($company['lock_reason'])) echo '<br><small style="color:#6b7280;">' . htmlspecialchars($company['lock_reason']) . '</small>';
+                                                            } else {
+                                                                echo 'Active';
+                                                            }
+                                                        ?></span>
+                                                    </div>
+                                                </div>
+                                                <div style="margin-top:0.6rem;">
+                                                    <?php if (!empty($company['locked'])): ?>
+                                                        <form method="post" action="../_actions/portal_company_action.php" style="display:inline;" onclick="event.stopPropagation();">
+                                                            <input type="hidden" name="action" value="unlock">
+                                                            <input type="hidden" name="company_id" value="<?php echo (int)$company['id']; ?>">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                            <input type="text" name="reason" placeholder="Unlock reason (required)" required style="padding:4px 8px;width:240px;margin-right:6px;">
+                                                            <button type="submit" onclick="event.stopPropagation();return confirm('Unlock this account? Refunds will be re-enabled.');" style="background:#059669;color:#fff;padding:6px 14px;border:none;border-radius:4px;cursor:pointer;">Unlock</button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <form method="post" action="../_actions/portal_company_action.php" style="display:inline;" onclick="event.stopPropagation();">
+                                                            <input type="hidden" name="action" value="lock">
+                                                            <input type="hidden" name="company_id" value="<?php echo (int)$company['id']; ?>">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                            <input type="text" name="reason" placeholder="Lock reason (required)" required style="padding:4px 8px;width:240px;margin-right:6px;">
+                                                            <button type="submit" onclick="event.stopPropagation();return confirm('Lock this account? Refunds will be disabled until unlocked.');" style="background:#dc2626;color:#fff;padding:6px 14px;border:none;border-radius:4px;cursor:pointer;">Lock</button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <!-- Email Change History -->
+                                            <?php $ec_changes = $email_changes_by_company[$company['id']] ?? []; ?>
+                                            <?php if (!empty($ec_changes)): ?>
+                                            <div class="detail-section">
+                                                <h4 class="detail-section-title">Email Change History (last 10)</h4>
+                                                <table style="width:100%;font-size:.9em;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:left;">When</th>
+                                                            <th style="text-align:left;">From → To</th>
+                                                            <th style="text-align:left;">State</th>
+                                                            <th style="text-align:left;">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($ec_changes as $ec): ?>
+                                                        <tr>
+                                                            <td><?php echo date('M j, Y g:i A', strtotime($ec['created_at'])); ?></td>
+                                                            <td>
+                                                                <?php echo htmlspecialchars($ec['old_email']); ?>
+                                                                <span style="color:#6b7280;"> → </span>
+                                                                <?php echo htmlspecialchars($ec['new_email']); ?>
+                                                            </td>
+                                                            <td>
+                                                                <span class="badge badge-state-<?php echo htmlspecialchars($ec['state']); ?>">
+                                                                    <?php echo htmlspecialchars($ec['state']); ?>
+                                                                </span>
+                                                            </td>
+                                                            <td>
+                                                                <?php if ($ec['state'] === 'completed' && !empty($ec['has_revert_token']) && (!$ec['revert_until'] || strtotime($ec['revert_until']) > time())): ?>
+                                                                    <form method="post" action="../_actions/portal_company_action.php" style="display:inline;" onclick="event.stopPropagation();">
+                                                                        <input type="hidden" name="action" value="revert_email">
+                                                                        <input type="hidden" name="email_change_id" value="<?php echo (int)$ec['id']; ?>">
+                                                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                                        <input type="text" name="reason" placeholder="Revert reason" required style="padding:3px 6px;width:160px;margin-right:4px;">
+                                                                        <button type="submit" onclick="event.stopPropagation();return confirm('Admin-revert this email change? Both addresses will be notified.');" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Revert</button>
+                                                                    </form>
+                                                                <?php endif; ?>
+                                                            </td>
+                                                        </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <?php endif; ?>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -903,6 +1058,79 @@ include __DIR__ . '/../admin_header.php';
                 <div class="stat-value"><?php echo number_format($total_refunded); ?></div>
                 <div class="subtext">$<?php echo number_format($total_refund_amount, 2); ?> CAD</div>
             </div>
+            <div class="stat-card">
+                <h3>Refunds in Flight</h3>
+                <div class="stat-value"><?php echo number_format($inflight_count); ?></div>
+                <div class="subtext">Not yet completed</div>
+            </div>
+            <div class="stat-card">
+                <h3>Held for Review</h3>
+                <div class="stat-value"><?php echo number_format($held_for_review_count); ?></div>
+                <div class="subtext">Last 7d (cooling-off + failed)</div>
+            </div>
+        </div>
+
+        <!-- In-flight refund requests (state machine) -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>Refund Requests</h2>
+                <span class="subtext" style="color:#6b7280;font-size:.85rem;">In-flight orchestration. Completed refunds appear in "Refunded Payments" below.</span>
+            </div>
+            <?php if (empty($inflight_refunds)): ?>
+                <p style="text-align: center; color: #6b7280; padding: 1.5rem;">No in-flight refund requests.</p>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table data-paginate="25">
+                        <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Company</th>
+                                <th>Invoice</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Provider</th>
+                                <th>State</th>
+                                <th>Tier</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($inflight_refunds as $r): ?>
+                                <tr>
+                                    <td><?php echo date('M j g:i A', strtotime($r['created_at'])); ?></td>
+                                    <td><?php echo htmlspecialchars($r['company_name'] ?? '—'); ?></td>
+                                    <td><?php echo htmlspecialchars($r['invoice_number']); ?></td>
+                                    <td><?php echo htmlspecialchars($r['customer_name'] ?? '—'); ?></td>
+                                    <td>$<?php echo number_format($r['amount_cents']/100, 2); ?> <?php echo htmlspecialchars($r['currency']); ?></td>
+                                    <td><?php echo htmlspecialchars(ucfirst($r['provider'])); ?></td>
+                                    <td><span class="badge badge-state-<?php echo htmlspecialchars($r['state']); ?>"><?php echo htmlspecialchars($r['state']); ?></span></td>
+                                    <td><?php echo htmlspecialchars($r['velocity_tier'] ?? '—'); ?></td>
+                                    <td>
+                                        <?php if (in_array($r['state'], ['pending_code','code_verified','cooling_off'], true)): ?>
+                                            <form method="post" action="../_actions/refund_admin_action.php" style="display:inline;">
+                                                <input type="hidden" name="action" value="cancel">
+                                                <input type="hidden" name="request_id" value="<?php echo (int)$r['id']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                <button type="submit" onclick="return confirm('Cancel this refund?')" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Cancel</button>
+                                            </form>
+                                        <?php elseif ($r['state'] === 'processing'): ?>
+                                            <form method="post" action="../_actions/refund_admin_action.php" style="display:inline;">
+                                                <input type="hidden" name="action" value="force_fail">
+                                                <input type="hidden" name="request_id" value="<?php echo (int)$r['id']; ?>">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                                                <button type="submit" onclick="return confirm('Force-fail this refund?')" style="background:#fff;border:1px solid #d1d5db;padding:4px 10px;border-radius:4px;cursor:pointer;">Force fail</button>
+                                            </form>
+                                        <?php endif; ?>
+                                        <?php if ($r['state_reason']): ?>
+                                            <small style="color:#6b7280;display:block;margin-top:2px;"><?php echo htmlspecialchars(substr($r['state_reason'], 0, 80)); ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
 
         <!-- Failed Payments Table -->

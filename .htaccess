@@ -262,6 +262,9 @@ php_value upload_max_filesize 10M
     # Provider connect/disconnect: /api/portal/connect/{provider}
     RewriteRule ^api/portal/connect/(stripe|paypal|square)/?$ api/portal/connect.php?provider=$1 [L,QSA]
 
+    # Portal payment webhooks: /api/portal/webhooks/{provider}
+    RewriteRule ^api/portal/webhooks/(stripe|paypal|square)/?$ api/portal/webhooks/$1.php [L,QSA]
+
     # Telemetry data upload
     RewriteRule ^api/data/upload/?$ api/data/upload.php [L,QSA]
 

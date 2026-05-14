@@ -321,6 +321,13 @@ $isDocsLanding = true;
                 </div>
             </div>
             <div class="category-cards compact">
+                <a href="pages/reference/how-numbers-are-calculated.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('bar-chart', 20) ?>
+                    </div>
+                    <h3>How Numbers Are Calculated</h3>
+                    <p>Revenue, profit, tax, refunds explained</p>
+                </a>
                 <a href="pages/reference/supported-currencies.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('dollar', 20) ?>

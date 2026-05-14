@@ -193,133 +193,15 @@ function process_stripe_payment(array $invoice, array $data, float $amount, stri
 
 /**
  * Process a confirmed PayPal payment
+ *
+ * Defensive guard: PayPal portal payments are intentionally disabled. The
+ * customer-facing UI does not render the PayPal button (see
+ * get_available_payment_methods in portal-helper.php) and checkout.php
+ * rejects PayPal at the order-create step, so this function should never
+ * be reached through the normal flow. If a stale client still POSTs here,
+ * fail closed with a clear 503.
  */
 function process_paypal_payment(array $invoice, array $data, float $amount, string $referenceNumber, float $processingFee = 0.00): void
 {
-    global $is_production;
-
-    $paypalMerchantId = $invoice['paypal_merchant_id'] ?? '';
-    if (empty($paypalMerchantId)) {
-        send_error_response(400, 'PayPal is not configured for this business.', 'PAYPAL_NOT_CONNECTED');
-    }
-
-    $orderId = $data['order_id'] ?? '';
-    if (empty($orderId)) {
-        send_error_response(400, 'Missing PayPal order_id.', 'MISSING_FIELD');
-    }
-
-    // Validate order ID format to prevent SSRF via URL path injection
-    if (!preg_match('/^[A-Za-z0-9\-]+$/', $orderId)) {
-        send_error_response(400, 'Invalid PayPal order ID format.', 'INVALID_ORDER_ID');
-    }
-
-    // Verify the order with PayPal
-    $paypalClientId = $is_production
-        ? $_ENV['PAYPAL_LIVE_CLIENT_ID']
-        : $_ENV['PAYPAL_SANDBOX_CLIENT_ID'];
-    $paypalSecret = $is_production
-        ? $_ENV['PAYPAL_LIVE_CLIENT_SECRET']
-        : $_ENV['PAYPAL_SANDBOX_CLIENT_SECRET'];
-    $paypalBaseUrl = $is_production
-        ? 'https://api-m.paypal.com'
-        : 'https://api-m.sandbox.paypal.com';
-
-    // Get access token
-    $ch = curl_init("$paypalBaseUrl/v1/oauth2/token");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => 'grant_type=client_credentials',
-        CURLOPT_USERPWD => "$paypalClientId:$paypalSecret",
-        CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-    $tokenResponse = json_decode(curl_exec($ch), true);
-
-    if (empty($tokenResponse['access_token'])) {
-        send_error_response(500, 'Failed to authenticate with PayPal.', 'PAYPAL_AUTH_FAILED');
-    }
-
-    $accessToken = $tokenResponse['access_token'];
-
-    // Verify order details
-    $ch = curl_init("$paypalBaseUrl/v2/checkout/orders/$orderId");
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => [
-            "Authorization: Bearer $accessToken",
-            "Content-Type: application/json"
-        ],
-        CURLOPT_SSL_VERIFYPEER => true,
-        CURLOPT_SSL_VERIFYHOST => 2,
-    ]);
-    $orderResponse = json_decode(curl_exec($ch), true);
-
-    if (empty($orderResponse['id']) || $orderResponse['status'] !== 'COMPLETED') {
-        send_error_response(400, 'PayPal order is not completed.', 'PAYPAL_NOT_COMPLETED');
-    }
-
-    // Extract capture details and verify the actual captured amount
-    $captureId = '';
-    $capturedAmount = 0;
-    if (isset($orderResponse['purchase_units'][0]['payments']['captures'][0])) {
-        $capture = $orderResponse['purchase_units'][0]['payments']['captures'][0];
-        $captureId = $capture['id'] ?? '';
-        $capturedAmount = floatval($capture['amount']['value'] ?? 0);
-    }
-
-    // Use the PayPal-verified amount, not the client-supplied amount
-    if ($capturedAmount <= 0) {
-        send_error_response(400, 'Could not verify PayPal payment amount.', 'PAYPAL_AMOUNT_INVALID');
-    }
-    if (abs($capturedAmount - $amount) > 0.01) {
-        error_log("Portal PayPal amount mismatch for invoice " . $invoice['invoice_id'] . " (order: $orderId)");
-        send_error_response(400, 'Payment amount mismatch.', 'AMOUNT_MISMATCH');
-    }
-    $amount = $capturedAmount; // Use the verified amount
-
-    // Record the payment
-    $result = record_portal_payment([
-        'company_id' => $invoice['company_id'],
-        'invoice_id' => $invoice['invoice_id'],
-        'customer_name' => $invoice['customer_name'],
-        'amount' => $amount,
-        'processing_fee' => $processingFee,
-        'currency' => strtoupper($invoice['currency'] ?: 'usd'),
-        'payment_method' => 'paypal',
-        'provider_payment_id' => $orderId,
-        'provider_transaction_id' => $captureId ?: $orderId,
-        'reference_number' => $referenceNumber,
-        'status' => 'completed',
-        'payment_environment' => $is_production ? 'production' : 'sandbox',
-    ]);
-
-    if (!$result['success']) {
-        send_error_response(500, $result['message'], 'RECORD_FAILED');
-    }
-
-    // Send payment confirmation email (best-effort, don't block the response on failure)
-    if (!empty($invoice['customer_email'])) {
-        send_payment_confirmation([
-            'customerEmail' => $invoice['customer_email'],
-            'customerName' => $invoice['customer_name'] ?? '',
-            'companyName' => $invoice['company_name'] ?? '',
-            'invoiceId' => $invoice['invoice_id'],
-            'amount' => $amount,
-            'currency' => strtoupper($invoice['currency'] ?: 'usd'),
-            'referenceNumber' => $result['reference_number'],
-            'paymentMethod' => 'paypal',
-        ]);
-    }
-
-    send_json_response(200, [
-        'success' => true,
-        'method' => 'paypal',
-        'reference_number' => $result['reference_number'],
-        'amount' => $amount,
-        'currency' => strtoupper($invoice['currency'] ?: 'usd'),
-        'invoice_id' => $invoice['invoice_id'],
-        'timestamp' => date('c')
-    ]);
+    send_error_response(503, 'PayPal is not currently supported. Pay with Stripe or Square instead.', 'PROVIDER_UNSUPPORTED');
 }

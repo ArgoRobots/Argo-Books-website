@@ -165,26 +165,16 @@ function handle_stripe_checkout(array $invoice, int $amountCents, string $curren
 
 /**
  * Handle PayPal checkout (returns order details for client-side approval)
+ *
+ * PayPal portal payments are intentionally disabled at this layer. The
+ * customer-facing invoice page does not render the PayPal button (see
+ * get_available_payment_methods in portal-helper.php), so this function
+ * should never be reached through the normal flow — but if a stale client
+ * or direct POST still calls it, we return a clear 503.
  */
 function handle_paypal_checkout(array $invoice, float $amount, string $currency, array $data): void
 {
-    $paypalMerchantId = $invoice['paypal_merchant_id'] ?? '';
-    if (empty($paypalMerchantId)) {
-        send_error_response(400, 'PayPal is not configured for this business.', 'PAYPAL_NOT_CONNECTED');
-    }
-
-    // For PayPal, the order is created client-side using the PayPal SDK.
-    // We return the merchant info so the frontend can create the order with the correct payee.
-    send_json_response(200, [
-        'success' => true,
-        'method' => 'paypal',
-        'merchant_id' => $paypalMerchantId,
-        'invoice_id' => $invoice['invoice_id'],
-        'amount' => number_format($amount, 2, '.', ''),
-        'currency' => strtoupper($currency),
-        'description' => 'Invoice ' . $invoice['invoice_id'],
-        'timestamp' => date('c')
-    ]);
+    send_error_response(503, 'PayPal is not currently supported. Pay with Stripe or Square instead.', 'PROVIDER_UNSUPPORTED');
 }
 
 /**
@@ -247,8 +237,10 @@ function process_square_payment(array $invoice, array $company, array $data, int
         : 'https://connect.squareupsandbox.com/v2';
 
     // Derive idempotency key from invoice+amount+source so retries reuse the same key,
-    // but clients cannot manipulate it (server-side HMAC with encryption key as secret)
-    $idempotencyKey = hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? '');
+    // but clients cannot manipulate it (server-side HMAC with encryption key as secret).
+    // Truncated to 45 chars to fit Square's idempotency_key max length (180 bits of
+    // entropy retained — more than enough for uniqueness).
+    $idempotencyKey = substr(hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? ''), 0, 45);
     $referenceNumber = generate_reference_number();
 
     $paymentData = [
@@ -270,7 +262,7 @@ function process_square_payment(array $invoice, array $company, array $data, int
         CURLOPT_CUSTOMREQUEST => 'POST',
         CURLOPT_POSTFIELDS => json_encode($paymentData),
         CURLOPT_HTTPHEADER => [
-            "Square-Version: 2025-10-16",
+            "Square-Version: 2026-01-22",
             "Authorization: Bearer $accessToken",
             "Content-Type: application/json"
         ],

@@ -265,7 +265,7 @@ try {
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_CUSTOMREQUEST => $method,
                     CURLOPT_HTTPHEADER => [
-                        "Square-Version: 2025-10-16",
+                        "Square-Version: 2026-01-22",
                         "Authorization: Bearer $squareAccessToken",
                         "Content-Type: application/json"
                     ],

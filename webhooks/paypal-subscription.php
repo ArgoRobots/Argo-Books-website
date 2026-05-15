@@ -25,6 +25,7 @@ $dotenv->load();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 require_once __DIR__ . '/paypal-helper.php';
+require_once __DIR__ . '/../cron/_renewal_helpers.php';
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -536,24 +537,3 @@ function handlePaymentRefunded($resource) {
     }
 }
 
-/**
- * Calculate new subscription end date.
- *
- * Bases the new period on the LATER of the existing end_date or NOW() so a
- * delayed renewal doesn't leave the new end_date still in the past.
- */
-function calculateNewEndDate($currentEndDate, $billing) {
-    $endDateTime = new DateTime($currentEndDate);
-    $now = new DateTime('now');
-    if ($endDateTime < $now) {
-        $endDateTime = $now;
-    }
-
-    if ($billing === 'yearly') {
-        $endDateTime->add(new DateInterval('P1Y'));
-    } else {
-        $endDateTime->add(new DateInterval('P1M'));
-    }
-
-    return $endDateTime->format('Y-m-d H:i:s');
-}

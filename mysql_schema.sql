@@ -206,19 +206,6 @@ CREATE TABLE IF NOT EXISTS statistics (
     INDEX idx_country_code (country_code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create version_history table to track software versions
-CREATE TABLE IF NOT EXISTS version_history (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    version VARCHAR(20) NOT NULL,
-    release_date DATETIME NOT NULL,
-    changelog TEXT,
-    download_count INT DEFAULT 0,
-    is_current BOOLEAN DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-
-    UNIQUE INDEX idx_version_number (version)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Create referral_links table for tracking ad/sponsor sources
 CREATE TABLE IF NOT EXISTS referral_links (
     id INT PRIMARY KEY AUTO_INCREMENT,

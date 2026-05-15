@@ -285,6 +285,97 @@ HTML;
     send_styled_email($to, $subject, $body, 'purple');
 }
 
+/**
+ * Send a calm, action-oriented heads-up to the merchant's owner_email when
+ * the velocity engine hard-blocks a refund. Mirrors the in-app modal copy
+ * but gives them a permanent inbox record + a clean reply-to-resolve flow.
+ * Reply-To is set to contact@argorobots.com so a plain Reply gets the
+ * message to the admin inbox (where the matching admin alert already lives).
+ * Best-effort — caller wraps in try/catch.
+ */
+function refund_email_send_hard_block(string $to, array $req): void {
+    $amount_str = htmlspecialchars(number_format($req['amount_cents'] / 100, 2) . ' ' . $req['currency']);
+    $invoice_safe = htmlspecialchars($req['invoice_number']);
+    $subject = "Refund paused: $amount_str on invoice $invoice_safe";
+    $body = <<<HTML
+        <p>The refund of <strong>$amount_str</strong> on invoice <strong>$invoice_safe</strong> was paused by our automated safety check, and refunds on your account are temporarily on hold while we review.</p>
+        <p><strong>This is often a false positive.</strong> Our system is tuned conservatively and frequently triggers on legitimate refunds, especially for newer accounts or larger amounts.</p>
+        <p>To get this sorted, just reply to this email or write to <a href="mailto:contact@argorobots.com">contact@argorobots.com</a>. We will review and resume refunds within one business day, usually sooner.</p>
+        <p>The rest of your account (invoicing, accepting payments, sync) continues to work normally.</p>
+HTML;
+    send_styled_email($to, $subject, $body, 'purple', null, null, 'contact@argorobots.com');
+}
+
+/**
+ * Send an admin alert to contact@argorobots.com when the velocity engine
+ * hard-blocks a refund (and locks the merchant's account). The alert carries
+ * enough context to investigate the lock without logging into the DB:
+ * company info, refund details, the velocity diagnostic that tripped, and a
+ * link to the audit log entry. Best-effort — caller wraps in try/catch.
+ */
+function refund_notify_admin_of_hard_block(array $company, array $request, array $velocity, int $request_id): void {
+    $base = rtrim($_ENV['SITE_URL'] ?? 'https://argorobots.com', '/');
+    $admin_url = $base . '/admin/payments/index.php#companies';
+
+    $company_id    = (int)($company['id'] ?? 0);
+    $company_name  = htmlspecialchars((string)($company['company_name'] ?? '(unknown)'));
+    $owner_email   = htmlspecialchars((string)($company['owner_email'] ?? '(no email)'));
+    $env_label     = htmlspecialchars((string)($company['environment'] ?? 'production'));
+
+    $amount_cents  = (int)($request['amount_cents'] ?? 0);
+    $amount_str    = htmlspecialchars(number_format($amount_cents / 100, 2) . ' ' . ($request['currency'] ?? 'USD'));
+    $invoice_safe  = htmlspecialchars((string)($request['invoice_number'] ?? '(unknown)'));
+    $provider_safe = htmlspecialchars((string)($request['provider'] ?? '(unknown)'));
+    $reason_safe   = htmlspecialchars((string)($request['reason'] ?? ''));
+
+    $vel_reason    = htmlspecialchars((string)($velocity['reason'] ?? '(unspecified)'));
+    $today_str     = htmlspecialchars(number_format(($velocity['today_cents'] ?? 0) / 100, 2));
+    $hour_count    = (int)($velocity['hour_count'] ?? 0);
+
+    $subject = "[Argo Books] Refund hard-block: company #$company_id ($company_name)";
+    $body = <<<HTML
+        <p><strong>An automated safety check has paused refunds on a portal account.</strong> This often catches false positives — review and unlock if legitimate.</p>
+
+        <h3 style="margin-top:24px;">Company</h3>
+        <ul>
+            <li><strong>ID:</strong> $company_id</li>
+            <li><strong>Name:</strong> $company_name</li>
+            <li><strong>Owner email:</strong> $owner_email</li>
+            <li><strong>Environment:</strong> $env_label</li>
+        </ul>
+
+        <h3 style="margin-top:24px;">Refund that tripped the check</h3>
+        <ul>
+            <li><strong>Request ID:</strong> #$request_id</li>
+            <li><strong>Invoice:</strong> $invoice_safe</li>
+            <li><strong>Provider:</strong> $provider_safe</li>
+            <li><strong>Amount:</strong> $amount_str</li>
+            <li><strong>Merchant-provided reason:</strong> $reason_safe</li>
+        </ul>
+
+        <h3 style="margin-top:24px;">Velocity diagnostic</h3>
+        <ul>
+            <li><strong>Trigger:</strong> <code>$vel_reason</code></li>
+            <li><strong>Total refunded today (incl. this attempt):</strong> \$$today_str</li>
+            <li><strong>Refund attempts in last hour:</strong> $hour_count</li>
+        </ul>
+
+        <h3 style="margin-top:24px;">Next steps</h3>
+        <ol>
+            <li>Open the admin panel: <a href="$admin_url">$admin_url</a></li>
+            <li>Find company #$company_id in the Companies list; review their recent refund history and audit log.</li>
+            <li>If legitimate, click <strong>Unlock</strong> (you'll be asked for a reason). Consider adding a per-company override if they regularly need higher limits.</li>
+            <li>If suspicious, leave locked and reply to the merchant once they reach out.</li>
+        </ol>
+
+        <p>Full investigation procedure: see <code>read-me/Hard-block response procedure.md</code> in the repo.</p>
+HTML;
+    // Reply-To set to the merchant's owner_email so you can hit Reply and talk
+    // to them directly. Skip if owner_email is empty.
+    $reply_to = !empty($company['owner_email']) ? $company['owner_email'] : null;
+    send_styled_email('contact@argorobots.com', $subject, $body, 'purple', null, null, $reply_to);
+}
+
 // ---------------------------------------------------------------
 // Provider execution dispatch
 // ---------------------------------------------------------------

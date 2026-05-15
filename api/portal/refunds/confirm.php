@@ -95,21 +95,51 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
     audit_log($pdo, (int)$company['id'], 'velocity_tier_assigned', 'system', null, $request_id, null, $velocity);
 
     if ($velocity['tier'] === 'hard_block') {
+        // lock_reason is what the user sees on every SUBSEQUENT refund attempt
+        // (surfaced as the 423 ACCOUNT_LOCKED message in refund_ensure_company_active).
+        // The first-attempt message returned below is the one shown on the
+        // failure screen the moment the block happens. Both messages emphasise
+        // that the system is automated and sometimes wrong — a legitimate
+        // merchant hitting this shouldn't read "fraud" or "frozen". The
+        // technical velocity reason is preserved in the audit_log calls so
+        // support can see exactly what tripped without exposing it to the user.
+        $userFriendlyLockReason = 'Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds — email contact@argorobots.com and we will resume refunds within one business day.';
         $pdo->beginTransaction();
         $pdo->prepare("UPDATE portal_companies SET locked = 1, lock_reason = ?, locked_at = NOW() WHERE id = ?")
-            ->execute(['Auto-locked by velocity engine: ' . ($velocity['reason'] ?? 'threshold breach'), $company['id']]);
+            ->execute([$userFriendlyLockReason, $company['id']]);
         $pdo->prepare("UPDATE refund_requests SET state='failed', state_reason='hard_block', velocity_tier=?, updated_at=NOW() WHERE id = ?")
             ->execute([$velocity['tier'], $request_id]);
         audit_log($pdo, (int)$company['id'], 'account_locked', 'system', null, $request_id, null, $velocity);
-        audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, ['reason' => 'hard_block']);
+        audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, ['reason' => 'hard_block', 'velocity_reason' => $velocity['reason'] ?? null]);
         $pdo->commit();
+
+        // Notify the admin so we can investigate quickly. Best-effort — wrap in
+        // try/catch so an SMTP hiccup never breaks the lock-down code path
+        // (the lock has already been written; the email is just a heads-up).
+        try {
+            refund_notify_admin_of_hard_block($company, $request, $velocity, $request_id);
+        } catch (\Throwable $e) {
+            error_log('Hard-block admin notification failed: ' . $e->getMessage());
+        }
+        // Also send a heads-up to the merchant's owner_email so they have a
+        // permanent inbox record even if they closed the modal. Reply-To on
+        // that email goes to contact@argorobots.com so plain Reply reaches us.
+        // Same best-effort pattern — SMTP failure must not break the lock.
+        if (!empty($company['owner_email'])) {
+            try {
+                refund_email_send_hard_block($company['owner_email'], $request);
+            } catch (\Throwable $e) {
+                error_log('Hard-block user notification failed: ' . $e->getMessage());
+            }
+        }
 
         http_response_code(423);
         echo json_encode([
             'success' => false,
             'state' => 'failed',
             'velocityTier' => $velocity['tier'],
-            'message' => 'This refund triggered fraud-prevention rules. Your account has been frozen pending review. Contact support.',
+            'errorCode' => 'HARD_BLOCK',
+            'message' => 'This refund was flagged by our automated safety check. The system sometimes flags legitimate refunds — please email contact@argorobots.com and we will review and process this refund within one business day. Other parts of your account continue to work normally.',
         ]);
         return;
     }

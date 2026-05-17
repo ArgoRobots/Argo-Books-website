@@ -476,6 +476,157 @@ function schedule_followups_for_lead($pdo, int $leadId, ?int $abTestId = null, ?
 }
 
 /**
+ * Generates a follow-up draft for a single outreach_followups row using Gemini.
+ *
+ * Determines the per-touch intent by:
+ *  1. If the row has an ab_variant_id, parsing that variant's JSON content
+ *     and extracting the intent for this touch_number.
+ *  2. Otherwise, reading the default_intent from followup_sequence_config.
+ *
+ * Prompts Gemini with the original first-touch subject + body for context so
+ * the follow-up reads as a coherent continuation rather than a fresh pitch.
+ *
+ * On success: writes draft_subject/draft_body/drafted_at, flips status to
+ * 'drafted', and returns true.
+ * On failure: increments draft_attempts, may flip status to 'failed' if
+ * attempts >= 3, and returns false. Does NOT throw.
+ */
+function draft_followup_via_gemini($pdo, array $followupRow): bool
+{
+    $followupId = (int) $followupRow['id'];
+    $leadId = (int) $followupRow['lead_id'];
+    $touchNumber = (int) $followupRow['touch_number'];
+    $abVariantId = isset($followupRow['ab_variant_id']) ? (int) $followupRow['ab_variant_id'] : 0;
+
+    // Fetch lead context (business name, summary, original first-touch subject/body, category)
+    $leadStmt = $pdo->prepare("SELECT business_name, business_summary, category, city, draft_subject, draft_body FROM outreach_leads WHERE id = ?");
+    $leadStmt->execute([$leadId]);
+    $lead = $leadStmt->fetch();
+    if (!$lead) {
+        // Lead deleted — mark followup failed permanently
+        $pdo->prepare("UPDATE outreach_followups SET status = 'failed', draft_attempts = draft_attempts + 1 WHERE id = ?")
+            ->execute([$followupId]);
+        return false;
+    }
+
+    // Determine intent: A/B variant override OR default_intent from config
+    $intent = null;
+    if ($abVariantId > 0) {
+        $vStmt = $pdo->prepare("SELECT content FROM outreach_ab_variants WHERE id = ?");
+        $vStmt->execute([$abVariantId]);
+        $vRow = $vStmt->fetch();
+        if ($vRow) {
+            $parsed = json_decode((string) $vRow['content'], true);
+            if (is_array($parsed)) {
+                foreach ($parsed as $entry) {
+                    if (is_array($entry) && isset($entry['touch'], $entry['intent']) && (int) $entry['touch'] === $touchNumber) {
+                        $intent = (string) $entry['intent'];
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    if ($intent === null) {
+        // Fall back to config default
+        $cfgStmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'");
+        $cfgStmt->execute();
+        $cfgRow = $cfgStmt->fetch();
+        if ($cfgRow) {
+            $cfg = json_decode((string) $cfgRow['state_value'], true);
+            if (is_array($cfg)) {
+                foreach ($cfg as $entry) {
+                    if (is_array($entry) && isset($entry['touch'], $entry['default_intent']) && (int) $entry['touch'] === $touchNumber) {
+                        $intent = (string) $entry['default_intent'];
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    if ($intent === null || trim($intent) === '') {
+        $intent = 'gentle bump'; // last-resort fallback
+    }
+
+    // Total touches in the configured sequence (for "touch N of M" context to Gemini)
+    $totalStmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'");
+    $totalStmt->execute();
+    $totalRow = $totalStmt->fetch();
+    $totalTouches = 1;
+    if ($totalRow) {
+        $cfg = json_decode((string) $totalRow['state_value'], true);
+        if (is_array($cfg)) {
+            $totalTouches = count($cfg) + 1; // +1 because touch 1 isn't in the config
+        }
+    }
+
+    $bizName = trim((string) ($lead['business_name'] ?? ''));
+    $bizSummary = trim((string) ($lead['business_summary'] ?? ''));
+    $category = trim((string) ($lead['category'] ?? ''));
+    $origSubject = trim((string) ($lead['draft_subject'] ?? ''));
+    $origBody = trim((string) ($lead['draft_body'] ?? ''));
+
+    $prompt = "You are writing a follow-up email in an ongoing cold-outreach sequence.\n\n"
+        . "Context:\n"
+        . "- This is touch $touchNumber of " . ($totalTouches) . " in the sequence.\n"
+        . "- The recipient has not replied to any prior touch.\n"
+        . "- Recipient business: " . ($bizName !== '' ? $bizName : '(unknown)') . "\n"
+        . ($category !== '' ? "- Category: $category\n" : '')
+        . ($bizSummary !== '' ? "- About them: $bizSummary\n" : '')
+        . "\n"
+        . "Original first-touch subject: $origSubject\n"
+        . "Original first-touch body:\n---\n$origBody\n---\n"
+        . "\n"
+        . "Intent for THIS follow-up: $intent\n"
+        . "\n"
+        . "Write a brief follow-up email (max ~120 words) that:\n"
+        . "- Sounds like a continuation of the original, not a fresh pitch.\n"
+        . "- Reflects the intent above (do not literally quote the intent text).\n"
+        . "- Is from Evan at Argo Books (free accounting software for small Canadian businesses).\n"
+        . "- Includes 'argorobots.com' once, bare URL (not formatted).\n"
+        . "- Mentions the unsubscribe option once with the placeholder {UNSUBSCRIBE_URL} (no other text around the placeholder).\n"
+        . "- Signs off 'All the best,\\nEvan\\nArgo Books'.\n"
+        . "\n"
+        . "Output as JSON exactly: {\"subject\": \"...\", \"body\": \"...\"}\n"
+        . "The subject should NOT include 'Re:' — that prefix is added automatically.";
+
+    // call_gemini($systemPrompt, $userPrompt) returns ['content' => '...'] on success
+    // or ['error' => '...'] on failure.
+    $geminiResult = call_gemini('', $prompt);
+    $geminiText = (is_array($geminiResult) && isset($geminiResult['content'])) ? (string) $geminiResult['content'] : '';
+    if ($geminiText === '') {
+        $pdo->prepare("UPDATE outreach_followups SET draft_attempts = draft_attempts + 1, status = CASE WHEN draft_attempts + 1 >= 3 THEN 'failed' ELSE status END WHERE id = ?")
+            ->execute([$followupId]);
+        return false;
+    }
+
+    // Strip any markdown fences Gemini sometimes wraps JSON in
+    $cleaned = preg_replace('/^```(?:json)?\s*|\s*```$/m', '', trim($geminiText));
+    $parsed = json_decode($cleaned, true);
+    if (!is_array($parsed) || !isset($parsed['subject'], $parsed['body'])) {
+        $pdo->prepare("UPDATE outreach_followups SET draft_attempts = draft_attempts + 1, status = CASE WHEN draft_attempts + 1 >= 3 THEN 'failed' ELSE status END WHERE id = ?")
+            ->execute([$followupId]);
+        return false;
+    }
+
+    $subject = trim((string) $parsed['subject']);
+    $body = trim((string) $parsed['body']);
+
+    // Always Re:-prefix the subject (idempotent)
+    if (stripos($subject, 're:') !== 0) {
+        $subject = 'Re: ' . ($origSubject !== '' ? $origSubject : $subject);
+    }
+
+    $pdo->prepare(
+        "UPDATE outreach_followups
+         SET draft_subject = ?, draft_body = ?, drafted_at = NOW(), status = 'drafted', draft_attempts = draft_attempts + 1
+         WHERE id = ?"
+    )->execute([$subject, $body, $followupId]);
+
+    return true;
+}
+
+/**
  * Send a follow-up email to a lead that was contacted but didn't reply.
  * Threaded as a Re: reply to the original via In-Reply-To / References,
  * so it lands in the recipient's existing inbox conversation rather than

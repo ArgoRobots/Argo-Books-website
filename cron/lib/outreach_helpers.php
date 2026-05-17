@@ -412,6 +412,66 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
 }
 
 /**
+ * After a first-touch email is sent, create one outreach_followups row per
+ * touch in the active sequence config. scheduled_for is computed cumulatively
+ * from days_after_prev. Copies the lead's existing A/B test/variant assignment
+ * (set during first-touch drafting) onto every follow-up row so all touches
+ * in the sequence use the same followup_sequence variant.
+ *
+ * Idempotent at the row level via UNIQUE KEY (lead_id, touch_number) —
+ * a re-call (e.g. after a manual resend) will silently no-op on already-
+ * existing rows.
+ *
+ * Returns the number of rows actually inserted.
+ */
+function schedule_followups_for_lead($pdo, int $leadId, ?int $abTestId = null, ?int $abVariantId = null): int
+{
+    // Read the active sequence config from outreach_pipeline_state. If unset
+    // or empty, no follow-ups are scheduled (sequence disabled).
+    $stmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'");
+    $stmt->execute();
+    $row = $stmt->fetch();
+    $configJson = $row ? $row['state_value'] : null;
+    if (!$configJson) return 0;
+
+    $config = json_decode($configJson, true);
+    if (!is_array($config) || empty($config)) return 0;
+
+    // The lead's first-touch sent_at — needed as the anchor for scheduled_for.
+    $leadStmt = $pdo->prepare("SELECT sent_at FROM outreach_leads WHERE id = ?");
+    $leadStmt->execute([$leadId]);
+    $leadRow = $leadStmt->fetch();
+    if (!$leadRow || !$leadRow['sent_at']) return 0;
+
+    $anchor = strtotime($leadRow['sent_at']);
+    if ($anchor === false) return 0;
+
+    $cumulativeDays = 0;
+    $inserted = 0;
+
+    $insertStmt = $pdo->prepare(
+        "INSERT IGNORE INTO outreach_followups
+            (lead_id, touch_number, scheduled_for, status, ab_test_id, ab_variant_id)
+         VALUES (?, ?, ?, 'scheduled', ?, ?)"
+    );
+
+    foreach ($config as $entry) {
+        if (!is_array($entry) || !isset($entry['touch'], $entry['days_after_prev'])) continue;
+        $touchNumber = (int) $entry['touch'];
+        $daysAfterPrev = max(1, (int) $entry['days_after_prev']);
+        $cumulativeDays += $daysAfterPrev;
+        $scheduledFor = date('Y-m-d H:i:s', $anchor + $cumulativeDays * 86400);
+
+        $insertStmt->execute([$leadId, $touchNumber, $scheduledFor, $abTestId, $abVariantId]);
+        if ($insertStmt->rowCount() > 0) {
+            $inserted++;
+        }
+    }
+
+    return $inserted;
+}
+
+/**
  * Send a follow-up email to a lead that was contacted but didn't reply.
  * Threaded as a Re: reply to the original via In-Reply-To / References,
  * so it lands in the recipient's existing inbox conversation rather than

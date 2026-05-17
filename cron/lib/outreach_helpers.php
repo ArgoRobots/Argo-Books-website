@@ -435,6 +435,10 @@ function schedule_followups_for_lead($pdo, int $leadId, ?int $abTestId = null, ?
     if (!$configJson) return 0;
 
     $config = json_decode($configJson, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log('schedule_followups_for_lead: followup_sequence_config contains invalid JSON (' . json_last_error_msg() . ') — no follow-ups scheduled for lead #' . $leadId);
+        return 0;
+    }
     if (!is_array($config) || empty($config)) return 0;
 
     // The lead's first-touch sent_at — needed as the anchor for scheduled_for.

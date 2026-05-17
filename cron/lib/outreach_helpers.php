@@ -612,9 +612,10 @@ function draft_followup_via_gemini($pdo, array $followupRow): bool
     $subject = trim((string) $parsed['subject']);
     $body = trim((string) $parsed['body']);
 
-    // Always Re:-prefix the subject (idempotent)
+    // Always Re:-prefix the subject. Gemini was told not to include "Re:" itself
+    // (see prompt), but be idempotent in case it did anyway.
     if (stripos($subject, 're:') !== 0) {
-        $subject = 'Re: ' . ($origSubject !== '' ? $origSubject : $subject);
+        $subject = 'Re: ' . $subject;
     }
 
     $pdo->prepare(

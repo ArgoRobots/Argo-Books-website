@@ -13,6 +13,40 @@ if (defined('OUTREACH_AB_HELPERS_LOADED')) return;
 define('OUTREACH_AB_HELPERS_LOADED', true);
 
 /**
+ * Starter variants for the followup_sequence A/B type. Each variant's
+ * intent array assumes the default 3-touch sequence config (touches 2, 3, 4).
+ * If the admin has changed the touch count, the seeding function will
+ * project these to match — for now just keep them aligned with the
+ * shipped default config.
+ */
+const FOLLOWUP_SEQUENCE_SEED_VARIANTS = [
+    [
+        'label' => 'Bump-Reframe-Close',
+        'intents' => [
+            ['touch' => 2, 'intent' => 'gentle bump'],
+            ['touch' => 3, 'intent' => 'different angle, offer concrete example'],
+            ['touch' => 4, 'intent' => 'final note before closing'],
+        ],
+    ],
+    [
+        'label' => 'Value-Question-Close',
+        'intents' => [
+            ['touch' => 2, 'intent' => 'helpful tip relevant to their business'],
+            ['touch' => 3, 'intent' => 'open-ended question about their pain point'],
+            ['touch' => 4, 'intent' => 'final note before closing'],
+        ],
+    ],
+    [
+        'label' => 'Persistent Bump',
+        'intents' => [
+            ['touch' => 2, 'intent' => 'gentle bump'],
+            ['touch' => 3, 'intent' => 'gentle bump, slightly different wording'],
+            ['touch' => 4, 'intent' => 'gentle bump, one more time'],
+        ],
+    ],
+];
+
+/**
  * Two-proportion z-test between a leader variant and another variant.
  * Returns an advisory tag + label for display.
  *
@@ -194,4 +228,68 @@ function validate_followup_sequence_content(string $contentJson, array $configTo
     }
 
     return ['valid' => true, 'reason' => null];
+}
+
+/**
+ * Idempotent: creates the followup_sequence starter A/B test in 'draft'
+ * status with the three seed variants attached, if no followup_sequence
+ * test of any status exists yet. Admin reviews and activates from the
+ * A/B Tests tab.
+ *
+ * Variant intents are filtered to only the touches present in the current
+ * followup_sequence_config — so if admin has 2 touches configured instead
+ * of the default 3, only those touches' intents make it onto the variants.
+ *
+ * Returns the test_id if created, or null if a test already exists.
+ */
+function ensure_followup_starter_test($pdo): ?int
+{
+    // Skip if any followup_sequence test exists already
+    $existing = $pdo->query("SELECT id FROM outreach_ab_tests WHERE variant_type = 'followup_sequence' LIMIT 1")->fetchColumn();
+    if ($existing) return null;
+
+    // Read current config to know which touches are active
+    $cfgRow = $pdo->query("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'")->fetch();
+    if (!$cfgRow) return null;
+    $cfg = json_decode((string) $cfgRow['state_value'], true);
+    if (!is_array($cfg) || empty($cfg)) return null;
+
+    $configTouches = array_map(fn($e) => (int) $e['touch'], array_filter($cfg, fn($e) => is_array($e) && isset($e['touch'])));
+    if (empty($configTouches)) return null;
+
+    $pdo->beginTransaction();
+    try {
+        $pdo->prepare("INSERT INTO outreach_ab_tests (name, variant_type, status, notes) VALUES (?, 'followup_sequence', 'draft', ?)")
+            ->execute([
+                'Starter follow-up sequences',
+                'Auto-seeded on first deploy. Three baseline strategies to test against each other. Activate from this tab when ready.',
+            ]);
+        $testId = (int) $pdo->lastInsertId();
+
+        $varStmt = $pdo->prepare("INSERT INTO outreach_ab_variants (test_id, label, content, is_default) VALUES (?, ?, ?, ?)");
+        foreach (FOLLOWUP_SEQUENCE_SEED_VARIANTS as $i => $variant) {
+            // Filter intents to only touches in the current config
+            $filteredIntents = array_values(array_filter($variant['intents'], fn($it) => in_array((int) $it['touch'], $configTouches, true)));
+            // If the config has touches the seed doesn't cover (e.g. admin added touch 5), fill with the variant's last intent
+            $coveredTouches = array_map(fn($it) => (int) $it['touch'], $filteredIntents);
+            foreach ($configTouches as $t) {
+                if (!in_array($t, $coveredTouches, true) && !empty($filteredIntents)) {
+                    $filteredIntents[] = ['touch' => $t, 'intent' => $filteredIntents[count($filteredIntents) - 1]['intent']];
+                }
+            }
+            usort($filteredIntents, fn($a, $b) => $a['touch'] - $b['touch']);
+            $varStmt->execute([
+                $testId,
+                $variant['label'],
+                json_encode($filteredIntents, JSON_UNESCAPED_SLASHES),
+                $i === 0 ? 1 : 0,
+            ]);
+        }
+
+        $pdo->commit();
+        return $testId;
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        return null;
+    }
 }

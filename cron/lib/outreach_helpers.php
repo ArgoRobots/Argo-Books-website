@@ -1879,6 +1879,55 @@ function ab_auto_rotation_order()
  */
 function ab_start_new_cycle($pdo, $variantType = 'subject')
 {
+    // followup_sequence uses its own seed pool rather than the directive
+    // generator, so handle it before the generic dispatch below.
+    if ($variantType === 'followup_sequence') {
+        $cfgRow = $pdo->query("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'")->fetch();
+        if (!$cfgRow) {
+            return ['action' => 'failed', 'variant_type' => $variantType, 'error' => 'followup_sequence_config not set — cannot start cycle'];
+        }
+        $cfg = json_decode((string) $cfgRow['state_value'], true);
+        if (!is_array($cfg) || empty($cfg)) {
+            return ['action' => 'failed', 'variant_type' => $variantType, 'error' => 'followup_sequence_config is empty'];
+        }
+        $configTouches = array_map(fn($e) => (int) $e['touch'], array_filter($cfg, fn($e) => is_array($e) && isset($e['touch'])));
+
+        $pdo->beginTransaction();
+        try {
+            $testName = 'Auto-cycle followup_sequence ' . date('Y-m-d H:i');
+            $pdo->prepare("INSERT INTO outreach_ab_tests (name, variant_type, status, started_at) VALUES (?, 'followup_sequence', 'active', NOW())")
+                ->execute([$testName]);
+            $testId = (int) $pdo->lastInsertId();
+
+            $varStmt = $pdo->prepare("INSERT INTO outreach_ab_variants (test_id, label, content, is_default) VALUES (?, ?, ?, ?)");
+            foreach (FOLLOWUP_SEQUENCE_SEED_VARIANTS as $i => $variant) {
+                $filtered = array_values(array_filter($variant['intents'], fn($it) => in_array((int) $it['touch'], $configTouches, true)));
+                $coveredTouches = array_map(fn($it) => (int) $it['touch'], $filtered);
+                foreach ($configTouches as $t) {
+                    if (!in_array($t, $coveredTouches, true) && !empty($filtered)) {
+                        $filtered[] = ['touch' => $t, 'intent' => $filtered[count($filtered) - 1]['intent']];
+                    }
+                }
+                usort($filtered, fn($a, $b) => $a['touch'] - $b['touch']);
+                $varStmt->execute([$testId, $variant['label'], json_encode($filtered, JSON_UNESCAPED_SLASHES), $i === 0 ? 1 : 0]);
+            }
+
+            $pdo->commit();
+            return [
+                'action' => 'created',
+                'variant_type' => $variantType,
+                'test_id' => $testId,
+                'test_name' => $testName,
+                'variant_count' => count(FOLLOWUP_SEQUENCE_SEED_VARIANTS),
+                'carried_winner' => false,
+                'source' => 'seed pool',
+            ];
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            return ['action' => 'failed', 'variant_type' => $variantType, 'error' => 'DB error: ' . $e->getMessage()];
+        }
+    }
+
     $count = 3;
 
     $gen = generate_ab_variants_for_type($pdo, $variantType, $count);

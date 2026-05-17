@@ -51,22 +51,6 @@ header .header-inner .menu-container .menu .whats-new:after {
   padding: 0 24px;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--hero-badge-bg);
-  border: 1px solid var(--hero-badge-border);
-  border-radius: 50px;
-  font-size: 0.9rem;
-  margin-bottom: 24px;
-}
-
-.hero-badge svg {
-  color: var(--amber-400);
-}
-
 .hero h1 {
   font-size: 3rem;
   font-weight: 700;

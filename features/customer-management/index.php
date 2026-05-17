@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('users', 16) ?>
-                <span>Customer Management</span>
-            </div>
             <h1 class="animate-fade-in">Know your customers, grow your business</h1>
             <p class="hero-subtitle animate-fade-in">Keep a complete record of every customer — names, contact details, addresses, and notes — in one organized place. Build stronger relationships with the people who matter most to your business.</p>
             <div class="hero-ctas animate-fade-in">

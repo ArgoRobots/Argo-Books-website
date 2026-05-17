@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('analytics', 16) ?>
-                <span>Predictive Analytics</span>
-            </div>
             <h1 class="animate-fade-in">See what's coming before it happens</h1>
             <p class="hero-subtitle animate-fade-in">AI-powered forecasting analyzes your data to predict trends, detect seasonal patterns, and surface insights that help you make smarter business decisions — automatically.</p>
             <div class="hero-ctas animate-fade-in">

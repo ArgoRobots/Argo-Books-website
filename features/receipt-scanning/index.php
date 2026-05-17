@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('receipt-scan-detail', 16) ?>
-                <span>AI Receipt Scanning</span>
-            </div>
             <h1 class="animate-fade-in">Turn any receipt into organized data — instantly</h1>
             <p class="hero-subtitle animate-fade-in">Stop typing. Start scanning. Argo Books reads your receipts with AI and pulls out every detail — store name, items, totals, and taxes — so your books stay accurate without the busywork.</p>
             <div class="hero-ctas animate-fade-in">

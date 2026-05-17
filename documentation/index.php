@@ -65,10 +65,6 @@ $isDocsLanding = true;
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-badge">
-                <?= svg_icon('book-open', 16) ?>
-                Documentation
-            </div>
             <h1>How can we help you?</h1>
             <p class="hero-subtitle">Everything you need to master Argo Books - from quick setup to advanced features</p>
 

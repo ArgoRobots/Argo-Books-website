@@ -90,12 +90,12 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('map-pin', 16) ?>
-                <span>Saskatoon, SK, Canada</span>
-            </div>
             <h1 class="animate-fade-in">About Argo Books</h1>
             <p class="hero-subtitle animate-fade-in">Building the future of small business management, one feature at a time.</p>
+            <p class="hero-made-in animate-fade-in">
+                <img src="../resources/images/canada-flag.svg" alt="Canadian flag" width="22" height="11">
+                <span>Made in Canada</span>
+            </p>
         </div>
     </section>
 

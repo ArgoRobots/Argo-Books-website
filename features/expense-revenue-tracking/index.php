@@ -143,10 +143,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('dollar', 16) ?>
-                <span>Expense &amp; Revenue Tracking</span>
-            </div>
             <h1 class="animate-fade-in">Know exactly where every dollar goes — and where it comes from</h1>
             <p class="hero-subtitle animate-fade-in">Track every expense and revenue transaction in one place. Guided forms, smart validation, and real-time profit monitoring keep your books accurate without accounting experience.</p>
             <div class="hero-ctas animate-fade-in">

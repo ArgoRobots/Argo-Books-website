@@ -91,10 +91,6 @@ if (empty($_SESSION['csrf_token'])) {
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="hero-content">
-            <div class="hero-badge">
-                <?= svg_icon('users', 16) ?>
-                <span>Community Forum</span>
-            </div>
             <h1>Argo Books Community</h1>
             <p>Report bugs, suggest features, and help shape the future of Argo Books</p>
             <a href="guidelines.php" class="guidelines-btn">

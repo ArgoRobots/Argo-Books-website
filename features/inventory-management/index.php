@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('package', 16) ?>
-                <span>Inventory Management</span>
-            </div>
             <h1 class="animate-fade-in">Know exactly what you have, where it is, and when to reorder</h1>
             <p class="hero-subtitle animate-fade-in">Track every product across multiple locations with real-time stock levels, automatic reorder alerts, purchase orders, and stock adjustments. Complete inventory control without the complexity.</p>
             <div class="hero-ctas animate-fade-in">

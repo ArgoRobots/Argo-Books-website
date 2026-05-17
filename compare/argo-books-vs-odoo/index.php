@@ -133,10 +133,6 @@ $plans = get_plan_features();
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('analytics', 16) ?>
-                <span>Comparison</span>
-            </div>
             <h1 class="animate-fade-in">Argo Books vs Odoo</h1>
             <p class="hero-subtitle animate-fade-in">Simple finance management without the ERP complexity.</p>
             <div class="hero-ctas animate-fade-in">

@@ -133,10 +133,6 @@ $plans = get_plan_features();
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('analytics', 16) ?>
-                <span>Comparison</span>
-            </div>
             <h1 class="animate-fade-in">Argo Books vs ZipBooks</h1>
             <p class="hero-subtitle animate-fade-in">Both simple, both free to start — but Argo Books gives you more for less.</p>
             <div class="hero-ctas animate-fade-in">

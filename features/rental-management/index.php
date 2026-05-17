@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('calendar', 16) ?>
-                <span>Rental Management</span>
-            </div>
             <h1 class="animate-fade-in">Track every rental from booking to return</h1>
             <p class="hero-subtitle animate-fade-in">Manage bookings, track rental periods, collect deposits, handle returns, and monitor revenue — all in one place. Built for equipment rental, event supplies, and any rental-based business.</p>
             <div class="hero-ctas animate-fade-in">

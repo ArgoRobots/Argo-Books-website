@@ -147,11 +147,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge">
-                <?= svg_icon('star', 16) ?>
-                <span>Pricing</span>
-            </div>
-            <h1>Choose Your Plan</h1>
+            <h1>Find a plan that's right for you</h1>
             <p class="hero-subtitle">Unlock the full power of Argo Books</p>
         </div>
     </section>
@@ -168,7 +164,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             <span class="amount">0</span>
                             <span class="period">forever</span>
                         </div>
-                        <p class="price-note">No credit card required</p>
+                        <p class="price-note">No account required</p>
 
                         <ul class="card-features">
                             <?php foreach ($plans['free']['features'] as $feature): ?>
@@ -225,7 +221,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <img src="../resources/images/canada-flag.svg" alt="Canadian flag" width="22" height="11">
                     <span>Made in Saskatoon, Canada</span>
                 </div>
-                <h2>Flat pricing, forever. No tricks.</h2>
+                <h2>Same price forever. No price creep</h2>
                 <p class="honest-pricing-lede">We're a small Canadian team — no investors pushing us to inflate prices or game your renewal. The price you see is the price you pay. This year, next year, always.</p>
 
                 <div class="honest-pricing-compare">
@@ -262,7 +258,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </li>
                     <li>
                         <?= svg_icon('check', 18) ?>
-                        <span>Cancel in two clicks from your portal — no phone calls</span>
+                        <span>Cancel in two clicks — no phone calls</span>
                     </li>
                 </ul>
             </div>
@@ -348,8 +344,8 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <p>Invoices you can send</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>Online</h3>
-                    <p>Payments via Stripe, PayPal &amp; Square</p>
+                    <h3>Analytics</h3>
+                    <p>Predictive analytics and actionable insights</p>
                 </div>
             </div>
         </div>

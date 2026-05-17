@@ -149,22 +149,6 @@ body {
   z-index: 2;
 }
 
-.hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: var(--hero-badge-bg);
-  border: 1px solid var(--hero-badge-border);
-  border-radius: 50px;
-  font-size: 0.9rem;
-  margin-bottom: 24px;
-}
-
-.hero-badge svg {
-  color: var(--red-500);
-}
-
 .hero h1 {
   font-size: 3rem;
   font-weight: 700;
@@ -177,6 +161,26 @@ body {
   color: var(--white);
   max-width: 600px;
   margin: 0 auto;
+}
+
+.hero-made-in {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 24px auto 0;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.hero-made-in img {
+  display: block;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 /* ========================================

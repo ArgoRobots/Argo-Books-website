@@ -78,10 +78,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('bolt', 16) ?>
-                <span>Features</span>
-            </div>
             <h1 class="animate-fade-in">Everything you need to run your business</h1>
             <p class="hero-subtitle animate-fade-in">AI-powered tools that automate bookkeeping, track inventory, generate invoices, and give you real-time insights — so you can focus on growing your business.</p>
             <div class="hero-ctas animate-fade-in">

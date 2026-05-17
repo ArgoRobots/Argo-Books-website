@@ -70,10 +70,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="hero-content">
-            <div class="hero-badge">
-                <?= svg_icon('loading', 16) ?>
-                <span>Changelog</span>
-            </div>
             <h1>What's New in Argo Books</h1>
             <p>Discover the latest improvements and features we've added to make managing your business even easier</p>
             <div class="hero-buttons">
@@ -90,6 +86,48 @@
 
     <div class="container">
         <div class="version-grid">
+
+            <!-- Version 2.0.7 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.7</span>
+                        <span class="date-tag">May 14 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Invoice refunds</strong> &mdash; Refund a portal payment without leaving Argo Books. Pick which line items or amount to refund and click send.</li>
+                                <li><strong>Refund analytics</strong> &mdash; A new Refunds tab in the analytics page shows your refund rate, top reasons, and trends over time.</li>
+                                <li><strong>Customer &amp; supplier avatars</strong> &mdash; Add a profile picture to any customer or supplier.</li>
+                                <li><strong>Rental availability calendar</strong> &mdash; Each rental item now has a calendar view of free and booked counts, plus a quick "next available" answer for any quantity you need.</li>
+                                <li><strong>Forecast scenarios</strong> &mdash; Forecasts now show Conservative, Baseline, and Optimistic ranges instead of a single line, so you can see the uncertainty around future projections.</li>
+                                <li><strong>Change payment portal email</strong> &mdash; Change the email on your account with secure two-step verification. Completed changes can be reverted from a link in your email for 30 days if something goes wrong.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Faster startup</strong> &mdash; Company data and settings now load in parallel, so the app opens noticeably faster.</li>
+                                <li><strong>Processing fee explainer</strong> &mdash; Processing fee details are now tucked into an info popup, keeping the invoice screen cleaner.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Receipt list updates instantly</strong> &mdash; Newly scanned receipts now appear on the receipts page right away.</li>
+                                <li><strong>Local time on timestamps</strong> &mdash; Some timestamps were showing in UTC instead of your local time; they now display correctly.</li>
+                                <li>Various bug fixes and stability improvements.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Version 2.0.6 -->
             <div class="version-card">

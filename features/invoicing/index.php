@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('document', 16) ?>
-                <span>Invoicing</span>
-            </div>
             <h1 class="animate-fade-in">Create professional invoices and get paid faster</h1>
             <p class="hero-subtitle animate-fade-in">Build polished invoices in seconds with customizable templates, automatic calculations, and built-in online payments. Track every invoice from draft to paid — no chasing required.</p>
             <div class="hero-ctas animate-fade-in">

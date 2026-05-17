@@ -142,10 +142,6 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <div class="hero-badge animate-fade-in">
-                <?= svg_icon('document-upload', 16) ?>
-                <span>Spreadsheet Import</span>
-            </div>
             <h1 class="animate-fade-in">Drop a spreadsheet, get clean records</h1>
             <p class="hero-subtitle animate-fade-in">Import customers, products, transactions, and more from any spreadsheet file. Argo Books handles the rest — no manual setup.</p>
             <div class="hero-ctas animate-fade-in">

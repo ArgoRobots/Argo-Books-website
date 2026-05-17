@@ -293,3 +293,53 @@ function ensure_followup_starter_test($pdo): ?int
         return null;
     }
 }
+
+/**
+ * Checks the active followup_sequence A/B test (if any) against the current
+ * followup_sequence_config. If any variant's touch list doesn't match the
+ * config's touch list, pauses the test and writes ab_auto_last_pause_reason
+ * to state for surfacing in the admin UI.
+ *
+ * Returns ['action' => 'ok'|'paused'|'no_active'|'no_config', 'reason' => ?string].
+ */
+function check_followup_sequence_shape_match($pdo): array
+{
+    $test = $pdo->query("SELECT id, name FROM outreach_ab_tests WHERE variant_type = 'followup_sequence' AND status = 'active' LIMIT 1")->fetch();
+    if (!$test) {
+        return ['action' => 'no_active', 'reason' => null];
+    }
+
+    $cfgRow = $pdo->query("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'")->fetch();
+    if (!$cfgRow) {
+        return ['action' => 'no_config', 'reason' => null];
+    }
+    $cfg = json_decode((string) $cfgRow['state_value'], true);
+    if (!is_array($cfg)) {
+        return ['action' => 'no_config', 'reason' => null];
+    }
+    $configTouches = array_map(fn($e) => (int) $e['touch'], array_filter($cfg, fn($e) => is_array($e) && isset($e['touch'])));
+    sort($configTouches);
+
+    $variants = $pdo->prepare("SELECT id, label, content FROM outreach_ab_variants WHERE test_id = ?");
+    $variants->execute([(int) $test['id']]);
+    foreach ($variants->fetchAll() as $v) {
+        $validation = validate_followup_sequence_content((string) $v['content'], $configTouches);
+        if (!$validation['valid']) {
+            // Pause the test
+            $pdo->prepare("UPDATE outreach_ab_tests SET status = 'paused' WHERE id = ?")
+                ->execute([(int) $test['id']]);
+            $reason = sprintf(
+                "followup_sequence test #%d '%s' auto-paused — variant '%s' shape mismatch: %s",
+                (int) $test['id'],
+                (string) $test['name'],
+                (string) $v['label'],
+                (string) $validation['reason']
+            );
+            $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES ('ab_auto_last_pause_reason', ?) ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)")
+                ->execute([$reason]);
+            return ['action' => 'paused', 'reason' => $reason];
+        }
+    }
+
+    return ['action' => 'ok', 'reason' => null];
+}

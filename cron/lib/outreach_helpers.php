@@ -1571,7 +1571,7 @@ Return ONLY the JSON, no other text.";
  */
 function ab_known_variant_types()
 {
-    return ['subject', 'body', 'sender', 'cta', 'preheader', 'format', 'personalization'];
+    return ['subject', 'body', 'sender', 'cta', 'preheader', 'format', 'personalization', 'followup_sequence'];
 }
 
 /**
@@ -1866,7 +1866,7 @@ function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
  */
 function ab_auto_rotation_order()
 {
-    return ['subject', 'sender', 'format', 'personalization'];
+    return ['subject', 'sender', 'format', 'personalization', 'followup_sequence'];
 }
 
 /**

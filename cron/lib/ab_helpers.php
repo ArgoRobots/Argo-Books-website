@@ -117,6 +117,9 @@ function load_variants_with_stats($pdo, $testId)
         $v['bounce_rate']    = $v['sent_count'] > 0 ? $v['bounced_count'] / $v['sent_count'] : 0.0;
         $v['reply_rate']     = $v['sent_count'] > 0 ? $v['replied_count'] / $v['sent_count'] : 0.0;
     }
+    // (followup_sequence variants use the same lead-level counts: the unit
+    // of randomization is the lead, and reply/click attribution is at the
+    // lead level regardless of which touch produced the response.)
     return $rows;
 }
 
@@ -149,4 +152,46 @@ function confidence_vs_leader_on($metric, $leader, $other)
         $leader['sent_count'], $leader[$countKey],
         $other['sent_count'],  $other[$countKey]
     );
+}
+
+/**
+ * Validate that a followup_sequence variant's JSON content has the right
+ * shape: an array of {touch, intent} entries, one per configured touch,
+ * with touch numbers matching the active followup_sequence_config.
+ *
+ * Returns ['valid' => bool, 'reason' => string|null].
+ */
+function validate_followup_sequence_content(string $contentJson, array $configTouchNumbers): array
+{
+    $parsed = json_decode($contentJson, true);
+    if (!is_array($parsed)) {
+        return ['valid' => false, 'reason' => 'content is not valid JSON array'];
+    }
+
+    $variantTouches = [];
+    foreach ($parsed as $entry) {
+        if (!is_array($entry) || !isset($entry['touch'], $entry['intent'])) {
+            return ['valid' => false, 'reason' => 'each entry must have "touch" and "intent" keys'];
+        }
+        $touch = (int) $entry['touch'];
+        $intent = trim((string) $entry['intent']);
+        if ($intent === '') {
+            return ['valid' => false, 'reason' => "touch $touch has empty intent"];
+        }
+        if (strlen($intent) > 200) {
+            return ['valid' => false, 'reason' => "touch $touch intent exceeds 200 chars"];
+        }
+        $variantTouches[] = $touch;
+    }
+
+    sort($variantTouches);
+    sort($configTouchNumbers);
+    if ($variantTouches !== $configTouchNumbers) {
+        return [
+            'valid' => false,
+            'reason' => 'variant touch list [' . implode(',', $variantTouches) . '] does not match config [' . implode(',', $configTouchNumbers) . ']',
+        ];
+    }
+
+    return ['valid' => true, 'reason' => null];
 }

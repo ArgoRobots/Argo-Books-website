@@ -94,13 +94,6 @@
     min-height: 400px;
 }
 
-.chart-container h2 {
-    margin: 0 0 20px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--black);
-}
-
 .chart-container canvas {
     max-height: 350px;
 }
@@ -124,7 +117,6 @@
     margin: 0;
     font-size: 20px;
     font-weight: 600;
-    color: var(--black);
 }
 
 .table-responsive {

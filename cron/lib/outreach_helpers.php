@@ -628,109 +628,207 @@ function draft_followup_via_gemini($pdo, array $followupRow): bool
 }
 
 /**
- * Send a follow-up email to a lead that was contacted but didn't reply.
- * Threaded as a Re: reply to the original via In-Reply-To / References,
- * so it lands in the recipient's existing inbox conversation rather than
- * arriving as a fresh cold email.
- *
- * Eligibility (status='contacted', followup_count=0, due-date passed) is
- * enforced via an atomic UPDATE-to-claim pattern so concurrent cron runs
- * can't double-send. Returns true on successful delivery, false otherwise.
- *
- * The optional &$reason out-param disambiguates non-success outcomes:
- *   'sent'         — follow-up delivered
- *   'not_eligible' — atomic claim lost (already followed up, replied,
- *                    not yet due, or claimed by a concurrent run)
- *   'invalid_email'— lead's email is missing or malformed
- *   'smtp_failed'  — SMTP/transport failure (the only "real failure" reason)
+ * Halt all pre-sent follow-ups for a single lead. Used by admin actions
+ * (manual halt from the UI). Returns count of rows updated.
  */
-function send_outreach_followup($pdo, array $lead, ?string &$reason = null): bool
+function halt_followups_for_lead($pdo, int $leadId, string $haltReason = 'manual'): int
 {
-    require_once __DIR__ . '/followup_template.php';
+    $stmt = $pdo->prepare(
+        "UPDATE outreach_followups
+         SET status = 'halted', halt_reason = ?
+         WHERE lead_id = ?
+           AND status IN ('scheduled', 'drafted', 'approved')"
+    );
+    $stmt->execute([$haltReason, $leadId]);
+    return $stmt->rowCount();
+}
 
-    $id = (int) $lead['id'];
+/**
+ * Bulk halt: mark pre-sent follow-up rows as halted for any lead in a
+ * stop-condition status, or whose email is in email_suppressions (context='outreach').
+ *
+ * Called from stepHaltFollowups on each cron tick. Idempotent — only touches
+ * rows still in scheduled/drafted/approved state.
+ *
+ * Returns an associative array of halt_reason => count for logging.
+ */
+function halt_followups_bulk($pdo): array
+{
+    $counts = [
+        'replied' => 0,
+        'unsubscribed' => 0,
+        'bounced' => 0,
+    ];
+
+    // 1) Leads in stop-condition status
+    $stopStatuses = ['replied', 'interested', 'not_interested', 'onboarded', 'email_bounced'];
+    $placeholders = implode(',', array_fill(0, count($stopStatuses), '?'));
+    $stmt = $pdo->prepare(
+        "UPDATE outreach_followups f
+         JOIN outreach_leads l ON l.id = f.lead_id
+         SET f.status = 'halted',
+             f.halt_reason = CASE l.status
+                 WHEN 'email_bounced' THEN 'bounced'
+                 WHEN 'replied' THEN 'replied'
+                 WHEN 'interested' THEN 'replied'
+                 WHEN 'onboarded' THEN 'replied'
+                 ELSE 'replied'
+             END
+         WHERE f.status IN ('scheduled', 'drafted', 'approved')
+           AND l.status IN ($placeholders)"
+    );
+    $stmt->execute($stopStatuses);
+    $statusHalted = $stmt->rowCount();
+
+    // 2) Leads whose email is in the outreach suppression list (unsubscribed)
+    $suppStmt = $pdo->prepare(
+        "UPDATE outreach_followups f
+         JOIN outreach_leads l ON l.id = f.lead_id
+         JOIN email_suppressions s ON LOWER(s.email) = LOWER(l.email) AND s.context = 'outreach'
+         SET f.status = 'halted', f.halt_reason = 'unsubscribed'
+         WHERE f.status IN ('scheduled', 'drafted', 'approved')"
+    );
+    $suppStmt->execute();
+    $unsubHalted = $suppStmt->rowCount();
+
+    $counts['replied'] = max(0, $statusHalted - $unsubHalted); // rough split for logging
+    $counts['unsubscribed'] = $unsubHalted;
+
+    return $counts;
+}
+
+/**
+ * Send a single approved follow-up row. Atomic-claims the row by flipping
+ * status=approved → status=sent. Threading headers point at the PREVIOUS
+ * touch's message_id (or the original first-touch's message_id if this is
+ * touch 2) so the whole sequence stays in one inbox thread.
+ *
+ * Returns true on send success. On failure, releases the atomic claim
+ * (status returns to 'approved') so the next cron tick retries.
+ *
+ * &$reason out-param: 'sent' | 'not_eligible' | 'invalid_email' | 'smtp_failed' | 'lead_missing'
+ */
+function send_followup_row($pdo, array $followupRow, ?string &$reason = null): bool
+{
+    $followupId = (int) $followupRow['id'];
+    $leadId = (int) $followupRow['lead_id'];
+    $touchNumber = (int) $followupRow['touch_number'];
+
+    // Fetch lead for email + unsubscribe token + first-touch context
+    $leadStmt = $pdo->prepare("SELECT email, business_name, unsubscribe_token, original_message_id FROM outreach_leads WHERE id = ?");
+    $leadStmt->execute([$leadId]);
+    $lead = $leadStmt->fetch();
+    if (!$lead) {
+        $reason = 'lead_missing';
+        return false;
+    }
+
     $email = trim((string) $lead['email']);
     if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $pdo->prepare("UPDATE outreach_followups SET status = 'failed', halt_reason = 'invalid_email' WHERE id = ?")
+            ->execute([$followupId]);
         $reason = 'invalid_email';
         return false;
     }
 
-    // Atomically claim the slot. Re-checks every eligibility predicate
-    // server-side, so two overlapping cron runs can't both send a follow-up
-    // for the same lead. The pipeline lock-file already serializes runs in
-    // practice, but be defensive.
-    $claim = $pdo->prepare("UPDATE outreach_leads
-        SET last_followup_at = NOW(), followup_count = followup_count + 1
-        WHERE id = ? AND followup_count = 0
-          AND status = 'contacted'
-          AND next_followup_due_at IS NOT NULL
-          AND next_followup_due_at <= NOW()");
-    $claim->execute([$id]);
+    // Atomic claim — only one process can flip approved → sent
+    $claim = $pdo->prepare(
+        "UPDATE outreach_followups
+         SET status = 'sent', sent_at = NOW()
+         WHERE id = ? AND status = 'approved'"
+    );
+    $claim->execute([$followupId]);
     if ($claim->rowCount() === 0) {
         $reason = 'not_eligible';
-        return false; // already followed up, replied, not due, or race-lost
+        return false; // race-lost, already sent, or halted between fetch and claim
     }
 
-    // Generate or reuse the unsubscribe token (same pattern as first send).
-    $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
-    if (empty($unsubscribeToken)) {
-        $unsubscribeToken = bin2hex(random_bytes(32));
+    // Ensure unsubscribe token exists
+    $unsubToken = $lead['unsubscribe_token'] ?? null;
+    if (empty($unsubToken)) {
+        $unsubToken = bin2hex(random_bytes(32));
         $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?")
-            ->execute([$unsubscribeToken, $id]);
+            ->execute([$unsubToken, $leadId]);
     }
-    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+    $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubToken;
 
-    $followup = build_followup_email($lead, $unsubUrl);
-
-    // Threading headers: makes the follow-up land in the recipient's existing
-    // thread instead of arriving as a fresh cold email. Without these,
-    // reply-rate gains from following up are roughly halved.
+    // Threading: previous touch's message_id, or first-touch's if this is touch 2
+    $prevMessageId = null;
+    if ($touchNumber > 2) {
+        $prevStmt = $pdo->prepare("SELECT message_id FROM outreach_followups WHERE lead_id = ? AND touch_number = ? AND status = 'sent'");
+        $prevStmt->execute([$leadId, $touchNumber - 1]);
+        $prevRow = $prevStmt->fetch();
+        if ($prevRow && !empty($prevRow['message_id'])) {
+            $prevMessageId = (string) $prevRow['message_id'];
+        }
+    }
+    if ($prevMessageId === null) {
+        // Fall back to first-touch's message_id
+        $prevMessageId = trim((string) ($lead['original_message_id'] ?? ''));
+        if ($prevMessageId === '') $prevMessageId = null;
+    }
     $threadingHeaders = [];
-    $origMsgId = trim((string) ($lead['original_message_id'] ?? ''));
-    if ($origMsgId !== '') {
-        $threadingHeaders['In-Reply-To'] = $origMsgId;
-        $threadingHeaders['References']  = $origMsgId;
+    if ($prevMessageId !== null) {
+        $threadingHeaders['In-Reply-To'] = $prevMessageId;
+        $threadingHeaders['References']  = $prevMessageId;
     }
 
-    // Render body as HTML — same anchor-wrapping as the first-touch HTML
-    // branch so the bare argorobots.com mention and the unsubscribe URL get
-    // styled links instead of plain text.
-    $trackedUrl = 'https://argorobots.com/?source=outreach-' . $id . '-fu1';
+    // Build tracked URL + render body HTML (same pattern as send_outreach_lead)
+    $trackedUrl = 'https://argorobots.com/?source=outreach-' . $leadId . '-fu' . $touchNumber;
     $anchorHtml = '<a href="' . htmlspecialchars($trackedUrl) . '" style="color:#3b82f6;text-decoration:underline">argorobots.com</a>';
     $unsubAnchor = '<a href="' . htmlspecialchars($unsubUrl) . '" style="color:#6b7280;text-decoration:underline">unsubscribe</a>';
-    $escaped = htmlspecialchars($followup['body']);
+
+    $rawBody = (string) ($followupRow['draft_body'] ?? '');
+    $rawBody = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $rawBody);
+
+    $escaped = htmlspecialchars($rawBody);
     $escaped = preg_replace('#https?://argorobots\.com/?(?![\w?/])#', $anchorHtml, $escaped);
     $escaped = preg_replace('#https?://argorobots\.com/unsubscribe\?t=[a-f0-9]+#i', $unsubAnchor, $escaped);
+
+    if (strpos($escaped, 'unsubscribe?t=') === false) {
+        $unsubLine = "\n\n<span style=\"color:#9ca3af;font-size:13px\">Not interested? " . $unsubAnchor . " and I'll stop emailing you.</span>";
+        $escaped .= $unsubLine;
+    }
+
     $finalBody = '<p>' . nl2br($escaped) . '</p>';
 
     $messageId = null;
     $result = send_styled_email(
         $email,
-        $followup['subject'],
+        (string) ($followupRow['draft_subject'] ?? 'Following up'),
         $finalBody,
         '',
         'contact@argorobots.com',
         'Evan',
         'contact@argorobots.com',
         $threadingHeaders,
-        $followup['preheader'],
+        'Quick bump on my last note',
         'html',
         $messageId
     );
 
     if ($result) {
-        // Update last_contact_date for timeline accuracy. followup_count and
-        // last_followup_at were already updated by the claim above.
-        $pdo->prepare("UPDATE outreach_leads SET last_contact_date = NOW() WHERE id = ?")->execute([$id]);
-        log_activity($pdo, $id, 'followup_sent', 'Follow-up #1 delivered');
+        // Record the message_id so the NEXT touch can thread off it
+        $pdo->prepare("UPDATE outreach_followups SET message_id = ? WHERE id = ?")
+            ->execute([$messageId, $followupId]);
+
+        // Update lead-level activity timestamp + counters for backward-compat
+        $pdo->prepare(
+            "UPDATE outreach_leads
+             SET last_contact_date = NOW(),
+                 last_followup_at = NOW(),
+                 followup_count = followup_count + 1
+             WHERE id = ?"
+        )->execute([$leadId]);
+
+        log_activity($pdo, $leadId, 'followup_sent', "Follow-up #$touchNumber delivered");
         $reason = 'sent';
         return true;
     }
 
-    // Send failed: roll back the claim so retries work next cron run.
-    $pdo->prepare("UPDATE outreach_leads
-        SET last_followup_at = NULL, followup_count = followup_count - 1
-        WHERE id = ?")->execute([$id]);
+    // SMTP failed — release the claim
+    $pdo->prepare("UPDATE outreach_followups SET status = 'approved', sent_at = NULL WHERE id = ?")
+        ->execute([$followupId]);
     $reason = 'smtp_failed';
     return false;
 }

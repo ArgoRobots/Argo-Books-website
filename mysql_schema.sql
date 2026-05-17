@@ -859,7 +859,7 @@ CREATE TABLE IF NOT EXISTS outreach_email_events (
 
 -- A/B tests for outreach email variants. variant_type covers every test type
 -- the framework supports: subject, body, sender, cta, preheader, format,
--- personalization. Only one test of any type can be active at a time.
+-- personalization, followup_sequence. Only one test of any type can be active at a time.
 CREATE TABLE IF NOT EXISTS outreach_ab_tests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(120) NOT NULL,
@@ -925,8 +925,9 @@ CREATE TABLE IF NOT EXISTS outreach_followups (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
     UNIQUE KEY uniq_lead_touch (lead_id, touch_number),
-    INDEX idx_status_scheduled (status, scheduled_for),
-    INDEX idx_lead (lead_id, touch_number)
+    INDEX idx_status_scheduled (status, scheduled_for)
+    -- (no separate idx_lead — uniq_lead_touch already covers lookups by lead_id
+    -- via the leftmost-prefix rule, and InnoDB implements UNIQUE as a B-tree)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- For existing installs (run alongside the ALTER above):

@@ -2565,6 +2565,99 @@ a {
     margin: 0 auto;
 }
 
+/* ========================================
+   Mini Price Lock-In Strip
+   ======================================== */
+.price-lock-strip {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 750px;
+    margin: 32px auto 0;
+    padding: 18px 24px;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+    border: 1px solid #f5c6c6;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(192, 57, 43, 0.06);
+}
+
+.price-lock-flag {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.price-lock-flag img {
+    display: block;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.price-lock-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.price-lock-content h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 2px;
+    letter-spacing: -0.01em;
+}
+
+.price-lock-content p {
+    font-size: 0.9rem;
+    color: var(--black);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.price-lock-link {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    background: transparent;
+    color: #c0392b;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid #f5c6c6;
+    border-radius: 50px;
+    transition: background 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+}
+
+.price-lock-link:hover {
+    background: #c0392b;
+    color: var(--white);
+    border-color: #c0392b;
+}
+
+.price-lock-link svg {
+    transition: transform 0.2s ease;
+}
+
+.price-lock-link:hover svg {
+    transform: translateX(2px);
+}
+
+@media (max-width: 640px) {
+    .price-lock-strip {
+        flex-direction: column;
+        text-align: center;
+        gap: 14px;
+        padding: 20px;
+    }
+
+    .price-lock-content h3 {
+        font-size: 1rem;
+    }
+}
+
 .pricing-card {
     background: var(--white);
     border-radius: 24px;
@@ -2722,6 +2815,7 @@ a {
     text-align: center;
     box-shadow: 0 4px 20px var(--shadow-sm);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-width: 0;
 }
 
 .contact-card:hover {

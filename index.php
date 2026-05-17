@@ -1261,6 +1261,21 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <a href="pricing/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
                 </div>
             </div>
+
+            <!-- Mini Price Lock-In Strip -->
+            <div class="price-lock-strip animate-on-scroll">
+                <div class="price-lock-flag">
+                    <img src="resources/images/canada-flag.svg" alt="Canadian flag" width="26" height="13">
+                </div>
+                <div class="price-lock-content">
+                    <h3>Same price forever. No price creep</h3>
+                    <p>Made in Saskatoon — no "intro pricing" that doubles after a few months, no annual hikes.</p>
+                </div>
+                <a href="pricing/" class="price-lock-link">
+                    <span>See the promise</span>
+                    <?= svg_icon('arrow-right', 16) ?>
+                </a>
+            </div>
         </div>
     </section>
 

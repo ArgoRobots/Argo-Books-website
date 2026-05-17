@@ -1364,7 +1364,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                         </span>
                         <span class="cta-feature">
                             <?= svg_icon('check', 16) ?>
-                            No credit card required
+                            No account required
                         </span>
                         <span class="cta-feature">
                             <?= svg_icon('check', 16) ?>

@@ -316,24 +316,24 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps to paperless receipts</h2>
+                <h2 class="section-title">Three steps to organized receipts</h2>
                 <p class="section-desc">From paper receipt to organized expense record in under a minute. No typing, no guessing, no lost receipts.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Snap a photo or upload an image</h3>
-                    <p>Take a photo of your receipt or drag and drop an image file directly into Argo Books.</p>
+                    <p>Take a photo of your receipt and open it in Argo Books.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
                     <h3>AI reads and structures the data</h3>
-                    <p>Our AI extracts the vendor, date, line items, tax, tip, and total — even from faded ink or messy formatting.</p>
+                    <p>Argo Books extracts the vendor, date, line items, tax, tip, and total — even from faded ink or messy formatting.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Verify and save</h3>
-                    <p>Argo Books auto-categorizes each expense. Just confirm the details, make any quick corrections, and save.</p>
+                    <p>Argo Books auto-categorizes each expense. Just confirm the details and save.</p>
                 </div>
             </div>
         </div>
@@ -365,8 +365,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Stay Organized</span>
                     <h2>Every receipt, filed and searchable</h2>
-                    <p>Once scanned, your receipts become part of your financial records. Every expense is categorized, timestamped, and linked to the original receipt image. No more digging through shoeboxes before tax season — everything is organized and searchable from day one.</p>
-                    <p>Need to find that $342 equipment purchase from last July? Search by amount, date, vendor, or category and find it in seconds. Argo Books turns your chaotic receipt pile into a clean, audit-ready expense log.</p>
+                    <p>Once scanned, your receipts become part of your financial records. Every expense is categorized, timestamped, and linked to the receipt. No more digging through shoeboxes before tax season — everything is organized and searchable from day one.</p>
+                    <p>Need to find that $342 equipment purchase from last July? Do a quick search and find it in seconds.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -396,7 +396,7 @@
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">More than just a scanner</h2>
+                <h2 class="section-title">Explore more features</h2>
                 <p class="section-desc">AI receipt scanning isn't just about saving time — it changes how you manage your business finances.</p>
             </div>
             <div class="benefits-grid">

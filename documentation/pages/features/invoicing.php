@@ -70,7 +70,8 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Toggle off</strong> → customer pays just the invoice total. You absorb the fee.</li>
             </ul>
             <p>When your customers pay the invoices, the total amount and the fee go into your account. It's when you take the money out of your Stripe/PayPal/Square account and move it into your normal bank account that they charge you. The fee may be slightly different than the 2.9% + $0.30, especially if your customer is in a different country.</p>
-
+            <p>Argo Books does not add any extra fee on top of the payment providers.</p>
+            
             <div class="info-box">
                 <p><strong>Tip:</strong> Payment processing fees are optionally passed on to the customer at checkout. To absorb the fees yourself instead, create an invoice template, go to the "Display" tab, and uncheck "Pass processing fees to customers".</p>
             </div>

@@ -161,7 +161,7 @@ $systemRequirements = getSystemRequirements();
         </div>
         <div class="hero-content">
             <h1>Download Argo Books</h1>
-            <p>Choose your platform and get started for free</p>
+            <p>Get started for free. No account required.</p>
         </div>
     </section>
 
@@ -197,7 +197,7 @@ $systemRequirements = getSystemRequirements();
                 </div>
                 <div class="platform-info">
                     <h2>macOS</h2>
-                    <p class="platform-desc">For macOS 11 Big Sur and later</p>
+                    <p class="platform-desc">For macOS 14 Sonoma and later</p>
                 </div>
                 <div class="platform-actions">
                     <button class="btn btn-gray download-btn disabled" disabled>

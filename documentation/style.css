@@ -283,10 +283,6 @@ body.docs-landing {
   gap: 16px;
 }
 
-.category-cards.compact {
-  grid-template-columns: repeat(3, 1fr);
-}
-
 .doc-card {
   position: relative;
   display: flex;
@@ -416,12 +412,6 @@ body.docs-landing {
 /* ==========================================
    LANDING PAGE RESPONSIVE
    ========================================== */
-@media (max-width: 900px) {
-  .category-cards.compact {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  }
-}
-
 @media (max-width: 768px) {
   .hero {
     padding: 80px 20px 60px;

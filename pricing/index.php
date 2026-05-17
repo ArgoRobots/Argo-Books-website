@@ -216,6 +216,60 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     </section>
 
     <!-- =============================================
+         HONEST PRICING / MADE IN CANADA
+         ============================================= -->
+    <section class="honest-pricing">
+        <div class="container">
+            <div class="honest-pricing-inner animate-on-scroll">
+                <div class="honest-pricing-badge">
+                    <img src="../resources/images/canada-flag.svg" alt="Canadian flag" width="22" height="11">
+                    <span>Made in Saskatoon, Canada</span>
+                </div>
+                <h2>Flat pricing, forever. No tricks.</h2>
+                <p class="honest-pricing-lede">We're a small Canadian team — no investors pushing us to inflate prices or game your renewal. The price you see is the price you pay. This year, next year, always.</p>
+
+                <div class="honest-pricing-compare">
+                    <div class="compare-card compare-them">
+                        <span class="compare-label">The usual playbook</span>
+                        <div class="compare-price-flow">
+                            <span class="compare-price-start">$7.80<small>/mo</small></span>
+                            <span class="compare-arrow">&rarr;</span>
+                            <span class="compare-price-end">$26<small>/mo</small></span>
+                        </div>
+                        <p class="compare-desc">"70% off for 4 months" — then a 233% price jump on the 5th bill.</p>
+                    </div>
+                    <div class="compare-card compare-us">
+                        <span class="compare-label">Argo Books</span>
+                        <div class="compare-price-flow">
+                            <span class="compare-price-flat">$<?php echo number_format($monthlyPrice, 0); ?><small>/mo</small></span>
+                        </div>
+                        <p class="compare-desc">One price. Forever. No countdown clock, no surprise renewal.</p>
+                    </div>
+                </div>
+
+                <ul class="honest-pricing-promises">
+                    <li>
+                        <?= svg_icon('check', 18) ?>
+                        <span>No "intro pricing" that doubles after a few months</span>
+                    </li>
+                    <li>
+                        <?= svg_icon('check', 18) ?>
+                        <span>No annual price hikes — your rate is locked in</span>
+                    </li>
+                    <li>
+                        <?= svg_icon('check', 18) ?>
+                        <span>No surprise add-on fees for features you'd expect</span>
+                    </li>
+                    <li>
+                        <?= svg_icon('check', 18) ?>
+                        <span>Cancel in two clicks from your portal — no phone calls</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
          PREMIUM FEATURES INTRO
          ============================================= -->
     <section class="premium-intro">

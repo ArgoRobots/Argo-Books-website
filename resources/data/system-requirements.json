@@ -15,7 +15,7 @@
         "icon": "apple",
         "available": false,
         "requirements": [
-            "macOS 10.15 Catalina or later",
+            "macOS 14 Sonoma or later",
             "Apple Silicon or Intel processor",
             "4 GB RAM minimum",
             "500 MB available disk space",
@@ -27,7 +27,7 @@
         "icon": "linux",
         "available": false,
         "requirements": [
-            "Ubuntu 20.04+, Debian 11+, Fedora 35+, or equivalent",
+            "Ubuntu 22.04+, Debian 12+, Fedora 42+, or equivalent",
             "64-bit processor",
             "4 GB RAM minimum",
             "500 MB available disk space",

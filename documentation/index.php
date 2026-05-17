@@ -320,7 +320,7 @@ $isDocsLanding = true;
                     <p>Detailed tables and specifications</p>
                 </div>
             </div>
-            <div class="category-cards compact">
+            <div class="category-cards">
                 <a href="pages/reference/how-numbers-are-calculated.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('bar-chart', 20) ?>

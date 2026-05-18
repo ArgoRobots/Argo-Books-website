@@ -68,8 +68,9 @@ CREATE TABLE IF NOT EXISTS outreach_followups (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
     UNIQUE KEY uniq_lead_touch (lead_id, touch_number),
-    INDEX idx_status_scheduled (status, scheduled_for),
-    INDEX idx_lead (lead_id, touch_number)
+    INDEX idx_status_scheduled (status, scheduled_for)
+    -- (no separate idx_lead — uniq_lead_touch already covers lookups by lead_id
+    -- via the leftmost-prefix rule, and InnoDB implements UNIQUE as a B-tree)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 

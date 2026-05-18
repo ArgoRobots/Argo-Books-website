@@ -185,11 +185,7 @@ include __DIR__ . '/../admin_header.php';
 
 <link rel="stylesheet" href="style.css">
 
-<div class="page-header">
-    <div>
-        <h1><?= htmlspecialchars($page_title) ?></h1>
-        <p class="text-muted"><?= htmlspecialchars($page_description) ?></p>
-    </div>
+<div class="range-row">
     <div class="range-selector">
         <?php foreach ($rangeMap as $key => $r): ?>
             <a href="?range=<?= $key ?>" class="range-btn <?= $range === $key ? 'active' : '' ?>">

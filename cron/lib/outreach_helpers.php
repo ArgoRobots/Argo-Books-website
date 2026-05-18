@@ -1517,7 +1517,7 @@ Return ONLY the JSON, no other text.";
     if (!$parsed || !isset($parsed['subject']) || !isset($parsed['body'])) {
         // AI returned invalid JSON — save with needs_review so it won't be auto-approved
         $fallbackSubject = "Quick question for {$lead['business_name']}";
-        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
         $stmt->execute([$fallbackSubject, $content, $abTestId, $abVariantId, $id]);
 
         return ['success' => true, 'needs_review' => true, 'subject' => $fallbackSubject, 'body' => $content];
@@ -1578,11 +1578,11 @@ Return ONLY the JSON, no other text.";
     // draft as needs_review so the auto-approve step skips it and the admin
     // sees the issue before anything goes out.
     if ($needsReviewReason !== null) {
-        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
         $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
         log_activity($pdo, $id, 'draft_needs_review', $needsReviewReason);
     } else {
-        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','awaiting_approval','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), status = CASE WHEN status IN ('new','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
         $stmt->execute([$parsed['subject'], $parsed['body'], $abTestId, $abVariantId, $id]);
     }
 

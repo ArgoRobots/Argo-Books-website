@@ -297,8 +297,8 @@ function ensure_followup_starter_test($pdo): ?int
 /**
  * Checks the active followup_sequence A/B test (if any) against the current
  * followup_sequence_config. If any variant's touch list doesn't match the
- * config's touch list, pauses the test and writes ab_auto_last_pause_reason
- * to state for surfacing in the admin UI.
+ * config's touch list, pauses the test. Caller (stepManageAbTests) surfaces
+ * the reason via logPipeline.
  *
  * Returns ['action' => 'ok'|'paused'|'no_active'|'no_config', 'reason' => ?string].
  */
@@ -335,8 +335,6 @@ function check_followup_sequence_shape_match($pdo): array
                 (string) $v['label'],
                 (string) $validation['reason']
             );
-            $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES ('ab_auto_last_pause_reason', ?) ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)")
-                ->execute([$reason]);
             return ['action' => 'paused', 'reason' => $reason];
         }
     }

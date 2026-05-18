@@ -15,7 +15,8 @@
  *
  * Manual execution:
  *   php outreach_pipeline.php
- *   php outreach_pipeline.php --discover-only   # Only run discovery + import
+ *   php outreach_pipeline.php --discover-only   # Only run discovery + import (Google Places + Shopify)
+ *   php outreach_pipeline.php --shopify-only    # Only run Shopify discovery
  *   php outreach_pipeline.php --draft-only      # Only run draft generation
  *   php outreach_pipeline.php --send-only       # Only run send (same as outreach_email.php)
  *   php outreach_pipeline.php --dry-run         # Log what would happen without doing it
@@ -36,6 +37,7 @@ $dotenv->load();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 require_once __DIR__ . '/lib/outreach_helpers.php';
+require_once __DIR__ . '/lib/shopify_discovery.php';
 
 // ─── Lock file to prevent overlapping runs ───
 
@@ -62,10 +64,11 @@ define('DAILY_DRAFT_LIMIT', (int) ($_ENV['OUTREACH_DAILY_DRAFT_LIMIT'] ?? 100));
 // Parse CLI flags ($argv is null under CGI, fall back to empty array)
 $args = array_slice($argv ?? [], 1);
 $discoverOnly = in_array('--discover-only', $args);
+$shopifyOnly = in_array('--shopify-only', $args);
 $draftOnly = in_array('--draft-only', $args);
 $sendOnly = in_array('--send-only', $args);
 $dryRun = in_array('--dry-run', $args);
-$runAll = !$discoverOnly && !$draftOnly && !$sendOnly;
+$runAll = !$discoverOnly && !$draftOnly && !$sendOnly && !$shopifyOnly;
 
 // ─── Target Cities (Saskatchewan first, then expand outward) ───
 
@@ -190,6 +193,11 @@ try {
     // ─── STEP 1 & 2: Discover + Import ───
     if ($runAll || $discoverOnly) {
         stepDiscover($pdo, $dryRun);
+    }
+
+    // ─── STEP 1b: Discover Shopify Stores (parallel discovery source) ───
+    if ($runAll || $discoverOnly || $shopifyOnly) {
+        stepDiscoverShopify($pdo, $dryRun);
     }
 
     // ─── STEP 2.5: Manage A/B Tests (auto-promote winners, auto-create next cycle) ───
@@ -433,6 +441,222 @@ function stepDiscover($pdo, $dryRun)
     } catch (PDOException $e) {
         // Cleanup failure shouldn't fail the pipeline — table may not exist yet.
     }
+}
+
+function stepDiscoverShopify($pdo, $dryRun)
+{
+    logPipeline('--- Step 1b: Discover Shopify Stores ---');
+
+    // ─── Guard 1: Feature flag ───
+    $enabled = $_ENV['OUTREACH_SHOPIFY_ENABLED'] ?? 'false';
+    if ($enabled !== 'true') {
+        logPipeline('Shopify discovery is DISABLED via OUTREACH_SHOPIFY_ENABLED. Skipping.');
+        return;
+    }
+
+    // ─── Guard 2: SerpAPI key ───
+    $serpapiKey = $_ENV['SERPAPI_KEY'] ?? '';
+    if (empty($serpapiKey)) {
+        logPipeline('SERPAPI_KEY not configured. Skipping Shopify discovery.', 'WARN');
+        return;
+    }
+
+    // ─── Guard 3: Daily counter reset ───
+    $today = date('Y-m-d');
+    $lastReset = getState($pdo, 'shopify_last_reset_date', '');
+    if ($lastReset !== $today) {
+        setState($pdo, 'shopify_imports_today', '0');
+        setState($pdo, 'serpapi_calls_today', '0');
+        setState($pdo, 'shopify_last_reset_date', $today);
+        logPipeline("Daily Shopify counters reset for $today.");
+    }
+
+    // ─── Guard 4: SerpAPI daily limit ───
+    $serpapiLimit = (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3);
+    $serpapiCallsToday = (int) getState($pdo, 'serpapi_calls_today', '0');
+    if ($serpapiCallsToday >= $serpapiLimit) {
+        logPipeline("SerpAPI daily limit reached ($serpapiCallsToday/$serpapiLimit). Skipping Shopify discovery.");
+        return;
+    }
+
+    // ─── Guard 5: Shopify import daily limit ───
+    $shopifyImportLimit = (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5);
+    $shopifyImportsToday = (int) getState($pdo, 'shopify_imports_today', '0');
+    if ($shopifyImportsToday >= $shopifyImportLimit) {
+        logPipeline("Shopify import daily limit reached ($shopifyImportsToday/$shopifyImportLimit). Skipping Shopify discovery.");
+        return;
+    }
+
+    // ─── Pick next dork query ───
+    $dorkPool = SHOPIFY_DORK_POOL;
+    $cursor = (int) getState($pdo, 'shopify_dork_cursor', '0');
+    $query = $dorkPool[$cursor % count($dorkPool)];
+    $nextCursor = $cursor + 1;
+    setState($pdo, 'shopify_dork_cursor', (string) $nextCursor);
+
+    logPipeline("Shopify discovery: dork cursor=$cursor, query='$query'");
+
+    // ─── Dry run ───
+    if ($dryRun) {
+        logPipeline("[DRY RUN] Would call SerpAPI with query='$query', then evaluate up to $shopifyImportLimit Shopify candidates.");
+        return;
+    }
+
+    // ─── Call SerpAPI ───
+    $results = serpapi_query($query, $serpapiKey, 10);
+    // Increment serpapi_calls_today regardless of result
+    setState($pdo, 'serpapi_calls_today', (string) ($serpapiCallsToday + 1));
+
+    if (empty($results)) {
+        logPipeline("SerpAPI returned no results for query='$query'. Skipping candidate evaluation.");
+        return;
+    }
+
+    logPipeline("SerpAPI returned " . count($results) . " results for query='$query'.");
+
+    // ─── Insert candidates via INSERT IGNORE, collect newly-inserted ───
+    $newCandidates = [];
+    foreach ($results as $result) {
+        $rawLink = $result['link'] ?? '';
+        if ($rawLink === '') {
+            continue;
+        }
+        $canonical = shopify_canonical_url($rawLink);
+        if ($canonical === '') {
+            continue;
+        }
+
+        $stmt = $pdo->prepare(
+            "INSERT IGNORE INTO outreach_shopify_candidates (canonical_url, status, last_query)
+             VALUES (?, 'pending', ?)"
+        );
+        $stmt->execute([$canonical, $query]);
+
+        if ($stmt->rowCount() === 1) {
+            // Newly inserted — add to evaluation queue
+            $newCandidates[] = $canonical;
+        }
+    }
+
+    logPipeline("Inserted " . count($newCandidates) . " new candidates into outreach_shopify_candidates.");
+
+    // ─── Evaluate newly-pending candidates ───
+    $evaluated = 0;
+    $imported  = 0;
+    $rejected  = 0;
+    $errored   = 0;
+
+    foreach ($newCandidates as $canonical) {
+        if ($shopifyImportsToday >= $shopifyImportLimit) {
+            break;
+        }
+
+        $evaluated++;
+
+        try {
+            $evalResult = evaluate_shopify_candidate($canonical);
+        } catch (Exception $e) {
+            logPipeline("Error evaluating candidate '$canonical': " . $e->getMessage(), 'ERROR');
+            $errored++;
+            continue;
+        }
+
+        if ($evalResult['fit'] === true) {
+            $meta      = $evalResult['metadata'];
+            $email     = $meta['email'] ?? null;
+            $finalUrl  = $evalResult['final_url'] ?? $canonical;
+
+            // Dedup check: email or website already in outreach_leads
+            $dupCheck = $pdo->prepare(
+                "SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1"
+            );
+            $dupCheck->execute([$email, $finalUrl]);
+            if ($dupCheck->fetch()) {
+                // Mark candidate as rejected / duplicate
+                $upd = $pdo->prepare(
+                    "UPDATE outreach_shopify_candidates
+                     SET status='rejected', reject_reason='duplicate'
+                     WHERE canonical_url = ?"
+                );
+                $upd->execute([$canonical]);
+                logPipeline("Shopify candidate '$canonical' skipped — already in outreach_leads (duplicate).");
+                $rejected++;
+                continue;
+            }
+
+            // Build business_summary
+            $productsCount          = $meta['products_count'] ?? 0;
+            $firstProductCreatedAt  = $meta['first_product_created_at'] ?? '';
+            $businessSummary = "Shopify store. {$productsCount} products."
+                . ($firstProductCreatedAt ? " First product created {$firstProductCreatedAt}." : '')
+                . " Discovered via: {$query}";
+
+            // Insert lead
+            $insLead = $pdo->prepare(
+                "INSERT INTO outreach_leads
+                 (business_name, email, website, source, contact_page_url, business_summary)
+                 VALUES (?, ?, ?, 'shopify_auto', ?, ?)"
+            );
+            $insLead->execute([
+                $meta['business_name'] ?? $canonical,
+                $email,
+                $finalUrl,
+                $finalUrl,
+                $businessSummary,
+            ]);
+            $leadId = (int) $pdo->lastInsertId();
+
+            // Update candidate as imported
+            $updCand = $pdo->prepare(
+                "UPDATE outreach_shopify_candidates
+                 SET status='imported',
+                     lead_id=?,
+                     harvested_email=?,
+                     products_count=?,
+                     first_product_created_at=?,
+                     detected_country=?,
+                     myshopify_url=?
+                 WHERE canonical_url = ?"
+            );
+            $updCand->execute([
+                $leadId,
+                $email,
+                $productsCount,
+                $firstProductCreatedAt ?: null,
+                $meta['country'] ?? null,
+                $canonical,
+                $canonical,
+            ]);
+
+            log_activity($pdo, $leadId, 'lead_created', "Auto-imported from Shopify via dork: $query");
+
+            $shopifyImportsToday++;
+            setState($pdo, 'shopify_imports_today', (string) $shopifyImportsToday);
+
+            logPipeline("Imported Shopify lead #$leadId: '{$meta['business_name']}' <$email> from $canonical");
+            $imported++;
+
+        } else {
+            // Rejected — update candidate
+            $rejectReason = $evalResult['reason'] ?? 'unknown';
+            $rejectDetail = substr($evalResult['detail'] ?? '', 0, 500);
+
+            $updRej = $pdo->prepare(
+                "UPDATE outreach_shopify_candidates
+                 SET status='rejected', reject_reason=?, reject_detail=?
+                 WHERE canonical_url = ?"
+            );
+            $updRej->execute([$rejectReason, $rejectDetail, $canonical]);
+
+            logPipeline("Shopify candidate '$canonical' rejected: $rejectReason — $rejectDetail");
+            $rejected++;
+        }
+    }
+
+    logPipeline(
+        "Shopify discovery: query='$query', results=" . count($results)
+        . ", evaluated=$evaluated, imported=$imported, rejected=$rejected, errored=$errored"
+    );
 }
 
 function stepManageAbTests($pdo, $dryRun)

@@ -641,6 +641,22 @@ function shopify_import($pdo)
         json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
     }
 
+    // Daily import cap — shared with the cron via shopify_imports_today, so
+    // UI imports must respect it or the cron's same-day imports get silently
+    // blocked. Operator can raise OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT in
+    // .env if they need to bypass.
+    _shopify_reset_daily_counters_if_needed($pdo);
+    $importsLimit = (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5);
+    $importsToday = (int) _shopify_state_get($pdo, 'shopify_imports_today', '0');
+    if ($importsToday >= $importsLimit) {
+        json_response([
+            'success'       => false,
+            'message'       => "Daily Shopify import limit reached ($importsToday/$importsLimit). Resets at midnight or raise OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT in .env.",
+            'imports_today' => $importsToday,
+            'imports_limit' => $importsLimit,
+        ], 429);
+    }
+
     // Re-evaluate server-side — don't trust client-passed metadata
     $result = evaluate_shopify_candidate($canonicalUrl);
     if (empty($result['fit'])) {

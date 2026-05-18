@@ -15,7 +15,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
 if (($_ENV['APP_ENV'] ?? '') === 'production') {
-    fwrite(STDERR, "REFUSING TO RUN: APP_ENV='production'. Smoke tests touch live data.\n");
+    fwrite(STDERR, "REFUSING TO RUN: APP_ENV='production'.\n");
     exit(2);
 }
 
@@ -53,12 +53,12 @@ assert_true(
     "Uppercased host + query + fragment stripped"
 );
 assert_true(
-    shopify_canonical_url('http://example.ca/path/') === 'http://example.ca/path',
-    "Trailing slash on path stripped"
+    shopify_canonical_url('http://example.ca/path/') === 'http://example.ca',
+    "Path stripped (origin only)"
 );
 assert_true(
-    shopify_canonical_url('https://example.ca/path') === 'https://example.ca/path',
-    "Already-canonical URL unchanged"
+    shopify_canonical_url('https://example.ca/path') === 'https://example.ca',
+    "Deep-link path stripped to origin"
 );
 assert_true(
     shopify_canonical_url('  ') === '',

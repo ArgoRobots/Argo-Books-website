@@ -969,4 +969,4 @@ CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
     UNIQUE KEY uniq_canonical_url (canonical_url),
     INDEX idx_status_checked (status, checked_at),
     INDEX idx_lead (lead_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

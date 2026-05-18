@@ -117,13 +117,15 @@ function serpapi_query(string $query, string $apiKey, int $limit = 10): array
 }
 
 /**
- * Canonicalize a candidate Shopify store URL.
+ * Canonicalize a candidate Shopify store URL to its origin.
  *
- * Lowercases scheme + host, drops query string and fragment, drops trailing
- * slash on path. Returns the original trimmed string on parse_url failure.
+ * Lowercases scheme + host, drops query, fragment, AND path. The candidate
+ * identity is the store (one row per store), not the URL — so a SerpAPI hit
+ * on /pages/contact and another on /products/foo for the same store dedup
+ * to a single row. Returns the original trimmed string on parse_url failure.
  *
  * @param string $url Raw URL
- * @return string     Canonicalized URL
+ * @return string     Origin URL (scheme://host)
  */
 function shopify_canonical_url(string $url): string
 {
@@ -139,9 +141,12 @@ function shopify_canonical_url(string $url): string
 
     $scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : 'https';
     $host   = strtolower($parts['host']);
-    $path   = isset($parts['path']) ? rtrim($parts['path'], '/') : '';
 
-    return $scheme . '://' . $host . $path;
+    // Origin only — path is intentionally dropped. SerpAPI dorks that include
+    // "contact"/"about" keywords often return deep links, but our candidate
+    // identity is the store (one row per store), and downstream evaluator
+    // logic needs the origin to build /products.json correctly.
+    return $scheme . '://' . $host;
 }
 
 /**
@@ -161,8 +166,11 @@ function fetch_shopify_products_json(string $storefrontUrl, int $timeout = 10): 
     $context = stream_context_create([
         'http' => [
             'timeout'         => $timeout,
-            'follow_location' => 1,
-            'max_redirects'   => 3,
+            // Redirects disabled: /products.json lives on the same origin as
+            // the storefront; a redirect target could be an internal/private
+            // URL (SSRF vector). Fail closed instead.
+            'follow_location' => 0,
+            'max_redirects'   => 0,
             'user_agent'      => 'Mozilla/5.0',
             'ignore_errors'   => true,
         ],
@@ -247,7 +255,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         $curlError = curl_error($ch);
         $httpCode  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $effective = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        unset($ch);  // curl_close deprecated in PHP 8.5; unset achieves same cleanup
+        curl_close($ch);
 
         if ($html === false || $curlError !== '' || $httpCode < 200 || $httpCode >= 400) {
             return [
@@ -272,7 +280,10 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         }
 
         if (!empty($effective)) {
-            $finalUrl = rtrim($effective, '/');
+            // Normalize to origin — drops any path the redirect chain ended at,
+            // so downstream /products.json and contact-page probing work
+            // correctly when the candidate URL was a deep link.
+            $finalUrl = shopify_canonical_url($effective);
         }
 
         if (!_shopify_url_is_safe_external($finalUrl)) {

@@ -6,7 +6,7 @@ Argo Books has a built-in outreach system that finds small businesses and writes
 
 It also has a A/B test system to learn what works, so it constantly improves itself.
 
-Everything lives in the admin dashboard under **Outreach**, which has four tabs: **Leads**, **A/B Tests**, **Follow-ups**, and **Settings**.
+Everything lives in the admin dashboard under **Outreach**, which has four tabs: **Leads**, **Follow-ups**, **A/B Tests**, and **Settings**.
 
 ## Google Places channel
 
@@ -48,6 +48,29 @@ From here you can:
 - **See the full activity history** for any lead — every draft, every send, every click.
 
 Every outreach email's `argorobots.com` link is rewritten to include a `?source=outreach-{leadId}` parameter (plus `-v{variantId}` when the lead was assigned to an A/B variant). Hits land in `referral_visits` and show up on the A/B table as "Clicked" automatically.
+
+## The Follow-ups tab
+
+This is the review queue for follow-up emails. It only matters in Review-before-send mode. In Auto-send mode, follow-ups are sent right away.
+
+The tab has five sub-views:
+
+- **Pending review** — drafts waiting for you to approve. The pill carries a count badge so you can tell at a glance whether there's work to do.
+- **Approved & queued** — drafts you've approved that are waiting for their scheduled send time.
+- **Upcoming** — touches that are scheduled but haven't been drafted yet (drafting happens about a day before each send).
+- **Sent** — what's gone out in the last 30 days.
+- **Halted / failed** — sequences that stopped (lead replied, unsubscribed, bounced, you manually halted, or the AI couldn't produce a draft).
+
+For each pending row you can:
+
+- **Approve & queue** — sends after the scheduled time.
+- **Regenerate draft** — re-draft if the wording doesn't feel right.
+- **Skip this touch** — drop just this one touch; the next touch in the sequence still goes out on its original schedule.
+- **Halt sequence** — stop ALL remaining follow-ups for this lead.
+
+Bulk-select via checkboxes to approve, skip, or halt sequences for multiple rows at once.
+
+You can also see the per-lead sequence (every touch + status + scheduled date) by opening any lead in the Leads tab.
 
 ## The A/B Tests tab
 
@@ -99,29 +122,6 @@ Once a winner is promoted, the cron immediately starts the next cycle.
 ### Safety pause
 
 The follow-up sequence A/B type auto-pauses if the configured touch count changes while a test is active (e.g. you add a 4th touch in Settings but the active test only has intents for 3 touches). The mismatch shows up in the A/B Tests tab so you can either match the test to the new shape or revert the Settings change.
-
-## The Follow-ups tab
-
-This is the review queue for follow-up emails. It only matters in Review-before-send mode. In Auto-send mode, follow-ups are sent right away.
-
-The tab has five sub-views:
-
-- **Pending review** — drafts waiting for you to approve. The pill carries a count badge so you can tell at a glance whether there's work to do.
-- **Approved & queued** — drafts you've approved that are waiting for their scheduled send time.
-- **Upcoming** — touches that are scheduled but haven't been drafted yet (drafting happens about a day before each send).
-- **Sent** — what's gone out in the last 30 days.
-- **Halted / failed** — sequences that stopped (lead replied, unsubscribed, bounced, you manually halted, or the AI couldn't produce a draft).
-
-For each pending row you can:
-
-- **Approve & queue** — sends after the scheduled time.
-- **Regenerate draft** — re-draft if the wording doesn't feel right.
-- **Skip this touch** — drop just this one touch; the next touch in the sequence still goes out on its original schedule.
-- **Halt sequence** — stop ALL remaining follow-ups for this lead.
-
-Bulk-select via checkboxes to approve, skip, or halt sequences for multiple rows at once.
-
-You can also see the per-lead sequence (every touch + status + scheduled date) by opening any lead in the Leads tab.
 
 ## The Settings tab
 

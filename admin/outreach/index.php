@@ -58,8 +58,8 @@ include __DIR__ . '/../admin_header.php';
 <!-- Page-level tabs -->
 <div class="section-tabs">
     <button class="section-tab <?php echo $activeTab === 'leads' ? 'active' : ''; ?>" data-tab="leads">Leads</button>
-    <button class="section-tab <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>" data-tab="ab-tests">A/B Tests</button>
     <button class="section-tab <?php echo $activeTab === 'followups' ? 'active' : ''; ?>" data-tab="followups">Follow-ups</button>
+    <button class="section-tab <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>" data-tab="ab-tests">A/B Tests</button>
     <button class="section-tab <?php echo $activeTab === 'settings' ? 'active' : ''; ?>" data-tab="settings">Settings</button>
 </div>
 
@@ -288,12 +288,12 @@ include __DIR__ . '/../admin_header.php';
 
 </div> <!-- /#leads -->
 
-<div id="ab-tests" class="tab-content <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>">
-    <?php ab_tests_tab_render($pdo, (int) ($_GET['test_id'] ?? 0)); ?>
-</div>
-
 <div id="followups" class="tab-content <?php echo $activeTab === 'followups' ? 'active' : ''; ?>">
     <?php followups_tab_render($pdo); ?>
+</div>
+
+<div id="ab-tests" class="tab-content <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>">
+    <?php ab_tests_tab_render($pdo, (int) ($_GET['test_id'] ?? 0)); ?>
 </div>
 
 <div id="settings" class="tab-content <?php echo $activeTab === 'settings' ? 'active' : ''; ?>">

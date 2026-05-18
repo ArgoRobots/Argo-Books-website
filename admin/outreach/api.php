@@ -149,6 +149,9 @@ switch ($action) {
     case 'get_followups_for_lead':
         get_followups_for_lead($pdo);
         break;
+    case 'save_followup_draft':
+        save_followup_draft($pdo);
+        break;
 
     default:
         echo json_encode(['success' => false, 'message' => 'Unknown action']);
@@ -977,5 +980,18 @@ Example: [\"small\", \"medium\", \"small\", \"large\"]";
     }
 
     json_response(['success' => true, 'sizes' => $normalized]);
+}
+
+function save_followup_draft($pdo)
+{
+    $id = (int) ($_POST['id'] ?? 0);
+    $subject = trim((string) ($_POST['subject'] ?? ''));
+    $body = trim((string) ($_POST['body'] ?? ''));
+    if ($id <= 0 || $subject === '' || $body === '') {
+        echo json_encode(['success' => false, 'message' => 'Missing fields']); return;
+    }
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET draft_subject = ?, draft_body = ? WHERE id = ? AND status = 'drafted'");
+    $stmt->execute([$subject, $body, $id]);
+    echo json_encode(['success' => true]);
 }
 

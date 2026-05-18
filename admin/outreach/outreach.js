@@ -1208,6 +1208,10 @@ async function loadFollowups() {
             return;
         }
         container.innerHTML = data.rows.map(r => renderFollowupRow(r, currentFollowupView)).join('');
+        if (currentFollowupView === 'pending_review') {
+            var badge = document.getElementById('fuCountPending');
+            if (badge) badge.textContent = data.rows.length;
+        }
         updateFollowupsBulkBar();
     } catch (e) {
         container.innerHTML = '<p class="empty-state">Error loading follow-ups: ' + e.message + '</p>';
@@ -1287,30 +1291,30 @@ window.approveFollowup = async function(id) {
     const subjectInput = document.querySelector('.fu-subject[data-id="' + id + '"]');
     const bodyInput = document.querySelector('.fu-body[data-id="' + id + '"]');
     if (subjectInput && bodyInput) {
-        await api('save_followup_draft', { id: id, subject: subjectInput.value, body: bodyInput.value });
+        await api('save_followup_draft', { method: 'POST', body: { id: id, subject: subjectInput.value, body: bodyInput.value } });
     }
-    const data = await api('approve_followup', { id: id });
+    const data = await api('approve_followup', { method: 'POST', body: { id: id } });
     if (data.success) loadFollowups();
     else alert('Approve failed: ' + (data.message || 'unknown'));
 };
 
 window.regenerateFollowup = async function(id) {
     if (!confirm('Regenerate this follow-up via Gemini? Current draft will be replaced.')) return;
-    const data = await api('regenerate_followup', { id: id });
+    const data = await api('regenerate_followup', { method: 'POST', body: { id: id } });
     if (data.success) loadFollowups();
     else alert('Regenerate failed: ' + (data.message || 'unknown'));
 };
 
 window.skipFollowup = async function(id) {
     if (!confirm('Skip this follow-up touch? The next touch in the sequence will still be sent on schedule.')) return;
-    const data = await api('skip_followup', { id: id });
+    const data = await api('skip_followup', { method: 'POST', body: { id: id } });
     if (data.success) loadFollowups();
     else alert('Skip failed: ' + (data.message || 'unknown'));
 };
 
 window.haltFollowupSequence = async function(leadId) {
     if (!confirm('Halt the entire follow-up sequence for this lead? No more follow-ups will be sent.')) return;
-    const data = await api('halt_followup_sequence', { lead_id: leadId });
+    const data = await api('halt_followup_sequence', { method: 'POST', body: { lead_id: leadId } });
     if (data.success) loadFollowups();
     else alert('Halt failed: ' + (data.message || 'unknown'));
 };
@@ -1325,7 +1329,7 @@ window.updateFollowupsBulkBar = function() {
 window.bulkApproveFollowups = async function() {
     const ids = Array.from(document.querySelectorAll('.fu-row-check:checked')).map(c => parseInt(c.dataset.fuId));
     if (!ids.length) return;
-    const data = await api('bulk_approve_followups', { ids: ids });
+    const data = await api('bulk_approve_followups', { method: 'POST', body: { ids: ids } });
     if (data.success) { alert('Approved ' + data.approved_count + ' follow-up(s).'); loadFollowups(); }
     else alert('Bulk approve failed: ' + (data.message || 'unknown'));
 };
@@ -1334,7 +1338,7 @@ window.bulkSkipFollowups = async function() {
     const ids = Array.from(document.querySelectorAll('.fu-row-check:checked')).map(c => parseInt(c.dataset.fuId));
     if (!ids.length) return;
     if (!confirm('Skip ' + ids.length + ' follow-up(s)?')) return;
-    const data = await api('bulk_skip_followups', { ids: ids });
+    const data = await api('bulk_skip_followups', { method: 'POST', body: { ids: ids } });
     if (data.success) { alert('Skipped ' + data.skipped_count + ' follow-up(s).'); loadFollowups(); }
     else alert('Bulk skip failed: ' + (data.message || 'unknown'));
 };
@@ -1343,7 +1347,7 @@ window.bulkHaltFollowupSequences = async function() {
     const leadIds = Array.from(new Set(Array.from(document.querySelectorAll('.fu-row-check:checked')).map(c => parseInt(c.dataset.leadId))));
     if (!leadIds.length) return;
     if (!confirm('Halt the follow-up sequence for ' + leadIds.length + ' lead(s)? This stops ALL remaining follow-ups for these leads.')) return;
-    const data = await api('bulk_halt_followups', { lead_ids: leadIds });
+    const data = await api('bulk_halt_followups', { method: 'POST', body: { lead_ids: leadIds } });
     if (data.success) { alert('Halted ' + data.halted_count + ' follow-up row(s).'); loadFollowups(); }
     else alert('Bulk halt failed: ' + (data.message || 'unknown'));
 };

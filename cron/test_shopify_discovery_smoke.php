@@ -15,7 +15,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
 if (($_ENV['APP_ENV'] ?? '') === 'production') {
-    fwrite(STDERR, "REFUSING TO RUN: APP_ENV='production'.\n");
+    fwrite(STDERR, "REFUSING TO RUN: APP_ENV='production'. Smoke tests touch live data.\n");
     exit(2);
 }
 
@@ -31,7 +31,8 @@ function assert_true($cond, $msg) {
 }
 
 // ─── Shared fixture ───
-$caProducts = ['products' => array_fill(0, 10, ['created_at' => '2024-08-12T10:23:45-04:00'])];
+$goodDate   = (new DateTime('-14 months'))->format(DateTime::RFC3339);
+$caProducts = ['products' => array_fill(0, 10, ['created_at' => $goodDate])];
 
 // ─── Section 1: filter_gatekept_email ───
 echo "Section 1: filter_gatekept_email\n";
@@ -104,17 +105,21 @@ assert_true(stripos($r['detail'] ?? '', 'Awesome Agency') !== false, "agency_ope
 // from offline smoke testing; see report for explanation.
 
 // too_few_products
-$fewProducts = ['products' => array_fill(0, 3, ['created_at' => '2024-08-12T10:23:45-04:00'])];
+$fewDate     = (new DateTime('-14 months'))->format(DateTime::RFC3339);
+$fewProducts = ['products' => array_fill(0, 3, ['created_at' => $fewDate])];
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $fewProducts);
 assert_true($r['reason'] === 'too_few_products', "too_few_products: reason correct");
+assert_true(str_contains($r['detail'] ?? '', '3'), "too_few_products: detail mentions count 3");
 
-// too_new (1 month old — today is 2026-05-17)
-$newProducts = ['products' => array_fill(0, 10, ['created_at' => '2026-04-15T10:00:00-04:00'])];
+// too_new (~1 month ago — always within the too_new window)
+$newDate     = (new DateTime('-1 month'))->format(DateTime::RFC3339);
+$newProducts = ['products' => array_fill(0, 10, ['created_at' => $newDate])];
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $newProducts);
 assert_true($r['reason'] === 'too_new', "too_new: reason correct");
 
-// too_old (31 months old)
-$oldProducts = ['products' => array_fill(0, 10, ['created_at' => '2023-10-01T10:00:00-04:00'])];
+// too_old (~27 months ago — past the 24-month ceiling)
+$oldDate     = (new DateTime('-27 months'))->format(DateTime::RFC3339);
+$oldProducts = ['products' => array_fill(0, 10, ['created_at' => $oldDate])];
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $oldProducts);
 assert_true($r['reason'] === 'too_old', "too_old: reason correct");
 

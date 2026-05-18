@@ -946,3 +946,27 @@ CREATE TABLE IF NOT EXISTS outreach_scrape_cache (
     last_attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_scrape_attempted (last_attempted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tracks Shopify storefronts discovered via SerpAPI dorking.
+-- Acts as a dedup cache + reject-reason audit log so SerpAPI quota
+-- isn't wasted re-evaluating known stores. Fit candidates are imported
+-- into outreach_leads (source='shopify_auto') and linked via lead_id.
+CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    canonical_url VARCHAR(500) NOT NULL,
+    myshopify_url VARCHAR(500) DEFAULT NULL,
+    status ENUM('imported','rejected','error','pending') NOT NULL DEFAULT 'pending',
+    reject_reason VARCHAR(100) DEFAULT NULL,
+    reject_detail VARCHAR(500) DEFAULT NULL,
+    products_count INT DEFAULT NULL,
+    first_product_created_at DATETIME DEFAULT NULL,
+    detected_country VARCHAR(8) DEFAULT NULL,
+    harvested_email VARCHAR(255) DEFAULT NULL,
+    lead_id INT DEFAULT NULL,
+    last_query VARCHAR(255) DEFAULT NULL,
+    checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_canonical_url (canonical_url),
+    INDEX idx_status_checked (status, checked_at),
+    INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

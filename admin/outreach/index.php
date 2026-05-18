@@ -313,6 +313,7 @@ include __DIR__ . '/../admin_header.php';
                 <button class="tab active" onclick="switchTab('tabInfo', this)">Info</button>
                 <button class="tab" onclick="switchTab('tabDraft', this)">Email Draft</button>
                 <button class="tab" onclick="switchTab('tabActivity', this)">Activity</button>
+                <button class="tab" onclick="switchTab('tabFollowups', this); loadLeadFollowups();">Follow-ups</button>
             </div>
 
             <!-- Info Tab -->
@@ -442,6 +443,13 @@ include __DIR__ . '/../admin_header.php';
             <div id="tabActivity" class="tab-content">
                 <div id="activityTimeline" class="activity-timeline">
                     <p class="empty-state-text">Loading activity...</p>
+                </div>
+            </div>
+
+            <!-- Follow-ups Tab -->
+            <div id="tabFollowups" class="tab-content">
+                <div id="leadFollowupsList">
+                    <p class="empty-state-text">Loading follow-ups...</p>
                 </div>
             </div>
         </div>

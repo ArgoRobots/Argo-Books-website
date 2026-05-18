@@ -1358,3 +1358,35 @@ document.addEventListener('DOMContentLoaded', function() {
         loadFollowups();
     }
 });
+
+window.loadLeadFollowups = async function() {
+    const list = document.getElementById('leadFollowupsList');
+    list.innerHTML = '<p class="empty-state-text">Loading...</p>';
+    // currentLeadId is the global declared at outreach.js:2 and set by
+    // openLeadDetail() at outreach.js:527 whenever a lead modal opens.
+    if (!currentLeadId) {
+        list.innerHTML = '<p class="empty-state-text">No lead selected.</p>';
+        return;
+    }
+    const data = await api('get_followups_for_lead&lead_id=' + currentLeadId);
+    if (!data.success) {
+        list.innerHTML = '<p class="empty-state-text">Error: ' + (data.message || 'unknown') + '</p>';
+        return;
+    }
+    if (!data.rows.length) {
+        list.innerHTML = '<p class="empty-state-text">No follow-ups scheduled for this lead. Sequence is configured in Settings; rows are created when the first-touch email sends.</p>';
+        return;
+    }
+    list.innerHTML = '<table class="data-table"><thead><tr><th>Touch</th><th>Status</th><th>Scheduled</th><th>Sent</th><th>Halt reason</th><th>A/B variant</th></tr></thead><tbody>' +
+        data.rows.map(r =>
+            '<tr>' +
+                '<td>' + r.touch_number + '</td>' +
+                '<td>' + escapeHtml(r.status) + '</td>' +
+                '<td>' + (r.scheduled_for || '—') + '</td>' +
+                '<td>' + (r.sent_at || '—') + '</td>' +
+                '<td>' + (r.halt_reason ? escapeHtml(r.halt_reason) : '—') + '</td>' +
+                '<td>' + (r.ab_variant_label ? escapeHtml(r.ab_variant_label) : '—') + '</td>' +
+            '</tr>'
+        ).join('') +
+    '</tbody></table>';
+};

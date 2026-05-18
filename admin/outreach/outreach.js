@@ -17,6 +17,7 @@ function updateUrlParams() {
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
     const companySize = document.getElementById('filterCompanySize').value;
+    const source = document.getElementById('filterSource').value;
     const sort = document.getElementById('filterSort').value;
 
     const setOrDelete = (key, value) => value ? params.set(key, value) : params.delete(key);
@@ -24,6 +25,7 @@ function updateUrlParams() {
     setOrDelete('status', status);
     setOrDelete('response', response);
     setOrDelete('company_size', companySize);
+    setOrDelete('source', source);
     setOrDelete('sort', sort && sort !== 'date_added_desc' ? sort : '');
 
     const qs = params.toString();
@@ -37,6 +39,7 @@ function restoreFiltersFromUrl() {
     if (params.has('status')) document.getElementById('filterStatus').value = params.get('status');
     if (params.has('response')) document.getElementById('filterResponse').value = params.get('response');
     if (params.has('company_size')) document.getElementById('filterCompanySize').value = params.get('company_size');
+    if (params.has('source')) document.getElementById('filterSource').value = params.get('source');
     if (params.has('sort')) document.getElementById('filterSort').value = params.get('sort');
 }
 
@@ -168,12 +171,14 @@ async function loadLeads() {
     const status = document.getElementById('filterStatus').value;
     const response = document.getElementById('filterResponse').value;
     const companySize = document.getElementById('filterCompanySize').value;
+    const source = document.getElementById('filterSource').value;
     const sort = document.getElementById('filterSort').value;
 
     if (search) params.search = search;
     if (status) params.status = status;
     if (response) params.response_status = response;
     if (companySize) params.company_size = companySize;
+    if (source) params.source = source;
     if (sort) params.sort = sort;
 
     // Persist filters to URL

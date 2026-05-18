@@ -288,6 +288,16 @@ include __DIR__ . '/../admin_header.php';
                 </select>
             </div>
             <div class="filter-group">
+                <label for="filterSource">Source</label>
+                <select id="filterSource" onchange="loadLeads()">
+                    <option value="">All</option>
+                    <option value="google_places">Google Places</option>
+                    <option value="shopify">Shopify</option>
+                    <option value="manual">Manual</option>
+                    <option value="csv_import">CSV</option>
+                </select>
+            </div>
+            <div class="filter-group">
                 <label for="filterSort">Sort</label>
                 <select id="filterSort" onchange="loadLeads()">
                     <option value="date_added_desc">Newest First</option>

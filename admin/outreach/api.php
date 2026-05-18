@@ -199,6 +199,7 @@ function get_leads($pdo)
     $status = $_GET['status'] ?? '';
     $response_status = $_GET['response_status'] ?? '';
     $company_size = $_GET['company_size'] ?? '';
+    $source = $_GET['source'] ?? '';
     $search = $_GET['search'] ?? '';
     $sort = $_GET['sort'] ?? 'date_added_desc';
 
@@ -216,6 +217,19 @@ function get_leads($pdo)
     if ($company_size) {
         $where[] = 'ol.company_size = ?';
         $params[] = $company_size;
+    }
+    // Source filter groups UI + cron variants together (google_places and
+    // google_places_auto both match "google_places"; shopify_auto matches
+    // "shopify") so admins don't have to think about the channel split.
+    if ($source) {
+        if ($source === 'google_places') {
+            $where[] = "ol.source IN ('google_places', 'google_places_auto')";
+        } elseif ($source === 'shopify') {
+            $where[] = "ol.source IN ('shopify', 'shopify_auto')";
+        } else {
+            $where[] = 'ol.source = ?';
+            $params[] = $source;
+        }
     }
     if ($search) {
         $where[] = '(ol.business_name LIKE ? OR ol.email LIKE ? OR ol.contact_name LIKE ? OR ol.city LIKE ? OR ol.category LIKE ?)';

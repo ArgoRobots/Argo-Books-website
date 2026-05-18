@@ -841,6 +841,7 @@ function send_followup_row($pdo, array $followupRow, ?string &$reason = null): b
  */
 function filter_gatekept_email($email)
 {
+    $email = trim($email);
     if (empty($email)) return true;
 
     $at = strpos($email, '@');

@@ -38,6 +38,7 @@ require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 require_once __DIR__ . '/lib/outreach_helpers.php';
 require_once __DIR__ . '/lib/shopify_discovery.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // ─── Lock file to prevent overlapping runs ───
 
@@ -177,8 +178,10 @@ function setState($pdo, $key, $value)
 logPipeline('=== Outreach Pipeline Starting ===');
 if ($dryRun) logPipeline('DRY RUN MODE — no changes will be made');
 
+global $pdo;
+$cronRunId = $dryRun ? 0 : cron_run_start($pdo, 'outreach_pipeline');
+
 try {
-    global $pdo;
     ensureStateTable($pdo);
 
     // ─── Master kill-switch: admin can disable the entire outreach system
@@ -250,9 +253,11 @@ try {
     }
 
     logPipeline('=== Outreach Pipeline Complete ===');
+    cron_run_finish($pdo, $cronRunId, 'ok');
 
 } catch (Exception $e) {
     logPipeline("Pipeline fatal error: " . $e->getMessage(), 'ERROR');
+    cron_run_finish($pdo, $cronRunId, 'error', $e->getMessage());
     exit(1);
 } finally {
     // Release lock file
@@ -403,6 +408,7 @@ function stepDiscover($pdo, $dryRun)
     }
 
     logPipeline("Imported $imported new leads, skipped $skipped duplicates from $city");
+    cron_metric_incr('leads_discovered', $imported);
 
     // Advance the category offset by however many categories we actually
     // walked. If we hit the daily cap early, the pointer stays close to
@@ -660,6 +666,8 @@ function stepDiscoverShopify($pdo, $dryRun)
         "Shopify discovery: query='$query', results=" . count($results)
         . ", evaluated=$evaluated, imported=$imported, rejected=$rejected, errored=$errored"
     );
+    cron_metric_incr('leads_discovered', $imported);
+    cron_metric_incr('shopify_rejected', $rejected);
 }
 
 function stepManageAbTests($pdo, $dryRun)
@@ -705,6 +713,7 @@ function stepManageAbTests($pdo, $dryRun)
         $type = $evalResult['variant_type'] ?? $type;
 
         if ($evalResult['action'] === 'promoted') {
+            cron_metric_incr('ab_tests_promoted');
             $metric = $evalResult['metric'] ?? 'ctr';
             logPipeline(sprintf(
                 "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (reply rate %.2f%%, CTR %.2f%%) via %s by %s after %d days.",
@@ -887,6 +896,7 @@ function stepGenerateDrafts($pdo, $dryRun)
     }
 
     logPipeline("Drafts generated: $success, failed: $failed");
+    cron_metric_incr('drafts_generated', $success);
 }
 
 function stepAutoApprove($pdo, $dryRun)
@@ -1046,6 +1056,7 @@ function stepSendEmails($pdo, $dryRun)
     }
 
     logPipeline("Send complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
+    cron_metric_incr('first_emails_sent', $successCount);
 }
 
 function stepSendFollowups($pdo, $dryRun)
@@ -1115,6 +1126,7 @@ function stepSendFollowups($pdo, $dryRun)
     }
 
     logPipeline("Follow-ups complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
+    cron_metric_incr('followups_sent', $successCount);
 }
 
 function stepHaltFollowups($pdo, $dryRun)
@@ -1207,4 +1219,5 @@ function stepDraftFollowups($pdo, $dryRun)
     }
 
     logPipeline("Follow-up drafts: $success generated, $failed failed.");
+    cron_metric_incr('followup_drafts_generated', $success);
 }

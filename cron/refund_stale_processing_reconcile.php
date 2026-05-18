@@ -25,8 +25,13 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../api/portal/_audit.php';
 require_once __DIR__ . '/../api/portal/_refund_helpers.php';
 require_once __DIR__ . '/../api/portal/refunds/_provider_stripe.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 global $pdo;
+
+$runId = cron_run_start($pdo, 'refund_stale_processing_reconcile');
+
+try {
 
 $stmt = $pdo->query("
     SELECT r.*, c.environment, c.stripe_account_id
@@ -104,3 +109,10 @@ foreach ($rows as $r) {
 }
 
 echo "Reconciled $reconciled of " . count($rows) . " stuck-processing rows\n";
+cron_metric_incr('refunds_reconciled', $reconciled);
+cron_run_finish($pdo, $runId, 'ok');
+
+} catch (Throwable $e) {
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
+    throw $e;
+}

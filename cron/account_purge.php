@@ -26,6 +26,7 @@ $dotenv->load();
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/_purge_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 function logPurge($message, $type = 'INFO') {
     $timestamp = date('Y-m-d H:i:s');
@@ -43,6 +44,8 @@ function logPurge($message, $type = 'INFO') {
 }
 
 logPurge('Starting account purge check...');
+
+$runId = cron_run_start($pdo, 'account_purge');
 
 try {
     global $pdo;
@@ -80,8 +83,11 @@ try {
     }
 
     logPurge("Account purge complete. Deleted: $deletedCount, Failed: $failedCount");
+    cron_metric_incr('accounts_deleted', $deletedCount);
+    cron_run_finish($pdo, $runId, 'ok');
 
-} catch (PDOException $e) {
+} catch (Throwable $e) {
     logPurge("Database error: " . $e->getMessage(), 'ERROR');
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
     exit(1);
 }

@@ -1,0 +1,270 @@
+/* Cron Activity page */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 24px 24px 16px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.page-header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+}
+
+.range-selector {
+    display: flex;
+    gap: 4px;
+    background: var(--gray-100);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+[data-theme="dark"] .range-selector {
+    background: var(--gray-800);
+}
+
+.range-btn {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--gray-700);
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.range-btn:hover {
+    background: var(--gray-200);
+}
+
+.range-btn.active {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+[data-theme="dark"] .range-btn {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .range-btn:hover {
+    background: var(--gray-700);
+}
+
+[data-theme="dark"] .range-btn.active {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+.empty-state {
+    margin: 32px 24px;
+    padding: 24px;
+    border: 1px dashed var(--gray-300);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--gray-600);
+}
+
+[data-theme="dark"] .empty-state {
+    border-color: var(--gray-700);
+    color: var(--gray-400);
+}
+
+.cron-cards {
+    padding: 0 24px 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 1100px) {
+    .cron-cards {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.cron-card {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--gray-border, var(--gray-200));
+    border-radius: 8px;
+    padding: 18px 20px;
+}
+
+[data-theme="dark"] .cron-card {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+.cron-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.cron-card-header h2 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+}
+
+.cron-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--gray-600);
+}
+
+[data-theme="dark"] .cron-meta {
+    color: var(--gray-400);
+}
+
+.cron-meta .cron-freq::before { content: '⏱ '; }
+.cron-meta .cron-runs::before { content: '🔁 '; }
+.cron-meta .cron-last::before { content: '🕒 '; }
+
+.cron-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.cron-pill.status-ok       { background: #dcfce7; color: #166534; }
+.cron-pill.status-stale    { background: #fef3c7; color: #854d0e; }
+.cron-pill.status-error    { background: #fee2e2; color: #991b1b; }
+.cron-pill.status-running  { background: #dbeafe; color: #1e40af; }
+
+[data-theme="dark"] .cron-pill.status-ok      { background: #14532d; color: #bbf7d0; }
+[data-theme="dark"] .cron-pill.status-stale   { background: #78350f; color: #fde68a; }
+[data-theme="dark"] .cron-pill.status-error   { background: #7f1d1d; color: #fecaca; }
+[data-theme="dark"] .cron-pill.status-running { background: #1e3a8a; color: #bfdbfe; }
+
+.cron-empty {
+    padding: 12px;
+    background: var(--gray-100, #f9fafb);
+    border-radius: 6px;
+    color: var(--gray-600);
+    font-size: 13px;
+    text-align: center;
+}
+
+[data-theme="dark"] .cron-empty {
+    background: var(--gray-900);
+    color: var(--gray-400);
+}
+
+.cron-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.cron-metric {
+    padding: 10px 12px;
+    background: var(--gray-100, #f9fafb);
+    border-radius: 6px;
+}
+
+[data-theme="dark"] .cron-metric {
+    background: var(--gray-900);
+}
+
+.metric-value {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.metric-label {
+    font-size: 12px;
+    color: var(--gray-600);
+    margin-top: 4px;
+}
+
+[data-theme="dark"] .metric-label {
+    color: var(--gray-400);
+}
+
+.cron-detail {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--gray-border, var(--gray-200));
+}
+
+[data-theme="dark"] .cron-detail {
+    border-color: var(--gray-700);
+}
+
+.cron-detail summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+[data-theme="dark"] .cron-detail summary {
+    color: var(--gray-400);
+}
+
+.cron-detail summary:hover {
+    color: var(--primary-blue);
+}
+
+.cron-error {
+    margin: 10px 0 0;
+    padding: 10px 12px;
+    background: #fef2f2;
+    color: #991b1b;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+}
+
+[data-theme="dark"] .cron-error {
+    background: #450a0a;
+    color: #fecaca;
+}
+
+.cron-metric-table {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 12px;
+    border-collapse: collapse;
+}
+
+.cron-metric-table td {
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--gray-border, var(--gray-200));
+}
+
+[data-theme="dark"] .cron-metric-table td {
+    border-color: var(--gray-700);
+}
+
+.cron-metric-table td.k {
+    color: var(--gray-600);
+    width: 40%;
+}
+
+.cron-metric-table td.v {
+    font-weight: 600;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .cron-metric-table td.k {
+    color: var(--gray-400);
+}

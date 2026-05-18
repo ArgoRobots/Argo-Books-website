@@ -22,8 +22,13 @@ if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/_audit.php';
 require_once __DIR__ . '/../api/portal/_refund_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 global $pdo;
+
+$runId = cron_run_start($pdo, 'refund_cooling_off_promoter');
+
+try {
 
 $stmt = $pdo->query("
     SELECT r.*, c.id AS cid, c.locked, c.lock_reason, c.email_verified_at,
@@ -89,3 +94,11 @@ foreach ($rows as $row) {
 }
 
 echo "Promoted: $promoted, Auto-cancelled (locked >24h): $auto_cancelled\n";
+cron_metric_incr('refunds_promoted', $promoted);
+cron_metric_incr('refunds_auto_cancelled', $auto_cancelled);
+cron_run_finish($pdo, $runId, 'ok');
+
+} catch (Throwable $e) {
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
+    throw $e;
+}

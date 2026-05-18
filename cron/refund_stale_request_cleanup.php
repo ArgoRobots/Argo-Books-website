@@ -21,8 +21,13 @@ if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../api/portal/_audit.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 global $pdo;
+
+$runId = cron_run_start($pdo, 'refund_stale_request_cleanup');
+
+try {
 
 $stmt = $pdo->query("
     SELECT id, company_id FROM refund_requests
@@ -54,3 +59,11 @@ echo "Cleaned $cancelled stale pending_code rows (scanned " . count($rows) . ")\
 
 // Also vacuum the idempotency cache (older than 24h is useless).
 $pdo->exec("DELETE FROM refund_idempotency_cache WHERE created_at < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+
+cron_metric_incr('requests_cancelled', $cancelled);
+cron_run_finish($pdo, $runId, 'ok');
+
+} catch (Throwable $e) {
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
+    throw $e;
+}

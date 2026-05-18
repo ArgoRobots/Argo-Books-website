@@ -972,3 +972,19 @@ CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
     INDEX idx_status_checked (status, checked_at),
     INDEX idx_lead (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-run audit trail for every cron job. Each cron calls cron_run_start
+-- at the top, increments named metrics throughout its work
+-- (cron_metric_incr / cron_metric_set in cron/lib/run_tracker.php), then
+-- calls cron_run_finish on exit. The /admin/crons page reads this table
+-- to render a dashboard of cron activity over a chosen time range.
+CREATE TABLE IF NOT EXISTS cron_runs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    cron_name VARCHAR(100) NOT NULL,
+    started_at DATETIME NOT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    status ENUM('running','ok','error') NOT NULL DEFAULT 'running',
+    error_message TEXT DEFAULT NULL,
+    metrics JSON DEFAULT NULL,
+    INDEX idx_cron_started (cron_name, started_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

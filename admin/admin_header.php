@@ -100,6 +100,9 @@ $base_path = $in_subdir ? '../' : '';
                     <a href="<?php echo $base_path; ?>reviews/" class="header-link <?php echo $current_dir === 'reviews' ? 'active' : ''; ?>">
                         Reviews
                     </a>
+                    <a href="<?php echo $base_path; ?>crons/" class="header-link <?php echo $current_dir === 'crons' ? 'active' : ''; ?>">
+                        Crons
+                    </a>
                     <a href="<?php echo $base_path; ?>settings/" class="header-link <?php echo $current_dir === 'settings' ? 'active' : ''; ?>">
                         2FA
                     </a>
@@ -144,6 +147,7 @@ $base_path = $in_subdir ? '../' : '';
                     <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
                     <li><a href="<?php echo $base_path; ?>outreach/" class="<?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">Outreach</a></li>
                     <li><a href="<?php echo $base_path; ?>reviews/" class="<?php echo $current_dir === 'reviews' ? 'active' : ''; ?>">Reviews</a></li>
+                    <li><a href="<?php echo $base_path; ?>crons/" class="<?php echo $current_dir === 'crons' ? 'active' : ''; ?>">Crons</a></li>
                     <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA</a></li>
                     <li><a href="<?php echo $base_path; ?>logout.php" class="logout-link">Logout</a></li>
                 </ul>

@@ -43,6 +43,7 @@ require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 require_once __DIR__ . '/_renewal_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // Configure logging
 function logMessage($message, $type = 'INFO') {
@@ -63,6 +64,8 @@ function logMessage($message, $type = 'INFO') {
 }
 
 logMessage('Starting subscription renewal check...');
+
+$runId = cron_run_start($pdo, 'subscription_renewal');
 
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';
@@ -105,12 +108,15 @@ try {
 
 } catch (PDOException $e) {
     logMessage("Database error fetching subscriptions: " . $e->getMessage(), 'ERROR');
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
     exit(1);
 }
 
 $successCount = 0;
 $failedCount = 0;
 $skippedCount = 0;
+
+try {
 
 foreach ($subscriptions as $subscription) {
     $subscriptionId = $subscription['subscription_id'];
@@ -325,6 +331,7 @@ foreach ($subscriptions as $subscription) {
 logMessage("Renewal processing complete. Success: $successCount, Failed: $failedCount, Skipped: $skippedCount");
 
 // Also check for subscriptions that should be marked as expired
+$expiredCount = 0;
 try {
     $stmt = $pdo->prepare("
         UPDATE premium_subscriptions
@@ -368,6 +375,17 @@ try {
     }
 } catch (PDOException $e) {
     logMessage("Error clearing previous_paypal_subscription_id: " . $e->getMessage(), 'ERROR');
+}
+
+    cron_metric_incr('renewals_succeeded', $successCount);
+    cron_metric_incr('renewals_failed', $failedCount);
+    cron_metric_incr('subscriptions_expired', $expiredCount);
+    cron_run_finish($pdo, $runId, 'ok');
+
+} catch (Throwable $e) {
+    logMessage("Fatal error: " . $e->getMessage(), 'ERROR');
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
+    throw $e;
 }
 
 /**

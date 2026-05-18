@@ -28,6 +28,7 @@ $dotenv->load();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/lib/outreach_helpers.php';
 require_once __DIR__ . '/lib/imap_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // ─── Lock file ───
 
@@ -62,6 +63,8 @@ function logReply($message, $type = 'INFO')
 // ─── Main ───
 
 logReply('=== Reply Checker Starting ===');
+
+$runId = cron_run_start($pdo, 'reply_checker');
 
 try {
     global $pdo;
@@ -144,9 +147,13 @@ try {
 
     logReply("Run complete. Matched: $matched | Bounces: $bounces | Auto-responders skipped: $skipped_auto | No match: $no_match");
     logReply('=== Reply Checker Complete ===');
+    cron_metric_incr('replies_matched', $matched);
+    cron_metric_incr('emails_scanned', count($messages));
+    cron_run_finish($pdo, $runId, 'ok');
 
 } catch (Exception $e) {
     logReply('Fatal error: ' . $e->getMessage(), 'ERROR');
+    cron_run_finish($pdo, $runId, 'error', $e->getMessage());
     exit(1);
 } finally {
     if (isset($lockFp) && is_resource($lockFp)) {

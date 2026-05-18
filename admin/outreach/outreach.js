@@ -1461,6 +1461,7 @@ async function runShopifyDiscovery() {
         shopifyLastSummary = {
             rejected_count: data.rejected_count || 0,
             reject_reasons: data.reject_reasons || {},
+            already_imported_count: data.already_imported_count || 0,
             total_evaluated: data.total_evaluated || 0,
         };
         _shopifyUpdateUsageDisplay(
@@ -1485,34 +1486,42 @@ function renderShopifyResults() {
     const importAllBtn = document.getElementById('shopifyImportAllBtn');
     const safe = (s) => escapeHtml(String(s ?? ''));
 
-    const importableCount = shopifyResults.filter(r => !r.already_imported).length;
-    const importedCount   = shopifyResults.filter(r => r.already_imported).length;
-
-    // Summary line — fits in the table + rejected count from the server,
-    // with a top-reasons hint when the dork mostly missed.
+    // Table only ever holds importable fits — already-imported rows are
+    // filtered server-side at search time and removed locally after each
+    // successful import.
     let summary = `${shopifyResults.length} fit`;
-    if (importedCount > 0) summary += ` (${importedCount} already imported)`;
-    if (shopifyLastSummary && shopifyLastSummary.rejected_count > 0) {
-        const reasons = shopifyLastSummary.reject_reasons || {};
-        const reasonStr = Object.entries(reasons)
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 3)
-            .map(([k, n]) => `${n}× ${k}`)
-            .join(', ');
-        summary += ` · ${shopifyLastSummary.rejected_count} rejected`;
-        if (reasonStr) summary += ` (${reasonStr})`;
+    if (shopifyLastSummary) {
+        if (shopifyLastSummary.already_imported_count > 0) {
+            summary += ` · ${shopifyLastSummary.already_imported_count} already imported (hidden)`;
+        }
+        if (shopifyLastSummary.rejected_count > 0) {
+            const reasons = shopifyLastSummary.reject_reasons || {};
+            const reasonStr = Object.entries(reasons)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([k, n]) => `${n}× ${k}`)
+                .join(', ');
+            summary += ` · ${shopifyLastSummary.rejected_count} rejected`;
+            if (reasonStr) summary += ` (${reasonStr})`;
+        }
     }
     countEl.textContent = summary;
 
     if (importAllBtn) {
-        importAllBtn.disabled = importableCount === 0;
-        importAllBtn.textContent = importableCount > 0 ? `Import ${importableCount} Fit${importableCount !== 1 ? 's' : ''}` : 'Import All Fits';
+        importAllBtn.disabled = shopifyResults.length === 0;
+        importAllBtn.textContent = shopifyResults.length > 0 ? `Import ${shopifyResults.length} Fit${shopifyResults.length !== 1 ? 's' : ''}` : 'Import All Fits';
     }
 
     if (shopifyResults.length === 0) {
-        const emptyMsg = shopifyLastSummary && shopifyLastSummary.total_evaluated > 0
-            ? 'SerpAPI returned results but none passed the filter. See the rejection summary above for why.'
-            : 'SerpAPI returned no results for this query.';
+        let emptyMsg = 'SerpAPI returned no results for this query.';
+        if (shopifyLastSummary && shopifyLastSummary.total_evaluated > 0) {
+            const reasons = [];
+            if (shopifyLastSummary.rejected_count > 0) reasons.push(`${shopifyLastSummary.rejected_count} rejected`);
+            if (shopifyLastSummary.already_imported_count > 0) reasons.push(`${shopifyLastSummary.already_imported_count} already imported`);
+            emptyMsg = reasons.length
+                ? `No new fits — all ${shopifyLastSummary.total_evaluated} results from this query were filtered (${reasons.join(', ')}).`
+                : 'SerpAPI returned results but none passed the filter.';
+        }
         body.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:#888;">${emptyMsg}</td></tr>`;
         return;
     }
@@ -1523,29 +1532,21 @@ function renderShopifyResults() {
             ? `<div><strong>${safe(r.business_name)}</strong></div><div style="font-size:12px;"><a href="${safe(displayUrl)}" target="_blank" rel="noopener" class="link">${safe(displayUrl)}</a></div>`
             : `<a href="${safe(displayUrl)}" target="_blank" rel="noopener" class="link">${safe(displayUrl)}</a>`;
 
-        const resultCell = r.already_imported
-            ? `<span class="status-badge status-contacted">already imported (#${r.existing_lead_id})</span>`
-            : '<span class="status-badge status-replied">fit</span>';
-
-        const actionCell = r.already_imported
-            ? '—'
-            : `<button class="btn btn-small btn-blue" onclick="importShopifyRow(${idx}, this)">Import</button>`;
-
         return '<tr>' +
             `<td>${store}</td>` +
             `<td>${safe(r.email) || '—'}</td>` +
             `<td>${r.products_count != null ? safe(r.products_count) : '—'}</td>` +
             `<td>${safe(r.first_product_at) || '—'}</td>` +
             `<td>${safe(r.country) || '—'}</td>` +
-            `<td>${resultCell}</td>` +
-            `<td>${actionCell}</td>` +
+            `<td><span class="status-badge status-replied">fit</span></td>` +
+            `<td><button class="btn btn-small btn-blue" onclick="importShopifyRow(${idx}, this)">Import</button></td>` +
         '</tr>';
     }).join('');
 }
 
 async function importShopifyRow(idx, btn) {
     const row = shopifyResults[idx];
-    if (!row || !row.fit) return;
+    if (!row) return;
     btn.disabled = true;
     btn.textContent = 'Importing…';
     try {
@@ -1554,8 +1555,10 @@ async function importShopifyRow(idx, btn) {
             body: { canonical_url: row.canonical_url }
         });
         if (data.success) {
-            shopifyResults[idx].already_imported = true;
-            shopifyResults[idx].existing_lead_id = data.lead_id;
+            shopifyResults = shopifyResults.filter(r => r.canonical_url !== row.canonical_url);
+            if (shopifyLastSummary) {
+                shopifyLastSummary.already_imported_count = (shopifyLastSummary.already_imported_count || 0) + 1;
+            }
             renderShopifyResults();
             loadStats();
         } else {
@@ -1571,40 +1574,37 @@ async function importShopifyRow(idx, btn) {
 }
 
 async function importAllShopifyFits() {
-    const fits = shopifyResults
-        .map((r, idx) => ({ row: r, idx }))
-        .filter(x => x.row.fit && !x.row.already_imported);
+    if (shopifyResults.length === 0) return;
+    if (!confirm(`Import ${shopifyResults.length} Shopify store${shopifyResults.length === 1 ? '' : 's'} as new leads?`)) return;
 
-    if (fits.length === 0) return;
-    if (!confirm(`Import ${fits.length} Shopify store${fits.length === 1 ? '' : 's'} as new leads?`)) return;
-
+    // Copy by canonical_url so index shifts during the loop don't matter
+    const toImport = shopifyResults.map(r => r.canonical_url);
     const btn = document.getElementById('shopifyImportAllBtn');
     btn.disabled = true;
     btn.textContent = 'Importing…';
 
-    let imported = 0;
+    const succeeded = new Set();
     let failed = 0;
-    for (const { row, idx } of fits) {
+    for (const canonical of toImport) {
         try {
             const data = await api('shopify_import', {
                 method: 'POST',
-                body: { canonical_url: row.canonical_url }
+                body: { canonical_url: canonical }
             });
-            if (data.success) {
-                shopifyResults[idx].already_imported = true;
-                shopifyResults[idx].existing_lead_id = data.lead_id;
-                imported++;
-            } else {
-                failed++;
-            }
+            if (data.success) succeeded.add(canonical);
+            else failed++;
         } catch (e) {
             failed++;
         }
     }
 
+    shopifyResults = shopifyResults.filter(r => !succeeded.has(r.canonical_url));
+    if (shopifyLastSummary) {
+        shopifyLastSummary.already_imported_count = (shopifyLastSummary.already_imported_count || 0) + succeeded.size;
+    }
     renderShopifyResults();
     loadStats();
-    notify(`Imported ${imported} lead${imported === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
+    notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
 }
 
 // Load Shopify status on page load so the usage display is populated

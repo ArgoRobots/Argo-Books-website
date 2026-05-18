@@ -591,13 +591,13 @@ function shopify_run_dork($pdo)
     $serpResults = serpapi_query($query, $apiKey, $limit);
     _shopify_state_set($pdo, 'serpapi_calls_today', (string) ($callsToday + 1));
 
-    // Evaluate each result and keep only fits (including already-imported fits,
-    // which still pass the evaluator). Rejects are summarized by count + a
-    // top-reasons breakdown so the operator can see why the dork yielded
-    // nothing without the table being cluttered with rejected rows.
-    $fits          = [];
-    $rejectedCount = 0;
-    $rejectReasons = [];
+    // Evaluate each result and keep only fits that aren't already imported.
+    // Rejects and already-imported are summarized by count so the operator
+    // still sees why the dork yielded few rows, without cluttering the table.
+    $fits                 = [];
+    $rejectedCount        = 0;
+    $rejectReasons        = [];
+    $alreadyImportedCount = 0;
     foreach ($serpResults as $r) {
         $canonical = shopify_canonical_url($r['link'] ?? '');
         if ($canonical === '') continue;
@@ -614,6 +614,10 @@ function shopify_run_dork($pdo)
         $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
         $check->execute([$canonical]);
         $existingLeadId = $check->fetchColumn();
+        if ($existingLeadId !== false) {
+            $alreadyImportedCount++;
+            continue;
+        }
 
         $meta = $result['metadata'] ?? [];
         $fits[] = [
@@ -626,21 +630,20 @@ function shopify_run_dork($pdo)
             'products_count'   => $meta['products_count'] ?? null,
             'first_product_at' => $meta['first_product_created_at'] ?? null,
             'country'          => $meta['country'] ?? '',
-            'already_imported' => $existingLeadId !== false,
-            'existing_lead_id' => $existingLeadId !== false ? (int) $existingLeadId : null,
         ];
     }
 
     json_response([
-        'success'             => true,
-        'results'             => $fits,
-        'rejected_count'      => $rejectedCount,
-        'reject_reasons'      => $rejectReasons,
-        'total_evaluated'     => count($serpResults),
-        'serpapi_calls_today' => $callsToday + 1,
-        'serpapi_limit'       => $serpapiLimit,
-        'imports_today'       => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
-        'imports_limit'       => (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5),
+        'success'                => true,
+        'results'                => $fits,
+        'rejected_count'         => $rejectedCount,
+        'reject_reasons'         => $rejectReasons,
+        'already_imported_count' => $alreadyImportedCount,
+        'total_evaluated'        => count($serpResults),
+        'serpapi_calls_today'    => $callsToday + 1,
+        'serpapi_limit'          => $serpapiLimit,
+        'imports_today'          => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
+        'imports_limit'          => (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5),
     ]);
 }
 

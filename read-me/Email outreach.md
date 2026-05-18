@@ -97,7 +97,7 @@ Each test targets one **variant type**:
 - **Personalization depth** — with vs without the AI-generated business summary (which costs a Gemini call per lead). Use this to find out whether that extra call is worth keeping.
 - **Follow-up sequence** — tests the whole follow-up strategy as one unit. Each variant defines an intent per touch (e.g. variant A: bump → reframe → close; variant B: value tip → question → close; variant C: persistent bump). A lead gets assigned a variant when their first email goes out and stays on it through the whole sequence so attribution is clean. The system ships with 3 starter variants out of the box in `draft` status — activate from this tab when ready.
 
-Only one test can be active at a time, regardless of type — that keeps the math clean. The auto-loop creates the next cycle as soon as the current one promotes.
+One first-touch test (subject / body / CTA / sender / preheader / format / personalization) and one follow-up test (follow-up sequence) can be active at the same time, since they measure different emails and don't confound each other's attribution. Activating a test in one phase pauses any other active test in **the same phase only**. The auto-loop creates the next cycle in each phase as soon as that phase's current test promotes.
 
 ### How variants work
 

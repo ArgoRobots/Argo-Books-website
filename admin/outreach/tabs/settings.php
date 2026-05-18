@@ -154,8 +154,9 @@ function settings_tab_render($pdo)
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
     $followupLimit = (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30);
 
-    // Active A/B test snapshot — show whichever variant_type is currently
-    // running (only one is active at a time, regardless of type).
+    // Active A/B test snapshot — shows the most-recently-started active
+    // test. A first-touch test and a follow-up test can run concurrently;
+    // this widget surfaces one; the full list is on the A/B Tests tab.
     $active = null;
     try {
         $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests WHERE status = 'active' ORDER BY started_at DESC, id DESC LIMIT 1");

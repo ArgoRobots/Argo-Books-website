@@ -64,6 +64,28 @@ function get_category_pain_points($category)
 require_once __DIR__ . '/ab_helpers.php';
 
 /**
+ * Which A/B phase a variant type belongs to. The framework keeps one test
+ * active per phase — first-touch tests (subject/body/cta/sender/preheader/
+ * format/personalization) and follow-up tests (followup_sequence) measure
+ * different emails, so they can run concurrently without confounding.
+ */
+function ab_phase_of_type($variantType): string
+{
+    return $variantType === 'followup_sequence' ? 'follow_up' : 'first_touch';
+}
+
+/**
+ * Variant types in the first-touch phase. Used to pause sibling tests at
+ * activation time and to filter the active-test lookup during first-email
+ * drafting so a follow-up test doesn't get assigned to an outgoing first
+ * email.
+ */
+function ab_first_touch_types(): array
+{
+    return ['subject', 'body', 'cta', 'sender', 'preheader', 'format', 'personalization'];
+}
+
+/**
  * Find the single active A/B test of a given variant type, or null if none.
  * Returns ['test' => row, 'variants' => [rows]] on hit. Used by the cron's
  * promotion sweep, which iterates per type.
@@ -86,17 +108,20 @@ function get_active_ab_test($pdo, $variantType)
 }
 
 /**
- * Find THE single active A/B test (any type) and its variants, or null. Use
- * this when the caller doesn't care which type — the framework's invariant is
- * one active test at a time, so iterating per-type is wasteful at draft time
- * (worst case 7 queries per drafted lead just to find the active one).
+ * Find the single active first-touch A/B test (subject / body / cta / sender /
+ * preheader / format / personalization) and its variants, or null. Used by
+ * the draft generator for outgoing first emails — followup_sequence tests
+ * are looked up separately at follow-up-schedule time, so they should not
+ * leak into first-email attribution.
  */
-function get_single_active_ab_test($pdo)
+function get_single_active_first_touch_test($pdo)
 {
+    $types = ab_first_touch_types();
+    $placeholders = implode(',', array_fill(0, count($types), '?'));
     $stmt = $pdo->prepare("SELECT * FROM outreach_ab_tests
-        WHERE status = 'active'
+        WHERE status = 'active' AND variant_type IN ($placeholders)
         ORDER BY started_at DESC, id DESC LIMIT 1");
-    $stmt->execute();
+    $stmt->execute($types);
     $test = $stmt->fetch();
     if (!$test) return null;
 
@@ -1350,8 +1375,9 @@ function generate_draft_for_lead($pdo, $lead)
 
     // A/B variant lookup must happen before the summary block so a
     // personalization test can gate the AI summary call entirely.
-    // Only one test can be active at a time across the whole framework
-    // (enforced by the activation handler), so a single SELECT finds it.
+    // Only the active first-touch test is considered here — follow-up tests
+    // are looked up separately at follow-up-schedule time so their variants
+    // don't leak into first-email attribution.
     //
     // If the lead is already assigned to the currently-active test (e.g.
     // admin clicked "Regenerate Draft" after the email went out), keep the
@@ -1367,7 +1393,7 @@ function generate_draft_for_lead($pdo, $lead)
     $abSubjectDirectiveText = null; // captured for the post-generation echo check
     $existingAbTestId = isset($lead['ab_test_id']) ? (int) $lead['ab_test_id'] : 0;
     $existingAbVariantId = isset($lead['ab_variant_id']) ? (int) $lead['ab_variant_id'] : 0;
-    $active = get_single_active_ab_test($pdo);
+    $active = get_single_active_first_touch_test($pdo);
     if ($active) {
         $activeTestId = (int) $active['test']['id'];
         $eligibleType = (string) $active['test']['variant_type'];

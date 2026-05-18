@@ -859,7 +859,9 @@ CREATE TABLE IF NOT EXISTS outreach_email_events (
 
 -- A/B tests for outreach email variants. variant_type covers every test type
 -- the framework supports: subject, body, sender, cta, preheader, format,
--- personalization, followup_sequence. Only one test of any type can be active at a time.
+-- personalization, followup_sequence. One first-touch test (everything except followup_sequence)
+-- and one follow-up test (followup_sequence) can be active concurrently; activating a test
+-- pauses any other active test in the same phase only.
 CREATE TABLE IF NOT EXISTS outreach_ab_tests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(120) NOT NULL,

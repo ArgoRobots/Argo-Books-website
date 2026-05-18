@@ -731,18 +731,46 @@ function stepManageAbTests($pdo, $dryRun)
         }
     }
 
-    // If any test is still running (any type), don't start a new cycle yet
-    // — keep the one-active-test-at-a-time invariant.
-    if ($anyStillRunning) return;
+    // 3) Auto-create the next cycle. The ab_auto_next_type pointer rotates
+    //    across ab_auto_rotation_order() so the pipeline tests one lever,
+    //    then the next, and so on. body / cta / preheader aren't in the
+    //    rotation — they need crafted copy and stay admin-initiated.
+    $order = ab_auto_rotation_order();
+    $cycleType = getState($pdo, 'ab_auto_next_type', $order[0]);
+    if (!in_array($cycleType, $order, true)) {
+        $cycleType = $order[0];
+    }
+    $cyclePhase = ab_phase_of_type($cycleType);
 
-    // 2) Defensive backstop: never start a new cycle while ANY status='active'
-    //    test row exists, even one the per-type promotion sweep couldn't
-    //    evaluate (e.g. zero or one variant attached, which can't happen via
-    //    the UI but could from direct DB edits). Two active tests would
-    //    silently corrupt the one-active-test invariant.
-    $activeCheck = $pdo->query("SELECT id, name, variant_type,
+    // If any test in the SAME phase as the next cycle type is still running,
+    // don't start a new one yet. Different-phase tests are fine to coexist
+    // (e.g. an active subject test doesn't block a new followup_sequence
+    // cycle and vice versa).
+    if ($anyStillRunning) {
+        $stillRunningSamePhase = false;
+        foreach ($allTypes as $type) {
+            if (ab_phase_of_type($type) !== $cyclePhase) continue;
+            $hasActive = $pdo->prepare("SELECT 1 FROM outreach_ab_tests WHERE status = 'active' AND variant_type = ? LIMIT 1");
+            $hasActive->execute([$type]);
+            if ($hasActive->fetchColumn()) { $stillRunningSamePhase = true; break; }
+        }
+        if ($stillRunningSamePhase) return;
+    }
+
+    // 2) Defensive backstop: never start a new cycle while a same-phase
+    //    status='active' test row exists, even one the per-type promotion
+    //    sweep couldn't evaluate (e.g. zero or one variant attached, which
+    //    can't happen via the UI but could from direct DB edits). Two active
+    //    tests in the same phase would silently corrupt round-robin attribution.
+    $samePhaseTypes = $cyclePhase === 'follow_up'
+        ? ['followup_sequence']
+        : ab_first_touch_types();
+    $phasePlaceholders = implode(',', array_fill(0, count($samePhaseTypes), '?'));
+    $activeCheck = $pdo->prepare("SELECT id, name, variant_type,
         (SELECT COUNT(*) FROM outreach_ab_variants v WHERE v.test_id = t.id) AS variant_count
-        FROM outreach_ab_tests t WHERE status = 'active' ORDER BY id ASC LIMIT 1")->fetch();
+        FROM outreach_ab_tests t WHERE status = 'active' AND variant_type IN ($phasePlaceholders) ORDER BY id ASC LIMIT 1");
+    $activeCheck->execute($samePhaseTypes);
+    $activeCheck = $activeCheck->fetch();
     if ($activeCheck) {
         if ((int) $activeCheck['variant_count'] < 2) {
             logPipeline(sprintf(
@@ -763,16 +791,9 @@ function stepManageAbTests($pdo, $dryRun)
         return;
     }
 
-    // 3) Auto-create the next cycle. The ab_auto_next_type pointer rotates
-    //    across ab_auto_rotation_order() so the pipeline tests one lever,
-    //    then the next, and so on. body / cta / preheader aren't in the
-    //    rotation — they need crafted copy and stay admin-initiated.
-    $order = ab_auto_rotation_order();
-    $cycleType = getState($pdo, 'ab_auto_next_type', $order[0]);
-    if (!in_array($cycleType, $order, true)) {
-        $cycleType = $order[0];
-    }
-
+    // 3) Auto-create the next cycle. $cycleType / $order were determined
+    //    above (before the phase-aware blockers) so the same value flows
+    //    through here.
     $newCycle = ab_start_new_cycle($pdo, $cycleType);
     if ($newCycle['action'] === 'created') {
         logPipeline(sprintf(

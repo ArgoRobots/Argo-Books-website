@@ -113,12 +113,23 @@ function ab_tests_tab_handle_post($pdo)
         $newStatus = $_POST['status'] ?? '';
         if ($testId && in_array($newStatus, ['draft', 'active', 'paused', 'completed'], true)) {
             if ($newStatus === 'active') {
-                // Only one test can be active at a time across the whole
-                // framework — the draft generator picks the first active
-                // test it finds, so a second active test of any other type
-                // would silently starve. Pause every other active test.
-                $pdo->prepare("UPDATE outreach_ab_tests SET status = 'paused' WHERE status = 'active' AND id <> ?")
-                    ->execute([$testId]);
+                // Pause any other active test in the SAME phase (first-touch
+                // tests for outgoing first emails; follow-up tests for the
+                // follow-up sequence). Different-phase tests measure different
+                // emails and can coexist without confounding — see
+                // ab_phase_of_type() in cron/lib/outreach_helpers.php.
+                require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
+                $typeRow = $pdo->prepare("SELECT variant_type FROM outreach_ab_tests WHERE id = ?");
+                $typeRow->execute([$testId]);
+                $thisType = (string) $typeRow->fetchColumn();
+                $thisPhase = ab_phase_of_type($thisType);
+                $samePhaseTypes = $thisPhase === 'follow_up'
+                    ? ['followup_sequence']
+                    : ab_first_touch_types();
+                $placeholders = implode(',', array_fill(0, count($samePhaseTypes), '?'));
+                $pauseParams = array_merge($samePhaseTypes, [$testId]);
+                $pdo->prepare("UPDATE outreach_ab_tests SET status = 'paused' WHERE status = 'active' AND variant_type IN ($placeholders) AND id <> ?")
+                    ->execute($pauseParams);
                 $pdo->prepare("UPDATE outreach_ab_tests SET status = 'active', started_at = COALESCE(started_at, NOW()) WHERE id = ?")
                     ->execute([$testId]);
             } elseif ($newStatus === 'completed') {
@@ -378,7 +389,7 @@ function ab_tests_tab_render_list($pdo)
                                     <td><?php echo format_ctr((int) $t['sent_count'], (int) $t['bounced_count']); ?></td>
                                     <td class="actions-cell">
                                         <?php if ($t['status'] === 'draft' || $t['status'] === 'paused'): ?>
-                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
+                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other active test in the same phase will be paused. (First-touch tests and follow-up tests can run at the same time since they measure different emails.)');">
                                                 <input type="hidden" name="tab" value="ab-tests">
                                                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                                                 <input type="hidden" name="action" value="status_change">
@@ -547,7 +558,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
             </h2>
             <div>
                 <?php if ($test['status'] === 'draft' || $test['status'] === 'paused'): ?>
-                    <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other currently active test will be paused (only one A/B test can be active at a time).');">
+                    <form method="POST" style="display:inline;" onsubmit="return confirm('Activate this test? Any other active test in the same phase will be paused. (First-touch tests and follow-up tests can run at the same time since they measure different emails.)');">
                         <input type="hidden" name="tab" value="ab-tests">
                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
                         <input type="hidden" name="action" value="status_change">

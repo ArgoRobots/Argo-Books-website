@@ -636,19 +636,25 @@ function shopify_run_dork($pdo)
             $canonical = shopify_canonical_url($r['link'] ?? '');
             if ($canonical === '') continue;
 
+            // Already-imported check FIRST, before the expensive evaluator
+            // call. Uses outreach_shopify_candidates.canonical_url (stable —
+            // populated at import time) rather than outreach_leads.website
+            // (which holds the post-redirect custom domain and won't match
+            // a SerpAPI result that points at .myshopify.com).
+            $importedCheck = $pdo->prepare("SELECT 1 FROM outreach_shopify_candidates
+                WHERE canonical_url = ? AND status = 'imported' AND lead_id IS NOT NULL LIMIT 1");
+            $importedCheck->execute([$canonical]);
+            if ($importedCheck->fetchColumn() !== false) {
+                $alreadyImportedCount++;
+                continue;
+            }
+
             $result = evaluate_shopify_candidate($canonical);
 
             if (empty($result['fit'])) {
                 $rejectedCount++;
                 $reason = $result['reason'] ?? 'unknown';
                 $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
-                continue;
-            }
-
-            $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
-            $check->execute([$canonical]);
-            if ($check->fetchColumn() !== false) {
-                $alreadyImportedCount++;
                 continue;
             }
 

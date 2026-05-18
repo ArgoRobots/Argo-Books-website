@@ -1555,6 +1555,7 @@ async function importShopifyRow(idx, btn) {
             }
             renderShopifyResults();
             loadStats();
+            loadLeads();
         } else {
             notify(data.message || 'Import failed');
             btn.disabled = false;
@@ -1598,6 +1599,7 @@ async function importAllShopifyFits() {
     }
     renderShopifyResults();
     loadStats();
+    loadLeads();
     notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
 }
 

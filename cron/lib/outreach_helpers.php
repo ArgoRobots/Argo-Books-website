@@ -830,6 +830,35 @@ function send_followup_row($pdo, array $followupRow, ?string &$reason = null): b
     return false;
 }
 
+// ─── Email Gatekeeping Helper ───
+
+/**
+ * Returns true if the email's local part matches a "gatekept" role prefix —
+ * signals a multi-person operation (support desk, partnerships team, etc.)
+ * rather than a solo-founder inbox. CASL implied-consent outreach targets
+ * individual business owners, so these addresses should be rejected.
+ * Returns true for empty/malformed input as a defensive default.
+ */
+function filter_gatekept_email($email)
+{
+    $email = trim($email);
+    if (empty($email)) return true;
+
+    $at = strpos($email, '@');
+    if ($at === false) return true;
+
+    $local = strtolower(substr($email, 0, $at));
+    if ($local === '') return true;
+
+    static $gatekept = [
+        'support', 'partnerships', 'help', 'sales', 'careers', 'jobs',
+        'press', 'media', 'legal', 'billing', 'noreply', 'no-reply',
+        'donotreply', 'abuse', 'webmaster', 'postmaster',
+    ];
+
+    return in_array($local, $gatekept, true);
+}
+
 // ─── Email Scraping Helper ───
 
 /**

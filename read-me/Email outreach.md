@@ -8,9 +8,11 @@ It also has a A/B test system to learn what works, so it constantly improves its
 
 Everything lives in the admin dashboard under **Outreach**, which has four tabs: **Leads**, **A/B Tests**, **Follow-ups**, and **Settings**.
 
-## How it works
+## Google Places channel
 
-Once a day the outreach cron does a routine:
+Google Places finds small brick-and-mortar businesses.
+
+### How it works
 
 1. **Picks a city**, rotating through Saskatchewan first and then expanding outward into the rest of Canada.
 2. **Finds small businesses** there by category (plumbers, cafes, salons, and 90-odd other small-business types) and grabs their public contact email from their website.
@@ -21,6 +23,17 @@ Once a day the outreach cron does a routine:
 7. **Halts follow-ups** for any lead who replied, unsubscribed, or hard-bounced since the last run.
 8. **Drafts each follow-up** with Gemini about a day before it's due to send. Each one personalizes against the lead's business, the original first email, and a per-touch "intent" (e.g. "gentle bump", "different angle", "final note before closing"). The intent comes from the active follow-up A/B test or the default in Settings.
 9. **Sends follow-ups** that are approved, up to the daily follow-up cap (`OUTREACH_DAILY_FOLLOWUP_LIMIT`, default 75 across all touch positions). In Auto-send mode, drafts auto-approve and go straight out. In Review-before-send mode, they queue in the Follow-ups tab for you to approve.
+
+## Shopify channel
+
+Finds small Canadian Shopify sellers in their first 3–24 months — stores that are past the "just launched" stage but likely haven't yet found solid accounting software
+
+### How it works
+
+1. SerpAPI runs a `site:myshopify.com` dork query, returning `.myshopify.com` storefronts.
+2. The evaluator fetches each storefront's `/products.json`, checks product count (5–∞) and age of the oldest product (3–24 months), and looks for a Canadian address signal (postal code or province) on the storefront.
+3. It then scrapes the store's contact page for a direct email address. Role-mailbox addresses (`support@`, `partnerships@`, etc.) are rejected; only personal or general-contact addresses are accepted.
+4. Stores that pass all checks are imported as leads (`status='imported'`). Stores that fail are recorded with a `reject_reason` so they aren't re-evaluated on future runs.
 
 ## The Leads tab
 
@@ -89,26 +102,26 @@ The follow-up sequence A/B type auto-pauses if the configured touch count change
 
 ## The Follow-ups tab
 
-This is the review queue for follow-up emails. It only matters in Review-before-send mode — in Auto-send mode, follow-ups go straight out and you can ignore this tab.
+This is the review queue for follow-up emails. It only matters in Review-before-send mode. In Auto-send mode, follow-ups are sent right away.
 
 The tab has five sub-views:
 
-- **Pending review** — drafts the system generated in the last ~2 days, waiting for you to approve. The pill carries a count badge so you can tell at a glance whether there's work to do.
+- **Pending review** — drafts waiting for you to approve. The pill carries a count badge so you can tell at a glance whether there's work to do.
 - **Approved & queued** — drafts you've approved that are waiting for their scheduled send time.
-- **Upcoming** — touches that are scheduled but not yet drafted by Gemini (drafting happens ~1 day before each send).
+- **Upcoming** — touches that are scheduled but haven't been drafted yet (drafting happens about a day before each send).
 - **Sent** — what's gone out in the last 30 days.
-- **Halted / failed** — sequences that stopped (lead replied, unsubscribed, bounced, you manually halted, or Gemini failed 3 times on a draft).
+- **Halted / failed** — sequences that stopped (lead replied, unsubscribed, bounced, you manually halted, or the AI couldn't produce a draft).
 
 For each pending row you can:
 
-- **Approve & queue** — sends on the next cron tick after the scheduled time.
-- **Regenerate draft** — re-call Gemini if the wording doesn't feel right.
+- **Approve & queue** — sends after the scheduled time.
+- **Regenerate draft** — re-draft if the wording doesn't feel right.
 - **Skip this touch** — drop just this one touch; the next touch in the sequence still goes out on its original schedule.
 - **Halt sequence** — stop ALL remaining follow-ups for this lead.
 
 Bulk-select via checkboxes to approve, skip, or halt sequences for multiple rows at once.
 
-You can also see the per-lead sequence (every touch + status + scheduled date) by opening any lead in the Leads tab and clicking the **Follow-ups** sub-tab inside the detail modal.
+You can also see the per-lead sequence (every touch + status + scheduled date) by opening any lead in the Leads tab.
 
 ## The Settings tab
 

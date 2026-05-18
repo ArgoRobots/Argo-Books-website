@@ -315,6 +315,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
     // Step 4: Age check — find the OLDEST product created_at
     // -------------------------------------------------------------------------
     $oldestTs = null;
+    $oldestDt = null;
     foreach ($products as $product) {
         if (empty($product['created_at'])) {
             continue;

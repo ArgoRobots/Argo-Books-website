@@ -12,6 +12,29 @@
 
 require_once __DIR__ . '/outreach_helpers.php';
 
+/**
+ * Reject URLs whose host resolves to a private, reserved, or loopback address.
+ * Defends against SSRF from crafted redirect chains. Returns true if the URL is
+ * safe to fetch from a server-side context.
+ */
+function _shopify_url_is_safe_external(string $url): bool
+{
+    $host = parse_url($url, PHP_URL_HOST);
+    if (!is_string($host) || $host === '') {
+        return false;
+    }
+    // If already a literal IP, validate directly
+    if (filter_var($host, FILTER_VALIDATE_IP)) {
+        return (bool) filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    }
+    // Resolve hostname (synchronous; OK in cron context)
+    $ip = gethostbyname($host);
+    if ($ip === $host) {
+        return false;  // resolution failed
+    }
+    return (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+}
+
 const SHOPIFY_DORK_POOL = [
     'site:myshopify.com "based in canada" "contact"',
     'site:myshopify.com "ships from canada" "founded"',
@@ -200,7 +223,13 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         $html = $htmlOverride;
     } else {
         // Use cURL to reliably capture the final URL after redirects
+        if (!_shopify_url_is_safe_external($url)) {
+            return ['fit' => false, 'reason' => 'fetch_failed', 'detail' => 'Input URL host resolves to private/reserved IP', 'final_url' => $url, 'metadata' => []];
+        }
         $ch = curl_init($url);
+        if ($ch === false) {
+            return ['fit' => false, 'reason' => 'fetch_failed', 'detail' => 'curl_init failed', 'final_url' => $url, 'metadata' => []];
+        }
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_FOLLOWLOCATION  => true,
@@ -214,7 +243,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         $curlError = curl_error($ch);
         $httpCode  = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $effective = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-        unset($ch);  // curl_close deprecated in PHP 8.4; unset achieves same cleanup
+        unset($ch);  // curl_close deprecated in PHP 8.5; unset achieves same cleanup
 
         if ($html === false || $curlError !== '' || $httpCode < 200 || $httpCode >= 400) {
             return [
@@ -228,6 +257,10 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
 
         if (!empty($effective)) {
             $finalUrl = rtrim($effective, '/');
+        }
+
+        if (!_shopify_url_is_safe_external($finalUrl)) {
+            return ['fit' => false, 'reason' => 'fetch_failed', 'detail' => 'Redirect target resolves to private/reserved IP', 'final_url' => $finalUrl, 'metadata' => []];
         }
     }
 
@@ -298,11 +331,15 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         }
     }
 
-    $nowTs     = time();
-    $ageMonths = ($oldestTs !== null) ? (($nowTs - $oldestTs) / (30.44 * 86400)) : 0;
-    $ageDays   = ($oldestTs !== null) ? (int) round(($nowTs - $oldestTs) / 86400) : 0;
+    if ($oldestTs === null) {
+        return ['fit' => false, 'reason' => 'age_unknown', 'detail' => 'No parseable created_at on any product', 'final_url' => $finalUrl, 'metadata' => $metadata];
+    }
 
-    if ($oldestTs !== null && $ageMonths < 3) {
+    $nowTs     = time();
+    $ageMonths = ($nowTs - $oldestTs) / (30.44 * 86400);
+    $ageDays   = (int) round(($nowTs - $oldestTs) / 86400);
+
+    if ($ageMonths < 3) {
         return [
             'fit'       => false,
             'reason'    => 'too_new',
@@ -312,7 +349,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         ];
     }
 
-    if ($oldestTs !== null && $ageMonths > 24) {
+    if ($ageMonths > 24) {
         $monthsInt = (int) round($ageMonths);
         return [
             'fit'       => false,
@@ -324,11 +361,8 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
     }
 
     // Store the oldest created_at as MySQL DATETIME
-    $mysqlDatetime = '';
-    if ($oldestTs !== null) {
-        /** @var DateTime $oldestDt */
-        $mysqlDatetime = $oldestDt->format('Y-m-d H:i:s');
-    }
+    /** @var DateTime $oldestDt */
+    $mysqlDatetime = $oldestDt->format('Y-m-d H:i:s');
     $metadata['first_product_created_at'] = $mysqlDatetime;
 
     // -------------------------------------------------------------------------
@@ -377,19 +411,34 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
     if ($htmlOverride !== null) {
         // Extract from the injected HTML (mirrors logic in _scrape_email_from_website_uncached)
         $email = null;
+        $falsePositives = ['example.com', 'sentry.io', 'wixpress.com', 'wordpress.org', 'w3.org', 'schema.org', 'googleapis.com', 'gravatar.com'];
         $decodedHtml = urldecode($htmlOverride);
-        if (preg_match('/mailto:\s*([^\s"\'<>]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $decodedHtml, $mEmail)) {
-            $candidate = trim(urldecode($mEmail[1]));
-            if (preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $candidate)) {
-                $email = $candidate;
+        if (preg_match_all('/mailto:\s*([^\s"\'<>]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,})/', $decodedHtml, $mEmail)) {
+            foreach ($mEmail[1] as $raw) {
+                $candidate = trim(urldecode($raw));
+                if (!preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $candidate)) {
+                    continue;
+                }
+                $isFp = false;
+                foreach ($falsePositives as $fp) {
+                    if (str_contains(strtolower($candidate), $fp)) { $isFp = true; break; }
+                }
+                if (!$isFp) { $email = $candidate; break; }
             }
         }
         if ($email === null) {
             $text = preg_replace('/[^\x20-\x7E\n\r\t]/', ' ', strip_tags($decodedHtml));
-            if (preg_match('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $text, $mEmail)) {
-                $candidate = trim($mEmail[0]);
-                if (preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $candidate)) {
-                    $email = $candidate;
+            if (preg_match_all('/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/', $text, $mEmail)) {
+                foreach ($mEmail[0] as $raw) {
+                    $candidate = trim($raw);
+                    if (!preg_match('/^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/', $candidate)) {
+                        continue;
+                    }
+                    $isFp = false;
+                    foreach ($falsePositives as $fp) {
+                        if (str_contains(strtolower($candidate), $fp)) { $isFp = true; break; }
+                    }
+                    if (!$isFp) { $email = $candidate; break; }
                 }
             }
         }

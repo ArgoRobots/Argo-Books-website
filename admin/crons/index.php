@@ -216,10 +216,10 @@ include __DIR__ . '/../admin_header.php';
                     <h2>
                         <?= htmlspecialchars($cfg['label']) ?>
                         <?php if (!empty($cfg['description'])): ?>
-                            <details class="cron-info">
-                                <summary title="What does this cron do?" aria-label="What does this cron do?">i</summary>
-                                <div class="cron-info-popover"><?= htmlspecialchars($cfg['description']) ?></div>
-                            </details>
+                            <span class="cron-info" tabindex="0" aria-label="What does this cron do?">
+                                <span class="cron-info-icon" aria-hidden="true">i</span>
+                                <span class="cron-info-tooltip" role="tooltip"><?= htmlspecialchars($cfg['description']) ?></span>
+                            </span>
                         <?php endif; ?>
                     </h2>
                     <div class="cron-meta">

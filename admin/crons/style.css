@@ -106,11 +106,16 @@
     gap: 8px;
 }
 
-/* Info button: small circular "i" that expands an inline description
-   below the title. Uses <details>/<summary> so it works without JS. */
-.cron-info summary {
-    list-style: none;
-    cursor: pointer;
+/* Info button: small circular "i" that reveals a tooltip popup on hover
+   or keyboard focus. CSS-only; no JS needed. */
+.cron-info {
+    position: relative;
+    display: inline-flex;
+    outline: none;
+}
+
+.cron-info-icon {
+    cursor: help;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -127,45 +132,71 @@
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-.cron-info summary::-webkit-details-marker,
-.cron-info summary::marker {
-    display: none;
-    content: '';
-}
-
-.cron-info summary:hover,
-.cron-info[open] summary {
+.cron-info:hover .cron-info-icon,
+.cron-info:focus-visible .cron-info-icon {
     background: var(--primary-blue);
     color: #fff;
 }
 
-[data-theme="dark"] .cron-info summary {
+[data-theme="dark"] .cron-info-icon {
     background: var(--gray-700);
     color: var(--gray-200);
 }
 
-[data-theme="dark"] .cron-info summary:hover,
-[data-theme="dark"] .cron-info[open] summary {
+[data-theme="dark"] .cron-info:hover .cron-info-icon,
+[data-theme="dark"] .cron-info:focus-visible .cron-info-icon {
     background: var(--primary-blue);
     color: #fff;
 }
 
-.cron-info-popover {
-    flex-basis: 100%;
-    margin-top: 6px;
+.cron-info-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    width: max-content;
+    max-width: 320px;
     padding: 10px 12px;
-    background: var(--gray-100, #f9fafb);
-    border-left: 3px solid var(--primary-blue);
-    border-radius: 4px;
-    font-size: 13px;
+    background: #1f2937;
+    color: #f9fafb;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: 400;
     line-height: 1.5;
-    color: var(--gray-700);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+    pointer-events: none;
+    z-index: 10;
+    white-space: normal;
 }
 
-[data-theme="dark"] .cron-info-popover {
-    background: var(--gray-900);
-    color: var(--gray-300);
+.cron-info-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 8px;
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+}
+
+.cron-info:hover .cron-info-tooltip,
+.cron-info:focus-visible .cron-info-tooltip,
+.cron-info:focus-within .cron-info-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0s;
+}
+
+[data-theme="dark"] .cron-info-tooltip {
+    background: #0f172a;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .cron-info-tooltip::after {
+    border-top-color: #0f172a;
 }
 
 .cron-meta {
@@ -180,9 +211,6 @@
     color: var(--gray-400);
 }
 
-.cron-meta .cron-freq::before { content: '⏱ '; }
-.cron-meta .cron-runs::before { content: '🔁 '; }
-.cron-meta .cron-last::before { content: '🕒 '; }
 
 .cron-pill {
     padding: 4px 10px;

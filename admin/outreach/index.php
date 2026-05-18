@@ -327,6 +327,7 @@ include __DIR__ . '/../admin_header.php';
                     <th>Phone</th>
                     <th>City</th>
                     <th>Category</th>
+                    <th>Source</th>
                     <th>Status</th>
                     <th>Sent</th>
                     <th>Clicked</th>
@@ -334,7 +335,7 @@ include __DIR__ . '/../admin_header.php';
                 </tr>
             </thead>
             <tbody id="leadsTableBody">
-                <tr><td colspan="11" class="empty-state">Loading...</td></tr>
+                <tr><td colspan="12" class="empty-state">Loading...</td></tr>
             </tbody>
         </table>
     </div>

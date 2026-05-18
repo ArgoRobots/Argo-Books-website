@@ -184,7 +184,7 @@ async function loadLeads() {
         const tbody = document.getElementById('leadsTableBody');
 
         if (!data.success || !data.leads.length) {
-            tbody.innerHTML = '<tr><td colspan="11" class="empty-state">No leads found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="12" class="empty-state">No leads found</td></tr>';
             updateBulkBar();
             return;
         }
@@ -203,6 +203,7 @@ async function loadLeads() {
                 <td>${lead.phone ? esc(lead.phone) : '<span class="text-muted">—</span>'}</td>
                 <td>${esc(lead.city || '')}</td>
                 <td>${esc(lead.category || '')}</td>
+                <td>${formatSource(lead.source)}</td>
                 <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
                 <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
@@ -1155,6 +1156,17 @@ function esc(str) {
 
 function formatStatus(status) {
     return status.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function formatSource(source) {
+    switch (source) {
+        case 'google_places':      return 'Google Places';
+        case 'google_places_auto': return 'Google Places <small style="color:#888">· auto</small>';
+        case 'shopify_auto':       return 'Shopify';
+        case 'manual':             return 'Manual';
+        case 'csv_import':         return 'CSV';
+        default:                   return source ? esc(source) : '<span class="text-muted">—</span>';
+    }
 }
 
 

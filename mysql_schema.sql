@@ -859,11 +859,11 @@ CREATE TABLE IF NOT EXISTS outreach_email_events (
 
 -- A/B tests for outreach email variants. variant_type covers every test type
 -- the framework supports: subject, body, sender, cta, preheader, format,
--- personalization. Only one test of any type can be active at a time.
+-- personalization, followup_sequence. Only one test of any type can be active at a time.
 CREATE TABLE IF NOT EXISTS outreach_ab_tests (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(120) NOT NULL,
-    variant_type ENUM('subject','body','sender','cta','preheader','format','personalization') NOT NULL DEFAULT 'subject',
+    variant_type ENUM('subject','body','sender','cta','preheader','format','personalization','followup_sequence') NOT NULL DEFAULT 'subject',
     status ENUM('draft','active','paused','completed') NOT NULL DEFAULT 'draft',
     notes TEXT DEFAULT NULL,
     started_at DATETIME DEFAULT NULL,
@@ -885,6 +885,53 @@ CREATE TABLE IF NOT EXISTS outreach_ab_variants (
     FOREIGN KEY (test_id) REFERENCES outreach_ab_tests(id) ON DELETE CASCADE,
     INDEX idx_ab_variant_test (test_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs, expand the variant_type ENUM:
+--   ALTER TABLE outreach_ab_tests
+--     MODIFY COLUMN variant_type ENUM('subject','body','sender','cta','preheader','format','personalization','followup_sequence') NOT NULL DEFAULT 'subject';
+
+-- ─────────────────────────────────────────────────────────────────────
+-- outreach_followups
+-- One row per scheduled follow-up touch (touch 1 = original first-touch
+-- email, lives in outreach_leads). Created in bulk when first-touch send
+-- succeeds (one row per configured touch in followup_sequence_config).
+--
+-- State machine:
+--   scheduled  →  drafted  →  approved  →  sent
+--      └─→ halted (replied/unsubscribed/bounced/manual/max_reached)
+--      └─→ skipped (admin clicked skip on the drafted row)
+--      └─→ failed  (Gemini call failed 3 times)
+--
+-- ab_test_id / ab_variant_id are copied from the lead's assignment at
+-- creation time so the whole sequence shares one variant (we test
+-- strategies, not arbitrary mixes).
+-- ─────────────────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS outreach_followups (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    lead_id INT NOT NULL,
+    touch_number TINYINT UNSIGNED NOT NULL,
+    scheduled_for DATETIME NOT NULL,
+    draft_subject VARCHAR(500) DEFAULT NULL,
+    draft_body TEXT DEFAULT NULL,
+    drafted_at DATETIME DEFAULT NULL,
+    draft_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    status ENUM('scheduled','drafted','approved','sent','halted','skipped','failed') NOT NULL DEFAULT 'scheduled',
+    halt_reason VARCHAR(100) DEFAULT NULL,
+    ab_test_id INT DEFAULT NULL,
+    ab_variant_id INT DEFAULT NULL,
+    sent_at DATETIME DEFAULT NULL,
+    message_id VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_lead_touch (lead_id, touch_number),
+    INDEX idx_status_scheduled (status, scheduled_for)
+    -- (no separate idx_lead — uniq_lead_touch already covers lookups by lead_id
+    -- via the leftmost-prefix rule, and InnoDB implements UNIQUE as a B-tree)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- For existing installs (run alongside the ALTER above):
+--   (the CREATE TABLE IF NOT EXISTS above is safe to re-run.)
 
 -- Cache of email-scrape results keyed by website URL. The same business often
 -- shows up under multiple search categories (e.g. "spa" and "massage

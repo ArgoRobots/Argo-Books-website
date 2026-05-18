@@ -53,10 +53,11 @@ if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 // Follow-ups have their own daily cap, separate from first-touch sends.
-// Default 30 errs on the conservative side for fresh installs; production
-// should set OUTREACH_DAILY_FOLLOWUP_LIMIT explicitly to match domain
-// reputation (e.g. 75 during a backlog drain, 30 at steady state).
-define('DAILY_FOLLOWUP_LIMIT', (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30));
+// With the multi-touch sequence (touches 2 through N), this cap applies
+// across ALL touch positions combined. Default 75 — raise via env var
+// (OUTREACH_DAILY_FOLLOWUP_LIMIT) once domain reputation supports more.
+define('DAILY_FOLLOWUP_LIMIT', (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 75));
+define('DAILY_DRAFT_LIMIT', (int) ($_ENV['OUTREACH_DAILY_DRAFT_LIMIT'] ?? 100));
 
 // Parse CLI flags ($argv is null under CGI, fall back to empty array)
 $args = array_slice($argv ?? [], 1);
@@ -217,16 +218,27 @@ try {
         stepSendEmails($pdo, $dryRun);
     }
 
+    // ─── STEP 5.5: Halt Follow-ups (replies / unsubscribes / bounces) ───
+    // Also runs in --draft-only so we don't waste Gemini drafts on leads who
+    // have already replied/unsubscribed/bounced since the last run.
+    if ($runAll || $sendOnly || $draftOnly) {
+        stepHaltFollowups($pdo, $dryRun);
+    }
+
+    // ─── STEP 5.6: Draft Follow-ups (Gemini, lazy ~1 day before send) ───
+    // Always runs regardless of send mode — Drafting itself is harmless.
+    // The review-vs-auto gating happens INSIDE stepDraftFollowups (which
+    // advances drafted → approved only when auto_send_mode = 'auto').
+    if ($runAll || $sendOnly || $draftOnly) {
+        stepDraftFollowups($pdo, $dryRun);
+    }
+
     // ─── STEP 6: Send Follow-ups ───
-    // Same gate as Step 4: in review-before-send mode, the admin wants to
-    // approve outbound mail by hand, so the cron stays out of follow-ups
-    // too. (Step 5 doesn't need an explicit gate — it only sends leads with
-    // approval_status = 'approved', and review mode just doesn't auto-
-    // approve. Follow-ups have no approval workflow, so the gate is here.)
-    if (($runAll || $sendOnly) && $autoSendMode === 'auto') {
+    // Step 6 always runs — review-vs-auto gating is implicit in row statuses.
+    // (Review mode: rows stay 'drafted' awaiting admin approval — not picked
+    // up by the WHERE status='approved' query.)
+    if ($runAll || $sendOnly) {
         stepSendFollowups($pdo, $dryRun);
-    } elseif (($runAll || $sendOnly) && $autoSendMode === 'review') {
-        logPipeline('Send mode: review — follow-ups skipped (no manual-trigger UI exists yet; flip to auto-send to resume).');
     }
 
     logPipeline('=== Outreach Pipeline Complete ===');
@@ -431,6 +443,16 @@ function stepManageAbTests($pdo, $dryRun)
     if ($enabled !== '1') {
         logPipeline('A/B automation is OFF (ab_auto_enabled != 1). Skipping.');
         return;
+    }
+
+    // followup_sequence-specific shape check: if the active followup_sequence
+    // test's variant intents no longer match the current followup_sequence_config
+    // touch list (e.g. admin added a touch), auto-pause it.
+    if (!$dryRun) {
+        $shapeResult = check_followup_sequence_shape_match($pdo);
+        if ($shapeResult['action'] === 'paused') {
+            logPipeline($shapeResult['reason'] ?? 'followup_sequence test auto-paused for shape mismatch', 'WARN');
+        }
     }
 
     $allTypes = ab_known_variant_types();
@@ -750,6 +772,32 @@ function stepSendEmails($pdo, $dryRun)
                     : '';
                 log_activity($pdo, $id, 'email_sent', 'Outreach email sent automatically via pipeline to: ' . $email . $variantTag);
                 logPipeline("Sent email to $businessName <$email> (lead #$id)" . $variantTag);
+
+                // Schedule the multi-touch follow-up sequence (if any configured).
+                // For the followup_sequence A/B assignment, we look up the active
+                // followup_sequence test and pick a variant for this lead now —
+                // separate from any A/B variant the first-touch is on (which is
+                // usually subject/sender/format/etc., not followup_sequence).
+                $fuVariantId = null;
+                $fuTestId = null;
+                $fuActive = $pdo->query("SELECT id FROM outreach_ab_tests WHERE variant_type = 'followup_sequence' AND status = 'active' LIMIT 1")->fetch();
+                if ($fuActive) {
+                    $fuTestId = (int) $fuActive['id'];
+                    $fuVariants = $pdo->prepare("SELECT * FROM outreach_ab_variants WHERE test_id = ?");
+                    $fuVariants->execute([$fuTestId]);
+                    $fuVariantList = $fuVariants->fetchAll();
+                    if (count($fuVariantList) >= 2) {
+                        $picked = pick_ab_variant($pdo, ['id' => $fuTestId], $fuVariantList, $lead);
+                        if ($picked) {
+                            $fuVariantId = (int) $picked['id'];
+                        }
+                    }
+                }
+                $scheduled = schedule_followups_for_lead($pdo, $id, $fuTestId, $fuVariantId);
+                if ($scheduled > 0) {
+                    logPipeline("Scheduled $scheduled follow-up(s) for lead #$id" . ($fuVariantId ? " [followup A/B variant #$fuVariantId]" : ''));
+                }
+
                 $successCount++;
             } elseif ($reason === 'already_sent' || $reason === 'suppressed') {
                 // Skip outcomes are already logged inside send_outreach_lead;
@@ -781,10 +829,10 @@ function stepSendFollowups($pdo, $dryRun)
 {
     logPipeline('--- Step 6: Send Follow-ups ---');
 
-    $sentToday = (int) $pdo->query("
-        SELECT COUNT(*) FROM outreach_leads
-        WHERE DATE(last_followup_at) = CURDATE() AND followup_count > 0
-    ")->fetchColumn();
+    // Count how many follow-up sends have happened today (across all touch positions)
+    $sentToday = (int) $pdo->query(
+        "SELECT COUNT(*) FROM outreach_followups WHERE DATE(sent_at) = CURDATE()"
+    )->fetchColumn();
     $remaining = DAILY_FOLLOWUP_LIMIT - $sentToday;
 
     if ($remaining <= 0) {
@@ -792,31 +840,27 @@ function stepSendFollowups($pdo, $dryRun)
         return;
     }
 
-    $stmt = $pdo->prepare("
-        SELECT id, email, business_name, draft_subject, original_message_id, unsubscribe_token
-        FROM outreach_leads
-        WHERE status = 'contacted'
-          AND followup_count = 0
-          AND next_followup_due_at IS NOT NULL
-          AND next_followup_due_at <= NOW()
-          AND email IS NOT NULL AND email <> ''
-        ORDER BY next_followup_due_at ASC
-        LIMIT ?
-    ");
+    $stmt = $pdo->prepare(
+        "SELECT * FROM outreach_followups
+         WHERE status = 'approved'
+           AND scheduled_for <= NOW()
+         ORDER BY scheduled_for ASC
+         LIMIT ?"
+    );
     $stmt->bindValue(1, $remaining, PDO::PARAM_INT);
     $stmt->execute();
-    $leads = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $rows = $stmt->fetchAll();
 
-    if (empty($leads)) {
-        logPipeline('No follow-ups due.');
+    if (empty($rows)) {
+        logPipeline('No follow-ups ready to send.');
         return;
     }
 
-    logPipeline('Found ' . count($leads) . ' follow-up(s) due (cap: ' . DAILY_FOLLOWUP_LIMIT . '/day, ' . $sentToday . ' sent earlier today).');
+    logPipeline('Found ' . count($rows) . ' follow-up(s) ready to send (cap remaining: ' . $remaining . ').');
 
     if ($dryRun) {
-        foreach ($leads as $lead) {
-            logPipeline("[DRY RUN] Would send follow-up to: {$lead['business_name']} <{$lead['email']}>");
+        foreach ($rows as $r) {
+            logPipeline("[DRY RUN] Would send followup #{$r['id']} (lead #{$r['lead_id']}, touch {$r['touch_number']})");
         }
         return;
     }
@@ -825,32 +869,119 @@ function stepSendFollowups($pdo, $dryRun)
     $failCount = 0;
     $skipCount = 0;
 
-    foreach ($leads as $lead) {
+    foreach ($rows as $row) {
         try {
             $reason = null;
-            if (send_outreach_followup($pdo, $lead, $reason)) {
-                logPipeline("Follow-up sent to {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']})");
+            if (send_followup_row($pdo, $row, $reason)) {
+                logPipeline("Sent followup #{$row['id']} (lead #{$row['lead_id']}, touch {$row['touch_number']})");
                 $successCount++;
             } elseif ($reason === 'not_eligible') {
-                // Lead became ineligible between the SELECT and the atomic claim
-                // (replied, unsubscribed, or claimed by a concurrent run). Not a
-                // failure — the data outcome is correct.
-                logPipeline("Follow-up skipped for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']}): no longer eligible");
                 $skipCount++;
             } else {
-                logPipeline("Follow-up failed for {$lead['business_name']} <{$lead['email']}> (lead #{$lead['id']}): " . ($reason ?? 'unknown'), 'WARN');
+                logPipeline("Failed to send followup #{$row['id']}: " . ($reason ?? 'unknown'), 'WARN');
                 $failCount++;
             }
 
-            // Same brief pause between sends as the first-touch step.
-            if ($successCount + $failCount + $skipCount < count($leads)) {
+            if ($successCount + $failCount + $skipCount < count($rows)) {
                 sleep(2);
             }
-        } catch (Exception $e) {
-            logPipeline("Error sending follow-up to {$lead['business_name']} (lead #{$lead['id']}): " . $e->getMessage(), 'ERROR');
+        } catch (Throwable $e) {
+            logPipeline("Error sending followup #{$row['id']}: " . $e->getMessage(), 'ERROR');
             $failCount++;
         }
     }
 
     logPipeline("Follow-ups complete. Sent: $successCount, Failed: $failCount, Skipped: $skipCount");
+}
+
+function stepHaltFollowups($pdo, $dryRun)
+{
+    logPipeline('--- Step 5.5: Halt Follow-ups ---');
+
+    if ($dryRun) {
+        // Count how many WOULD be halted, but don't write
+        $countStmt = $pdo->query(
+            "SELECT COUNT(*) FROM outreach_followups f
+             JOIN outreach_leads l ON l.id = f.lead_id
+             WHERE f.status IN ('scheduled','drafted','approved')
+               AND (
+                   l.status IN ('replied','interested','not_interested','onboarded','email_bounced')
+                   OR EXISTS (SELECT 1 FROM email_suppressions s WHERE LOWER(s.email) = LOWER(l.email) AND s.context = 'outreach')
+               )"
+        );
+        $count = (int) $countStmt->fetchColumn();
+        logPipeline("[DRY RUN] Would halt $count follow-up row(s).");
+        return;
+    }
+
+    $counts = halt_followups_bulk($pdo);
+    $total = array_sum($counts);
+    if ($total === 0) {
+        logPipeline('No follow-ups halted.');
+    } else {
+        logPipeline("Halted $total follow-up(s): " . json_encode($counts));
+    }
+}
+
+function stepDraftFollowups($pdo, $dryRun)
+{
+    logPipeline('--- Step 5.6: Draft Follow-ups ---');
+
+    $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';
+    if (empty($geminiKey)) {
+        logPipeline('Gemini API key not configured. Skipping follow-up draft generation.', 'WARN');
+        return;
+    }
+
+    // Find rows whose draft window has opened (scheduled_for within next 24h)
+    $stmt = $pdo->prepare(
+        "SELECT * FROM outreach_followups
+         WHERE status = 'scheduled'
+           AND scheduled_for <= DATE_ADD(NOW(), INTERVAL 1 DAY)
+         ORDER BY scheduled_for ASC
+         LIMIT ?"
+    );
+    $stmt->bindValue(1, DAILY_DRAFT_LIMIT, PDO::PARAM_INT);
+    $stmt->execute();
+    $rows = $stmt->fetchAll();
+
+    if (empty($rows)) {
+        logPipeline('No follow-ups need drafts. Skipping.');
+        return;
+    }
+
+    logPipeline('Found ' . count($rows) . ' follow-up(s) needing AI drafts (cap: ' . DAILY_DRAFT_LIMIT . ').');
+
+    if ($dryRun) {
+        foreach ($rows as $r) {
+            logPipeline("[DRY RUN] Would draft followup #{$r['id']} (lead #{$r['lead_id']}, touch {$r['touch_number']})");
+        }
+        return;
+    }
+
+    $autoSendMode = getState($pdo, 'auto_send_mode', 'auto');
+
+    $success = 0;
+    $failed = 0;
+    foreach ($rows as $row) {
+        try {
+            $ok = draft_followup_via_gemini($pdo, $row);
+            if ($ok) {
+                $success++;
+                // In auto-send mode, advance drafted → approved immediately
+                if ($autoSendMode === 'auto') {
+                    $pdo->prepare("UPDATE outreach_followups SET status = 'approved' WHERE id = ? AND status = 'drafted'")
+                        ->execute([(int) $row['id']]);
+                }
+            } else {
+                $failed++;
+            }
+            sleep(1); // Rate-limit Gemini calls
+        } catch (Throwable $e) {
+            logPipeline("Draft followup error (followup #{$row['id']}): " . $e->getMessage(), 'ERROR');
+            $failed++;
+        }
+    }
+
+    logPipeline("Follow-up drafts: $success generated, $failed failed.");
 }

@@ -82,11 +82,68 @@ function settings_tab_handle_post($pdo)
         header('Location: index.php?tab=settings'); exit;
     }
 
+    if ($action === 'set_followup_sequence') {
+        $touches = $_POST['touches'] ?? [];
+        if (!is_array($touches)) $touches = [];
+        if (count($touches) > 6) {
+            $_SESSION['message'] = 'Maximum 6 follow-up touches allowed.';
+            $_SESSION['message_type'] = 'error';
+            header('Location: index.php?tab=settings'); exit;
+        }
+
+        $cfg = [];
+        $touchNum = 2;
+        foreach ($touches as $touch) {
+            if (!is_array($touch)) continue;
+            $days = (int) ($touch['days_after_prev'] ?? 0);
+            $intent = trim((string) ($touch['default_intent'] ?? ''));
+            if ($days < 1 || $days > 90) {
+                $_SESSION['message'] = "Touch $touchNum: days_after_prev must be 1-90.";
+                $_SESSION['message_type'] = 'error';
+                header('Location: index.php?tab=settings'); exit;
+            }
+            if (strlen($intent) > 200) {
+                $_SESSION['message'] = "Touch $touchNum: intent exceeds 200 chars.";
+                $_SESSION['message_type'] = 'error';
+                header('Location: index.php?tab=settings'); exit;
+            }
+            // Strip HTML tags defensively
+            $intent = strip_tags($intent);
+            if ($intent === '') $intent = 'gentle bump';
+            $cfg[] = [
+                'touch' => $touchNum,
+                'days_after_prev' => $days,
+                'default_intent' => $intent,
+            ];
+            $touchNum++;
+        }
+
+        settings_tab_set_state($pdo, 'followup_sequence_config', json_encode($cfg, JSON_UNESCAPED_SLASHES));
+        $_SESSION['message'] = 'Follow-up sequence saved (' . count($cfg) . ' touch' . (count($cfg) === 1 ? '' : 'es') . ').';
+        $_SESSION['message_type'] = 'success';
+        header('Location: index.php?tab=settings'); exit;
+    }
+
     header('Location: index.php?tab=settings'); exit;
 }
 
 function settings_tab_render($pdo)
 {
+    // ─── First-deploy seed: followup sequence config + A/B starter test ───
+    $existingFuCfg = settings_tab_get_state($pdo, 'followup_sequence_config', null);
+    if ($existingFuCfg === null) {
+        $defaultCfg = [
+            ['touch' => 2, 'days_after_prev' => 3,  'default_intent' => 'gentle bump'],
+            ['touch' => 3, 'days_after_prev' => 7,  'default_intent' => 'different angle'],
+            ['touch' => 4, 'days_after_prev' => 14, 'default_intent' => 'final note before closing'],
+        ];
+        settings_tab_set_state($pdo, 'followup_sequence_config', json_encode($defaultCfg, JSON_UNESCAPED_SLASHES));
+
+        // Seed the A/B starter test (requires ab_helpers)
+        require_once __DIR__ . '/../../../cron/lib/ab_helpers.php';
+        ensure_followup_starter_test($pdo);
+    }
+
     // Master enable flag for the whole outreach system — defaults ON so a
     // fresh install keeps behaving as before.
     $outreachEnabled = settings_tab_get_state($pdo, 'outreach_enabled', '1') === '1';
@@ -291,6 +348,101 @@ function settings_tab_render($pdo)
                     </button>
                 </form>
             </div>
+        </div>
+    </div>
+
+    <?php
+    // ─── Follow-up sequence panel ───
+
+    $fuConfigJson = settings_tab_get_state($pdo, 'followup_sequence_config', '[]');
+    $fuConfig = json_decode((string) $fuConfigJson, true);
+    if (!is_array($fuConfig)) $fuConfig = [];
+    ?>
+
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Follow-up sequence</h2>
+        </div>
+        <div class="panel-content">
+            <p class="hint" style="margin-top:0;">
+                The pipeline drafts each follow-up ~1 day before its scheduled send. Drafts queue in the
+                <a href="?tab=followups">Follow-ups tab</a> when Review-before-send is on; otherwise they auto-send.
+                Touch 1 is the original first-touch email; this list configures touches 2 onward.
+            </p>
+            <form method="POST">
+                <input type="hidden" name="tab" value="settings">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
+                <input type="hidden" name="action" value="set_followup_sequence">
+
+                <table class="data-table" style="margin-bottom:12px;">
+                    <thead>
+                        <tr>
+                            <th>Touch #</th>
+                            <th>Days after previous touch (1-90)</th>
+                            <th>Default intent (used if no active A/B test)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="followupTouchesBody">
+                        <?php if (empty($fuConfig)): ?>
+                            <tr><td colspan="4" class="empty-state">No follow-up touches configured. Click "Add touch" to add one.</td></tr>
+                        <?php else: ?>
+                            <?php foreach ($fuConfig as $i => $touch): ?>
+                                <?php $touchNum = (int) ($touch['touch'] ?? ($i + 2)); ?>
+                                <tr>
+                                    <td>Touch <?php echo $touchNum; ?></td>
+                                    <td><input type="number" name="touches[<?php echo $i; ?>][days_after_prev]" min="1" max="90" value="<?php echo (int) ($touch['days_after_prev'] ?? 5); ?>" required></td>
+                                    <td><input type="text" name="touches[<?php echo $i; ?>][default_intent]" maxlength="200" value="<?php echo htmlspecialchars((string) ($touch['default_intent'] ?? '')); ?>" style="width:100%;" required></td>
+                                    <td><!-- removed via JS only on the last row --></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button type="button" class="btn btn-small btn-blue" onclick="addFollowupTouch()">+ Add touch</button>
+                    <button type="button" class="btn btn-small btn-neutral" onclick="removeLastFollowupTouch()">Remove last touch</button>
+                    <button type="submit" class="btn btn-blue" style="margin-left:auto;">Save sequence</button>
+                </div>
+            </form>
+
+            <script>
+                (function() {
+                    var nextIndex = <?php echo count($fuConfig); ?>;
+                    var defaultGaps = [3, 7, 14, 21, 30, 60]; // suggested defaults when adding rows
+
+                    window.addFollowupTouch = function() {
+                        if (nextIndex >= 6) { alert('Maximum 6 follow-up touches.'); return; }
+                        var tbody = document.getElementById('followupTouchesBody');
+                        // Clear empty-state row if present
+                        if (tbody.querySelector('.empty-state')) tbody.innerHTML = '';
+                        var i = nextIndex;
+                        var touchNum = i + 2;
+                        var gap = defaultGaps[i] || 14;
+                        var row = document.createElement('tr');
+                        row.innerHTML = '<td>Touch ' + touchNum + '</td>' +
+                            '<td><input type="number" name="touches[' + i + '][days_after_prev]" min="1" max="90" value="' + gap + '" required></td>' +
+                            '<td><input type="text" name="touches[' + i + '][default_intent]" maxlength="200" value="" style="width:100%;" required placeholder="e.g. gentle bump"></td>' +
+                            '<td></td>';
+                        tbody.appendChild(row);
+                        nextIndex++;
+                    };
+
+                    window.removeLastFollowupTouch = function() {
+                        var tbody = document.getElementById('followupTouchesBody');
+                        var rows = tbody.querySelectorAll('tr');
+                        if (rows.length === 0) return;
+                        // Don't allow removing if it's the empty-state placeholder
+                        if (rows[0].querySelector('.empty-state')) return;
+                        rows[rows.length - 1].remove();
+                        nextIndex = Math.max(0, nextIndex - 1);
+                        if (tbody.children.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No follow-up touches configured. Click "Add touch" to add one.</td></tr>';
+                        }
+                    };
+                })();
+            </script>
         </div>
     </div>
 

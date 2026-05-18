@@ -53,7 +53,7 @@ function is_pipeline_running(): bool
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // Block actions that conflict with a running pipeline
-$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses'];
+$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup'];
 if (in_array($action, $pipelineActions) && is_pipeline_running()) {
     echo json_encode([
         'success' => false,
@@ -119,6 +119,38 @@ switch ($action) {
         break;
     case 'import_csv':
         import_csv($pdo);
+        break;
+
+    // Follow-ups
+    case 'get_followups':
+        get_followups($pdo);
+        break;
+    case 'approve_followup':
+        approve_followup($pdo);
+        break;
+    case 'regenerate_followup':
+        regenerate_followup($pdo);
+        break;
+    case 'skip_followup':
+        skip_followup($pdo);
+        break;
+    case 'halt_followup_sequence':
+        halt_followup_sequence($pdo);
+        break;
+    case 'bulk_approve_followups':
+        bulk_approve_followups($pdo);
+        break;
+    case 'bulk_skip_followups':
+        bulk_skip_followups($pdo);
+        break;
+    case 'bulk_halt_followups':
+        bulk_halt_followups($pdo);
+        break;
+    case 'get_followups_for_lead':
+        get_followups_for_lead($pdo);
+        break;
+    case 'save_followup_draft':
+        save_followup_draft($pdo);
         break;
 
     default:
@@ -365,6 +397,9 @@ function get_stats($pdo)
         SUM(status = 'replied') as replied,
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
+
+    // Follow-ups pending review (drafted, awaiting admin approval)
+    $rows['followups_pending'] = (int) $pdo->query("SELECT COUNT(*) FROM outreach_followups WHERE status = 'drafted'")->fetchColumn();
 
     // Count distinct leads clicked. SUBSTRING_INDEX collapses "outreach-42-v7" → "outreach-42"
     // so a lead that received multiple variants and had any of them clicked counts once.
@@ -715,6 +750,183 @@ function import_csv($pdo)
     json_response(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'message' => $message]);
 }
 
+// ─── Follow-up endpoints ───
+
+function get_followups($pdo)
+{
+    $view = $_GET['view'] ?? 'pending_review';
+    $validViews = ['pending_review', 'approved', 'upcoming', 'sent', 'halted'];
+    if (!in_array($view, $validViews, true)) {
+        $view = 'pending_review';
+    }
+
+    $sql = "SELECT f.*, l.business_name, l.email AS lead_email, l.city, l.draft_subject AS original_subject,
+                   v.label AS ab_variant_label
+            FROM outreach_followups f
+            JOIN outreach_leads l ON l.id = f.lead_id
+            LEFT JOIN outreach_ab_variants v ON v.id = f.ab_variant_id
+            WHERE ";
+
+    switch ($view) {
+        case 'pending_review':
+            $sql .= "f.status = 'drafted' AND f.scheduled_for <= DATE_ADD(NOW(), INTERVAL 2 DAY)";
+            $sql .= " ORDER BY f.scheduled_for ASC";
+            break;
+        case 'approved':
+            $sql .= "f.status = 'approved'";
+            $sql .= " ORDER BY f.scheduled_for ASC";
+            break;
+        case 'upcoming':
+            $sql .= "f.status = 'scheduled'";
+            $sql .= " ORDER BY f.scheduled_for ASC";
+            break;
+        case 'sent':
+            $sql .= "f.status = 'sent' AND f.sent_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+            $sql .= " ORDER BY f.sent_at DESC";
+            break;
+        case 'halted':
+            $sql .= "f.status IN ('halted','failed','skipped') AND f.updated_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+            $sql .= " ORDER BY f.updated_at DESC";
+            break;
+    }
+    $sql .= " LIMIT 200";
+
+    $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(['success' => true, 'view' => $view, 'rows' => $rows]);
+}
+
+function approve_followup($pdo)
+{
+    $id = (int) ($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid id']); return;
+    }
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'approved'
+    WHERE id = ? AND status = 'drafted'
+      AND draft_subject IS NOT NULL AND draft_subject <> ''
+      AND draft_body IS NOT NULL AND draft_body <> ''");
+    $stmt->execute([$id]);
+    if ($stmt->rowCount() === 0) {
+        echo json_encode(['success' => false, 'message' => 'Row not in drafted state, or draft subject/body is empty']); return;
+    }
+    echo json_encode(['success' => true]);
+}
+
+function regenerate_followup($pdo)
+{
+    $id = (int) ($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid id']); return;
+    }
+    $stmt = $pdo->prepare("SELECT * FROM outreach_followups WHERE id = ?");
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        echo json_encode(['success' => false, 'message' => 'Not found']); return;
+    }
+    if (!in_array($row['status'], ['drafted', 'failed'], true)) {
+        echo json_encode(['success' => false, 'message' => 'Can only regenerate drafted or failed rows']); return;
+    }
+
+    // Reset attempts so regen has a fresh budget
+    $pdo->prepare("UPDATE outreach_followups SET draft_attempts = 0, status = 'scheduled' WHERE id = ?")
+        ->execute([$id]);
+    // Re-fetch with the updated state
+    $stmt->execute([$id]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $ok = draft_followup_via_gemini($pdo, $row);
+    if ($ok) {
+        // Return the new draft for the UI
+        $newRow = $pdo->prepare("SELECT draft_subject, draft_body FROM outreach_followups WHERE id = ?");
+        $newRow->execute([$id]);
+        $r = $newRow->fetch(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'draft_subject' => $r['draft_subject'], 'draft_body' => $r['draft_body']]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Gemini draft failed']);
+    }
+}
+
+function skip_followup($pdo)
+{
+    $id = (int) ($_POST['id'] ?? 0);
+    if ($id <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid id']); return;
+    }
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'skipped', halt_reason = 'manual' WHERE id = ? AND status IN ('drafted','approved','scheduled')");
+    $stmt->execute([$id]);
+    if ($stmt->rowCount() === 0) {
+        echo json_encode(['success' => false, 'message' => 'Row already sent or halted']); return;
+    }
+    echo json_encode(['success' => true]);
+}
+
+function halt_followup_sequence($pdo)
+{
+    $leadId = (int) ($_POST['lead_id'] ?? 0);
+    if ($leadId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid lead_id']); return;
+    }
+    $count = halt_followups_for_lead($pdo, $leadId, 'manual');
+    echo json_encode(['success' => true, 'halted_count' => $count]);
+}
+
+function bulk_approve_followups($pdo)
+{
+    $ids = array_map('intval', (array) ($_POST['ids'] ?? []));
+    $ids = array_filter($ids, fn($i) => $i > 0);
+    if (empty($ids)) {
+        echo json_encode(['success' => false, 'message' => 'No ids']); return;
+    }
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'approved'
+    WHERE status = 'drafted'
+      AND draft_subject IS NOT NULL AND draft_subject <> ''
+      AND draft_body IS NOT NULL AND draft_body <> ''
+      AND id IN ($placeholders)");
+    $stmt->execute(array_values($ids));
+    echo json_encode(['success' => true, 'approved_count' => $stmt->rowCount()]);
+}
+
+function bulk_skip_followups($pdo)
+{
+    $ids = array_map('intval', (array) ($_POST['ids'] ?? []));
+    $ids = array_filter($ids, fn($i) => $i > 0);
+    if (empty($ids)) {
+        echo json_encode(['success' => false, 'message' => 'No ids']); return;
+    }
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'skipped', halt_reason = 'manual' WHERE status IN ('drafted','approved','scheduled') AND id IN ($placeholders)");
+    $stmt->execute(array_values($ids));
+    echo json_encode(['success' => true, 'skipped_count' => $stmt->rowCount()]);
+}
+
+function bulk_halt_followups($pdo)
+{
+    $leadIds = array_map('intval', (array) ($_POST['lead_ids'] ?? []));
+    $leadIds = array_filter($leadIds, fn($i) => $i > 0);
+    if (empty($leadIds)) {
+        echo json_encode(['success' => false, 'message' => 'No lead_ids']); return;
+    }
+    $total = 0;
+    foreach ($leadIds as $lid) {
+        $total += halt_followups_for_lead($pdo, $lid, 'manual');
+    }
+    echo json_encode(['success' => true, 'halted_count' => $total]);
+}
+
+function get_followups_for_lead($pdo)
+{
+    $leadId = (int) ($_GET['lead_id'] ?? 0);
+    if ($leadId <= 0) {
+        echo json_encode(['success' => false, 'message' => 'Invalid lead_id']); return;
+    }
+    $stmt = $pdo->prepare("SELECT f.*, v.label AS ab_variant_label FROM outreach_followups f LEFT JOIN outreach_ab_variants v ON v.id = f.ab_variant_id WHERE f.lead_id = ? ORDER BY f.touch_number ASC");
+    $stmt->execute([$leadId]);
+    echo json_encode(['success' => true, 'rows' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
+}
+
 // ─── AI Company Size Classification ───
 
 function classify_company_sizes($pdo)
@@ -775,5 +987,24 @@ Example: [\"small\", \"medium\", \"small\", \"large\"]";
     }
 
     json_response(['success' => true, 'sizes' => $normalized]);
+}
+
+function save_followup_draft($pdo)
+{
+    $id = (int) ($_POST['id'] ?? 0);
+    $subject = trim((string) ($_POST['subject'] ?? ''));
+    $body = trim((string) ($_POST['body'] ?? ''));
+    if ($id <= 0 || $subject === '' || $body === '') {
+        echo json_encode(['success' => false, 'message' => 'Missing fields']); return;
+    }
+    if (strlen($subject) > 500) {
+        echo json_encode(['success' => false, 'message' => 'Subject too long (max 500 chars)']); return;
+    }
+    if (strlen($body) > 10000) {
+        echo json_encode(['success' => false, 'message' => 'Body too long (max 10000 chars)']); return;
+    }
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET draft_subject = ?, draft_body = ? WHERE id = ? AND status = 'drafted'");
+    $stmt->execute([$subject, $body, $id]);
+    echo json_encode(['success' => true]);
 }
 

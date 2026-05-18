@@ -16,6 +16,7 @@ if (empty($_SESSION['csrf_token'])) {
 // Tab partials (load render + POST handlers)
 require_once __DIR__ . '/tabs/ab-tests.php';
 require_once __DIR__ . '/tabs/settings.php';
+require_once __DIR__ . '/tabs/followups.php';
 
 // Dispatch POST submissions from tab-specific forms BEFORE any output so
 // redirects via header() still work. CSRF: every state-changing tab form
@@ -38,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
 
 // Determine active tab from ?tab=
 $activeTab = $_GET['tab'] ?? 'leads';
-if (!in_array($activeTab, ['leads', 'ab-tests', 'settings'], true)) {
+if (!in_array($activeTab, ['leads', 'ab-tests', 'followups', 'settings'], true)) {
     $activeTab = 'leads';
 }
 
@@ -58,6 +59,7 @@ include __DIR__ . '/../admin_header.php';
 <div class="section-tabs">
     <button class="section-tab <?php echo $activeTab === 'leads' ? 'active' : ''; ?>" data-tab="leads">Leads</button>
     <button class="section-tab <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>" data-tab="ab-tests">A/B Tests</button>
+    <button class="section-tab <?php echo $activeTab === 'followups' ? 'active' : ''; ?>" data-tab="followups">Follow-ups</button>
     <button class="section-tab <?php echo $activeTab === 'settings' ? 'active' : ''; ?>" data-tab="settings">Settings</button>
 </div>
 
@@ -81,6 +83,10 @@ include __DIR__ . '/../admin_header.php';
     <div class="stat-card">
         <div class="stat-label">Drafts Pending</div>
         <div class="stat-value stat-pending" id="statDraftsPending">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Follow-ups pending review</div>
+        <div class="stat-value stat-pending" id="statFollowupsPending">0</div>
     </div>
     <div class="stat-card">
         <div class="stat-label">Contacted</div>
@@ -286,6 +292,10 @@ include __DIR__ . '/../admin_header.php';
     <?php ab_tests_tab_render($pdo, (int) ($_GET['test_id'] ?? 0)); ?>
 </div>
 
+<div id="followups" class="tab-content <?php echo $activeTab === 'followups' ? 'active' : ''; ?>">
+    <?php followups_tab_render($pdo); ?>
+</div>
+
 <div id="settings" class="tab-content <?php echo $activeTab === 'settings' ? 'active' : ''; ?>">
     <?php settings_tab_render($pdo); ?>
 </div>
@@ -303,6 +313,7 @@ include __DIR__ . '/../admin_header.php';
                 <button class="tab active" onclick="switchTab('tabInfo', this)">Info</button>
                 <button class="tab" onclick="switchTab('tabDraft', this)">Email Draft</button>
                 <button class="tab" onclick="switchTab('tabActivity', this)">Activity</button>
+                <button class="tab" onclick="switchTab('tabFollowups', this); loadLeadFollowups();">Follow-ups</button>
             </div>
 
             <!-- Info Tab -->
@@ -432,6 +443,13 @@ include __DIR__ . '/../admin_header.php';
             <div id="tabActivity" class="tab-content">
                 <div id="activityTimeline" class="activity-timeline">
                     <p class="empty-state-text">Loading activity...</p>
+                </div>
+            </div>
+
+            <!-- Follow-ups Tab -->
+            <div id="tabFollowups" class="tab-content">
+                <div id="leadFollowupsList">
+                    <p class="empty-state-text">Loading follow-ups...</p>
                 </div>
             </div>
         </div>

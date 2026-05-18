@@ -143,6 +143,7 @@ async function loadStats() {
             document.getElementById('statReplied').textContent = s.replied || 0;
             document.getElementById('statInterested').textContent = s.interested || 0;
             document.getElementById('statClicked').textContent = s.clicked || 0;
+            document.getElementById('statFollowupsPending').textContent = s.followups_pending || 0;
 
             // Show/hide pipeline running banner
             const banner = document.getElementById('pipelineBanner');
@@ -1173,3 +1174,227 @@ function formatDateTime(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-CA', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
 }
+
+// ─── Follow-ups tab ───
+
+let currentFollowupView = 'pending_review';
+
+window.switchFollowupsView = function(button, view) {
+    document.querySelectorAll('[data-fu-view]').forEach(b => b.classList.remove('active'));
+    button.classList.add('active');
+    currentFollowupView = view;
+    loadFollowups();
+};
+
+async function loadFollowups() {
+    const container = document.getElementById('followupsContainer');
+    container.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+        const data = await api('get_followups&view=' + encodeURIComponent(currentFollowupView));
+        if (!data.success) {
+            container.innerHTML = '<p class="empty-state">Error loading: ' + (data.message || 'unknown') + '</p>';
+            return;
+        }
+        if (!data.rows.length) {
+            const emptyMessages = {
+                'pending_review': 'No follow-ups awaiting review. Drafts appear here ~1 day before each scheduled send.',
+                'approved': 'No approved follow-ups waiting in the send queue.',
+                'upcoming': 'No follow-ups scheduled. New ones are created as leads receive their first email.',
+                'sent': 'No follow-ups sent in the last 30 days.',
+                'halted': 'No halted or failed follow-ups in the last 30 days.',
+            };
+            container.innerHTML = '<p class="empty-state">' + (emptyMessages[currentFollowupView] || 'No rows.') + '</p>';
+            updateFollowupsBulkBar();
+            return;
+        }
+        container.innerHTML = data.rows.map(r => renderFollowupRow(r, currentFollowupView)).join('');
+        if (currentFollowupView === 'pending_review') {
+            var badge = document.getElementById('fuCountPending');
+            if (badge) badge.textContent = data.rows.length;
+        }
+        updateFollowupsBulkBar();
+    } catch (e) {
+        container.innerHTML = '<p class="empty-state">Error loading follow-ups: ' + e.message + '</p>';
+    }
+}
+
+function renderFollowupRow(r, view) {
+    const cityLabel = r.city ? ' (' + escapeHtml(r.city) + ')' : '';
+    const scheduledStr = r.scheduled_for ? formatScheduled(r.scheduled_for) : '';
+    const sentStr = r.sent_at ? formatScheduled(r.sent_at) : '';
+    const haltReason = r.halt_reason ? ' · Reason: ' + escapeHtml(r.halt_reason) : '';
+    const abLabel = r.ab_variant_label ? ' · A/B: ' + escapeHtml(r.ab_variant_label) : '';
+
+    let actions = '';
+    let bodyEditor = '';
+    let checkboxCell = '';
+
+    if (view === 'pending_review') {
+        checkboxCell = '<input type="checkbox" class="fu-row-check" data-fu-id="' + r.id + '" data-lead-id="' + r.lead_id + '" onchange="updateFollowupsBulkBar()">';
+        bodyEditor = '<input type="text" class="fu-subject" data-id="' + r.id + '" value="' + escapeHtml(r.draft_subject || '') + '" style="width:100%; margin-bottom:6px;">' +
+            '<textarea class="fu-body" data-id="' + r.id + '" rows="6" style="width:100%; font-family:inherit;">' + escapeHtml(r.draft_body || '') + '</textarea>';
+        actions = '<button class="btn btn-small btn-blue" onclick="approveFollowup(' + r.id + ')">Approve & queue</button>' +
+            ' <button class="btn btn-small btn-blue" onclick="regenerateFollowup(' + r.id + ')">Regenerate draft</button>' +
+            ' <button class="btn btn-small btn-neutral" onclick="skipFollowup(' + r.id + ')">Skip this touch</button>' +
+            ' <button class="btn btn-small btn-red" onclick="haltFollowupSequence(' + r.lead_id + ')">Halt sequence</button>';
+    } else if (view === 'approved') {
+        actions = '<button class="btn btn-small btn-neutral" onclick="skipFollowup(' + r.id + ')">Skip</button>' +
+            ' <button class="btn btn-small btn-red" onclick="haltFollowupSequence(' + r.lead_id + ')">Halt sequence</button>';
+    } else if (view === 'upcoming') {
+        actions = '<button class="btn btn-small btn-red" onclick="haltFollowupSequence(' + r.lead_id + ')">Halt sequence</button>';
+    }
+
+    return '<div class="panel" style="margin-bottom:12px;">' +
+        '<div class="panel-content">' +
+            '<div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">' +
+                (checkboxCell ? '<div>' + checkboxCell + '</div>' : '') +
+                '<div style="flex:1;">' +
+                    '<strong>' + escapeHtml(r.business_name || 'Unknown') + '</strong>' + cityLabel +
+                    ' &nbsp;·&nbsp; Touch ' + r.touch_number +
+                    (scheduledStr ? ' &nbsp;·&nbsp; Scheduled ' + scheduledStr : '') +
+                    (sentStr ? ' &nbsp;·&nbsp; Sent ' + sentStr : '') +
+                    haltReason +
+                '</div>' +
+            '</div>' +
+            (bodyEditor ? '<div style="margin-bottom:8px;">' + bodyEditor + '</div>' :
+                (r.draft_subject ? '<div style="font-size:13px; color:#666;">Subject: ' + escapeHtml(r.draft_subject) + '</div>' : '')) +
+            '<div style="font-size:12px; color:#999; margin-top:6px;">' + abLabel + '</div>' +
+            (actions ? '<div style="margin-top:10px;">' + actions + '</div>' : '') +
+        '</div>' +
+    '</div>';
+}
+
+function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]);
+}
+
+function formatScheduled(dt) {
+    try {
+        const d = new Date(dt.replace(' ', 'T'));
+        const now = new Date();
+        const diffMs = d.getTime() - now.getTime();
+        const diffHours = diffMs / 3600000;
+        if (Math.abs(diffHours) < 48) {
+            const h = Math.round(diffHours);
+            if (h === 0) return 'now';
+            if (h > 0) return 'in ' + h + 'h';
+            return Math.abs(h) + 'h ago';
+        }
+        return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+        return dt;
+    }
+}
+
+window.approveFollowup = async function(id) {
+    // Save any inline subject/body edits first
+    const subjectInput = document.querySelector('.fu-subject[data-id="' + id + '"]');
+    const bodyInput = document.querySelector('.fu-body[data-id="' + id + '"]');
+    if (subjectInput && bodyInput) {
+        const saveResult = await api('save_followup_draft', { method: 'POST', body: { id: id, subject: subjectInput.value, body: bodyInput.value } });
+        if (!saveResult.success) {
+            alert('Save failed: ' + (saveResult.message || 'unknown') + ' — not approving.');
+            return;
+        }
+    }
+    const data = await api('approve_followup', { method: 'POST', body: { id: id } });
+    if (data.success) loadFollowups();
+    else alert('Approve failed: ' + (data.message || 'unknown'));
+};
+
+window.regenerateFollowup = async function(id) {
+    if (!confirm('Regenerate this follow-up via Gemini? Current draft will be replaced.')) return;
+    const data = await api('regenerate_followup', { method: 'POST', body: { id: id } });
+    if (data.success) loadFollowups();
+    else alert('Regenerate failed: ' + (data.message || 'unknown'));
+};
+
+window.skipFollowup = async function(id) {
+    if (!confirm('Skip this follow-up touch? The next touch in the sequence will still be sent on schedule.')) return;
+    const data = await api('skip_followup', { method: 'POST', body: { id: id } });
+    if (data.success) loadFollowups();
+    else alert('Skip failed: ' + (data.message || 'unknown'));
+};
+
+window.haltFollowupSequence = async function(leadId) {
+    if (!confirm('Halt the entire follow-up sequence for this lead? No more follow-ups will be sent.')) return;
+    const data = await api('halt_followup_sequence', { method: 'POST', body: { lead_id: leadId } });
+    if (data.success) loadFollowups();
+    else alert('Halt failed: ' + (data.message || 'unknown'));
+};
+
+window.updateFollowupsBulkBar = function() {
+    const checks = document.querySelectorAll('.fu-row-check:checked');
+    const bar = document.getElementById('fuBulkActionsBar');
+    document.getElementById('fuSelectedCount').textContent = checks.length;
+    bar.style.display = checks.length > 0 ? 'flex' : 'none';
+};
+
+window.bulkApproveFollowups = async function() {
+    const ids = Array.from(document.querySelectorAll('.fu-row-check:checked')).map(c => parseInt(c.dataset.fuId));
+    if (!ids.length) return;
+    const data = await api('bulk_approve_followups', { method: 'POST', body: { ids: ids } });
+    if (data.success) { alert('Approved ' + data.approved_count + ' follow-up(s).'); loadFollowups(); }
+    else alert('Bulk approve failed: ' + (data.message || 'unknown'));
+};
+
+window.bulkSkipFollowups = async function() {
+    const ids = Array.from(document.querySelectorAll('.fu-row-check:checked')).map(c => parseInt(c.dataset.fuId));
+    if (!ids.length) return;
+    if (!confirm('Skip ' + ids.length + ' follow-up(s)?')) return;
+    const data = await api('bulk_skip_followups', { method: 'POST', body: { ids: ids } });
+    if (data.success) { alert('Skipped ' + data.skipped_count + ' follow-up(s).'); loadFollowups(); }
+    else alert('Bulk skip failed: ' + (data.message || 'unknown'));
+};
+
+window.bulkHaltFollowupSequences = async function() {
+    const leadIds = Array.from(new Set(Array.from(document.querySelectorAll('.fu-row-check:checked')).map(c => parseInt(c.dataset.leadId))));
+    if (!leadIds.length) return;
+    if (!confirm('Halt the follow-up sequence for ' + leadIds.length + ' lead(s)? This stops ALL remaining follow-ups for these leads.')) return;
+    const data = await api('bulk_halt_followups', { method: 'POST', body: { lead_ids: leadIds } });
+    if (data.success) { alert('Halted ' + data.halted_count + ' follow-up row(s).'); loadFollowups(); }
+    else alert('Bulk halt failed: ' + (data.message || 'unknown'));
+};
+
+// Auto-load when the followups tab activates
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.section-tab[data-tab="followups"]').forEach(btn => {
+        btn.addEventListener('click', () => setTimeout(loadFollowups, 0));
+    });
+    // Also auto-load on page load if we're already on the tab (e.g. ?tab=followups)
+    if (window.location.search.indexOf('tab=followups') !== -1) {
+        loadFollowups();
+    }
+});
+
+window.loadLeadFollowups = async function() {
+    const list = document.getElementById('leadFollowupsList');
+    list.innerHTML = '<p class="empty-state-text">Loading...</p>';
+    // currentLeadId is the global declared at outreach.js:2 and set by
+    // openLeadDetail() at outreach.js:527 whenever a lead modal opens.
+    if (!currentLeadId) {
+        list.innerHTML = '<p class="empty-state-text">No lead selected.</p>';
+        return;
+    }
+    const data = await api('get_followups_for_lead&lead_id=' + currentLeadId);
+    if (!data.success) {
+        list.innerHTML = '<p class="empty-state-text">Error: ' + (data.message || 'unknown') + '</p>';
+        return;
+    }
+    if (!data.rows.length) {
+        list.innerHTML = '<p class="empty-state-text">No follow-ups scheduled for this lead. Sequence is configured in Settings; rows are created when the first-touch email sends.</p>';
+        return;
+    }
+    list.innerHTML = '<table class="data-table"><thead><tr><th>Touch</th><th>Status</th><th>Scheduled</th><th>Sent</th><th>Halt reason</th><th>A/B variant</th></tr></thead><tbody>' +
+        data.rows.map(r =>
+            '<tr>' +
+                '<td>' + r.touch_number + '</td>' +
+                '<td>' + escapeHtml(r.status) + '</td>' +
+                '<td>' + (r.scheduled_for || '—') + '</td>' +
+                '<td>' + (r.sent_at || '—') + '</td>' +
+                '<td>' + (r.halt_reason ? escapeHtml(r.halt_reason) : '—') + '</td>' +
+                '<td>' + (r.ab_variant_label ? escapeHtml(r.ab_variant_label) : '—') + '</td>' +
+            '</tr>'
+        ).join('') +
+    '</tbody></table>';
+};

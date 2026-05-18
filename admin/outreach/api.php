@@ -53,7 +53,7 @@ function is_pipeline_running(): bool
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // Block actions that conflict with a running pipeline
-$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup'];
+$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import'];
 if (in_array($action, $pipelineActions) && is_pipeline_running()) {
     echo json_encode([
         'success' => false,
@@ -89,6 +89,17 @@ switch ($action) {
         break;
     case 'import_leads':
         import_leads($pdo);
+        break;
+
+    // Shopify discovery
+    case 'shopify_get_status':
+        shopify_get_status($pdo);
+        break;
+    case 'shopify_run_dork':
+        shopify_run_dork($pdo);
+        break;
+    case 'shopify_import':
+        shopify_import($pdo);
         break;
 
     // AI draft
@@ -504,6 +515,216 @@ function import_leads($pdo)
         json_response(['success' => true, 'imported' => $imported, 'skipped' => $skipped, 'message' => "Imported $imported leads, skipped $skipped duplicates"]);
     } catch (Exception $e) {
         outreach_log("Import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+// ─── Shopify Discovery ───
+// Helpers (serpapi_query, shopify_canonical_url, evaluate_shopify_candidate) live in cron/lib/shopify_discovery.php
+
+function _shopify_state_get($pdo, string $key, string $default = ''): string
+{
+    $stmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = ?");
+    $stmt->execute([$key]);
+    $val = $stmt->fetchColumn();
+    return $val === false ? $default : (string) $val;
+}
+
+function _shopify_state_set($pdo, string $key, string $value): void
+{
+    $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value)
+        VALUES (?, ?) ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)")
+        ->execute([$key, $value]);
+}
+
+function _shopify_reset_daily_counters_if_needed($pdo): void
+{
+    $today = date('Y-m-d');
+    if (_shopify_state_get($pdo, 'shopify_last_reset_date', '') !== $today) {
+        _shopify_state_set($pdo, 'serpapi_calls_today', '0');
+        _shopify_state_set($pdo, 'shopify_imports_today', '0');
+        _shopify_state_set($pdo, 'shopify_last_reset_date', $today);
+    }
+}
+
+function shopify_get_status($pdo)
+{
+    _shopify_reset_daily_counters_if_needed($pdo);
+    json_response([
+        'success'             => true,
+        'enabled'             => ($_ENV['OUTREACH_SHOPIFY_ENABLED'] ?? 'false') === 'true',
+        'has_key'             => !empty($_ENV['SERPAPI_KEY']),
+        'serpapi_calls_today' => (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0'),
+        'serpapi_limit'       => (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3),
+        'imports_today'       => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
+        'imports_limit'       => (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5),
+    ]);
+}
+
+function shopify_run_dork($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/shopify_discovery.php';
+
+    $data  = json_decode(file_get_contents('php://input'), true) ?: [];
+    $query = trim($data['query'] ?? '');
+    $limit = min(10, max(1, (int) ($data['limit'] ?? 10)));
+
+    if ($query === '') {
+        json_response(['success' => false, 'message' => 'Query is required'], 400);
+    }
+
+    $apiKey = $_ENV['SERPAPI_KEY'] ?? '';
+    if ($apiKey === '') {
+        json_response(['success' => false, 'message' => 'SerpAPI key not configured. Set SERPAPI_KEY in .env'], 500);
+    }
+
+    _shopify_reset_daily_counters_if_needed($pdo);
+    $serpapiLimit = (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3);
+    $callsToday   = (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0');
+    if ($callsToday >= $serpapiLimit) {
+        json_response([
+            'success' => false,
+            'message' => "SerpAPI daily limit reached ($callsToday/$serpapiLimit). Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.",
+        ], 429);
+    }
+
+    $serpResults = serpapi_query($query, $apiKey, $limit);
+    _shopify_state_set($pdo, 'serpapi_calls_today', (string) ($callsToday + 1));
+
+    $evaluated = [];
+    foreach ($serpResults as $r) {
+        $canonical = shopify_canonical_url($r['link'] ?? '');
+        if ($canonical === '') continue;
+
+        // Flag if already imported as a lead
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+        $check->execute([$canonical]);
+        $existingLeadId = $check->fetchColumn();
+
+        $result    = evaluate_shopify_candidate($canonical);
+        $meta      = $result['metadata'] ?? [];
+        $evaluated[] = [
+            'canonical_url'    => $canonical,
+            'serp_title'       => $r['title'] ?? '',
+            'fit'              => (bool) ($result['fit'] ?? false),
+            'reason'           => $result['reason'] ?? '',
+            'detail'           => $result['detail'] ?? '',
+            'final_url'        => $result['final_url'] ?? $canonical,
+            'business_name'    => $meta['business_name'] ?? '',
+            'email'            => $meta['email'] ?? '',
+            'products_count'   => $meta['products_count'] ?? null,
+            'first_product_at' => $meta['first_product_created_at'] ?? null,
+            'country'          => $meta['country'] ?? '',
+            'already_imported' => $existingLeadId !== false,
+            'existing_lead_id' => $existingLeadId !== false ? (int) $existingLeadId : null,
+        ];
+    }
+
+    json_response([
+        'success'             => true,
+        'results'             => $evaluated,
+        'serpapi_calls_today' => $callsToday + 1,
+        'serpapi_limit'       => $serpapiLimit,
+        'imports_today'       => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
+        'imports_limit'       => (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5),
+    ]);
+}
+
+function shopify_import($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/shopify_discovery.php';
+
+    $data         = json_decode(file_get_contents('php://input'), true) ?: [];
+    $canonicalUrl = trim($data['canonical_url'] ?? '');
+
+    if ($canonicalUrl === '') {
+        json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
+    }
+
+    // Re-evaluate server-side — don't trust client-passed metadata
+    $result = evaluate_shopify_candidate($canonicalUrl);
+    if (empty($result['fit'])) {
+        json_response([
+            'success' => false,
+            'message' => 'Store no longer passes evaluation: ' . ($result['reason'] ?? 'unknown'),
+            'reason'  => $result['reason'] ?? '',
+            'detail'  => $result['detail'] ?? '',
+        ], 400);
+    }
+
+    $meta         = $result['metadata'];
+    $finalUrl     = $result['final_url'];
+    $email        = $meta['email'] ?? '';
+    $businessName = $meta['business_name'] ?? '';
+
+    if ($email === '') {
+        json_response(['success' => false, 'message' => 'Re-evaluation returned fit but no email — refusing to import'], 500);
+    }
+
+    // Dedup against existing leads (email OR website)
+    $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1");
+    $check->execute([$email, $finalUrl]);
+    if ($existing = $check->fetchColumn()) {
+        json_response([
+            'success'          => false,
+            'message'          => 'A lead with this email or website already exists',
+            'existing_lead_id' => (int) $existing,
+        ], 409);
+    }
+
+    try {
+        $businessSummary = sprintf(
+            "Shopify store. %s products. First product created %s.",
+            $meta['products_count'] ?? '?',
+            $meta['first_product_created_at'] ?? 'unknown date'
+        );
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, email, website, source, contact_page_url, business_summary)
+            VALUES (?, ?, ?, 'shopify_auto', ?, ?)");
+        $stmt->execute([
+            $businessName ?: $canonicalUrl,
+            $email,
+            $finalUrl,
+            $finalUrl,
+            $businessSummary,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        // UPSERT the candidate row so the cron's INSERT IGNORE skips it next time
+        $stmt = $pdo->prepare("INSERT INTO outreach_shopify_candidates
+            (canonical_url, myshopify_url, status, lead_id, harvested_email,
+             products_count, first_product_created_at, detected_country, last_query)
+            VALUES (?, ?, 'imported', ?, ?, ?, ?, ?, 'admin-ui')
+            ON DUPLICATE KEY UPDATE
+                status                   = 'imported',
+                lead_id                  = VALUES(lead_id),
+                harvested_email          = VALUES(harvested_email),
+                products_count           = VALUES(products_count),
+                first_product_created_at = VALUES(first_product_created_at),
+                detected_country         = VALUES(detected_country)");
+        $stmt->execute([
+            $canonicalUrl,
+            $canonicalUrl,
+            $leadId,
+            $email,
+            $meta['products_count'] ?? null,
+            $meta['first_product_created_at'] ?? null,
+            $meta['country'] ?? null,
+        ]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Imported from Shopify discovery UI');
+
+        $imports = (int) _shopify_state_get($pdo, 'shopify_imports_today', '0');
+        _shopify_state_set($pdo, 'shopify_imports_today', (string) ($imports + 1));
+
+        json_response([
+            'success'       => true,
+            'lead_id'       => $leadId,
+            'imports_today' => $imports + 1,
+        ]);
+    } catch (Exception $e) {
+        outreach_log("Shopify import failed: " . $e->getMessage());
         json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
     }
 }

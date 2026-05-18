@@ -830,11 +830,28 @@ function send_outreach_email($pdo)
     // Guard against re-sending to the same lead. Cold-outreach resends are
     // a spam-filter red flag and we never want this to happen by accident,
     // whether from the detail modal, the bulk-send flow, or a stray API call.
+    //
+    // Exception: if the previous send bounced (status='email_bounced'), the
+    // earlier attempt didn't reach a real inbox, so a deliberate retry after
+    // the admin has fixed the address isn't a duplicate. Reset sent_at and
+    // status so send_outreach_lead's atomic claim works and the post-send
+    // CASE in cron/lib/outreach_helpers.php can promote status back to
+    // 'contacted'. The suppression list still blocks sends to the bounced
+    // address itself — if the admin didn't actually fix the email, the new
+    // send attempt will be caught and refused as 'suppressed' instead.
     if (!empty($lead['sent_at'])) {
-        json_response([
-            'success' => false,
-            'message' => 'This lead was already emailed on ' . $lead['sent_at'] . '. Outreach does not resend to the same address.'
-        ], 409);
+        if (($lead['status'] ?? '') === 'email_bounced') {
+            $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL, status = 'approved' WHERE id = ?")
+                ->execute([$id]);
+            $lead['sent_at'] = null;
+            $lead['status']  = 'approved';
+            log_activity($pdo, $id, 'resend_after_bounce', 'Admin retrying send after previous bounce; email is now: ' . $lead['email']);
+        } else {
+            json_response([
+                'success' => false,
+                'message' => 'This lead was already emailed on ' . $lead['sent_at'] . '. Outreach does not resend to the same address.'
+            ], 409);
+        }
     }
 
     $reason = null;

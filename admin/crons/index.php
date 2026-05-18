@@ -30,6 +30,7 @@ $cronConfig = [
     'outreach_pipeline' => [
         'label'     => 'Outreach Pipeline',
         'frequency' => 'every hour',
+        'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, schedules follow-ups, and runs A/B tests on the wording. This is the main engine that finds and contacts new leads.',
         'metrics'   => [
             'leads_discovered'          => 'Leads discovered',
             'first_emails_sent'         => 'First emails sent',
@@ -44,6 +45,7 @@ $cronConfig = [
     'subscription_renewal' => [
         'label'     => 'Subscription Renewal',
         'frequency' => 'daily',
+        'description' => "Charges every Argo Premium subscriber whose billing date is today, sends them a receipt, and emails anyone whose card just declined. After three failed attempts in a row, the subscription is suspended so we don't keep retrying a bad card.",
         'metrics'   => [
             'renewals_succeeded'      => 'Renewals successful',
             'renewals_failed'         => 'Renewals failed',
@@ -55,6 +57,7 @@ $cronConfig = [
     'account_purge' => [
         'label'     => 'Account Purge',
         'frequency' => 'daily',
+        'description' => "Permanently deletes accounts that were marked for deletion 30+ days ago. The grace period gives users time to change their mind by signing back in — logging in cancels the deletion request.",
         'metrics'   => [
             'accounts_deleted' => 'Accounts deleted',
         ],
@@ -63,6 +66,7 @@ $cronConfig = [
     'reply_checker' => [
         'label'     => 'Reply Checker',
         'frequency' => 'hourly',
+        'description' => "Checks the contact inbox for replies to outreach emails. Any lead that replies gets auto-marked as 'replied' so the system stops sending them follow-ups.",
         'metrics'   => [
             'replies_matched' => 'Replies matched',
             'emails_scanned'  => 'Emails scanned',
@@ -72,6 +76,7 @@ $cronConfig = [
     'refund_cooling_off_promoter' => [
         'label'     => 'Refund Cooling-Off Promoter',
         'frequency' => 'every minute',
+        'description' => "Pushes refund requests through to the payment provider (Stripe, Square, etc.) once their 24-hour cooling-off window ends. The waiting period is a fraud safeguard — it gives us a chance to spot suspicious refund patterns before the money actually moves.",
         'metrics'   => [
             'refunds_promoted'       => 'Refunds promoted',
             'refunds_auto_cancelled' => 'Refunds auto-cancelled',
@@ -81,6 +86,7 @@ $cronConfig = [
     'refund_stale_processing_reconcile' => [
         'label'     => 'Refund Stale Processing',
         'frequency' => 'every 5 minutes',
+        'description' => "When a refund has been 'processing' for over half an hour, this directly asks the payment provider what really happened — useful for the cases where their webhook never reached us. Without this, an actually-completed refund could stay stuck in 'processing' forever in our records.",
         'metrics'   => [
             'refunds_reconciled' => 'Refunds reconciled',
         ],
@@ -89,6 +95,7 @@ $cronConfig = [
     'refund_stale_request_cleanup' => [
         'label'     => 'Refund Stale Request Cleanup',
         'frequency' => 'hourly',
+        'description' => "Cancels refund requests where the user started the flow but never confirmed it — e.g. they closed the tab before entering their email-verification code. After an hour, the request is automatically dropped so the audit log doesn't fill up with abandoned attempts.",
         'metrics'   => [
             'requests_cancelled' => 'Requests cancelled',
         ],
@@ -97,6 +104,7 @@ $cronConfig = [
     'refund_velocity_baseline_recompute' => [
         'label'     => 'Refund Velocity Baselines',
         'frequency' => 'nightly',
+        'description' => "Recalculates each company's 'normal' refund volume from their own history. The fraud-detection thresholds (3×, 10×, 25%, 50% of normal) then adapt to each shop's size — so a huge merchant doesn't get blocked by limits set for a small one, and a small merchant can't drain accidentally because the limits were too high.",
         'metrics'   => [
             'baselines_recomputed' => 'Baselines recomputed',
         ],
@@ -209,7 +217,15 @@ include __DIR__ . '/../admin_header.php';
         <div class="cron-card">
             <div class="cron-card-header">
                 <div>
-                    <h2><?= htmlspecialchars($cfg['label']) ?></h2>
+                    <h2>
+                        <?= htmlspecialchars($cfg['label']) ?>
+                        <?php if (!empty($cfg['description'])): ?>
+                            <details class="cron-info">
+                                <summary title="What does this cron do?" aria-label="What does this cron do?">i</summary>
+                                <div class="cron-info-popover"><?= htmlspecialchars($cfg['description']) ?></div>
+                            </details>
+                        <?php endif; ?>
+                    </h2>
                     <div class="cron-meta">
                         <span class="cron-freq"><?= htmlspecialchars($cfg['frequency']) ?></span>
                         <span class="cron-runs"><?= count($runs) ?> runs in range</span>

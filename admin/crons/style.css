@@ -113,6 +113,72 @@
     margin: 0 0 4px;
     font-size: 17px;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+/* Info button: small circular "i" that expands an inline description
+   below the title. Uses <details>/<summary> so it works without JS. */
+.cron-info summary {
+    list-style: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--gray-200);
+    color: var(--gray-700);
+    font-family: 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.cron-info summary::-webkit-details-marker,
+.cron-info summary::marker {
+    display: none;
+    content: '';
+}
+
+.cron-info summary:hover,
+.cron-info[open] summary {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+[data-theme="dark"] .cron-info summary {
+    background: var(--gray-700);
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .cron-info summary:hover,
+[data-theme="dark"] .cron-info[open] summary {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+.cron-info-popover {
+    flex-basis: 100%;
+    margin-top: 6px;
+    padding: 10px 12px;
+    background: var(--gray-100, #f9fafb);
+    border-left: 3px solid var(--primary-blue);
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--gray-700);
+}
+
+[data-theme="dark"] .cron-info-popover {
+    background: var(--gray-900);
+    color: var(--gray-300);
 }
 
 .cron-meta {

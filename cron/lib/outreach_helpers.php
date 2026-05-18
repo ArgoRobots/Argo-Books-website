@@ -847,6 +847,7 @@ function filter_gatekept_email($email)
     if ($at === false) return true;
 
     $local = strtolower(substr($email, 0, $at));
+    if ($local === '') return true;
 
     static $gatekept = [
         'support', 'partnerships', 'help', 'sales', 'careers', 'jobs',

@@ -160,7 +160,7 @@ include __DIR__ . '/../admin_header.php';
                     <button class="btn btn-blue" onclick="runShopifyDiscovery()" id="shopifyRunBtn">Run</button>
                 </div>
             </div>
-            <p style="margin:8px 0 0; color:#666; font-size:13px;">
+            <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
                 The system picks Canadian-startup queries automatically and keeps searching until it finds enough or your daily SerpAPI quota runs out. Usage today: <span id="serpapiUsage">…</span>.
             </p>
         </div>

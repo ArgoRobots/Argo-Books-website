@@ -85,9 +85,7 @@ Once a winner is promoted, the cron immediately starts the next cycle.
 
 ### Safety pause
 
-If the cron's own pick turns out badly — winner CTR under the configured floor (default 1%, stored in `outreach_pipeline_state.ab_ctr_floor`) — disables the A/B tests and shows an "A/B automation is off" banner at the top of the Settings tab. Flip the toggle below it to resume. This is so a run of bad cycles can't quietly drag CTR downward.
-
-The follow-up sequence A/B type also auto-pauses if the configured touch count changes while a test is active (e.g. you add a 4th touch in Settings but the active test only has intents for 3 touches). The mismatch shows up in the banner so you can either match the test to the new shape or revert the Settings change.
+The follow-up sequence A/B type auto-pauses if the configured touch count changes while a test is active (e.g. you add a 4th touch in Settings but the active test only has intents for 3 touches). The mismatch shows up in the A/B Tests tab so you can either match the test to the new shape or revert the Settings change.
 
 ## The Follow-ups tab
 
@@ -114,13 +112,13 @@ You can also see the per-lead sequence (every touch + status + scheduled date) b
 
 ## The Settings tab
 
-The Settings tab has three runtime toggles plus the sequence configuration:
+The Settings tab has two runtime controls plus the sequence configuration:
 
+- **Outreach system** — master enable/disable for the whole pipeline.
 - **Send mode** — Auto-send vs Review-before-send (affects both first emails AND follow-ups).
-- **A/B automation** — on/off for the auto-cycle that creates and promotes A/B tests.
 - **Follow-up sequence** — an editable table of touches. Each row is one touch: how many days after the previous touch it sends (1-90), and a default "intent" string that drives Gemini's wording (used when no follow-up A/B test is active). Add/remove rows for between 0 and 6 follow-up touches. Setting 0 touches disables follow-ups entirely.
 
-The Settings tab also shows the active A/B test snapshot and a tail of the day's pipeline log for quick health checks.
+A/B automation runs unconditionally whenever the outreach system is enabled — there's no separate on/off toggle. The Settings tab also shows the active A/B test snapshot and a tail of the day's pipeline log for quick health checks.
 
 ## What you should do
 

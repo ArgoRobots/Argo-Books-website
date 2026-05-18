@@ -81,7 +81,7 @@ Each rejected candidate gets a `reject_reason` written to `outreach_shopify_cand
 | `age_unknown` | No parseable `created_at` on any product — couldn't determine store age. |
 | `not_canadian` | No Canadian postal code or address signal found on the storefront. |
 | `no_contact_email` | Couldn't find any email address on the contact page. |
-| `gatekept_email` | Only role-mailbox addresses found (`support@`, `partnerships@`, `hello@`, etc.). |
+| `gatekept_email` | Only role-mailbox addresses found (`support@`, `partnerships@`, `sales@`, `no-reply@`, etc.). `hello@`, `info@`, `contact@`, and firstname-shaped addresses are accepted as plausible founder mailboxes. |
 | `duplicate` | A lead with that email or website already exists in `outreach_leads`. |
 
 `reject_detail` (VARCHAR 500) carries more context when available — e.g. the exact email address that was flagged as a role mailbox.

@@ -219,7 +219,9 @@ try {
     }
 
     // ─── STEP 5.5: Halt Follow-ups (replies / unsubscribes / bounces) ───
-    if ($runAll || $sendOnly) {
+    // Also runs in --draft-only so we don't waste Gemini drafts on leads who
+    // have already replied/unsubscribed/bounced since the last run.
+    if ($runAll || $sendOnly || $draftOnly) {
         stepHaltFollowups($pdo, $dryRun);
     }
 

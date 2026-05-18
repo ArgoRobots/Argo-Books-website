@@ -802,10 +802,13 @@ function approve_followup($pdo)
     if ($id <= 0) {
         echo json_encode(['success' => false, 'message' => 'Invalid id']); return;
     }
-    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'approved' WHERE id = ? AND status = 'drafted'");
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'approved'
+    WHERE id = ? AND status = 'drafted'
+      AND draft_subject IS NOT NULL AND draft_subject <> ''
+      AND draft_body IS NOT NULL AND draft_body <> ''");
     $stmt->execute([$id]);
     if ($stmt->rowCount() === 0) {
-        echo json_encode(['success' => false, 'message' => 'Row not in drafted state']); return;
+        echo json_encode(['success' => false, 'message' => 'Row not in drafted state, or draft subject/body is empty']); return;
     }
     echo json_encode(['success' => true]);
 }
@@ -877,7 +880,11 @@ function bulk_approve_followups($pdo)
         echo json_encode(['success' => false, 'message' => 'No ids']); return;
     }
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
-    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'approved' WHERE status = 'drafted' AND id IN ($placeholders)");
+    $stmt = $pdo->prepare("UPDATE outreach_followups SET status = 'approved'
+    WHERE status = 'drafted'
+      AND draft_subject IS NOT NULL AND draft_subject <> ''
+      AND draft_body IS NOT NULL AND draft_body <> ''
+      AND id IN ($placeholders)");
     $stmt->execute(array_values($ids));
     echo json_encode(['success' => true, 'approved_count' => $stmt->rowCount()]);
 }
@@ -989,6 +996,12 @@ function save_followup_draft($pdo)
     $body = trim((string) ($_POST['body'] ?? ''));
     if ($id <= 0 || $subject === '' || $body === '') {
         echo json_encode(['success' => false, 'message' => 'Missing fields']); return;
+    }
+    if (strlen($subject) > 500) {
+        echo json_encode(['success' => false, 'message' => 'Subject too long (max 500 chars)']); return;
+    }
+    if (strlen($body) > 10000) {
+        echo json_encode(['success' => false, 'message' => 'Body too long (max 10000 chars)']); return;
     }
     $stmt = $pdo->prepare("UPDATE outreach_followups SET draft_subject = ?, draft_body = ? WHERE id = ? AND status = 'drafted'");
     $stmt->execute([$subject, $body, $id]);

@@ -1291,7 +1291,11 @@ window.approveFollowup = async function(id) {
     const subjectInput = document.querySelector('.fu-subject[data-id="' + id + '"]');
     const bodyInput = document.querySelector('.fu-body[data-id="' + id + '"]');
     if (subjectInput && bodyInput) {
-        await api('save_followup_draft', { method: 'POST', body: { id: id, subject: subjectInput.value, body: bodyInput.value } });
+        const saveResult = await api('save_followup_draft', { method: 'POST', body: { id: id, subject: subjectInput.value, body: bodyInput.value } });
+        if (!saveResult.success) {
+            alert('Save failed: ' + (saveResult.message || 'unknown') + ' — not approving.');
+            return;
+        }
     }
     const data = await api('approve_followup', { method: 'POST', body: { id: id } });
     if (data.success) loadFollowups();

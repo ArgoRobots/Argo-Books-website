@@ -654,33 +654,29 @@ function halt_followups_for_lead($pdo, int $leadId, string $haltReason = 'manual
  */
 function halt_followups_bulk($pdo): array
 {
-    $counts = [
-        'replied' => 0,
-        'unsubscribed' => 0,
-        'bounced' => 0,
-    ];
-
-    // 1) Leads in stop-condition status
-    $stopStatuses = ['replied', 'interested', 'not_interested', 'onboarded', 'email_bounced'];
-    $placeholders = implode(',', array_fill(0, count($stopStatuses), '?'));
-    $stmt = $pdo->prepare(
+    // Halt rows for leads in reply-equivalent stop statuses
+    $repliedStmt = $pdo->prepare(
         "UPDATE outreach_followups f
          JOIN outreach_leads l ON l.id = f.lead_id
-         SET f.status = 'halted',
-             f.halt_reason = CASE l.status
-                 WHEN 'email_bounced' THEN 'bounced'
-                 WHEN 'replied' THEN 'replied'
-                 WHEN 'interested' THEN 'replied'
-                 WHEN 'onboarded' THEN 'replied'
-                 ELSE 'replied'
-             END
+         SET f.status = 'halted', f.halt_reason = 'replied'
          WHERE f.status IN ('scheduled', 'drafted', 'approved')
-           AND l.status IN ($placeholders)"
+           AND l.status IN ('replied', 'interested', 'not_interested', 'onboarded')"
     );
-    $stmt->execute($stopStatuses);
-    $statusHalted = $stmt->rowCount();
+    $repliedStmt->execute();
+    $repliedCount = $repliedStmt->rowCount();
 
-    // 2) Leads whose email is in the outreach suppression list (unsubscribed)
+    // Halt rows for leads with bounced/complained emails
+    $bouncedStmt = $pdo->prepare(
+        "UPDATE outreach_followups f
+         JOIN outreach_leads l ON l.id = f.lead_id
+         SET f.status = 'halted', f.halt_reason = 'bounced'
+         WHERE f.status IN ('scheduled', 'drafted', 'approved')
+           AND l.status = 'email_bounced'"
+    );
+    $bouncedStmt->execute();
+    $bouncedCount = $bouncedStmt->rowCount();
+
+    // Halt rows for leads whose email is in the outreach suppression list (unsubscribed)
     $suppStmt = $pdo->prepare(
         "UPDATE outreach_followups f
          JOIN outreach_leads l ON l.id = f.lead_id
@@ -689,12 +685,13 @@ function halt_followups_bulk($pdo): array
          WHERE f.status IN ('scheduled', 'drafted', 'approved')"
     );
     $suppStmt->execute();
-    $unsubHalted = $suppStmt->rowCount();
+    $unsubCount = $suppStmt->rowCount();
 
-    $counts['replied'] = max(0, $statusHalted - $unsubHalted); // rough split for logging
-    $counts['unsubscribed'] = $unsubHalted;
-
-    return $counts;
+    return [
+        'replied' => $repliedCount,
+        'bounced' => $bouncedCount,
+        'unsubscribed' => $unsubCount,
+    ];
 }
 
 /**

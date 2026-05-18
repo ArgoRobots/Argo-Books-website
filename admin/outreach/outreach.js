@@ -1397,26 +1397,17 @@ window.loadLeadFollowups = async function() {
 let shopifyResults = [];
 let shopifyLastSummary = null; // { rejected_count, reject_reasons, total_evaluated }
 
-function _shopifyUpdateUsageDisplay(callsToday, limit, importsToday, importsLimit) {
+function _shopifyUpdateUsageDisplay(callsToday, limit) {
     const span = document.getElementById('serpapiUsage');
     if (!span) return;
-    let txt = `${callsToday}/${limit} queries`;
-    if (typeof importsToday === 'number' && typeof importsLimit === 'number') {
-        txt += `, ${importsToday}/${importsLimit} imports`;
-    }
-    span.textContent = txt;
+    span.textContent = `${callsToday}/${limit} SerpAPI queries`;
 }
 
 async function loadShopifyStatus() {
     try {
         const data = await api('shopify_get_status');
         if (data.success) {
-            _shopifyUpdateUsageDisplay(
-                data.serpapi_calls_today,
-                data.serpapi_limit,
-                data.imports_today,
-                data.imports_limit
-            );
+            _shopifyUpdateUsageDisplay(data.serpapi_calls_today, data.serpapi_limit);
         }
     } catch (e) { /* non-fatal */ }
 }
@@ -1449,12 +1440,7 @@ async function runShopifyDiscovery() {
             quota_exhausted: !!data.quota_exhausted,
             queries_run: (data.queries_run || []).length,
         };
-        _shopifyUpdateUsageDisplay(
-            data.serpapi_calls_today,
-            data.serpapi_limit,
-            data.imports_today,
-            data.imports_limit
-        );
+        _shopifyUpdateUsageDisplay(data.serpapi_calls_today, data.serpapi_limit);
         document.getElementById('shopifyResults').style.display = 'block';
         renderShopifyResults();
 

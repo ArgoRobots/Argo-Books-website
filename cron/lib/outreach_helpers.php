@@ -1574,13 +1574,11 @@ function ab_known_variant_types()
 /**
  * Evaluate the active test of a given variant type and promote a winner if
  * any exit criterion is met. Side effect: on trigger, UPDATE the test row to
- * completed with winner_variant_id set; optionally self-pauses automation if
- * the winning CTR is below the configured safety floor.
+ * completed with winner_variant_id set.
  *
  * Returns one of:
  *   ['action' => 'none', 'reason' => '...', 'variant_type' => $variantType, ...]
  *   ['action' => 'promoted', 'test_id' => N, 'variant_type' => $variantType, ...]
- *   ['action' => 'paused_safety', 'test_id' => N, 'variant_type' => $variantType, ...]
  *
  * Exit criteria (any one triggers promotion):
  *   a) leader significant at p<0.05 vs EVERY other variant AND every variant sent >= 30
@@ -1660,43 +1658,8 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
     $pdo->prepare("UPDATE outreach_ab_tests SET winner_variant_id = ?, status = 'completed', completed_at = NOW() WHERE id = ?")
         ->execute([$winner['id'], $test['id']]);
 
-    // Safety-floor checks. CTR floor is always evaluated — it's a
-    // deliverability signal (CTR below 1% suggests the email isn't even
-    // reaching inboxes) regardless of which metric drove promotion. Reply
-    // floor is only evaluated when we promoted on reply rate.
-    $floorStmt = $pdo->prepare("SELECT state_key, state_value FROM outreach_pipeline_state WHERE state_key IN ('ab_ctr_floor','ab_reply_floor')");
-    $floorStmt->execute();
-    $floorRows = $floorStmt->fetchAll();
-    $ctrFloor = 0.01;
-    $replyFloor = 0.005;
-    foreach ($floorRows as $row) {
-        if ($row['state_key'] === 'ab_ctr_floor')   $ctrFloor   = (float) $row['state_value'];
-        if ($row['state_key'] === 'ab_reply_floor') $replyFloor = (float) $row['state_value'];
-    }
-
-    $pausedForSafety = false;
-    $pauseReason = null;
-    if ($winner['sent_count'] >= 20) {
-        if ($metric === 'reply_rate' && $winner['reply_rate'] < $replyFloor) {
-            $pauseReason = 'Winner reply rate ' . number_format($winner['reply_rate'] * 100, 2)
-                . '% below floor ' . number_format($replyFloor * 100, 2)
-                . '% on test #' . (int) $test['id'];
-        } elseif ($winner['ctr'] < $ctrFloor) {
-            $pauseReason = 'Winner CTR ' . number_format($winner['ctr'] * 100, 2)
-                . '% below floor ' . number_format($ctrFloor * 100, 2)
-                . '% on test #' . (int) $test['id'];
-        }
-    }
-    if ($pauseReason !== null) {
-        $pauseStmt = $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES (?, ?)
-            ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)");
-        $pauseStmt->execute(['ab_auto_enabled', '0']);
-        $pauseStmt->execute(['ab_auto_last_pause_reason', $pauseReason]);
-        $pausedForSafety = true;
-    }
-
     return [
-        'action' => $pausedForSafety ? 'paused_safety' : 'promoted',
+        'action' => 'promoted',
         'variant_type' => $variantType,
         'test_id' => (int) $test['id'],
         'test_name' => $test['name'],

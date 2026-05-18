@@ -4,7 +4,6 @@
  *
  * Renders toggles for:
  *   - Auto-send vs Review-before-send (state: auto_send_mode)
- *   - A/B automation on/off (state: ab_auto_enabled)
  *
  * Plus read-only status: current A/B test, daily send limit,
  * and a tail of today's pipeline log filtered to automation lines.
@@ -70,15 +69,6 @@ function settings_tab_handle_post($pdo)
             $_SESSION['message'] = 'Send mode set to: ' . ($mode === 'auto' ? 'Auto-send' : 'Review before send');
             $_SESSION['message_type'] = 'success';
         }
-        header('Location: index.php?tab=settings'); exit;
-    }
-
-    if ($action === 'set_ab_auto_enabled') {
-        $enabled = $_POST['enabled'] ?? '';
-        $val = ($enabled === '1') ? '1' : '0';
-        settings_tab_set_state($pdo, 'ab_auto_enabled', $val);
-        $_SESSION['message'] = 'A/B automation: ' . ($val === '1' ? 'ON' : 'OFF');
-        $_SESSION['message_type'] = 'success';
         header('Location: index.php?tab=settings'); exit;
     }
 
@@ -154,7 +144,6 @@ function settings_tab_render($pdo)
     $autoSendMode = settings_tab_get_state($pdo, 'auto_send_mode', 'auto');
     if (!in_array($autoSendMode, ['auto', 'review'], true)) $autoSendMode = 'auto';
 
-    $abAutoEnabled = settings_tab_get_state($pdo, 'ab_auto_enabled', '1') === '1';
     require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
     $rotationOrder = ab_auto_rotation_order();
     $abNextType = settings_tab_get_state($pdo, 'ab_auto_next_type', $rotationOrder[0]);
@@ -164,8 +153,6 @@ function settings_tab_render($pdo)
 
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
     $followupLimit = (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30);
-    $ctrFloor = (float) settings_tab_get_state($pdo, 'ab_ctr_floor', '0.01');
-    $replyFloor = (float) settings_tab_get_state($pdo, 'ab_reply_floor', '0.005');
 
     // Active A/B test snapshot — show whichever variant_type is currently
     // running (only one is active at a time, regardless of type).
@@ -222,19 +209,6 @@ function settings_tab_render($pdo)
         }
     }
     ?>
-
-    <?php if ($abAutoEnabled === false): ?>
-        <div class="panel" style="border-left:3px solid #f59e0b;">
-            <div class="panel-content">
-                <strong>A/B automation is off.</strong>
-                <?php if (settings_tab_get_state($pdo, 'ab_auto_last_pause_reason')): ?>
-                    The last automated run paused itself: <em><?php echo htmlspecialchars((string) settings_tab_get_state($pdo, 'ab_auto_last_pause_reason')); ?></em>
-                <?php else: ?>
-                    Flip the toggle below to let the pipeline create and promote tests on its own.
-                <?php endif; ?>
-            </div>
-        </div>
-    <?php endif; ?>
 
     <div class="panel">
         <div class="panel-header">
@@ -296,55 +270,6 @@ function settings_tab_render($pdo)
                     <button type="submit" class="segmented-option <?php echo $autoSendMode === 'review' ? 'active' : ''; ?>">
                         <span class="segmented-title">Review before send</span>
                         <span class="segmented-desc">Pipeline generates drafts and stops. Review or edit them in the Leads tab, then click Send Email (or use bulk send).</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <div class="panel-header">
-            <h2>A/B automation</h2>
-        </div>
-        <div class="panel-content">
-            <p class="hint" style="margin-top:0;">
-                When on, the pipeline runs A/B cycles by itself: it auto-generates variants each cycle (or uses the fixed pool for sender / format / personalization), promotes the winner when it has enough data (or after 14&ndash;28 days), and starts the next cycle &mdash; rotating across types so it tests one lever, then another, and so on.
-                Promotion is scored on reply rate when any variant has a reply, falling back to CTR otherwise. It will self-pause if the winner's reply rate drops below <?php echo number_format($replyFloor * 100, 2); ?>% (when promoting on replies), or if CTR drops below <?php echo number_format($ctrFloor * 100, 1); ?>% (deliverability check, always evaluated).
-            </p>
-            <p class="hint">
-                Rotation order:
-            </p>
-            <ol class="hint" style="margin-top:0;">
-                <li><strong>Subject line</strong> &mdash; AI-generated subject styles.</li>
-                <li><strong>Sender from-name</strong> &mdash; "Evan" vs "Evan from Argo Books" vs "Argo Books".</li>
-                <li><strong>Format</strong> &mdash; full HTML email vs plain text.</li>
-                <li><strong>Personalization</strong> &mdash; with vs without the AI-generated business summary.</li>
-            </ol>
-            <p class="hint">
-                Body, CTA, and preheader tests aren't in the rotation: those need wording you write yourself, so they're always started by hand from the A/B Tests tab. Manual tests still work either way &mdash; they just delay the rotation while they run.
-                <?php if ($abAutoEnabled): ?>
-                    <br><br>The next type the cron will start is <strong><?php echo htmlspecialchars($abNextType); ?></strong> (assuming nothing else is running by then).
-                <?php endif; ?>
-            </p>
-            <div class="segmented-toggle">
-                <form method="POST" style="display:contents;">
-                    <input type="hidden" name="tab" value="settings">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
-                    <input type="hidden" name="action" value="set_ab_auto_enabled">
-                    <input type="hidden" name="enabled" value="1">
-                    <button type="submit" class="segmented-option <?php echo $abAutoEnabled ? 'active' : ''; ?>">
-                        <span class="segmented-title">On</span>
-                        <span class="segmented-desc">Runs in the daily outreach cron.</span>
-                    </button>
-                </form>
-                <form method="POST" style="display:contents;">
-                    <input type="hidden" name="tab" value="settings">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? ''); ?>">
-                    <input type="hidden" name="action" value="set_ab_auto_enabled">
-                    <input type="hidden" name="enabled" value="0">
-                    <button type="submit" class="segmented-option <?php echo !$abAutoEnabled ? 'active' : ''; ?>">
-                        <span class="segmented-title">Off</span>
-                        <span class="segmented-desc">Active test keeps running; no new cycles start.</span>
                     </button>
                 </form>
             </div>
@@ -498,11 +423,7 @@ function settings_tab_render($pdo)
                     </div>
                 </div>
             <?php else: ?>
-                <p class="empty-state">No active A/B test.
-                    <?php if ($abAutoEnabled): ?>
-                        The next pipeline run will create one.
-                    <?php endif; ?>
-                </p>
+                <p class="empty-state">No active A/B test. The next pipeline run will create one.</p>
             <?php endif; ?>
         </div>
     </div>

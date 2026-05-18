@@ -591,24 +591,35 @@ function shopify_run_dork($pdo)
     $serpResults = serpapi_query($query, $apiKey, $limit);
     _shopify_state_set($pdo, 'serpapi_calls_today', (string) ($callsToday + 1));
 
-    $evaluated = [];
+    // Evaluate each result and keep only fits (including already-imported fits,
+    // which still pass the evaluator). Rejects are summarized by count + a
+    // top-reasons breakdown so the operator can see why the dork yielded
+    // nothing without the table being cluttered with rejected rows.
+    $fits          = [];
+    $rejectedCount = 0;
+    $rejectReasons = [];
     foreach ($serpResults as $r) {
         $canonical = shopify_canonical_url($r['link'] ?? '');
         if ($canonical === '') continue;
 
-        // Flag if already imported as a lead
+        $result = evaluate_shopify_candidate($canonical);
+
+        if (empty($result['fit'])) {
+            $rejectedCount++;
+            $reason = $result['reason'] ?? 'unknown';
+            $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
+            continue;
+        }
+
         $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
         $check->execute([$canonical]);
         $existingLeadId = $check->fetchColumn();
 
-        $result    = evaluate_shopify_candidate($canonical);
-        $meta      = $result['metadata'] ?? [];
-        $evaluated[] = [
+        $meta = $result['metadata'] ?? [];
+        $fits[] = [
             'canonical_url'    => $canonical,
             'serp_title'       => $r['title'] ?? '',
-            'fit'              => (bool) ($result['fit'] ?? false),
-            'reason'           => $result['reason'] ?? '',
-            'detail'           => $result['detail'] ?? '',
+            'fit'              => true,
             'final_url'        => $result['final_url'] ?? $canonical,
             'business_name'    => $meta['business_name'] ?? '',
             'email'            => $meta['email'] ?? '',
@@ -622,7 +633,10 @@ function shopify_run_dork($pdo)
 
     json_response([
         'success'             => true,
-        'results'             => $evaluated,
+        'results'             => $fits,
+        'rejected_count'      => $rejectedCount,
+        'reject_reasons'      => $rejectReasons,
+        'total_evaluated'     => count($serpResults),
         'serpapi_calls_today' => $callsToday + 1,
         'serpapi_limit'       => $serpapiLimit,
         'imports_today'       => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),

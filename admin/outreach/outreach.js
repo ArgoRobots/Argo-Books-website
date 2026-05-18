@@ -810,48 +810,39 @@ async function searchBusinesses() {
             console.warn('Company size classification failed:', e.message);
         }
 
-        // Add new batch to results and re-render
-        discoveryResults = discoveryResults.concat(newBatch);
+        // Drop items that don't match the size filter so they never land in
+        // discoveryResults — they shouldn't be displayed OR imported.
+        const matchingBatch = sizeFilter
+            ? newBatch.filter(b => b.company_size === sizeFilter)
+            : newBatch;
+
+        discoveryResults = discoveryResults.concat(matchingBatch);
         renderDiscoveryResults();
         saveDiscoveryToSession();
 
-        // Check if we have enough filtered results
-        if (!sizeFilter) break;
-        const filteredCount = discoveryResults.filter(b => b.company_size === sizeFilter).length;
-        if (filteredCount >= limit) break;
+        if (discoveryResults.length >= limit) break;
     }
 
     btn.disabled = false;
     btn.textContent = 'Search';
 
-    if (lastNote && sizeFilter) {
-        const filteredCount = discoveryResults.filter(b => b.company_size === sizeFilter).length;
-        if (filteredCount < limit) {
-            notify(`Found ${filteredCount} ${sizeFilter} businesses out of ${discoveryResults.length} total. Not enough ${sizeFilter} businesses in this area.`, 'info');
-        }
+    if (lastNote && sizeFilter && discoveryResults.length < limit) {
+        notify(`Found ${discoveryResults.length} ${sizeFilter} businesses (asked for ${limit}). Not enough in this area.`, 'info');
     }
 }
 
 function renderDiscoveryResults() {
-    const sizeFilter = document.getElementById('discCompanySize').value;
-    const filtered = sizeFilter
-        ? discoveryResults.filter(biz => biz.company_size === sizeFilter)
-        : discoveryResults;
-
-    document.getElementById('discoveryCount').textContent = sizeFilter
-        ? `${filtered.length} of ${discoveryResults.length} results (filtered by ${sizeFilter})`
-        : `${discoveryResults.length} results`;
+    document.getElementById('discoveryCount').textContent = `${discoveryResults.length} results`;
 
     const tbody = document.getElementById('discoveryTableBody');
 
-    if (!filtered.length) {
+    if (!discoveryResults.length) {
         tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No businesses found</td></tr>';
         return;
     }
 
-    tbody.innerHTML = filtered.map((biz, i) => {
-        // Find original index for checkbox data
-        const origIndex = discoveryResults.indexOf(biz);
+    tbody.innerHTML = discoveryResults.map((biz, i) => {
+        const origIndex = i;
         return `
         <tr>
             <td><div class="checkbox"><input type="checkbox" class="disc-check" data-index="${origIndex}" id="disc-check-${origIndex}" checked><label for="disc-check-${origIndex}"></label></div></td>
@@ -1402,6 +1393,7 @@ window.loadLeadFollowups = async function() {
 // ─── Shopify Discovery ───
 
 let shopifyResults = [];
+let shopifyLastSummary = null; // { rejected_count, reject_reasons, total_evaluated }
 
 function onShopifyDorkChange() {
     const sel = document.getElementById('shopifyDork');
@@ -1466,6 +1458,11 @@ async function runShopifyDiscovery() {
         }
 
         shopifyResults = data.results || [];
+        shopifyLastSummary = {
+            rejected_count: data.rejected_count || 0,
+            reject_reasons: data.reject_reasons || {},
+            total_evaluated: data.total_evaluated || 0,
+        };
         _shopifyUpdateUsageDisplay(
             data.serpapi_calls_today,
             data.serpapi_limit,
@@ -1486,45 +1483,53 @@ function renderShopifyResults() {
     const body = document.getElementById('shopifyResultsBody');
     const countEl = document.getElementById('shopifyResultsCount');
     const importAllBtn = document.getElementById('shopifyImportAllBtn');
+    const safe = (s) => escapeHtml(String(s ?? ''));
 
-    const fitCount = shopifyResults.filter(r => r.fit && !r.already_imported).length;
-    const rejectCount = shopifyResults.filter(r => !r.fit).length;
-    const dupCount = shopifyResults.filter(r => r.fit && r.already_imported).length;
-    countEl.textContent =
-        `${shopifyResults.length} results — ${fitCount} fit, ${rejectCount} rejected` +
-        (dupCount > 0 ? `, ${dupCount} already imported` : '');
+    const importableCount = shopifyResults.filter(r => !r.already_imported).length;
+    const importedCount   = shopifyResults.filter(r => r.already_imported).length;
+
+    // Summary line — fits in the table + rejected count from the server,
+    // with a top-reasons hint when the dork mostly missed.
+    let summary = `${shopifyResults.length} fit`;
+    if (importedCount > 0) summary += ` (${importedCount} already imported)`;
+    if (shopifyLastSummary && shopifyLastSummary.rejected_count > 0) {
+        const reasons = shopifyLastSummary.reject_reasons || {};
+        const reasonStr = Object.entries(reasons)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([k, n]) => `${n}× ${k}`)
+            .join(', ');
+        summary += ` · ${shopifyLastSummary.rejected_count} rejected`;
+        if (reasonStr) summary += ` (${reasonStr})`;
+    }
+    countEl.textContent = summary;
 
     if (importAllBtn) {
-        importAllBtn.disabled = fitCount === 0;
-        importAllBtn.textContent = fitCount > 0 ? `Import ${fitCount} Fit${fitCount !== 1 ? 's' : ''}` : 'Import All Fits';
+        importAllBtn.disabled = importableCount === 0;
+        importAllBtn.textContent = importableCount > 0 ? `Import ${importableCount} Fit${importableCount !== 1 ? 's' : ''}` : 'Import All Fits';
     }
 
     if (shopifyResults.length === 0) {
-        body.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#666;">SerpAPI returned no results for this query.</td></tr>';
+        const emptyMsg = shopifyLastSummary && shopifyLastSummary.total_evaluated > 0
+            ? 'SerpAPI returned results but none passed the filter. See the rejection summary above for why.'
+            : 'SerpAPI returned no results for this query.';
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:#888;">${emptyMsg}</td></tr>`;
         return;
     }
 
     body.innerHTML = shopifyResults.map((r, idx) => {
-        const safe = (s) => escapeHtml(String(s ?? ''));
         const displayUrl = r.final_url || r.canonical_url;
         const store = r.business_name
-            ? `<div><strong>${safe(r.business_name)}</strong></div><div style="font-size:12px;"><a href="${safe(displayUrl)}" target="_blank" rel="noopener">${safe(displayUrl)}</a></div>`
-            : `<a href="${safe(displayUrl)}" target="_blank" rel="noopener">${safe(displayUrl)}</a>`;
+            ? `<div><strong>${safe(r.business_name)}</strong></div><div style="font-size:12px;"><a href="${safe(displayUrl)}" target="_blank" rel="noopener" class="link">${safe(displayUrl)}</a></div>`
+            : `<a href="${safe(displayUrl)}" target="_blank" rel="noopener" class="link">${safe(displayUrl)}</a>`;
 
-        let resultCell;
-        if (r.fit && r.already_imported) {
-            resultCell = `<span class="status-badge status-contacted">already imported (#${r.existing_lead_id})</span>`;
-        } else if (r.fit) {
-            resultCell = '<span class="status-badge status-replied">fit</span>';
-        } else {
-            const detailLine = r.detail ? `<div style="font-size:11px; color:#888; margin-top:2px;">${safe(r.detail)}</div>` : '';
-            resultCell = `<span class="status-badge status-paused">${safe(r.reason || 'rejected')}</span>${detailLine}`;
-        }
+        const resultCell = r.already_imported
+            ? `<span class="status-badge status-contacted">already imported (#${r.existing_lead_id})</span>`
+            : '<span class="status-badge status-replied">fit</span>';
 
-        let actionCell = '—';
-        if (r.fit && !r.already_imported) {
-            actionCell = `<button class="btn btn-small btn-blue" onclick="importShopifyRow(${idx}, this)">Import</button>`;
-        }
+        const actionCell = r.already_imported
+            ? '—'
+            : `<button class="btn btn-small btn-blue" onclick="importShopifyRow(${idx}, this)">Import</button>`;
 
         return '<tr>' +
             `<td>${store}</td>` +

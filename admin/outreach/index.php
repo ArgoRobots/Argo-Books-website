@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
 
 // Determine active tab from ?tab=
 $activeTab = $_GET['tab'] ?? 'leads';
-if (!in_array($activeTab, ['leads', 'ab-tests', 'followups', 'settings'], true)) {
+if (!in_array($activeTab, ['discovery', 'leads', 'ab-tests', 'followups', 'settings'], true)) {
     $activeTab = 'leads';
 }
 
@@ -57,59 +57,19 @@ include __DIR__ . '/../admin_header.php';
 
 <!-- Page-level tabs -->
 <div class="section-tabs">
+    <button class="section-tab <?php echo $activeTab === 'discovery' ? 'active' : ''; ?>" data-tab="discovery">Discovery</button>
     <button class="section-tab <?php echo $activeTab === 'leads' ? 'active' : ''; ?>" data-tab="leads">Leads</button>
     <button class="section-tab <?php echo $activeTab === 'followups' ? 'active' : ''; ?>" data-tab="followups">Follow-ups</button>
     <button class="section-tab <?php echo $activeTab === 'ab-tests' ? 'active' : ''; ?>" data-tab="ab-tests">A/B Tests</button>
     <button class="section-tab <?php echo $activeTab === 'settings' ? 'active' : ''; ?>" data-tab="settings">Settings</button>
 </div>
 
-<div id="leads" class="tab-content <?php echo $activeTab === 'leads' ? 'active' : ''; ?>">
+<div id="discovery" class="tab-content <?php echo $activeTab === 'discovery' ? 'active' : ''; ?>">
 
-<!-- Pipeline Running Banner -->
-<div id="pipelineBanner" style="display:none; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:6px; padding:12px 16px; margin-bottom:16px; font-weight:500;">
-    The outreach cron pipeline is currently running. Sending, drafting, and discovery are temporarily disabled to prevent conflicts.
-</div>
-
-<!-- Dashboard Stats -->
-<div class="stats-row" id="statsRow">
-    <div class="stat-card">
-        <div class="stat-label">Total Leads</div>
-        <div class="stat-value" id="statTotal">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">New</div>
-        <div class="stat-value stat-new" id="statNew">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Drafts Pending</div>
-        <div class="stat-value stat-pending" id="statDraftsPending">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Follow-ups pending review</div>
-        <div class="stat-value stat-pending" id="statFollowupsPending">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Contacted</div>
-        <div class="stat-value stat-contacted" id="statContacted">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Replied</div>
-        <div class="stat-value stat-replied" id="statReplied">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Interested</div>
-        <div class="stat-value stat-interested" id="statInterested">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Clicked</div>
-        <div class="stat-value stat-clicked" id="statClicked">0</div>
-    </div>
-</div>
-
-<!-- Business Discovery Panel -->
+<!-- Google Places Discovery Panel -->
 <div class="panel discovery-panel">
     <div class="panel-header" onclick="togglePanel('discoveryContent')">
-        <h2><?= svg_icon('search', 18) ?> Business Discovery</h2>
+        <h2><?= svg_icon('search', 18) ?> Google Places</h2>
         <span class="panel-toggle" id="discoveryToggle">&#9660;</span>
     </div>
     <div class="panel-content" id="discoveryContent">
@@ -180,6 +140,117 @@ include __DIR__ . '/../admin_header.php';
                 </table>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Shopify Discovery Panel -->
+<div class="panel discovery-panel">
+    <div class="panel-header" onclick="togglePanel('shopifyContent')">
+        <h2><?= svg_icon('search', 18) ?> Shopify</h2>
+        <span class="panel-toggle" id="shopifyToggle">&#9660;</span>
+    </div>
+    <div class="panel-content" id="shopifyContent">
+        <div class="discovery-form">
+            <div class="form-row">
+                <div class="form-group" style="flex: 2;">
+                    <label for="shopifyDork">SerpAPI dork query</label>
+                    <select id="shopifyDork" onchange="onShopifyDorkChange()">
+                        <?php
+                        require_once __DIR__ . '/../../cron/lib/shopify_discovery.php';
+                        foreach (SHOPIFY_DORK_POOL as $dork) {
+                            echo '<option value="' . htmlspecialchars($dork, ENT_QUOTES) . '">' . htmlspecialchars($dork, ENT_QUOTES) . '</option>';
+                        }
+                        ?>
+                        <option value="__custom__">Custom query…</option>
+                    </select>
+                    <input type="text" id="shopifyDorkCustom" placeholder='site:myshopify.com "your query"' style="display:none; margin-top:8px;">
+                </div>
+                <div class="form-group">
+                    <label for="shopifyLimit">Limit</label>
+                    <select id="shopifyLimit">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                    </select>
+                </div>
+                <div class="form-group form-group-btn">
+                    <button class="btn btn-blue" onclick="runShopifyDiscovery()" id="shopifyRunBtn">Run</button>
+                </div>
+            </div>
+            <p style="margin:8px 0 0; color:#666; font-size:13px;">
+                SerpAPI usage today: <span id="serpapiUsage">…</span>
+                &nbsp;·&nbsp; Each run uses one SerpAPI query from your daily quota.
+            </p>
+        </div>
+
+        <div id="shopifyResults" style="display:none; margin-top:16px;">
+            <div class="discovery-actions">
+                <span id="shopifyResultsCount">0 results</span>
+                <div>
+                    <button class="btn btn-small btn-blue" onclick="importAllShopifyFits()" id="shopifyImportAllBtn">Import All Fits</button>
+                </div>
+            </div>
+            <div class="discovery-table-wrapper">
+                <table class="data-table discovery-table">
+                    <thead>
+                        <tr>
+                            <th>Store</th>
+                            <th>Email</th>
+                            <th>Products</th>
+                            <th>Oldest Product</th>
+                            <th>Country</th>
+                            <th>Result</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shopifyResultsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div> <!-- /#discovery -->
+
+<div id="leads" class="tab-content <?php echo $activeTab === 'leads' ? 'active' : ''; ?>">
+
+<!-- Pipeline Running Banner -->
+<div id="pipelineBanner" style="display:none; background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:6px; padding:12px 16px; margin-bottom:16px; font-weight:500;">
+    The outreach cron pipeline is currently running. Sending, drafting, and discovery are temporarily disabled to prevent conflicts.
+</div>
+
+<!-- Dashboard Stats -->
+<div class="stats-row" id="statsRow">
+    <div class="stat-card">
+        <div class="stat-label">Total Leads</div>
+        <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">New</div>
+        <div class="stat-value stat-new" id="statNew">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Drafts Pending</div>
+        <div class="stat-value stat-pending" id="statDraftsPending">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Follow-ups pending review</div>
+        <div class="stat-value stat-pending" id="statFollowupsPending">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Contacted</div>
+        <div class="stat-value stat-contacted" id="statContacted">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Replied</div>
+        <div class="stat-value stat-replied" id="statReplied">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Interested</div>
+        <div class="stat-value stat-interested" id="statInterested">0</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Clicked</div>
+        <div class="stat-value stat-clicked" id="statClicked">0</div>
     </div>
 </div>
 

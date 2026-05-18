@@ -1398,3 +1398,210 @@ window.loadLeadFollowups = async function() {
         ).join('') +
     '</tbody></table>';
 };
+
+// ─── Shopify Discovery ───
+
+let shopifyResults = [];
+
+function onShopifyDorkChange() {
+    const sel = document.getElementById('shopifyDork');
+    const custom = document.getElementById('shopifyDorkCustom');
+    if (!sel || !custom) return;
+    custom.style.display = sel.value === '__custom__' ? '' : 'none';
+    if (sel.value === '__custom__') custom.focus();
+}
+
+function _shopifyUpdateUsageDisplay(callsToday, limit, importsToday, importsLimit) {
+    const span = document.getElementById('serpapiUsage');
+    if (!span) return;
+    let txt = `${callsToday}/${limit} queries`;
+    if (typeof importsToday === 'number' && typeof importsLimit === 'number') {
+        txt += `, ${importsToday}/${importsLimit} imports`;
+    }
+    span.textContent = txt;
+}
+
+async function loadShopifyStatus() {
+    try {
+        const data = await api('shopify_get_status');
+        if (data.success) {
+            _shopifyUpdateUsageDisplay(
+                data.serpapi_calls_today,
+                data.serpapi_limit,
+                data.imports_today,
+                data.imports_limit
+            );
+        }
+    } catch (e) { /* non-fatal */ }
+}
+
+async function runShopifyDiscovery() {
+    const dorkSel = document.getElementById('shopifyDork');
+    const custom = document.getElementById('shopifyDorkCustom');
+    const limit = parseInt(document.getElementById('shopifyLimit').value, 10) || 10;
+    const btn = document.getElementById('shopifyRunBtn');
+
+    let query = dorkSel.value;
+    if (query === '__custom__') {
+        query = custom.value.trim();
+        if (!query) {
+            notify('Enter a custom query first');
+            custom.focus();
+            return;
+        }
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Running…';
+
+    try {
+        const data = await api('shopify_run_dork', {
+            method: 'POST',
+            body: { query, limit }
+        });
+
+        if (!data.success) {
+            notify(data.message || 'Shopify discovery failed');
+            return;
+        }
+
+        shopifyResults = data.results || [];
+        _shopifyUpdateUsageDisplay(
+            data.serpapi_calls_today,
+            data.serpapi_limit,
+            data.imports_today,
+            data.imports_limit
+        );
+        document.getElementById('shopifyResults').style.display = 'block';
+        renderShopifyResults();
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run';
+    }
+}
+
+function renderShopifyResults() {
+    const body = document.getElementById('shopifyResultsBody');
+    const countEl = document.getElementById('shopifyResultsCount');
+    const importAllBtn = document.getElementById('shopifyImportAllBtn');
+
+    const fitCount = shopifyResults.filter(r => r.fit && !r.already_imported).length;
+    const rejectCount = shopifyResults.filter(r => !r.fit).length;
+    const dupCount = shopifyResults.filter(r => r.fit && r.already_imported).length;
+    countEl.textContent =
+        `${shopifyResults.length} results — ${fitCount} fit, ${rejectCount} rejected` +
+        (dupCount > 0 ? `, ${dupCount} already imported` : '');
+
+    if (importAllBtn) {
+        importAllBtn.disabled = fitCount === 0;
+        importAllBtn.textContent = fitCount > 0 ? `Import ${fitCount} Fit${fitCount !== 1 ? 's' : ''}` : 'Import All Fits';
+    }
+
+    if (shopifyResults.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:#666;">SerpAPI returned no results for this query.</td></tr>';
+        return;
+    }
+
+    body.innerHTML = shopifyResults.map((r, idx) => {
+        const safe = (s) => escapeHtml(String(s ?? ''));
+        const displayUrl = r.final_url || r.canonical_url;
+        const store = r.business_name
+            ? `<div><strong>${safe(r.business_name)}</strong></div><div style="font-size:12px;"><a href="${safe(displayUrl)}" target="_blank" rel="noopener">${safe(displayUrl)}</a></div>`
+            : `<a href="${safe(displayUrl)}" target="_blank" rel="noopener">${safe(displayUrl)}</a>`;
+
+        let resultCell;
+        if (r.fit && r.already_imported) {
+            resultCell = `<span class="status-badge status-contacted">already imported (#${r.existing_lead_id})</span>`;
+        } else if (r.fit) {
+            resultCell = '<span class="status-badge status-replied">fit</span>';
+        } else {
+            const detailLine = r.detail ? `<div style="font-size:11px; color:#888; margin-top:2px;">${safe(r.detail)}</div>` : '';
+            resultCell = `<span class="status-badge status-paused">${safe(r.reason || 'rejected')}</span>${detailLine}`;
+        }
+
+        let actionCell = '—';
+        if (r.fit && !r.already_imported) {
+            actionCell = `<button class="btn btn-small btn-blue" onclick="importShopifyRow(${idx}, this)">Import</button>`;
+        }
+
+        return '<tr>' +
+            `<td>${store}</td>` +
+            `<td>${safe(r.email) || '—'}</td>` +
+            `<td>${r.products_count != null ? safe(r.products_count) : '—'}</td>` +
+            `<td>${safe(r.first_product_at) || '—'}</td>` +
+            `<td>${safe(r.country) || '—'}</td>` +
+            `<td>${resultCell}</td>` +
+            `<td>${actionCell}</td>` +
+        '</tr>';
+    }).join('');
+}
+
+async function importShopifyRow(idx, btn) {
+    const row = shopifyResults[idx];
+    if (!row || !row.fit) return;
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    try {
+        const data = await api('shopify_import', {
+            method: 'POST',
+            body: { canonical_url: row.canonical_url }
+        });
+        if (data.success) {
+            shopifyResults[idx].already_imported = true;
+            shopifyResults[idx].existing_lead_id = data.lead_id;
+            renderShopifyResults();
+            loadStats();
+        } else {
+            notify(data.message || 'Import failed');
+            btn.disabled = false;
+            btn.textContent = 'Import';
+        }
+    } catch (e) {
+        notify(e.message);
+        btn.disabled = false;
+        btn.textContent = 'Import';
+    }
+}
+
+async function importAllShopifyFits() {
+    const fits = shopifyResults
+        .map((r, idx) => ({ row: r, idx }))
+        .filter(x => x.row.fit && !x.row.already_imported);
+
+    if (fits.length === 0) return;
+    if (!confirm(`Import ${fits.length} Shopify store${fits.length === 1 ? '' : 's'} as new leads?`)) return;
+
+    const btn = document.getElementById('shopifyImportAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+
+    let imported = 0;
+    let failed = 0;
+    for (const { row, idx } of fits) {
+        try {
+            const data = await api('shopify_import', {
+                method: 'POST',
+                body: { canonical_url: row.canonical_url }
+            });
+            if (data.success) {
+                shopifyResults[idx].already_imported = true;
+                shopifyResults[idx].existing_lead_id = data.lead_id;
+                imported++;
+            } else {
+                failed++;
+            }
+        } catch (e) {
+            failed++;
+        }
+    }
+
+    renderShopifyResults();
+    loadStats();
+    notify(`Imported ${imported} lead${imported === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
+}
+
+// Load Shopify status on page load so the usage display is populated
+document.addEventListener('DOMContentLoaded', loadShopifyStatus);
+

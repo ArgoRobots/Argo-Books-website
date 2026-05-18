@@ -6,7 +6,7 @@ Argo Books has a built-in outreach system that finds small businesses and writes
 
 It also has a A/B test system to learn what works, so it constantly improves itself.
 
-Everything lives in the admin dashboard under **Outreach**, which has four tabs: **Leads**, **Follow-ups**, **A/B Tests**, and **Settings**.
+Everything lives in the admin dashboard under **Outreach**, which has five tabs: **Discovery**, **Leads**, **Follow-ups**, **A/B Tests**, and **Settings**.
 
 ## Google Places channel
 
@@ -35,13 +35,21 @@ Finds small Canadian Shopify sellers in their first 3–24 months — stores tha
 3. It then scrapes the store's contact page for a direct email address. Role-mailbox addresses (`support@`, `partnerships@`, etc.) are rejected; only personal or general-contact addresses are accepted.
 4. Stores that pass all checks are imported as leads (`status='imported'`). Stores that fail are recorded with a `reject_reason` so they aren't re-evaluated on future runs.
 
+## The Discovery tab
+
+Manual discovery for both channels — useful for spot-checking what the cron would find before letting it run on its own, or for sourcing leads outside the cron schedule.
+
+- **Google Places** — the city / province / category / size / limit form. Searches Google Places live and previews matching businesses with their scraped contact emails. Pick which ones to import.
+- **Shopify** — pick a SerpAPI dork from the rotation (or write a custom one) and run it. Each result gets evaluated by the same filter as the cron (Canadian signal, 3–24 month age, 5+ products, non-gatekept email, not agency-operated) and the table shows fit / rejected / already-imported with the reject reason. Import any fit row, or "Import All Fits" in bulk.
+
+Both panels show the daily quota state so you don't blow through SerpAPI's free tier mid-day. The Shopify panel respects the same `SERPAPI_DAILY_QUERY_LIMIT` and `OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT` env vars the cron uses.
+
 ## The Leads tab
 
 This is the list of businesses the system has found or that you've added manually.
 
 From here you can:
 
-- **Search the web for new businesses** in a specific city and category, preview the results, and pick which ones to import.
 - **Add a lead manually** or import a CSV spreadsheet.
 - **Open a lead** to see the AI-generated email, edit the draft before it's sent, or mark the conversation status (interested / not interested / onboarded / replied).
 - **Bulk-generate drafts** or **bulk-send emails** for a group of leads you've selected.

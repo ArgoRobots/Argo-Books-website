@@ -152,33 +152,16 @@ include __DIR__ . '/../admin_header.php';
     <div class="panel-content" id="shopifyContent">
         <div class="discovery-form">
             <div class="form-row">
-                <div class="form-group" style="flex: 2;">
-                    <label for="shopifyDork">SerpAPI dork query</label>
-                    <select id="shopifyDork" onchange="onShopifyDorkChange()">
-                        <?php
-                        require_once __DIR__ . '/../../cron/lib/shopify_discovery.php';
-                        foreach (SHOPIFY_DORK_POOL as $dork) {
-                            echo '<option value="' . htmlspecialchars($dork, ENT_QUOTES) . '">' . htmlspecialchars($dork, ENT_QUOTES) . '</option>';
-                        }
-                        ?>
-                        <option value="__custom__">Custom query…</option>
-                    </select>
-                    <input type="text" id="shopifyDorkCustom" placeholder='site:myshopify.com "your query"' style="display:none; margin-top:8px;">
-                </div>
                 <div class="form-group">
-                    <label for="shopifyLimit">Limit</label>
-                    <select id="shopifyLimit">
-                        <option value="5">5</option>
-                        <option value="10" selected>10</option>
-                    </select>
+                    <label for="shopifyLimit">How many startups to find</label>
+                    <input type="number" id="shopifyLimit" value="10" min="1" max="50">
                 </div>
                 <div class="form-group form-group-btn">
                     <button class="btn btn-blue" onclick="runShopifyDiscovery()" id="shopifyRunBtn">Run</button>
                 </div>
             </div>
             <p style="margin:8px 0 0; color:#666; font-size:13px;">
-                SerpAPI usage today: <span id="serpapiUsage">…</span>
-                &nbsp;·&nbsp; Each run uses one SerpAPI query from your daily quota.
+                The system picks Canadian-startup queries automatically and keeps searching until it finds enough or your daily SerpAPI quota runs out. Usage today: <span id="serpapiUsage">…</span>.
             </p>
         </div>
 

@@ -35,17 +35,20 @@ function _shopify_url_is_safe_external(string $url): bool
     return (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
 }
 
+// Broad Canadian-signal dorks. No city-specific terms — the eligible market
+// is anywhere in Canada, not just metros, and the storefront-level country
+// check in evaluate_shopify_candidate confirms CA before any lead is created.
 const SHOPIFY_DORK_POOL = [
     'site:myshopify.com "based in canada" "contact"',
     'site:myshopify.com "ships from canada" "founded"',
     'site:myshopify.com "made in canada" "small batch"',
-    'site:myshopify.com "toronto" "shop"',
-    'site:myshopify.com "vancouver" "small business"',
-    'site:myshopify.com "calgary" OR "edmonton" "handmade"',
-    'site:myshopify.com "ottawa" OR "montreal" "founded in 2024"',
     'site:myshopify.com "proudly canadian" "contact us"',
     'site:myshopify.com "shipping across canada" "about"',
     'site:myshopify.com "canadian small business" "contact"',
+    'site:myshopify.com "canadian-owned" "shop"',
+    'site:myshopify.com "from canada" "small batch"',
+    'site:myshopify.com "canada" "founded in 2024"',
+    'site:myshopify.com "canada" "founded in 2025"',
 ];
 
 /**

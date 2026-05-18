@@ -565,13 +565,15 @@ function shopify_run_dork($pdo)
 {
     require_once __DIR__ . '/../../cron/lib/shopify_discovery.php';
 
-    $data  = json_decode(file_get_contents('php://input'), true) ?: [];
-    $query = trim($data['query'] ?? '');
-    $limit = min(10, max(1, (int) ($data['limit'] ?? 10)));
+    // Each evaluator call does multiple HTTP requests (storefront cURL,
+    // /products.json, contact-page email scrape), so a multi-round run with
+    // 10 candidates per dork can take a few minutes. Bump the time limit so
+    // the request can finish; the daily SerpAPI quota provides the upper
+    // bound on how many rounds can stack up.
+    @set_time_limit(300);
 
-    if ($query === '') {
-        json_response(['success' => false, 'message' => 'Query is required'], 400);
-    }
+    $data  = json_decode(file_get_contents('php://input'), true) ?: [];
+    $limit = min(50, max(1, (int) ($data['limit'] ?? 10)));
 
     $apiKey = $_ENV['SERPAPI_KEY'] ?? '';
     if ($apiKey === '') {
@@ -588,59 +590,82 @@ function shopify_run_dork($pdo)
         ], 429);
     }
 
-    $serpResults = serpapi_query($query, $apiKey, $limit);
-    _shopify_state_set($pdo, 'serpapi_calls_today', (string) ($callsToday + 1));
-
-    // Evaluate each result and keep only fits that aren't already imported.
-    // Rejects and already-imported are summarized by count so the operator
-    // still sees why the dork yielded few rows, without cluttering the table.
+    // Auto-rotate through SHOPIFY_DORK_POOL until we have $limit fits or the
+    // daily SerpAPI quota is exhausted. Cursor is shared with the cron via
+    // shopify_dork_cursor so consecutive UI clicks (and cron ticks) don't
+    // keep hitting the same query.
+    $cursor               = (int) _shopify_state_get($pdo, 'shopify_dork_cursor', '0');
+    $poolSize             = count(SHOPIFY_DORK_POOL);
     $fits                 = [];
     $rejectedCount        = 0;
     $rejectReasons        = [];
     $alreadyImportedCount = 0;
-    foreach ($serpResults as $r) {
-        $canonical = shopify_canonical_url($r['link'] ?? '');
-        if ($canonical === '') continue;
+    $totalEvaluated       = 0;
+    $queriesRun           = [];
 
-        $result = evaluate_shopify_candidate($canonical);
+    while (count($fits) < $limit && $callsToday < $serpapiLimit) {
+        $query = SHOPIFY_DORK_POOL[$cursor % $poolSize];
+        $cursor++;
+        _shopify_state_set($pdo, 'shopify_dork_cursor', (string) $cursor);
 
-        if (empty($result['fit'])) {
-            $rejectedCount++;
-            $reason = $result['reason'] ?? 'unknown';
-            $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
-            continue;
+        $serpResults = serpapi_query($query, $apiKey, 10);
+        $callsToday++;
+        _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
+        $queriesRun[] = $query;
+
+        if (empty($serpResults)) continue;
+        $totalEvaluated += count($serpResults);
+
+        foreach ($serpResults as $r) {
+            if (count($fits) >= $limit) break 2;
+
+            $canonical = shopify_canonical_url($r['link'] ?? '');
+            if ($canonical === '') continue;
+
+            $result = evaluate_shopify_candidate($canonical);
+
+            if (empty($result['fit'])) {
+                $rejectedCount++;
+                $reason = $result['reason'] ?? 'unknown';
+                $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
+                continue;
+            }
+
+            $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+            $check->execute([$canonical]);
+            if ($check->fetchColumn() !== false) {
+                $alreadyImportedCount++;
+                continue;
+            }
+
+            $meta = $result['metadata'] ?? [];
+            $fits[] = [
+                'canonical_url'    => $canonical,
+                'serp_title'       => $r['title'] ?? '',
+                'fit'              => true,
+                'final_url'        => $result['final_url'] ?? $canonical,
+                'business_name'    => $meta['business_name'] ?? '',
+                'email'            => $meta['email'] ?? '',
+                'products_count'   => $meta['products_count'] ?? null,
+                'first_product_at' => $meta['first_product_created_at'] ?? null,
+                'country'          => $meta['country'] ?? '',
+            ];
         }
-
-        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
-        $check->execute([$canonical]);
-        $existingLeadId = $check->fetchColumn();
-        if ($existingLeadId !== false) {
-            $alreadyImportedCount++;
-            continue;
-        }
-
-        $meta = $result['metadata'] ?? [];
-        $fits[] = [
-            'canonical_url'    => $canonical,
-            'serp_title'       => $r['title'] ?? '',
-            'fit'              => true,
-            'final_url'        => $result['final_url'] ?? $canonical,
-            'business_name'    => $meta['business_name'] ?? '',
-            'email'            => $meta['email'] ?? '',
-            'products_count'   => $meta['products_count'] ?? null,
-            'first_product_at' => $meta['first_product_created_at'] ?? null,
-            'country'          => $meta['country'] ?? '',
-        ];
     }
+
+    $quotaExhausted = $callsToday >= $serpapiLimit && count($fits) < $limit;
 
     json_response([
         'success'                => true,
         'results'                => $fits,
+        'requested_limit'        => $limit,
+        'quota_exhausted'        => $quotaExhausted,
         'rejected_count'         => $rejectedCount,
         'reject_reasons'         => $rejectReasons,
         'already_imported_count' => $alreadyImportedCount,
-        'total_evaluated'        => count($serpResults),
-        'serpapi_calls_today'    => $callsToday + 1,
+        'total_evaluated'        => $totalEvaluated,
+        'queries_run'            => $queriesRun,
+        'serpapi_calls_today'    => $callsToday,
         'serpapi_limit'          => $serpapiLimit,
         'imports_today'          => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
         'imports_limit'          => (int) ($_ENV['OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT'] ?? 5),

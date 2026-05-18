@@ -767,9 +767,11 @@ async function searchBusinesses() {
     discoveryResults = [];
     document.getElementById('discoveryResults').style.display = 'block';
 
-    // If a size filter is active, we may need multiple search+classify rounds
-    // to accumulate enough results that match the filter
-    const maxAttempts = sizeFilter ? 3 : 1;
+    // Keep paging Google Places until we have `limit` results matching the
+    // filter, or the API stops returning new businesses (exhausted area).
+    // 10 is a safety cap so a city + category with no matches doesn't loop
+    // forever — each round already excludes places_ids already collected.
+    const maxAttempts = 10;
     let lastNote = null;
 
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
@@ -1395,14 +1397,6 @@ window.loadLeadFollowups = async function() {
 let shopifyResults = [];
 let shopifyLastSummary = null; // { rejected_count, reject_reasons, total_evaluated }
 
-function onShopifyDorkChange() {
-    const sel = document.getElementById('shopifyDork');
-    const custom = document.getElementById('shopifyDorkCustom');
-    if (!sel || !custom) return;
-    custom.style.display = sel.value === '__custom__' ? '' : 'none';
-    if (sel.value === '__custom__') custom.focus();
-}
-
 function _shopifyUpdateUsageDisplay(callsToday, limit, importsToday, importsLimit) {
     const span = document.getElementById('serpapiUsage');
     if (!span) return;
@@ -1428,28 +1422,16 @@ async function loadShopifyStatus() {
 }
 
 async function runShopifyDiscovery() {
-    const dorkSel = document.getElementById('shopifyDork');
-    const custom = document.getElementById('shopifyDorkCustom');
-    const limit = parseInt(document.getElementById('shopifyLimit').value, 10) || 10;
+    const limit = Math.min(50, Math.max(1, parseInt(document.getElementById('shopifyLimit').value, 10) || 10));
     const btn = document.getElementById('shopifyRunBtn');
 
-    let query = dorkSel.value;
-    if (query === '__custom__') {
-        query = custom.value.trim();
-        if (!query) {
-            notify('Enter a custom query first');
-            custom.focus();
-            return;
-        }
-    }
-
     btn.disabled = true;
-    btn.textContent = 'Running…';
+    btn.textContent = 'Searching…';
 
     try {
         const data = await api('shopify_run_dork', {
             method: 'POST',
-            body: { query, limit }
+            body: { limit }
         });
 
         if (!data.success) {
@@ -1463,6 +1445,9 @@ async function runShopifyDiscovery() {
             reject_reasons: data.reject_reasons || {},
             already_imported_count: data.already_imported_count || 0,
             total_evaluated: data.total_evaluated || 0,
+            requested_limit: data.requested_limit || limit,
+            quota_exhausted: !!data.quota_exhausted,
+            queries_run: (data.queries_run || []).length,
         };
         _shopifyUpdateUsageDisplay(
             data.serpapi_calls_today,
@@ -1472,6 +1457,10 @@ async function runShopifyDiscovery() {
         );
         document.getElementById('shopifyResults').style.display = 'block';
         renderShopifyResults();
+
+        if (shopifyLastSummary.quota_exhausted) {
+            notify(`SerpAPI daily quota hit before finding ${shopifyLastSummary.requested_limit}. Got ${shopifyResults.length} fit${shopifyResults.length === 1 ? '' : 's'} after ${shopifyLastSummary.queries_run} ${shopifyLastSummary.queries_run === 1 ? 'query' : 'queries'}. Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.`);
+        }
     } catch (e) {
         notify(e.message);
     } finally {
@@ -1513,14 +1502,16 @@ function renderShopifyResults() {
     }
 
     if (shopifyResults.length === 0) {
-        let emptyMsg = 'SerpAPI returned no results for this query.';
+        const queriesRunN = (shopifyLastSummary && shopifyLastSummary.queries_run) || 0;
+        const queryWord = queriesRunN === 1 ? 'query' : 'queries';
+        let emptyMsg = `SerpAPI returned no results across ${queriesRunN} ${queryWord}.`;
         if (shopifyLastSummary && shopifyLastSummary.total_evaluated > 0) {
             const reasons = [];
             if (shopifyLastSummary.rejected_count > 0) reasons.push(`${shopifyLastSummary.rejected_count} rejected`);
             if (shopifyLastSummary.already_imported_count > 0) reasons.push(`${shopifyLastSummary.already_imported_count} already imported`);
             emptyMsg = reasons.length
-                ? `No new fits — all ${shopifyLastSummary.total_evaluated} results from this query were filtered (${reasons.join(', ')}).`
-                : 'SerpAPI returned results but none passed the filter.';
+                ? `No new fits — all ${shopifyLastSummary.total_evaluated} results across ${queriesRunN} ${queryWord} were filtered (${reasons.join(', ')}).`
+                : `SerpAPI returned results across ${queriesRunN} ${queryWord} but none passed the filter.`;
         }
         body.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:#888;">${emptyMsg}</td></tr>`;
         return;

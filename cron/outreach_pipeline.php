@@ -557,6 +557,9 @@ function stepDiscoverShopify($pdo, $dryRun)
             $evalResult = evaluate_shopify_candidate($canonical);
         } catch (Exception $e) {
             logPipeline("Error evaluating candidate '$canonical': " . $e->getMessage(), 'ERROR');
+            $pdo->prepare(
+                "UPDATE outreach_shopify_candidates SET status='error', reject_detail=? WHERE canonical_url=?"
+            )->execute([substr($e->getMessage(), 0, 500), $canonical]);
             $errored++;
             continue;
         }

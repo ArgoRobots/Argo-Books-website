@@ -169,7 +169,7 @@ function fetch_shopify_products_json(string $storefrontUrl, int $timeout = 10): 
         'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
     ]);
 
-    $raw = @file_get_contents($endpoint, false, $context);
+    $raw = @file_get_contents($endpoint, false, $context, 0, 2097152);  // 2 MB cap
 
     // Check HTTP status from response headers
     if (isset($http_response_header) && is_array($http_response_header)) {
@@ -189,6 +189,9 @@ function fetch_shopify_products_json(string $storefrontUrl, int $timeout = 10): 
 
     $decoded = json_decode($raw, true);
     if (!is_array($decoded)) {
+        if (strlen($raw) >= 2097152) {
+            error_log("Shopify /products.json too large (>2MB) at $endpoint");
+        }
         return null;
     }
 
@@ -238,6 +241,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
             CURLOPT_USERAGENT       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             CURLOPT_SSL_VERIFYPEER  => true,
             CURLOPT_ENCODING        => '',  // accept compressed responses
+            CURLOPT_MAXFILESIZE     => 2097152,  // 2 MB cap (enforced only when Content-Length is sent)
         ]);
         $html      = curl_exec($ch);
         $curlError = curl_error($ch);
@@ -250,6 +254,18 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
                 'fit'       => false,
                 'reason'    => 'fetch_failed',
                 'detail'    => 'HTTP fetch failed' . ($curlError ? ": {$curlError}" : " (HTTP {$httpCode})"),
+                'final_url' => $url,
+                'metadata'  => [],
+            ];
+        }
+
+        // Backup size guard: bail if response exceeds 2 MB regardless of Content-Length
+        if (is_string($html) && strlen($html) >= 2097152) {
+            error_log("Shopify storefront HTML too large (>2MB) at $url");
+            return [
+                'fit'       => false,
+                'reason'    => 'fetch_failed',
+                'detail'    => 'Storefront HTML response exceeded 2 MB size cap',
                 'final_url' => $url,
                 'metadata'  => [],
             ];

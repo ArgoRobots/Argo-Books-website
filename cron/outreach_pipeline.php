@@ -666,12 +666,6 @@ function stepManageAbTests($pdo, $dryRun)
 {
     logPipeline('--- Step 2.5: Manage A/B Tests ---');
 
-    $enabled = getState($pdo, 'ab_auto_enabled', '1');
-    if ($enabled !== '1') {
-        logPipeline('A/B automation is OFF (ab_auto_enabled != 1). Skipping.');
-        return;
-    }
-
     // followup_sequence-specific shape check: if the active followup_sequence
     // test's variant intents no longer match the current followup_sequence_config
     // touch list (e.g. admin added a touch), auto-pause it.
@@ -706,7 +700,6 @@ function stepManageAbTests($pdo, $dryRun)
     //    one test can be active at a time per the framework's invariant; the
     //    loop is type-agnostic so any wired type can promote cleanly.
     $anyStillRunning = false;
-    $anyPaused = false;
     foreach ($allTypes as $type) {
         $evalResult = ab_check_and_promote_active_test($pdo, $type);
         $type = $evalResult['variant_type'] ?? $type;
@@ -725,20 +718,6 @@ function stepManageAbTests($pdo, $dryRun)
                 $metric,
                 $evalResult['age_days']
             ));
-        } elseif ($evalResult['action'] === 'paused_safety') {
-            $metric = $evalResult['metric'] ?? 'ctr';
-            $rate = $metric === 'reply_rate'
-                ? ($evalResult['winner_reply_rate'] ?? 0)
-                : $evalResult['winner_ctr'];
-            logPipeline(sprintf(
-                "A/B auto-paused for safety: %s test #%d promoted variant %s but %s %.2f%% fell below floor. ab_auto_enabled set to 0.",
-                $type,
-                $evalResult['test_id'],
-                $evalResult['winner_label'],
-                $metric === 'reply_rate' ? 'reply rate' : 'CTR',
-                $rate * 100
-            ), 'WARN');
-            $anyPaused = true;
         } elseif ($evalResult['action'] === 'none' && ($evalResult['reason'] ?? '') === 'criteria_not_met') {
             logPipeline(sprintf(
                 "A/B %s test #%d '%s' still running (age %d days, min sent %d) — no promotion criteria met yet.",
@@ -751,10 +730,6 @@ function stepManageAbTests($pdo, $dryRun)
             $anyStillRunning = true;
         }
     }
-
-    // Safety-pause short-circuits new-cycle creation across all types — admin
-    // needs to flip A/B automation back on in Settings before anything moves.
-    if ($anyPaused) return;
 
     // If any test is still running (any type), don't start a new cycle yet
     // — keep the one-active-test-at-a-time invariant.

@@ -321,6 +321,11 @@ body.menu-open::after {
   top: 3px;
 }
 
+.header-logout-btn.btn-small {
+  min-width: 0;
+  padding: 5px 14px;
+}
+
 /* Main Content */
 .admin-content {
   margin: 0 auto;
@@ -922,10 +927,6 @@ tbody tr:hover {
 
   .mobile-user {
     margin-left: auto;
-  }
-
-  .home-text {
-    display: none;
   }
 
   .admin-content {

@@ -237,7 +237,7 @@ body.menu-open::after {
 }
 
 .header-title {
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--dark-gray);
 }
@@ -298,6 +298,7 @@ body.menu-open::after {
   background: var(--gray-bg-light);
   color: var(--black);
   text-decoration: none;
+  min-width: auto !important;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
   font-size: 0.875rem;
@@ -982,10 +983,6 @@ tbody tr:hover {
     gap: 0.5rem;
   }
 
-  .header-title {
-    font-size: 1.1rem;
-  }
-
   .user-name {
     font-size: 0.8rem;
   }
@@ -1592,6 +1589,10 @@ tbody tr:hover {
 /* Dark theme - License page */
 [data-theme="dark"] .form-group label {
   color: var(--gray-300);
+}
+
+[data-theme="dark"] .form-group small {
+  color: var(--gray-400);
 }
 
 [data-theme="dark"] .form-group input,

@@ -391,8 +391,7 @@ include __DIR__ . '/../admin_header.php';
                                 </span>
                             </td>
                             <td class="action-buttons">
-                                <button onclick="copyLink('<?php echo htmlspecialchars($link['target_url']); ?>', '<?php echo htmlspecialchars($link['source_code']); ?>')" class="btn-small btn-blue" title="Copy link with source parameter">Copy Link</button>
-                                <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-small btn-yellow" title="Edit">Edit</button>
+                                <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-small btn-blue" title="Edit">Edit</button>
                                 <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-small btn-red" title="Delete">Delete</button>
                             </td>
                         </tr>
@@ -716,18 +715,6 @@ include __DIR__ . '/../admin_header.php';
         document.getElementById('modalTitle').textContent = 'Create Referral Link';
         document.getElementById('source_code').removeAttribute('readonly');
         document.getElementById('activeCheckboxGroup').style.display = 'none';
-    }
-
-    function copyLink(targetUrl, sourceCode) {
-        const url = new URL(targetUrl);
-        url.searchParams.set('source', sourceCode);
-        const fullUrl = url.toString();
-
-        navigator.clipboard.writeText(fullUrl).then(() => {
-            alert('Link copied to clipboard:\n' + fullUrl);
-        }).catch(err => {
-            prompt('Copy this link:', fullUrl);
-        });
     }
 
     function editLink(link) {

@@ -55,6 +55,11 @@ if (!flock($lockFp, LOCK_EX | LOCK_NB)) {
 // ─── Configuration ───
 
 define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
+// Per-source discovery caps. The two sources run independently and each
+// keeps searching (Google: cycling cities; Shopify: cycling dorks) until
+// their cap is hit. Defaults split DAILY_SEND_LIMIT roughly in half so
+// the two sources contribute equally to the day's queue.
+define('DAILY_GOOGLE_DISCOVERY_LIMIT', (int) ($_ENV['OUTREACH_DAILY_GOOGLE_DISCOVERY_LIMIT'] ?? (int) ceil(DAILY_SEND_LIMIT / 2)));
 // Follow-ups have their own daily cap, separate from first-touch sends.
 // With the multi-touch sequence (touches 2 through N), this cap applies
 // across ALL touch positions combined. Default 75 — raise via env var
@@ -282,162 +287,174 @@ function stepDiscover($pdo, $dryRun)
     }
 
     $totalCategories = count(OUTREACH_CATEGORY_POOL);
-
-    // Determine which city to search next
-    $cityIndex = (int) getState($pdo, 'current_city_index', '0');
-    if ($cityIndex >= count($targetCities)) {
-        $cityIndex = 0;
-        if (!$dryRun) {
-            setState($pdo, 'current_city_index', '0');
-            setState($pdo, 'current_city_category_offset', '0');
-        }
-        logPipeline('All cities searched. Wrapping around to start.');
-    }
-
-    // Track which categories we've searched for the current city. We keep
-    // walking the pool starting from this offset and only stop when we've
-    // collected DAILY_SEND_LIMIT businesses or cycled through every
-    // category. Each run picks up where the last left off so the daily
-    // cap actually gets hit instead of being limited by an arbitrary
-    // categories-per-run constant.
-    $categoryOffset = (int) getState($pdo, 'current_city_category_offset', '0');
-
-    $target = $targetCities[$cityIndex];
-    $city = $target['city'];
-    $province = $target['province'];
-
-    logPipeline("--- Step 1: Discovery for $city, $province (city #" . ($cityIndex + 1) . "/" . count($targetCities) . ", starting at category " . ($categoryOffset + 1) . "/$totalCategories) ---");
+    $totalCities = count($targetCities);
 
     if ($dryRun) {
-        logPipeline("[DRY RUN] Would search Google Places for businesses in $city, $province until cap of " . DAILY_SEND_LIMIT . " is reached or all $totalCategories categories are exhausted");
+        $cityIndex = (int) getState($pdo, 'current_city_index', '0');
+        if ($cityIndex >= $totalCities) $cityIndex = 0;
+        $cur = $targetCities[$cityIndex];
+        logPipeline("[DRY RUN] Would loop cities starting at '{$cur['city']}, {$cur['province']}' (#" . ($cityIndex + 1) . "/$totalCities) until import cap of " . DAILY_GOOGLE_DISCOVERY_LIMIT . " is hit or all cities tried.");
         return;
     }
 
-    // Get existing place IDs to skip duplicates during search
-    $stmt = $pdo->prepare("SELECT places_id FROM outreach_leads WHERE places_id IS NOT NULL AND places_id != ''");
-    $stmt->execute();
-    $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
+    $totalImportedThisRun = 0;
+    $citiesProcessedThisRun = 0;
+    $citiesUsed = [];
 
-    // Walk the category pool from $categoryOffset, wrapping at the end. Stop
-    // as soon as we have DAILY_SEND_LIMIT businesses OR have visited every
-    // category in the pool (which signals the city is exhausted for this
-    // pass). Pass maxRounds=1 since each category is already specific — we
-    // don't need 5 query variations per category like the admin dashboard.
-    $businesses = [];
-    $categoriesSearched = 0;
-    $apiErrors = 0;
-    $categoriesUsed = [];
+    logPipeline('--- Step 1: Google Places Discovery ---');
 
-    for ($i = 0; $i < $totalCategories; $i++) {
-        if (count($businesses) >= DAILY_SEND_LIMIT) break;
-
-        $catIdx = ($categoryOffset + $i) % $totalCategories;
-        $cat = OUTREACH_CATEGORY_POOL[$catIdx];
-        $categoriesUsed[] = $cat;
-
-        $remaining = DAILY_SEND_LIMIT - count($businesses);
-        $result = search_businesses_core($city, $province, $cat, $remaining, $apiKey, $existingPlaceIds, 1);
-        $categoriesSearched++;
-
-        if (isset($result['error'])) {
-            logPipeline("API error searching '$cat' in $city: {$result['error']}", 'WARN');
-            $apiErrors++;
-            continue;
+    while (true) {
+        if ($totalImportedThisRun >= DAILY_GOOGLE_DISCOVERY_LIMIT) {
+            logPipeline("Google Places cap reached ($totalImportedThisRun/" . DAILY_GOOGLE_DISCOVERY_LIMIT . "). Stopping city loop.");
+            break;
+        }
+        if ($citiesProcessedThisRun >= $totalCities) {
+            logPipeline("All $totalCities cities tried this run. Stopping city loop.");
+            break;
         }
 
-        // Add new place IDs to exclude list so next category doesn't re-find them
-        foreach ($result['businesses'] as $biz) {
+        // Determine which city to search next
+        $cityIndex = (int) getState($pdo, 'current_city_index', '0');
+        if ($cityIndex >= $totalCities) {
+            $cityIndex = 0;
+            setState($pdo, 'current_city_index', '0');
+            setState($pdo, 'current_city_category_offset', '0');
+            logPipeline('All cities searched. Wrapping around to start.');
+        }
+        $categoryOffset = (int) getState($pdo, 'current_city_category_offset', '0');
+
+        $target = $targetCities[$cityIndex];
+        $city = $target['city'];
+        $province = $target['province'];
+        $citiesUsed[] = "$city";
+
+        $remainingCap = DAILY_GOOGLE_DISCOVERY_LIMIT - $totalImportedThisRun;
+
+        logPipeline("Searching $city, $province (city #" . ($cityIndex + 1) . "/$totalCities, starting at category " . ($categoryOffset + 1) . "/$totalCategories, remaining cap: $remainingCap)");
+
+        // Get existing place IDs to skip duplicates during search
+        $stmt = $pdo->prepare("SELECT places_id FROM outreach_leads WHERE places_id IS NOT NULL AND places_id != ''");
+        $stmt->execute();
+        $existingPlaceIds = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'places_id');
+
+        // Walk the category pool from $categoryOffset, wrapping at the end. Stop
+        // as soon as we have $remainingCap businesses OR have visited every
+        // category. maxRounds=1 since each category is already specific.
+        $businesses = [];
+        $categoriesSearched = 0;
+        $apiErrors = 0;
+        $categoriesUsed = [];
+
+        for ($i = 0; $i < $totalCategories; $i++) {
+            if (count($businesses) >= $remainingCap) break;
+
+            $catIdx = ($categoryOffset + $i) % $totalCategories;
+            $cat = OUTREACH_CATEGORY_POOL[$catIdx];
+            $categoriesUsed[] = $cat;
+
+            $remaining = $remainingCap - count($businesses);
+            $result = search_businesses_core($city, $province, $cat, $remaining, $apiKey, $existingPlaceIds, 1);
+            $categoriesSearched++;
+
+            if (isset($result['error'])) {
+                logPipeline("API error searching '$cat' in $city: {$result['error']}", 'WARN');
+                $apiErrors++;
+                continue;
+            }
+
+            foreach ($result['businesses'] as $biz) {
+                if (!empty($biz['places_id'])) {
+                    $existingPlaceIds[] = $biz['places_id'];
+                }
+                $businesses[] = $biz;
+            }
+        }
+
+        // If every single API call failed, don't advance state — let the next
+        // pipeline run retry these same categories. Break the loop so we don't
+        // burn through every city while the API is down.
+        if ($apiErrors > 0 && $apiErrors === $categoriesSearched) {
+            logPipeline("All $apiErrors API calls failed for $city. Will retry same categories next run.", 'ERROR');
+            break;
+        }
+
+        logPipeline("Discovered " . count($businesses) . " businesses with emails in $city ($categoriesSearched category searches; $apiErrors errors)");
+
+        // Import discovered businesses
+        $imported = 0;
+        $skipped = 0;
+
+        foreach ($businesses as $biz) {
+            // Double-check dedup by places_id
             if (!empty($biz['places_id'])) {
-                $existingPlaceIds[] = $biz['places_id'];
+                $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE places_id = ?");
+                $check->execute([$biz['places_id']]);
+                if ($check->fetch()) {
+                    $skipped++;
+                    continue;
+                }
             }
-            $businesses[] = $biz;
-        }
-    }
 
-    // If every single API call failed, don't advance — retry same categories next run
-    if ($apiErrors > 0 && $apiErrors === $categoriesSearched) {
-        logPipeline("All $apiErrors API calls failed for $city. Will retry same categories next run.", 'ERROR');
-        return;
-    }
-
-    logPipeline("Discovered " . count($businesses) . " businesses with emails in $city ($categoriesSearched category searches: " . implode(', ', $categoriesUsed) . "; $apiErrors errors)");
-
-    // Import discovered businesses
-    $imported = 0;
-    $skipped = 0;
-
-    foreach ($businesses as $biz) {
-        // Double-check dedup by places_id
-        if (!empty($biz['places_id'])) {
-            $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE places_id = ?");
-            $check->execute([$biz['places_id']]);
-            if ($check->fetch()) {
-                $skipped++;
-                continue;
+            // Also dedup by email to avoid emailing same address twice
+            if (!empty($biz['email'])) {
+                $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ?");
+                $check->execute([$biz['email']]);
+                if ($check->fetch()) {
+                    $skipped++;
+                    continue;
+                }
             }
+
+            $stmt = $pdo->prepare("INSERT INTO outreach_leads
+                (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
+                VALUES (?, ?, ?, ?, ?, ?, 'google_places_auto', ?, ?, ?)");
+            $stmt->execute([
+                $biz['business_name'] ?? 'Unknown',
+                $biz['phone'] ?? null,
+                $biz['website'] ?? null,
+                $biz['address'] ?? null,
+                $biz['category'] ?? null,
+                $biz['city'] ?? null,
+                $biz['places_id'] ?? null,
+                $biz['contact_page_url'] ?? null,
+                $biz['email'] ?? null,
+            ]);
+
+            $id = $pdo->lastInsertId();
+            log_activity($pdo, $id, 'lead_created', "Auto-imported from Google Places ($city, $province)");
+            $imported++;
         }
 
-        // Also dedup by email to avoid emailing same address twice
-        if (!empty($biz['email'])) {
-            $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ?");
-            $check->execute([$biz['email']]);
-            if ($check->fetch()) {
-                $skipped++;
-                continue;
-            }
-        }
+        logPipeline("Imported $imported new leads, skipped $skipped duplicates from $city");
+        cron_metric_incr('leads_discovered', $imported);
+        $totalImportedThisRun += $imported;
+        $citiesProcessedThisRun++;
 
-        $stmt = $pdo->prepare("INSERT INTO outreach_leads
-            (business_name, phone, website, address, category, city, source, places_id, contact_page_url, email)
-            VALUES (?, ?, ?, ?, ?, ?, 'google_places_auto', ?, ?, ?)");
-        $stmt->execute([
-            $biz['business_name'] ?? 'Unknown',
-            $biz['phone'] ?? null,
-            $biz['website'] ?? null,
-            $biz['address'] ?? null,
-            $biz['category'] ?? null,
-            $biz['city'] ?? null,
-            $biz['places_id'] ?? null,
-            $biz['contact_page_url'] ?? null,
-            $biz['email'] ?? null,
-        ]);
+        setState($pdo, 'last_discovery_date', date('Y-m-d'));
+        setState($pdo, 'last_discovery_city', "$city, $province");
 
-        $id = $pdo->lastInsertId();
-        log_activity($pdo, $id, 'lead_created', "Auto-imported from Google Places ($city, $province)");
-        $imported++;
-    }
+        // Decide whether to continue looping or stop. If we cycled through every
+        // category for this city, the city is "done" for now — advance the
+        // pointer and let the loop pick up the next city. If we stopped before
+        // cycling all categories, it means we hit the per-city cap; save the
+        // offset so the next pipeline run resumes here, and break.
+        $cycledThroughAll = ($categoriesSearched >= $totalCategories);
 
-    logPipeline("Imported $imported new leads, skipped $skipped duplicates from $city");
-    cron_metric_incr('leads_discovered', $imported);
-
-    // Advance the category offset by however many categories we actually
-    // walked. If we hit the daily cap early, the pointer stays close to
-    // where we stopped so the next run picks up at the next category. If
-    // we cycled through the entire pool without hitting the cap, the city
-    // is considered exhausted and we move on.
-    $cycledThroughAll = ($categoriesSearched >= $totalCategories);
-
-    if ($cycledThroughAll) {
-        if ($imported === 0) {
-            logPipeline("All $totalCategories categories searched for $city with no new leads. City exhausted, advancing.");
+        if ($cycledThroughAll) {
             setState($pdo, 'current_city_index', (string)($cityIndex + 1));
             setState($pdo, 'current_city_category_offset', '0');
+            // Loop continues to next city if cap not hit
         } else {
-            logPipeline("Completed full category cycle for $city while still finding leads. Resetting offset for next run.");
-            setState($pdo, 'current_city_category_offset', '0');
+            $newOffset = ($categoryOffset + $categoriesSearched) % $totalCategories;
+            setState($pdo, 'current_city_category_offset', (string)$newOffset);
+            logPipeline("Cap hit in $city after $categoriesSearched categories. Next run resumes at category " . ($newOffset + 1) . "/$totalCategories.");
+            break;
         }
-    } else {
-        $newOffset = ($categoryOffset + $categoriesSearched) % $totalCategories;
-        setState($pdo, 'current_city_category_offset', (string)$newOffset);
-        logPipeline("Hit daily cap after $categoriesSearched categories. Next run picks up at category " . ($newOffset + 1) . "/$totalCategories for $city.");
     }
 
-    setState($pdo, 'last_discovery_date', date('Y-m-d'));
-    setState($pdo, 'last_discovery_city', "$city, $province");
+    logPipeline("Google Places discovery complete. Cities processed: $citiesProcessedThisRun (" . implode(', ', $citiesUsed) . "), total imported: $totalImportedThisRun");
 
-    // Prune expired scrape-cache rows so the table doesn't grow unbounded as
-    // discovery walks new URLs. Matches the 30-day TTL used at read time —
-    // older entries can never produce a hit anyway. Indexed scan, runs daily.
+    // Prune expired scrape-cache rows so the table doesn't grow unbounded.
     try {
         $deleted = $pdo->exec("DELETE FROM outreach_scrape_cache
             WHERE last_attempted_at < DATE_SUB(NOW(), INTERVAL 30 DAY)");
@@ -493,181 +510,202 @@ function stepDiscoverShopify($pdo, $dryRun)
         return;
     }
 
-    // ─── Pick next dork query ───
-    $dorkPool = SHOPIFY_DORK_POOL;
-    $cursor = (int) getState($pdo, 'shopify_dork_cursor', '0');
-    $query = $dorkPool[$cursor % count($dorkPool)];
-    $nextCursor = $cursor + 1;
-    setState($pdo, 'shopify_dork_cursor', (string) $nextCursor);
-
-    logPipeline("Shopify discovery: dork cursor=$cursor, query='$query'");
-
     // ─── Dry run ───
     if ($dryRun) {
-        logPipeline("[DRY RUN] Would call SerpAPI with query='$query', then evaluate up to $shopifyImportLimit Shopify candidates.");
+        $cursor = (int) getState($pdo, 'shopify_dork_cursor', '0');
+        $query = SHOPIFY_DORK_POOL[$cursor % count(SHOPIFY_DORK_POOL)];
+        logPipeline("[DRY RUN] Would loop SerpAPI dorks starting at cursor=$cursor (next='$query') until import cap ($shopifyImportLimit) or SerpAPI budget ($serpapiLimit) is hit.");
         return;
     }
 
-    // ─── Call SerpAPI ───
-    $results = serpapi_query($query, $serpapiKey, 10);
-    // Increment serpapi_calls_today regardless of result
-    setState($pdo, 'serpapi_calls_today', (string) ($serpapiCallsToday + 1));
+    // ─── Loop dorks until import cap hit, SerpAPI budget exhausted, or all
+    // dorks in the pool have been tried this run. High rejection rates are
+    // expected (most candidates are too_old / agency_operated / dupes), so a
+    // single dork rarely fills the cap on its own. ───
+    $dorkPool = SHOPIFY_DORK_POOL;
+    $totalDorks = count($dorkPool);
+    $dorksTriedThisRun = 0;
+    $totalImported = 0;
+    $totalEvaluated = 0;
+    $totalRejected = 0;
+    $totalErrored = 0;
+    $totalSerpapiResults = 0;
+    $queriesUsed = [];
 
-    if (empty($results)) {
-        logPipeline("SerpAPI returned no results for query='$query'. Skipping candidate evaluation.");
-        return;
-    }
-
-    logPipeline("SerpAPI returned " . count($results) . " results for query='$query'.");
-
-    // ─── Insert candidates via INSERT IGNORE, collect newly-inserted ───
-    $newCandidates = [];
-    foreach ($results as $result) {
-        $rawLink = $result['link'] ?? '';
-        if ($rawLink === '') {
-            continue;
-        }
-        $canonical = shopify_canonical_url($rawLink);
-        if ($canonical === '') {
-            continue;
-        }
-
-        $stmt = $pdo->prepare(
-            "INSERT IGNORE INTO outreach_shopify_candidates (canonical_url, status, last_query)
-             VALUES (?, 'pending', ?)"
-        );
-        $stmt->execute([$canonical, $query]);
-
-        if ($stmt->rowCount() === 1) {
-            // Newly inserted — add to evaluation queue
-            $newCandidates[] = $canonical;
-        }
-    }
-
-    logPipeline("Inserted " . count($newCandidates) . " new candidates into outreach_shopify_candidates.");
-
-    // ─── Evaluate newly-pending candidates ───
-    $evaluated = 0;
-    $imported  = 0;
-    $rejected  = 0;
-    $errored   = 0;
-
-    foreach ($newCandidates as $canonical) {
+    while (true) {
         if ($shopifyImportsToday >= $shopifyImportLimit) {
+            logPipeline("Shopify import cap reached ($shopifyImportsToday/$shopifyImportLimit). Stopping dork loop.");
+            break;
+        }
+        if ($serpapiCallsToday >= $serpapiLimit) {
+            logPipeline("SerpAPI daily budget exhausted ($serpapiCallsToday/$serpapiLimit). Stopping dork loop.");
+            break;
+        }
+        if ($dorksTriedThisRun >= $totalDorks) {
+            logPipeline("All $totalDorks dorks tried this run. Stopping dork loop.");
             break;
         }
 
-        $evaluated++;
+        // Pick next dork and advance cursor immediately so failures don't get re-tried next dork
+        $cursor = (int) getState($pdo, 'shopify_dork_cursor', '0');
+        $query = $dorkPool[$cursor % $totalDorks];
+        setState($pdo, 'shopify_dork_cursor', (string) ($cursor + 1));
+        $dorksTriedThisRun++;
+        $queriesUsed[] = $query;
 
-        try {
-            $evalResult = evaluate_shopify_candidate($canonical);
-        } catch (Exception $e) {
-            logPipeline("Error evaluating candidate '$canonical': " . $e->getMessage(), 'ERROR');
-            $pdo->prepare(
-                "UPDATE outreach_shopify_candidates SET status='error', reject_detail=? WHERE canonical_url=?"
-            )->execute([substr($e->getMessage(), 0, 500), $canonical]);
-            $errored++;
+        logPipeline("Shopify dork #$dorksTriedThisRun/$totalDorks (cursor=$cursor): '$query'");
+
+        // SerpAPI call (always increments counter, even on empty result)
+        $results = serpapi_query($query, $serpapiKey, 10);
+        $serpapiCallsToday++;
+        setState($pdo, 'serpapi_calls_today', (string) $serpapiCallsToday);
+
+        if (empty($results)) {
+            logPipeline("SerpAPI returned no results for '$query'. Moving to next dork.");
             continue;
         }
+        $totalSerpapiResults += count($results);
 
-        if ($evalResult['fit'] === true) {
-            $meta      = $evalResult['metadata'];
-            $email     = $meta['email'] ?? null;
-            $finalUrl  = $evalResult['final_url'] ?? $canonical;
-
-            // Dedup check: email or website already in outreach_leads
-            $dupCheck = $pdo->prepare(
-                "SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1"
-            );
-            $dupCheck->execute([$email, $finalUrl]);
-            if ($dupCheck->fetch()) {
-                // Mark candidate as rejected / duplicate
-                $upd = $pdo->prepare(
-                    "UPDATE outreach_shopify_candidates
-                     SET status='rejected', reject_reason='duplicate'
-                     WHERE canonical_url = ?"
-                );
-                $upd->execute([$canonical]);
-                logPipeline("Shopify candidate '$canonical' skipped — already in outreach_leads (duplicate).");
-                $rejected++;
+        // Insert candidates via INSERT IGNORE, collect newly-inserted
+        $newCandidates = [];
+        foreach ($results as $result) {
+            $rawLink = $result['link'] ?? '';
+            if ($rawLink === '') {
+                continue;
+            }
+            $canonical = shopify_canonical_url($rawLink);
+            if ($canonical === '') {
                 continue;
             }
 
-            // Build business_summary
-            $productsCount          = $meta['products_count'] ?? 0;
-            $firstProductCreatedAt  = $meta['first_product_created_at'] ?? '';
-            $businessSummary = "Shopify store. {$productsCount} products."
-                . ($firstProductCreatedAt ? " First product created {$firstProductCreatedAt}." : '')
-                . " Discovered via: {$query}";
-
-            // Insert lead
-            $insLead = $pdo->prepare(
-                "INSERT INTO outreach_leads
-                 (business_name, email, website, source, contact_page_url, business_summary)
-                 VALUES (?, ?, ?, 'shopify_auto', ?, ?)"
+            $stmt = $pdo->prepare(
+                "INSERT IGNORE INTO outreach_shopify_candidates (canonical_url, status, last_query)
+                 VALUES (?, 'pending', ?)"
             );
-            $insLead->execute([
-                $meta['business_name'] ?? $canonical,
-                $email,
-                $finalUrl,
-                $finalUrl,
-                $businessSummary,
-            ]);
-            $leadId = (int) $pdo->lastInsertId();
+            $stmt->execute([$canonical, $query]);
 
-            // Update candidate as imported
-            $updCand = $pdo->prepare(
-                "UPDATE outreach_shopify_candidates
-                 SET status='imported',
-                     lead_id=?,
-                     harvested_email=?,
-                     products_count=?,
-                     first_product_created_at=?,
-                     detected_country=?,
-                     myshopify_url=?
-                 WHERE canonical_url = ?"
-            );
-            $updCand->execute([
-                $leadId,
-                $email,
-                $productsCount,
-                $firstProductCreatedAt ?: null,
-                $meta['country'] ?? null,
-                $canonical,
-                $canonical,
-            ]);
+            if ($stmt->rowCount() === 1) {
+                $newCandidates[] = $canonical;
+            }
+        }
 
-            log_activity($pdo, $leadId, 'lead_created', "Auto-imported from Shopify via dork: $query");
+        logPipeline("'$query' → " . count($results) . " SerpAPI results, " . count($newCandidates) . " new candidates.");
 
-            $shopifyImportsToday++;
-            setState($pdo, 'shopify_imports_today', (string) $shopifyImportsToday);
+        // Evaluate candidates (stop early if cap reached mid-loop)
+        foreach ($newCandidates as $canonical) {
+            if ($shopifyImportsToday >= $shopifyImportLimit) {
+                break;
+            }
 
-            logPipeline("Imported Shopify lead #$leadId: '{$meta['business_name']}' <$email> from $canonical");
-            $imported++;
+            $totalEvaluated++;
 
-        } else {
-            // Rejected — update candidate
-            $rejectReason = $evalResult['reason'] ?? 'unknown';
-            $rejectDetail = substr($evalResult['detail'] ?? '', 0, 500);
+            try {
+                $evalResult = evaluate_shopify_candidate($canonical);
+            } catch (Exception $e) {
+                logPipeline("Error evaluating candidate '$canonical': " . $e->getMessage(), 'ERROR');
+                $pdo->prepare(
+                    "UPDATE outreach_shopify_candidates SET status='error', reject_detail=? WHERE canonical_url=?"
+                )->execute([substr($e->getMessage(), 0, 500), $canonical]);
+                $totalErrored++;
+                continue;
+            }
 
-            $updRej = $pdo->prepare(
-                "UPDATE outreach_shopify_candidates
-                 SET status='rejected', reject_reason=?, reject_detail=?
-                 WHERE canonical_url = ?"
-            );
-            $updRej->execute([$rejectReason, $rejectDetail, $canonical]);
+            if ($evalResult['fit'] === true) {
+                $meta      = $evalResult['metadata'];
+                $email     = $meta['email'] ?? null;
+                $finalUrl  = $evalResult['final_url'] ?? $canonical;
 
-            logPipeline("Shopify candidate '$canonical' rejected: $rejectReason — $rejectDetail");
-            $rejected++;
+                // Dedup check: email or website already in outreach_leads
+                $dupCheck = $pdo->prepare(
+                    "SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1"
+                );
+                $dupCheck->execute([$email, $finalUrl]);
+                if ($dupCheck->fetch()) {
+                    $upd = $pdo->prepare(
+                        "UPDATE outreach_shopify_candidates
+                         SET status='rejected', reject_reason='duplicate'
+                         WHERE canonical_url = ?"
+                    );
+                    $upd->execute([$canonical]);
+                    logPipeline("Shopify candidate '$canonical' skipped — already in outreach_leads (duplicate).");
+                    $totalRejected++;
+                    continue;
+                }
+
+                $productsCount          = $meta['products_count'] ?? 0;
+                $firstProductCreatedAt  = $meta['first_product_created_at'] ?? '';
+                $businessSummary = "Shopify store. {$productsCount} products."
+                    . ($firstProductCreatedAt ? " First product created {$firstProductCreatedAt}." : '')
+                    . " Discovered via: {$query}";
+
+                $insLead = $pdo->prepare(
+                    "INSERT INTO outreach_leads
+                     (business_name, email, website, source, contact_page_url, business_summary)
+                     VALUES (?, ?, ?, 'shopify_auto', ?, ?)"
+                );
+                $insLead->execute([
+                    $meta['business_name'] ?? $canonical,
+                    $email,
+                    $finalUrl,
+                    $finalUrl,
+                    $businessSummary,
+                ]);
+                $leadId = (int) $pdo->lastInsertId();
+
+                $updCand = $pdo->prepare(
+                    "UPDATE outreach_shopify_candidates
+                     SET status='imported',
+                         lead_id=?,
+                         harvested_email=?,
+                         products_count=?,
+                         first_product_created_at=?,
+                         detected_country=?,
+                         myshopify_url=?
+                     WHERE canonical_url = ?"
+                );
+                $updCand->execute([
+                    $leadId,
+                    $email,
+                    $productsCount,
+                    $firstProductCreatedAt ?: null,
+                    $meta['country'] ?? null,
+                    $canonical,
+                    $canonical,
+                ]);
+
+                log_activity($pdo, $leadId, 'lead_created', "Auto-imported from Shopify via dork: $query");
+
+                $shopifyImportsToday++;
+                setState($pdo, 'shopify_imports_today', (string) $shopifyImportsToday);
+
+                logPipeline("Imported Shopify lead #$leadId: '{$meta['business_name']}' <$email> from $canonical");
+                $totalImported++;
+
+            } else {
+                $rejectReason = $evalResult['reason'] ?? 'unknown';
+                $rejectDetail = substr($evalResult['detail'] ?? '', 0, 500);
+
+                $updRej = $pdo->prepare(
+                    "UPDATE outreach_shopify_candidates
+                     SET status='rejected', reject_reason=?, reject_detail=?
+                     WHERE canonical_url = ?"
+                );
+                $updRej->execute([$rejectReason, $rejectDetail, $canonical]);
+
+                logPipeline("Shopify candidate '$canonical' rejected: $rejectReason — $rejectDetail");
+                $totalRejected++;
+            }
         }
     }
 
     logPipeline(
-        "Shopify discovery: query='$query', results=" . count($results)
-        . ", evaluated=$evaluated, imported=$imported, rejected=$rejected, errored=$errored"
+        "Shopify discovery complete. Dorks tried: $dorksTriedThisRun/$totalDorks, "
+        . "SerpAPI results: $totalSerpapiResults, evaluated: $totalEvaluated, "
+        . "imported: $totalImported, rejected: $totalRejected, errored: $totalErrored. "
+        . "Queries: " . implode(' | ', $queriesUsed)
     );
-    cron_metric_incr('leads_discovered', $imported);
-    cron_metric_incr('shopify_rejected', $rejected);
+    cron_metric_incr('leads_discovered', $totalImported);
+    cron_metric_incr('shopify_rejected', $totalRejected);
 }
 
 function stepManageAbTests($pdo, $dryRun)

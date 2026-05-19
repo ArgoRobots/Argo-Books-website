@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
+
+track_referral_event('downloads_page');
 // Load system requirements from JSON
 function getSystemRequirements()
 {

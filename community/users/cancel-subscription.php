@@ -6,6 +6,7 @@ require_once __DIR__ . '/../community_functions.php';
 require_once __DIR__ . '/user_functions.php';
 require_once __DIR__ . '/../../webhooks/paypal-helper.php';
 require_once __DIR__ . '/../../config/pricing.php';
+require_once __DIR__ . '/../../track_referral_event.php';
 
 require_once __DIR__ . '/../../resources/icons.php';
 
@@ -81,6 +82,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_cancel'])) {
                 );
             } catch (Exception $e) {
                 error_log("Failed to send cancellation email: " . $e->getMessage());
+            }
+
+            try {
+                $attr = find_visitor_for_subscription($subscription['subscription_id']);
+                track_referral_event('premium_churned', [
+                    'visitor_id'      => $attr['visitor_id'] ?? ($_COOKIE[ARGO_VISITOR_COOKIE] ?? null),
+                    'source_code'     => $attr['source_code'],
+                    'subscription_id' => $subscription['subscription_id'],
+                    'user_id'         => $attr['user_id'] ?? $user_id,
+                    'event_data'      => ['reason' => 'user_cancelled', 'source' => 'portal'],
+                ]);
+            } catch (Exception $e) {
+                error_log('Portal cancel premium_churned event failed: ' . $e->getMessage());
             }
         }
 

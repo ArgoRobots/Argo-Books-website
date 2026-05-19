@@ -26,6 +26,7 @@ require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
 require_once __DIR__ . '/paypal-helper.php';
 require_once __DIR__ . '/../cron/_renewal_helpers.php';
+require_once __DIR__ . '/../track_referral_event.php';
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -233,6 +234,20 @@ function handleSubscriptionCancelled($resource) {
             error_log("Failed to send cancellation email: " . $e->getMessage());
         }
 
+        try {
+            $attr = find_visitor_for_subscription($subscription['subscription_id']);
+            track_referral_event('premium_churned', [
+                'visitor_id'      => $attr['visitor_id'],
+                'source_code'     => $attr['source_code'],
+                'subscription_id' => $subscription['subscription_id'],
+                'user_id'         => $attr['user_id'],
+                'event_data'      => ['reason' => 'cancelled', 'source' => 'paypal_webhook'],
+                'allow_bot'       => true,
+            ]);
+        } catch (Exception $e) {
+            error_log('PayPal premium_churned (cancel) event failed: ' . $e->getMessage());
+        }
+
         logPayPalWebhookEvent('BILLING.SUBSCRIPTION.CANCELLED', $resource, 'subscription_cancelled');
     } else {
         logPayPalWebhookEvent('BILLING.SUBSCRIPTION.CANCELLED', $resource, 'subscription_not_found');
@@ -251,6 +266,11 @@ function handleSubscriptionExpired($resource) {
         throw new Exception("Missing subscription ID in expired event");
     }
 
+    // Look up subscription before status update so we can attribute the churn
+    $lookup = $pdo->prepare('SELECT subscription_id FROM premium_subscriptions WHERE paypal_subscription_id = ?');
+    $lookup->execute([$paypalSubscriptionId]);
+    $subRow = $lookup->fetch();
+
     // Update subscription status
     $stmt = $pdo->prepare("
         UPDATE premium_subscriptions
@@ -258,6 +278,22 @@ function handleSubscriptionExpired($resource) {
         WHERE paypal_subscription_id = ?
     ");
     $stmt->execute([$paypalSubscriptionId]);
+
+    if ($subRow !== false) {
+        try {
+            $attr = find_visitor_for_subscription($subRow['subscription_id']);
+            track_referral_event('premium_churned', [
+                'visitor_id'      => $attr['visitor_id'],
+                'source_code'     => $attr['source_code'],
+                'subscription_id' => $subRow['subscription_id'],
+                'user_id'         => $attr['user_id'],
+                'event_data'      => ['reason' => 'expired', 'source' => 'paypal_webhook'],
+                'allow_bot'       => true,
+            ]);
+        } catch (Exception $e) {
+            error_log('PayPal premium_churned (expire) event failed: ' . $e->getMessage());
+        }
+    }
 
     logPayPalWebhookEvent('BILLING.SUBSCRIPTION.EXPIRED', $resource, 'subscription_expired');
 }
@@ -416,6 +452,28 @@ function handlePaymentCompleted($resource) {
         $paymentType,
         current_environment()
     ]);
+
+    // Fire funnel event for this payment. Webhook has no session/cookie,
+    // so resolve attribution from the original premium_signup event.
+    try {
+        $attr = find_visitor_for_subscription($subscription['subscription_id']);
+        track_referral_event('premium_paid', [
+            'visitor_id'      => $attr['visitor_id'],
+            'source_code'     => $attr['source_code'],
+            'subscription_id' => $subscription['subscription_id'],
+            'user_id'         => $attr['user_id'],
+            'event_data'      => [
+                'amount'         => $amount,
+                'currency'       => $currency,
+                'payment_type'   => $paymentType,
+                'payment_method' => 'paypal',
+                'transaction_id' => $transactionId,
+            ],
+            'allow_bot' => true,
+        ]);
+    } catch (Exception $e) {
+        error_log('PayPal premium_paid event failed: ' . $e->getMessage());
+    }
 
     if ($cycleSwitchFirstBill) {
         // First bill after a cycle switch — record the sale (above), but

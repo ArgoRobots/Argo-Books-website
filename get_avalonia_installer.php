@@ -16,6 +16,7 @@
  */
 session_start();
 require_once __DIR__ . '/statistics.php';
+require_once __DIR__ . '/track_referral_event.php';
 
 // Platform file patterns: platform key => filename pattern
 // {version} is replaced at runtime
@@ -91,11 +92,55 @@ function findInstaller(string $version, string $platform): ?array
 }
 
 /**
+ * Compute an 8-char HMAC token for the given visitor_id. The token is
+ * embedded in the served installer filename so the desktop app can pass
+ * it back on first-run, letting us join "ad click -> install" without
+ * sending PII through the filename.
+ *
+ * Token verification on the API side re-hashes recent visitor_ids and
+ * compares, so this is one-way.
+ */
+function computeInstallerToken(string $visitor_id): string
+{
+    $secret = $_ENV['REFERRAL_TOKEN_SECRET'] ?? '';
+    if ($secret === '') {
+        return '';
+    }
+    return substr(hash_hmac('sha256', $visitor_id, $secret), 0, 8);
+}
+
+/**
  * Serves a file for download and exits.
  */
 function serveFile(array $installer): void
 {
     global $mimeTypes;
+
+    // Fire the download_click funnel event BEFORE we start streaming headers/bytes,
+    // so the visitor cookie can still be set if this is the visitor's first request.
+    track_referral_event('download_click', [
+        'event_data' => [
+            'platform' => $installer['platform'],
+            'version'  => $installer['version'],
+        ],
+    ]);
+
+    // Embed the visitor token into the served filename so the installer can
+    // extract it during install (Phase 3 telemetry). Falls back to the
+    // plain filename if the visitor has no cookie or no secret is configured.
+    $served_filename = $installer['filename'];
+    $visitor_id = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
+    if ($visitor_id && preg_match('/^[0-9a-f-]{36}$/i', $visitor_id)) {
+        $token = computeInstallerToken($visitor_id);
+        if ($token !== '') {
+            $ext_pos = strrpos($served_filename, '.');
+            if ($ext_pos !== false) {
+                $served_filename = substr($served_filename, 0, $ext_pos)
+                    . '_' . $token
+                    . substr($served_filename, $ext_pos);
+            }
+        }
+    }
 
     // Clean output buffers
     while (ob_get_level()) {
@@ -107,7 +152,7 @@ function serveFile(array $installer): void
 
     header('Content-Type: ' . $contentType);
     header('Content-Transfer-Encoding: binary');
-    header('Content-Disposition: attachment; filename="' . $installer['filename'] . '"');
+    header('Content-Disposition: attachment; filename="' . $served_filename . '"');
     header('Content-Length: ' . $installer['filesize']);
     header('Cache-Control: no-cache, no-store, must-revalidate');
     header('Pragma: no-cache');

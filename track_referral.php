@@ -10,6 +10,7 @@
  */
 
 require_once __DIR__ . '/statistics.php';
+require_once __DIR__ . '/track_referral_event.php';
 
 /**
  * Map of referrer hosts and utm_source values to source codes.
@@ -140,3 +141,14 @@ if ($resolved_source === null && !empty($_SERVER['HTTP_REFERER'])) {
 if ($resolved_source !== null) {
     track_referral_visit($resolved_source, $_SERVER['REQUEST_URI']);
 }
+
+// Fire a landing event for every page that requires this file. Tracks
+// visitors with no source too (resolved_source = null) so the funnel
+// captures "direct/unknown" traffic alongside paid sources.
+track_referral_event('landing', [
+    'source_code' => $resolved_source,
+    'event_data'  => [
+        'resolved_source' => $resolved_source,
+        'referer'         => $_SERVER['HTTP_REFERER'] ?? null,
+    ],
+]);

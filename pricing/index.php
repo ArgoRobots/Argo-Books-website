@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/../resources/icons.php';
+require_once __DIR__ . '/../track_referral.php';
 
 $pricing = get_pricing_config();
 $plans = get_plan_features();

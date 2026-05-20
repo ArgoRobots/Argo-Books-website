@@ -87,6 +87,11 @@ include __DIR__ . '/../admin_header.php';
         <?php if ($is_enabled): ?>
             <h2>Your account is currently protected with 2FA</h2>
 
+            <p>
+                <a href="trusted-devices.php" class="link">Manage trusted devices</a>
+                — review the browsers that can skip the 2FA step for 30 days.
+            </p>
+
             <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
                 <div class="center">
                     <button type="submit" name="disable_2fa" class="btn btn-red">Disable 2FA</button>

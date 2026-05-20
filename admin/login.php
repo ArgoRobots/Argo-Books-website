@@ -13,6 +13,7 @@ session_start();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/settings/2fa.php';
+require_once __DIR__ . '/trusted_devices.php';
 
 // Check if user is already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
@@ -55,6 +56,20 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
                     clear_rate_limit_attempts($clientIp, 'admin_2fa');
                     clear_rate_limit_attempts($clientIp, 'admin_login');
 
+                    // If the user ticked "Trust this device for 30 days",
+                    // issue a token so subsequent logins from this browser
+                    // can skip the TOTP step (password is still required).
+                    if (!empty($_POST['trust_device'])) {
+                        $u = get_user_by_username($username);
+                        if ($u) {
+                            issue_trusted_device_token(
+                                (int)$u['id'],
+                                $_SERVER['HTTP_USER_AGENT'] ?? '',
+                                $clientIp
+                            );
+                        }
+                    }
+
                     // Update last login time
                     $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                     $stmt->execute([$username]);
@@ -92,6 +107,24 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $actual_username = $user['username']; // Get actual username with correct case
 
             if (is_2fa_enabled($actual_username)) {
+                // If the browser has a valid "trust this device" cookie for
+                // this admin, skip the TOTP step. The password was just
+                // verified above; the cookie alone never grants access.
+                $trusted_for = verify_trusted_device_cookie($clientIp);
+                if ($trusted_for !== null && strcasecmp($trusted_for, $actual_username) === 0) {
+                    session_regenerate_id(true);
+                    $_SESSION['admin_logged_in'] = true;
+                    $_SESSION['admin_username'] = $actual_username;
+
+                    clear_rate_limit_attempts($clientIp, 'admin_login');
+
+                    $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
+                    $stmt->execute([$actual_username]);
+
+                    header('Location: index.php');
+                    exit;
+                }
+
                 // 2FA is enabled, show the verification form. Don't clear the
                 // password-attempt counter yet — we only count this as success
                 // once 2FA also passes.
@@ -162,7 +195,32 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     <input type="number" id="verification_code" name="verification_code" class="verification-code" required autofocus placeholder="000000" min="0" max="999999">
                 </div>
 
+                <div class="form-group trust-device-group">
+                    <label class="trust-device-label">
+                        <input type="checkbox" id="trust_device" name="trust_device" value="1">
+                        Trust this device for 30 days (skip the code on this browser)
+                    </label>
+                </div>
+
                 <input type="hidden" name="verify_code" value="1">
+
+                <style>
+                    .trust-device-group { margin-top: -8px; }
+                    .trust-device-label {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-size: 0.9em;
+                        cursor: pointer;
+                        user-select: none;
+                    }
+                    .trust-device-label input[type="checkbox"] {
+                        width: 16px;
+                        height: 16px;
+                        margin: 0;
+                        cursor: pointer;
+                    }
+                </style>
 
                 <div class="center">
                     <button type="button" onclick="submitVerificationForm()" id="submit-button" class="btn btn-blue">Verify</button>

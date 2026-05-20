@@ -36,6 +36,27 @@ CREATE TABLE IF NOT EXISTS admin_users (
 --   ALTER TABLE admin_users
 --     ADD COLUMN last_2fa_counter BIGINT NOT NULL DEFAULT 0 AFTER two_factor_enabled;
 
+-- Trusted admin devices (skip TOTP step on opted-in devices for 30 days).
+-- Split-token pattern: cookie holds "selector.validator"; DB stores selector
+-- in plaintext (for O(1) lookup) and a SHA-256 hash of the validator so a DB
+-- read cannot impersonate the user. The trust cookie ONLY bypasses TOTP --
+-- the password step is still required on every login.
+CREATE TABLE IF NOT EXISTS admin_trusted_devices (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    selector CHAR(16) NOT NULL UNIQUE,
+    validator_hash CHAR(64) NOT NULL,
+    label VARCHAR(120),
+    user_agent VARCHAR(255),
+    ip_address VARCHAR(45),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_used_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL,
+    CONSTRAINT fk_atd_user FOREIGN KEY (user_id) REFERENCES admin_users(id) ON DELETE CASCADE,
+    INDEX idx_atd_user_id (user_id),
+    INDEX idx_atd_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Create users table
 CREATE TABLE IF NOT EXISTS community_users (
     id INT PRIMARY KEY AUTO_INCREMENT,

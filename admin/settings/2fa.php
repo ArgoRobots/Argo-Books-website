@@ -1,6 +1,7 @@
 <?php
 date_default_timezone_set('UTC');
 require_once __DIR__ . '/totp.php';
+require_once __DIR__ . '/../trusted_devices.php';
 
 /**
  * Get user by username (case-insensitive)
@@ -60,6 +61,14 @@ function disable_2fa($username)
         global $pdo;
         $stmt = $pdo->prepare('UPDATE admin_users SET two_factor_secret = NULL, two_factor_enabled = 0 WHERE username = ?');
         $success = $stmt->execute([$user['username']]) && $stmt->rowCount() > 0;
+
+        // Trusted-device cookies only make sense while 2FA is enabled — they
+        // bypass the TOTP step. Clear them on disable so a re-enable cannot
+        // silently re-trust devices the user no longer recognises.
+        if ($success) {
+            revoke_all_trusted_devices((int)$user['id']);
+        }
+
         return $success;
     } catch (Exception $e) {
         return false;

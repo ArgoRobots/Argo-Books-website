@@ -1,162 +1,102 @@
 # Argo Books Website — Claude Code Guide
 
-## Project Overview
+PHP/MySQL website for [Argo Books](https://argorobots.com/) accounting software. Handles marketing, software downloads, license sales, customer portal, community forum, admin dashboard, and API endpoints for the desktop app.
 
-PHP/MySQL website for [Argo Books](https://argorobots.com/), accounting software. The site handles marketing, software downloads, license key sales, customer portal, community forum, admin dashboard, and API endpoints for the desktop app.
+**Stack:** PHP 8.3+, MySQL (InnoDB, `utf8mb4`), Laragon locally, Composer. No build step — refresh the browser.
 
-## Local Development Setup
+**Companion repos:** The Avalonia/C# desktop app lives at `C:\Users\evand\Desktop\Argo-Books-Avalonia`. Many endpoints in `/api/` are called from there.
 
-**Requirements:** Laragon (Apache + MySQL), Composer, PHP 8.3+
-
-```bash
-# Install dependencies
-composer install
-
-# Database: create 'argo_books' in MySQL, then import schema
-# Import mysql_schema.sql via HeidiSQL or MySQL CLI
-
-# Copy and configure environment
-cp ".env - sandbox" .env
-# Edit .env with local credentials
-
-# Run locally
-# http://localhost/argo-books-website
-```
-
-**No build step** — PHP is interpreted directly. Refresh browser to see changes.
-
-## Environment
+## Environment files
 
 - `.env` — active environment file (gitignored)
-- `.env - production` — production credentials template
-- `.env - sandbox` — sandbox/testing credentials template
-- `APP_ENV="sandbox"` for local development, `"production"` for production
+- `.env - production` and `.env - sandbox` — checked-in templates
+- `APP_ENV` (`sandbox` or `production`) drives all environment-conditional code (see `current_environment()` in `db_connect.php`)
 
-## Key Files & Entry Points
+## Key files
 
-| Path | Purpose |
-|------|---------|
-| `index.php` | Homepage / main entry point |
-| `db_connect.php` | Database connection, AES-256-GCM encryption helpers |
-| `email_sender.php` | All email sending logic (SMTP via Resend) |
-| `license_functions.php` | License key generation and validation |
-| `statistics.php` | Page view tracking (include in each page) |
-| `mysql_schema.sql` | Full database schema |
-| `config/pricing.php` | Centralized pricing config (reads from .env) |
+| Path | Why it matters |
+|---|---|
+| `db_connect.php` | Global `$pdo` + AES-256-GCM helpers + `current_environment()` |
+| `email_sender.php` / `smtp_mailer.php` | All transactional email goes through here |
+| `license_functions.php` | License key generation, validation, redemption |
+| `statistics.php` | Page-view tracking + bot detection (`is_likely_bot()`) |
+| `track_referral.php` / `track_referral_event.php` | Referral attribution + full-funnel event log |
+| `mysql_schema.sql` | Source of truth for the schema — update when adding tables |
+| `config/pricing.php` | Pricing config (reads `.env`) |
 | `config/plans.json` | Free vs Premium feature definitions |
-| `style.css` | Global stylesheet |
 
-## Directory Structure
+## Database access
 
-```
-/admin          Admin dashboard (2FA-protected)
-/api            RESTful endpoints for the desktop app
-/community      Bug/feature request forum
-/config         Shared config (pricing, plans)
-/cron           Background jobs (subscriptions, email outreach, purges)
-/documentation  User-facing docs with search
-/downloads      Software version management
-/portal         Customer self-service (invoices, subscriptions)
-/resources      Shared assets (images, JS, CSS, uploads)
-/webhooks       Payment webhook handlers (Stripe, PayPal, Square)
-/whats-new      Release notes and version history
-/read-me        Developer guides (cron setup, payment testing, email setup)
-```
+All queries go through the global `$pdo`. PDO is configured with `ATTR_ERRMODE => ERRMODE_EXCEPTION`, default fetch mode `FETCH_ASSOC`, `ATTR_EMULATE_PREPARES => false`. Inside functions, declare `global $pdo;` before use.
 
-## Database
+- Use prepared statements for anything touching user input. Pass params as an array to `execute([...])`; never concatenate into SQL.
+- `$stmt->fetch()` returns `false` when there's no row — check explicitly.
+- Let `PDOException` bubble unless you have a specific user-facing error to return.
 
-- MySQL with InnoDB, `utf8mb4`
-- Database name: `argo_books`
-- Connection via PDO in `db_connect.php` (global `$pdo`; `PDO::ATTR_ERRMODE` is `ERRMODE_EXCEPTION`, default fetch mode is `FETCH_ASSOC`)
-- Schema file: `mysql_schema.sql` — update this when adding/modifying tables
+**Never create migration files.** Schema changes go in `mysql_schema.sql` plus a chat-message SQL block (CREATE/ALTER statements) for the user to run manually in HeidiSQL. Do not create a `migrations/` folder.
 
-Key table groups:
-- **Licensing:** `license_keys`, `premium_subscriptions`, `premium_subscription_payments`
-- **Community:** `community_users`, `community_posts`, `community_comments`, `community_votes`
-- **Portal:** `portal_companies`, `portal_invoices`, `portal_payments`
-- **Analytics:** `statistics`, `receipt_scan_usage`, `invoice_send_usage`
-- **Email:** `outreach_leads`, `outreach_activity_log`
+## Email sending
 
-## Payment Gateways
+**All transactional email must go through Resend via the SMTP relay.** Never call `mail()` directly without first attempting `create_smtp_mailer()` — raw `mail()` bypasses Resend, loses deliverability, and silently no-ops on servers without an MTA.
 
-Two gateways are supported in the **portal Connect flow** (merchants accepting invoice payments): **Stripe** and **Square**. Each has a checkout/payment page, a webhook handler in `/webhooks/`, and sandbox credentials in `.env - sandbox` (see `/read-me/` for testing guides).
+Pattern for new callers outside `email_sender.php`: try SMTP first, fall back to `mail()` only when `create_smtp_mailer()` returns `null`. Reference implementations: `api/invoice/invoice_email_sender.php`, `api/portal/portal-helper.php`.
 
-**PayPal is NOT supported in the portal Connect flow.** PayPal's "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, and proper merchant onboarding requires PayPal Partner Referrals API which is gated behind Platforms & Marketplaces partner enrollment. The portal-side PayPal handlers (`api/portal/connect.php`, `connect-callback.php`, `checkout.php` `handle_paypal_checkout()`, `process-payment.php` `process_paypal_payment()`) all return 503 PROVIDER_UNSUPPORTED, and `get_available_payment_methods()` in `api/portal/portal-helper.php` deliberately omits PayPal even when `paypal_merchant_id` is set on a `portal_companies` row. The desktop app hides the PayPal Connect button. Re-enabling requires the Partner Referrals migration documented in the plan file.
+For local dev, set up MailHog so the fallback path doesn't try to hit a real MTA — see `read-me/setup/Local email setup.md`.
 
-**PayPal IS still used** for the **SaaS subscription flow** (Argo Premium billing on argorobots.com) — that's a separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout page. Do not touch SaaS-subscription PayPal code when working on portal-related features.
+## Payment gateways
 
-Processing fees are configurable via `.env` (`PROCESSING_FEE_PERCENT`, `PROCESSING_FEE_FIXED`).
+**Portal Connect flow** (merchants accepting invoice payments through their own provider account): **Stripe** and **Square** only.
 
-## Email Sending
+**PayPal portal Connect is disabled.** The "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, and proper merchant onboarding requires the Partner Referrals API (gated behind Platforms & Marketplaces partner enrollment). All portal-side PayPal handlers (`api/portal/connect.php`, `connect-callback.php`, `checkout.php` `handle_paypal_checkout()`, `process-payment.php` `process_paypal_payment()`) return 503 `PROVIDER_UNSUPPORTED`, and `get_available_payment_methods()` in `api/portal/portal-helper.php` deliberately omits PayPal even when `paypal_merchant_id` is set. The desktop app hides the PayPal Connect button.
 
-**All transactional email must go through Resend via the SMTP relay.** The entry points are `email_sender.php` (general-purpose, `send_styled_email()`) and `smtp_mailer.php` (`create_smtp_mailer()` — returns a configured PHPMailer instance, or `null` if SMTP is not configured so the caller can fall back to PHP `mail()`).
+**PayPal IS still used for the SaaS subscription flow** (Argo Premium billing on argorobots.com) — separate, working integration with its own webhook handler (`webhooks/paypal-subscription.php`), plan IDs, and checkout. Do not touch SaaS-subscription PayPal code when working on portal features.
 
-Rules for any code that sends email:
+## Header / footer loading
 
-- **Never call `mail()` directly without first attempting `create_smtp_mailer()`.** Raw `mail()` bypasses Resend, loses deliverability, and silently no-ops on servers without an MTA.
-- Prefer reusing existing helpers in `email_sender.php` (e.g., `send_premium_subscription_receipt`, `send_payment_failed_email`, `resend_subscription_id_email`) rather than duplicating HTML templates elsewhere.
-- The accepted pattern for new callers outside `email_sender.php`: try SMTP first, fall back to `mail()` only when `create_smtp_mailer()` returns `null`. See `api/invoice/invoice_email_sender.php` and `api/portal/portal-helper.php` for reference implementations.
-- SMTP config lives in `.env` under `SMTP_*` (see `smtp_mailer.php` docblock). In production and sandbox, `SMTP_HOST=smtp.resend.com`, `SMTP_USERNAME=resend`, `SMTP_PASSWORD` is the Resend API key.
-- For local development, set up MailHog (see `/read-me/Local email setup.md`) so mail() fallback works without hitting real inboxes.
-
-## Database Access
-
-All DB queries go through the global `$pdo` (PDO with `ATTR_ERRMODE => ERRMODE_EXCEPTION`, default fetch mode `FETCH_ASSOC`, `ATTR_EMULATE_PREPARES => false`). At script top-level, `$pdo` is already in scope once `db_connect.php` is required. Inside functions, declare `global $pdo;` before use.
-
-Conventions:
-
-- Always use prepared statements for any query touching user input. Pass params as an array to `execute([...])`; don't concatenate into SQL.
-- `$stmt->fetch()` returns `false` when there's no row — check that explicitly instead of treating it as an existence test.
-- PDO throws `PDOException` on error. Wrap in try/catch only at boundaries where you want a specific user-facing error response; otherwise let it bubble to the global handler.
-- For INSERT/UPDATE/DELETE, `$stmt->rowCount()` gives affected rows and `$pdo->lastInsertId()` gives the new id.
-- Transactions: `$pdo->beginTransaction()` / `$pdo->commit()` / `$pdo->rollBack()` (note the capital B).
-
-## Layout (Header / Footer)
-
-Pages include empty containers — `<div id="includeHeader"></div>` and `<div id="includeFooter"></div>` — which `resources/scripts/main.js` fills via jQuery `.load()` from `resources/header/index.html` and `resources/footer/index.html`.
+Pages include empty `<div id="includeHeader"></div>` and `<div id="includeFooter"></div>` containers that `resources/scripts/main.js` fills via jQuery `.load()` from `resources/header/index.html` and `resources/footer/index.html`.
 
 Consequences:
 - Any `<script>` a page depends on must load before `main.js`.
-- New site-wide URL prefixes (e.g., `/unsubscribe/`) must be registered in `main.js`'s `fixLinks` logic (see commit `77eb2a1`).
+- New site-wide URL prefixes (e.g. `/unsubscribe/`) must be registered in `main.js`'s `fixLinks` logic.
 
-## Cron Jobs
+## CSS / theming
 
-Located in `/cron/`. Must be scheduled on the server (see `/read-me/Cron jobs.md`):
+All colors come from CSS variables in `resources/styles/custom-colors.css` — don't hardcode hex values. Dark mode uses `[data-theme="dark"]` selectors. Shared admin styles in `admin/common-style.css` already cover `.stat-card`, `.table-container`, `.chart-container`, `.section-tabs`, `.modal`, etc. for both themes; only add `[data-theme="dark"]` overrides for custom components those defaults don't reach.
 
-| File | Frequency | Purpose |
-|------|-----------|---------|
-| `subscription_renewal.php` | Daily | Process recurring subscription renewals |
-| `outreach_pipeline.php` | Hourly | Send bulk email campaigns |
-| `account_purge.php` | Daily | Delete accounts scheduled for deletion |
+## Tests
 
-## Git Workflow
+PHPUnit suite lives in `/tests/`. Run with `./vendor/bin/phpunit` from the project root. Requires a separate `argo_books_test` database (creds in `.env.testing`). The deploy workflow does not run tests — they're a local / pre-commit guardrail only.
 
-- If there is an active version branch (e.g., `V.2.0.5`) for the next release, then branch off this version branch, not `main`.
-- Target PRs to the current version branch, not `main`.
-- `main` only receives merges when a version is released to production.
+## Git workflow
 
-## What's New Page
+If there's an active version branch (e.g. `V.2.0.7`) for the next release, branch off it and target PRs to it. `main` only receives merges when a version ships to production.
 
-- Write for non-technical users — plain language, no jargon
-- Only include changes users will notice (new features, UI changes, important fixes)
-- Skip internal refactors, code cleanup, dependency updates, and developer-facing changes
-- Use short, benefit-oriented descriptions (e.g., "Faster invoice loading" not "Optimized SQL query for invoice retrieval")
+## "What's New" page
 
-## Security Notes
+For end users — plain language, no jargon. Include only user-visible changes; skip refactors, dependency updates, and other developer-facing work. Frame as benefits ("Faster invoice loading", not "Optimized SQL query").
 
-- Admin requires TOTP 2FA — secret stored in `admin_users` table
-- Sensitive portal data encrypted with AES-256-GCM (`db_connect.php`)
+**Never make bugs sound scary.** Accounting software has to feel rock-solid. Avoid words like *crash*, *bug*, *broken*, *error*, *lost*, *corrupted*, *vulnerability*. Either skip the entry or rephrase as a positive:
+
+- "Fixed a bug where invoices could be lost" → skip, or "More reliable invoice saving"
+- "Patched a security vulnerability" → skip entirely
+
+## Security
+
+- Admin requires TOTP 2FA — secret stored in `admin_users.two_factor_secret`
+- Sensitive portal data is AES-256-GCM encrypted via `portal_encrypt()` / `portal_decrypt()` in `db_connect.php`
 - `.htaccess` blocks direct access to `.env`, `.sql`, log files
-- Always sanitize user input; use PDO prepared statements (`$pdo->prepare(...)->execute([...])`) for every SQL query touching user input — never concatenate into SQL
 
-## Third-Party Services
+## Detailed docs
 
-| Service | Purpose | Config Key Prefix |
-|---------|---------|-------------------|
-| Stripe | Payments | `STRIPE_` |
-| PayPal | Payments | `PAYPAL_` |
-| Square | Payments | `SQUARE_` |
-| Resend | Email relay (SMTP) | `SMTP_` |
-| Google OAuth | Social login | `GOOGLE_` |
-| Google Gemini | AI features and receipt scanning | `GEMINI_` |
-| Open Exchange Rates | Currency conversion | `EXCHANGE_RATES_` |
+The `read-me/` directory has authoritative reference docs that are kept current. Don't duplicate their content here:
+
+- `read-me/Cron jobs.md` — every scheduled cron and its frequency
+- `read-me/Deployment.md` — how `.github/workflows/deploy.yml` ships code to the server
+- `read-me/Email outreach.md` — outreach pipeline behavior
+- `read-me/Admin guide.md` — admin dashboard tour
+- `read-me/setup/Payment provider setup.md` — Stripe / PayPal / Square provider config
+- `read-me/testing/Payment provider testing.md` — sandbox testing procedures
+- `read-me/setup/Local email setup.md` — MailHog setup
+- `read-me/setup/Google Ads campaign setup.md` — Google Ads campaign + UET/gtag wiring
+- `read-me/setup/Funnel tracking - Advanced Installer setup.md` — Phase 3 installer token custom action
+- `read-me/procedures/Refund block response procedure.md` — what to do when the refund safety check fires

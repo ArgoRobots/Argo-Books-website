@@ -16,7 +16,6 @@
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../env_helper.php';
-require_once __DIR__ . '/../rate_limit_helper.php';
 
 const ADMIN_TRUST_COOKIE = 'admin_trust_token';
 const ADMIN_TRUST_TTL_DAYS = 30;
@@ -35,20 +34,28 @@ function issue_trusted_device_token($user_id, $user_agent, $ip)
 
     $label = derive_device_label($user_agent);
 
-    $stmt = $pdo->prepare(
-        'INSERT INTO admin_trusted_devices
-            (user_id, selector, validator_hash, label, user_agent, ip_address, expires_at)
-         VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? DAY))'
-    );
-    $stmt->execute([
-        $user_id,
-        $selector,
-        $validator_hash,
-        $label,
-        substr((string)$user_agent, 0, 255),
-        substr((string)$ip, 0, 45),
-        ADMIN_TRUST_TTL_DAYS,
-    ]);
+    // Fail closed: if the INSERT throws (missing migration, transient DB
+    // error, etc.) we don't set the cookie. The caller's login proceeds
+    // normally; the user just doesn't gain trusted-device status this time.
+    try {
+        $stmt = $pdo->prepare(
+            'INSERT INTO admin_trusted_devices
+                (user_id, selector, validator_hash, label, user_agent, ip_address, expires_at)
+             VALUES (?, ?, ?, ?, ?, ?, DATE_ADD(NOW(), INTERVAL ? DAY))'
+        );
+        $stmt->execute([
+            $user_id,
+            $selector,
+            $validator_hash,
+            $label,
+            substr((string)$user_agent, 0, 255),
+            substr((string)$ip, 0, 45),
+            ADMIN_TRUST_TTL_DAYS,
+        ]);
+    } catch (Throwable $e) {
+        error_log('issue_trusted_device_token failed: ' . $e->getMessage());
+        return;
+    }
 
     $secure = env('APP_ENV', 'sandbox') === 'production';
     setcookie(ADMIN_TRUST_COOKIE, $selector . '.' . $validator, [
@@ -81,31 +88,39 @@ function verify_trusted_device_cookie($ip)
         return null;
     }
 
-    $stmt = $pdo->prepare(
-        'SELECT d.id, d.validator_hash, d.expires_at, u.username
-         FROM admin_trusted_devices d
-         JOIN admin_users u ON u.id = d.user_id
-         WHERE d.selector = ? AND d.expires_at > NOW()
-         LIMIT 1'
-    );
-    $stmt->execute([$selector]);
-    $row = $stmt->fetch();
-    if (!$row) {
+    // Trust-cookie verification must NEVER throw — that would block the admin
+    // from logging in entirely if the table is missing or the DB hiccups. Any
+    // error here falls through to the normal TOTP prompt.
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT d.id, d.validator_hash, d.expires_at, u.username
+             FROM admin_trusted_devices d
+             JOIN admin_users u ON u.id = d.user_id
+             WHERE d.selector = ? AND d.expires_at > NOW()
+             LIMIT 1'
+        );
+        $stmt->execute([$selector]);
+        $row = $stmt->fetch();
+        if (!$row) {
+            return null;
+        }
+
+        if (!hash_equals($row['validator_hash'], hash('sha256', $validator))) {
+            return null;
+        }
+
+        $upd = $pdo->prepare(
+            'UPDATE admin_trusted_devices
+             SET last_used_at = NOW(), ip_address = ?
+             WHERE id = ?'
+        );
+        $upd->execute([substr((string)$ip, 0, 45), $row['id']]);
+
+        return $row['username'];
+    } catch (Throwable $e) {
+        error_log('verify_trusted_device_cookie failed: ' . $e->getMessage());
         return null;
     }
-
-    if (!hash_equals($row['validator_hash'], hash('sha256', $validator))) {
-        return null;
-    }
-
-    $upd = $pdo->prepare(
-        'UPDATE admin_trusted_devices
-         SET last_used_at = NOW(), ip_address = ?
-         WHERE id = ?'
-    );
-    $upd->execute([substr((string)$ip, 0, 45), $row['id']]);
-
-    return $row['username'];
 }
 
 /** Revoke a single device, scoped to the owning user. */

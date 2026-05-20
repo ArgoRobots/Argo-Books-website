@@ -23,7 +23,10 @@ if (!isset($_SESSION['csrf_token'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $posted_csrf = $_POST['csrf_token'] ?? '';
+    // Cast guards against array input (e.g. ?csrf_token[]=x) which would
+    // TypeError hash_equals. Matches the defensive pattern in
+    // admin/_actions/refund_admin_action.php + portal_company_action.php.
+    $posted_csrf = (string)($_POST['csrf_token'] ?? '');
     if (!hash_equals($_SESSION['csrf_token'], $posted_csrf)) {
         $error = 'Security token mismatch. Please try again.';
     } elseif (!$user) {

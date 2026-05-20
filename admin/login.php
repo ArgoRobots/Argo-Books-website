@@ -116,6 +116,11 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     $_SESSION['admin_logged_in'] = true;
                     $_SESSION['admin_username'] = $actual_username;
 
+                    // Mirror the normal 2FA-success path: a successful login
+                    // (whether by TOTP or trust cookie) resets both buckets so
+                    // prior failed 2FA attempts don't bite the user when their
+                    // trust cookie eventually expires.
+                    clear_rate_limit_attempts($clientIp, 'admin_2fa');
                     clear_rate_limit_attempts($clientIp, 'admin_login');
 
                     $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
@@ -203,24 +208,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 </div>
 
                 <input type="hidden" name="verify_code" value="1">
-
-                <style>
-                    .trust-device-group { margin-top: -8px; }
-                    .trust-device-label {
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                        font-size: 0.9em;
-                        cursor: pointer;
-                        user-select: none;
-                    }
-                    .trust-device-label input[type="checkbox"] {
-                        width: 16px;
-                        height: 16px;
-                        margin: 0;
-                        cursor: pointer;
-                    }
-                </style>
 
                 <div class="center">
                     <button type="button" onclick="submitVerificationForm()" id="submit-button" class="btn btn-blue">Verify</button>

@@ -1081,6 +1081,15 @@ tbody tr:hover {
 }
 
 /* Dark theme - Base */
+[data-theme="dark"] {
+  /* color-scheme tells the browser's UA stylesheet to render native
+     controls (checkboxes, focus rings, scrollbars, date pickers, etc.)
+     using their dark variants. Without this, an unchecked native
+     checkbox or a focused <input> shows a light/white background that
+     looks out of place on dark admin pages. */
+  color-scheme: dark;
+}
+
 [data-theme="dark"] body {
   background: var(--neutral-111827);
   color: var(--gray-200);
@@ -2066,6 +2075,13 @@ tbody tr:hover {
 }
 
 
+
+/* The 2FA login form centers its input via `margin: 0 auto`; align the
+   label and the trust-device checkbox to match so the column reads as a
+   single centered group instead of left-label / centered-input / left-box. */
+#verification-form .form-group {
+    text-align: center;
+}
 
 /* "Trust this device for 30 days" checkbox on the 2FA verification form */
 .trust-device-group {

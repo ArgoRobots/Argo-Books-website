@@ -203,7 +203,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 <div class="form-group trust-device-group">
                     <label class="trust-device-label">
                         <input type="checkbox" id="trust_device" name="trust_device" value="1">
-                        Trust this device for 30 days (skip the code on this browser)
+                        Trust this device for 30 days
                     </label>
                 </div>
 

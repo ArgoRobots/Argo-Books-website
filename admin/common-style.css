@@ -2073,7 +2073,7 @@ tbody tr:hover {
 }
 
 .trust-device-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 0.9em;
@@ -2086,4 +2086,7 @@ tbody tr:hover {
     height: 16px;
     margin: 0;
     cursor: pointer;
+    /* accent-color tints the native checkbox in both light and dark themes
+       without needing a fully custom appearance: none implementation. */
+    accent-color: var(--primary-blue);
 }

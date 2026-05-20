@@ -1455,18 +1455,24 @@ function generate_draft_for_lead($pdo, $lead)
         }
     }
 
+    $country = strtoupper(trim($lead['country'] ?? 'CA'));
+    $isCanadian = ($country === 'CA');
     $isLocal = false;
     $city = strtolower(trim($lead['city'] ?? ''));
     $province = strtolower(trim($lead['province'] ?? ''));
-    if ($province === 'saskatchewan' || $province === 'sk' || in_array($city, ['saskatoon','regina','prince albert','moose jaw','swift current','yorkton','north battleford','estevan','weyburn','martensville','warman','humboldt','melfort','meadow lake','lloydminster'])) {
+    if ($isCanadian && ($province === 'saskatchewan' || $province === 'sk' || in_array($city, ['saskatoon','regina','prince albert','moose jaw','swift current','yorkton','north battleford','estevan','weyburn','martensville','warman','humboldt','melfort','meadow lake','lloydminster']))) {
         $isLocal = true;
     }
 
-    $isSaskatoon = in_array($city, ['saskatoon','martensville','warman']);
+    $isSaskatoon = $isLocal && in_array($city, ['saskatoon','martensville','warman']);
 
-    $localInstruction = $isLocal
-        ? "- The business is in Saskatchewan. Evan is a local Saskatchewan software developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon software developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal."
-        : "- The business is outside Saskatchewan. Evan is a Canadian software developer. Say \"Canadian software developer\", do NOT say \"local\" and do NOT mention Saskatoon or Saskatchewan.";
+    if ($isLocal) {
+        $localInstruction = "- The business is in Saskatchewan. Evan is a local Saskatchewan software developer based in Saskatoon. ALWAYS mention being local, e.g. \"I'm a local Saskatoon software developer\" or \"As a fellow Saskatchewan business\". This local connection is important, make it feel personal.";
+    } elseif ($isCanadian) {
+        $localInstruction = "- The business is outside Saskatchewan but in Canada. Evan is a Canadian software developer. Say \"Canadian software developer\" or \"fellow Canadian small business\", do NOT say \"local\" and do NOT mention Saskatoon or Saskatchewan.";
+    } else {
+        $localInstruction = "- The business is in the United States. Evan is an independent software developer (he is Canadian, but do NOT lead with that — it adds nothing for a US recipient and can read as out-of-place). Say \"independent software developer\" or \"solo developer\". Do NOT say \"local\", do NOT mention Saskatoon or Saskatchewan, and do NOT say \"fellow Canadian\".";
+    }
 
     $inPersonInstruction = $isSaskatoon
         ? "\n- IMPORTANT: Since this business is in the Saskatoon area, you MUST include an offer for an in-person visit to help them get set up. Work it in naturally, e.g. \"Since I'm right here in Saskatoon, I'd be happy to stop by and help you get set up in person\" or \"I could even swing by to walk you through it\". This is a key selling point for local businesses."
@@ -1490,7 +1496,7 @@ About Argo Books:
 - It is a simple bookkeeping and invoicing app designed so you do not need any accounting knowledge at all
 - Built specifically for small businesses, not a bloated enterprise tool
 - Features include invoicing, expense tracking, and simple bookkeeping
-- Evan is " . ($isLocal ? "a local independent software developer based in Saskatoon" : "a Canadian independent software developer") . " building this specifically for small businesses
+- Evan is " . ($isLocal ? "a local independent software developer based in Saskatoon" : ($isCanadian ? "a Canadian independent software developer" : "an independent software developer")) . " building this specifically for small businesses
 
 Rules:
 - Keep it very short (2-3 short paragraphs max, under 100 words ideally)
@@ -1507,6 +1513,7 @@ PERSONALIZATION (this is critical):
 - Instead of asserting facts about their business, use general industry knowledge. Say things like \"businesses like yours often deal with...\" or \"in the [industry] space, invoicing can be a hassle\" rather than \"I know you do X\"
 - Only reference Argo Books features that are relevant to their general industry. Do not list every feature
 - If a business summary is provided, use it ONLY to understand their industry and tailor which Argo features to mention. Do NOT parrot back details from the summary as if you personally know about their business
+- EXCEPTION: if the summary lists a \"Recently added product\" name, you MAY reference it ONCE in a natural way (e.g. \"loved the [product name] on your store\"). This is public information from their store, not creepy. Keep it brief and only if it flows naturally — do not force it
 - If no summary is available, keep it more general but still mention their industry/category if known
 $painPointsInstruction
 

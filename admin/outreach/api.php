@@ -622,9 +622,13 @@ function shopify_run_dork($pdo)
         $cursor++;
         _shopify_state_set($pdo, 'shopify_dork_cursor', (string) $cursor);
 
-        $serpResults = serpapi_query($query, $apiKey, 10);
-        $callsToday++;
-        _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
+        $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
+        $queryResult = serpapi_query_cached($queryWithExclusions, $apiKey, 100, $pdo);
+        $serpResults = $queryResult['results'];
+        if (!$queryResult['from_cache']) {
+            $callsToday++;
+            _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
+        }
         $queriesRun[] = $query;
 
         if (empty($serpResults)) continue;
@@ -746,16 +750,20 @@ function shopify_import($pdo)
             $meta['products_count'] ?? '?',
             $meta['first_product_created_at'] ?? 'unknown date'
         );
+        if (!empty($meta['featured_product'])) {
+            $businessSummary .= sprintf(' Recently added product: "%s".', $meta['featured_product']);
+        }
 
         $stmt = $pdo->prepare("INSERT INTO outreach_leads
-            (business_name, email, website, source, contact_page_url, business_summary)
-            VALUES (?, ?, ?, 'shopify_auto', ?, ?)");
+            (business_name, email, website, source, contact_page_url, business_summary, country)
+            VALUES (?, ?, ?, 'shopify_auto', ?, ?, ?)");
         $stmt->execute([
             $businessName ?: $canonicalUrl,
             $email,
             $finalUrl,
             $finalUrl,
             $businessSummary,
+            $meta['country'] ?? 'CA',
         ]);
         $leadId = (int) $pdo->lastInsertId();
 

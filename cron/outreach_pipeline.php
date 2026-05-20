@@ -555,10 +555,20 @@ function stepDiscoverShopify($pdo, $dryRun)
 
         logPipeline("Shopify dork #$dorksTriedThisRun/$totalDorks (cursor=$cursor): '$query'");
 
-        // SerpAPI call (always increments counter, even on empty result)
-        $results = serpapi_query($query, $serpapiKey, 10);
-        $serpapiCallsToday++;
-        setState($pdo, 'serpapi_calls_today', (string) $serpapiCallsToday);
+        // SerpAPI call via 14-day response cache. Append global exclusions
+        // so we don't pay for results that openly advertise being decades
+        // old. num=100 is Google's per-page cap and costs the same as
+        // num=10 on SerpAPI — 10x the candidates per credit. Cache hits
+        // do NOT consume daily SerpAPI quota.
+        $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
+        $queryResult = serpapi_query_cached($queryWithExclusions, $serpapiKey, 100, $pdo);
+        $results = $queryResult['results'];
+        if ($queryResult['from_cache']) {
+            logPipeline("'$query' served from SerpAPI cache (no credit spent).");
+        } else {
+            $serpapiCallsToday++;
+            setState($pdo, 'serpapi_calls_today', (string) $serpapiCallsToday);
+        }
 
         if (empty($results)) {
             logPipeline("SerpAPI returned no results for '$query'. Moving to next dork.");
@@ -634,14 +644,16 @@ function stepDiscoverShopify($pdo, $dryRun)
 
                 $productsCount          = $meta['products_count'] ?? 0;
                 $firstProductCreatedAt  = $meta['first_product_created_at'] ?? '';
+                $featuredProduct        = $meta['featured_product'] ?? null;
                 $businessSummary = "Shopify store. {$productsCount} products."
                     . ($firstProductCreatedAt ? " First product created {$firstProductCreatedAt}." : '')
+                    . ($featuredProduct ? " Recently added product: \"{$featuredProduct}\"." : '')
                     . " Discovered via: {$query}";
 
                 $insLead = $pdo->prepare(
                     "INSERT INTO outreach_leads
-                     (business_name, email, website, source, contact_page_url, business_summary)
-                     VALUES (?, ?, ?, 'shopify_auto', ?, ?)"
+                     (business_name, email, website, source, contact_page_url, business_summary, country)
+                     VALUES (?, ?, ?, 'shopify_auto', ?, ?, ?)"
                 );
                 $insLead->execute([
                     $meta['business_name'] ?? $canonical,
@@ -649,6 +661,7 @@ function stepDiscoverShopify($pdo, $dryRun)
                     $finalUrl,
                     $finalUrl,
                     $businessSummary,
+                    $meta['country'] ?? 'CA',
                 ]);
                 $leadId = (int) $pdo->lastInsertId();
 

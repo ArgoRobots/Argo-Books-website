@@ -192,6 +192,85 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
+<?php
+// Shopify reject-reason distribution (last 30 days). Helps tune which
+// filters are killing leads so the discovery cron can be adjusted.
+$shopifyRejectStats = [];
+$shopifyImported30d = 0;
+$shopifyTotal30d = 0;
+try {
+    $stmt = $pdo->prepare(
+        "SELECT reject_reason, COUNT(*) AS cnt, MAX(reject_detail) AS sample
+         FROM outreach_shopify_candidates
+         WHERE status = 'rejected'
+           AND checked_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+           AND reject_reason IS NOT NULL
+         GROUP BY reject_reason
+         ORDER BY cnt DESC"
+    );
+    $stmt->execute();
+    $shopifyRejectStats = $stmt->fetchAll();
+
+    $stmt2 = $pdo->prepare(
+        "SELECT
+             SUM(status='imported') AS imported,
+             COUNT(*) AS total
+         FROM outreach_shopify_candidates
+         WHERE checked_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"
+    );
+    $stmt2->execute();
+    $totals = $stmt2->fetch();
+    $shopifyImported30d = (int) ($totals['imported'] ?? 0);
+    $shopifyTotal30d    = (int) ($totals['total'] ?? 0);
+} catch (Throwable $e) {
+    // Show empty state on query failure
+}
+$shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
+?>
+
+<!-- Shopify Rejection Reasons Panel -->
+<div class="panel discovery-panel">
+    <div class="panel-header" onclick="togglePanel('shopifyRejectStatsContent')">
+        <h2><?= svg_icon('bar-chart', 18) ?> Why Shopify candidates get rejected (last 30 days)</h2>
+        <span class="panel-toggle" id="shopifyRejectStatsToggle">&#9660;</span>
+    </div>
+    <div class="panel-content" id="shopifyRejectStatsContent">
+        <?php if ($shopifyTotal30d === 0): ?>
+            <p class="text-muted" style="margin:8px 0; font-size:13px;">No Shopify candidates evaluated in the last 30 days.</p>
+        <?php else: ?>
+            <p class="text-muted" style="margin:0 0 12px; font-size:13px;">
+                Of <?= (int) $shopifyTotal30d ?> candidates evaluated, <?= (int) $shopifyImported30d ?> were imported as leads and <?= (int) $shopifyRejectedTotal ?> were rejected. Use this breakdown to tune the dork pool or evaluator thresholds.
+            </p>
+            <div class="discovery-table-wrapper">
+                <table class="data-table discovery-table">
+                    <thead>
+                        <tr>
+                            <th>Reject reason</th>
+                            <th style="width:90px; text-align:right;">Count</th>
+                            <th style="width:90px; text-align:right;">% of rejects</th>
+                            <th>Sample detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($shopifyRejectStats as $row): ?>
+                            <?php
+                                $cnt = (int) $row['cnt'];
+                                $pct = $shopifyRejectedTotal > 0 ? round($cnt / $shopifyRejectedTotal * 100) : 0;
+                            ?>
+                            <tr>
+                                <td><code><?= htmlspecialchars((string) $row['reject_reason']) ?></code></td>
+                                <td style="text-align:right;"><?= $cnt ?></td>
+                                <td style="text-align:right;"><?= $pct ?>%</td>
+                                <td class="text-muted" style="font-size:12px;"><?= htmlspecialchars((string) ($row['sample'] ?? '')) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
 </div> <!-- /#discovery -->
 
 <div id="leads" class="tab-content <?php echo $activeTab === 'leads' ? 'active' : ''; ?>">

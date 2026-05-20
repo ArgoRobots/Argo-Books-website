@@ -772,6 +772,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     contact_page_url VARCHAR(500) DEFAULT NULL,
     places_id VARCHAR(255) DEFAULT NULL,
     company_size ENUM('small','medium','large') DEFAULT NULL,
+    country CHAR(2) DEFAULT 'CA',
     business_summary TEXT DEFAULT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_outreach_status (status),
@@ -971,6 +972,21 @@ CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
     UNIQUE KEY uniq_canonical_url (canonical_url),
     INDEX idx_status_checked (status, checked_at),
     INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 14-day cache of SerpAPI organic-results responses. The Shopify discovery
+-- cron rotates through ~12 dork queries on a daily schedule, and Google's
+-- site:myshopify.com results for these queries change slowly. Caching cuts
+-- SerpAPI credit burn substantially with no measurable impact on lead
+-- discovery. Cache hits do NOT increment serpapi_calls_today.
+CREATE TABLE IF NOT EXISTS serpapi_response_cache (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    query_hash CHAR(64) NOT NULL,
+    query_text VARCHAR(500) NOT NULL,
+    response_json MEDIUMTEXT NOT NULL,
+    fetched_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_query_hash (query_hash),
+    INDEX idx_fetched_at (fetched_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Per-run audit trail for every cron job. Each cron calls cron_run_start

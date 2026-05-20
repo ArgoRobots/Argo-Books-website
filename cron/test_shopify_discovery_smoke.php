@@ -31,8 +31,15 @@ function assert_true($cond, $msg) {
 }
 
 // ─── Shared fixture ───
-$goodDate   = (new DateTime('-14 months'))->format(DateTime::RFC3339);
-$caProducts = ['products' => array_fill(0, 10, ['created_at' => $goodDate])];
+// Realistic actively-trading store: 9 older products (oldest 14 months ago,
+// inside the 3-24 month window) + 1 fresh product (1 month ago) so the
+// dormancy check (rejects if newest > 6 months old) passes.
+$goodDate    = (new DateTime('-14 months'))->format(DateTime::RFC3339);
+$freshDate   = (new DateTime('-1 month'))->format(DateTime::RFC3339);
+$caProducts  = ['products' => array_merge(
+    array_fill(0, 9, ['created_at' => $goodDate]),
+    [['created_at' => $freshDate]]
+)];
 
 // ─── Section 1: filter_gatekept_email ───
 echo "Section 1: filter_gatekept_email\n";
@@ -128,10 +135,17 @@ $badAgeProducts = ['products' => array_fill(0, 10, ['created_at' => 'completely-
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $badAgeProducts);
 assert_true($r['reason'] === 'age_unknown', "age_unknown: reason correct");
 
-// not_canadian
+// US lead now accepted (the channel was Canadian-only originally; US was
+// added so the same evaluator accepts either country).
 $usaHtml = '<html><body>Made in USA hello@x.com</body></html>';
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $usaHtml, $caProducts);
-assert_true($r['reason'] === 'not_canadian', "not_canadian: reason correct");
+assert_true($r['fit'] === true, "US 'Made in USA' signal passes country gate");
+assert_true(($r['metadata']['country'] ?? null) === 'US', "US lead metadata.country === 'US'");
+
+// Non-target country (no CA or US signal at all)
+$frHtml = '<html><body>Fabriqué en France hello@x.fr</body></html>';
+$r = evaluate_shopify_candidate('https://test.myshopify.com', $frHtml, $caProducts);
+assert_true($r['reason'] === 'not_target_country', "not_target_country: reason correct for non-CA/US");
 
 // no_contact_email
 $noEmailHtml = '<html><body>Made in Canada (no email anywhere)</body></html>';
@@ -175,7 +189,7 @@ assert_true($r['fit'] === true, "'proudly canadian' phrase passes Canada gate");
 // Just the word "Canada" alone (no postal code, no qualifying phrase) — should FAIL
 $justCanadaHtml = '<html><body>We ship to Canada. hello@x.ca</body></html>';
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $justCanadaHtml, $caProducts);
-assert_true($r['reason'] === 'not_canadian', "Bare 'Canada' without postal code or signal phrase → not_canadian");
+assert_true($r['reason'] === 'not_target_country', "Bare 'Canada' without postal code or signal phrase → not_target_country");
 
 // ─── Section 6: Powered-by-Shopify exclusion ───
 echo "Section 6: Powered-by-Shopify exclusion\n";

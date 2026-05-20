@@ -2,7 +2,7 @@
 
 ## Payment Processor Fees
 
-Every online payment — whether it's a customer paying an invoice through the Payment Portal or a customer buying an Argo Premium subscription — adds **2.9% + \$0.30 CAD** on top of the base amount. That's the same number no matter which provider (Stripe, PayPal, or Square), no matter the country. It's hardcoded — set in `.env` via `PROCESSING_FEE_PERCENT` and `PROCESSING_FEE_FIXED`.
+Every online payment, whether it's a customer paying an invoice through the Payment Portal or a customer buying an Argo Premium subscription adds **2.9% + \$0.30 CAD** on top of the base amount. That's the same number no matter which provider (Stripe, PayPal, or Square), no matter the country. It's hardcoded in `.env` via `PROCESSING_FEE_PERCENT` and `PROCESSING_FEE_FIXED`.
 
 Who actually pays the fee depends on the flow:
 
@@ -21,15 +21,15 @@ Argo Books, and the companies using Argo Books pay these fees when they move the
 
 ### PayPal
 
-> **Note:** PayPal is currently **not supported** as a payment provider in the customer-facing Payment Portal. Merchants cannot connect their PayPal Business account through Argo Books, and customers paying invoices will only see Stripe and Square as options. PayPal is still used for the Argo Premium subscription (the merchant paying Argo Books for their plan) — that flow is unaffected.
+> **Note:** PayPal is currently **not supported** as a payment provider in the customer-facing Payment Portal. Merchants cannot connect their PayPal Business account through Argo Books, and customers paying invoices will only see Stripe and Square as options. PayPal is still used for the Argo Premium subscription (the merchant paying Argo Books for their plan).
 >
 > The reason: PayPal's "Log in with PayPal" OAuth flow refuses to return merchant identity for Business accounts, so the Connect flow can't onboard real merchants. Proper onboarding requires PayPal **Partner Referrals API**, which is gated behind their **Platforms & Marketplaces** partner program. To re-enable PayPal in the portal, Argo Books needs to:
-> 1. Form a registered business entity (e.g., a Canadian-Controlled Private Corporation — see "Forming a business entity" below if needed).
+> 1. Form a registered business entity (e.g., a Canadian-Controlled Private Corporation. See "Forming a business entity" below if needed).
 > 2. Apply at https://www.paypal.com/us/business/platforms-marketplaces (or the regional equivalent for non-US applicants).
 > 3. Once approved, implement the Partner Referrals migration described in the plan file.
 > 4. Optionally, drop the PayPal `BN code` (`PayPal-Partner-Attribution-Id`) into `.env` for revenue attribution.
 >
-> Plan to apply once Argo Books has its first ~50 paying merchants or ~$10k/month projected PayPal volume — pre-revenue applications typically get deferred. Until then, the portal runs on Stripe + Square only.
+> Plan to apply once Argo Books has its first ~50 paying merchants or ~$10k/month projected PayPal volume. Pre-revenue applications typically get deferred. Until then, the portal runs on Stripe + Square only.
 
 When re-enabled, PayPal's processing fees are:
 

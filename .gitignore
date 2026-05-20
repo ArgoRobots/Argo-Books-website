@@ -21,3 +21,4 @@ reset_admin_password.php
 .phpunit.cache/
 .phpunit.result.cache
 /tests/coverage/
+/.superpowers/

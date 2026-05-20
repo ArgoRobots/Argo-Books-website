@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/db_connect.php';
+require_once __DIR__ . '/track_referral_event.php';
 
 /**
  * Generate a random license key
@@ -166,6 +167,31 @@ function redeem_premium_key($key, $device_id) {
         $stmt->execute([$device_id, $subscriptionId, $key]);
 
         $pdo->commit();
+
+        // Fire premium_signup for free-key redemption. No premium_paid because
+        // no money changed hands. The desktop app's HTTP client has a non-browser
+        // UA so allow_bot=true bypasses the standard filter.
+        try {
+            $visitorId   = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
+            $sourceCode  = $_SESSION['referral_source']   ?? null;
+
+            track_referral_event('premium_signup', [
+                'visitor_id'      => $visitorId,
+                'source_code'     => $sourceCode,
+                'subscription_id' => $subscriptionId,
+                'event_data'      => [
+                    'amount'     => 0,
+                    'redemption' => 'free_key',
+                    'duration_months' => $duration_months,
+                ],
+                'allow_bot' => true,
+            ]);
+            if (!empty($visitorId)) {
+                backfill_visitor_events($visitorId, $subscriptionId);
+            }
+        } catch (Exception $e) {
+            error_log('Free-key premium_signup event failed: ' . $e->getMessage());
+        }
 
         return [
             'success' => true,

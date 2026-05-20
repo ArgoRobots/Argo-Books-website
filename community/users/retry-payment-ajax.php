@@ -13,6 +13,7 @@ require_once __DIR__ . '/../community_functions.php';
 require_once __DIR__ . '/user_functions.php';
 require_once __DIR__ . '/../../webhooks/paypal-helper.php';
 require_once __DIR__ . '/../../config/pricing.php';
+require_once __DIR__ . '/../../track_referral_event.php';
 
 // Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -339,6 +340,25 @@ try {
                 } catch (Exception $e) {
                     error_log("Failed to record payment: " . $e->getMessage());
                 }
+            }
+
+            // Fire premium_paid event for the retry payment
+            try {
+                $attr = find_visitor_for_subscription($subscription_id);
+                track_referral_event('premium_paid', [
+                    'visitor_id'      => $attr['visitor_id'] ?? ($_COOKIE[ARGO_VISITOR_COOKIE] ?? null),
+                    'source_code'     => $attr['source_code'],
+                    'subscription_id' => $subscription_id,
+                    'user_id'         => $attr['user_id'] ?? ($_SESSION['user_id'] ?? null),
+                    'event_data'      => [
+                        'amount'         => $amount,
+                        'currency'       => 'CAD',
+                        'payment_type'   => 'retry',
+                        'payment_method' => $payment_method,
+                    ],
+                ]);
+            } catch (Exception $e) {
+                error_log('Retry premium_paid event failed: ' . $e->getMessage());
             }
 
             // Send reactivation email with end date (current end date for

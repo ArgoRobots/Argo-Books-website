@@ -14,6 +14,7 @@ require_once __DIR__ . '/../../../email_sender.php';
 require_once __DIR__ . '/../../../license_functions.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once __DIR__ . '/../../../config/pricing.php';
+require_once __DIR__ . '/../../../track_referral_event.php';
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -782,16 +783,57 @@ try {
 
         $pdo->commit();
 
-        // Mark referral visit as converted if this purchase came from a referral source
-        if (!empty($_SESSION['referral_source'])) {
+        // Mark referral visit as converted if this purchase came from a referral source.
+        // The existing referral_visits write is load-bearing for the legacy admin charts.
+        $referralSource = $_SESSION['referral_source'] ?? null;
+        $visitorId      = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
+
+        if (!empty($referralSource)) {
             try {
                 $refStmt = $pdo->prepare("UPDATE referral_visits SET converted = 1, license_key = ? WHERE source_code = ? AND converted = 0 ORDER BY visited_at DESC LIMIT 1");
-                $refStmt->execute([$subscriptionId, $_SESSION['referral_source']]);
-                unset($_SESSION['referral_source']);
+                $refStmt->execute([$subscriptionId, $referralSource]);
             } catch (Exception $e) {
                 error_log("Failed to mark referral conversion: " . $e->getMessage());
             }
         }
+
+        // Fire premium_signup + premium_paid events and backfill all prior
+        // funnel events for this visitor so attribution stays attached to
+        // the subscription even across logged-out browse sessions.
+        try {
+            track_referral_event('premium_signup', [
+                'visitor_id'      => $visitorId,
+                'source_code'     => $referralSource,
+                'subscription_id' => $subscriptionId,
+                'user_id'         => $userId,
+                'event_data'      => [
+                    'amount'        => $amount,
+                    'currency'      => $currency,
+                    'billing_cycle' => $billing ?? null,
+                ],
+            ]);
+
+            track_referral_event('premium_paid', [
+                'visitor_id'      => $visitorId,
+                'source_code'     => $referralSource,
+                'subscription_id' => $subscriptionId,
+                'user_id'         => $userId,
+                'event_data'      => [
+                    'amount'         => $amount,
+                    'currency'       => $currency,
+                    'payment_type'   => 'initial',
+                    'payment_method' => $paymentMethod,
+                ],
+            ]);
+
+            if (!empty($visitorId)) {
+                backfill_visitor_events($visitorId, $subscriptionId, $userId);
+            }
+        } catch (Exception $e) {
+            error_log("Failed to track premium signup events: " . $e->getMessage());
+        }
+
+        unset($_SESSION['referral_source']);
 
         // Send receipt email
         try {

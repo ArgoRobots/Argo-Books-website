@@ -363,3 +363,337 @@ code {
 [data-theme="dark"] .table-header-actions h2 {
     color: var(--gray-200);
 }
+
+/* ============================================================
+ * Tab strip — Overview / Funnel / Spend
+ * ============================================================ */
+.tab-strip {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--gray-border);
+    padding: 0 4px;
+}
+
+.tab-strip a {
+    padding: 12px 24px;
+    text-decoration: none;
+    color: var(--gray-500);
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+}
+
+.tab-strip a:hover {
+    color: var(--blue-500);
+}
+
+.tab-strip a.active {
+    color: var(--blue-500);
+    border-bottom-color: var(--blue-500);
+}
+
+[data-theme="dark"] .tab-strip a {
+    color: var(--gray-400);
+}
+
+[data-theme="dark"] .tab-strip a:hover,
+[data-theme="dark"] .tab-strip a.active {
+    color: var(--blue-400);
+}
+
+[data-theme="dark"] .tab-strip a.active {
+    border-bottom-color: var(--blue-400);
+}
+
+/* ============================================================
+ * Funnel UI
+ * ============================================================ */
+.funnel-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-default);
+}
+
+.funnel-controls .control-label {
+    font-weight: 600;
+    color: var(--black);
+    font-size: 13px;
+    margin-right: 4px;
+}
+
+.funnel-pill-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.funnel-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--gray-bg-light);
+    color: var(--black);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+}
+
+.funnel-pill:hover {
+    background: var(--gray-border);
+}
+
+.funnel-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+[data-theme="dark"] .funnel-pill {
+    background: var(--gray-700);
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .funnel-pill:hover {
+    background: var(--gray-600);
+}
+
+[data-theme="dark"] .funnel-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+.funnel-container {
+    background: var(--white);
+    padding: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-default);
+    margin-bottom: 24px;
+}
+
+.funnel-container h2 {
+    margin: 0 0 24px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.funnel-container h2 .source-tag {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 3px 10px;
+    background: var(--blue-100);
+    color: var(--blue-800);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+[data-theme="dark"] .funnel-container h2 {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .funnel-container h2 .source-tag {
+    background: var(--blue-900);
+    color: var(--blue-200);
+}
+
+.funnel {
+    display: flex;
+    flex-direction: column;
+}
+
+.funnel-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 120px;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 0;
+}
+
+.funnel-label {
+    font-weight: 500;
+    color: var(--black);
+    font-size: 14px;
+}
+
+[data-theme="dark"] .funnel-label {
+    color: var(--gray-200);
+}
+
+.funnel-bar-wrap {
+    height: 36px;
+    background: var(--gray-bg-light);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+[data-theme="dark"] .funnel-bar-wrap {
+    background: var(--gray-800);
+}
+
+.funnel-bar {
+    height: 100%;
+    width: 0;
+    border-radius: 0 6px 6px 0;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.funnel.loaded .funnel-bar {
+    width: var(--target-pct);
+}
+
+.funnel-bar-landing       { background: linear-gradient(90deg, var(--blue-500),    var(--blue-400)); }
+.funnel-bar-downloads_page{ background: linear-gradient(90deg, var(--indigo-500),  var(--indigo-400)); }
+.funnel-bar-download_click{ background: linear-gradient(90deg, var(--purple-500),  var(--purple-400)); }
+.funnel-bar-app_first_run { background: linear-gradient(90deg, var(--purple-400),  var(--purple-300)); }
+.funnel-bar-premium_signup{ background: linear-gradient(90deg, var(--emerald-500), var(--emerald-400)); }
+.funnel-bar-premium_paid  { background: linear-gradient(90deg, var(--emerald-700), var(--emerald-500)); }
+.funnel-bar-still_paying  { background: linear-gradient(90deg, var(--emerald-800), var(--emerald-600)); }
+
+.funnel-count {
+    text-align: right;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--black);
+    font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .funnel-count {
+    color: var(--gray-100);
+}
+
+.funnel-dropoff {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 0 6px 220px;
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.funnel-dropoff .kept { color: var(--emerald-600); font-weight: 600; }
+.funnel-dropoff .lost { color: var(--gray-400); }
+.funnel-dropoff .sep  { color: var(--gray-300); }
+
+.funnel-dropoff.biggest { color: var(--red-600); }
+.funnel-dropoff.biggest .kept { color: var(--red-600); }
+.funnel-dropoff.biggest::before {
+    content: "⚠";
+    margin-right: 4px;
+    color: var(--red-600);
+}
+
+[data-theme="dark"] .funnel-dropoff       { color: var(--gray-500); }
+[data-theme="dark"] .funnel-dropoff .kept { color: var(--emerald-400); }
+[data-theme="dark"] .funnel-dropoff .lost { color: var(--gray-500); }
+[data-theme="dark"] .funnel-dropoff.biggest { color: var(--red-400); }
+[data-theme="dark"] .funnel-dropoff.biggest .kept { color: var(--red-400); }
+[data-theme="dark"] .funnel-dropoff.biggest::before { color: var(--red-400); }
+
+/* Hero stat cards — extends the existing .stat-card */
+.stat-card.hero {
+    padding: 24px 28px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card.hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px var(--shadow-default);
+}
+
+.stat-card.hero .suffix {
+    font-size: 13px;
+    color: var(--gray-500);
+    margin-left: 8px;
+    font-weight: 500;
+}
+
+.stat-card.ratio-losing {
+    background: linear-gradient(135deg, var(--red-50), var(--white));
+}
+.stat-card.ratio-losing .value { color: var(--red-600); }
+
+.stat-card.ratio-marginal {
+    background: linear-gradient(135deg, var(--amber-50), var(--white));
+}
+.stat-card.ratio-marginal .value { color: var(--amber-700); }
+
+.stat-card.ratio-profitable {
+    background: linear-gradient(135deg, var(--green-50), var(--white));
+}
+.stat-card.ratio-profitable .value { color: var(--green-700); }
+
+.stat-card.ratio-organic {
+    background: linear-gradient(135deg, var(--emerald-50), var(--white));
+}
+.stat-card.ratio-organic .value { color: var(--emerald-700); }
+
+[data-theme="dark"] .stat-card.ratio-losing,
+[data-theme="dark"] .stat-card.ratio-marginal,
+[data-theme="dark"] .stat-card.ratio-profitable,
+[data-theme="dark"] .stat-card.ratio-organic {
+    background: var(--gray-800);
+}
+
+/* Comparison table tweaks */
+.compare-table tbody tr {
+    cursor: pointer;
+}
+
+.compare-table .ratio-cell {
+    font-weight: 600;
+}
+.compare-table .ratio-cell.losing { color: var(--red-600); }
+.compare-table .ratio-cell.marginal { color: var(--amber-700); }
+.compare-table .ratio-cell.profitable,
+.compare-table .ratio-cell.organic { color: var(--emerald-600); }
+
+[data-theme="dark"] .compare-table .ratio-cell.losing { color: var(--red-400); }
+[data-theme="dark"] .compare-table .ratio-cell.marginal { color: var(--amber-400); }
+[data-theme="dark"] .compare-table .ratio-cell.profitable,
+[data-theme="dark"] .compare-table .ratio-cell.organic { color: var(--emerald-400); }
+
+/* Spend tab styling */
+.spend-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--gray-500);
+}
+
+.empty-state p {
+    margin: 0 0 16px 0;
+    font-size: 15px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .funnel-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+    .funnel-dropoff {
+        padding-left: 0;
+    }
+    .funnel-count {
+        text-align: left;
+    }
+}

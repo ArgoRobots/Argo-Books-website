@@ -988,3 +988,51 @@ CREATE TABLE IF NOT EXISTS cron_runs (
     metrics JSON DEFAULT NULL,
     INDEX idx_cron_started (cron_name, started_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-visitor funnel event log. Captures every step of the referral funnel
+-- (landing -> downloads_page -> download_click -> app_first_run ->
+-- premium_signup -> premium_paid -> premium_churned). The argo_visitor_id
+-- cookie ties events together across sessions; on Premium signup all prior
+-- events for that visitor get backfilled with subscription_id + user_id so
+-- attribution survives a logged-out browse-to-buy flow.
+CREATE TABLE IF NOT EXISTS referral_events (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    visitor_id CHAR(36) DEFAULT NULL COMMENT 'UUID from argo_visitor_id cookie; NULL for unattributed app_first_run events',
+    source_code VARCHAR(50) DEFAULT NULL,
+    event_type ENUM(
+        'landing','downloads_page','download_click','app_first_run',
+        'premium_signup','premium_paid','premium_churned'
+    ) NOT NULL,
+    event_data JSON DEFAULT NULL,
+    subscription_id VARCHAR(50) DEFAULT NULL,
+    user_id INT DEFAULT NULL,
+    page_url VARCHAR(500) DEFAULT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    user_agent VARCHAR(255) DEFAULT NULL,
+    country_code VARCHAR(2) DEFAULT NULL,
+    environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_visitor (visitor_id),
+    INDEX idx_source_event_created (source_code, event_type, created_at),
+    INDEX idx_event_created (event_type, created_at),
+    INDEX idx_subscription (subscription_id),
+    INDEX idx_env_created (environment, created_at),
+    INDEX idx_ip (ip_address)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Manual monthly ad-spend entry per source. Used to compute Customer
+-- Acquisition Cost (CAC) and LTV:CAC ratio in the admin funnel UI. Period
+-- granularity is one calendar month; period_start is always YYYY-MM-01.
+CREATE TABLE IF NOT EXISTS campaign_spend (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    source_code VARCHAR(50) NOT NULL,
+    period_start DATE NOT NULL COMMENT 'First day of month (YYYY-MM-01)',
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
+    notes TEXT DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_source_period (source_code, period_start),
+    INDEX idx_period (period_start),
+    FOREIGN KEY (source_code) REFERENCES referral_links(source_code) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

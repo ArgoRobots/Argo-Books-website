@@ -4,18 +4,18 @@ When the refund system hard-blocks a refund, it locks the user's portal account 
 
 ## The default policy: if they reply, unlock
 
-The realistic threat model here is **not** "attacker drains the merchant" — refunds return money to the original customer's card, not to an attacker-controlled destination, so refunds aren't a viable theft vector. The actual scenarios the system catches are:
+The realistic threat model here is **not** "attacker drains the merchant" because refunds return money to the original customer's card, not to an attacker-controlled destination, so refunds aren't a viable theft vector. The actual scenarios the system catches are:
 
-- **Buggy automation** script error, accidental loop
-- **Sabotage** by a disgruntled employee or competitor
-- **A confused user** who's panicking and refunding too many things
-- **False positive** — system fired on a legitimate big refund
+- **Buggy automation**: script error, accidental loop
+- **Sabotage**: by a disgruntled employee or competitor
+- **A confused user**: who's panicking and refunding too many things
+- **False positive**: system fired on a legitimate big refund
 
 In all four cases, a real user replies to your email and explains. A saboteur or fraudster typically doesn't.
 
 **So the default policy is:** if the user replies to your email at all, unlock them. Don't interrogate. Don't ask for proof. Rely on bad actors self-selecting out by not responding.
 
-You only need to do real investigation if **(a)** they reply but something obviously seems off (incoherent reply, suspicious story, asks you to do something weird), or **(b)** the trigger looks so extreme that you want a sanity check before unlocking (e.g., 50+ refunds in 5 minutes — that's almost certainly a script malfunction worth confirming).
+You only need to do real investigation if **(a)** they reply but something obviously seems off (incoherent reply, suspicious story, asks you to do something weird), or **(b)** the trigger looks so extreme that you want a sanity check before unlocking (e.g., 50+ refunds in 5 minutes. That's almost certainly a script malfunction worth confirming).
 
 ---
 
@@ -23,10 +23,10 @@ You only need to do real investigation if **(a)** they reply but something obvio
 
 The email subject is `[Argo Books] Refund hard-block: company #N (Company Name)`. The body has four sections:
 
-- **Company** — id, name, owner email, environment (sandbox vs production).
-- **Refund that tripped the check** — request id, invoice number, provider, amount, user-provided reason.
-- **Diagnostic** — the specific trigger, today's total refund amount, refund attempts in the last hour.
-- **Next steps** — link into the admin panel.
+- **Company**: id, name, owner email, environment (sandbox vs production).
+- **Refund that tripped the check**: request id, invoice number, provider, amount, user-provided reason.
+- **Diagnostic**: the specific trigger, today's total refund amount, refund attempts in the last hour.
+- **Next steps**: link into the admin panel.
 
 Trigger codes:
 
@@ -52,7 +52,7 @@ That's the whole flow most of the time.
 
 ## 3. (Optional) Investigate
 
-You usually don't need to do this. Skip to section 4 unless you want to dig deeper.
+You don't need to do this. Skip to section 4 unless you want to dig deeper.
 
 To see the full picture of what happened:
 
@@ -66,27 +66,24 @@ LIMIT 50;
 
 What you'll see (most recent first):
 
-- `account_locked` (actor=system) — payload has the velocity tier, reason, today_cents, hour_count
-- `failed` (actor=system) — payload has `reason: hard_block, velocity_reason: <code>`
-- `velocity_tier_assigned` (actor=system)
-- `code_verified` (actor=owner) — confirms the refund was authenticated (the user typed the 6-digit code from their email)
-- `request_created` (actor=owner)
+- `account_locked`: payload has the velocity tier, reason, today_cents, hour_count
+- `failed`: payload has `reason: hard_block, velocity_reason: <code>`
+- `velocity_tier_assigned`
+- `code_verified`: confirms the refund was authenticated (the user typed the 6-digit code from their email)
+- `request_created`
 
-That `code_verified` event is meaningful — it means whoever triggered the refund had access to the merchant's email inbox. That's a real authentication signal independent of anything else.
+That `code_verified` event is meaningful. It means whoever triggered the refund had access to the merchant's email inbox. That's a real authentication signal independent of anything else.
 
-For broader context, the user's refund and payment history:
+For broader context, the user's refund history:
 
 ```sql
 SELECT id, invoice_number, amount_cents, currency, state, velocity_tier, created_at, completed_at, reason
 FROM refund_requests
 WHERE company_id = <company_id>
 ORDER BY created_at DESC LIMIT 30;
-
-SELECT id, invoice_id, amount, currency, status, payment_method, created_at
-FROM portal_payments
-WHERE company_id = <company_id>
-ORDER BY created_at DESC LIMIT 30;
 ```
+
+For their payment history, you don't need SQL. just open the **Transactions** tab on `admin/payments` and filter by the company in the Company dropdown. Add a Status filter if you only want refunds or only completed payments.
 
 If the established-account tier fired, also:
 
@@ -94,7 +91,7 @@ If the established-account tier fired, also:
 SELECT * FROM refund_velocity_baselines WHERE company_id = <company_id>;
 ```
 
-If `daily_avg_refund_cents` or `revenue_30d_cents` look way off from reality, the baseline cron may not have run recently — verify `refund_velocity_baseline_recompute.php` is installed and running nightly.
+If `daily_avg_refund_cents` or `revenue_30d_cents` look way off from reality, the baseline cron may not have run recently. Verify `refund_velocity_baseline_recompute.php` is installed and running nightly.
 
 ---
 
@@ -105,10 +102,10 @@ Once you've decided to unlock:
 1. Sign in to `www.argorobots.com/admin`.
 2. Go to the 'Payment Portal' tab and find the 'Companies' section.
 3. Find the locked company. Click 'Unlock'.
-4. Enter a free-text reason — e.g., `User confirmed legitimate refund via email`. The reason is required and gets logged.
+4. Enter a free-text reason: e.g., `User confirmed legitimate refund via email`. The reason is required and gets logged.
 5. Click submit.
 
-The unlock writes an audit log entry. The user can immediately retry the original refund from the desktop.
+The user can immediately retry the original refund from the desktop.
 
 ---
 
@@ -143,11 +140,11 @@ DELETE FROM refund_velocity_config WHERE company_id = <company_id>;
 
 ## 6. Reply to the user
 
-### Default — they replied, you unlocked
+### Default: they replied, you unlocked
 
 > Hi <Name>,
 >
-> Thanks for reaching out. I've unlocked refunds on your account — you can retry from the desktop and it should go through now.
+> Thanks for reaching out. I've unlocked refunds on your account. You can retry from the desktop and it should go through now.
 >
 > What happened: Argo Books has an automated safety check that pauses refunds when certain patterns trip a threshold. It's tuned conservatively and often triggers on completely legitimate refunds, especially for newer accounts or larger amounts. Sorry for the friction.
 >
@@ -158,7 +155,7 @@ DELETE FROM refund_velocity_config WHERE company_id = <company_id>;
 > Evan
 > Argo Books
 
-### Rare — something seems off in their reply
+### Rare: something seems off in their reply
 
 Only use this if the reply itself raises real concern (incoherent, evasive, asks you to do something unusual). Otherwise default to unlocking.
 
@@ -180,8 +177,8 @@ Only use this if the reply itself raises real concern (incoherent, evasive, asks
 
 If you've unlocked the same user twice for the same legitimate reason, the system's defaults are wrong for that account. Two paths:
 
-1. **Per-company override** — solve it for this user only (section 5).
-2. **Adjust global defaults** — solve it for everyone. Edit the row in `refund_velocity_config` where `company_id IS NULL`. Be careful: lowering defaults means more friction; raising defaults means more chance of letting buggy/malicious refund bursts through.
+1. **Per-company override**: solve it for this user only (section 5).
+2. **Adjust global defaults**: solve it for everyone. Edit the row in `refund_velocity_config` where `company_id IS NULL`. Be careful: lowering defaults means more friction; raising defaults means more chance of letting buggy/malicious refund bursts through.
 
 If you find yourself adjusting global defaults more than twice in a quarter, the system's design probably needs to change.
 
@@ -189,8 +186,8 @@ If you find yourself adjusting global defaults more than twice in a quarter, the
 
 For reference, while you're handling the alert:
 
-- **In the refund modal at the moment of hard-block** — *"This refund was flagged by our automated safety check. The system sometimes flags legitimate refunds — please email contact@argorobots.com and we will review and process this refund within one business day. Other parts of your account continue to work normally."* — plus a clickable "Email contact@argorobots.com" button that opens their mail client with a pre-filled message.
-- **In their inbox** — an email at the owner_email set in Payment Portal settings, subject `Refund paused: <amount> on invoice <number>`. Body explains it was paused by the automated safety check, that this is often a false positive, and to email us to get refunds resumed.
-- **On every subsequent refund attempt** — the modal errors out with: *"Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds — email contact@argorobots.com and we will resume refunds within one business day."*
-- **The customer being refunded** — sees nothing different. They just don't get a refund yet.
-- **Other parts of the user's account** — sending invoices, payment receiving, etc. continue to work normally. Only refunds are paused.
+- **In the refund modal at the moment of hard-block**: *"This refund was flagged by our automated safety check. The system sometimes flags legitimate refunds. Please email contact@argorobots.com and we will review and process this refund within one business day. Other parts of your account continue to work normally."* Plus a clickable "Email contact@argorobots.com" button that opens their mail client with a pre-filled message.
+- **In their inbox**: an email at the owner_email set in Payment Portal settings, subject `Refund paused: <amount> on invoice <number>`. Body explains it was paused by the automated safety check, that this is often a false positive, and to email us to get refunds resumed.
+- **On every subsequent refund attempt**: the modal says: *"Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds — email contact@argorobots.com and we will resume refunds within one business day."*
+- **The customer being refunded**: sees nothing different. They just don't get a refund yet.
+- **Other parts of the user's account**: sending invoices,  receiving payment, etc. continue to work normally. Only refunds are paused.

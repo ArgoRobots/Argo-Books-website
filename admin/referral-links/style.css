@@ -367,49 +367,11 @@ code {
 /* ============================================================
  * Tab strip — Overview / Funnel / Spend
  * ============================================================ */
-.tab-strip {
-    display: flex;
-    gap: 4px;
-    margin-bottom: 24px;
-    border-bottom: 1px solid var(--gray-border);
-    padding: 0 4px;
-}
-
-.tab-strip a {
-    padding: 12px 24px;
-    text-decoration: none;
-    color: var(--gray-500);
-    font-weight: 600;
-    font-size: 14px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.15s;
-    margin-bottom: -1px;
-}
-
-.tab-strip a:hover {
-    color: var(--blue-500);
-}
-
-.tab-strip a.active {
-    color: var(--blue-500);
-    border-bottom-color: var(--blue-500);
-}
-
-[data-theme="dark"] .tab-strip a {
-    color: var(--gray-400);
-}
-
-[data-theme="dark"] .tab-strip a:hover,
-[data-theme="dark"] .tab-strip a.active {
-    color: var(--blue-400);
-}
-
-[data-theme="dark"] .tab-strip a.active {
-    border-bottom-color: var(--blue-400);
-}
-
 /* ============================================================
  * Funnel UI
+ *
+ * Tabs use the shared .section-tabs / .section-tab markup from
+ * admin/common-style.css, so no tab styles are defined here.
  * ============================================================ */
 .funnel-controls {
     display: flex;
@@ -479,6 +441,16 @@ code {
     margin-bottom: 24px;
 }
 
+[data-theme="dark"] .funnel-container {
+    background: var(--gray-800);
+    border: 1px solid var(--black);
+}
+
+[data-theme="dark"] .funnel-controls {
+    background: var(--gray-800);
+    border: 1px solid var(--black);
+}
+
 .funnel-container h2 {
     margin: 0 0 24px 0;
     font-size: 20px;
@@ -505,6 +477,10 @@ code {
 [data-theme="dark"] .funnel-container h2 .source-tag {
     background: var(--blue-900);
     color: var(--blue-200);
+}
+
+[data-theme="dark"] .funnel-controls .control-label {
+    color: var(--gray-200);
 }
 
 .funnel {
@@ -544,14 +520,9 @@ code {
 
 .funnel-bar {
     height: 100%;
-    width: 0;
+    width: var(--target-pct, 0);
     border-radius: 0 6px 6px 0;
     box-shadow: inset 0 -2px 0 rgba(0,0,0,0.1);
-    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.funnel.loaded .funnel-bar {
-    width: var(--target-pct);
 }
 
 .funnel-bar-landing       { background: linear-gradient(90deg, var(--blue-500),    var(--blue-400)); }
@@ -646,6 +617,13 @@ code {
 [data-theme="dark"] .stat-card.ratio-organic {
     background: var(--gray-800);
 }
+
+[data-theme="dark"] .stat-card.ratio-losing .value     { color: var(--red-400); }
+[data-theme="dark"] .stat-card.ratio-marginal .value   { color: var(--amber-400); }
+[data-theme="dark"] .stat-card.ratio-profitable .value { color: var(--emerald-400); }
+[data-theme="dark"] .stat-card.ratio-organic .value    { color: var(--emerald-400); }
+
+[data-theme="dark"] .stat-card.hero .suffix { color: var(--gray-400); }
 
 /* Comparison table tweaks */
 .compare-table tbody tr {

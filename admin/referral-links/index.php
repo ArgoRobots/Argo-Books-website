@@ -521,14 +521,14 @@ include __DIR__ . '/../admin_header.php';
         </div>
     <?php endif; ?>
 
-    <!-- Tab strip -->
-    <div class="tab-strip">
-        <a href="?tab=overview" class="<?php echo $current_tab === 'overview' ? 'active' : ''; ?>">Overview</a>
-        <a href="?tab=funnel"   class="<?php echo $current_tab === 'funnel'   ? 'active' : ''; ?>">Funnel</a>
-        <a href="?tab=spend"    class="<?php echo $current_tab === 'spend'    ? 'active' : ''; ?>">Spend</a>
+    <!-- Tab strip (shared markup + JS with other admin pages) -->
+    <div class="section-tabs">
+        <button class="section-tab <?php echo $current_tab === 'overview' ? 'active' : ''; ?>" data-tab="overview">Overview</button>
+        <button class="section-tab <?php echo $current_tab === 'funnel'   ? 'active' : ''; ?>" data-tab="funnel">Funnel</button>
+        <button class="section-tab <?php echo $current_tab === 'spend'    ? 'active' : ''; ?>" data-tab="spend">Spend</button>
     </div>
 
-    <?php if ($current_tab === 'overview'): ?>
+    <div id="overview" class="tab-content <?php echo $current_tab === 'overview' ? 'active' : ''; ?>">
     <!-- Summary Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -656,9 +656,10 @@ include __DIR__ . '/../admin_header.php';
             </table>
         </div>
     </div>
-    <?php endif; // overview tab ?>
+    </div><!-- /#overview -->
 
-    <?php if ($current_tab === 'funnel'):
+    <div id="funnel" class="tab-content <?php echo $current_tab === 'funnel' ? 'active' : ''; ?>">
+    <?php
         $funnel_counts = get_funnel_stage_counts($funnel_period_start_dt, $funnel_source_filter ?: null);
         $per_source = get_funnel_per_source($funnel_period_start_dt, current_environment());
 
@@ -819,7 +820,7 @@ include __DIR__ . '/../admin_header.php';
             <?php endif; ?>
         </h2>
 
-        <div class="funnel" id="funnel">
+        <div class="funnel funnel-bars">
             <?php foreach ($funnel_stages as $i => $stage): ?>
                 <div class="funnel-row" data-stage="<?php echo htmlspecialchars($stage['key']); ?>">
                     <div class="funnel-label"><?php echo htmlspecialchars($stage['label']); ?></div>
@@ -912,9 +913,10 @@ include __DIR__ . '/../admin_header.php';
             </table>
         </div>
     </div>
-    <?php endif; // funnel tab ?>
+    </div><!-- /#funnel -->
 
-    <?php if ($current_tab === 'spend'):
+    <div id="spend" class="tab-content <?php echo $current_tab === 'spend' ? 'active' : ''; ?>">
+    <?php
         $spend_rows = get_campaign_spend_rows();
         $active_sources_for_spend = array_filter($referral_links, fn($l) => $l['is_active']);
     ?>
@@ -969,7 +971,7 @@ include __DIR__ . '/../admin_header.php';
             </div>
         <?php endif; ?>
     </div>
-    <?php endif; // spend tab ?>
+    </div><!-- /#spend -->
 </div>
 
 <!-- Ad spend modal -->
@@ -1400,15 +1402,6 @@ include __DIR__ . '/../admin_header.php';
         }
     });
 
-    // -------- Funnel-tab JS: animate the bars in on load --------
-    const funnelEl = document.getElementById('funnel');
-    if (funnelEl) {
-        // Defer one frame so CSS picks up width:0 baseline before transitioning to --target-pct
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-            funnelEl.classList.add('loaded');
-        }));
-    }
-
     // -------- Spend-tab JS: modal open/close + edit + delete --------
     function openSpendModal() {
         const m = document.getElementById('spendModal');
@@ -1484,6 +1477,7 @@ include __DIR__ . '/../admin_header.php';
         });
     });
 </script>
+<script src="../section-tabs.js"></script>
 
 <?php
 // Footer is typically included in admin_header.php or handled separately

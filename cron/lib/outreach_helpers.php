@@ -1290,7 +1290,7 @@ function call_gemini($systemPrompt, $userPrompt)
         ],
         'generationConfig' => [
             'temperature' => 0.7,
-            'maxOutputTokens' => 2000,
+            'maxOutputTokens' => 4000,
         ],
     ];
     if (!empty($systemPrompt)) {
@@ -1319,6 +1319,15 @@ function call_gemini($systemPrompt, $userPrompt)
     }
 
     $result = json_decode($response, true);
+
+    // Treat MAX_TOKENS as an error so callers don't accept truncated output.
+    // Gemini 2.5 Flash has thinking enabled by default and thinking tokens
+    // count against maxOutputTokens, so a partial response is a real risk.
+    $finishReason = $result['candidates'][0]['finishReason'] ?? '';
+    if ($finishReason === 'MAX_TOKENS') {
+        return ['error' => 'Gemini output truncated (MAX_TOKENS) — increase maxOutputTokens or shorten the prompt'];
+    }
+
     return ['content' => $result['candidates'][0]['content']['parts'][0]['text'] ?? ''];
 }
 
@@ -1541,12 +1550,16 @@ Return ONLY the JSON, no other text.";
 
     $parsed = json_decode($content, true);
     if (!$parsed || !isset($parsed['subject']) || !isset($parsed['body'])) {
-        // AI returned invalid JSON — save with needs_review so it won't be auto-approved
+        // AI returned invalid/truncated JSON. Save a clear placeholder body
+        // (not the raw broken response) and mark needs_review so the admin
+        // sees what happened and can regenerate.
         $fallbackSubject = "Quick question for {$lead['business_name']}";
+        $placeholderBody = "[Draft generation failed: Gemini returned malformed or truncated output. Click Regenerate to try again.]";
         $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = ?, ab_variant_id = ?, drafted_at = NOW(), approval_status = 'needs_review', status = CASE WHEN status IN ('new','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
-        $stmt->execute([$fallbackSubject, $content, $abTestId, $abVariantId, $id]);
+        $stmt->execute([$fallbackSubject, $placeholderBody, $abTestId, $abVariantId, $id]);
+        log_activity($pdo, $id, 'draft_needs_review', 'Gemini returned malformed JSON (likely truncated).');
 
-        return ['success' => true, 'needs_review' => true, 'subject' => $fallbackSubject, 'body' => $content];
+        return ['success' => true, 'needs_review' => true, 'subject' => $fallbackSubject, 'body' => $placeholderBody];
     }
 
     // Ensure the website URL is in the body — inject before sign-off if AI omitted it

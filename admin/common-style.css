@@ -2065,3 +2065,25 @@ tbody tr:hover {
     border-bottom-color: var(--primary-blue);
 }
 
+
+
+/* "Trust this device for 30 days" checkbox on the 2FA verification form */
+.trust-device-group {
+    margin-top: -8px;
+}
+
+.trust-device-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    user-select: none;
+}
+
+.trust-device-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+}

@@ -108,37 +108,54 @@ function verify_trusted_device_cookie($ip)
         if (!hash_equals($row['validator_hash'], hash('sha256', $validator))) {
             return null;
         }
+    } catch (Throwable $e) {
+        error_log('verify_trusted_device_cookie failed: ' . $e->getMessage());
+        return null;
+    }
 
+    // Metadata update is best-effort: the auth decision was already made above
+    // when the validator matched. A transient UPDATE failure must not force
+    // the user back to TOTP — they're already authenticated.
+    try {
         $upd = $pdo->prepare(
             'UPDATE admin_trusted_devices
              SET last_used_at = NOW(), ip_address = ?
              WHERE id = ?'
         );
         $upd->execute([substr((string)$ip, 0, 45), $row['id']]);
-
-        return $row['username'];
     } catch (Throwable $e) {
-        error_log('verify_trusted_device_cookie failed: ' . $e->getMessage());
-        return null;
+        error_log('verify_trusted_device_cookie metadata update failed: ' . $e->getMessage());
     }
+
+    return $row['username'];
 }
 
 /** Revoke a single device, scoped to the owning user. */
 function revoke_trusted_device($user_id, $device_id)
 {
     global $pdo;
-    $stmt = $pdo->prepare('DELETE FROM admin_trusted_devices WHERE id = ? AND user_id = ?');
-    $stmt->execute([$device_id, $user_id]);
-    return $stmt->rowCount() > 0;
+    try {
+        $stmt = $pdo->prepare('DELETE FROM admin_trusted_devices WHERE id = ? AND user_id = ?');
+        $stmt->execute([$device_id, $user_id]);
+        return $stmt->rowCount() > 0;
+    } catch (Throwable $e) {
+        error_log('revoke_trusted_device failed: ' . $e->getMessage());
+        return false;
+    }
 }
 
 /** Revoke every trusted device for a user. Returns the count removed. */
 function revoke_all_trusted_devices($user_id)
 {
     global $pdo;
-    $stmt = $pdo->prepare('DELETE FROM admin_trusted_devices WHERE user_id = ?');
-    $stmt->execute([$user_id]);
-    return $stmt->rowCount();
+    try {
+        $stmt = $pdo->prepare('DELETE FROM admin_trusted_devices WHERE user_id = ?');
+        $stmt->execute([$user_id]);
+        return $stmt->rowCount();
+    } catch (Throwable $e) {
+        error_log('revoke_all_trusted_devices failed: ' . $e->getMessage());
+        return 0;
+    }
 }
 
 /** Expire the cookie on the client. Safe to call even if no cookie is set. */
@@ -158,14 +175,19 @@ function clear_trusted_device_cookie()
 function list_trusted_devices($user_id)
 {
     global $pdo;
-    $stmt = $pdo->prepare(
-        'SELECT id, label, user_agent, ip_address, created_at, last_used_at, expires_at
-         FROM admin_trusted_devices
-         WHERE user_id = ? AND expires_at > NOW()
-         ORDER BY last_used_at DESC'
-    );
-    $stmt->execute([$user_id]);
-    return $stmt->fetchAll();
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT id, label, user_agent, ip_address, created_at, last_used_at, expires_at
+             FROM admin_trusted_devices
+             WHERE user_id = ? AND expires_at > NOW()
+             ORDER BY last_used_at DESC'
+        );
+        $stmt->execute([$user_id]);
+        return $stmt->fetchAll();
+    } catch (Throwable $e) {
+        error_log('list_trusted_devices failed: ' . $e->getMessage());
+        return [];
+    }
 }
 
 /**

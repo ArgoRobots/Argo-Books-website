@@ -96,7 +96,8 @@ The Auto-send vs Review-before-send mode is controlled at runtime via the **Sett
 
 ```bash
 php outreach_pipeline.php                  # Run full pipeline
-php outreach_pipeline.php --discover-only  # Only discover + import businesses
+php outreach_pipeline.php --discover-only  # Only discover + import businesses (Google Places + Shopify)
+php outreach_pipeline.php --shopify-only   # Only run Shopify discovery
 php outreach_pipeline.php --draft-only     # Only generate AI drafts
 php outreach_pipeline.php --send-only      # Only send approved emails
 php outreach_pipeline.php --dry-run        # Log what would happen without doing it
@@ -161,3 +162,64 @@ A lock file (`/cron/logs/reply_checker.lock`) prevents overlapping runs.
 
 - Replies sent from a different address than the lead's email won't be detected
 - Relies on the contact mailbox being the reply-to for outreach emails (it is, per `send_outreach_lead()`)
+
+---
+
+## 5. Refund Cooling-Off Promoter
+
+**Script:** `cron/refund_cooling_off_promoter.php`
+**Schedule:** Every 1 minute
+
+```bash
+* * * * * /usr/bin/php /home/argorobots/public_html/cron/refund_cooling_off_promoter.php
+```
+
+### What It Does
+
+Promotes refund requests from `cooling_off` to `processing` once their cooling-off timer has elapsed. Without this cron, refunds flagged for soft review would sit in `cooling_off` forever.
+
+---
+
+## 6. Refund Stale Processing Reconcile
+
+**Script:** `cron/refund_stale_processing_reconcile.php`
+**Schedule:** Every 5 minutes
+
+```bash
+*/5 * * * * /usr/bin/php /home/argorobots/public_html/cron/refund_stale_processing_reconcile.php
+```
+
+### What It Does
+
+Queries Stripe for refund requests stuck in `processing` for more than 30 minutes and updates their state based on the provider's response. Catches refunds where the provider succeeded but our callback never fired.
+
+---
+
+## 7. Refund Stale Request Cleanup
+
+**Script:** `cron/refund_stale_request_cleanup.php`
+**Schedule:** Hourly
+
+```bash
+0 * * * * /usr/bin/php /home/argorobots/public_html/cron/refund_stale_request_cleanup.php
+```
+
+### What It Does
+
+1. Cancels refund requests stuck in `pending_code` for more than 1 hour (user never typed the verification code).
+2. Vacuums old entries out of the refund idempotency cache.
+
+---
+
+## 8. Refund Velocity Baseline Recompute
+
+**Script:** `cron/refund_velocity_baseline_recompute.php`
+**Schedule:** Nightly at 2:00 AM
+
+```bash
+0 2 * * * /usr/bin/php /home/argorobots/public_html/cron/refund_velocity_baseline_recompute.php
+```
+
+### What It Does
+
+Refreshes `refund_velocity_baselines` per company so the established-account hard-block tier (≥ 50% of trailing 30-day revenue) has accurate inputs. If baselines drift out of date, the refund safety check fires too often or not enough — see the [Hard-Block Response Procedure](procedures/Refund%20block%20response%20procedure.md) for symptoms.

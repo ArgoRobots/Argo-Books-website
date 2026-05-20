@@ -4,11 +4,11 @@
  *
  * This script should be run daily via cron to check for and process subscription renewals.
  *
- * RECOMMENDED SCHEDULE: Daily at midnight (00:00)
+ * RECOMMENDED SCHEDULE: Daily at 3:00 PM
  *
  * Example cron entry:
  *
- *   0 0 * * * /usr/bin/php /path/to/subscription_renewal.php
+ *   0 15 * * * /usr/bin/php /path/to/subscription_renewal.php
  *
  * The script will:
  *   1. Find active subscriptions due for renewal within 24 hours

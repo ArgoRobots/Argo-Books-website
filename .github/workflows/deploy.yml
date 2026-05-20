@@ -101,10 +101,13 @@ jobs:
                     --exclude ^\.github/$ \
                     --exclude ^\.gitignore$ \
                     --exclude ^README\.md$ \
+                    --exclude ^CLAUDE\.md$ \
                     --exclude ^read-me/$ \
                     --exclude ^composer\.json$ \
                     --exclude ^composer\.lock$ \
                     --exclude ^mysql_schema\.sql$ \
+                    --exclude ^phpunit\.xml$ \
+                    --exclude ^tests/$ \
                     --exclude ^\.ftp-deploy-sync-state\.json$ \
                     ./ ${REMOTE_DIR}; \
                   bye" \
@@ -119,7 +122,7 @@ jobs:
           # Function to check if a file should be excluded
           is_excluded() {
             case "$1" in
-              .git/*|.github/*|.gitignore|README.md|read-me/*|composer.json|composer.lock|mysql_schema.sql|.ftp-deploy-sync-state.json) return 0 ;;
+              .git/*|.github/*|.gitignore|README.md|CLAUDE.md|read-me/*|composer.json|composer.lock|mysql_schema.sql|phpunit.xml|tests/*|.ftp-deploy-sync-state.json) return 0 ;;
               *) return 1 ;;
             esac
           }

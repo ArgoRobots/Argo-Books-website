@@ -21,9 +21,10 @@ Both modes deploy to **production** AND **dev** in the same run.
 Everything in `.gitignore` is automatically skipped (it's not in the runner's checkout). On top of that, lftp explicitly excludes:
 
 - `.git/`, `.github/`, `.gitignore`
-- `README.md`, `read-me/`
+- `README.md`, `CLAUDE.md`, `read-me/`
 - `composer.json`, `composer.lock` (the runner uses them, but they don't go to the server)
 - `mysql_schema.sql`
+- `phpunit.xml`, `tests/` (PHPUnit suite — local-only)
 - `.ftp-deploy-sync-state.json`
 
 ## Forcing a full re-upload

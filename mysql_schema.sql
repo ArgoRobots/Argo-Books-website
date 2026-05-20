@@ -997,7 +997,7 @@ CREATE TABLE IF NOT EXISTS cron_runs (
 -- attribution survives a logged-out browse-to-buy flow.
 CREATE TABLE IF NOT EXISTS referral_events (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    visitor_id CHAR(36) NOT NULL COMMENT 'UUID from argo_visitor_id cookie',
+    visitor_id CHAR(36) DEFAULT NULL COMMENT 'UUID from argo_visitor_id cookie; NULL for unattributed app_first_run events',
     source_code VARCHAR(50) DEFAULT NULL,
     event_type ENUM(
         'landing','downloads_page','download_click','app_first_run',
@@ -1016,7 +1016,8 @@ CREATE TABLE IF NOT EXISTS referral_events (
     INDEX idx_source_event_created (source_code, event_type, created_at),
     INDEX idx_event_created (event_type, created_at),
     INDEX idx_subscription (subscription_id),
-    INDEX idx_env_created (environment, created_at)
+    INDEX idx_env_created (environment, created_at),
+    INDEX idx_ip (ip_address)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Manual monthly ad-spend entry per source. Used to compute Customer

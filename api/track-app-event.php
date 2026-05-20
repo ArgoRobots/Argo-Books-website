@@ -113,17 +113,30 @@ if ($visitor_id !== null) {
     }
 }
 
-// Dedup: skip if we've already logged a first_run for this visitor+machine
-if ($visitor_id !== null && $machine_uuid !== '') {
+// Dedup: skip if we've already logged a first_run for this machine.
+// When visitor_id is null (token didn't resolve), dedupe by machine_uuid
+// alone so retries from an untokenized installer don't create multiple rows.
+if ($machine_uuid !== '') {
     try {
-        $dedup = $pdo->prepare(
-            "SELECT 1 FROM referral_events
-              WHERE event_type = 'app_first_run'
-                AND visitor_id = ?
-                AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
-              LIMIT 1"
-        );
-        $dedup->execute([$visitor_id, $machine_uuid]);
+        if ($visitor_id !== null) {
+            $dedup = $pdo->prepare(
+                "SELECT 1 FROM referral_events
+                  WHERE event_type = 'app_first_run'
+                    AND visitor_id = ?
+                    AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
+                  LIMIT 1"
+            );
+            $dedup->execute([$visitor_id, $machine_uuid]);
+        } else {
+            $dedup = $pdo->prepare(
+                "SELECT 1 FROM referral_events
+                  WHERE event_type = 'app_first_run'
+                    AND visitor_id IS NULL
+                    AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
+                  LIMIT 1"
+            );
+            $dedup->execute([$machine_uuid]);
+        }
         if ($dedup->fetch() !== false) {
             echo json_encode(['success' => true, 'duplicate' => true]);
             exit;

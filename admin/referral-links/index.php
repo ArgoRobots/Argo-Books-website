@@ -12,8 +12,20 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 $page_title = "Referral Link Tracking";
 $page_description = "Create and manage referral links to track ad/sponsor performance";
 
+// Generate a per-session CSRF token used by every form on this page.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // CSRF check — every state-mutating POST must include the session token.
+    $posted_token = $_POST['csrf_token'] ?? '';
+    if (!is_string($posted_token) || !hash_equals($_SESSION['csrf_token'] ?? '', $posted_token)) {
+        http_response_code(403);
+        die('Invalid CSRF token. Reload the page and try again.');
+    }
+
     if (isset($_POST['action'])) {
         if ($_POST['action'] === 'create') {
             $source_code = trim($_POST['source_code']);
@@ -248,9 +260,15 @@ function funnel_period_start(string $period): ?string
 }
 
 /**
- * Count distinct visitors per funnel stage for the given period + source filter.
- * Uses COUNT(DISTINCT visitor_id) so a user firing the same event twice in a
- * day doesn't double-count.
+ * Count funnel-stage totals for the given period + source filter.
+ *
+ * Top-of-funnel stages (landing through premium_signup) count distinct
+ * visitors so a user firing the same event twice doesn't double-count.
+ *
+ * premium_paid and premium_churned count distinct subscription_id instead:
+ * they're subscription-keyed events that can fire for visitors we never
+ * resolved (webhook context), and premium_paid is restricted to the initial
+ * payment so renewals/retries don't inflate the "paid" stage above signups.
  */
 function get_funnel_stage_counts(?string $period_start, ?string $source_code): array
 {
@@ -269,29 +287,33 @@ function get_funnel_stage_counts(?string $period_start, ?string $source_code): a
     }
     $where = implode(' AND ', $where_clauses);
 
-    $sql = "SELECT event_type, COUNT(DISTINCT visitor_id) AS c
-              FROM referral_events
-             WHERE $where
-             GROUP BY event_type";
+    $sql = "
+        SELECT
+          COUNT(DISTINCT CASE WHEN event_type='landing'        THEN visitor_id END) AS landing,
+          COUNT(DISTINCT CASE WHEN event_type='downloads_page' THEN visitor_id END) AS downloads_page,
+          COUNT(DISTINCT CASE WHEN event_type='download_click' THEN visitor_id END) AS download_click,
+          COUNT(DISTINCT CASE WHEN event_type='app_first_run'  THEN visitor_id END) AS app_first_run,
+          COUNT(DISTINCT CASE WHEN event_type='premium_signup' THEN visitor_id END) AS premium_signup,
+          COUNT(DISTINCT CASE WHEN event_type='premium_paid'
+                                AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.payment_type')) = 'initial'
+                               THEN subscription_id END) AS premium_paid,
+          COUNT(DISTINCT CASE WHEN event_type='premium_churned' THEN subscription_id END) AS premium_churned
+        FROM referral_events
+        WHERE $where";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
+    $row = $stmt->fetch();
 
-    $counts = [
-        'landing'         => 0,
-        'downloads_page'  => 0,
-        'download_click'  => 0,
-        'app_first_run'   => 0,
-        'premium_signup'  => 0,
-        'premium_paid'    => 0,
-        'premium_churned' => 0,
+    return [
+        'landing'         => (int)($row['landing'] ?? 0),
+        'downloads_page'  => (int)($row['downloads_page'] ?? 0),
+        'download_click'  => (int)($row['download_click'] ?? 0),
+        'app_first_run'   => (int)($row['app_first_run'] ?? 0),
+        'premium_signup'  => (int)($row['premium_signup'] ?? 0),
+        'premium_paid'    => (int)($row['premium_paid'] ?? 0),
+        'premium_churned' => (int)($row['premium_churned'] ?? 0),
     ];
-    while ($row = $stmt->fetch()) {
-        if (isset($counts[$row['event_type']])) {
-            $counts[$row['event_type']] = (int)$row['c'];
-        }
-    }
-    return $counts;
 }
 
 /**
@@ -314,6 +336,15 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
     if ($period_start !== null) {
         $spend_period_clause = 'WHERE period_start >= ?';
         $params_spend[] = date('Y-m-01', strtotime($period_start));
+    }
+
+    // Revenue must scope to the same period as events + spend, otherwise the
+    // funnel mixes period-scoped events with all-time revenue and inflates LTV.
+    $rev_period_clause = '';
+    $params_rev_extra = [];
+    if ($period_start !== null) {
+        $rev_period_clause = ' AND p.created_at >= ?';
+        $params_rev_extra[] = $period_start;
     }
 
     // We compute everything in one query so periods stay in sync between
@@ -362,13 +393,14 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
                AND p.status = 'completed'
              WHERE re2.event_type = 'premium_signup'
                AND re2.environment = ?
+               $rev_period_clause
              GROUP BY re2.source_code
         ) rv ON rv.source_code = rl.source_code
         WHERE rl.is_active = 1
         ORDER BY landings DESC, rl.created_at DESC";
 
-    // Bind order: ev params, then spend params, then env again for rv.
-    $bind = array_merge($params, $params_spend, [$environment]);
+    // Bind order: ev params, then spend params, then env + optional period for rv.
+    $bind = array_merge($params, $params_spend, [$environment], $params_rev_extra);
     $stmt = $pdo->prepare($sql);
     $stmt->execute($bind);
     return $stmt->fetchAll();
@@ -947,6 +979,7 @@ include __DIR__ . '/../admin_header.php';
         <h2 id="spendModalTitle">Add ad spend</h2>
         <form id="spendForm" method="POST" action="index.php">
             <input type="hidden" name="action" value="spend_save">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
             <div class="form-group">
                 <label for="spend_source_code">Source *</label>
                 <select name="spend_source_code" id="spend_source_code" required
@@ -995,6 +1028,7 @@ include __DIR__ . '/../admin_header.php';
         <form id="linkForm" method="POST">
             <input type="hidden" name="action" id="formAction" value="create">
             <input type="hidden" name="id" id="linkId">
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 
             <div class="form-group">
                 <label for="source_code">Source Code *</label>
@@ -1044,6 +1078,7 @@ include __DIR__ . '/../admin_header.php';
     const timeConversionCounts = <?php echo json_encode($time_conversion_counts); ?>;
     const countryLabels = <?php echo json_encode($country_labels); ?>;
     const countryVisitCounts = <?php echo json_encode($country_visit_counts); ?>;
+    const csrfToken = <?php echo json_encode($_SESSION['csrf_token']); ?>;
 
     document.addEventListener('DOMContentLoaded', function() {
         const sourceVisitsEl = document.getElementById('sourceVisitsChart');
@@ -1324,10 +1359,21 @@ include __DIR__ . '/../admin_header.php';
         if (confirm('Are you sure you want to delete this referral link? This will not delete visit history.')) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.innerHTML = `
-                <input type="hidden" name="action" value="delete">
-                <input type="hidden" name="id" value="${id}">
-            `;
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = 'csrf_token';
+            tokenInput.value = csrfToken;
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'delete';
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = id;
+            form.appendChild(tokenInput);
+            form.appendChild(actionInput);
+            form.appendChild(idInput);
             document.body.appendChild(form);
             form.submit();
         }
@@ -1394,10 +1440,21 @@ include __DIR__ . '/../admin_header.php';
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = 'index.php?tab=spend';
-        form.innerHTML = `
-            <input type="hidden" name="action" value="spend_delete">
-            <input type="hidden" name="id" value="${id}">
-        `;
+        const tokenInput = document.createElement('input');
+        tokenInput.type = 'hidden';
+        tokenInput.name = 'csrf_token';
+        tokenInput.value = csrfToken;
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'spend_delete';
+        const idInput = document.createElement('input');
+        idInput.type = 'hidden';
+        idInput.name = 'id';
+        idInput.value = id;
+        form.appendChild(tokenInput);
+        form.appendChild(actionInput);
+        form.appendChild(idInput);
         document.body.appendChild(form);
         form.submit();
     };

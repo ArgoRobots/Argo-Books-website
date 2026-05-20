@@ -52,7 +52,7 @@ function get_or_set_visitor_id(): string
             'expires'  => time() + ARGO_VISITOR_TTL,
             'path'     => '/',
             'secure'   => $secure,
-            'httponly' => false,
+            'httponly' => true,
             'samesite' => 'Lax',
         ]);
         $_COOKIE[ARGO_VISITOR_COOKIE] = $uuid;
@@ -150,8 +150,13 @@ function track_referral_event(string $event_type, array $opts = []): bool
         return false;
     }
 
-    $visitor_id = $opts['visitor_id'] ?? null;
-    if (empty($visitor_id)) {
+    // Distinguish "caller omitted visitor_id" (mint from cookie) from
+    // "caller explicitly passed null" (record unattributed). Without this,
+    // app_first_run retries from an untokenized installer would mint a
+    // fresh UUID each time and inflate counts.
+    if (array_key_exists('visitor_id', $opts)) {
+        $visitor_id = $opts['visitor_id'];
+    } else {
         $visitor_id = get_or_set_visitor_id();
     }
 

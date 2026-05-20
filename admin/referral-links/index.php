@@ -757,7 +757,7 @@ include __DIR__ . '/../admin_header.php';
         <span class="control-label" style="margin-left:auto;">Source:</span>
         <div class="funnel-pill-row">
             <a href="<?php echo htmlspecialchars('index.php?' . http_build_query(['tab' => 'funnel', 'funnel_period' => $funnel_period_key])); ?>"
-               class="funnel-pill <?php echo $funnel_source_filter === '' ? 'active' : ''; ?>">All sources</a>
+               class="funnel-pill <?php echo $funnel_source_filter === '' ? 'active' : ''; ?>">All traffic</a>
             <?php foreach ($referral_links as $rl):
                 if (!$rl['is_active']) continue;
                 $href = 'index.php?' . http_build_query([
@@ -816,7 +816,7 @@ include __DIR__ . '/../admin_header.php';
             <?php if ($funnel_source_filter !== ''): ?>
                 <span class="source-tag"><?php echo htmlspecialchars($funnel_source_filter); ?></span>
             <?php else: ?>
-                <span class="source-tag">all sources</span>
+                <span class="source-tag">all traffic, including visitors with no referral link</span>
             <?php endif; ?>
         </h2>
 
@@ -1469,8 +1469,9 @@ include __DIR__ . '/../admin_header.php';
         sessionStorage.removeItem('scrollPosition');
     }
 
-    // Save scroll position when clicking period links
-    const links = document.querySelectorAll('a[href^="?period="]');
+    // Save scroll position when clicking period links or funnel filter pills,
+    // so the page reload doesn't jump back to the top.
+    const links = document.querySelectorAll('a[href^="?period="], .funnel-pill');
     links.forEach(link => {
         link.addEventListener('click', function() {
             sessionStorage.setItem('scrollPosition', window.scrollY);

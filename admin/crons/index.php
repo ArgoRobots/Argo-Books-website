@@ -271,5 +271,21 @@ include __DIR__ . '/../admin_header.php';
     <?php endforeach; ?>
     </div>
 <?php endif; ?>
+
+<script>
+    // Preserve scroll position when clicking a range filter pill, so the
+    // page reload doesn't jump back to the top. Shared sessionStorage key
+    // 'scrollPosition' — matches the pattern used in referral-links,
+    // website-stats, users, and license pages.
+    if (sessionStorage.getItem('scrollPosition')) {
+        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
+        sessionStorage.removeItem('scrollPosition');
+    }
+    document.querySelectorAll('.range-btn').forEach(link => {
+        link.addEventListener('click', function () {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        });
+    });
+</script>
 </body>
 </html>

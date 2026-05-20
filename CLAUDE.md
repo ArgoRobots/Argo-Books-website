@@ -63,6 +63,10 @@ Consequences:
 
 All colors come from CSS variables in `resources/styles/custom-colors.css` — don't hardcode hex values. Dark mode uses `[data-theme="dark"]` selectors. Shared admin styles in `admin/common-style.css` already cover `.stat-card`, `.table-container`, `.chart-container`, `.section-tabs`, `.modal`, etc. for both themes; only add `[data-theme="dark"]` overrides for custom components those defaults don't reach.
 
+## Preserving scroll on filter reload
+
+Admin pages with filter pills that reload the page (period selectors, source pills, range buttons) use a shared `sessionStorage.scrollPosition` pattern so the reload doesn't jump back to the top. When adding a new filter, extend the existing handler's selector on that page rather than writing a parallel script. URL anchors (`#section-id`) do NOT solve this — they only change where the jump lands. Reference implementations: `admin/referral-links/index.php`, `admin/website-stats/index.php`, `admin/users/index.php`, `admin/crons/index.php`.
+
 ## Tests
 
 PHPUnit suite lives in `/tests/`. Run with `./vendor/bin/phpunit` from the project root. Requires a separate `argo_books_test` database (creds in `.env.testing`). The deploy workflow does not run tests — they're a local / pre-commit guardrail only.

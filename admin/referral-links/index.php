@@ -407,6 +407,54 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
 }
 
 /**
+ * Top landing pages by distinct-visitor count, for the All-traffic funnel
+ * breakdown. Trailing query/hash strings are stripped server-side via a
+ * SUBSTRING_INDEX so `/?ref=foo` and `/` collapse into the same bucket.
+ */
+function get_landing_page_breakdown(?string $period_start, string $environment): array
+{
+    global $pdo;
+
+    $where = ['environment = ?', "event_type = 'landing'"];
+    $params = [$environment];
+    if ($period_start !== null) {
+        $where[] = 'created_at >= ?';
+        $params[] = $period_start;
+    }
+    $where_sql = implode(' AND ', $where);
+
+    $sql = "
+        SELECT
+            SUBSTRING_INDEX(SUBSTRING_INDEX(page_url, '?', 1), '#', 1) AS clean_path,
+            COUNT(DISTINCT visitor_id) AS visitors
+        FROM referral_events
+        WHERE $where_sql
+        GROUP BY clean_path
+        ORDER BY visitors DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll();
+}
+
+/**
+ * Map a request path to a human-readable label for the landing-pages chart.
+ * Anything we don't recognise falls back to the raw path.
+ */
+function friendly_landing_label(?string $path): string
+{
+    $p = strtolower(trim((string)$path));
+    if ($p === '' || $p === '/' || $p === '/index.php') return 'Home';
+    if ($p === '/downloads/' || $p === '/downloads') return 'Downloads page';
+
+    // /compare/argo-books-vs-<competitor>/  →  "<Competitor> comparison"
+    if (preg_match('#^/compare/argo-books-vs-([a-z0-9-]+)/?$#', $p, $m)) {
+        return ucfirst($m[1]) . ' comparison';
+    }
+    return $path;
+}
+
+/**
  * All ad-spend rows for the Spend tab, sorted newest period first.
  */
 function get_campaign_spend_rows(): array
@@ -663,6 +711,32 @@ include __DIR__ . '/../admin_header.php';
         $funnel_counts = get_funnel_stage_counts($funnel_period_start_dt, $funnel_source_filter ?: null);
         $per_source = get_funnel_per_source($funnel_period_start_dt, current_environment());
 
+        // Landing-page breakdown: only meaningful for "All traffic" since a
+        // specific tracked source usually points at a single destination page.
+        $landing_breakdown = [];
+        $landing_chart_labels = [];
+        $landing_chart_counts = [];
+        if ($funnel_source_filter === '') {
+            $rows = get_landing_page_breakdown($funnel_period_start_dt, current_environment());
+            // Cap at top 7; collapse the long tail into "Other" so the pie stays readable.
+            $top = array_slice($rows, 0, 7);
+            $rest = array_slice($rows, 7);
+            $other_total = array_sum(array_map(fn($r) => (int)$r['visitors'], $rest));
+            foreach ($top as $r) {
+                $landing_breakdown[] = [
+                    'label'    => friendly_landing_label($r['clean_path']),
+                    'visitors' => (int)$r['visitors'],
+                ];
+            }
+            if ($other_total > 0) {
+                $landing_breakdown[] = ['label' => 'Other', 'visitors' => $other_total];
+            }
+            foreach ($landing_breakdown as $r) {
+                $landing_chart_labels[] = $r['label'];
+                $landing_chart_counts[] = $r['visitors'];
+            }
+        }
+
         // Compute aggregate totals + CAC/LTV for the hero cards
         $total_spend = 0.0;
         $total_revenue = 0.0;
@@ -846,6 +920,29 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
             <?php endforeach; ?>
         </div>
+
+        <?php if (!empty($landing_breakdown)): ?>
+            <div class="landing-breakdown">
+                <h3>Where landings come from</h3>
+                <div class="landing-breakdown-body">
+                    <div class="landing-breakdown-chart">
+                        <canvas id="landingPagesChart"></canvas>
+                    </div>
+                    <ul class="landing-breakdown-list">
+                        <?php $total_landings = array_sum($landing_chart_counts); ?>
+                        <?php foreach ($landing_breakdown as $i => $row):
+                            $pct = $total_landings > 0 ? round(($row['visitors'] / $total_landings) * 100, 1) : 0;
+                        ?>
+                            <li>
+                                <span class="swatch" data-swatch-idx="<?php echo $i; ?>"></span>
+                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
+                                <span class="pct"><?php echo $pct; ?>%</span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- Comparison table -->
@@ -1477,6 +1574,62 @@ include __DIR__ . '/../admin_header.php';
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });
     });
+
+    // Landing-page breakdown doughnut (only rendered on All-traffic funnel).
+    (function () {
+        const canvas = document.getElementById('landingPagesChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const labels = <?php echo json_encode($landing_chart_labels, JSON_UNESCAPED_SLASHES); ?>;
+        const counts = <?php echo json_encode($landing_chart_counts); ?>;
+        if (!labels.length) return;
+
+        // Reuse the palette other admin charts use so themes stay consistent.
+        const palette = [
+            'rgba(59, 130, 246, 0.85)',   // blue
+            'rgba(139, 92, 246, 0.85)',   // purple
+            'rgba(16, 185, 129, 0.85)',   // emerald
+            'rgba(245, 158, 11, 0.85)',   // amber
+            'rgba(239, 68, 68, 0.85)',    // red
+            'rgba(14, 165, 233, 0.85)',   // sky
+            'rgba(168, 85, 247, 0.85)',   // violet
+            'rgba(107, 114, 128, 0.85)',  // gray (Other)
+        ];
+        const colors = labels.map((_, i) => palette[i % palette.length]);
+
+        // Color the inline list swatches to match the chart slices.
+        document.querySelectorAll('.landing-breakdown-list .swatch').forEach(el => {
+            const idx = parseInt(el.getAttribute('data-swatch-idx'), 10);
+            if (!Number.isNaN(idx) && colors[idx]) {
+                el.style.backgroundColor = colors[idx];
+            }
+        });
+
+        new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    })();
 </script>
 <script src="../section-tabs.js"></script>
 

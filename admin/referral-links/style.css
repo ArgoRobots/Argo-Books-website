@@ -662,6 +662,78 @@ code {
     font-size: 15px;
 }
 
+/* Landing-page breakdown chart (rendered under the funnel on All traffic). */
+.landing-breakdown {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--gray-border);
+}
+
+[data-theme="dark"] .landing-breakdown {
+    border-top-color: var(--gray-700);
+}
+
+.landing-breakdown h3 {
+    margin: 0 0 16px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+[data-theme="dark"] .landing-breakdown h3 {
+    color: var(--gray-300);
+}
+
+.landing-breakdown-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.landing-breakdown-chart {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    flex: 0 0 240px;
+}
+
+.landing-breakdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 240px;
+    max-width: 420px;
+}
+
+.landing-breakdown-list li {
+    display: grid;
+    grid-template-columns: 14px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 14px;
+}
+
+.landing-breakdown-list .swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--gray-400);
+}
+
+.landing-breakdown-list .pct {
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-700);
+    font-weight: 600;
+}
+
+[data-theme="dark"] .landing-breakdown-list .pct {
+    color: var(--gray-200);
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
     .funnel-row {
@@ -673,5 +745,9 @@ code {
     }
     .funnel-count {
         text-align: left;
+    }
+    .landing-breakdown-chart {
+        width: 200px;
+        height: 200px;
     }
 }

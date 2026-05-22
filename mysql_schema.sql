@@ -1073,3 +1073,150 @@ CREATE TABLE IF NOT EXISTS campaign_spend (
     INDEX idx_period (period_start),
     FOREIGN KEY (source_code) REFERENCES referral_links(source_code) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─── Reddit outreach channel ───
+-- Threads discovered by the daily cron + the founder's manual reply tracking.
+-- Manual posting only (no auto-posting); permalink is required to mark a
+-- thread `replied`, which feeds the status-check cron's worklist.
+CREATE TABLE IF NOT EXISTS reddit_threads (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    reddit_id VARCHAR(20) NOT NULL UNIQUE COMMENT 'Reddit t3_xxxxxx ID',
+    subreddit VARCHAR(64) NOT NULL,
+    title VARCHAR(500) NOT NULL,
+    body TEXT DEFAULT NULL,
+    url VARCHAR(500) NOT NULL,
+    author VARCHAR(64) DEFAULT NULL,
+    author_karma INT DEFAULT NULL,
+    post_score INT DEFAULT 0,
+    comment_count INT DEFAULT 0,
+    posted_at DATETIME DEFAULT NULL,
+    discovered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    discovery_source ENUM('watchlist','keyword','both') NOT NULL DEFAULT 'watchlist',
+    matched_keywords JSON DEFAULT NULL,
+    rules_score INT DEFAULT 0,
+    ai_relevance TINYINT DEFAULT NULL COMMENT '0-10 or NULL if not checked',
+    ai_relevance_reason VARCHAR(500) DEFAULT NULL,
+    draft_body TEXT DEFAULT NULL,
+    draft_generated_at DATETIME DEFAULT NULL,
+    status ENUM('new','drafted','drafted_pending','replied','skipped','not_fit','expired') NOT NULL DEFAULT 'new',
+    status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied — counts toward post-limit',
+    reply_permalink VARCHAR(500) DEFAULT NULL,
+    reply_comment_id VARCHAR(20) DEFAULT NULL COMMENT 'Extracted t1_xxxxxx from permalink',
+    reply_posted_at DATETIME DEFAULT NULL,
+    reply_status ENUM('pending','live','removed','removed_or_shadowbanned','deleted_by_user') DEFAULT NULL,
+    reply_status_checked_at DATETIME DEFAULT NULL,
+    reply_status_check_count TINYINT DEFAULT 0,
+    reply_upvotes INT DEFAULT NULL,
+    reply_replies_count INT DEFAULT NULL,
+    override_limit TINYINT(1) DEFAULT 0 COMMENT 'Founder explicitly went over the post-limit cap',
+    notes TEXT DEFAULT NULL,
+    INDEX idx_status (status),
+    INDEX idx_discovered (discovered_at),
+    INDEX idx_relevance_status (ai_relevance, status),
+    INDEX idx_reply_status (reply_status),
+    INDEX idx_subreddit (subreddit),
+    INDEX idx_reply_posted (reply_posted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Watchlist of subreddits polled daily. Per-subreddit removal-rate stats
+-- are rolled up by the status-check cron and used by the auto-disable rule.
+CREATE TABLE IF NOT EXISTS reddit_subreddits (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(64) NOT NULL UNIQUE,
+    enabled TINYINT(1) NOT NULL DEFAULT 1,
+    notes VARCHAR(255) DEFAULT NULL,
+    replies_30d INT NOT NULL DEFAULT 0,
+    removal_rate_30d DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    auto_disabled_at DATETIME DEFAULT NULL,
+    auto_disabled_reason VARCHAR(120) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Search terms run against Reddit's global search each day. Use quoted
+-- phrases for exact matching (e.g. "quickbooks alternative").
+CREATE TABLE IF NOT EXISTS reddit_keywords (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    keyword VARCHAR(120) NOT NULL UNIQUE,
+    enabled TINYINT(1) NOT NULL DEFAULT 1,
+    notes VARCHAR(255) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Singleton settings row (id=1 enforced). Holds OAuth token cache,
+-- diagnostics, and tunable thresholds.
+CREATE TABLE IF NOT EXISTS reddit_settings (
+    id TINYINT PRIMARY KEY,
+    access_token VARCHAR(255) DEFAULT NULL COMMENT 'Encrypted via portal_encrypt()',
+    access_token_expires_at DATETIME DEFAULT NULL,
+    last_run_at DATETIME DEFAULT NULL,
+    last_run_threads_found INT DEFAULT 0,
+    last_run_threads_drafted INT DEFAULT 0,
+    last_run_error TEXT DEFAULT NULL,
+    last_status_check_at DATETIME DEFAULT NULL,
+    rules_score_floor TINYINT NOT NULL DEFAULT 30,
+    ai_relevance_floor TINYINT NOT NULL DEFAULT 6,
+    daily_post_limit TINYINT NOT NULL DEFAULT 3,
+    weekly_post_limit TINYINT NOT NULL DEFAULT 12,
+    auto_disable_removal_rate TINYINT NOT NULL DEFAULT 60,
+    auto_disable_min_replies TINYINT NOT NULL DEFAULT 3
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Seed the singleton row and a starter watchlist + keyword pool. Idempotent
+-- via INSERT IGNORE so re-running the schema is safe.
+INSERT IGNORE INTO reddit_settings (id) VALUES (1);
+
+INSERT IGNORE INTO reddit_subreddits (name, notes) VALUES
+    ('smallbusiness', 'general small-business owners'),
+    ('EtsySellers', 'Etsy shop owners — high product-mention tolerance'),
+    ('Flipping', 'resellers and flippers'),
+    ('freelance', 'freelancers'),
+    ('sidehustle', 'side-hustle starters'),
+    ('juststart', 'brand-new entrepreneurs'),
+    ('Bookkeeping', 'small and heavily moderated — tune carefully'),
+    ('Entrepreneur', 'huge but bans self-promo aggressively'),
+    ('PersonalFinanceCanada', 'Canadian audience'),
+    ('ecommerce', 'general ecommerce — inventory + invoicing pain'),
+    ('shopify', 'Shopify store owners'),
+    ('Reselling', 'resellers — inventory + receipt tracking'),
+    ('Landlord', 'landlords — rental income tracking'),
+    ('realestateinvesting', 'real estate investors — rental bookkeeping'),
+    ('sweatystartup', 'service-business owners'),
+    ('microsaas', 'indie SaaS founders — invoicing + subscription accounting'),
+    ('graphic_design', 'designers — invoicing pain'),
+    ('AmazonSeller', 'Amazon sellers — inventory + fees tracking');
+
+INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
+    ('bookkeeping software', 'broad intent'),
+    ('quickbooks alternative', 'switch-intent'),
+    ('freshbooks alternative', 'switch-intent'),
+    ('wave accounting', 'often switch-intent from Wave bugs'),
+    ('freelancer taxes canada', 'Canadian freelancer pain'),
+    ('etsy bookkeeping', 'Etsy seller pain'),
+    ('side hustle taxes', 'side-hustler tax confusion'),
+    ('small business spreadsheet bookkeeping', 'spreadsheet-to-software transition'),
+    -- Receipt scanning
+    ('receipt scanning app', 'AI receipt scan'),
+    ('scan receipts for taxes', 'AI receipt scan'),
+    ('digitize receipts', 'AI receipt scan'),
+    ('track expenses receipts', 'expenses + receipts'),
+    -- Invoicing
+    ('invoice software for freelancers', 'invoicing'),
+    ('send invoices online', 'invoicing'),
+    ('best invoicing software', 'invoicing'),
+    ('invoice template app', 'invoicing'),
+    -- Rental / landlords
+    ('rental property bookkeeping', 'rental'),
+    ('landlord accounting software', 'rental'),
+    ('track rental income', 'rental'),
+    -- Inventory
+    ('small business inventory software', 'inventory'),
+    ('inventory tracking spreadsheet', 'inventory — spreadsheet pain'),
+    ('ecommerce inventory tracking', 'inventory — ecommerce'),
+    -- Customer / supplier
+    ('small business CRM', 'customer mgmt'),
+    ('track customers spreadsheet', 'customer mgmt — spreadsheet pain'),
+    ('vendor tracking software', 'supplier mgmt'),
+    -- General SMB / self-employed
+    ('self-employed accounting', 'self-employed broad intent'),
+    ('sole proprietor taxes', 'sole proprietor pain');

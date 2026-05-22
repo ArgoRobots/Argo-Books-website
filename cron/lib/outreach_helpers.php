@@ -34,10 +34,9 @@ const OUTREACH_CATEGORY_POOL = [
     'upholstery services', 'tailors', 'dry cleaners', 'spas',
     'tanning salons', 'nail salons', 'barber shops', 'optical stores',
     'hearing aid clinics', 'home inspectors', 'appraisers',
-    'property management', 'storage facilities', 'courier services',
-    'towing services', 'glass repair', 'fencing contractors',
-    'concrete contractors', 'paving contractors', 'tree services',
-    'snow removal', 'pool services', 'septic services',
+    'property management', 'storage facilities', 'glass repair',
+    'fencing contractors', 'concrete contractors', 'paving contractors', 
+    'tree services', 'snow removal', 'pool services', 'septic services',
     'garage door repair', 'security companies', 'staffing agencies',
     'travel agencies', 'event venues', 'food trucks',
 ];

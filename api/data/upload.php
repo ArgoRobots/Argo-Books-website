@@ -22,39 +22,75 @@ define('ALLOWED_MIME_TYPES', ['application/json', 'text/plain']);
 define('DATA_DIR', __DIR__ . '/../../admin/data-logs');
 define('MAX_UPLOADS_PER_HOUR_PREMIUM', 100);
 define('MAX_UPLOADS_PER_HOUR_FREE', 6);
+// Coarse per-IP cap for free tier so rotating X-Device-Id values from a single IP
+// cannot bypass the per-(device,IP) limit. Set high enough to cover legitimate
+// shared NATs (a household, a small office) but low enough to block abuse.
+define('MAX_UPLOADS_PER_HOUR_FREE_PER_IP', 60);
 define('MAX_FILENAME_LENGTH', 255);
 
-// Rate limiting check (enhanced with authentication)
-function checkRateLimit($authIdentifier, int $maxPerHour)
+/**
+ * Atomic check-and-bump on a single rate-limit bucket. Held under an exclusive
+ * file lock so concurrent requests cannot both see "under the limit" and both
+ * succeed past it. Returns true if the bump was accepted, false if the bucket
+ * is full.
+ */
+function checkBucket(string $bucketKey, int $maxPerHour): bool
 {
-    // Use auth identifier in rate limiting to prevent key sharing abuse
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $rate_key = hash('sha256', $authIdentifier . '|' . $ip);
-    $rate_file = sys_get_temp_dir() . '/upload_rate_' . $rate_key;
-
-    $current_time = time();
-    $uploads = [];
-
-    // Read existing rate data
-    if (file_exists($rate_file)) {
-        $data = file_get_contents($rate_file);
-        $uploads = json_decode($data, true) ?: [];
+    $rate_file = sys_get_temp_dir() . '/upload_rate_' . hash('sha256', $bucketKey);
+    $handle = fopen($rate_file, 'c+');
+    if (!$handle) {
+        // Fail open if we can't access the temp file; surface as success so we
+        // don't block uploads on local I/O issues.
+        return true;
+    }
+    if (!flock($handle, LOCK_EX)) {
+        fclose($handle);
+        return true;
     }
 
-    // Remove uploads older than 1 hour
-    $uploads = array_filter($uploads, function ($timestamp) use ($current_time) {
-        return ($current_time - $timestamp) < 3600;
-    });
+    try {
+        $content = stream_get_contents($handle);
+        $uploads = json_decode($content ?: '[]', true) ?: [];
 
-    // Check if rate limit exceeded
-    if (count($uploads) >= $maxPerHour) {
+        $current_time = time();
+        $uploads = array_values(array_filter($uploads, function ($timestamp) use ($current_time) {
+            return ($current_time - $timestamp) < 3600;
+        }));
+
+        if (count($uploads) >= $maxPerHour) {
+            return false;
+        }
+
+        $uploads[] = $current_time;
+
+        ftruncate($handle, 0);
+        rewind($handle);
+        fwrite($handle, json_encode($uploads));
+        fflush($handle);
+
+        return true;
+    } finally {
+        flock($handle, LOCK_UN);
+        fclose($handle);
+    }
+}
+
+/**
+ * Per-tier rate limit check. Free tier gets a per-(device,IP) cap plus a coarser
+ * per-IP cap as defense against device-ID rotation. Premium tier is keyed only on
+ * (subscription,IP) since license keys are server-verified and can't be rotated
+ * the same way.
+ */
+function checkRateLimit(string $authIdentifier, int $maxPerHour, ?int $ipMaxPerHour = null): bool
+{
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+    if (!checkBucket($authIdentifier . '|' . $ip, $maxPerHour)) {
         return false;
     }
-
-    // Add current upload
-    $uploads[] = $current_time;
-    file_put_contents($rate_file, json_encode($uploads));
-
+    if ($ipMaxPerHour !== null && !checkBucket('ip:' . $ip, $ipMaxPerHour)) {
+        return false;
+    }
     return true;
 }
 
@@ -159,9 +195,11 @@ try {
     $authId = $auth['authId'];
     $maxFileSize = $tier === 'premium' ? MAX_FILE_SIZE_PREMIUM : MAX_FILE_SIZE_FREE;
     $maxPerHour = $tier === 'premium' ? MAX_UPLOADS_PER_HOUR_PREMIUM : MAX_UPLOADS_PER_HOUR_FREE;
+    // Free tier also gets a coarse per-IP cap so device-ID rotation can't bypass the per-device limit.
+    $ipMaxPerHour = $tier === 'free' ? MAX_UPLOADS_PER_HOUR_FREE_PER_IP : null;
 
-    // Rate limiting check (bucket keyed on tier-specific authId)
-    if (!checkRateLimit($authId, $maxPerHour)) {
+    // Rate limiting check (bucket keyed on tier-specific authId, with optional per-IP secondary)
+    if (!checkRateLimit($authId, $maxPerHour, $ipMaxPerHour)) {
         http_response_code(429);
         echo json_encode(['error' => 'Rate limit exceeded']);
         logSecurityEvent('rate_limit_exceeded', $tier);

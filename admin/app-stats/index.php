@@ -33,9 +33,6 @@ $aggregatedData = [
         'FeatureUsage' => []
     ],
     'geoLocationEnabled' => false,
-    'privacySettings' => [
-        'collectCityData' => true
-    ],
     'tierFilter' => $tierFilter,
     // Per-tier user counts computed from ALL files (independent of $tierFilter)
     'tierStats' => [
@@ -287,8 +284,13 @@ if (!is_dir($dataDir)) {
     }
 }
 
-// Convert aggregated data to JSON for JavaScript
-$jsonData = json_encode($aggregatedData);
+// Convert aggregated data to JSON for JavaScript. Escape HTML-meaningful characters
+// (<, >, &, ', ") as \u00xx so a telemetry string containing "</script>" cannot break
+// out of the inline <script> context where this is emitted.
+$jsonData = json_encode(
+    $aggregatedData,
+    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES
+);
 
 // Include the shared header
 include __DIR__ . '/../admin_header.php';

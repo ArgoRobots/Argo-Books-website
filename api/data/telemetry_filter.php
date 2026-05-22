@@ -7,8 +7,6 @@
  * the fields listed in the allowlist. Anything not listed is silently dropped
  * before the file is written to admin/data-logs/. Applied to both free and
  * premium uploads, so the on-the-wire shape is identical across tiers.
- *
- * See docs/superpowers/specs/2026-05-21-free-tier-telemetry-design.md.
  */
 
 const TELEMETRY_PLATFORMS = ['Windows', 'macOS', 'Linux', 'Other'];

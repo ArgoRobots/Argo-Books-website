@@ -17,6 +17,8 @@ if (empty($_SESSION['csrf_token'])) {
 require_once __DIR__ . '/tabs/ab-tests.php';
 require_once __DIR__ . '/tabs/settings.php';
 require_once __DIR__ . '/tabs/followups.php';
+require_once __DIR__ . '/tabs/reddit-threads.php';
+require_once __DIR__ . '/tabs/reddit-settings.php';
 
 // Dispatch POST submissions from tab-specific forms BEFORE any output so
 // redirects via header() still work. CSRF: every state-changing tab form
@@ -34,12 +36,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tab'])) {
         ab_tests_tab_handle_post($pdo);
     } elseif ($postTab === 'settings') {
         settings_tab_handle_post($pdo);
+    } elseif ($postTab === 'reddit-settings') {
+        reddit_settings_tab_handle_post($pdo);
     }
 }
 
 // Determine active tab from ?tab=
 $activeTab = $_GET['tab'] ?? 'leads';
-if (!in_array($activeTab, ['discovery', 'leads', 'ab-tests', 'followups', 'settings'], true)) {
+$allowedTabs = ['discovery', 'leads', 'ab-tests', 'followups', 'settings', 'reddit-threads', 'reddit-settings'];
+if (!in_array($activeTab, $allowedTabs, true)) {
     $activeTab = 'leads';
 }
 
@@ -54,6 +59,25 @@ include __DIR__ . '/../admin_header.php';
 <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="../../resources/styles/checkbox.css">
+
+<?php
+// Determine which channel is active. Reddit sub-tabs map to the reddit pane;
+// everything else (including legacy URLs without a tab param) maps to email.
+$redditTabs = ['reddit-threads', 'reddit-settings'];
+$activeChannel = $_GET['channel'] ?? (in_array($activeTab, $redditTabs, true) ? 'reddit' : 'email');
+if (!in_array($activeChannel, ['email', 'reddit'], true)) {
+    $activeChannel = 'email';
+}
+?>
+
+<!-- Channel-level tabs (Email | Reddit) -->
+<div class="channel-tabs">
+    <button class="channel-tab <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel="email">Email</button>
+    <button class="channel-tab <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel="reddit">Reddit</button>
+</div>
+
+<!-- Email channel -->
+<div class="channel-pane <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel-pane="email">
 
 <!-- Page-level tabs -->
 <div class="section-tabs">
@@ -163,6 +187,11 @@ include __DIR__ . '/../admin_header.php';
             <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
                 The system picks Canadian-startup queries automatically and keeps searching until it finds enough or your daily SerpAPI quota runs out. Usage today: <span id="serpapiUsage">…</span>.
             </p>
+            <div style="text-align:center; margin-top:10px;">
+                <button class="btn btn-small btn-blue" onclick="showModal('shopifyRejectStatsModal')">
+                    Why candidates get rejected (last 30 days)
+                </button>
+            </div>
         </div>
 
         <div id="shopifyResults" style="display:none; margin-top:16px;">
@@ -227,49 +256,6 @@ try {
 }
 $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
 ?>
-
-<!-- Shopify Rejection Reasons Panel -->
-<div class="panel discovery-panel">
-    <div class="panel-header" onclick="togglePanel('shopifyRejectStatsContent')">
-        <h2><?= svg_icon('bar-chart', 18) ?> Why Shopify candidates get rejected (last 30 days)</h2>
-        <span class="panel-toggle" id="shopifyRejectStatsToggle">&#9660;</span>
-    </div>
-    <div class="panel-content" id="shopifyRejectStatsContent">
-        <?php if ($shopifyTotal30d === 0): ?>
-            <p class="text-muted" style="margin:8px 0; font-size:13px;">No Shopify candidates evaluated in the last 30 days.</p>
-        <?php else: ?>
-            <p class="text-muted" style="margin:0 0 12px; font-size:13px;">
-                Of <?= (int) $shopifyTotal30d ?> candidates evaluated, <?= (int) $shopifyImported30d ?> were imported as leads and <?= (int) $shopifyRejectedTotal ?> were rejected. Use this breakdown to tune the dork pool or evaluator thresholds.
-            </p>
-            <div class="discovery-table-wrapper">
-                <table class="data-table discovery-table">
-                    <thead>
-                        <tr>
-                            <th>Reject reason</th>
-                            <th style="width:90px; text-align:right;">Count</th>
-                            <th style="width:90px; text-align:right;">% of rejects</th>
-                            <th>Sample detail</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($shopifyRejectStats as $row): ?>
-                            <?php
-                                $cnt = (int) $row['cnt'];
-                                $pct = $shopifyRejectedTotal > 0 ? round($cnt / $shopifyRejectedTotal * 100) : 0;
-                            ?>
-                            <tr>
-                                <td><code><?= htmlspecialchars((string) $row['reject_reason']) ?></code></td>
-                                <td style="text-align:right;"><?= $cnt ?></td>
-                                <td style="text-align:right;"><?= $pct ?>%</td>
-                                <td class="text-muted" style="font-size:12px;"><?= htmlspecialchars((string) ($row['sample'] ?? '')) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
-</div>
 
 </div> <!-- /#discovery -->
 
@@ -443,6 +429,32 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
 <div id="settings" class="tab-content <?php echo $activeTab === 'settings' ? 'active' : ''; ?>">
     <?php settings_tab_render($pdo); ?>
 </div>
+
+</div> <!-- /.channel-pane[data-channel-pane="email"] -->
+
+<!-- Reddit channel -->
+<?php
+// If the URL points to the Reddit channel without a Reddit sub-tab, default to threads.
+if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'reddit-settings'], true)) {
+    $activeTab = 'reddit-threads';
+}
+?>
+<div class="channel-pane <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel-pane="reddit">
+
+    <!-- Reddit sub-tabs -->
+    <div class="section-tabs">
+        <button class="section-tab <?php echo $activeTab === 'reddit-threads' ? 'active' : ''; ?>" data-tab="reddit-threads">Threads</button>
+        <button class="section-tab <?php echo $activeTab === 'reddit-settings' ? 'active' : ''; ?>" data-tab="reddit-settings">Settings</button>
+    </div>
+
+    <div id="reddit-threads" class="tab-content <?php echo $activeTab === 'reddit-threads' ? 'active' : ''; ?>">
+        <?php reddit_threads_tab_render($pdo); ?>
+    </div>
+
+    <div id="reddit-settings" class="tab-content <?php echo $activeTab === 'reddit-settings' ? 'active' : ''; ?>">
+        <?php reddit_settings_tab_render($pdo); ?>
+    </div>
+</div> <!-- /.channel-pane[data-channel-pane="reddit"] -->
 
 <!-- Lead Detail Modal -->
 <div id="leadDetailModal" class="modal" style="display:none;">
@@ -689,6 +701,146 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
         <div class="modal-footer">
             <button class="btn btn-blue" onclick="closeBulkSendModal()">Cancel</button>
             <button class="btn btn-blue" id="btnBulkSend" disabled>Send All</button>
+        </div>
+    </div>
+</div>
+
+<!-- Reddit Thread Detail Modal -->
+<div id="redditThreadModal" class="modal" style="display:none;">
+    <div class="modal-content modal-large" style="height:auto; max-height:85vh;">
+        <div class="modal-header">
+            <h3 id="redditThreadTitle">Thread</h3>
+            <button class="modal-close" onclick="closeModal('redditThreadModal')">&times;</button>
+        </div>
+        <div class="modal-body reddit-thread-modal-body">
+            <div class="reddit-thread-meta">
+                <span><strong>Subreddit:</strong> <span id="redditThreadSubreddit"></span></span>
+                <span><strong>AI relevance:</strong> <span id="redditThreadAi"></span></span>
+                <span><strong>Status:</strong> <span id="redditThreadStatus"></span></span>
+                <span><strong>Posted:</strong> <span id="redditThreadPosted"></span></span>
+                <a id="redditThreadUrl" target="_blank" rel="noopener noreferrer">Open on Reddit ↗</a>
+            </div>
+            <div class="reddit-thread-section">
+                <h4>OP body</h4>
+                <pre id="redditThreadBody" class="reddit-thread-body"></pre>
+            </div>
+            <div class="reddit-thread-section">
+                <h4>Why this thread scored that way</h4>
+                <p id="redditThreadReason" class="text-muted"></p>
+            </div>
+            <div class="reddit-thread-section">
+                <h4>Draft</h4>
+                <textarea id="redditDraftBody" rows="10" placeholder="Draft will appear here..."></textarea>
+                <div class="reddit-draft-actions">
+                    <button class="btn btn-small btn-blue" onclick="generatePendingRedditDraft()" id="redditDraftGenerateBtn" style="display:none;">Generate draft</button>
+                    <button class="btn btn-small btn-blue" onclick="saveRedditDraft()">Save draft</button>
+                    <button class="btn btn-small btn-neutral" onclick="openRedditRegenerateFeedback()">Regenerate</button>
+                    <button class="btn btn-small btn-blue" onclick="copyRedditDraft(this)">Copy</button>
+                </div>
+                <div id="redditRegenerateFeedback" class="reddit-regenerate-feedback" style="display:none;">
+                    <label for="redditRegenerateFeedbackText">What should be different about the next draft? (optional)</label>
+                    <textarea id="redditRegenerateFeedbackText" rows="3" placeholder="e.g. too formal, don't mention QuickBooks, lead with the side-hustle angle, drop the disclosure phrasing..."></textarea>
+                    <div class="reddit-regenerate-feedback-actions">
+                        <button class="btn btn-small btn-neutral" onclick="cancelRedditRegenerate()">Cancel</button>
+                        <button class="btn btn-small btn-blue" onclick="submitRedditRegenerate(this)" id="redditRegenerateSubmitBtn">Regenerate</button>
+                    </div>
+                </div>
+            </div>
+            <div class="reddit-thread-section" id="redditReplyStatusSection" style="display:none;">
+                <h4>Posted reply status</h4>
+                <div id="redditReplyStatusBody" class="text-muted"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-red" onclick="markRedditNotFit()">Mark not fit</button>
+            <button class="btn btn-neutral" onclick="markRedditSkipped()">Skip</button>
+            <button class="btn btn-blue" onclick="openMarkRedditRepliedModal()">Mark replied…</button>
+        </div>
+    </div>
+</div>
+
+<!-- Mark Replied Modal -->
+<div id="redditMarkRepliedModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:560px; height:auto; max-height:80vh;">
+        <div class="modal-header">
+            <h3>Mark replied</h3>
+            <button class="modal-close" onclick="closeModal('redditMarkRepliedModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-muted" style="font-size:13px;">After posting your reply on Reddit, paste the comment permalink here so we can track whether it survives auto-removal.</p>
+            <div class="form-group">
+                <label for="redditReplyPermalink">Reddit comment permalink</label>
+                <input type="url" id="redditReplyPermalink" placeholder="https://www.reddit.com/r/.../comments/.../slug/abc123/" required>
+                <p class="form-help">Right-click the timestamp on your comment in Reddit and copy the link.</p>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="redditMentionedProduct" checked>
+                    Mentioned Argo Books in this reply (counts toward post limit)
+                </label>
+            </div>
+            <div id="redditOverrideSection" style="display:none;">
+                <div class="reddit-limit-warning">
+                    <strong>You're at or above your post limit.</strong>
+                    <div id="redditOverrideMsg" style="margin-top:4px;"></div>
+                </div>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="redditOverrideLimit">
+                    I understand — post anyway (significantly increases shadowban risk)
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-neutral" onclick="closeModal('redditMarkRepliedModal')">Cancel</button>
+            <button class="btn btn-blue" onclick="confirmMarkRedditReplied()" id="redditConfirmMarkRepliedBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Shopify Rejection Reasons Modal -->
+<div id="shopifyRejectStatsModal" class="modal" style="display:none;">
+    <div class="modal-content modal-large" style="height:auto; max-height:80vh;">
+        <div class="modal-header">
+            <h3>Why Shopify candidates get rejected (last 30 days)</h3>
+            <button class="modal-close" onclick="closeModal('shopifyRejectStatsModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <?php if ($shopifyTotal30d === 0): ?>
+                <p class="text-muted" style="margin:8px 0; font-size:13px;">No Shopify candidates evaluated in the last 30 days.</p>
+            <?php else: ?>
+                <p class="text-muted" style="margin:0 0 12px; font-size:13px;">
+                    Of <?= (int) $shopifyTotal30d ?> candidates evaluated, <?= (int) $shopifyImported30d ?> were imported as leads and <?= (int) $shopifyRejectedTotal ?> were rejected. Use this breakdown to tune the dork pool or evaluator thresholds.
+                </p>
+                <div class="discovery-table-wrapper">
+                    <table class="data-table discovery-table">
+                        <thead>
+                            <tr>
+                                <th>Reject reason</th>
+                                <th style="width:90px; text-align:right;">Count</th>
+                                <th style="width:90px; text-align:right;">% of rejects</th>
+                                <th>Sample detail</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($shopifyRejectStats as $row): ?>
+                                <?php
+                                    $cnt = (int) $row['cnt'];
+                                    $pct = $shopifyRejectedTotal > 0 ? round($cnt / $shopifyRejectedTotal * 100) : 0;
+                                ?>
+                                <tr>
+                                    <td><code><?= htmlspecialchars((string) $row['reject_reason']) ?></code></td>
+                                    <td style="text-align:right;"><?= $cnt ?></td>
+                                    <td style="text-align:right;"><?= $pct ?>%</td>
+                                    <td class="text-muted" style="font-size:12px;"><?= htmlspecialchars((string) ($row['sample'] ?? '')) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="closeModal('shopifyRejectStatsModal')">Close</button>
         </div>
     </div>
 </div>

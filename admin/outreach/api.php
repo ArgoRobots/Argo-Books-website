@@ -14,6 +14,7 @@ header('Content-Type: application/json');
 
 // Load shared outreach helpers (scrape_email_from_website, search_businesses_core, call_gemini, etc.)
 require_once __DIR__ . '/../../cron/lib/outreach_helpers.php';
+require_once __DIR__ . '/../../cron/lib/reddit_helpers.php';
 
 // CSRF protection for state-changing (non-GET) requests
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
@@ -58,6 +59,26 @@ if (in_array($action, $pipelineActions) && is_pipeline_running()) {
     echo json_encode([
         'success' => false,
         'message' => 'The outreach pipeline cron job is currently running. Please wait a few minutes and try again.'
+    ]);
+    exit;
+}
+
+// Block Reddit actions while the Reddit cron is running
+function is_reddit_monitor_running(): bool
+{
+    $lockFile = __DIR__ . '/../../cron/logs/reddit_monitor.lock';
+    if (!file_exists($lockFile)) return false;
+    $fp = @fopen($lockFile, 'r');
+    if (!$fp) return false;
+    $locked = !flock($fp, LOCK_EX | LOCK_NB);
+    fclose($fp);
+    return $locked;
+}
+$redditCronActions = ['reddit_run_now', 'reddit_regenerate_draft', 'reddit_generate_pending_draft'];
+if (in_array($action, $redditCronActions) && is_reddit_monitor_running()) {
+    echo json_encode([
+        'success' => false,
+        'message' => 'The Reddit discovery cron is currently running. Please wait a few minutes and try again.'
     ]);
     exit;
 }
@@ -162,6 +183,47 @@ switch ($action) {
         break;
     case 'save_followup_draft':
         save_followup_draft($pdo);
+        break;
+
+    // Reddit outreach
+    case 'reddit_get_threads':
+        reddit_api_get_threads($pdo);
+        break;
+    case 'reddit_get_thread':
+        reddit_api_get_thread($pdo);
+        break;
+    case 'reddit_get_stats':
+        reddit_api_get_stats($pdo);
+        break;
+    case 'reddit_pipeline_status':
+        reddit_api_pipeline_status();
+        break;
+    case 'reddit_pipeline_progress':
+        reddit_api_pipeline_progress();
+        break;
+    case 'reddit_run_now':
+        reddit_api_run_now($pdo);
+        break;
+    case 'reddit_mark_replied':
+        reddit_api_mark_replied($pdo);
+        break;
+    case 'reddit_mark_not_fit':
+        reddit_api_mark_not_fit($pdo);
+        break;
+    case 'reddit_mark_skipped':
+        reddit_api_mark_skipped($pdo);
+        break;
+    case 'reddit_save_draft':
+        reddit_api_save_draft($pdo);
+        break;
+    case 'reddit_regenerate_draft':
+        reddit_api_regenerate_draft($pdo);
+        break;
+    case 'reddit_generate_pending_draft':
+        reddit_api_generate_pending_draft($pdo);
+        break;
+    case 'reddit_get_account_info':
+        reddit_api_get_account_info($pdo);
         break;
 
     default:
@@ -1320,5 +1382,373 @@ function save_followup_draft($pdo)
     $stmt = $pdo->prepare("UPDATE outreach_followups SET draft_subject = ?, draft_body = ? WHERE id = ? AND status = 'drafted'");
     $stmt->execute([$subject, $body, $id]);
     echo json_encode(['success' => true]);
+}
+
+// ─── Reddit outreach endpoints ───
+
+function reddit_api_get_threads($pdo)
+{
+    $status = (string) ($_GET['status'] ?? 'actionable');
+    $subreddit = (string) ($_GET['subreddit'] ?? '');
+    $source = (string) ($_GET['source'] ?? '');
+    $days = max(0, (int) ($_GET['days'] ?? 30));
+
+    $where = [];
+    $params = [];
+
+    if ($status === 'actionable') {
+        $where[] = "status IN ('drafted', 'drafted_pending')";
+    } elseif ($status === 'reply_removed') {
+        $where[] = "status = 'replied' AND reply_status IN ('removed', 'removed_or_shadowbanned')";
+    } elseif ($status !== '' && $status !== 'all') {
+        $where[] = 'status = ?';
+        $params[] = $status;
+    }
+
+    if ($subreddit !== '') {
+        $where[] = 'subreddit = ?';
+        $params[] = $subreddit;
+    }
+
+    if (in_array($source, ['watchlist', 'keyword', 'both'], true)) {
+        $where[] = 'discovery_source = ?';
+        $params[] = $source;
+    }
+
+    if ($days > 0) {
+        $where[] = "discovered_at > DATE_SUB(NOW(), INTERVAL $days DAY)";
+    }
+
+    $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+    // List endpoint deliberately omits draft_body (could be up to ~2KB per row,
+    // not used by the table UI). The thread-detail modal fetches the full row
+    // via reddit_get_thread when opened. `has_draft` lets the UI show a flag.
+    $sql = "SELECT id, reddit_id, subreddit, title, url, ai_relevance, ai_relevance_reason, status,
+                   reply_status, reply_upvotes, reply_replies_count, reply_permalink,
+                   (draft_body IS NOT NULL AND draft_body <> '') AS has_draft,
+                   discovered_at, posted_at, comment_count, rules_score, discovery_source, mentioned_product
+            FROM reddit_threads $whereClause
+            ORDER BY (ai_relevance IS NULL) ASC, ai_relevance DESC, discovered_at DESC
+            LIMIT 200";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $threads = $stmt->fetchAll();
+    } catch (PDOException $e) {
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+
+    json_response(['success' => true, 'threads' => $threads]);
+}
+
+function reddit_api_get_thread($pdo)
+{
+    $id = (int) ($_GET['id'] ?? 0);
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+
+    $stmt = $pdo->prepare("SELECT * FROM reddit_threads WHERE id = ?");
+    $stmt->execute([$id]);
+    $thread = $stmt->fetch();
+    if (!$thread) json_response(['success' => false, 'message' => 'Thread not found'], 404);
+
+    json_response(['success' => true, 'thread' => $thread]);
+}
+
+function reddit_api_get_stats($pdo)
+{
+    try {
+        $stats = [
+            'total' => (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads")->fetchColumn(),
+            'drafted' => (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'drafted'")->fetchColumn(),
+            'drafted_pending' => (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'drafted_pending'")->fetchColumn(),
+            'replied_7d' => (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'replied' AND reply_posted_at > DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn(),
+            'daily_used' => (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'replied' AND mentioned_product = 1 AND reply_posted_at > DATE_SUB(NOW(), INTERVAL 1 DAY)")->fetchColumn(),
+            'weekly_used' => (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'replied' AND mentioned_product = 1 AND reply_posted_at > DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn(),
+        ];
+
+        // Reply survival: of replies whose status has been checked at least once,
+        // what % are still live? Excludes deleted_by_user (founder's own action).
+        $survival = $pdo->query("
+            SELECT
+                SUM(CASE WHEN reply_status = 'live' THEN 1 ELSE 0 END) AS live_count,
+                SUM(CASE WHEN reply_status IN ('live','removed','removed_or_shadowbanned') THEN 1 ELSE 0 END) AS judged_count
+            FROM reddit_threads
+            WHERE status = 'replied' AND reply_posted_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+        ")->fetch();
+        $judged = (int) ($survival['judged_count'] ?? 0);
+        $live = (int) ($survival['live_count'] ?? 0);
+        $stats['survival_pct'] = $judged > 0 ? round(($live / $judged) * 100, 1) : null;
+        $stats['survival_n'] = $judged;
+
+        // Avg upvotes on live replies
+        $avg = $pdo->query("
+            SELECT AVG(reply_upvotes) AS avg_upvotes
+            FROM reddit_threads
+            WHERE reply_status = 'live' AND reply_upvotes IS NOT NULL
+        ")->fetch();
+        $stats['avg_upvotes'] = $avg && $avg['avg_upvotes'] !== null ? round((float) $avg['avg_upvotes'], 1) : null;
+
+        // Profile-link clicks (30d). statistics.php emits a 'reddit_referrer'
+        // event row whenever an inbound page view has a reddit.com Referer.
+        try {
+            $clicks = $pdo->query("
+                SELECT COUNT(*) FROM statistics
+                WHERE event_type = 'reddit_referrer'
+                  AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY)
+            ")->fetchColumn();
+            $stats['profile_clicks_30d'] = (int) $clicks;
+        } catch (PDOException $e) {
+            $stats['profile_clicks_30d'] = 0;
+        }
+
+        // Post limits (for safety meter)
+        $cfg = $pdo->query("SELECT daily_post_limit, weekly_post_limit FROM reddit_settings WHERE id = 1")->fetch();
+        $stats['daily_limit'] = (int) ($cfg['daily_post_limit'] ?? 3);
+        $stats['weekly_limit'] = (int) ($cfg['weekly_post_limit'] ?? 12);
+
+        json_response(['success' => true, 'stats' => $stats]);
+    } catch (PDOException $e) {
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+function reddit_api_pipeline_status()
+{
+    json_response(['success' => true, 'running' => is_reddit_monitor_running()]);
+}
+
+function reddit_api_pipeline_progress()
+{
+    json_response([
+        'success' => true,
+        'running' => is_reddit_monitor_running(),
+        'progress' => reddit_progress_read(),
+    ]);
+}
+
+function reddit_api_run_now($pdo)
+{
+    // Shared-hosting friendly: many hosts disable exec/shell_exec/proc_open via
+    // disable_functions. Instead of spawning a subprocess, we send the HTTP
+    // response immediately, detach from the client, then run the cron inline
+    // in this same PHP process. $pdo is brought in as a parameter so it stays
+    // in scope when we `require` the cron from inside this function (PHP
+    // doesn't auto-import globals into function scope for included files).
+    $cronPath = realpath(__DIR__ . '/../../cron/reddit_monitor.php');
+    if (!$cronPath) {
+        json_response(['success' => false, 'message' => 'Cron script not found'], 500);
+    }
+
+    // Let the work run as long as it needs and survive client disconnect.
+    @set_time_limit(600);
+    @ignore_user_abort(true);
+
+    // Send the JSON response now so the admin UI doesn't hang while the cron runs.
+    http_response_code(200);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => true, 'message' => 'Reddit discovery started. Refresh in a minute or two to see new threads.']);
+
+    // Release the session lock BEFORE running the inline cron. PHP's default
+    // file-based session handler holds an exclusive lock on the session file
+    // for the duration of the request — without this close, page reloads and
+    // the JS progress polling block for the full multi-minute cron runtime.
+    if (function_exists('session_write_close')) {
+        @session_write_close();
+    }
+
+    // Detach from the client. fastcgi_finish_request is PHP-FPM only; fall back
+    // to flushing buffers on other SAPIs (work continues either way thanks to
+    // ignore_user_abort).
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request();
+    } else {
+        while (function_exists('ob_get_level') && ob_get_level() > 0) {
+            @ob_end_flush();
+        }
+        @flush();
+    }
+
+    outreach_log('Reddit monitor triggered manually from admin (inline)');
+
+    // Bypass the cron's CLI-only guard and run the pipeline inline. After the
+    // cron file finishes, control returns here and PHP exits normally.
+    if (!defined('REDDIT_MONITOR_INLINE')) {
+        define('REDDIT_MONITOR_INLINE', true);
+    }
+    try {
+        require $cronPath;
+    } catch (Throwable $e) {
+        outreach_log('Inline Reddit monitor crashed: ' . $e->getMessage());
+    }
+    exit;
+}
+
+function reddit_api_mark_replied($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $id = (int) ($data['id'] ?? 0);
+    $permalink = trim((string) ($data['permalink'] ?? ''));
+    $mentionedProduct = !empty($data['mentioned_product']) ? 1 : 0;
+    $overrideLimit = !empty($data['override_limit']) ? 1 : 0;
+
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+
+    $commentId = reddit_extract_comment_id_from_permalink($permalink);
+    if ($commentId === null) {
+        json_response(['success' => false, 'message' => 'Invalid Reddit comment permalink. Expected something like https://www.reddit.com/r/.../comments/.../slug/<comment_id>/'], 400);
+    }
+
+    // Enforce post limits unless override is set
+    if ($mentionedProduct && !$overrideLimit) {
+        $cfg = $pdo->query("SELECT daily_post_limit, weekly_post_limit FROM reddit_settings WHERE id = 1")->fetch();
+        $dailyLimit = (int) ($cfg['daily_post_limit'] ?? 3);
+        $weeklyLimit = (int) ($cfg['weekly_post_limit'] ?? 12);
+        $dailyUsed = (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'replied' AND mentioned_product = 1 AND reply_posted_at > DATE_SUB(NOW(), INTERVAL 1 DAY)")->fetchColumn();
+        $weeklyUsed = (int) $pdo->query("SELECT COUNT(*) FROM reddit_threads WHERE status = 'replied' AND mentioned_product = 1 AND reply_posted_at > DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
+        if ($dailyUsed >= $dailyLimit || $weeklyUsed >= $weeklyLimit) {
+            json_response([
+                'success' => false,
+                'message' => "You're at the post limit (daily $dailyUsed/$dailyLimit, weekly $weeklyUsed/$weeklyLimit). Override required.",
+                'requires_override' => true,
+                'daily_used' => $dailyUsed,
+                'daily_limit' => $dailyLimit,
+                'weekly_used' => $weeklyUsed,
+                'weekly_limit' => $weeklyLimit,
+            ], 400);
+        }
+    }
+
+    $stmt = $pdo->prepare("
+        UPDATE reddit_threads
+        SET status = 'replied',
+            reply_permalink = ?,
+            reply_comment_id = ?,
+            reply_posted_at = NOW(),
+            reply_status = 'pending',
+            reply_status_check_count = 0,
+            mentioned_product = ?,
+            override_limit = ?
+        WHERE id = ?
+    ");
+    $stmt->execute([$permalink, $commentId, $mentionedProduct, $overrideLimit, $id]);
+
+    if ($stmt->rowCount() === 0) {
+        json_response(['success' => false, 'message' => 'Thread not found'], 404);
+    }
+
+    json_response(['success' => true]);
+}
+
+function reddit_api_mark_not_fit($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $id = (int) ($data['id'] ?? 0);
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+
+    $stmt = $pdo->prepare("UPDATE reddit_threads SET status = 'not_fit' WHERE id = ?");
+    $stmt->execute([$id]);
+    json_response(['success' => true]);
+}
+
+function reddit_api_mark_skipped($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $id = (int) ($data['id'] ?? 0);
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+
+    $stmt = $pdo->prepare("UPDATE reddit_threads SET status = 'skipped' WHERE id = ?");
+    $stmt->execute([$id]);
+    json_response(['success' => true]);
+}
+
+function reddit_api_save_draft($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $id = (int) ($data['id'] ?? 0);
+    $body = trim((string) ($data['draft_body'] ?? ''));
+
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+    if ($body === '') json_response(['success' => false, 'message' => 'Draft body cannot be empty'], 400);
+    if (strlen($body) > 10000) json_response(['success' => false, 'message' => 'Draft too long (max 10000 chars)'], 400);
+
+    $stmt = $pdo->prepare("UPDATE reddit_threads SET draft_body = ?, status = CASE WHEN status = 'drafted_pending' THEN 'drafted' ELSE status END WHERE id = ?");
+    $stmt->execute([$body, $id]);
+    json_response(['success' => true]);
+}
+
+function reddit_api_regenerate_draft($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $id = (int) ($data['id'] ?? 0);
+    $feedback = trim((string) ($data['feedback'] ?? ''));
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+    if (mb_strlen($feedback) > 2000) {
+        json_response(['success' => false, 'message' => 'Feedback too long (max 2000 chars)'], 400);
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM reddit_threads WHERE id = ?");
+    $stmt->execute([$id]);
+    $thread = $stmt->fetch();
+    if (!$thread) json_response(['success' => false, 'message' => 'Thread not found'], 404);
+
+    $comments = reddit_fetch_top_comments($pdo, $thread['subreddit'], $thread['reddit_id']);
+    $draft = reddit_generate_draft($thread, $comments, [
+        'previous_draft' => $thread['draft_body'] ?? '',
+        'feedback' => $feedback,
+    ]);
+    if (!empty($draft['error'])) {
+        json_response(['success' => false, 'message' => 'Draft generation failed: ' . $draft['error']], 500);
+    }
+
+    $upd = $pdo->prepare("UPDATE reddit_threads SET draft_body = ?, draft_generated_at = NOW(), status = 'drafted' WHERE id = ?");
+    $upd->execute([$draft['body'], $id]);
+
+    json_response(['success' => true, 'draft_body' => $draft['body']]);
+}
+
+function reddit_api_generate_pending_draft($pdo)
+{
+    // Same as regenerate but only valid for drafted_pending rows
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $id = (int) ($data['id'] ?? 0);
+    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
+
+    $stmt = $pdo->prepare("SELECT * FROM reddit_threads WHERE id = ? AND status = 'drafted_pending'");
+    $stmt->execute([$id]);
+    $thread = $stmt->fetch();
+    if (!$thread) json_response(['success' => false, 'message' => 'Thread not found or not pending'], 404);
+
+    $comments = reddit_fetch_top_comments($pdo, $thread['subreddit'], $thread['reddit_id']);
+    $draft = reddit_generate_draft($thread, $comments);
+    if (!empty($draft['error'])) {
+        json_response(['success' => false, 'message' => 'Draft generation failed: ' . $draft['error']], 500);
+    }
+
+    $upd = $pdo->prepare("UPDATE reddit_threads SET draft_body = ?, draft_generated_at = NOW(), status = 'drafted' WHERE id = ?");
+    $upd->execute([$draft['body'], $id]);
+
+    json_response(['success' => true, 'draft_body' => $draft['body']]);
+}
+
+function reddit_api_get_account_info($pdo)
+{
+    if (empty($_ENV['REDDIT_USERNAME'])) {
+        json_response([
+            'success' => false,
+            'message' => 'REDDIT_USERNAME is not set in .env, so we don\'t know which account to look up. Set it to enable this card.',
+        ]);
+    }
+
+    $info = reddit_fetch_account_about($pdo);
+    if ($info === null) {
+        $hint = reddit_oauth_configured()
+            ? 'OAuth token request failed — verify REDDIT_CLIENT_ID / SECRET / PASSWORD in .env.'
+            : 'Without OAuth, Reddit blocks the account-about endpoint from this server\'s IP. Configure REDDIT_* OAuth env vars to enable.';
+        json_response(['success' => false, 'message' => $hint]);
+    }
+
+    $info['account_age_days'] = $info['created_utc'] > 0 ? floor((time() - $info['created_utc']) / 86400) : null;
+    json_response(['success' => true, 'account' => $info]);
 }
 

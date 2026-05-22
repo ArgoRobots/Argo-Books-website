@@ -223,3 +223,81 @@ Queries Stripe for refund requests stuck in `processing` for more than 30 minute
 ### What It Does
 
 Refreshes `refund_velocity_baselines` per company so the established-account hard-block tier (≥ 50% of trailing 30-day revenue) has accurate inputs. If baselines drift out of date, the refund safety check fires too often or not enough — see the [Hard-Block Response Procedure](procedures/Refund%20block%20response%20procedure.md) for symptoms.
+
+---
+
+## 9. Reddit Discovery
+
+**Script:** `cron/reddit_monitor.php`
+**Schedule:** Daily at 8:00 AM
+
+```bash
+0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_monitor.php
+```
+
+### What It Does
+
+1. Pulls fresh threads (last 24h) from each enabled watchlist subreddit
+2. Runs global Reddit search for each enabled keyword
+3. Deduplicates by thread ID and applies rules-based scoring
+4. Runs a neutral AI relevance check (Gemini) on threads above the rules floor
+5. Pre-generates a draft reply for threads scoring ≥ 8 on AI relevance
+6. Marks borderline (6–7) threads as `drafted_pending` for on-demand drafting in the admin UI
+7. Auto-expires drafted threads older than 3 days
+
+Manual posting only — the cron does NOT post anything to Reddit. Drafts are reviewed and copy-pasted manually by the founder.
+
+### Environment Variables
+
+Default mode is **unauthenticated** — no app, no OAuth, no policy gate. Fill in the `REDDIT_*` vars later to upgrade to OAuth without code changes.
+
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | yes | Reused from the email pipeline for AI relevance + draft generation |
+| `REDDIT_CLIENT_ID` | optional | From a personal-use script app at https://www.reddit.com/prefs/apps/. Required only for OAuth mode. |
+| `REDDIT_CLIENT_SECRET` | optional | App secret. Required only for OAuth mode. |
+| `REDDIT_USERNAME` | optional | Reddit account that will post. If set without the OAuth pair, used purely as the User-Agent identifier and for the admin "your account stats" card. |
+| `REDDIT_PASSWORD` | optional | Account password. Required only for OAuth mode. |
+
+**Endpoint behaviour (unauth mode):** Reddit's JSON endpoints are aggressively IP-blocked from datacenter hosts (returns 403). To work around this, the helpers fetch discovery-shaped paths (`/r/X/new`, `/search`) via Reddit's RSS feed at the `.rss` suffix and parse the Atom XML back into the JSON listing shape — those endpoints are typically not IP-blocked. Endpoints with no RSS counterpart (`/api/info`, `/user/X/about`) still go to JSON and will silently 403 from blocked IPs, meaning the **reply-status check** and **account-info card** require OAuth to function. Discovery + drafting work either way.
+
+When all four `REDDIT_*` vars are set, the helpers switch to OAuth (`oauth.reddit.com`) and all endpoints work normally. No code change required.
+
+Per-channel tuning (scoring floors, post limits, auto-disable thresholds, subreddit / keyword lists) lives in the database and is editable in the admin UI under **Outreach → Reddit → Settings**.
+
+### CLI Flags
+
+```bash
+php reddit_monitor.php             # Full pipeline
+php reddit_monitor.php --dry-run   # Log what would happen; don't write threads/drafts
+php reddit_monitor.php --verbose   # Stream progress to stdout
+```
+
+### Logs
+
+A lock file (`/cron/logs/reddit_monitor.lock`) prevents overlapping runs.
+
+### Manual Trigger
+
+The admin Reddit → Threads tab has a **"Run discovery now"** button that triggers this cron in the background.
+
+---
+
+## 10. Reddit Status Check
+
+**Script:** `cron/reddit_status_check.php`
+**Schedule:** Every 2 hours
+
+```bash
+0 */2 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_status_check.php
+```
+
+### What It Does
+
+For each thread marked `replied`, re-checks the posted Reddit comment via the Reddit API on a staggered schedule (30min / 2h / 6h / 24h / 72h after posting). Classifies the reply as `live`, `removed`, `removed_or_shadowbanned`, or `deleted_by_user`, captures upvote + reply engagement, and rolls up per-subreddit removal rates. Applies the auto-disable rule: any subreddit with ≥ N replies in the last 30 days and ≥ X% removal rate is automatically removed from the watchlist (N and X configurable in admin Settings).
+
+Idempotent — each row tracks its own check count and last-checked timestamp; the cron never over-checks. After 5 checks, a reply's status is treated as final and dropped from the worklist.
+
+### Logs
+
+A lock file (`/cron/logs/reddit_status_check.lock`) prevents overlapping runs.

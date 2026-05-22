@@ -179,10 +179,13 @@
                 if you do not accept cookies, you may not be able to use some portions of our Website.</p>
 
             <h2>Argo Books Desktop Application Data</h2>
-            <p>To help us improve the Argo Books <strong>desktop software</strong>, we collect anonymous usage
-                statistics and geographic information. This data is completely anonymous, stored locally on your device,
-                and cannot be used to identify you personally. This feature is <strong>enabled by default</strong>, but
-                you can opt out at any time.</p>
+            <p>Anonymous usage data is collected to help us improve Argo Books. We use it to understand how the
+                <strong>desktop software</strong> is used, identify and fix bugs, diagnose performance issues,
+                prioritize new features, and optimize the app for different regions. This data is completely
+                anonymous and cannot be used to identify you personally. Anonymous usage data is collected by all
+                installations of Argo Books and is uploaded to our servers when you close the application. You
+                remain in control of your data: you can view what has been collected on your device at any time,
+                and delete it at any time.</p>
 
             <h3>Anonymous Data We Collect in the Desktop Software</h3>
             <p>The desktop application collects the following anonymous usage statistics:</p>
@@ -190,17 +193,23 @@
                 <li><strong>Export data</strong>: Type of export (Excel, Google Sheets, backup, etc.), duration of
                     export operation, and file size</li>
                 <li><strong>API usage</strong>: API type (Google Sheets, Google Gemini, Microsoft Translator, Open Exchange
-                    Rates), model used (for AI functions), operation duration, and tokens used</li>
-                <li><strong>Error data</strong>: Error category, error code, timestamp, and anonymous context
-                    information to help identify and fix software issues</li>
+                    Rates), operation duration, and whether the call succeeded</li>
+                <li><strong>Error data</strong>: Error category, exception type name, source filename, line number,
+                    and method name so we can identify and fix software issues. The error message text itself is
+                    never sent</li>
                 <li><strong>Session data</strong>: Session start/end times, session duration, application version, and
-                    operating system information</li>
-                <li><strong>Geographic data</strong>: Country, region, city, and timezone to
-                    understand our global user base and optimize performance for different regions</li>
-                <li><strong>Hashed IP addresses</strong>: One-way encrypted IP addresses that cannot be reversed to
-                    identify you, used for unique session tracking</li>
+                    operating system (Windows, macOS, or Linux)</li>
+                <li><strong>Geographic data</strong>: Country, region, and timezone to understand our global user base</li>
+                <li><strong>Feature usage</strong>: Which features are used (e.g., receipts scanned, reports generated) so 
+                    we can prioritize improvements</li>
                 <li><strong>Timestamp</strong>: When the action occurred</li>
             </ul>
+
+            <p>We never collect financial data, transaction data, customer names, vendor names, company names, file
+                paths, document contents, city-level location data, or per-user identifiers. Your IP address is
+                visible to our server during the upload itself (as with any web request) and is used to derive your
+                country and region, but the IP address itself is not stored alongside the collected data. The data
+                collected describes how the application is used, not what you use it for.</p>
 
             <p>This data is separate from any standard web analytics we use on our Website.</p>
 
@@ -216,18 +225,18 @@
             </ul>
 
             <h3>Managing Your Anonymous Data</h3>
-            <p>You have full control over anonymous data collection in the desktop application:</p>
+            <p>Anonymous usage data is collected automatically and cannot be disabled, but you remain in control of the
+                copy on your device:</p>
             <ul>
-                <li><strong>Opt-out</strong>: While enabled by default, you can disable anonymous data collection at any
-                    time in the desktop software under Settings > General</li>
-                <li><strong>Export your data</strong>: You can export all collected data as a JSON file for your review
-                    directly from the desktop application</li>
+                <li><strong>View your data</strong>: Open the telemetry folder on your device from
+                    <em>Settings &gt; General &gt; Privacy</em> to see exactly which anonymous events have been
+                    recorded. The files are plain JSON that you can read or copy</li>
                 <li><strong>Delete your data</strong>: You can delete all anonymous data stored on your device at any
-                    time from the Settings panel</li>
+                    time from the same panel. Deleting clears the local copy. To also remove data that has already
+                    been uploaded to our servers, email
+                    <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a> and we will
+                    delete it</li>
             </ul>
-
-            <p>No anonymous data is sent to our servers without your permission. All data is stored locally on
-                your device until you choose to share it with us.</p>
 
             <h2>Google API Services</h2>
             <p>When you use the 'Export to Google Sheets' feature in our desktop application, we request access to your Google account to:</p>
@@ -258,7 +267,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: February 17, 2026</p>
+            <p class="last-updated">Last updated: May 21, 2026</p>
         </div>
     </div>
 

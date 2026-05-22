@@ -103,6 +103,7 @@
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
                                 <li><strong>Invoice refunds</strong> &mdash; Refund a portal payment without leaving Argo Books. Pick which line items or amount to refund and click send.</li>
+                                <li><strong>Send invoices in any currency</strong> &mdash; Bill customers in the currency that works for them, no matter where they're based.</li>
                                 <li><strong>Refund analytics</strong> &mdash; A new Refunds tab in the analytics page shows your refund rate, top reasons, and trends over time.</li>
                                 <li><strong>Customer &amp; supplier avatars</strong> &mdash; Add a profile picture to any customer or supplier.</li>
                                 <li><strong>Rental availability calendar</strong> &mdash; Each rental item now has a calendar view of free and booked counts, plus a quick "next available" answer for any quantity you need.</li>

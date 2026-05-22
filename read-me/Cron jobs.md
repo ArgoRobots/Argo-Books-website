@@ -249,7 +249,7 @@ Manual posting only — the cron does NOT post anything to Reddit. Drafts are re
 
 ### Environment Variables
 
-Default mode is **unauthenticated** — the cron uses Reddit's public JSON endpoints (no app, no OAuth, no policy gate). Fill in the `REDDIT_*` vars later to upgrade to OAuth without code changes.
+Default mode is **unauthenticated** — no app, no OAuth, no policy gate. Fill in the `REDDIT_*` vars later to upgrade to OAuth without code changes.
 
 | Variable | Required | Description |
 |---|---|---|
@@ -259,7 +259,9 @@ Default mode is **unauthenticated** — the cron uses Reddit's public JSON endpo
 | `REDDIT_USERNAME` | optional | Reddit account that will post. If set without the OAuth pair, used purely as the User-Agent identifier and for the admin "your account stats" card. |
 | `REDDIT_PASSWORD` | optional | Account password. Required only for OAuth mode. |
 
-The cron uses OAuth automatically when all four `REDDIT_*` vars are set; otherwise it falls back to public JSON endpoints. The public endpoint path is slightly less durable — Reddit can throttle/block unauthenticated reads at any time — but works fine at our volume.
+**Endpoint behaviour (unauth mode):** Reddit's JSON endpoints are aggressively IP-blocked from datacenter hosts (returns 403). To work around this, the helpers fetch discovery-shaped paths (`/r/X/new`, `/search`) via Reddit's RSS feed at the `.rss` suffix and parse the Atom XML back into the JSON listing shape — those endpoints are typically not IP-blocked. Endpoints with no RSS counterpart (`/api/info`, `/user/X/about`) still go to JSON and will silently 403 from blocked IPs, meaning the **reply-status check** and **account-info card** require OAuth to function. Discovery + drafting work either way.
+
+When all four `REDDIT_*` vars are set, the helpers switch to OAuth (`oauth.reddit.com`) and all endpoints work normally. No code change required.
 
 Per-channel tuning (scoring floors, post limits, auto-disable thresholds, subreddit / keyword lists) lives in the database and is editable in the admin UI under **Outreach → Reddit → Settings**.
 

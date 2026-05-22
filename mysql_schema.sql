@@ -1102,7 +1102,7 @@ CREATE TABLE IF NOT EXISTS reddit_threads (
     status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied — counts toward post-limit',
     reply_permalink VARCHAR(500) DEFAULT NULL,
-    reply_comment_id VARCHAR(20) DEFAULT NULL COMMENT 'Extracted t1_xxxxxx from permalink',
+    reply_comment_id VARCHAR(20) DEFAULT NULL COMMENT 'Base36 comment id (no t1_ prefix) extracted from the permalink; the t1_ prefix is prepended at query time',
     reply_posted_at DATETIME DEFAULT NULL,
     reply_status ENUM('pending','live','removed','removed_or_shadowbanned','deleted_by_user') DEFAULT NULL,
     reply_status_checked_at DATETIME DEFAULT NULL,

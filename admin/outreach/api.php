@@ -1420,8 +1420,12 @@ function reddit_api_get_threads($pdo)
     }
 
     $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+    // List endpoint deliberately omits draft_body (could be up to ~2KB per row,
+    // not used by the table UI). The thread-detail modal fetches the full row
+    // via reddit_get_thread when opened. `has_draft` lets the UI show a flag.
     $sql = "SELECT id, reddit_id, subreddit, title, url, ai_relevance, ai_relevance_reason, status,
-                   reply_status, reply_upvotes, reply_replies_count, reply_permalink, draft_body,
+                   reply_status, reply_upvotes, reply_replies_count, reply_permalink,
+                   (draft_body IS NOT NULL AND draft_body <> '') AS has_draft,
                    discovered_at, posted_at, comment_count, rules_score, discovery_source, mentioned_product
             FROM reddit_threads $whereClause
             ORDER BY (ai_relevance IS NULL) ASC, ai_relevance DESC, discovered_at DESC

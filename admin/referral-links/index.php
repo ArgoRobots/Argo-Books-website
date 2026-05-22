@@ -423,6 +423,8 @@ function get_landing_page_breakdown(?string $period_start, string $environment):
     }
     $where_sql = implode(' AND ', $where);
 
+    // LIMIT keeps the result small even on a large referral_events table —
+    // the caller only renders the top few in the chart anyway.
     $sql = "
         SELECT
             SUBSTRING_INDEX(SUBSTRING_INDEX(page_url, '?', 1), '#', 1) AS clean_path,
@@ -430,7 +432,8 @@ function get_landing_page_breakdown(?string $period_start, string $environment):
         FROM referral_events
         WHERE $where_sql
         GROUP BY clean_path
-        ORDER BY visitors DESC";
+        ORDER BY visitors DESC
+        LIMIT 20";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -447,9 +450,11 @@ function friendly_landing_label(?string $path): string
     if ($p === '' || $p === '/' || $p === '/index.php') return 'Home';
     if ($p === '/downloads/' || $p === '/downloads') return 'Downloads page';
 
-    // /compare/argo-books-vs-<competitor>/  →  "<Competitor> comparison"
+    // /compare/argo-books-vs-<competitor>/  →  "<Competitor> Comparison".
+    // Convert hyphens to spaces and title-case so multi-word slugs render
+    // properly ("quickbooks-online" → "Quickbooks Online comparison").
     if (preg_match('#^/compare/argo-books-vs-([a-z0-9-]+)/?$#', $p, $m)) {
-        return ucfirst($m[1]) . ' comparison';
+        return ucwords(str_replace('-', ' ', $m[1])) . ' comparison';
     }
     return $path;
 }

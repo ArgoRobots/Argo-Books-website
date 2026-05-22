@@ -14,7 +14,8 @@
  *   7. Threads with ai_relevance < ai_relevance_floor → status='skipped'
  *   8. Threads with ai_relevance ≥ 8 → pre-generate draft, status='drafted'
  *   9. Threads with ai_relevance 6-7 → status='drafted_pending' (on-demand draft)
- *  10. Auto-expire `drafted`/`drafted_pending` threads older than 3 days
+ *  10. Auto-expire `new`, `drafted`, and `drafted_pending` threads older than 3 days
+ *      (including `new` catches AI-failure retries that never got reprocessed)
  *  11. Update reddit_settings diagnostics
  *
  * Manual flags:

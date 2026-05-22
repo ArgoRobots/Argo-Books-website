@@ -149,8 +149,9 @@ function track_reddit_referrer_if_present($page)
     $referrer = $_SERVER['HTTP_REFERER'] ?? '';
     if ($referrer === '') return;
     if (!preg_match('#^https?://(www\.|old\.|new\.|m\.|i\.)?reddit\.com/?#i', $referrer)) return;
-    // event_data carries the inbound page + a hash of the referrer so we can
-    // see roughly where they landed; we don't store the full referring URL.
+    // event_data is the inbound page (the landing URL the Reddit visitor hit).
+    // We deliberately don't store the referrer itself, since it adds little
+    // beyond "reddit.com" and risks logging tracking params from share links.
     track_event('reddit_referrer', $page);
 }
 

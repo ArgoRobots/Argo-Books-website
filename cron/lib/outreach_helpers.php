@@ -35,7 +35,7 @@ const OUTREACH_CATEGORY_POOL = [
     'tanning salons', 'nail salons', 'barber shops', 'optical stores',
     'hearing aid clinics', 'home inspectors', 'appraisers',
     'property management', 'storage facilities', 'glass repair',
-    'fencing contractors', 'concrete contractors', 'paving contractors', 
+    'fencing contractors', 'concrete contractors', 'paving contractors',
     'tree services', 'snow removal', 'pool services', 'septic services',
     'garage door repair', 'security companies', 'staffing agencies',
     'travel agencies', 'event venues', 'food trucks',

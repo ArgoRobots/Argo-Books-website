@@ -573,8 +573,17 @@ function reddit_check_comment_status($pdo, string $commentId36): array
     $c = $children[0]['data'] ?? [];
     $body = $c['body'] ?? '';
     $upvotes = isset($c['ups']) ? (int) $c['ups'] : null;
-    // num_replies is not always present on comments; fall back to 0.
-    $replies = isset($c['num_replies']) ? (int) $c['num_replies'] : 0;
+    // Reddit comment objects expose replies via a `replies` Listing (or empty
+    // string when there are none). There's no `num_replies` scalar — we have
+    // to count children in the Listing when one is returned. /api/info often
+    // doesn't expand the replies tree (it returns ""), in which case we
+    // record null rather than misleadingly logging 0.
+    $replies = null;
+    if (isset($c['replies']) && is_array($c['replies'])) {
+        $replies = count($c['replies']['data']['children'] ?? []);
+    } elseif (isset($c['replies']) && $c['replies'] === '') {
+        $replies = 0;
+    }
 
     if ($body === '[removed]') {
         return ['status' => 'removed', 'upvotes' => $upvotes, 'replies' => $replies];

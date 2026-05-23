@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   const rawData = window.dashboardData;
   const isGeoEnabled = rawData.geoLocationEnabled || false;
-  const privacySettings = rawData.privacySettings || {};
 
   const typeColors = {
     ExcelSheetsChart: "#3b82f6",
@@ -225,12 +224,6 @@ document.addEventListener("DOMContentLoaded", function () {
     sessionData,
     errorData
   ) {
-    if (!privacySettings.collectCityData) {
-      document.getElementById("cityDistributionChart").parentElement.innerHTML =
-        '<div class="chart-no-data">City data collection disabled for privacy</div>';
-      return;
-    }
-
     const allData = [
       ...exportData,
       ...geminiData,

@@ -79,14 +79,15 @@
             <p>You must immediately notify us of any unauthorized uses of your account or any other breaches of
                 security. We will not be liable for any acts or omissions by you, including any damages of any kind
                 incurred as a result of such acts or omissions.</p>
-            <p>The Argo Books desktop application collects anonymous usage statistics and geographic information
-                by default to help us improve the quality and performance of our desktop software. This includes
-                operational data, API usage, error tracking, session information, and geographic data (country, region,
-                city, timezone) to identify and resolve software issues and optimize performance
-                globally. You can disable this feature at any time in the Settings panel of the application. This data
-                collection is separate from any standard web analytics used on our website. For more information about
-                what data is collected and how it is used, please see our <a class="link" href="privacy.php">Privacy
-                    Policy</a>.</p>
+            <p>The Argo Books desktop application collects anonymous usage data to help us improve Argo Books. We
+                use it to understand how the software is used, identify and fix bugs, diagnose performance issues,
+                prioritize new features, and optimize the app for different regions. This includes operational data,
+                API usage, error tracking, session information, and geographic data (country, region, and timezone).
+                The data is uploaded to our servers when the application is closed. You can view the data collected
+                on your device and delete it from your device at any time through the Settings panel. This data
+                collection is separate from any standard web analytics used on our website. For more information
+                about what data is collected and how it is used, please see our
+                <a class="link" href="privacy.php">Privacy Policy</a>.</p>
 
             <h2>User Content</h2>
             <p>Our Service allows you to post, link, store, share and otherwise make available certain information,
@@ -212,7 +213,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: April 30, 2026</p>
+            <p class="last-updated">Last updated: May 21, 2026</p>
         </div>
     </div>
 

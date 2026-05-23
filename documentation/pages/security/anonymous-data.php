@@ -9,33 +9,26 @@ include __DIR__ . '/../../docs-header.php';
 ?>
 
         <div class="docs-content">
-            <p>Argo Books desktop application collects anonymous usage statistics and geo-location data to help us improve the software by understanding how it's being used, identifying performance issues, and prioritizing new features. This feature is enabled by default.</p>
-
-            <h2>Managing Anonymous Data Collection</h2>
-            <ol class="steps-list">
-                <li>Go to "Settings > General" in the desktop application</li>
-                <li>Scroll to the Privacy section and find the "Anonymous Data Collection" toggle</li>
-                <li>Toggle the switch to disable data collection if desired</li>
-            </ol>
+            <p>Anonymous usage data is collected to help us improve Argo Books. We use it to understand how the software is used, identify and fix bugs, diagnose performance issues, prioritize new features, and optimize the app for different regions.</p>
 
             <h2>What Data is Collected</h2>
-            <p>Only anonymous usage statistics about the desktop application are collected, such as:</p>
+            <p>Only anonymous usage statistics about the desktop application are collected:</p>
             <ul>
                 <li>Export operations (type, duration, file size)</li>
-                <li>API usage (type, duration, tokens)</li>
-                <li>Error tracking (error category, error code, timestamp) - helps us identify and fix software issues</li>
-                <li>Session data (session start/end, duration)</li>
-                <li>Geographic location (country, region, city, timezone)</li>
-                <li>Hashed IP addresses (one-way encrypted, cannot be reversed to identify you)</li>
+                <li>API usage (type, duration, success/failure)</li>
+                <li>Error tracking (error category, exception type)</li>
+                <li>Session data (session start/end, duration, app version, operating system)</li>
+                <li>Geographic location (country, region, timezone)</li>
+                <li>Feature usage (which features are used, e.g., receipt scanned, reports generated)</li>
             </ul>
 
-            <p><strong>No personal information or business data is ever collected.</strong></p>
+            <p><strong>No personal information or business data is ever collected.</strong> Filenames, company names, customer or vendor names, transaction data, document contents, city-level location, and per-user identifiers are never sent.</p>
 
             <h2>Viewing and Deleting Your Data</h2>
-            <p>When data collection is enabled, two buttons appear below the toggle:</p>
+            <p>The Privacy section under <em>Settings &gt; General</em> has two buttons:</p>
             <ul>
-                <li><strong>View Data:</strong> Opens the folder where anonymous telemetry files are stored on your device, so you can review them directly.</li>
-                <li><strong>Delete All Data:</strong> Permanently removes all collected anonymous data from your device.</li>
+                <li><strong>View Data:</strong> Opens the folder where anonymous telemetry files are stored on your device, so you can review them directly. The files are plain JSON.</li>
+                <li><strong>Delete All Data:</strong> Permanently removes all collected anonymous data from your device. Deleting clears the local copy. To also remove data that has already been uploaded to our servers, email <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a> and we will delete it.</li>
             </ul>
 
             <div class="page-navigation">

@@ -14,6 +14,13 @@ $page_description = "View and analyze anonymous user data with geo-location insi
 
 $dataDir = '../data-logs/';
 $errorMessage = '';
+
+// Tier filter: 'all' (default), 'free', 'premium'
+$tierFilter = $_GET['tier'] ?? 'all';
+if (!in_array($tierFilter, ['all', 'free', 'premium'], true)) {
+    $tierFilter = 'all';
+}
+
 $aggregatedData = [
     'dataPoints' => [
         'Export' => [],
@@ -26,21 +33,26 @@ $aggregatedData = [
         'FeatureUsage' => []
     ],
     'geoLocationEnabled' => false,
-    'privacySettings' => [
-        'collectCityData' => true
-    ]
+    'tierFilter' => $tierFilter,
+    // Per-tier user counts computed from ALL files (independent of $tierFilter)
+    'tierStats' => [
+        'free' => ['files' => 0, 'mauUsers' => 0, 'totalUsers' => 0],
+        'premium' => ['files' => 0, 'mauUsers' => 0, 'totalUsers' => 0],
+    ],
 ];
 $fileInfo = [];
 
 // Helper function to normalize event data
-// $sessionMeta contains top-level fields from the compact format
+// $sessionMeta contains top-level fields from the compact format (including tier + authId)
 function normalizeEvent($event, $sessionMeta = []) {
     $normalized = [
         'timestamp' => $event['timestamp'] ?? date('Y-m-d H:i:s'),
         'appVersion' => $event['appVersion'] ?? $sessionMeta['appVersion'] ?? 'Unknown',
         'platform' => $event['platform'] ?? $sessionMeta['platform'] ?? 'Unknown',
         'userAgent' => $event['userAgent'] ?? $sessionMeta['userAgent'] ?? '',
-        'dataType' => $event['dataType'] ?? 'Unknown'
+        'dataType' => $event['dataType'] ?? 'Unknown',
+        'tier' => $sessionMeta['tier'] ?? 'premium',
+        'authId' => $sessionMeta['authId'] ?? '',
     ];
 
     // Geo-location: prefer event-level, fall back to session-level
@@ -51,6 +63,11 @@ function normalizeEvent($event, $sessionMeta = []) {
         $normalized['city'] = $geo['city'] ?? '';
         $normalized['timezone'] = $geo['timezone'] ?? '';
         $normalized['hashedIP'] = $geo['hashedIp'] ?? '';
+    }
+
+    // Fallback user identifier for free-tier events (no hashedIp); use authId as a stable per-device key.
+    if (empty($normalized['hashedIP']) && !empty($normalized['authId'])) {
+        $normalized['hashedIP'] = $normalized['authId'];
     }
 
     return $normalized;
@@ -144,6 +161,13 @@ if (!is_dir($dataDir)) {
         $processedFiles = 0;
         $failedFiles = 0;
 
+        // Track per-tier unique users (from ALL files, regardless of $tierFilter)
+        $tierUsers = [
+            'free' => ['all' => [], 'mau' => []],
+            'premium' => ['all' => [], 'mau' => []],
+        ];
+        $mauThreshold = time() - 30 * 86400;
+
         // Process all JSON files and aggregate the data
         foreach ($dataFiles as $file) {
             $jsonDataRaw = file_get_contents($file);
@@ -163,28 +187,60 @@ if (!is_dir($dataDir)) {
             // Upload payload with events array
             // Compact format: session metadata at top level, events only have unique fields
             if (isset($fileData['events']) && is_array($fileData['events'])) {
+                // Files without an explicit tier (legacy uploads) are treated as premium
+                $fileTier = $fileData['tier'] ?? 'premium';
+                if (!in_array($fileTier, ['free', 'premium'], true)) {
+                    $fileTier = 'premium';
+                }
+                $fileAuthId = $fileData['authId'] ?? '';
+
+                // Always count toward per-tier stats, even if the file is filtered out below
+                $aggregatedData['tierStats'][$fileTier]['files']++;
+
                 // Extract session-level metadata from the top level
                 $sessionMeta = [
                     'appVersion' => $fileData['appVersion'] ?? null,
                     'platform' => $fileData['platform'] ?? null,
                     'userAgent' => $fileData['userAgent'] ?? null,
                     'geoLocation' => $fileData['geoLocation'] ?? null,
+                    'tier' => $fileTier,
+                    'authId' => $fileAuthId,
                 ];
+
+                // Skip files that don't match the active tier filter (UI-only filter; tier stats above are unaffected)
+                $includeFile = $tierFilter === 'all' || $tierFilter === $fileTier;
 
                 foreach ($fileData['events'] as $event) {
                     $result = processEvent($event, $sourceFile, $sessionMeta);
-                    if ($result !== null) {
-                        $category = $result['category'];
-                        $data = $result['data'];
+                    if ($result === null) {
+                        continue;
+                    }
 
-                        if (!isset($aggregatedData['dataPoints'][$category])) {
-                            $aggregatedData['dataPoints'][$category] = [];
-                        }
-                        $aggregatedData['dataPoints'][$category][] = $data;
+                    $data = $result['data'];
 
-                        if (!empty($data['country']) && $data['country'] !== 'Unknown') {
-                            $aggregatedData['geoLocationEnabled'] = true;
+                    // Tier-stats accounting uses ALL events (not filter-gated)
+                    $userKey = !empty($data['hashedIP']) ? $data['hashedIP'] : ($fileAuthId ?: null);
+                    if ($userKey !== null) {
+                        $tierUsers[$fileTier]['all'][$userKey] = true;
+                        $eventTime = strtotime($data['timestamp'] ?? '1970-01-01');
+                        if ($eventTime !== false && $eventTime >= $mauThreshold) {
+                            $tierUsers[$fileTier]['mau'][$userKey] = true;
                         }
+                    }
+
+                    // Per-category dataPoints respect the tier filter
+                    if (!$includeFile) {
+                        continue;
+                    }
+
+                    $category = $result['category'];
+                    if (!isset($aggregatedData['dataPoints'][$category])) {
+                        $aggregatedData['dataPoints'][$category] = [];
+                    }
+                    $aggregatedData['dataPoints'][$category][] = $data;
+
+                    if (!empty($data['country']) && $data['country'] !== 'Unknown') {
+                        $aggregatedData['geoLocationEnabled'] = true;
                     }
                 }
                 $processedFiles++;
@@ -193,6 +249,12 @@ if (!is_dir($dataDir)) {
             else {
                 $failedFiles++;
             }
+        }
+
+        // Finalize per-tier user counts
+        foreach (['free', 'premium'] as $t) {
+            $aggregatedData['tierStats'][$t]['totalUsers'] = count($tierUsers[$t]['all']);
+            $aggregatedData['tierStats'][$t]['mauUsers'] = count($tierUsers[$t]['mau']);
         }
 
         // Store file processing information
@@ -222,8 +284,13 @@ if (!is_dir($dataDir)) {
     }
 }
 
-// Convert aggregated data to JSON for JavaScript
-$jsonData = json_encode($aggregatedData);
+// Convert aggregated data to JSON for JavaScript. Escape HTML-meaningful characters
+// (<, >, &, ', ") as \u00xx so a telemetry string containing "</script>" cannot break
+// out of the inline <script> context where this is emitted.
+$jsonData = json_encode(
+    $aggregatedData,
+    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES
+);
 
 // Include the shared header
 include __DIR__ . '/../admin_header.php';
@@ -355,27 +422,56 @@ include __DIR__ . '/../admin_header.php';
 </style>
 
 <div class="container">
+    <?php
+    $hasAnyData = !$errorMessage && ($fileInfo['total_files'] ?? 0) > 0;
+    $currentViewHasData = !empty($aggregatedData['dataPoints']) && (
+        count($aggregatedData['dataPoints']['Export']) > 0 ||
+        count($aggregatedData['dataPoints']['Gemini']) > 0 ||
+        count($aggregatedData['dataPoints']['OpenExchangeRates']) > 0 ||
+        count($aggregatedData['dataPoints']['GoogleSheets']) > 0 ||
+        count($aggregatedData['dataPoints']['ReceiptScanning']) > 0 ||
+        count($aggregatedData['dataPoints']['Session']) > 0 ||
+        count($aggregatedData['dataPoints']['Error']) > 0 ||
+        count($aggregatedData['dataPoints']['FeatureUsage']) > 0
+    );
+    ?>
+
+    <?php if ($hasAnyData): ?>
+        <div class="tier-filter-bar" style="display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; flex-wrap: wrap;">
+            <span style="font-weight: 600; color: var(--text-secondary, #6b7280); margin-right: 4px;">Tier:</span>
+            <?php
+                $tierLabels = [
+                    'all' => 'All',
+                    'free' => 'Free (' . number_format($aggregatedData['tierStats']['free']['files']) . ')',
+                    'premium' => 'Premium (' . number_format($aggregatedData['tierStats']['premium']['files']) . ')',
+                ];
+                foreach ($tierLabels as $tierKey => $label):
+                    $isActive = $tierFilter === $tierKey;
+            ?>
+                <a href="?tier=<?= $tierKey ?>"
+                   class="tier-pill <?= $isActive ? 'active' : '' ?>"
+                   style="padding: 6px 14px; border-radius: 999px; text-decoration: none; font-size: 0.85rem; font-weight: 500; border: 1px solid <?= $isActive ? 'var(--accent, #3b82f6)' : 'var(--border, #e5e7eb)' ?>; background: <?= $isActive ? 'var(--accent, #3b82f6)' : 'transparent' ?>; color: <?= $isActive ? '#fff' : 'var(--text-primary, #374151)' ?>;">
+                    <?= htmlspecialchars($label) ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
     <?php if ($errorMessage): ?>
         <div class="no-data">
             <h3>No Data Available</h3>
             <p><?= htmlspecialchars($errorMessage) ?></p>
             <p><small>Make sure the data directory exists and contains valid JSON files at: <code>admin/data-logs/</code></small></p>
         </div>
-    <?php elseif (
-        empty($aggregatedData['dataPoints']) ||
-        (count($aggregatedData['dataPoints']['Export']) == 0 &&
-            count($aggregatedData['dataPoints']['Gemini']) == 0 &&
-            count($aggregatedData['dataPoints']['OpenExchangeRates']) == 0 &&
-            count($aggregatedData['dataPoints']['GoogleSheets']) == 0 &&
-            count($aggregatedData['dataPoints']['ReceiptScanning']) == 0 &&
-            count($aggregatedData['dataPoints']['Session']) == 0 &&
-            count($aggregatedData['dataPoints']['Error']) == 0 &&
-            count($aggregatedData['dataPoints']['FeatureUsage']) == 0)
-    ): ?>
+    <?php elseif (!$currentViewHasData): ?>
         <div class="no-data">
             <h3>No Data Available</h3>
-            <p>No anonymous data has been collected yet. Data will appear here once users start using the application and uploading their analytics.</p>
-            <p><small>Data files are automatically uploaded to: <code>admin/data-logs/</code></small></p>
+            <?php if ($tierFilter !== 'all'): ?>
+                <p>No <?= htmlspecialchars($tierFilter) ?>-tier data has been collected yet. Switch to a different tier above.</p>
+            <?php else: ?>
+                <p>No anonymous data has been collected yet. Data will appear here once users start using the application and uploading their analytics.</p>
+                <p><small>Data files are automatically uploaded to: <code>admin/data-logs/</code></small></p>
+            <?php endif; ?>
         </div>
     <?php else: ?>
         <div class="data-info">
@@ -384,6 +480,9 @@ include __DIR__ . '/../admin_header.php';
             (<?= $fileInfo['total_files'] ?> total files)
             <?php if ($fileInfo['failed_files'] > 0): ?>
                 | <?= $fileInfo['failed_files'] ?> files failed to process
+            <?php endif; ?>
+            <?php if ($tierFilter !== 'all'): ?>
+                | <strong>Filter:</strong> <?= htmlspecialchars(ucfirst($tierFilter)) ?> tier only
             <?php endif; ?>
             <br>
             <strong>Latest Data:</strong> <?= date('M j, Y g:i A', $fileInfo['latest_modified']) ?>
@@ -429,6 +528,19 @@ include __DIR__ . '/../admin_header.php';
                         <h3>Active This Month</h3>
                         <div class="value" id="kpiMAU">—</div>
                         <p class="subtext">Last 30 days</p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Free Users (MAU)</h3>
+                        <div class="value"><?= number_format($aggregatedData['tierStats']['free']['mauUsers']) ?></div>
+                        <p class="subtext"><?= number_format($aggregatedData['tierStats']['free']['totalUsers']) ?> total · last 30 days</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Premium Users (MAU)</h3>
+                        <div class="value"><?= number_format($aggregatedData['tierStats']['premium']['mauUsers']) ?></div>
+                        <p class="subtext"><?= number_format($aggregatedData['tierStats']['premium']['totalUsers']) ?> total · last 30 days</p>
                     </div>
                 </div>
 
@@ -720,3 +832,18 @@ include __DIR__ . '/../admin_header.php';
 window.dashboardData = <?= $jsonData ?>;
 </script>
 <script src="main.js"></script>
+
+<script>
+// Preserve scroll position when switching tier filter (shared admin pattern; see CLAUDE.md)
+document.addEventListener('DOMContentLoaded', function () {
+    if (sessionStorage.getItem('scrollPosition')) {
+        window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
+        sessionStorage.removeItem('scrollPosition');
+    }
+    document.querySelectorAll('a.tier-pill').forEach(function (link) {
+        link.addEventListener('click', function () {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+        });
+    });
+});
+</script>

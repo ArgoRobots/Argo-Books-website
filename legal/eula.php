@@ -118,23 +118,28 @@
 
             <h2>4. Anonymous Data Collection</h2>
 
-            <h3>4.1 Error & Crash Reporting</h3>
-            <p>The primary purpose of anonymous data collection is to identify and fix errors, crashes, and
-                performance issues that users encounter. When something goes wrong, the Software captures diagnostic
-                information so we can reproduce and resolve the problem. This data collection is enabled by default
-                but can be disabled in the Settings panel. Data collected includes:</p>
+            <h3>4.1 What We Collect and Why</h3>
+            <p>Anonymous usage data is collected to help us improve Argo Books. We use it to understand how the
+                software is used, identify and fix bugs, diagnose performance issues, prioritize new features, and
+                optimize the app for different regions. Anonymous data collection is a built-in part of the Software.
+                Data collected includes:</p>
             <ul>
-                <li>Error and crash reports (error category, error code, stack trace, timestamp, and anonymous context information)</li>
+                <li>Error and crash reports (error category, exception type, source filename, line number, and method
+                    name; the error message text itself is never sent)</li>
                 <li>Performance diagnostics (slow operations, failed exports, API timeouts)</li>
-                <li>Session data (application version, session duration) to help us identify version-specific issues</li>
-                <li>Geographic information (country, region, city, timezone) to detect region-specific problems</li>
-                <li>Hashed IP addresses (one-way encrypted, cannot be used to identify you)</li>
+                <li>Session data (application version, session duration, operating system) to help us
+                    identify version- and platform-specific issues</li>
+                <li>Geographic information (country, region, timezone)</li>
             </ul>
+            <p>The Software does not collect any financial, transactional, customer, vendor, company, or document
+                content data, nor any city-level location data or per-user identifier. Your IP address is visible to
+                our server during the upload itself (as with any web request) but is not stored in the collected data.</p>
 
             <h3>4.2 Storage and Control</h3>
-            <p>All anonymous data is stored locally on your device. No data is sent to our servers without your
-                permission. You can export and delete this data at any time through the Settings panel. Geographic data
-                helps us understand our global user base and optimize the Software for different regions.</p>
+            <p>Anonymous data is recorded on your device during use and uploaded to our servers when the application
+                is closed. You can view the local copy of this data, and delete it from your device, at any time
+                through the Settings panel. Geographic data helps us understand our global user base and optimize the
+                Software for different regions.</p>
 
             <h2>5. Third-Party Services</h2>
             <p>The Software may use third-party services for certain functionality, including but not limited to Google
@@ -185,7 +190,7 @@
                 <li>Email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: March 17, 2026</p>
+            <p class="last-updated">Last updated: May 21, 2026</p>
         </div>
     </div>
 

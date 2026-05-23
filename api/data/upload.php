@@ -4,6 +4,7 @@ session_start();
 // Load environment variables from .env file
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/telemetry_filter.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
 $dotenv->load();
@@ -15,45 +16,107 @@ header('X-XSS-Protection: 1; mode=block');
 header('Content-Type: application/json');
 
 // Configuration
-define('MAX_FILE_SIZE', 10 * 1024 * 1024); // 10MB max
+define('MAX_FILE_SIZE_PREMIUM', 10 * 1024 * 1024); // 10MB max for Premium uploads
+define('MAX_FILE_SIZE_FREE', 256 * 1024);          // 256KB max for free-tier uploads
 define('ALLOWED_MIME_TYPES', ['application/json', 'text/plain']);
 define('DATA_DIR', __DIR__ . '/../../admin/data-logs');
-define('MAX_UPLOADS_PER_HOUR', 100); // Rate limiting
+define('MAX_UPLOADS_PER_HOUR_PREMIUM', 100);
+define('MAX_UPLOADS_PER_HOUR_FREE', 6);
+// Coarse per-IP cap for free tier so rotating X-Device-Id values from a single IP
+// cannot bypass the per-(device,IP) limit. Set high enough to cover legitimate
+// shared NATs (a household, a small office) but low enough to block abuse.
+define('MAX_UPLOADS_PER_HOUR_FREE_PER_IP', 60);
 define('MAX_FILENAME_LENGTH', 255);
 
-// Rate limiting check (enhanced with authentication)
-function checkRateLimit($authIdentifier = null)
+/**
+ * Atomic check-and-bump on a single rate-limit bucket. Held under an exclusive
+ * file lock so concurrent requests cannot both see "under the limit" and both
+ * succeed past it. Returns true if the bump was accepted, false if the bucket
+ * is full.
+ */
+function checkBucket(string $bucketKey, int $maxPerHour): bool
 {
-    // Use auth identifier in rate limiting to prevent key sharing abuse
-    $api_key = $authIdentifier ?? $_SERVER['HTTP_X_LICENSE_KEY'] ?? 'unknown';
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $rate_key = hash('sha256', $api_key . $ip); // Combine auth identifier and IP for rate limiting
-    $rate_file = sys_get_temp_dir() . '/upload_rate_' . $rate_key;
-
-    $current_time = time();
-    $uploads = [];
-
-    // Read existing rate data
-    if (file_exists($rate_file)) {
-        $data = file_get_contents($rate_file);
-        $uploads = json_decode($data, true) ?: [];
+    $rate_file = sys_get_temp_dir() . '/upload_rate_' . hash('sha256', $bucketKey);
+    $handle = fopen($rate_file, 'c+');
+    if (!$handle) {
+        // Fail open if we can't access the temp file; surface as success so we
+        // don't block uploads on local I/O issues.
+        return true;
+    }
+    if (!flock($handle, LOCK_EX)) {
+        fclose($handle);
+        return true;
     }
 
-    // Remove uploads older than 1 hour
-    $uploads = array_filter($uploads, function ($timestamp) use ($current_time) {
-        return ($current_time - $timestamp) < 3600;
-    });
+    try {
+        $content = stream_get_contents($handle);
+        $uploads = json_decode($content ?: '[]', true) ?: [];
 
-    // Check if rate limit exceeded
-    if (count($uploads) >= MAX_UPLOADS_PER_HOUR) {
+        $current_time = time();
+        $uploads = array_values(array_filter($uploads, function ($timestamp) use ($current_time) {
+            return ($current_time - $timestamp) < 3600;
+        }));
+
+        if (count($uploads) >= $maxPerHour) {
+            return false;
+        }
+
+        $uploads[] = $current_time;
+
+        ftruncate($handle, 0);
+        rewind($handle);
+        fwrite($handle, json_encode($uploads));
+        fflush($handle);
+
+        return true;
+    } finally {
+        flock($handle, LOCK_UN);
+        fclose($handle);
+    }
+}
+
+/**
+ * Per-tier rate limit check. Free tier gets a per-(device,IP) cap plus a coarser
+ * per-IP cap as defense against device-ID rotation. Premium tier is keyed only on
+ * (subscription,IP) since license keys are server-verified and can't be rotated
+ * the same way.
+ */
+function checkRateLimit(string $authIdentifier, int $maxPerHour, ?int $ipMaxPerHour = null): bool
+{
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+
+    if (!checkBucket($authIdentifier . '|' . $ip, $maxPerHour)) {
         return false;
     }
-
-    // Add current upload
-    $uploads[] = $current_time;
-    file_put_contents($rate_file, json_encode($uploads));
-
+    if ($ipMaxPerHour !== null && !checkBucket('ip:' . $ip, $ipMaxPerHour)) {
+        return false;
+    }
     return true;
+}
+
+/**
+ * Authenticate a telemetry upload as either Premium (license key) or Free (device ID).
+ * Returns ['tier' => 'premium'|'free', 'authId' => string] on success, null on failure.
+ */
+function authenticate_telemetry_request(): ?array
+{
+    $license = authenticate_license_request();
+    if ($license !== null) {
+        return [
+            'tier' => 'premium',
+            'authId' => 'subscription:' . ($license['subscription_id'] ?? 'unknown'),
+        ];
+    }
+
+    $deviceHash = authenticate_device_request();
+    if ($deviceHash !== null) {
+        return [
+            'tier' => 'free',
+            'authId' => 'device:' . $deviceHash,
+        ];
+    }
+
+    return null;
 }
 
 // Validate JSON content
@@ -119,21 +182,27 @@ try {
         exit;
     }
 
-    // Authenticate request using license key (the desktop app sends its license key)
-    $license = authenticate_license_request();
-    if (!$license) {
+    // Authenticate: try Premium (license key) first, then Free (device ID)
+    $auth = authenticate_telemetry_request();
+    if ($auth === null) {
         http_response_code(401);
         echo json_encode(['error' => 'Unauthorized']);
-        logSecurityEvent('invalid_license_key');
+        logSecurityEvent('invalid_auth');
         exit;
     }
 
-    // Rate limiting check — use subscription ID for rate limiting bucket
-    $subscriptionId = $license['subscription_id'] ?? null;
-    if (!checkRateLimit($subscriptionId ? 'subscription:' . $subscriptionId : null)) {
+    $tier = $auth['tier'];
+    $authId = $auth['authId'];
+    $maxFileSize = $tier === 'premium' ? MAX_FILE_SIZE_PREMIUM : MAX_FILE_SIZE_FREE;
+    $maxPerHour = $tier === 'premium' ? MAX_UPLOADS_PER_HOUR_PREMIUM : MAX_UPLOADS_PER_HOUR_FREE;
+    // Free tier also gets a coarse per-IP cap so device-ID rotation can't bypass the per-device limit.
+    $ipMaxPerHour = $tier === 'free' ? MAX_UPLOADS_PER_HOUR_FREE_PER_IP : null;
+
+    // Rate limiting check (bucket keyed on tier-specific authId, with optional per-IP secondary)
+    if (!checkRateLimit($authId, $maxPerHour, $ipMaxPerHour)) {
         http_response_code(429);
         echo json_encode(['error' => 'Rate limit exceeded']);
-        logSecurityEvent('rate_limit_exceeded');
+        logSecurityEvent('rate_limit_exceeded', $tier);
         exit;
     }
 
@@ -148,11 +217,11 @@ try {
 
     $uploaded_file = $_FILES['file'];
 
-    // Validate file size
-    if ($uploaded_file['size'] > MAX_FILE_SIZE) {
+    // Validate file size (per-tier)
+    if ($uploaded_file['size'] > $maxFileSize) {
         http_response_code(413);
-        echo json_encode(['error' => 'File too large', 'max_size' => MAX_FILE_SIZE]);
-        logSecurityEvent('file_too_large', $uploaded_file['size']);
+        echo json_encode(['error' => 'File too large', 'max_size' => $maxFileSize]);
+        logSecurityEvent('file_too_large', $uploaded_file['size'] . ' tier=' . $tier);
         exit;
     }
 
@@ -192,6 +261,30 @@ try {
         exit;
     }
 
+    // Decode payload so we can tag it with tier/authId and (for free) apply allowlist
+    $payload = json_decode($content, true);
+    if (!is_array($payload)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid payload structure']);
+        logSecurityEvent('invalid_payload_structure');
+        exit;
+    }
+
+    // Rebuild payload from scratch using server-side allowlist (applied to both tiers
+    // so the on-the-wire shape is identical regardless of subscription status).
+    $payload = filter_telemetry_payload($payload);
+
+    // Server-injected tier + authId always override anything in the uploaded payload
+    unset($payload['tier'], $payload['authId']);
+    $tagged = ['tier' => $tier, 'authId' => $authId] + $payload;
+    $content = json_encode($tagged);
+    if ($content === false) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to encode payload']);
+        logSecurityEvent('encode_failure');
+        exit;
+    }
+
     // Create secure directory if needed
     if (!is_dir(DATA_DIR)) {
         if (!mkdir(DATA_DIR, 0755, true)) {
@@ -206,10 +299,10 @@ try {
         file_put_contents(DATA_DIR . '/.htaccess', $htaccess_content);
     }
 
-    // Generate secure filename
+    // Generate secure filename. Prefix encodes tier so admin can filter at the directory level.
     $timestamp = date('Ymd_His');
     $random_suffix = bin2hex(random_bytes(4));
-    $filename = DATA_DIR . "/argo_data_{$timestamp}_{$random_suffix}.json";
+    $filename = DATA_DIR . "/argo_data_{$tier}_{$timestamp}_{$random_suffix}.json";
 
     // Ensure filename doesn't already exist
     $counter = 1;

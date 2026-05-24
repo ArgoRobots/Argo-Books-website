@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 320" font-family="'Segoe UI Variable','Segoe UI',system-ui,sans-serif" role="img" aria-label="Microsoft Edge SmartScreen dialog with the Keep anyway option open">
+  <defs>
+    <filter id="panel-shadow" x="-10%" y="-5%" width="120%" height="115%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+    <filter id="menu-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="380" height="320" fill="#ffffff"/>
+
+  <!-- Dialog card -->
+  <rect x="14" y="18" width="352" height="260" rx="12" fill="#ffffff" stroke="#d6d6d6" stroke-width="1"/>
+
+  <!-- Close X -->
+  <g transform="translate(334,38)" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round">
+    <line x1="0" y1="0" x2="10" y2="10"/>
+    <line x1="10" y1="0" x2="0" y2="10"/>
+  </g>
+
+  <!-- Title -->
+  <text x="32" y="62" font-size="15" font-weight="700" fill="#1a1a1a">
+    <tspan x="32" dy="0">Make sure you trust Argo Books</tspan>
+    <tspan x="32" dy="22">Installer.exe before you open it</tspan>
+  </text>
+
+  <!-- Description -->
+  <text x="32" y="120" font-size="12" fill="#3a3a3a">
+    <tspan x="32" dy="0">Microsoft Defender SmartScreen couldn't verify</tspan>
+    <tspan x="32" dy="16">if this file is safe because it isn't commonly</tspan>
+    <tspan x="32" dy="16">downloaded. Make sure you trust the file you're</tspan>
+    <tspan x="32" dy="16">downloading or its source before you open it.</tspan>
+  </text>
+
+  <!-- Blue action links -->
+  <text x="32" y="204" font-size="12.5" fill="#0067c0">Report this app as safe</text>
+  <text x="32" y="226" font-size="12.5" fill="#0067c0">Learn more</text>
+
+  <!-- Cancel button (white, slightly rounded) -->
+  <rect x="178" y="240" width="70" height="28" rx="4" fill="#ffffff" stroke="#cfcfcf" stroke-width="1"/>
+  <text x="213" y="259" text-anchor="middle" font-size="13" fill="#1a1a1a">Cancel</text>
+
+  <!-- Delete split-button (dark, slightly rounded, chevron inside) -->
+  <rect x="258" y="240" width="82" height="28" rx="4" fill="#1a1a1a"/>
+  <text x="270" y="259" font-size="13" fill="#ffffff">Delete</text>
+  <path d="M319 251 l6 6 l6 -6" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- "Keep anyway" popover (target — outer rect matches Delete's x/width exactly (258, 82) and touches Delete's bottom edge at y=268 with no gap; no drop shadow) -->
+  <rect x="258" y="268" width="82" height="36" rx="6" fill="#0078d4"/>
+  <rect x="259.5" y="269.5" width="79" height="33" rx="5" fill="#ffffff"/>
+  <text x="299" y="290" text-anchor="middle" font-size="12" fill="#0067c0" font-weight="600">Keep anyway</text>
+</svg>

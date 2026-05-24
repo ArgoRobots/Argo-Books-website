@@ -93,6 +93,51 @@ function formatFileSize($bytes)
 
 $latestVersion = getLatestVersion();
 $systemRequirements = getSystemRequirements();
+
+// Detect browser for SmartScreen guide (Windows downloads only)
+function detectBrowserForGuide(): string
+{
+    $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+    $chUa = $_SERVER['HTTP_SEC_CH_UA'] ?? '';
+
+    if (stripos($chUa, 'Brave') !== false) return 'brave';
+    if (stripos($ua, 'Edg/') !== false) return 'edge';
+    if (stripos($ua, 'OPR/') !== false || stripos($ua, 'Opera/') !== false) return 'opera';
+    if (stripos($ua, 'Vivaldi/') !== false) return 'vivaldi';
+    if (stripos($ua, 'Firefox/') !== false) return 'firefox';
+    if (stripos($ua, 'Chrome/') !== false) return 'chrome';
+    return 'unknown';
+}
+
+// Browser-specific walkthroughs for the SmartScreen / download warning.
+// Add more browsers by dropping a key here + saving screenshots to
+// resources/images/smartscreen-guide/<browser>-step-N.svg.
+$smartScreenGuides = [
+    'edge' => [
+        'browser_name' => 'Microsoft Edge',
+        'intro' => 'Edge will ask you to confirm this download. This is a normal extra step for new app. Here\'s how to keep the installer:',
+        'steps' => [
+            [
+                'title' => 'Open the Downloads panel, hover the file, and click the ⋯ menu',
+                'image' => '../resources/images/smartscreen-guide/edge-step-1.svg',
+                'alt'   => 'Edge Downloads panel showing the Argo Books installer with the more-options menu',
+            ],
+            [
+                'title' => 'Choose Keep from the menu',
+                'image' => '../resources/images/smartscreen-guide/edge-step-2.svg',
+                'alt'   => 'Edge download menu with the Keep option highlighted',
+            ],
+            [
+                'title' => 'Click the arrow next to Delete, then choose Keep anyway',
+                'image' => '../resources/images/smartscreen-guide/edge-step-3.svg',
+                'alt'   => 'Edge confirmation dialog with the Keep anyway button',
+            ],
+        ],
+    ],
+];
+
+$browserKey = detectBrowserForGuide();
+$smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -240,6 +285,31 @@ $systemRequirements = getSystemRequirements();
             </div>
         </div>
 
+        <!-- SmartScreen / browser download warning guide -->
+        <?php if ($smartScreenGuide): ?>
+        <div class="smartscreen-guide" id="smartScreenGuide" data-browser="<?php echo htmlspecialchars($browserKey); ?>" hidden>
+            <div class="smartscreen-guide-header">
+                <div class="smartscreen-status">
+                    <?= svg_icon('check', 16) ?>
+                    <span>Your download is starting</span>
+                </div>
+                <h2><?php echo htmlspecialchars($smartScreenGuide['browser_name']); ?> has an extra confirmation step</h2>
+                <p><?php echo htmlspecialchars($smartScreenGuide['intro']); ?></p>
+            </div>
+            <ol class="smartscreen-steps">
+                <?php foreach ($smartScreenGuide['steps'] as $i => $step): ?>
+                <li class="smartscreen-step">
+                    <div class="smartscreen-step-number"><?php echo $i + 1; ?></div>
+                    <p class="smartscreen-step-title"><?php echo htmlspecialchars($step['title']); ?></p>
+                    <div class="smartscreen-step-image">
+                        <img src="<?php echo htmlspecialchars($step['image']); ?>" alt="<?php echo htmlspecialchars($step['alt']); ?>" loading="lazy">
+                    </div>
+                </li>
+                <?php endforeach; ?>
+            </ol>
+        </div>
+        <?php endif; ?>
+
         <!-- System Requirements -->
         <div class="requirements-section">
             <h2>System Requirements</h2>
@@ -300,7 +370,9 @@ $systemRequirements = getSystemRequirements();
     </footer>
 
     <script>
-        // Add download tracking
+        const smartScreenGuide = document.getElementById('smartScreenGuide');
+
+        // Add download tracking + reveal SmartScreen guide for Windows downloads
         document.querySelectorAll('.download-btn:not(.disabled)').forEach(function(btn) {
             btn.addEventListener('click', function(e) {
                 const platform = this.getAttribute('data-platform');
@@ -309,6 +381,18 @@ $systemRequirements = getSystemRequirements();
                         'event_category': 'software',
                         'event_label': 'argo_books_' + platform,
                         'platform': platform
+                    });
+                }
+
+                if (platform === 'windows' && smartScreenGuide) {
+                    smartScreenGuide.hidden = false;
+                    requestAnimationFrame(function() {
+                        smartScreenGuide.classList.add('is-visible');
+                        setTimeout(function() {
+                            const targetY = smartScreenGuide.getBoundingClientRect().top
+                                + window.pageYOffset - 130;
+                            window.scrollTo({ top: targetY, behavior: 'smooth' });
+                        }, 120);
                     });
                 }
             });

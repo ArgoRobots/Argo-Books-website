@@ -8,11 +8,11 @@ Every push to the `main` branch triggers `.github/workflows/deploy.yml`, which u
 2. **Determine changed files**: runs `git diff HEAD~1 HEAD` to figure out:
    - `mode`: `incremental` (normal pushes) or `full` (first commit or manually-triggered full deploy).
    - `composer_changed`: whether `composer.json` or `composer.lock` changed in this commit.
-3. **Cache + install Composer deps** (only if `composer_changed = true`) — restores `vendor/` from the GitHub Actions cache keyed on `composer.lock`'s hash, then runs `composer install --no-dev --optimize-autoloader`. Skipped entirely on pushes that don't touch composer files.
+3. **Cache + install Composer deps** (only if `composer_changed = true`). Restores `vendor/` from the GitHub Actions cache keyed on `composer.lock`'s hash, then runs `composer install --no-dev --optimize-autoloader`. Skipped entirely on pushes that don't touch composer files.
 4. **Setup SSH + install lftp**: preps the connection to the server.
 5. **Upload**: runs the matching deploy step:
    - **Incremental:** uploads only files that changed in this commit. Deletes files that were deleted. Mirrors `vendor/` only if `composer_changed = true`.
-   - **Full mirror:** uploads everything (with a small exclude list — see below).
+   - **Full mirror:** uploads everything (with a small exclude list; see below).
 
 Both modes deploy to **production** AND **dev** in the same run.
 
@@ -24,7 +24,7 @@ Everything in `.gitignore` is automatically skipped (it's not in the runner's ch
 - `README.md`, `CLAUDE.md`, `read-me/`
 - `composer.json`, `composer.lock` (the runner uses them, but they don't go to the server)
 - `mysql_schema.sql`
-- `phpunit.xml`, `tests/` (PHPUnit suite — local-only)
+- `phpunit.xml`, `tests/` (PHPUnit suite, local-only)
 - `.ftp-deploy-sync-state.json`
 
 ## Forcing a full re-upload

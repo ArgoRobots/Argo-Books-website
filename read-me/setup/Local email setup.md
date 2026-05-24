@@ -12,7 +12,7 @@ When running the Argo Books website locally on Laragon, PHP's `mail()` function 
 
 ### 2. Create and configure php.ini
 
-Laragon doesn't ship with a `php.ini` by default — only template files. You need to create one first:
+Laragon doesn't ship with a `php.ini` by default, only template files. You need to create one first:
 
 1. Open your Laragon PHP folder (e.g. `C:\laragon\bin\php\php-8.x.x-nts-Win32-vs17-x64`)
 2. Copy `php.ini-development` and rename the copy to `php.ini`
@@ -25,7 +25,7 @@ smtp_port=1025
 sendmail_from = noreply@localhost
 ```
 
-Make sure `sendmail_path` is commented out (has a `;` in front of it). On Windows, PHP uses `SMTP` and `smtp_port` directly — no sendmail needed.
+Make sure `sendmail_path` is commented out (has a `;` in front of it). On Windows, PHP uses `SMTP` and `smtp_port` directly. No sendmail needed.
 
 ### 3. Run MailHog
 
@@ -59,7 +59,7 @@ PHP mail() → SMTP localhost:1025 → MailHog → Web UI (port 8025)
    ```php
    <?php phpinfo();
    ```
-   Open it in your browser and search for "Loaded Configuration File" — it should show the path to your `php.ini`. Also check that `SMTP` shows `localhost` and `smtp_port` shows `1025`.
+   Open it in your browser and search for "Loaded Configuration File". It should show the path to your `php.ini`. Also check that `SMTP` shows `localhost` and `smtp_port` shows `1025`.
 
 3. **Test PHP mail directly:** Create `test_mail.php` in your project root:
    ```php

@@ -53,7 +53,7 @@ From here you can:
 - **Add a lead manually** or import a CSV spreadsheet.
 - **Open a lead** to see the AI-generated email, edit the draft before it's sent, or mark the conversation status (interested / not interested / onboarded / replied).
 - **Bulk-generate drafts** or **bulk-send emails** for a group of leads you've selected.
-- **See the full activity history** for any lead — every draft, every send, every click.
+- **See the full activity history** for any lead: every draft, every send, every click.
 
 Every outreach email's `argorobots.com` link is rewritten to include a `?source=outreach-{leadId}` parameter (plus `-v{variantId}` when the lead was assigned to an A/B variant). Hits land in `referral_visits` and show up on the A/B table as "Clicked" automatically.
 
@@ -107,7 +107,7 @@ Each test has 2–4 variants. The way variant content is interpreted depends on 
   - **A literal value**: used exactly as written for every email in that variant. Good for "I have specific wording I want to try."
   - **A style directive** prefixed with `directive:` (e.g. `directive: ask a curiosity question referencing their city`). The AI generates fresh content in that style for each lead. Good for testing *kinds* of writing, not specific wordings. Anything without the prefix is treated as a literal.
 - **Sender / preheader** are always literal strings.
-- **Format / personalization** use a fixed two-variant template (`html` vs `plain`, `on` vs `off`). The form fills these automatically when you pick the type — you don't author them.
+- **Format / personalization** use a fixed two-variant template (`html` vs `plain`, `on` vs `off`). The form fills these automatically when you pick the type. You don't author them.
 
 When you create a test by hand, the form adapts to the type you pick. When the system creates a test automatically, it uses directives for subject (so they generalise across different businesses) or the fixed pool for sender / format / personalization.
 
@@ -158,7 +158,7 @@ A/B automation runs unconditionally whenever the outreach system is enabled. The
 
 Each lead receives a sequence of emails. By default the first email plus 3 follow-ups (4 total), spaced +3, +7, +14 days after the first email. The count and gaps are configurable in Settings.
 
-- **First email** — short (2–3 short paragraphs, under 100 words), AI-personalized to the lead's category and city. Includes a tracked argorobots.com link and a soft one-line unsubscribe.
-- **Follow-ups** — also AI-personalized, threaded as `Re:` replies to the original so they land in the recipient's existing inbox conversation rather than as fresh emails. Each touch has its own intent (gentle bump / different angle / final note before closing), so the sequence doesn't read as the same email three times.
+- **First email**: short (2–3 short paragraphs, under 100 words), AI-personalized to the lead's category and city. Includes a tracked argorobots.com link and a soft one-line unsubscribe.
+- **Follow-ups**: also AI-personalized, threaded as `Re:` replies to the original so they land in the recipient's existing inbox conversation rather than as fresh emails. Each touch has its own intent (gentle bump / different angle / final note before closing), so the sequence doesn't read as the same email three times.
 
 The sequence automatically halts when the lead replies, unsubscribes, hard-bounces, or you manually halt it. Halted sequences sit in the Follow-ups tab's Halted/failed sub-view for the record.

@@ -85,8 +85,8 @@ php /home/argorobots/public_html/cron/account_purge.php
 
 | Variable | Default | Description |
 |---|---|---|
-| `GOOGLE_PLACES_API_KEY` | — | Required for business discovery. Must have **Places API (New)** enabled in Google Cloud Console (uses `places.googleapis.com/v1/places:searchText`, not the legacy `maps.googleapis.com/maps/api/place/...` endpoints). |
-| `GEMINI_API_KEY` | — | Required for AI draft generation |
+| `GOOGLE_PLACES_API_KEY` | (required) | Required for business discovery. Must have **Places API (New)** enabled in Google Cloud Console (uses `places.googleapis.com/v1/places:searchText`, not the legacy `maps.googleapis.com/maps/api/place/...` endpoints). |
+| `GEMINI_API_KEY` | (required) | Required for AI draft generation |
 | `OUTREACH_DAILY_SEND_LIMIT` | 10 | Max first-touch emails sent per day (also controls discovery and draft batch sizes) |
 | `OUTREACH_DAILY_FOLLOWUP_LIMIT` | 30 | Max follow-up emails sent per day (separate cap, oldest-due first) |
 
@@ -140,10 +140,10 @@ Admins can then manually classify replied leads as `interested` or `not_interest
 
 | Variable | Default | Description |
 |---|---|---|
-| `IMAP_HOST` | — | e.g. `mail.argorobots.com` |
+| `IMAP_HOST` | (required) | e.g. `mail.argorobots.com` |
 | `IMAP_PORT` | 993 | IMAP SSL port |
-| `IMAP_USERNAME` | — | Full email address (e.g. `contact@argorobots.com`) |
-| `IMAP_PASSWORD` | — | Mailbox password or app password |
+| `IMAP_USERNAME` | (required) | Full email address (e.g. `contact@argorobots.com`) |
+| `IMAP_PASSWORD` | (required) | Mailbox password or app password |
 | `IMAP_MAILBOX` | INBOX | Folder to check |
 
 ### Manual Execution
@@ -222,7 +222,7 @@ Queries Stripe for refund requests stuck in `processing` for more than 30 minute
 
 ### What It Does
 
-Refreshes `refund_velocity_baselines` per company so the established-account hard-block tier (≥ 50% of trailing 30-day revenue) has accurate inputs. If baselines drift out of date, the refund safety check fires too often or not enough — see the [Hard-Block Response Procedure](procedures/Refund%20block%20response%20procedure.md) for symptoms.
+Refreshes `refund_velocity_baselines` per company so the established-account hard-block tier (≥ 50% of trailing 30-day revenue) has accurate inputs. If baselines drift out of date, the refund safety check fires too often or not enough. See the [Hard-Block Response Procedure](procedures/Refund%20block%20response%20procedure.md) for symptoms.
 
 ---
 
@@ -245,11 +245,11 @@ Refreshes `refund_velocity_baselines` per company so the established-account har
 6. Marks borderline (6–7) threads as `drafted_pending` for on-demand drafting in the admin UI
 7. Auto-expires drafted threads older than 3 days
 
-Manual posting only — the cron does NOT post anything to Reddit. Drafts are reviewed and copy-pasted manually by the founder.
+Manual posting only. The cron does NOT post anything to Reddit. Drafts are reviewed and copy-pasted manually by the founder.
 
 ### Environment Variables
 
-Default mode is **unauthenticated** — no app, no OAuth, no policy gate. Fill in the `REDDIT_*` vars later to upgrade to OAuth without code changes.
+Default mode is **unauthenticated**: no app, no OAuth, no policy gate. Fill in the `REDDIT_*` vars later to upgrade to OAuth without code changes.
 
 | Variable | Required | Description |
 |---|---|---|
@@ -259,7 +259,7 @@ Default mode is **unauthenticated** — no app, no OAuth, no policy gate. Fill i
 | `REDDIT_USERNAME` | optional | Reddit account that will post. If set without the OAuth pair, used purely as the User-Agent identifier and for the admin "your account stats" card. |
 | `REDDIT_PASSWORD` | optional | Account password. Required only for OAuth mode. |
 
-**Endpoint behaviour (unauth mode):** Reddit's JSON endpoints are aggressively IP-blocked from datacenter hosts (returns 403). To work around this, the helpers fetch discovery-shaped paths (`/r/X/new`, `/search`) via Reddit's RSS feed at the `.rss` suffix and parse the Atom XML back into the JSON listing shape — those endpoints are typically not IP-blocked. Endpoints with no RSS counterpart (`/api/info`, `/user/X/about`) still go to JSON and will silently 403 from blocked IPs, meaning the **reply-status check** and **account-info card** require OAuth to function. Discovery + drafting work either way.
+**Endpoint behaviour (unauth mode):** Reddit's JSON endpoints are aggressively IP-blocked from datacenter hosts (returns 403). To work around this, the helpers fetch discovery-shaped paths (`/r/X/new`, `/search`) via Reddit's RSS feed at the `.rss` suffix and parse the Atom XML back into the JSON listing shape; those endpoints are typically not IP-blocked. Endpoints with no RSS counterpart (`/api/info`, `/user/X/about`) still go to JSON and will silently 403 from blocked IPs, meaning the **reply-status check** and **account-info card** require OAuth to function. Discovery + drafting work either way.
 
 When all four `REDDIT_*` vars are set, the helpers switch to OAuth (`oauth.reddit.com`) and all endpoints work normally. No code change required.
 
@@ -296,7 +296,7 @@ The admin Reddit → Threads tab has a **"Run discovery now"** button that trigg
 
 For each thread marked `replied`, re-checks the posted Reddit comment via the Reddit API on a staggered schedule (30min / 2h / 6h / 24h / 72h after posting). Classifies the reply as `live`, `removed`, `removed_or_shadowbanned`, or `deleted_by_user`, captures upvote + reply engagement, and rolls up per-subreddit removal rates. Applies the auto-disable rule: any subreddit with ≥ N replies in the last 30 days and ≥ X% removal rate is automatically removed from the watchlist (N and X configurable in admin Settings).
 
-Idempotent — each row tracks its own check count and last-checked timestamp; the cron never over-checks. After 5 checks, a reply's status is treated as final and dropped from the worklist.
+Idempotent: each row tracks its own check count and last-checked timestamp; the cron never over-checks. After 5 checks, a reply's status is treated as final and dropped from the worklist.
 
 ### Logs
 

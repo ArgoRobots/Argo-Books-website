@@ -1,6 +1,6 @@
 # Payment Provider Testing
 
-Test procedures for Stripe, PayPal, and Square — both the **payment portal**
+Test procedures for Stripe, PayPal, and Square, both the **payment portal**
 and the **SaaS subscription billing**.
 
 Two completely separate flows go through each provider:
@@ -61,7 +61,7 @@ Unlike Square and PayPal (OAuth flows), Stripe portal Connect uses **Stripe Conn
    |---|---|
    | Phone | Any valid format, e.g. `000 000 0000` |
    | Email | Any address (will receive Express dashboard emails) |
-   | Date of birth | `01 / 01 / 1901` — magic DOB that auto-passes ID verification |
+   | Date of birth | `01 / 01 / 1901` (magic DOB that auto-passes ID verification) |
    | Address | Any valid address in the country you chose |
    | Tax ID / SSN (US) | `000000000` |
    | SIN (Canada) | `000 000 000` |
@@ -80,7 +80,7 @@ Unlike Square and PayPal (OAuth flows), Stripe portal Connect uses **Stripe Conn
 
 ## PayPal
 
-> **Status:** Only the SaaS subscription billing side of PayPal is testable. The portal Connect flow is disabled — see the **Portal Connect** subsection below.
+> **Status:** Only the SaaS subscription billing side of PayPal is testable. The portal Connect flow is disabled. See the **Portal Connect** subsection below.
 
 ### SaaS subscription payment
 
@@ -111,11 +111,11 @@ https://dev.argorobots.com/pricing/checkout/index.php?method=paypal
 2. Make sure you're in **Sandbox Mode**
 3. Check the Payments section for your test payment
 
-### Portal Connect — NOT CURRENTLY SUPPORTED
+### Portal Connect: NOT CURRENTLY SUPPORTED
 
 The PayPal portal Connect flow is **disabled**. PayPal's "Log in with PayPal" OAuth endpoint refuses to return identity for Business-account tokens, so the flow can't onboard real merchants. The desktop app hides the PayPal Connect button under Settings -> Payment Portal, and the server-side `api/portal/connect/paypal` endpoint returns 503 PROVIDER_UNSUPPORTED.
 
-Re-enabling requires migrating to **PayPal Partner Referrals API** after approval into PayPal Platforms & Marketplaces — see `read-me/Admin guide.md` for the program details. There is no portal Connect test to run for PayPal today; test Stripe and Square portal Connect instead.
+Re-enabling requires migrating to **PayPal Partner Referrals API** after approval into PayPal Platforms & Marketplaces. See `read-me/Admin guide.md` for the program details. There is no portal Connect test to run for PayPal today; test Stripe and Square portal Connect instead.
 
 ---
 

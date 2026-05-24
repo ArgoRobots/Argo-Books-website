@@ -188,6 +188,6 @@ For reference, while you're handling the alert:
 
 - **In the refund modal at the moment of hard-block**: *"This refund was flagged by our automated safety check. The system sometimes flags legitimate refunds. Please email contact@argorobots.com and we will review and process this refund within one business day. Other parts of your account continue to work normally."* Plus a clickable "Email contact@argorobots.com" button that opens their mail client with a pre-filled message.
 - **In their inbox**: an email at the owner_email set in Payment Portal settings, subject `Refund paused: <amount> on invoice <number>`. Body explains it was paused by the automated safety check, that this is often a false positive, and to email us to get refunds resumed.
-- **On every subsequent refund attempt**: the modal says: *"Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds — email contact@argorobots.com and we will resume refunds within one business day."*
+- **On every subsequent refund attempt**: the modal says: *"Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds. Email contact@argorobots.com and we will resume refunds within one business day."*
 - **The customer being refunded**: sees nothing different. They just don't get a refund yet.
 - **Other parts of the user's account**: sending invoices, receiving payment, etc. continue to work normally. Only refunds are paused.

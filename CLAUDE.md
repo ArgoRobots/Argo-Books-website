@@ -84,6 +84,10 @@ For end users — plain language, no jargon. Include only user-visible changes; 
 - "Fixed a bug where invoices could be lost" → skip, or "More reliable invoice saving"
 - "Patched a security vulnerability" → skip entirely
 
+## Documentation style
+
+When writing markdown docs (in `read-me/` or anywhere else in the repo), don't use em dashes (the `—` character). Use a comma, a colon, or a period instead, to match the project's house style. Don't substitute a regular hyphen either: that reads as a compound-word marker, not a clause break.
+
 ## Security
 
 - Admin requires TOTP 2FA — secret stored in `admin_users.two_factor_secret`
@@ -102,5 +106,5 @@ The `read-me/` directory has authoritative reference docs that are kept current.
 - `read-me/testing/Payment provider testing.md` — sandbox testing procedures
 - `read-me/setup/Local email setup.md` — MailHog setup
 - `read-me/setup/Google Ads campaign setup.md` — Google Ads campaign + UET/gtag wiring
-- `read-me/setup/Funnel tracking - Advanced Installer setup.md` — Phase 3 installer token custom action
+- `read-me/setup/Advanced Installer project setup.md` - recovery guide for the Windows installer project (tooling install, project recreation, signing, the WriteInstallToken custom action for funnel attribution)
 - `read-me/procedures/Refund block response procedure.md` — what to do when the refund safety check fires

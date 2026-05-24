@@ -727,21 +727,13 @@ SYS;
         . "\nComment count: " . (int) ($thread['comment_count'] ?? 0)
         . "\nTop 10 comments:\n" . $commentsBlock;
 
-    // Few-shot learning: include recent founder-labeled threads so the AI
-    // gradually calibrates to this specific founder's taste. Only triggers
-    // when there's a meaningful sample (3+ of each label) to avoid noise
-    // from a tiny set of early labels.
+    // Few-shot learning: include recent founder-accepted threads (drafted or
+    // replied) so the AI gradually calibrates to what's actually worked. Only
+    // triggers when there's a meaningful sample (3+) to avoid noise from a
+    // tiny set of early labels. The negatives block was removed to save
+    // tokens — rejections are inferred from the rules text only.
     if ($pdo !== null) {
         $examples = reddit_fetch_label_examples($pdo);
-        if (!empty($examples['negatives']) && count($examples['negatives']) >= 3) {
-            $userPrompt .= "\n\n--- Examples the founder REJECTED as not a fit (treat similar threads as 4 or lower) ---";
-            foreach ($examples['negatives'] as $ex) {
-                $userPrompt .= "\n- r/{$ex['subreddit']} | {$ex['title']}";
-                if (!empty($ex['ai_relevance_reason'])) {
-                    $userPrompt .= " | AI thought: {$ex['ai_relevance_reason']}";
-                }
-            }
-        }
         if (!empty($examples['positives']) && count($examples['positives']) >= 3) {
             $userPrompt .= "\n\n--- Examples the founder ACCEPTED (drafted or replied — treat similar threads as 7+) ---";
             foreach ($examples['positives'] as $ex) {
@@ -766,30 +758,17 @@ SYS;
 }
 
 /**
- * Pull the most recent founder-labeled threads to use as few-shot examples
- * in the AI relevance prompt. Negatives = explicit 'not_fit' labels.
- * Positives = threads the founder actually drafted/replied on (the strongest
- * 'yes this is a fit' signal we have). Capped to a few of each so the prompt
- * doesn't balloon.
+ * Pull the most recent founder-accepted threads (drafted or replied) to use
+ * as positive few-shot examples in the AI relevance prompt. Capped to a few
+ * so the prompt doesn't balloon.
  *
- * Returns ['negatives' => [...], 'positives' => [...]]. Each row is a small
- * dict of subreddit/title/ai_relevance_reason — small enough to fit a dozen
- * in the prompt without significantly bumping token cost.
+ * Returns ['positives' => [...]] — kept as a single-key array (rather than a
+ * flat list) so callers can be extended later without changing the shape.
  */
 function reddit_fetch_label_examples($pdo, int $limitEach = 5): array
 {
-    $out = ['negatives' => [], 'positives' => []];
+    $out = ['positives' => []];
     try {
-        $negStmt = $pdo->prepare("
-            SELECT subreddit, title, ai_relevance_reason
-            FROM reddit_threads
-            WHERE status = 'not_fit'
-            ORDER BY status_updated_at DESC
-            LIMIT $limitEach
-        ");
-        $negStmt->execute();
-        $out['negatives'] = $negStmt->fetchAll() ?: [];
-
         $posStmt = $pdo->prepare("
             SELECT subreddit, title
             FROM reddit_threads

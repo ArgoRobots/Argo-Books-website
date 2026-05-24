@@ -48,7 +48,10 @@ function reddit_threads_tab_render($pdo)
                     <div class="safety-meter-fill" id="redditWeeklyFill" data-used="<?= (int) $weeklyUsed ?>" data-limit="<?= (int) $limits['weekly'] ?>"></div>
                 </div>
             </div>
-            <div class="safety-meter-help" title="Heuristic limits to reduce shadowban risk. Counts only replies where you marked 'Mentioned Argo Books'. Tune in Settings as the account ages.">?</div>
+            <span class="safety-meter-help" tabindex="0" aria-label="What do these limits mean?">
+                <span class="safety-meter-help-icon" aria-hidden="true">?</span>
+                <span class="safety-meter-help-tooltip" role="tooltip">Heuristic limits to reduce shadowban risk. Counts only replies where you marked &lsquo;Mentioned Argo Books&rsquo;. Tune in Settings as the account ages.</span>
+            </span>
         </div>
     </div>
 

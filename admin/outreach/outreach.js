@@ -2025,8 +2025,6 @@ function openMarkRedditRepliedModal() {
     if (!redditCurrentThread) return;
     document.getElementById('redditReplyPermalink').value = '';
     document.getElementById('redditMentionedProduct').checked = true;
-    document.getElementById('redditOverrideLimit').checked = false;
-    document.getElementById('redditOverrideSection').style.display = 'none';
     showModal('redditMarkRepliedModal');
 }
 
@@ -2034,7 +2032,6 @@ async function confirmMarkRedditReplied() {
     if (!redditCurrentThread) return;
     const permalink = document.getElementById('redditReplyPermalink').value.trim();
     const mentioned = document.getElementById('redditMentionedProduct').checked ? 1 : 0;
-    const override = document.getElementById('redditOverrideLimit').checked ? 1 : 0;
 
     if (!permalink) { notify('Permalink is required'); return; }
     if (!/^https?:\/\/(www\.|old\.|new\.)?reddit\.com\/r\/[^\/]+\/comments\/[a-z0-9]+\/[^\/]*\/[a-z0-9]+\/?/i.test(permalink)) {
@@ -2043,21 +2040,37 @@ async function confirmMarkRedditReplied() {
     }
 
     const btn = document.getElementById('redditConfirmMarkRepliedBtn');
-    btn.disabled = true;
 
-    const data = await api('reddit_mark_replied', {
-        method: 'POST',
-        body: { id: redditCurrentThread.id, permalink, mentioned_product: mentioned, override_limit: override }
-    });
-    btn.disabled = false;
+    const submit = async (override) => {
+        btn.disabled = true;
+        try {
+            return await api('reddit_mark_replied', {
+                method: 'POST',
+                body: { id: redditCurrentThread.id, permalink, mentioned_product: mentioned, override_limit: override }
+            });
+        } finally {
+            btn.disabled = false;
+        }
+    };
+
+    let data;
+    try {
+        data = await submit(0);
+
+        if (data && !data.success && data.requires_override) {
+            const ok = confirm(
+                `You're at the post limit (daily ${data.daily_used}/${data.daily_limit}, weekly ${data.weekly_used}/${data.weekly_limit}). ` +
+                `Post anyway? This increases shadowban risk.`
+            );
+            if (!ok) return;
+            data = await submit(1);
+        }
+    } catch (e) {
+        notify(e?.message || 'Failed to mark replied');
+        return;
+    }
 
     if (!data || !data.success) {
-        if (data && data.requires_override) {
-            document.getElementById('redditOverrideSection').style.display = '';
-            document.getElementById('redditOverrideMsg').textContent =
-                `Daily: ${data.daily_used}/${data.daily_limit} · Weekly: ${data.weekly_used}/${data.weekly_limit}`;
-            return;
-        }
         notify(data?.message || 'Failed to mark replied');
         return;
     }

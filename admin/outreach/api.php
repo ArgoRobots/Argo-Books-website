@@ -1615,7 +1615,7 @@ function reddit_api_mark_replied($pdo)
                 'daily_limit' => $dailyLimit,
                 'weekly_used' => $weeklyUsed,
                 'weekly_limit' => $weeklyLimit,
-            ], 400);
+            ]);
         }
     }
 

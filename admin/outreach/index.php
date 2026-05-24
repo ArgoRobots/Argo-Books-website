@@ -752,7 +752,7 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-red" onclick="markRedditNotFit()">Mark not fit</button>
+            <button class="btn btn-neutral" onclick="markRedditNotFit()">Mark not fit</button>
             <button class="btn btn-neutral" onclick="markRedditSkipped()">Skip</button>
             <button class="btn btn-blue" onclick="openMarkRedditRepliedModal()">Mark replied…</button>
         </div>
@@ -777,16 +777,6 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                 <label class="checkbox-label">
                     <input type="checkbox" id="redditMentionedProduct" checked>
                     Mentioned Argo Books in this reply (counts toward post limit)
-                </label>
-            </div>
-            <div id="redditOverrideSection" style="display:none;">
-                <div class="reddit-limit-warning">
-                    <strong>You're at or above your post limit.</strong>
-                    <div id="redditOverrideMsg" style="margin-top:4px;"></div>
-                </div>
-                <label class="checkbox-label">
-                    <input type="checkbox" id="redditOverrideLimit">
-                    I understand — post anyway (significantly increases shadowban risk)
                 </label>
             </div>
         </div>

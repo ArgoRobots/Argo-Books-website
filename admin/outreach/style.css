@@ -1474,20 +1474,81 @@
 .safety-meter-fill.safety-red { background: #dc2626; }
 
 .safety-meter-help {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: var(--gray-100);
-    color: var(--gray-600);
-    text-align: center;
-    line-height: 22px;
-    font-size: 13px;
-    cursor: help;
+    position: relative;
+    display: inline-flex;
     flex-shrink: 0;
+    outline: none;
+}
+
+.safety-meter-help-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--gray-200);
+    color: var(--gray-700);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.safety-meter-help:hover .safety-meter-help-icon,
+.safety-meter-help:focus-visible .safety-meter-help-icon {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+.safety-meter-help-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 0;
+    width: max-content;
+    max-width: 320px;
+    padding: 10px 12px;
+    background: #1f2937;
+    color: #f9fafb;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+    pointer-events: none;
+    z-index: 10;
+    white-space: normal;
+}
+
+.safety-meter-help-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 8px;
+    border: 6px solid transparent;
+    border-top-color: #1f2937;
+}
+
+.safety-meter-help:hover .safety-meter-help-tooltip,
+.safety-meter-help:focus-visible .safety-meter-help-tooltip,
+.safety-meter-help:focus-within .safety-meter-help-tooltip {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0s;
 }
 
 [data-theme="dark"] .reddit-safety-meter { background: var(--gray-800); border-color: var(--gray-700); }
 [data-theme="dark"] .safety-meter-bar { background: var(--gray-700); }
-[data-theme="dark"] .safety-meter-help { background: var(--gray-700); color: var(--gray-300); }
+[data-theme="dark"] .safety-meter-help-icon { background: var(--gray-700); color: var(--gray-200); }
+[data-theme="dark"] .safety-meter-help:hover .safety-meter-help-icon,
+[data-theme="dark"] .safety-meter-help:focus-visible .safety-meter-help-icon { background: var(--primary-blue); color: #fff; }
+[data-theme="dark"] .safety-meter-help-tooltip { background: #0f172a; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5); }
+[data-theme="dark"] .safety-meter-help-tooltip::after { border-top-color: #0f172a; }
 
 /* ─── Reddit threads table ────────────────────────────────────────────── */
 
@@ -1633,20 +1694,6 @@
 [data-theme="dark"] #redditMarkRepliedModal a:not(.btn) { color: var(--blue-400); }
 [data-theme="dark"] .reddit-thread-body { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--gray-200); }
 [data-theme="dark"] #redditDraftBody { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--gray-200); }
-
-/* ─── Mark Replied modal limit warning ────────────────────────────────── */
-
-.reddit-limit-warning {
-    background: var(--red-100);
-    color: var(--red-700);
-    border-left: 4px solid var(--red-500, #ef4444);
-    padding: 10px 12px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    font-size: 13px;
-}
-
-[data-theme="dark"] .reddit-limit-warning { background: rgba(239,68,68,0.15); color: #fca5a5; }
 
 .checkbox-label {
     display: flex;

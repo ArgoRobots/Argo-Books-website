@@ -17,6 +17,21 @@ function reddit_settings_tab_handle_post($pdo)
 {
     $action = $_POST['action'] ?? '';
 
+    if ($action === 'reddit_set_enabled') {
+        $enabled = ($_POST['enabled'] ?? '') === '1' ? 1 : 0;
+        reddit_settings_tab_ensure_singleton($pdo);
+        try {
+            $stmt = $pdo->prepare("UPDATE reddit_settings SET enabled = ? WHERE id = 1");
+            $stmt->execute([$enabled]);
+            $_SESSION['message'] = 'Reddit discovery: ' . ($enabled === 1 ? 'ENABLED' : 'DISABLED');
+            $_SESSION['message_type'] = 'success';
+        } catch (PDOException $e) {
+            $_SESSION['message'] = 'Could not update toggle. Run the latest schema migration (reddit_settings.enabled column) and try again.';
+            $_SESSION['message_type'] = 'error';
+        }
+        header('Location: index.php?channel=reddit&tab=reddit-settings'); exit;
+    }
+
     if ($action === 'reddit_add_subreddit') {
         $name = preg_replace('/[^A-Za-z0-9_]/', '', (string) ($_POST['name'] ?? ''));
         if ($name === '') {
@@ -138,6 +153,42 @@ function reddit_settings_tab_render($pdo)
         </div>
         <?php unset($_SESSION['message'], $_SESSION['message_type']); ?>
     <?php endif; ?>
+
+    <?php $redditEnabled = (int) $settings['enabled'] === 1; ?>
+
+    <!-- Master enable/disable toggle for the Reddit discovery pipeline -->
+    <div class="panel reddit-settings-panel">
+        <div class="panel-header">
+            <h2>Reddit discovery</h2>
+        </div>
+        <div class="panel-content">
+            <p class="hint" style="margin-top:0;">
+                Master switch for the daily Reddit discovery cron. When OFF, the cron exits without fetching threads, scoring, or generating drafts, even if it's still scheduled at the server level. Reply-status checks on already-posted threads continue regardless.
+            </p>
+            <div class="segmented-toggle">
+                <form method="post" action="index.php?channel=reddit&tab=reddit-settings" style="display:contents;">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                    <input type="hidden" name="tab" value="reddit-settings">
+                    <input type="hidden" name="action" value="reddit_set_enabled">
+                    <input type="hidden" name="enabled" value="1">
+                    <button type="submit" class="segmented-option <?= $redditEnabled ? 'active' : '' ?>">
+                        <span class="segmented-title">Enabled</span>
+                        <span class="segmented-desc">Daily cron runs as scheduled. Threads are discovered, scored, and drafted automatically.</span>
+                    </button>
+                </form>
+                <form method="post" action="index.php?channel=reddit&tab=reddit-settings" style="display:contents;">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrfToken) ?>">
+                    <input type="hidden" name="tab" value="reddit-settings">
+                    <input type="hidden" name="action" value="reddit_set_enabled">
+                    <input type="hidden" name="enabled" value="0">
+                    <button type="submit" class="segmented-option <?= !$redditEnabled ? 'active' : '' ?>">
+                        <span class="segmented-title">Disabled</span>
+                        <span class="segmented-desc">Cron exits immediately. No discovery, scoring, or drafting until re-enabled.</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Reddit account info card (loaded on demand) -->
     <div class="panel reddit-settings-panel">
@@ -400,9 +451,9 @@ function reddit_settings_tab_ensure_singleton($pdo): void
 {
     try {
         $stmt = $pdo->prepare("INSERT IGNORE INTO reddit_settings
-            (id, rules_score_floor, ai_relevance_floor, daily_post_limit, weekly_post_limit,
+            (id, enabled, rules_score_floor, ai_relevance_floor, daily_post_limit, weekly_post_limit,
              auto_disable_removal_rate, auto_disable_min_replies)
-            VALUES (1, 30, 6, 3, 12, 60, 3)");
+            VALUES (1, 1, 30, 6, 3, 12, 60, 3)");
         $stmt->execute();
     } catch (PDOException $e) {
         // Table not created yet; render code will fall back to defaults.
@@ -435,6 +486,7 @@ function reddit_settings_tab_fetch_keywords($pdo): array
 function reddit_settings_tab_fetch_settings($pdo): array
 {
     $defaults = [
+        'enabled' => 1,
         'rules_score_floor' => 30,
         'ai_relevance_floor' => 6,
         'daily_post_limit' => 3,
@@ -442,15 +494,26 @@ function reddit_settings_tab_fetch_settings($pdo): array
         'auto_disable_removal_rate' => 60,
         'auto_disable_min_replies' => 3,
     ];
+    // `enabled` column was added later — try selecting it, fall back to the
+    // pre-migration schema (and treat the channel as enabled) if it's missing.
     try {
-        $stmt = $pdo->prepare("SELECT rules_score_floor, ai_relevance_floor, daily_post_limit, weekly_post_limit,
+        $stmt = $pdo->prepare("SELECT enabled, rules_score_floor, ai_relevance_floor, daily_post_limit, weekly_post_limit,
                                       auto_disable_removal_rate, auto_disable_min_replies
                                FROM reddit_settings WHERE id = 1");
         $stmt->execute();
         $row = $stmt->fetch();
         return $row ? array_merge($defaults, $row) : $defaults;
     } catch (PDOException $e) {
-        return $defaults;
+        try {
+            $stmt = $pdo->prepare("SELECT rules_score_floor, ai_relevance_floor, daily_post_limit, weekly_post_limit,
+                                          auto_disable_removal_rate, auto_disable_min_replies
+                                   FROM reddit_settings WHERE id = 1");
+            $stmt->execute();
+            $row = $stmt->fetch();
+            return $row ? array_merge($defaults, $row) : $defaults;
+        } catch (PDOException $e2) {
+            return $defaults;
+        }
     }
 }
 

@@ -1147,6 +1147,7 @@ CREATE TABLE IF NOT EXISTS reddit_keywords (
 -- diagnostics, and tunable thresholds.
 CREATE TABLE IF NOT EXISTS reddit_settings (
     id TINYINT PRIMARY KEY,
+    enabled TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Master switch for the Reddit discovery pipeline. 0 = cron exits immediately.',
     access_token VARCHAR(255) DEFAULT NULL COMMENT 'Encrypted via portal_encrypt()',
     access_token_expires_at DATETIME DEFAULT NULL,
     last_run_at DATETIME DEFAULT NULL,

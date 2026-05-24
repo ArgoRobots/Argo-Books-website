@@ -82,6 +82,25 @@ reddit_progress_reset([
 try {
     // Ensure singleton row + read floors
     $pdo->exec("INSERT IGNORE INTO reddit_settings (id) VALUES (1)");
+
+    // Master kill-switch: admin can disable the Reddit pipeline from the
+    // Reddit Settings tab. Wrapped in try/catch so a pre-migration schema
+    // (no `enabled` column yet) is treated as enabled rather than crashing.
+    try {
+        $enabledRow = $pdo->query("SELECT enabled FROM reddit_settings WHERE id = 1")->fetch();
+        if ($enabledRow && (int) $enabledRow['enabled'] === 0) {
+            reddit_log('Reddit discovery is DISABLED via admin Settings (reddit_settings.enabled = 0). Exiting without running.');
+            reddit_progress_write([
+                'message' => 'Reddit discovery is disabled in Settings. Re-enable to run.',
+                'completed' => true,
+            ]);
+            echo "Reddit discovery disabled in admin Settings. Exiting.\n";
+            exit(0);
+        }
+    } catch (PDOException $e) {
+        // `enabled` column not yet added — assume enabled.
+    }
+
     $cfg = $pdo->query("SELECT rules_score_floor, ai_relevance_floor FROM reddit_settings WHERE id = 1")->fetch();
     $rulesFloor = (int) ($cfg['rules_score_floor'] ?? 30);
     $aiFloor = (int) ($cfg['ai_relevance_floor'] ?? 6);

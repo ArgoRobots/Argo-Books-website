@@ -419,6 +419,60 @@ include __DIR__ . '/../admin_header.php';
     border-radius: 8px;
     margin-top: 1rem;
 }
+
+/* Tier filter pills (matches the funnel-pill pattern from other admin pages) */
+.tier-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.tier-filter-label {
+    font-weight: 600;
+    color: var(--black);
+    margin-right: 4px;
+}
+
+.tier-pill {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--gray-bg-light);
+    color: var(--black);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+}
+
+.tier-pill:hover {
+    background: var(--gray-border);
+}
+
+.tier-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+[data-theme="dark"] .tier-filter-label {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .tier-pill {
+    background: var(--gray-700);
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .tier-pill:hover {
+    background: var(--gray-600);
+}
+
+[data-theme="dark"] .tier-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
 </style>
 
 <div class="container">
@@ -437,20 +491,19 @@ include __DIR__ . '/../admin_header.php';
     ?>
 
     <?php if ($hasAnyData): ?>
-        <div class="tier-filter-bar" style="display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; flex-wrap: wrap;">
-            <span style="font-weight: 600; color: var(--text-secondary, #6b7280); margin-right: 4px;">Tier:</span>
+        <div class="tier-filter-bar">
+            <span class="tier-filter-label">Tier:</span>
             <?php
                 $tierLabels = [
                     'all' => 'All',
-                    'free' => 'Free (' . number_format($aggregatedData['tierStats']['free']['files']) . ')',
-                    'premium' => 'Premium (' . number_format($aggregatedData['tierStats']['premium']['files']) . ')',
+                    'free' => 'Free',
+                    'premium' => 'Premium',
                 ];
                 foreach ($tierLabels as $tierKey => $label):
                     $isActive = $tierFilter === $tierKey;
             ?>
                 <a href="?tier=<?= $tierKey ?>"
-                   class="tier-pill <?= $isActive ? 'active' : '' ?>"
-                   style="padding: 6px 14px; border-radius: 999px; text-decoration: none; font-size: 0.85rem; font-weight: 500; border: 1px solid <?= $isActive ? 'var(--accent, #3b82f6)' : 'var(--border, #e5e7eb)' ?>; background: <?= $isActive ? 'var(--accent, #3b82f6)' : 'transparent' ?>; color: <?= $isActive ? '#fff' : 'var(--text-primary, #374151)' ?>;">
+                   class="tier-pill <?= $isActive ? 'active' : '' ?>">
                     <?= htmlspecialchars($label) ?>
                 </a>
             <?php endforeach; ?>

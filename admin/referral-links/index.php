@@ -778,7 +778,6 @@ include __DIR__ . '/../admin_header.php';
         }
 
         // Build the funnel stages array with computed percentages
-        // We hide app_first_run if there are zero events (Phase 3 not yet deployed)
         $stage_defs = [
             ['key' => 'landing',         'label' => 'Landing'],
             ['key' => 'downloads_page',  'label' => 'Downloads page'],
@@ -787,10 +786,6 @@ include __DIR__ . '/../admin_header.php';
             ['key' => 'premium_signup',  'label' => 'Premium signup'],
             ['key' => 'premium_paid',    'label' => 'Premium paid'],
         ];
-        // Hide app_first_run row entirely if no data yet
-        if ($funnel_counts['app_first_run'] === 0) {
-            $stage_defs = array_values(array_filter($stage_defs, fn($s) => $s['key'] !== 'app_first_run'));
-        }
 
         $top_count = max(1, $funnel_counts[$stage_defs[0]['key']]);
         $funnel_stages = [];

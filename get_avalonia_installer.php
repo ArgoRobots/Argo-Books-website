@@ -126,8 +126,8 @@ function serveFile(array $installer): void
     ]);
 
     // Embed the visitor token into the served filename so the installer can
-    // extract it during install (Phase 3 telemetry). Falls back to the
-    // plain filename if the visitor has no cookie or no secret is configured.
+    // extract it during install. Falls back to the plain filename if the
+    // visitor has no cookie or no secret is configured.
     $served_filename = $installer['filename'];
     $visitor_id = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
     if ($visitor_id && preg_match('/^[0-9a-f-]{36}$/i', $visitor_id)) {

@@ -1,0 +1,63 @@
+<?php
+require_once __DIR__ . '/../../../resources/icons.php';
+$pageTitle = 'Bank Matching';
+$pageDescription = 'Import a bank statement and match each line against your recorded revenue and expenses to verify your books and catch anything missing or duplicated.';
+$currentPage = 'bank-matching';
+$pageCategory = 'features';
+
+include __DIR__ . '/../../docs-header.php';
+?>
+
+        <div class="docs-content">
+            <p>Bank Matching lets you import a bank statement and check it against what you have recorded in Argo Books. Each line on the statement is matched to your recorded revenue and expenses, so you can confirm your books are complete and catch anything that is missing or entered twice. There are no bank connections to set up. You import a CSV or Excel statement that you download from your bank.</p>
+
+            <p>Bank statement lines are reference data only. Importing a statement never creates expenses or revenue, and it never changes your transactions. The only thing matching does is mark a record as matched to a statement line.</p>
+
+            <h2>How Bank Matching Works</h2>
+            <ol class="steps-list">
+                <li>Open <strong>Bank Matching</strong> from the sidebar, under Transactions</li>
+                <li>Click <strong>Import statement</strong> and choose a CSV or Excel file from your bank</li>
+                <li>Argo Books reads the columns and automatically matches each line against your books</li>
+                <li>Review the results: confident matches are confirmed for you, likely matches are suggested for you to accept, and anything left over is flagged as unmatched</li>
+            </ol>
+
+            <h2>Importing a Statement</h2>
+            <p>The importer reads any CSV or Excel bank statement and maps its columns to the fields Bank Matching needs:</p>
+            <div class="two-column-list">
+                <ul>
+                    <li>Date</li>
+                    <li>Description</li>
+                    <li>Amount (signed)</li>
+                </ul>
+                <ul>
+                    <li>Debit / Credit (separate columns)</li>
+                    <li>Balance</li>
+                    <li>Reference</li>
+                </ul>
+            </div>
+            <p>Column detection happens locally and instantly, recognizing common header names (and tolerating a few preamble rows). If your statement uses unusual or cryptic headers that can't be recognized, the AI smart importer is used as a backup to map the columns (this counts as one of your monthly AI imports). A statement only needs a date and either an Amount column or Debit/Credit columns.</p>
+
+            <h2>Match Statuses</h2>
+            <ul>
+                <li><strong>Matched:</strong> Confirmed and linked to a recorded transaction.</li>
+                <li><strong>Suggested:</strong> One or more records were found. Accept the best one or choose another.</li>
+                <li><strong>Unmatched:</strong> No matching record was found. This usually means a transaction you forgot to record.</li>
+                <li><strong>Ignored:</strong> A line you have set aside (for example an internal transfer) that you do not want to track.</li>
+            </ul>
+
+            <h2>Missing from Statement Tab</h2>
+            <p>The <strong>Missing from statement</strong> tab is the other side of the check: it lists your recorded revenue and expenses that no statement line matched. These are entries that may be missing from your bank statement, or that you may have recorded twice. Records with the same amount around the same date are flagged as a <strong>possible duplicate</strong>. You can search these records and filter them by date range and record type.</p>
+
+            <div class="page-navigation">
+                <a href="invoicing.php" class="nav-button prev">
+                    <span class="nav-label">Previous</span>
+                    <span class="nav-title">&larr; Invoicing & Payments</span>
+                </a>
+                <a href="rental.php" class="nav-button next">
+                    <span class="nav-label">Next</span>
+                    <span class="nav-title">Rental Management &rarr;</span>
+                </a>
+            </div>
+        </div>
+
+<?php include __DIR__ . '/../../docs-footer.php'; ?>

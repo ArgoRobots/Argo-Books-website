@@ -24,6 +24,7 @@ class DocumentationSearch {
             { id: 'report-generator', title: 'Report Generator', category: 'Core Features', folder: 'features', keywords: 'report generate pdf png jpg chart analytics template layout designer' },
             { id: 'sales-tracking', title: 'Expense/Revenue Tracking', category: 'Core Features', folder: 'features', keywords: 'expense revenue transaction order tracking add quantity price shipping tax' },
             { id: 'invoicing', title: 'Invoicing & Payments', category: 'Core Features', folder: 'features', keywords: 'invoice payment billing stripe paypal square online payment processing credit card' },
+            { id: 'bank-matching', title: 'Bank Matching', category: 'Core Features', folder: 'features', keywords: 'bank matching statement reconcile reconciliation import csv excel match expenses revenue invoices payments unmatched duplicate verify books deposit debit credit' },
             { id: 'rental', title: 'Rental Management', category: 'Core Features', folder: 'features', keywords: 'rental booking calendar availability equipment return deposit late fee reservation' },
             { id: 'customers', title: 'Customer Management', category: 'Core Features', folder: 'features', keywords: 'customer client profile contact expense history notes tags crm relationship' },
             { id: 'product-management', title: 'Product Management', category: 'Core Features', folder: 'features', keywords: 'products categories inventory add create manage organize' },

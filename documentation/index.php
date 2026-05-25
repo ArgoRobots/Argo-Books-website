@@ -205,6 +205,13 @@ $isDocsLanding = true;
                     <h3>Invoicing & Payments</h3>
                     <p>Create invoices, accept payments</p>
                 </a>
+                <a href="pages/features/bank-matching.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('credit-card', 20) ?>
+                    </div>
+                    <h3>Bank Matching</h3>
+                    <p>Match a bank statement to your books</p>
+                </a>
                 <a href="pages/features/rental.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('calendar', 20) ?>

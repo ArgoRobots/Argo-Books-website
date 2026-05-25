@@ -947,8 +947,9 @@ body.docs-page .account-avatar {
 /* Two-column list */
 .two-column-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0 2rem;
+  grid-template-columns: max-content max-content;
+  justify-content: start;
+  gap: 0 3rem;
   margin: 1rem 0 1.5rem;
 }
 

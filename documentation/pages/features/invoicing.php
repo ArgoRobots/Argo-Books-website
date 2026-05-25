@@ -62,6 +62,10 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Cancelled:</strong> Invoice has been cancelled</li>
             </ul>
 
+            <div class="info-box">
+                <p><strong>Note:</strong> When you record a payment manually, link it to an invoice or to a revenue so it stays tied to your income. Payments made through the online portal are linked to their invoice automatically.</p>
+            </div>
+
             <h2>Payment processing fees</h2>
             <p>Payment processing fees are charged by the payment provider, not Argo Books. Most providers typically charge around 2.9% + $0.30 per transaction, including Stripe, PayPal, and Square. Because the exact rate depends on many different factors, Argo Books adds the 2.9% + $0.30 for every transaction.</p>
             <p>You decide if you want to pass this fee onto your customer, or take the cost yourself. There is a "pass processing fee" toggle:</p>
@@ -99,9 +103,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Expense/Revenue Tracking</span>
                 </a>
-                <a href="rental.php" class="nav-button next">
+                <a href="bank-matching.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Rental Management &rarr;</span>
+                    <span class="nav-title">Bank Matching &rarr;</span>
                 </a>
             </div>
         </div>

@@ -176,6 +176,8 @@ code {
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
+    display: inline-block;
 }
 
 .status-active {

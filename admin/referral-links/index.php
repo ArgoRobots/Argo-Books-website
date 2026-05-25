@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../country_names.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -246,21 +247,8 @@ $country_labels = [];
 $country_visit_counts = [];
 $country_conversion_counts = [];
 
-// Country code to name mapping
-$country_name_map = [
-    'US' => 'United States', 'CA' => 'Canada', 'GB' => 'United Kingdom',
-    'AU' => 'Australia', 'DE' => 'Germany', 'FR' => 'France', 'JP' => 'Japan',
-    'CN' => 'China', 'IN' => 'India', 'BR' => 'Brazil', 'MX' => 'Mexico',
-    'IT' => 'Italy', 'ES' => 'Spain', 'NL' => 'Netherlands', 'SE' => 'Sweden',
-    'CH' => 'Switzerland', 'PL' => 'Poland', 'BE' => 'Belgium', 'NO' => 'Norway',
-    'AT' => 'Austria', 'DK' => 'Denmark', 'FI' => 'Finland', 'IE' => 'Ireland',
-    'NZ' => 'New Zealand', 'SG' => 'Singapore', 'HK' => 'Hong Kong', 'KR' => 'South Korea',
-    'RU' => 'Russia', 'ZA' => 'South Africa', 'AR' => 'Argentina', 'CL' => 'Chile'
-];
-
 foreach ($referral_countries as $country) {
-    $code = $country['country_code'];
-    $country_labels[] = $country_name_map[$code] ?? $code;
+    $country_labels[] = country_name($country['country_code']);
     $country_visit_counts[] = (int)$country['visit_count'];
     $country_conversion_counts[] = (int)$country['conversions'];
 }

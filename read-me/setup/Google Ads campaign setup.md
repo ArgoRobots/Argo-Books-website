@@ -2,8 +2,10 @@
 
 A start-to-finish guide for setting up a Google Ads Search campaign for Argo Books. This is what was done for the first "QuickBooks Alternative" campaign in May 2026, written so future campaigns (targeting other competitors, other keyword themes) can follow the same recipe.
 
+**NOTE:** Some numbers, including the CPA are estimates until we get real data.
+
 **Terminology note:** 
-- **CPC** = Cost Per Click (\$1.50 here)
+- **CPC** = Cost Per Click (\$3 here)
 - **CPA** = Cost Per Acquisition = cost per conversion (\$75 here).
 - **CLV / LTV** = Customer Lifetime Value ($180 here).
 
@@ -63,7 +65,7 @@ Search - QuickBooks Alternative - CA
 ### Step 6: Bidding
 
 - **What do you want to focus on?** → Change from "Conversions" to **Clicks**. Conversions-based smart bidding needs ~30+ conversions of data to optimize, which you don't have on day one.
-- Check **"Set a maximum cost per click bid limit"** → enter **`1.50`** CAD. This caps the worst-case spend per click. "QuickBooks alternative" keywords in Canada typically cost CA\$0.80 to \$2.00. $1.50 sits in the middle.
+- Check **"Set a maximum cost per click bid limit"** → enter **`1.50`** CAD. This caps the worst-case spend per click. "QuickBooks alternative" keywords in Canada typically cost CA\$0.80 to \$2.00. $3 sits in the middle.
 - Leave **"Adjust your bidding to help acquire new customers"** unchecked.
 
 ### Step 7: Campaign settings
@@ -221,7 +223,7 @@ Switch from Google's recommended budget to **Set custom budget**. Enter `$15`. K
 
 At $15/day:
 - Monthly cap: about $450
-- Expected clicks at \$1.50 CPC: ~300/month
+- Expected clicks at \$3 CPC: ~300/month
 - Expected `/downloads/` page visits at ~20% click-to-page rate: ~60/month
 - Expected CPA per `/downloads/` visit: ~$7.50
 
@@ -230,23 +232,15 @@ What the math actually means:
 The tracked "conversion" is a visit to `/downloads/`, not a paying customer. The real funnel goes:
 
 ```
-Ad click ($1.50)
+Ad click ($3)
   → /downloads/ visit  (~20% of clicks)
     → Download button click  (~60% of page visits)
       → Installs + uses the app  (~50% of downloads)
         → Hits a Free tier limit (5 receipt scans/mo, 25 invoices/mo)
-          → Upgrades to Premium at $10/mo  (~10-20% of active users who hit a limit)
+          → Upgrades to Premium at $10/mo
 ```
 
-Roughly 300 ad clicks produce **1-2 Premium customers per month**. CAC per paying customer is around \$225-\$450. Premium LTV at \$10/mo × 18-month average retention is ~$180.
-
-LTV:CAC lands roughly **0.4:1 to 0.8:1**. Marginal but plausible, not catastrophic. The campaign loses a small amount per paying customer on direct subscription revenue alone. The gap closes (or doesn't) through:
-
-- Funnel improvements over time (better landing page, better in-app upgrade prompts, tighter Free tier limits to force upgrades sooner)
-- Compounding LTV as retention grows past 18 months
-- Other revenue streams (payment processing fees on the portal, future tiers, add-on packs)
-
-The variables you actually control:
+The variables you can control:
 
 - **`/downloads/`-to-active-user conversion** depends on install smoothness and the first-run experience
 - **Active-user-to-Premium conversion** depends on how aggressively the in-app upgrade prompts trigger when a user hits the 5-receipt-scans or 25-invoices monthly limit
@@ -261,7 +255,7 @@ Skim the summary. The most important things to confirm:
 
 - Network: Search only (no Display, no Search Partners)
 - Location: Canada
-- Bid strategy: Maximize Clicks with $1.50 max CPC
+- Bid strategy: Maximize Clicks with $3 max CPC
 - Tracking template: `{lpurl}?source=google-ads-qb-alt`
 - AI Max: off
 - Keywords are in `[brackets]` and `"quotes"`, not broad match
@@ -306,7 +300,7 @@ If you set up a second campaign with a different source code (for example `googl
 
 ## After launch
 
-The first 24 to 48 hours are quiet. Google reviews ads (usually approves within a day) and the bid strategy is "learning." Don't tweak anything yet.
+The first 24 to 48 hours are quiet. Google reviews ads (usually approves within a few hours) and the bid strategy is "learning." Don't tweak anything yet.
 
 After 3-5 days:
 - Check "Tools → Reporting → Predefined reports → Basic → Search keywords". See which keywords are getting impressions and clicks. Pause any keyword with high spend and zero clicks.

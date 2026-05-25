@@ -266,6 +266,76 @@ function get_landing_page_breakdown(?string $period_start, string $environment):
 }
 
 /**
+ * Counts of survey answers among unattributed (visitor_id IS NULL) app_first_run
+ * rows. Returns ordered list of [answer => count] plus an "unanswered" count for
+ * the same period. Used by the source-survey breakdown section on the funnel tab.
+ */
+function get_unattributed_survey_breakdown(?string $period_start, string $environment): array
+{
+    global $pdo;
+
+    $answer_where = ['environment = ?', "event_type = 'app_first_run'", 'visitor_id IS NULL', 'source_survey_answer IS NOT NULL'];
+    $answer_params = [$environment];
+    if ($period_start !== null) {
+        $answer_where[] = 'source_survey_answered_at >= ?';
+        $answer_params[] = $period_start;
+    }
+    $answer_sql = "
+        SELECT source_survey_answer AS answer, COUNT(*) AS count
+          FROM referral_events
+         WHERE " . implode(' AND ', $answer_where) . "
+         GROUP BY source_survey_answer";
+    $stmt = $pdo->prepare($answer_sql);
+    $stmt->execute($answer_params);
+    $by_answer = [];
+    while ($row = $stmt->fetch()) {
+        $by_answer[(string)$row['answer']] = (int)$row['count'];
+    }
+
+    $unanswered_where = ['environment = ?', "event_type = 'app_first_run'", 'visitor_id IS NULL', 'source_survey_answer IS NULL'];
+    $unanswered_params = [$environment];
+    if ($period_start !== null) {
+        $unanswered_where[] = 'created_at >= ?';
+        $unanswered_params[] = $period_start;
+    }
+    $unanswered_sql = "
+        SELECT COUNT(*) AS count
+          FROM referral_events
+         WHERE " . implode(' AND ', $unanswered_where);
+    $stmt = $pdo->prepare($unanswered_sql);
+    $stmt->execute($unanswered_params);
+    $unanswered = (int)($stmt->fetchColumn() ?: 0);
+
+    // Freeform "Other" answers. Group case-insensitively so "youtube channel"
+    // and "Youtube channel" collapse, but show one representative casing.
+    $other_where = ['environment = ?', "event_type = 'app_first_run'", 'visitor_id IS NULL', "source_survey_answer = 'other'", 'source_survey_other_text IS NOT NULL', "source_survey_other_text <> ''"];
+    $other_params = [$environment];
+    if ($period_start !== null) {
+        $other_where[] = 'source_survey_answered_at >= ?';
+        $other_params[] = $period_start;
+    }
+    $other_sql = "
+        SELECT MIN(source_survey_other_text) AS text, COUNT(*) AS count
+          FROM referral_events
+         WHERE " . implode(' AND ', $other_where) . "
+         GROUP BY LOWER(TRIM(source_survey_other_text))
+         ORDER BY count DESC, text ASC
+         LIMIT 100";
+    $stmt = $pdo->prepare($other_sql);
+    $stmt->execute($other_params);
+    $other_texts = [];
+    while ($row = $stmt->fetch()) {
+        $other_texts[] = ['text' => (string)$row['text'], 'count' => (int)$row['count']];
+    }
+
+    return [
+        'by_answer'   => $by_answer,
+        'unanswered'  => $unanswered,
+        'other_texts' => $other_texts,
+    ];
+}
+
+/**
  * Map a request path to a human-readable label for the landing-pages chart.
  */
 function friendly_landing_label(?string $path): string
@@ -335,6 +405,11 @@ include __DIR__ . '/../admin_header.php';
     <?php
         $funnel_counts = get_funnel_stage_counts($funnel_period_start_dt, $funnel_source_filter ?: null);
         $per_source = get_funnel_per_source($funnel_period_start_dt, current_environment());
+
+        // Source-survey breakdown: unattributed installs only (visitor_id IS NULL),
+        // so it doesn't matter whether a specific source pill is selected — it
+        // always reflects "users we couldn't attribute by token".
+        $survey_breakdown = get_unattributed_survey_breakdown($funnel_period_start_dt, current_environment());
 
         // Landing-page breakdown: only meaningful for "All traffic" since a
         // specific tracked source usually points at a single destination page.
@@ -552,6 +627,80 @@ include __DIR__ . '/../admin_header.php';
                         <?php endforeach; ?>
                     </ul>
                 </div>
+            </div>
+        <?php endif; ?>
+
+        <?php
+            $survey_by_answer = $survey_breakdown['by_answer'];
+            $survey_unanswered = (int)$survey_breakdown['unanswered'];
+            $survey_total = array_sum($survey_by_answer) + $survey_unanswered;
+            $survey_show = $survey_total > 0;
+            $survey_option_order = ['google','bing','youtube','reddit','friend','email','other'];
+            $survey_option_labels = [
+                'google'  => 'Google',
+                'bing'    => 'Bing',
+                'youtube' => 'YouTube',
+                'reddit'  => 'Reddit',
+                'friend'  => 'A friend',
+                'email'   => 'Email',
+                'other'   => 'Other',
+            ];
+
+            // Build chart arrays (skip zero-count buckets so the doughnut isn't
+            // cluttered with empty legend entries). Unanswered is included as a
+            // gray slice at the end so the totals still add up to the unattributed
+            // install volume.
+            $survey_chart_rows = [];
+            foreach ($survey_option_order as $opt) {
+                $c = (int)($survey_by_answer[$opt] ?? 0);
+                if ($c > 0) {
+                    $survey_chart_rows[] = ['label' => $survey_option_labels[$opt], 'count' => $c];
+                }
+            }
+            if ($survey_unanswered > 0) {
+                $survey_chart_rows[] = ['label' => 'Unanswered', 'count' => $survey_unanswered];
+            }
+            $survey_chart_labels = array_map(fn($r) => $r['label'], $survey_chart_rows);
+            $survey_chart_counts = array_map(fn($r) => $r['count'], $survey_chart_rows);
+        ?>
+        <?php if ($survey_show): ?>
+            <div class="landing-breakdown">
+                <h3>Unattributed install sources (survey)</h3>
+                <p class="muted-note">
+                    In-app survey answers from users whose install we couldn't attribute by token
+                    (no referral cookie at install time).
+                </p>
+                <div class="landing-breakdown-body">
+                    <div class="landing-breakdown-chart">
+                        <canvas id="surveySourcesChart"></canvas>
+                    </div>
+                    <ul class="landing-breakdown-list">
+                        <?php foreach ($survey_chart_rows as $i => $row):
+                            $pct = $survey_total > 0 ? round(($row['count'] / $survey_total) * 100, 1) : 0;
+                        ?>
+                            <li>
+                                <span class="swatch" data-survey-swatch-idx="<?php echo $i; ?>"></span>
+                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
+                                <span class="pct"><?php echo $pct; ?>%</span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <?php $other_texts = $survey_breakdown['other_texts'] ?? []; ?>
+                <?php if (!empty($other_texts)): ?>
+                    <details class="survey-other-details" open>
+                        <summary>What did "Other" respondents say? (<?php echo count($other_texts); ?> unique)</summary>
+                        <ul class="survey-other-list">
+                            <?php foreach ($other_texts as $row): ?>
+                                <li>
+                                    <span class="lbl"><?php echo htmlspecialchars($row['text']); ?></span>
+                                    <span class="count">×<?php echo number_format($row['count']); ?></span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </details>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
     </div>
@@ -839,6 +988,63 @@ include __DIR__ . '/../admin_header.php';
 
         document.querySelectorAll('.landing-breakdown-list .swatch').forEach(el => {
             const idx = parseInt(el.getAttribute('data-swatch-idx'), 10);
+            if (!Number.isNaN(idx) && colors[idx]) {
+                el.style.backgroundColor = colors[idx];
+            }
+        });
+
+        new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    })();
+
+    // Source-survey breakdown doughnut (unattributed installs only).
+    (function () {
+        const canvas = document.getElementById('surveySourcesChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const labels = <?php echo json_encode($survey_chart_labels ?? [], JSON_UNESCAPED_SLASHES); ?>;
+        const counts = <?php echo json_encode($survey_chart_counts ?? []); ?>;
+        if (!labels.length) return;
+
+        // Same palette as the landing-pages chart so themes stay consistent.
+        // Unanswered always lands on the gray slot (last in the palette).
+        const palette = [
+            'rgba(59, 130, 246, 0.85)',   // blue
+            'rgba(139, 92, 246, 0.85)',   // purple
+            'rgba(16, 185, 129, 0.85)',   // emerald
+            'rgba(245, 158, 11, 0.85)',   // amber
+            'rgba(239, 68, 68, 0.85)',    // red
+            'rgba(14, 165, 233, 0.85)',   // sky
+            'rgba(168, 85, 247, 0.85)',   // violet
+            'rgba(107, 114, 128, 0.85)',  // gray
+        ];
+        const GRAY = palette[palette.length - 1];
+        const colors = labels.map((lbl, i) => lbl === 'Unanswered' ? GRAY : palette[i % (palette.length - 1)]);
+
+        document.querySelectorAll('.landing-breakdown-list .swatch[data-survey-swatch-idx]').forEach(el => {
+            const idx = parseInt(el.getAttribute('data-survey-swatch-idx'), 10);
             if (!Number.isNaN(idx) && colors[idx]) {
                 el.style.backgroundColor = colors[idx];
             }

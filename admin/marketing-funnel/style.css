@@ -431,3 +431,64 @@
         height: 200px;
     }
 }
+
+
+/* ─── Source Survey: Other freeform list ─────────────────────────────── */
+
+.survey-other-details {
+    margin-top: 16px;
+    border-top: 1px solid var(--gray-300);
+    padding-top: 12px;
+}
+
+[data-theme="dark"] .survey-other-details {
+    border-top-color: var(--gray-700);
+}
+
+.survey-other-details summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--gray-700);
+    user-select: none;
+    margin-bottom: 8px;
+}
+
+[data-theme="dark"] .survey-other-details summary {
+    color: var(--gray-300);
+}
+
+.survey-other-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.survey-other-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0;
+    font-size: 13px;
+    border-bottom: 1px dashed var(--gray-200);
+}
+
+[data-theme="dark"] .survey-other-list li {
+    border-bottom-color: var(--gray-700);
+}
+
+.survey-other-list .lbl {
+    word-break: break-word;
+}
+
+.survey-other-list .count {
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-600);
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .survey-other-list .count {
+    color: var(--gray-400);
+}

@@ -1047,6 +1047,9 @@ CREATE TABLE IF NOT EXISTS referral_events (
     ip_address VARCHAR(45) DEFAULT NULL,
     user_agent VARCHAR(255) DEFAULT NULL,
     country_code VARCHAR(2) DEFAULT NULL,
+    source_survey_answer VARCHAR(20) DEFAULT NULL COMMENT 'On app_first_run rows only: user answer to "Where did you hear about us?". One of: google, bing, youtube, reddit, friend, email, other.',
+    source_survey_other_text VARCHAR(200) DEFAULT NULL COMMENT 'Freeform user input when source_survey_answer = "other".',
+    source_survey_answered_at DATETIME DEFAULT NULL,
     environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_visitor (visitor_id),
@@ -1054,7 +1057,8 @@ CREATE TABLE IF NOT EXISTS referral_events (
     INDEX idx_event_created (event_type, created_at),
     INDEX idx_subscription (subscription_id),
     INDEX idx_env_created (environment, created_at),
-    INDEX idx_ip (ip_address)
+    INDEX idx_ip (ip_address),
+    INDEX idx_survey_answer (source_survey_answer, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Manual monthly ad-spend entry per source. Used to compute Customer

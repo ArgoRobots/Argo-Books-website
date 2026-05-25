@@ -51,7 +51,7 @@ $platform     = (string)($data['platform']     ?? '');
 $app_version  = (string)($data['app_version']  ?? '');
 $machine_uuid = (string)($data['machine_uuid'] ?? '');
 
-if ($event_type !== 'app_first_run') {
+if ($event_type !== 'app_first_run' && $event_type !== 'signup_survey') {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Unsupported event']);
     exit;
@@ -61,6 +61,80 @@ if (!preg_match('/^[a-z]{3,8}$/', $platform)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Invalid platform']);
     exit;
+}
+
+// signup_survey: the user answered "Where did you hear about Argo Books?".
+// Update the existing app_first_run row for this machine_uuid in place rather
+// than inserting a new event row (a single first-run row per machine is the
+// funnel's source of truth).
+if ($event_type === 'signup_survey') {
+    $answer = strtolower((string)($data['answer'] ?? ''));
+    $allowed = ['google', 'bing', 'youtube', 'reddit', 'friend', 'email', 'other'];
+    if (!in_array($answer, $allowed, true)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid answer']);
+        exit;
+    }
+    if (!preg_match('/^[0-9a-fA-F-]{32,36}$/', $machine_uuid)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Invalid machine_uuid']);
+        exit;
+    }
+
+    // Freeform text accompanies the "other" answer. Trim, cap at 200 chars,
+    // strip control characters so it stores cleanly. Ignore for non-other answers.
+    $other_text = null;
+    if ($answer === 'other') {
+        $raw_other = trim((string)($data['other_text'] ?? ''));
+        if ($raw_other === '') {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Missing other_text']);
+            exit;
+        }
+        $other_text = preg_replace('/[\x00-\x1F\x7F]/u', '', $raw_other);
+        if (mb_strlen($other_text) > 200) {
+            $other_text = mb_substr($other_text, 0, 200);
+        }
+    }
+
+    try {
+        // Find the most recent app_first_run row for this machine.
+        $find = $pdo->prepare(
+            "SELECT id FROM referral_events
+              WHERE event_type = 'app_first_run'
+                AND JSON_UNQUOTE(JSON_EXTRACT(event_data, '$.machine_uuid')) = ?
+              ORDER BY created_at DESC LIMIT 1"
+        );
+        $find->execute([$machine_uuid]);
+        $row = $find->fetch();
+        if ($row === false) {
+            // Survey arrived before first-run was logged. Desktop only fires
+            // the survey after the first-run marker is written, so this is
+            // exceptional. Respond 200 with deferred=true so the client doesn't
+            // retry forever.
+            echo json_encode(['success' => true, 'deferred' => true]);
+            exit;
+        }
+
+        // The IS NULL guard makes this idempotent: a second submission for the
+        // same machine is silently dropped.
+        $upd = $pdo->prepare(
+            "UPDATE referral_events
+                SET source_survey_answer = ?,
+                    source_survey_other_text = ?,
+                    source_survey_answered_at = NOW()
+              WHERE id = ? AND source_survey_answer IS NULL"
+        );
+        $upd->execute([$answer, $other_text, $row['id']]);
+
+        echo json_encode(['success' => true]);
+        exit;
+    } catch (PDOException $e) {
+        error_log('track-app-event signup_survey failed: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Server error']);
+        exit;
+    }
 }
 
 /**

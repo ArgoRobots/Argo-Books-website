@@ -109,7 +109,13 @@ $resolved_source = null;
 if (isset($_GET['source']) && !empty($_GET['source'])) {
     $candidate = trim($_GET['source']);
     if (preg_match('/^[a-zA-Z0-9_-]+$/', $candidate)) {
-        $resolved_source = $candidate;
+        // Google Ads sources require a gclid. Google auto-tagging adds a signed
+        // gclid to every real ad click; bots that scrape URLs with `?source=google-ads-...`
+        // almost never include one, so its absence is a strong fake-click signal.
+        $is_google_ads = strpos($candidate, 'google-ads-') === 0;
+        if (!$is_google_ads || !empty($_GET['gclid'])) {
+            $resolved_source = $candidate;
+        }
     }
 }
 

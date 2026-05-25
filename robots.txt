@@ -8,6 +8,9 @@ Allow: /
 # Disallow admin areas
 Disallow: /admin/
 
+# Disallow API endpoints (return JSON, not useful for indexing)
+Disallow: /api/
+
 # Disallow user profile pages in community
 Disallow: /community/users/
 

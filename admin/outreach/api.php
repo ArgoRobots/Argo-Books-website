@@ -1353,7 +1353,7 @@ function classify_company_sizes($pdo)
     $systemPrompt = "You classify businesses by company size. For each business in the list, determine if it is 'small', 'medium', or 'large' based on available information.
 
 Guidelines:
-- Small: Solo operators, freelancers, local mom-and-pop shops, single-location businesses with likely fewer than 20 employees. Most local service businesses (plumbers, landscapers, cleaners, small restaurants, local retail) are small.
+- Small: Solo operators, freelancers, local mom-and-pop shops, single-location businesses with likely fewer than 20 employees. Most local service businesses (plumbers, landscapers, cleaners) are small.
 - Medium: Businesses with multiple locations, established regional presence, or likely 20-200 employees. Regional chains, mid-size professional firms, established contractors with large teams.
 - Large: Major corporations, national/international chains, franchises of well-known brands, businesses with likely 200+ employees.
 

@@ -132,6 +132,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/styles/faq.css">
+    <link rel="stylesheet" href="../resources/styles/pricing-cards.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
 </head>
@@ -155,114 +156,13 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <section class="pricing-section">
         <div class="container">
-            <div class="pricing-cards-wrapper">
-                <!-- Free Card -->
-                <a href="../downloads/" class="pricing-card-link">
-                    <div class="pricing-card free-card">
-                        <h2>Free</h2>
-                        <div class="card-price">
-                            <span class="currency">$</span>
-                            <span class="amount">0</span>
-                            <span class="period">forever</span>
-                        </div>
-                        <p class="price-note">No account required</p>
-
-                        <ul class="card-features">
-                            <?php foreach ($plans['free']['features'] as $feature): ?>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span><?= render_feature_label($feature) ?></span>
-                            </li>
-                            <?php endforeach; ?>
-                        </ul>
-
-                        <div class="card-cta">
-                            <span class="cta-button free-cta">Download for Free</span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Premium Subscription Card -->
-                <a href="premium/" class="pricing-card-link">
-                    <div class="pricing-card ai-card">
-                        <div class="card-badge ai-badge">Most popular</div>
-                        <h2>Premium</h2>
-                        <div class="card-price">
-                            <span class="currency">$</span>
-                            <span class="amount"><?php echo number_format($monthlyPrice, 0); ?></span>
-                            <span class="period">CAD/month</span>
-                        </div>
-                        <p class="price-note">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
-
-                        <ul class="card-features">
-                            <?php foreach ($plans['premium']['features'] as $feature): ?>
-                            <li>
-                                <?= svg_icon('check-pricing') ?>
-                                <span><?= render_feature_label($feature) ?></span>
-                            </li>
-                            <?php endforeach; ?>
-                        </ul>
-
-                        <div class="card-cta">
-                            <span class="cta-button ai-cta">Get Premium</span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         HONEST PRICING / MADE IN CANADA
-         ============================================= -->
-    <section class="honest-pricing">
-        <div class="container">
-            <div class="honest-pricing-inner animate-on-scroll">
-                <div class="honest-pricing-badge">
-                    <img src="../resources/images/canada-flag.svg" alt="Canadian flag" width="22" height="11">
-                    <span>Made in Saskatoon, Canada</span>
-                </div>
-                <h2>Same price forever. No price creep</h2>
-                <p class="honest-pricing-lede">We're a small Canadian team, with no investors pushing us to inflate prices or game your renewal. The price you see is the price you pay. This year, next year, always.</p>
-
-                <div class="honest-pricing-compare">
-                    <div class="compare-card compare-them">
-                        <span class="compare-label">The usual playbook</span>
-                        <div class="compare-price-flow">
-                            <span class="compare-price-start">$7.80<small>/mo</small></span>
-                            <span class="compare-arrow">&rarr;</span>
-                            <span class="compare-price-end">$26<small>/mo</small></span>
-                        </div>
-                        <p class="compare-desc">"70% off for 4 months", then a 233% price jump on the 5th bill.</p>
-                    </div>
-                    <div class="compare-card compare-us">
-                        <span class="compare-label">Argo Books</span>
-                        <div class="compare-price-flow">
-                            <span class="compare-price-flat">$<?php echo number_format($monthlyPrice, 0); ?><small>/mo</small></span>
-                        </div>
-                        <p class="compare-desc">One price. Forever. No countdown clock, no surprise renewal.</p>
-                    </div>
-                </div>
-
-                <ul class="honest-pricing-promises">
-                    <li>
-                        <?= svg_icon('check', 18) ?>
-                        <span>No "intro pricing" that doubles after a few months</span>
-                    </li>
-                    <li>
-                        <?= svg_icon('check', 18) ?>
-                        <span>No annual price hikes. Your rate is locked in</span>
-                    </li>
-                    <li>
-                        <?= svg_icon('check', 18) ?>
-                        <span>No surprise add-on fees for features you'd expect</span>
-                    </li>
-                    <li>
-                        <?= svg_icon('check', 18) ?>
-                        <span>Cancel in two clicks, no phone calls</span>
-                    </li>
-                </ul>
-            </div>
+            <?php
+            $pricingCardsOptions = [
+                'free_cta_url'     => '../downloads/',
+                'premium_cta_url'  => 'premium/',
+            ];
+            include __DIR__ . '/../partials/pricing-cards.php';
+            ?>
         </div>
     </section>
 
@@ -594,6 +494,22 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         }, observerOptions);
         document.querySelectorAll('.animate-on-scroll').forEach(el => {
             observer.observe(el);
+        });
+
+        // Pricing cycle toggle
+        document.querySelectorAll('.pcards-cycle-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const cycle = this.dataset.cycle;
+                document.querySelectorAll('.pcards-cycle-btn').forEach(b => {
+                    const isActive = b === this;
+                    b.classList.toggle('active', isActive);
+                    b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+                document.querySelectorAll('[data-active-cycle]').forEach(c => {
+                    c.dataset.activeCycle = cycle;
+                });
+            });
         });
 
         const faqItems = document.querySelectorAll('.faq-item');

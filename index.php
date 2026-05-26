@@ -3,14 +3,7 @@ session_start();
 require_once __DIR__ . '/community/users/user_functions.php';
 require_once __DIR__ . '/track_referral.php';
 require_once __DIR__ . '/statistics.php';
-require_once __DIR__ . '/config/pricing.php';
 require_once __DIR__ . '/resources/icons.php';
-
-$pricing = get_pricing_config();
-$plans = get_plan_features();
-$monthlyPrice = $pricing['premium_monthly_price'];
-$yearlyPrice = $pricing['premium_yearly_price'];
-$yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
 track_page_view($_SERVER['REQUEST_URI']);
 
@@ -117,6 +110,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">
+    <link rel="stylesheet" href="resources/styles/pricing-cards.css">
     <link rel="stylesheet" href="resources/header/style.css">
     <link rel="stylesheet" href="resources/footer/style.css">
 </head>
@@ -146,11 +140,8 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">
-                        <span>Get Started Free</span>
+                        <span>Get Started For Free</span>
                         <?= svg_icon('arrow-right', 20) ?>
-                    </a>
-                    <a href="/features/" class="btn btn-secondary btn-lg">
-                        <span>See Features</span>
                     </a>
                 </div>
             </div>
@@ -1216,66 +1207,13 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 <p class="section-description">Start free, upgrade when you need more. No hidden fees, no surprises.</p>
             </div>
 
-            <div class="pricing-grid">
-                <!-- Free Plan -->
-                <div class="pricing-card animate-on-scroll">
-                    <div class="pricing-header">
-                        <span class="pricing-tag">Free Forever</span>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount">0</span>
-                        </div>
-                        <p class="pricing-description">Perfect for getting started</p>
-                    </div>
-                    <ul class="pricing-features">
-                        <?php foreach ($plans['free']['features'] as $feature): ?>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><?= render_feature_label($feature) ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="downloads" class="btn btn-secondary btn-block">Get Started Free</a>
-                </div>
-
-                <!-- Premium Plan -->
-                <div class="pricing-card ai-card animate-on-scroll">
-                    <div class="pricing-header">
-                        <span class="pricing-tag ai">Premium</span>
-                        <div class="pricing-amount">
-                            <span class="currency">$</span>
-                            <span class="amount"><?php echo number_format($monthlyPrice, 0); ?></span>
-                            <span class="period">CAD/month</span>
-                        </div>
-                        <p class="pricing-alt">or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year (save $<?php echo number_format($yearlySavings, 0); ?>)</p>
-                        <p class="pricing-description">Unlock the full power of Argo Books</p>
-                    </div>
-                    <ul class="pricing-features">
-                        <?php foreach ($plans['premium']['features'] as $feature): ?>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span><?= render_feature_label($feature) ?></span>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <a href="pricing/premium/" class="btn btn-ai btn-block">Subscribe to Premium</a>
-                </div>
-            </div>
-
-            <!-- Mini Price Lock-In Strip -->
-            <div class="price-lock-strip animate-on-scroll">
-                <div class="price-lock-flag">
-                    <img src="resources/images/canada-flag.svg" alt="Canadian flag" width="26" height="13">
-                </div>
-                <div class="price-lock-content">
-                    <h3>Same price forever. No price creep</h3>
-                    <p>Made in Saskatoon. No "intro pricing" that doubles after a few months, no annual hikes.</p>
-                </div>
-                <a href="pricing/" class="price-lock-link">
-                    <span>See the promise</span>
-                    <?= svg_icon('arrow-right', 16) ?>
-                </a>
-            </div>
+            <?php
+            $pricingCardsOptions = [
+                'free_cta_url'     => 'downloads',
+                'premium_cta_url'  => 'pricing/premium/',
+            ];
+            include __DIR__ . '/partials/pricing-cards.php';
+            ?>
         </div>
     </section>
 
@@ -1365,7 +1303,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <p>Start using Argo Books to save time, reduce errors, and grow smarter.</p>
                     <div class="cta-buttons">
                         <a href="downloads" class="btn btn-white btn-lg">
-                            <span>Get Started Free</span>
+                            <span>Get Started For Free</span>
                             <?= svg_icon('arrow-right', 20) ?>
                         </a>
                         <a href="pricing/" class="btn btn-outline-white btn-lg">
@@ -1438,6 +1376,21 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
 
         document.querySelectorAll('.animate-on-scroll').forEach(el => {
             observer.observe(el);
+        });
+
+        // Pricing cycle toggle
+        document.querySelectorAll('.pcards-cycle-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const cycle = this.dataset.cycle;
+                document.querySelectorAll('.pcards-cycle-btn').forEach(b => {
+                    const isActive = b === this;
+                    b.classList.toggle('active', isActive);
+                    b.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+                document.querySelectorAll('[data-active-cycle]').forEach(c => {
+                    c.dataset.activeCycle = cycle;
+                });
+            });
         });
 
         // Feature tabs

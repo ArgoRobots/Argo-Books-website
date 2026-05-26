@@ -1,0 +1,255 @@
+/* ========================================
+   Shared Pricing Cards
+   Used by the landing page and /pricing/.
+   Source partial: /partials/pricing-cards.php
+   ======================================== */
+
+/* Billing cycle toggle */
+.pcards-toggle {
+    display: flex;
+    margin: 0 auto 32px;
+    padding: 4px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    max-width: 360px;
+    width: 100%;
+    justify-content: center;
+}
+
+.pcards-cycle-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--gray-700);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    white-space: nowrap;
+}
+
+.pcards-cycle-btn:hover:not(.active) {
+    color: var(--gray-900);
+}
+
+.pcards-cycle-btn.active {
+    background: var(--white);
+    color: var(--purple-500);
+    box-shadow: 0 2px 8px var(--shadow-default);
+}
+
+.pcards-save {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--purple-50, #f3e8ff);
+    color: var(--purple-600);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.pcards-cycle-btn:not(.active) .pcards-save {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+/* Card grid */
+.pcards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 750px;
+    margin: 0 auto;
+}
+
+.pcards-grid[data-active-cycle="monthly"] [data-cycle="yearly"] { display: none; }
+.pcards-grid[data-active-cycle="yearly"] [data-cycle="monthly"] { display: none; }
+
+@media (max-width: 768px) {
+    .pcards-grid {
+        grid-template-columns: 1fr;
+        max-width: 450px;
+    }
+}
+
+/* Card */
+.pcard {
+    background: var(--white);
+    border-radius: 24px;
+    padding: 32px;
+    border: 1px solid var(--gray-200);
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.pcard:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--shadow-default);
+}
+
+.pcard-premium {
+    border: 2px solid var(--purple-500);
+}
+
+.pcard-head {
+    margin-top: 16px;
+    margin-bottom: 32px;
+}
+
+.pcard-tag {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray-100);
+    color: var(--black);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pcard-tag-premium {
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    color: var(--white);
+}
+
+/* Price display */
+.pcard-amount {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.pcard-amount-yearly {
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.pcard-amount-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+}
+
+.pcard-currency {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.pcard-number {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.pcard-period {
+    font-size: 1rem;
+    color: var(--black);
+}
+
+.pcard-strike {
+    color: var(--gray-500, #9ca3af);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba(124, 58, 237, 0.45);
+    line-height: 1.2;
+    text-align: center;
+}
+
+.pcard-alt {
+    font-size: 0.9rem;
+    color: var(--black);
+    font-weight: 600;
+    text-align: center;
+    margin: 8px 0 0;
+}
+
+/* Features list */
+.pcard-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    flex: 1;
+    text-align: left;
+}
+
+.pcard-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-100);
+    font-size: 0.95rem;
+}
+
+.pcard-features li:last-child {
+    border-bottom: none;
+}
+
+.pcard-features li svg {
+    color: var(--black);
+    flex-shrink: 0;
+}
+
+.pcard-features li span {
+    color: var(--gray-900);
+}
+
+/* CTAs */
+.pcard-cta {
+    display: block;
+    width: 100%;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.pcard-cta-free {
+    background: var(--gray-900);
+    color: var(--white);
+    border: 2px solid var(--gray-900);
+}
+
+.pcard-cta-free:hover {
+    background: var(--black);
+    border-color: var(--black);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    color: var(--white);
+}
+
+.pcard-cta-premium {
+    background: linear-gradient(135deg, var(--purple-500), var(--purple-600));
+    color: var(--white);
+    border: 2px solid transparent;
+}
+
+.pcard-cta-premium:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px var(--purple-alpha-40, rgba(124, 58, 237, 0.4));
+    color: var(--white);
+}

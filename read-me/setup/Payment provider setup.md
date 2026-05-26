@@ -141,7 +141,7 @@ Historical steps (do not action):
 PayPal needs Plan records to exist before the site can sell Premium subscriptions through it. A CLI script creates them via the PayPal API:
 
 ```
-php webhooks/setup-paypal-plans.php
+php setup-paypal-plans.php
 ```
 
 It uses `APP_ENV` to decide whether to create plans in sandbox or live PayPal, so it must be run **twice**: once with `APP_ENV=sandbox` to create the sandbox plans, and again with `APP_ENV=production` for the live plans. Each run prints two Plan IDs (Monthly and Yearly):

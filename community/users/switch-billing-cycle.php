@@ -55,7 +55,7 @@ if (!in_array($payment_method, ['stripe', 'square', 'paypal'], true)) {
 // subscribed seconds ago and the webhook hasn't arrived). Block here
 // rather than later in the flow.
 if ($is_paypal) {
-    require_once __DIR__ . '/../../webhooks/paypal-helper.php';
+    require_once __DIR__ . '/../../paypal-helper.php';
     $paypal_recent_sale = getMostRecentPayPalSale($premium_subscription['subscription_id']);
     if (!$paypal_recent_sale) {
         $redirect_with_error('Your subscription is still being activated by PayPal. Please wait a few minutes after subscribing before changing cycles.');
@@ -212,7 +212,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 // PayPal flow: show the breakdown with refund-style copy,
                 // then send the user to checkout where they'll approve a
                 // new PayPal subscription with the new plan_id.
-                // PayPal subscription plans (see webhooks/setup-paypal-plans.php)
+                // PayPal subscription plans (see setup-paypal-plans.php)
                 // are configured with the BASE price only. PayPal does NOT add
                 // our processing fee on top. So "charged today by PayPal" must
                 // show the base, not base+fee, or the user sees one number on

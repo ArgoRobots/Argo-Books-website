@@ -2,14 +2,14 @@
 /**
  * Follow-up smoke tests.
  *
- * Run via: php cron/test_followups_smoke.php
+ * Run via: php tests/Smoke/test_followups_smoke.php
  *
  * Inserts fake data into the real local DB, runs assertions, then cleans up.
  * DO NOT RUN AGAINST PRODUCTION. Aborts immediately if APP_ENV='production'.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+require_once __DIR__ . '/../../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
 $dotenv->load();
 
 if (($_ENV['APP_ENV'] ?? '') === 'production') {
@@ -17,9 +17,9 @@ if (($_ENV['APP_ENV'] ?? '') === 'production') {
     exit(2);
 }
 
-require_once __DIR__ . '/../db_connect.php';
-require_once __DIR__ . '/lib/outreach_helpers.php';
-require_once __DIR__ . '/lib/ab_helpers.php';
+require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../cron/lib/outreach_helpers.php';
+require_once __DIR__ . '/../../cron/lib/ab_helpers.php';
 
 global $pdo;
 

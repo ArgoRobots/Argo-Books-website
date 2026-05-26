@@ -20,9 +20,9 @@ if (php_sapi_name() !== 'cli') {
     die('Access denied. This script can only be run via CLI.');
 }
 
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../config/pricing.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/config/pricing.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 $pricing = get_pricing_config();

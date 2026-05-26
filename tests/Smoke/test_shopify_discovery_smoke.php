@@ -2,7 +2,7 @@
 /**
  * Shopify discovery smoke tests.
  *
- * Run via: php cron/test_shopify_discovery_smoke.php
+ * Run via: php tests/Smoke/test_shopify_discovery_smoke.php
  *
  * Pure-logic tests for the helpers in cron/lib/shopify_discovery.php using
  * injected HTML and product-JSON fixtures. No network, no DB.
@@ -10,8 +10,8 @@
  * DO NOT RUN AGAINST PRODUCTION. Aborts immediately if APP_ENV='production'.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+require_once __DIR__ . '/../../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
 $dotenv->load();
 
 if (($_ENV['APP_ENV'] ?? '') === 'production') {
@@ -19,7 +19,7 @@ if (($_ENV['APP_ENV'] ?? '') === 'production') {
     exit(2);
 }
 
-require_once __DIR__ . '/lib/shopify_discovery.php';  // pulls in outreach_helpers too
+require_once __DIR__ . '/../../cron/lib/shopify_discovery.php';  // pulls in outreach_helpers too
 
 $pass = 0;
 $fail = 0;

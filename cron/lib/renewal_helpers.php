@@ -11,7 +11,7 @@ declare(strict_types=1);
  * - recently_renewed: 23-hour idempotency guard against double-charges
  */
 
-require_once __DIR__ . '/../config/pricing.php';
+require_once __DIR__ . '/../../config/pricing.php';
 
 /**
  * Calculate new subscription end date.

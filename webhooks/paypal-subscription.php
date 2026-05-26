@@ -24,8 +24,8 @@ $dotenv->load();
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
-require_once __DIR__ . '/paypal-helper.php';
-require_once __DIR__ . '/../cron/_renewal_helpers.php';
+require_once __DIR__ . '/../paypal-helper.php';
+require_once __DIR__ . '/../cron/lib/renewal_helpers.php';
 require_once __DIR__ . '/../track_referral_event.php';
 
 // Only accept POST requests

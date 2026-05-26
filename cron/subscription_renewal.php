@@ -42,7 +42,7 @@ require_once __DIR__ . '/../config/pricing.php';
 
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../email_sender.php';
-require_once __DIR__ . '/_renewal_helpers.php';
+require_once __DIR__ . '/lib/renewal_helpers.php';
 require_once __DIR__ . '/lib/run_tracker.php';
 require_once __DIR__ . '/../track_referral_event.php';
 
@@ -131,7 +131,7 @@ foreach ($subscriptions as $subscription) {
     logMessage("Processing renewal for subscription: $subscriptionId (User: $userId, Method: $paymentMethod, Credit: $$creditBalance)");
 
     // Decide credit/charge split (and add processing fee). Single source of
-    // truth lives in cron/_renewal_helpers.php so it can be unit-tested.
+    // truth lives in cron/lib/renewal_helpers.php so it can be unit-tested.
     $pricingConfig = get_pricing_config();
     $decision = decide_renewal_charge((float) $creditBalance, $billing, $pricingConfig);
     $useCredit = $decision['useCredit'];
@@ -218,7 +218,7 @@ foreach ($subscriptions as $subscription) {
 
     try {
         // Idempotency guard against double-charges (overlapping cron runs,
-        // manual retries). Single source of truth in _renewal_helpers.php.
+        // manual retries). Single source of truth in cron/lib/renewal_helpers.php.
         if (recently_renewed($pdo, $subscriptionId)) {
             logMessage("Skipping $subscriptionId - already renewed within the last 23 hours", 'INFO');
             $skippedCount++;

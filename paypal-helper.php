@@ -350,7 +350,7 @@ function getMostRecentPayPalSale($subscriptionId) {
  * @param string $result The processing result
  */
 function logPayPalWebhookEvent($eventType, $data, $result = 'processed') {
-    $logDir = __DIR__ . '/../cron/logs';
+    $logDir = __DIR__ . '/cron/logs';
     if (!is_dir($logDir)) {
         mkdir($logDir, 0700, true);
     }

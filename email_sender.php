@@ -2,7 +2,24 @@
 
 require_once __DIR__ . '/smtp_mailer.php';
 require_once __DIR__ . '/config/pricing.php';
-require_once __DIR__ . '/_email_helpers.php';
+
+/**
+ * Strip CR/LF and the rest of the ASCII control range from any value that
+ * ends up in an email header. PHPMailer sanitizes its own header inputs,
+ * but the mail() fallback path in send_styled_email() concatenates these
+ * into the headers string verbatim. A stray newline would let an attacker
+ * inject Bcc/Cc/etc. via user-controlled fields (subject lines from
+ * community posts, contact-form reply-to, etc.).
+ *
+ * Returns null for null input so callers can pass through optional fields.
+ */
+function sanitize_header_value(?string $value): ?string
+{
+    if ($value === null) {
+        return null;
+    }
+    return preg_replace('/[\r\n\x00-\x1f]+/', ' ', $value);
+}
 
 // Note: send_post_reply_email() and send_mention_email() defined below
 // call into helpers from email_marketing.php (should_send_marketing_email,
@@ -44,9 +61,9 @@ function _premium_feature_list_items($prefix = '')
  */
 function send_styled_email($to_email, $subject, $body_content, $header_style = '', $from_email = null, $from_name = null, $reply_to = null, $extra_headers = [], $preheader = null, $format = 'html', &$message_id = null)
 {
-    // sanitize_header_value() (in _email_helpers.php) strips CR/LF and ASCII
-    // control chars so user-controlled fields can't inject Bcc/Cc/etc into
-    // the mail() fallback's concatenated header string.
+    // sanitize_header_value() strips CR/LF and ASCII control chars so
+    // user-controlled fields can't inject Bcc/Cc/etc into the mail()
+    // fallback's concatenated header string.
     $to_email = sanitize_header_value($to_email);
     $subject = (string) sanitize_header_value($subject);
     $from_email = sanitize_header_value($from_email);

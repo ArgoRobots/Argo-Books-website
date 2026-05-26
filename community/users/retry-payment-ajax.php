@@ -11,7 +11,7 @@ require_once __DIR__ . '/../../email_sender.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../community_functions.php';
 require_once __DIR__ . '/user_functions.php';
-require_once __DIR__ . '/../../webhooks/paypal-helper.php';
+require_once __DIR__ . '/../../paypal-helper.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral_event.php';
 

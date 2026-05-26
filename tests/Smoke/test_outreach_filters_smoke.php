@@ -3,7 +3,7 @@
  * Smoke tests for the outreach auto-filter helpers added after the
  * Air Canada Maple Leaf Lounge lead incident.
  *
- * Run via: php cron/test_outreach_filters_smoke.php
+ * Run via: php tests/Smoke/test_outreach_filters_smoke.php
  *
  * Pure-logic tests, no network, no DB. The AI gate (Layer 3) is not
  * exercised here because it actually calls Gemini; that's covered by
@@ -12,8 +12,8 @@
  * DO NOT RUN AGAINST PRODUCTION. Aborts immediately if APP_ENV='production'.
  */
 
-require_once __DIR__ . '/../vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+require_once __DIR__ . '/../../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
 $dotenv->load();
 
 if (($_ENV['APP_ENV'] ?? '') === 'production') {
@@ -21,7 +21,7 @@ if (($_ENV['APP_ENV'] ?? '') === 'production') {
     exit(2);
 }
 
-require_once __DIR__ . '/lib/outreach_helpers.php';
+require_once __DIR__ . '/../../cron/lib/outreach_helpers.php';
 
 $pass = 0;
 $fail = 0;

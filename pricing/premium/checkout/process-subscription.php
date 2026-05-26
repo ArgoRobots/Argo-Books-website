@@ -154,7 +154,7 @@ try {
                 // outbound URL paths to PayPal (cancel, refund). Reject
                 // anything that doesn't match the alphanumeric+hyphen format
                 // before it can persist or reach an API call.
-                require_once __DIR__ . '/../../../webhooks/paypal-helper.php';
+                require_once __DIR__ . '/../../../paypal-helper.php';
                 if (!isValidPayPalResourceId($paypalSubscriptionId)) {
                     $pdo->rollBack();
                     error_log("Rejected PayPal subscription with invalid id format. user_id=$userId, raw_id=" . substr((string) $paypalSubscriptionId, 0, 64));
@@ -404,7 +404,7 @@ try {
         );
         $paypalCycleSwitchData = null;
         if ($isPayPalCycleSwitch) {
-            require_once __DIR__ . '/../../../webhooks/paypal-helper.php';
+            require_once __DIR__ . '/../../../paypal-helper.php';
             require_once __DIR__ . '/../../../community/users/user_functions.php';
 
             // Re-read the row INSIDE the transaction with FOR UPDATE so a

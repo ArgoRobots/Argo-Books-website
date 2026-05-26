@@ -25,7 +25,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 
 require_once __DIR__ . '/../db_connect.php';
-require_once __DIR__ . '/_purge_helpers.php';
+require_once __DIR__ . '/lib/purge_helpers.php';
 require_once __DIR__ . '/lib/run_tracker.php';
 
 function logPurge($message, $type = 'INFO') {

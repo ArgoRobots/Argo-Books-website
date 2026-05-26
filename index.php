@@ -11,6 +11,26 @@ track_page_view($_SERVER['REQUEST_URI']);
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     check_remember_me();
 }
+
+// Pull the current app version + release date from the Sparkle update feed so
+// the homepage JSON-LD stays in sync with releases. Fallbacks cover the case
+// where the feed is missing or malformed; both values are echoed via
+// json_encode below so anything unexpected can't break the structured-data
+// block.
+$current_version = '2.0.7';
+$current_release_date = '2026-01-01';
+$update_xml = @simplexml_load_file(__DIR__ . '/avalonia-update.xml');
+if ($update_xml !== false && isset($update_xml->channel->item[0])) {
+    $item = $update_xml->channel->item[0];
+    $sparkle_version = (string) $item->children('sparkle', true)->version;
+    if ($sparkle_version !== '') {
+        $current_version = $sparkle_version;
+    }
+    $parsed_pub_date = strtotime((string) $item->pubDate);
+    if ($parsed_pub_date !== false) {
+        $current_release_date = date('Y-m-d', $parsed_pub_date);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,9 +115,9 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 }
             },
             "downloadUrl": "https://argorobots.com/downloads",
-            "softwareVersion": "1.0.4",
+            "softwareVersion": <?php echo json_encode($current_version); ?>,
             "datePublished": "2025-05-01",
-            "dateModified": "2025-11-28"
+            "dateModified": <?php echo json_encode($current_release_date); ?>
         }
     </script>
 

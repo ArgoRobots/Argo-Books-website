@@ -796,18 +796,20 @@ function reddit_fetch_label_examples($pdo, int $limitEach = 5): array
 function reddit_generate_draft(array $thread, array $topComments, array $regenContext = []): array
 {
     $systemPrompt = REDDIT_VOICE_DOC . "\n\n# Output rules for this task\n"
-        . "You are drafting a Reddit reply for the founder to copy-paste manually. "
+        . "You are drafting a Reddit reply to be copy-pasted manually. "
         . "Follow the voice rules strictly. Output ONLY the reply text, no preamble, no explanation, "
         . "no markdown formatting unless natural for Reddit. Do not include a URL. "
-        . "Do not include disclosure unless mentioning Argo Books. Keep it short: 2–4 short paragraphs at most.";
+        . "Do not claim to have built, founded, or developed Argo Books. "
+        . "Keep it short: 2 to 4 short paragraphs at most.";
 
-    $commentsBlock = empty($topComments)
+    $topCommentsForDraft = array_slice($topComments, 0, 5);
+    $commentsBlock = empty($topCommentsForDraft)
         ? '(no comments yet)'
-        : implode("\n---\n", array_map(fn($c) => mb_substr($c, 0, 400), $topComments));
+        : implode("\n---\n", array_map(fn($c) => mb_substr($c, 0, 250), $topCommentsForDraft));
 
     $userPrompt = "Subreddit: r/" . ($thread['subreddit'] ?? '')
         . "\nThread title: " . ($thread['title'] ?? '')
-        . "\nBody: " . (empty($thread['body']) ? '(link post, no body)' : mb_substr((string) $thread['body'], 0, 2000))
+        . "\nBody: " . (empty($thread['body']) ? '(link post, no body)' : mb_substr((string) $thread['body'], 0, 800))
         . "\nTop comments (for context, don't repeat what others already said):\n" . $commentsBlock;
 
     // Regeneration context: when the founder rejected a previous draft, show

@@ -14,11 +14,6 @@
  */
 
 return [
-    'restaurants' => [
-        'matching tip splits and daily cash drops',
-        'matching supplier invoices against rising food costs',
-        'end-of-month sales tax without a finance person',
-    ],
     'plumbers' => [
         'juggling estimates, invoices, and chasing late payments between jobs',
         'tracking parts receipts that pile up in the truck',
@@ -28,11 +23,6 @@ return [
         'turning field notes into clean invoices after a long day',
         'tracking permits and material costs per job',
         'chasing payment from general contractors',
-    ],
-    'dentists' => [
-        'matching insurance payments against what was billed',
-        'tracking supply costs without a full accounting team',
-        'month-end reports that do not take a whole evening',
     ],
     'lawyers' => [
         'tracking billable hours alongside expenses',
@@ -47,10 +37,6 @@ return [
         'tracking expenses across listings and closings',
         'separating commission income from deductible costs at tax time',
         'invoicing referral fees and staging costs',
-    ],
-    'insurance agents' => [
-        'tracking commissions against the expenses of running the office',
-        'simple books that do not require an accounting background',
     ],
     'auto repair' => [
         'parts invoices piling up between jobs',
@@ -328,14 +314,6 @@ return [
         'recurring unit invoices that go out on time every month',
         'late fees handled without chasing each tenant',
     ],
-    'courier services' => [
-        'per-delivery invoicing that does not bog down the day',
-        'tracking fuel and vehicle costs simply',
-    ],
-    'towing services' => [
-        'quick on-the-road invoicing after a call-out',
-        'tracking fuel, storage fees, and impound charges cleanly',
-    ],
     'glass repair' => [
         'insurance-billed jobs vs direct-pay customers tracked cleanly',
         'parts and trip fees per job',
@@ -380,19 +358,6 @@ return [
         'client invoicing and contractor pay-outs tracked together',
         'margin per placement at a glance',
     ],
-    'travel agencies' => [
-        'commission income tracked against the expenses of running the office',
-        'client deposits and balances cleanly recorded',
-    ],
-    'event venues' => [
-        'deposit-then-final invoicing per booking',
-        'vendor pass-throughs separate from your own revenue',
-    ],
-    'food trucks' => [
-        'daily cash-vs-card matching',
-        'tracking food and fuel costs against sales',
-    ],
-
     '_default' => [
         'keeping books up to date without losing an evening to it',
         'tracking receipts before they disappear',

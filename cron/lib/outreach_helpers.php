@@ -15,8 +15,8 @@ define('OUTREACH_HELPERS_LOADED', true);
 // ─── Discovery Category Pool ───
 // Used by both the cron pipeline (deterministic cycling) and search_businesses_core (random fallback for admin searches)
 const OUTREACH_CATEGORY_POOL = [
-    'restaurants', 'plumbers', 'electricians', 'dentists', 'lawyers',
-    'accountants', 'real estate agents', 'insurance agents', 'auto repair',
+    'plumbers', 'electricians', 'lawyers',
+    'accountants', 'real estate agents', 'auto repair',
     'hair salons', 'fitness gyms', 'chiropractors', 'veterinarians',
     'cleaning services', 'landscaping', 'roofing contractors', 'HVAC',
     'photographers', 'florists', 'bakeries', 'coffee shops', 'pet stores',
@@ -37,8 +37,7 @@ const OUTREACH_CATEGORY_POOL = [
     'property management', 'storage facilities', 'glass repair',
     'fencing contractors', 'concrete contractors', 'paving contractors',
     'tree services', 'snow removal', 'pool services', 'septic services',
-    'garage door repair', 'security companies', 'staffing agencies',
-    'travel agencies', 'event venues', 'food trucks',
+    'garage door repair', 'security companies', 'staffing agencies'
 ];
 
 // ─── Category Pain Points ───

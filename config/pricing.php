@@ -98,6 +98,11 @@ function _pricing_parse_int_env($key, $default) {
 
 /**
  * Get the plan features configuration from plans.json.
+ *
+ * Placeholders in the JSON (e.g. {free_invoice_monthly_limit}) are substituted
+ * against the env-driven pricing config so the four monthly limits stay in
+ * sync with .env without having to edit plans.json by hand.
+ *
  * Uses static caching so the file is only read once per request.
  *
  * @return array Plan data with 'free' and 'premium' keys
@@ -109,7 +114,15 @@ function get_plan_features() {
         return $plans;
     }
 
-    $plans = json_decode(file_get_contents(__DIR__ . '/plans.json'), true);
+    $cfg = get_pricing_config();
+    $json = file_get_contents(__DIR__ . '/plans.json');
+    $json = strtr($json, [
+        '{free_invoice_monthly_limit}'      => (string) $cfg['free_invoice_monthly_limit'],
+        '{free_receipt_scan_monthly_limit}' => (string) $cfg['free_receipt_scan_monthly_limit'],
+        '{ai_import_monthly_limit}'         => (string) $cfg['ai_import_monthly_limit'],
+        '{receipt_scan_monthly_limit}'      => (string) $cfg['receipt_scan_monthly_limit'],
+    ]);
+    $plans = json_decode($json, true);
     return $plans;
 }
 

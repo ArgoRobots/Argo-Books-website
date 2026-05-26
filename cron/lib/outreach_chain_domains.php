@@ -10,9 +10,12 @@
  * outreach pipeline targeting small business owners.
  *
  * Match rules (applied by filter_chain_domain in outreach_helpers.php):
- *   - exact host match: "aircanada.ca" matches  "aircanada.ca"
- *   - subdomain match:  "aircanada.ca" matches  "lounges.aircanada.ca"
- *   - TLD-suffix groups handle .gc.ca / .gov / .gov.uk / etc. uniformly
+ *   - exact host match:  "aircanada.ca" matches  "aircanada.ca"
+ *   - subdomain match:   parent-domain walk; "aircanada.ca" matches
+ *                        "lounges.aircanada.ca". The walk stops at 2
+ *                        labels, so list entries must be at least two
+ *                        labels (gc.ca, gov.bc.ca). Single-label
+ *                        suffixes like "gov" alone are not supported.
  *
  * Keep this list focused on the largest, clearest brands. False-positives
  * here cost a legit lead; false-negatives cost domain reputation. Aim for

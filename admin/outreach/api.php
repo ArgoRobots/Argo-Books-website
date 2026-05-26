@@ -889,6 +889,20 @@ function generate_draft($pdo)
         json_response(['success' => false, 'message' => $result['error']], 500);
     }
 
+    // The AI size gate (Layer 3 of the outreach auto-filter) can decide
+    // mid-draft that this lead is a chain/corp/institution and disqualify it
+    // instead of returning a draft. log_activity + status update were already
+    // done inside disqualify_lead(); surface it to the admin with a 409 so
+    // the UI can show "Disqualified" rather than render an empty subject/body.
+    if (!empty($result['disqualified'])) {
+        json_response([
+            'success' => false,
+            'disqualified' => true,
+            'reason' => $result['reason'] ?? 'auto_filter',
+            'message' => 'Lead disqualified by the auto-filter (' . ($result['reason'] ?? 'auto_filter') . '): ' . ($result['detail'] ?? ''),
+        ], 409);
+    }
+
     log_activity($pdo, $id, 'draft_generated', 'AI draft generated');
 
     json_response(['success' => true, 'subject' => $result['subject'], 'body' => $result['body']]);

@@ -1006,10 +1006,11 @@ function _outreach_host_from($value)
  * Air Canada Maple Leaf Lounge before any draft is generated.
  *
  * Matching:
- *   - exact host equality
- *   - subdomain equality (lounges.aircanada.ca matches aircanada.ca)
- *   - the special .gc.ca / .gov.ca / .gov / .gov.uk suffix-style entries
- *     in the curated list act as "any host ending with this suffix".
+ *   - exact host equality (aircanada.ca matches aircanada.ca)
+ *   - subdomain match by walking parent domains (lounges.aircanada.ca walks
+ *     up to aircanada.ca and matches). The walk stops at 2 labels, so
+ *     single-label suffixes like "gov" alone would not match; entries in
+ *     the curated list use at least two labels (gc.ca, gov.bc.ca, etc.).
  *
  * Returns false for empty / malformed input (do not over-reject if we
  * can't even parse it: other filters still apply).
@@ -1065,10 +1066,6 @@ const OUTREACH_PLACE_TYPE_BLOCKLIST = [
 
     // Corporate parent indicators.
     'corporate_office',
-
-    // Generic / catch-all "place" types that on their own carry no signal.
-    // We don't reject on these alone, but if Google has tagged the result
-    // with one of the above PLUS these, we still reject.
 ];
 
 /**
@@ -1250,10 +1247,11 @@ function disqualify_lead($pdo, $leadId, $reasonTag, $detailMessage)
             approval_status = 'not_drafted',
             notes = CONCAT(COALESCE(notes, ''),
                            CASE WHEN COALESCE(notes,'') = '' THEN '' ELSE '\n' END,
-                           '[Auto-filter ', ?, '] ', ?)
+                           '[Auto-filter ', ?, ' ', ?, '] ', ?)
         WHERE id = ?
     ");
     $stmt->execute([
+        $reasonTag,
         $reasonTag,
         date('Y-m-d H:i'),
         $detailMessage,
@@ -1828,12 +1826,13 @@ function generate_draft_for_lead($pdo, $lead)
     // pass-through (do NOT block drafting) so a transient Gemini outage
     // can't stall the pipeline. Layers 1+2 are the strong guards.
     //
-    // Skip if the lead is already classified as small_independent on a
-    // previous run (we re-use the business_summary column's presence as a
-    // proxy: if we ran the gate, we move forward; storing the explicit gate
-    // result would add a column and the AI call is cheap enough to repeat
-    // on regenerate). Also skip when the admin explicitly asked to bypass
-    // (e.g. manually-added leads where the admin already vetted them).
+    // Scope: only auto-discovered leads (sources ending in '_auto' such as
+    // 'google_places_auto' and 'shopify_auto'). Manually-added leads
+    // (source='manual', 'csv_import', etc.) bypass the gate on the
+    // assumption that the admin has already vetted them. The gate re-runs
+    // on every draft regeneration for an auto lead: the Gemini Flash call
+    // is cheap enough (~$0.0001/lead) that we don't bother caching the
+    // verdict in a column.
     $sourceVal = strtolower((string) ($lead['source'] ?? ''));
     $isAutoLead = str_ends_with($sourceVal, '_auto');
     if ($isAutoLead) {

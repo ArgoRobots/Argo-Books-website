@@ -1,0 +1,13 @@
+{
+    "options": [
+        { "key": "google",      "label": "Google" },
+        { "key": "bing",        "label": "Bing" },
+        { "key": "youtube",     "label": "YouTube" },
+        { "key": "reddit",      "label": "Reddit" },
+        { "key": "friend",      "label": "A friend" },
+        { "key": "email",       "label": "Email" },
+        { "key": "capterra",    "label": "Capterra" },
+        { "key": "producthunt", "label": "Product Hunt" },
+        { "key": "other",       "label": "Other", "freeform": true }
+    ]
+}

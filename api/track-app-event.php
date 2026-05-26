@@ -69,7 +69,10 @@ if (!preg_match('/^[a-z]{3,8}$/', $platform)) {
 // funnel's source of truth).
 if ($event_type === 'signup_survey') {
     $answer = strtolower((string)($data['answer'] ?? ''));
-    $allowed = ['google', 'bing', 'youtube', 'reddit', 'friend', 'email', 'other'];
+    // Valid answers come from config/survey-options.json (same source the app
+    // reads), so adding a survey option needs only that one file edit.
+    require_once __DIR__ . '/../config/survey_options.php';
+    $allowed = get_survey_option_keys();
     if (!in_array($answer, $allowed, true)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid answer']);
@@ -81,10 +84,11 @@ if ($event_type === 'signup_survey') {
         exit;
     }
 
-    // Freeform text accompanies the "other" answer. Trim, cap at 200 chars,
-    // strip control characters so it stores cleanly. Ignore for non-other answers.
+    // Freeform text accompanies any option flagged freeform in the JSON (today
+    // just "other"). Trim, cap at 200 chars, strip control characters so it
+    // stores cleanly. Ignore for non-freeform answers.
     $other_text = null;
-    if ($answer === 'other') {
+    if (in_array($answer, get_survey_freeform_keys(), true)) {
         $raw_other = trim((string)($data['other_text'] ?? ''));
         if ($raw_other === '') {
             http_response_code(400);

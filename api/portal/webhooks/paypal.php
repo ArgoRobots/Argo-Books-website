@@ -4,8 +4,13 @@
  *
  * POST /api/portal/webhooks/paypal
  *
- * Handles PayPal webhook events for invoice payments.
- * Backup confirmation for payments processed through the portal.
+ * Originally the backup confirmation channel for PayPal portal invoice
+ * payments. Portal-side PayPal is currently disabled (checkout.php,
+ * process-payment.php, and connect.php all return 503 PROVIDER_UNSUPPORTED;
+ * the customer-facing invoice page does not render a PayPal button), so no
+ * new PayPal portal payments are created. This handler therefore only fires
+ * for any legacy in-flight payments from before the disable. See CLAUDE.md
+ * (Payment gateways section) for the disablement rationale.
  */
 
 require_once __DIR__ . '/../portal-helper.php';

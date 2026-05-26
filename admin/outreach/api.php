@@ -917,6 +917,18 @@ function send_outreach_email($pdo)
         json_response(['success' => false, 'message' => 'No draft to send'], 400);
     }
 
+    // Guard against sending to disqualified leads. The auto-filter (chain
+    // domain, place type, AI size gate) caught this lead for a reason; if
+    // the admin really wants to override, they can clear status='disqualified'
+    // on the row directly. Refusing here keeps the UI's bulk-send flow safe.
+    if (($lead['status'] ?? '') === 'disqualified') {
+        $reasonTag = $lead['disqualified_reason'] ?? 'unspecified';
+        json_response([
+            'success' => false,
+            'message' => 'Lead was disqualified by the auto-filter (' . $reasonTag . '). Clear the disqualification first if you really want to send.'
+        ], 409);
+    }
+
     // Guard against re-sending to the same lead. Cold-outreach resends are
     // a spam-filter red flag and we never want this to happen by accident,
     // whether from the detail modal, the bulk-send flow, or a stray API call.

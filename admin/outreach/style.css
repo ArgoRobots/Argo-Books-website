@@ -305,6 +305,8 @@
 .badge-status-not_interested { background: var(--red-100); color: var(--red-700); }
 
 .badge-status-onboarded { background: var(--green-100); color: var(--green-800); }
+.badge-status-disqualified { background: var(--gray-100); color: var(--gray-700); }
+[data-theme="dark"] .badge-status-disqualified { background: var(--gray-700); color: var(--gray-200); }
 
 /* Company size badges */
 .badge-size-small { background: var(--green-100); color: var(--green-700); }

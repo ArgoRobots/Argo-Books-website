@@ -857,16 +857,25 @@ function send_followup_row($pdo, array $followupRow, ?string &$reason = null): b
 // ─── Email Gatekeeping Helper ───
 
 /**
- * Returns true if the email's local part matches a "gatekept" role prefix,
- * signalling a multi-person operation (support desk, partnerships team, etc.)
- * rather than a solo-founder inbox. CASL implied-consent outreach targets
- * individual business owners, so these addresses should be rejected.
+ * Returns true if the email's local part is a "gatekept" role mailbox
+ * (support desk, abuse inbox, phishing report, marketing team, etc.) rather
+ * than a solo-founder inbox. CASL implied-consent outreach targets individual
+ * business owners; these addresses should be rejected.
+ *
+ * Matching strategy:
+ *   1. Full local-part exact match against the token list (catches
+ *      "no-reply@", "donotreply@").
+ *   2. Each [._\-+]-separated segment exact match (catches
+ *      "phishing.hameconnage@aircanada.ca": "phishing" is in the list).
+ *   3. Multi-word tokens (customerservice, customercare) match as a prefix
+ *      on the full local part so they catch un-separated forms too.
+ *
  * Returns true for empty/malformed input as a defensive default.
  */
 function filter_gatekept_email($email)
 {
-    $email = trim($email);
-    if (empty($email)) return true;
+    $email = trim((string) $email);
+    if ($email === '') return true;
 
     $at = strpos($email, '@');
     if ($at === false) return true;
@@ -874,13 +883,384 @@ function filter_gatekept_email($email)
     $local = strtolower(substr($email, 0, $at));
     if ($local === '') return true;
 
-    static $gatekept = [
-        'support', 'partnerships', 'help', 'sales', 'careers', 'jobs',
-        'press', 'media', 'legal', 'billing', 'noreply', 'no-reply',
-        'donotreply', 'abuse', 'webmaster', 'postmaster',
+    static $tokens = [
+        // Original Shopify-channel list (kept for backward compatibility).
+        'support', 'partnerships', 'partnership', 'help', 'sales',
+        'careers', 'jobs', 'press', 'media', 'legal', 'billing',
+        'noreply', 'no-reply', 'donotreply', 'do-not-reply', 'abuse',
+        'webmaster', 'postmaster',
+
+        // Added for the Google Places channel after the Air Canada lounge
+        // incident: phishing.hameconnage@aircanada.ca slipped through because
+        // the old exact-match list had neither token and "phishing" wasn't
+        // an exact-match local part.
+        'phishing', 'hameconnage', 'fraud', 'scam', 'spam',
+        'compliance', 'privacy', 'security', 'risk',
+        'accounts', 'accounting', 'accountspayable', 'accountsreceivable',
+        'ap', 'ar', 'finance',
+        'marketing', 'newsletter', 'notifications', 'notification',
+        'alerts', 'alert', 'updates',
+        'inquiries', 'enquiry', 'enquiries', 'complaints', 'feedback',
+        'membership', 'volunteers', 'volunteer', 'donations',
+        'reception', 'frontdesk',
     ];
 
-    return in_array($local, $gatekept, true);
+    // 1) Full local-part exact match (handles "no-reply", "donotreply").
+    if (in_array($local, $tokens, true)) return true;
+
+    // 2) Segment-wise exact match. Split on the characters that conventionally
+    //    delimit local-part segments. A token like "phishing" inside
+    //    "phishing.hameconnage" should match here.
+    $segments = preg_split('/[.\-_+]/', $local) ?: [];
+    foreach ($segments as $seg) {
+        if ($seg !== '' && in_array($seg, $tokens, true)) return true;
+    }
+
+    // 3) Multi-word tokens as a prefix. Catches "customerservice@" and
+    //    "customercare@" without separators.
+    static $prefixTokens = [
+        'customerservice', 'customercare', 'customersupport',
+        'customer-service', 'customer-care', 'customer-support',
+    ];
+    foreach ($prefixTokens as $p) {
+        if (strpos($local, $p) === 0) return true;
+    }
+
+    return false;
+}
+
+// ─── Filter Logging ───
+
+/**
+ * Log a filter rejection. Routes to whichever logger the calling context
+ * defines: logPipeline() in the cron, outreach_log() in the admin API, and
+ * error_log() as a last resort. Keeps the call sites in search_businesses_core
+ * tidy.
+ */
+function _outreach_filter_log($message)
+{
+    $message = preg_replace('/[\r\n]+/', ' ', (string) $message);
+    if (function_exists('logPipeline')) {
+        logPipeline($message);
+        return;
+    }
+    if (function_exists('outreach_log')) {
+        outreach_log($message);
+        return;
+    }
+    @error_log('[outreach-filter] ' . $message);
+}
+
+// ─── Chain / Mega-brand Domain Filter ───
+
+/**
+ * Lazy-load the curated mega-brand domain list, normalised to lowercase.
+ */
+function _outreach_chain_domains()
+{
+    static $cached = null;
+    if ($cached !== null) return $cached;
+
+    $file = __DIR__ . '/outreach_chain_domains.php';
+    if (!is_file($file)) {
+        $cached = [];
+        return $cached;
+    }
+    $list = require $file;
+    $cached = [];
+    foreach ($list as $d) {
+        $d = strtolower(trim((string) $d));
+        if ($d !== '') $cached[$d] = true;
+    }
+    return $cached;
+}
+
+/**
+ * Return the bare hostname for a URL or an email address. Returns '' when
+ * input is empty or unparseable.
+ */
+function _outreach_host_from($value)
+{
+    $value = strtolower(trim((string) $value));
+    if ($value === '') return '';
+
+    // Email: take everything after the last '@'.
+    if (strpos($value, '@') !== false) {
+        $parts = explode('@', $value);
+        $host = end($parts);
+    } else {
+        // URL: prepend scheme if missing so parse_url returns host.
+        if (!preg_match('~^[a-z][a-z0-9+\-.]*://~', $value)) {
+            $value = 'http://' . $value;
+        }
+        $host = parse_url($value, PHP_URL_HOST) ?: '';
+    }
+
+    $host = preg_replace('/^www\./', '', $host);
+    return $host ?: '';
+}
+
+/**
+ * True if the email or website belongs to a known mega-brand / corporate
+ * parent / government domain. Used to reject Google-Places results like the
+ * Air Canada Maple Leaf Lounge before any draft is generated.
+ *
+ * Matching:
+ *   - exact host equality
+ *   - subdomain equality (lounges.aircanada.ca matches aircanada.ca)
+ *   - the special .gc.ca / .gov.ca / .gov / .gov.uk suffix-style entries
+ *     in the curated list act as "any host ending with this suffix".
+ *
+ * Returns false for empty / malformed input (do not over-reject if we
+ * can't even parse it: other filters still apply).
+ */
+function filter_chain_domain($emailOrUrl)
+{
+    $host = _outreach_host_from($emailOrUrl);
+    if ($host === '') return false;
+
+    $domains = _outreach_chain_domains();
+    if (empty($domains)) return false;
+
+    // Exact host match.
+    if (isset($domains[$host])) return true;
+
+    // Subdomain match against any registered entry. Walk parent domains:
+    //   lounges.aircanada.ca -> aircanada.ca -> ca
+    $parts = explode('.', $host);
+    while (count($parts) > 2) {
+        array_shift($parts);
+        $candidate = implode('.', $parts);
+        if (isset($domains[$candidate])) return true;
+    }
+
+    return false;
+}
+
+// ─── Google Places Type Filter ───
+
+/**
+ * Place types that should never produce an outreach lead regardless of which
+ * category was searched. These represent venues / institutions, not the
+ * small operator-run businesses we target. Sourced from Google's Place Type
+ * taxonomy: https://developers.google.com/maps/documentation/places/web-service/place-types
+ */
+const OUTREACH_PLACE_TYPE_BLOCKLIST = [
+    // Travel infrastructure (catches the Air Canada lounge case).
+    'airport', 'international_airport', 'airport_terminal',
+    'transit_station', 'bus_station', 'train_station', 'subway_station',
+    'light_rail_station', 'ferry_terminal', 'taxi_stand',
+
+    // Government / civic.
+    'city_hall', 'courthouse', 'embassy', 'fire_station', 'police',
+    'post_office', 'local_government_office', 'government_office',
+    'military_base',
+
+    // Large institutions.
+    'hospital', 'university', 'school', 'primary_school',
+    'secondary_school', 'library', 'museum', 'aquarium', 'zoo',
+    'stadium', 'amusement_park', 'casino', 'tourist_attraction',
+    'church', 'mosque', 'synagogue', 'hindu_temple', 'place_of_worship',
+    'cemetery', 'funeral_home',
+
+    // Corporate parent indicators.
+    'corporate_office',
+
+    // Generic / catch-all "place" types that on their own carry no signal.
+    // We don't reject on these alone, but if Google has tagged the result
+    // with one of the above PLUS these, we still reject.
+];
+
+/**
+ * Returns the first matching blocklisted type, or '' if none.
+ * Accepts the Place 'types' array (array of strings, may be empty).
+ */
+function filter_blocklisted_place_type($types)
+{
+    if (!is_array($types) || empty($types)) return '';
+    foreach ($types as $t) {
+        $t = is_string($t) ? strtolower(trim($t)) : '';
+        if ($t !== '' && in_array($t, OUTREACH_PLACE_TYPE_BLOCKLIST, true)) {
+            return $t;
+        }
+    }
+    return '';
+}
+
+/**
+ * Returns true when the search was scoped to a specific Google place type
+ * (e.g. travel_agency) but the returned place's types do NOT include it.
+ * Example: searching includedType=travel_agency, Google returns the Air
+ * Canada lounge whose primary type is 'airport'. expectedType isn't in the
+ * returned 'types' array, so the result is a category mismatch and should
+ * be dropped.
+ *
+ * Passing expectedType='' means "no scoping was applied, can't check" and
+ * the function returns false (do not reject).
+ */
+function filter_category_type_mismatch($expectedType, $types)
+{
+    $expectedType = strtolower(trim((string) $expectedType));
+    if ($expectedType === '') return false;
+    if (!is_array($types)) return true;
+
+    foreach ($types as $t) {
+        if (is_string($t) && strtolower(trim($t)) === $expectedType) {
+            return false; // expected type IS present
+        }
+    }
+    return true;
+}
+
+/**
+ * Soft signal: a Google business with hundreds of ratings is almost
+ * certainly a national chain location (or a major tourist attraction).
+ * Real Saskatoon plumbers/accountants/salons rarely exceed ~300 reviews.
+ *
+ * Returns true if review count exceeds threshold. NULL or 0 reviews are
+ * treated as "no signal" and pass through.
+ */
+function filter_review_count_too_high($reviewCount, $threshold = 300)
+{
+    if ($reviewCount === null || $reviewCount === '') return false;
+    $n = (int) $reviewCount;
+    if ($n <= 0) return false;
+    return $n > $threshold;
+}
+
+// ─── Layer 3: AI Size Gate ───
+
+/**
+ * Ask Gemini to classify whether a lead is a small independent business
+ * (good fit for Argo Books outreach) vs. a chain location / corporate
+ * office / government / large institution (bad fit, skip).
+ *
+ * Returns one of:
+ *   ['classification' => 'small_independent', 'reason' => '...']
+ *   ['classification' => 'chain_or_corp',     'reason' => '...']
+ *   ['classification' => 'uncertain',          'reason' => '...']
+ *   ['error' => 'message']                                              (API or parse failure)
+ *
+ * On 'error', callers should pass-through (do NOT reject) so a Gemini
+ * outage can't block legitimate outreach. Layers 1+2 already catch the
+ * obvious cases; Layer 3 is opportunistic insurance.
+ */
+function classify_lead_size_with_ai($lead)
+{
+    $name = trim((string) ($lead['business_name'] ?? ''));
+    if ($name === '') {
+        return ['error' => 'missing business_name'];
+    }
+
+    $website = trim((string) ($lead['website'] ?? ''));
+    $city = trim((string) ($lead['city'] ?? ''));
+    $address = trim((string) ($lead['address'] ?? ''));
+    $category = trim((string) ($lead['category'] ?? ''));
+
+    $details = "Business name: " . $name;
+    if ($city !== '')     $details .= "\nCity: " . $city;
+    if ($address !== '')  $details .= "\nAddress: " . $address;
+    if ($website !== '')  $details .= "\nWebsite: " . $website;
+    if ($category !== '') $details .= "\nSearch category: " . $category;
+
+    $systemPrompt = <<<PROMPT
+You are classifying outreach leads for Argo Books, a simple bookkeeping and
+invoicing app for small independent businesses (solo founders, family-run
+shops, small partnerships).
+
+Decide whether this business is a good outreach fit. Classify as:
+
+  "small_independent" — owner-operator, family-run, or small partnership.
+       The kind of business where one person makes the buying decision and
+       might personally try a new bookkeeping app.
+
+  "chain_or_corp" — any of:
+     * a location of a national or international chain or franchise
+       (e.g. Tim Hortons, McDonald's, Subway, Walmart, Starbucks)
+     * a subsidiary, branch, or office of a publicly-traded company
+     * an airline lounge, bank branch, telco store, hotel of a major brand
+     * a government office, embassy, ministry, crown corporation
+     * a hospital, university, large school, public library
+     * a large religious or charitable institution
+
+  "uncertain" — name and details are genuinely ambiguous and you cannot tell.
+
+Heuristics:
+  - Recognisable brand name in the business name -> almost always chain_or_corp
+  - "[Brand] [City] location" or "[Brand] Airport" -> chain_or_corp
+  - A unique name like "Joe's Plumbing" or "Le Macaron Bakery" -> small_independent
+  - Government domain (.gc.ca, .gov, provincial .gov.ca subdomains) -> chain_or_corp
+  - When genuinely torn, prefer "uncertain" over guessing.
+
+Respond with ONLY a JSON object, no preamble:
+{"classification": "small_independent" | "chain_or_corp" | "uncertain", "reason": "one short sentence"}
+PROMPT;
+
+    $result = call_gemini($systemPrompt, $details);
+    if (isset($result['error'])) {
+        return ['error' => $result['error']];
+    }
+
+    $content = trim((string) ($result['content'] ?? ''));
+    $content = preg_replace('/^```json\s*/i', '', $content);
+    $content = preg_replace('/\s*```$/', '', $content);
+
+    $parsed = json_decode($content, true);
+    if (!is_array($parsed) || !isset($parsed['classification'])) {
+        return ['error' => 'AI returned non-JSON or missing classification field'];
+    }
+
+    $cls = strtolower(trim((string) $parsed['classification']));
+    if (!in_array($cls, ['small_independent', 'chain_or_corp', 'uncertain'], true)) {
+        return ['error' => 'AI returned unknown classification: ' . $cls];
+    }
+
+    $reason = trim((string) ($parsed['reason'] ?? ''));
+    if ($reason === '') $reason = '(no reason given)';
+    if (strlen($reason) > 240) $reason = substr($reason, 0, 240);
+
+    return ['classification' => $cls, 'reason' => $reason];
+}
+
+/**
+ * Mark a lead as disqualified by the auto-filter. Sets status='disqualified',
+ * stores a short reason tag, appends a human-readable note, and writes an
+ * activity log entry. Idempotent: re-marking the same lead is a no-op (no
+ * extra notes appended) so the backfill script can safely re-run.
+ */
+function disqualify_lead($pdo, $leadId, $reasonTag, $detailMessage)
+{
+    $leadId = (int) $leadId;
+    if ($leadId <= 0) return;
+
+    $reasonTag = substr((string) $reasonTag, 0, 80);
+
+    // Idempotency: if already disqualified with the same tag, do nothing.
+    $check = $pdo->prepare("SELECT status, disqualified_reason FROM outreach_leads WHERE id = ?");
+    $check->execute([$leadId]);
+    $row = $check->fetch();
+    if ($row && $row['status'] === 'disqualified' && $row['disqualified_reason'] === $reasonTag) {
+        return;
+    }
+
+    $stmt = $pdo->prepare("
+        UPDATE outreach_leads
+        SET status = 'disqualified',
+            disqualified_reason = ?,
+            approval_status = 'not_drafted',
+            notes = CONCAT(COALESCE(notes, ''),
+                           CASE WHEN COALESCE(notes,'') = '' THEN '' ELSE '\n' END,
+                           '[Auto-filter ', ?, '] ', ?)
+        WHERE id = ?
+    ");
+    $stmt->execute([
+        $reasonTag,
+        date('Y-m-d H:i'),
+        $detailMessage,
+        $leadId,
+    ]);
+
+    log_activity($pdo, $leadId, 'lead_disqualified', "{$reasonTag}: {$detailMessage}");
 }
 
 // ─── Email Scraping Helper ───
@@ -1132,11 +1512,14 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
     // or ['error' => string] on failure. The FieldMask is what makes this cheap:
     // we ask for website + phone in the search response so we never need to call
     // Place Details. Highest tier in the mask (nationalPhoneNumber → Enterprise)
-    // sets the per-call price; result count doesn't.
+    // sets the per-call price; result count doesn't. userRatingCount is in the
+    // Basic tier so it adds no extra cost; we use it to filter out
+    // national-chain locations that have hundreds of reviews.
     $callSearchText = function (array $body) use ($apiKey) {
         $fieldMask = 'places.id,places.displayName,places.formattedAddress,'
             . 'places.websiteUri,places.nationalPhoneNumber,'
             . 'places.googleMapsUri,places.businessStatus,places.types,'
+            . 'places.primaryType,places.userRatingCount,'
             . 'nextPageToken';
         $context = stream_context_create(['http' => [
             'method' => 'POST',
@@ -1181,6 +1564,10 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
                 break;
             }
         }
+        // Remember the expected type so we can later reject results whose
+        // own 'types' array doesn't include it. Cleared if the API retry
+        // below drops includedType.
+        $expectedType = $body['includedType'] ?? '';
 
         $result = $callSearchText($body);
         // Only retry on INVALID_ARGUMENT (the status returned for unknown
@@ -1190,6 +1577,7 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
             && isset($body['includedType'])
             && ($result['status'] ?? '') === 'INVALID_ARGUMENT') {
             unset($body['includedType']);
+            $expectedType = '';
             $result = $callSearchText($body);
         }
         if (isset($result['error'])) {
@@ -1223,9 +1611,43 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
                 if (empty($website)) continue;
 
                 $types = $place['types'] ?? [];
+                $businessName = $place['displayName']['text'] ?? '';
+                $reviewCount = $place['userRatingCount'] ?? null;
+
+                // ─── Layer 1: hard exclusions ───
+                // These checks run BEFORE the email scrape so a chain or
+                // institution never gets its site fetched. The scrape is the
+                // expensive part of this loop; rejecting early is the win.
+
+                // (a) Place-type blocklist (airports, transit, hospitals, govt, etc.)
+                $blockedType = filter_blocklisted_place_type($types);
+                if ($blockedType !== '') {
+                    _outreach_filter_log("Filter reject [place_type:{$blockedType}]: '{$businessName}' ({$website})");
+                    continue;
+                }
+
+                // (b) Category / type mismatch: we asked for travel_agency
+                //     but Google returned a place not tagged travel_agency.
+                if ($expectedType !== '' && filter_category_type_mismatch($expectedType, $types)) {
+                    _outreach_filter_log("Filter reject [type_mismatch:expected={$expectedType}]: '{$businessName}' (types=" . implode(',', $types) . ")");
+                    continue;
+                }
+
+                // (c) Review-count cap: real local SMBs almost never exceed 300.
+                if (filter_review_count_too_high($reviewCount)) {
+                    _outreach_filter_log("Filter reject [review_count_too_high:{$reviewCount}]: '{$businessName}' ({$website})");
+                    continue;
+                }
+
+                // (d) Mega-brand / corporate-parent / government domain.
+                if (filter_chain_domain($website)) {
+                    _outreach_filter_log("Filter reject [chain_domain]: '{$businessName}' ({$website})");
+                    continue;
+                }
+
                 $business = [
                     'places_id' => $placeId,
-                    'business_name' => $place['displayName']['text'] ?? '',
+                    'business_name' => $businessName,
                     'address' => $place['formattedAddress'] ?? '',
                     'category' => $category ?: ($queryCategories[$round] ?? (isset($types[0]) ? ucfirst(str_replace('_', ' ', $types[0])) : '')),
                     'city' => $city,
@@ -1241,6 +1663,25 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
                 // Skip businesses where we couldn't find a valid email
                 if (empty($business['email']) || !filter_var($business['email'], FILTER_VALIDATE_EMAIL)) {
                     $business['email'] = null;
+                    continue;
+                }
+
+                // ─── Layer 2: role-mailbox filter ───
+                // The Air Canada lead came in with phishing.hameconnage@aircanada.ca.
+                // Applies the (now-improved) gatekept-prefix check that Shopify
+                // already runs, so the Google Places channel can't email an
+                // abuse desk or fraud-report inbox.
+                if (filter_gatekept_email($business['email'])) {
+                    _outreach_filter_log("Filter reject [role_mailbox:{$business['email']}]: '{$businessName}'");
+                    continue;
+                }
+
+                // (e) Email-domain chain check. Catches the case where the
+                //     business has a real-looking website (e.g. a vanity
+                //     site for a Tim Hortons location) but the email goes to
+                //     the parent brand domain.
+                if (filter_chain_domain($business['email'])) {
+                    _outreach_filter_log("Filter reject [chain_email_domain]: '{$businessName}' <{$business['email']}>");
                     continue;
                 }
 
@@ -1380,6 +1821,41 @@ Be specific and factual based on the website content. Do not include any other t
 function generate_draft_for_lead($pdo, $lead)
 {
     $id = $lead['id'];
+
+    // ─── Layer 3: AI Size Gate ───
+    // Catch chains/corporations/institutions that slipped past Layer 1+2
+    // before we spend Gemini tokens on summary + draft. Failures here
+    // pass-through (do NOT block drafting) so a transient Gemini outage
+    // can't stall the pipeline. Layers 1+2 are the strong guards.
+    //
+    // Skip if the lead is already classified as small_independent on a
+    // previous run (we re-use the business_summary column's presence as a
+    // proxy: if we ran the gate, we move forward; storing the explicit gate
+    // result would add a column and the AI call is cheap enough to repeat
+    // on regenerate). Also skip when the admin explicitly asked to bypass
+    // (e.g. manually-added leads where the admin already vetted them).
+    $sourceVal = strtolower((string) ($lead['source'] ?? ''));
+    $isAutoLead = str_ends_with($sourceVal, '_auto');
+    if ($isAutoLead) {
+        $gate = classify_lead_size_with_ai($lead);
+        if (isset($gate['error'])) {
+            log_activity($pdo, $id, 'size_gate_skipped', 'AI gate error, proceeding with draft: ' . $gate['error']);
+        } elseif ($gate['classification'] === 'chain_or_corp' || $gate['classification'] === 'uncertain') {
+            disqualify_lead(
+                $pdo,
+                $id,
+                'ai_' . $gate['classification'],
+                'AI size gate: ' . $gate['reason']
+            );
+            return [
+                'success' => true,
+                'disqualified' => true,
+                'reason' => 'ai_' . $gate['classification'],
+                'detail' => $gate['reason'],
+            ];
+        }
+        // classification === 'small_independent' falls through to drafting.
+    }
 
     // A/B variant lookup must happen before the summary block so a
     // personalization test can gate the AI summary call entirely.

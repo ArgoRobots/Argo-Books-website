@@ -22,7 +22,7 @@ $stmt->execute([$user_id]);
 $prefs = $stmt->fetch();
 
 if (!$prefs) {
-    // Logged in but no row — shouldn't happen, but bail safely
+    // Logged in but no row, shouldn't happen, but bail safely
     header('Location: login.php');
     exit;
 }
@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <li><span class="always-on-tag">Always on</span><span class="label">Subscription renewal &amp; failed payment notices</span></li>
                     </ul>
                     <div class="info-note">
-                        These keep your account, payments, and recovery working &mdash; turning them off would break things like password resets and receipt delivery.
+                        These keep your account, payments, and recovery working. Turning them off would break things like password resets and receipt delivery.
                     </div>
                 </div>
 

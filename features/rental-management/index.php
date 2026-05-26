@@ -15,7 +15,7 @@
         content="rental management software, booking management, equipment rental tracking, rental business software, rental inventory, rental returns, rental invoicing, equipment booking, rental deposits, overdue rentals">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Rental Management — Argo Books">
+    <meta property="og:title" content="Rental Management | Argo Books">
     <meta property="og:description"
         content="Manage rental bookings, track rental periods, handle returns, and monitor revenue with Argo Books. Built for equipment rental and any rental-based business.">
     <meta property="og:url" content="https://argorobots.com/features/rental-management/">
@@ -28,7 +28,7 @@
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Rental Management — Argo Books">
+    <meta name="twitter:title" content="Rental Management | Argo Books">
     <meta name="twitter:description"
         content="Manage rental bookings, track rental periods, handle returns, and monitor revenue with Argo Books. Built for equipment rental and any rental-based business.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Rental+Management&subtitle=Track+bookings%2C+rental+periods%2C+returns%2C+and+revenue.+Built+for+equipment+rental+businesses.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
@@ -72,7 +72,7 @@
                     "name": "Can I track deposits and payments for rentals?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can set deposit amounts per rental item and track whether each deposit has been paid or is still outstanding. When the rental is complete, you can generate a professional invoice directly from the rental record with one click — customer details and pricing auto-populate, so there's no double entry."
+                        "text": "Yes. You can set deposit amounts per rental item and track whether each deposit has been paid or is still outstanding. When the rental is complete, you can generate a professional invoice directly from the rental record with one click. Customer details and pricing auto-populate, so there's no double entry."
                     }
                 },
                 {
@@ -88,7 +88,7 @@
                     "name": "What types of businesses use rental management in Argo Books?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Rental management in Argo Books is designed for any business that lends or rents items — equipment rental companies, tool libraries, party supply rentals, AV equipment providers, and more. If you need to track who has what, when it's due back, and what they owe, Argo Books handles it."
+                        "text": "Rental management in Argo Books is designed for any business that lends or rents items: equipment rental companies, tool libraries, party supply rentals, AV equipment providers, and more. If you need to track who has what, when it's due back, and what they owe, Argo Books handles it."
                     }
                 }
             ]
@@ -115,7 +115,7 @@
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Rental Management — Argo Books</title>
+    <title>Rental Management | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -143,7 +143,7 @@
         </div>
         <div class="container">
             <h1 class="animate-fade-in">Track every rental from booking to return</h1>
-            <p class="hero-subtitle animate-fade-in">Manage bookings, track rental periods, collect deposits, handle returns, and monitor revenue — all in one place. Built for equipment rental, event supplies, and any rental-based business.</p>
+            <p class="hero-subtitle animate-fade-in">Manage bookings, track rental periods, collect deposits, handle returns, and monitor revenue, all in one place. Built for equipment rental, event supplies, and any rental-based business.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -166,7 +166,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Lost rentals and missed returns cost you money</h2>
-                    <p>Most rental businesses track bookings in spreadsheets or on paper. Items go out without proper records, return dates are forgotten, deposits aren't tracked, and overdue rentals slip through the cracks. Argo Books gives you a complete rental management system — so nothing gets missed.</p>
+                    <p>Most rental businesses track bookings in spreadsheets or on paper. Items go out without proper records, return dates are forgotten, deposits aren't tracked, and overdue rentals slip through the cracks. Argo Books gives you a complete rental management system, so nothing gets missed.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -250,14 +250,14 @@
     </section>
 
     <!-- =============================================
-         HOW IT WORKS — 3 Steps
+         HOW IT WORKS, 3 Steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
                 <h2 class="section-title">Three steps to organized rentals</h2>
-                <p class="section-desc">From handwritten booking slips to a complete rental system. No complex setup — Argo Books keeps it simple.</p>
+                <p class="section-desc">From handwritten booking slips to a complete rental system. No complex setup. Argo Books keeps it simple.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
@@ -305,7 +305,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Rental Records</span>
                     <h2>Every rental tracked from start to return</h2>
-                    <p>The rental records page gives you a complete view of every rental — past and present. See what's currently out, what's overdue, and what's been returned, all in one sortable table with summary cards at the top.</p>
+                    <p>The rental records page gives you a complete view of every rental, past and present. See what's currently out, what's overdue, and what's been returned, all in one sortable table with summary cards at the top.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -325,14 +325,14 @@
     </section>
 
     <!-- =============================================
-         BENEFITS GRID — 6 benefit cards
+         BENEFITS GRID, 6 benefit cards
          ============================================= -->
     <section class="benefits-section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
                 <h2 class="section-title">More than just tracking bookings</h2>
-                <p class="section-desc">Rental management in Argo Books isn't a complex booking system — it's the rental tracking your business actually needs to stay organized and profitable.</p>
+                <p class="section-desc">Rental management in Argo Books isn't a complex booking system. It's the rental tracking your business actually needs to stay organized and profitable.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
@@ -340,7 +340,7 @@
                         <?= svg_icon('bolt', 22) ?>
                     </div>
                     <h3>Never miss a return</h3>
-                    <p>Overdue rentals are flagged automatically when the due date passes. See which items need to come back at a glance — no manual date checking required.</p>
+                    <p>Overdue rentals are flagged automatically when the due date passes. See which items need to come back at a glance, with no manual date checking required.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
@@ -361,7 +361,7 @@
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Integrated invoicing</h3>
-                    <p>Generate invoices directly from rental records. Customer details, item pricing, and rental dates auto-populate — send professional invoices in seconds.</p>
+                    <p>Generate invoices directly from rental records. Customer details, item pricing, and rental dates auto-populate. Send professional invoices in seconds.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
@@ -375,7 +375,7 @@
                         <?= svg_icon('users', 22) ?>
                     </div>
                     <h3>Customer rental history</h3>
-                    <p>Every rental is linked to a customer profile. See a customer's complete rental history — what they rented, when, and how much they paid.</p>
+                    <p>Every rental is linked to a customer profile. See a customer's complete rental history: what they rented, when, and how much they paid.</p>
                 </div>
             </div>
         </div>
@@ -408,7 +408,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
                 <h2 class="section-title">Built for every business that rents equipment</h2>
-                <p class="section-desc">Whether you rent out 5 items or 5000 — rental management scales with your business.</p>
+                <p class="section-desc">Whether you rent out 5 items or 5000, rental management scales with your business.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">
@@ -459,7 +459,7 @@
                         <?= svg_icon('package', 22) ?>
                     </div>
                     <h3>Inventory Management</h3>
-                    <p>Rental items live in your inventory. Track total units, available stock, and items out on loan — all from the same product catalog.</p>
+                    <p>Rental items live in your inventory. Track total units, available stock, and items out on loan, all from the same product catalog.</p>
                 </a>
                 <a href="../customer-management/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
@@ -473,7 +473,7 @@
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Invoicing</h3>
-                    <p>Generate invoices directly from rental records. Item pricing, dates, and customer details auto-populate — send professional invoices in seconds.</p>
+                    <p>Generate invoices directly from rental records. Item pricing, dates, and customer details auto-populate. Send professional invoices in seconds.</p>
                 </a>
             </div>
         </div>
@@ -488,7 +488,7 @@
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to organize your rentals?</h2>
-                    <p>Download Argo Books and start tracking bookings in minutes. Free to get started — no credit card, no trial period.</p>
+                    <p>Download Argo Books and start tracking bookings in minutes. Free to get started, with no credit card and no trial period.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

@@ -6,8 +6,8 @@
  * in a single partial, dispatching on $_GET['test_id'].
  *
  * Exposes two functions:
- *   ab_tests_tab_handle_post($pdo) — process POST submissions for this tab
- *   ab_tests_tab_render($pdo, $testId) — output HTML body of the tab
+ *   ab_tests_tab_handle_post($pdo): process POST submissions for this tab
+ *   ab_tests_tab_render($pdo, $testId): output HTML body of the tab
  *
  * Assumes $pdo is the global PDO connection and the admin session is active.
  */
@@ -43,7 +43,7 @@ function ab_tests_tab_handle_post($pdo)
 
         if ($variantType === 'format') {
             // Format tests are fixed: html (control) vs plain. Ignore any
-            // variant rows the form posted — the values are not user-authored.
+            // variant rows the form posted, since the values are not user-authored.
             $rows = [
                 ['label' => 'A', 'content' => 'html',  'is_default' => 1],
                 ['label' => 'B', 'content' => 'plain', 'is_default' => 0],
@@ -71,7 +71,7 @@ function ab_tests_tab_handle_post($pdo)
                 if ($label === '' || $content === '') continue;
 
                 if (in_array($variantType, $literalOnlyTypes, true) && stripos($content, 'directive:') === 0) {
-                    $_SESSION['message'] = ucfirst($variantType) . ' variants are literal-only — remove the "directive:" prefix.';
+                    $_SESSION['message'] = ucfirst($variantType) . ' variants are literal-only. Remove the "directive:" prefix.';
                     $_SESSION['message_type'] = 'error';
                     header('Location: index.php?tab=ab-tests'); exit;
                 }
@@ -116,7 +116,7 @@ function ab_tests_tab_handle_post($pdo)
                 // Pause any other active test in the SAME phase (first-touch
                 // tests for outgoing first emails; follow-up tests for the
                 // follow-up sequence). Different-phase tests measure different
-                // emails and can coexist without confounding — see
+                // emails and can coexist without confounding. See
                 // ab_phase_of_type() in cron/lib/outreach_helpers.php.
                 require_once __DIR__ . '/../../../cron/lib/outreach_helpers.php';
                 $typeRow = $pdo->prepare("SELECT variant_type FROM outreach_ab_tests WHERE id = ?");
@@ -174,7 +174,7 @@ function ab_tests_tab_handle_post($pdo)
         header('Location: index.php?tab=ab-tests&test_id=' . $testId); exit;
     }
 
-    // Unknown action — just bounce back to the tab
+    // Unknown action: just bounce back to the tab
     header('Location: index.php?tab=ab-tests'); exit;
 }
 
@@ -305,20 +305,20 @@ function ab_tests_tab_render_list($pdo)
                     <strong>Variant content:</strong> Either a literal value (used verbatim) OR a directive prefixed with
                     <code>directive:</code> (e.g. <code>directive: Ask a curiosity question referencing the business's city</code>).
                     Directives let the AI generate the value each time while staying in a style.
-                    <span id="senderHintNote" style="display:none;"><br><strong>Sender variants are literal-only</strong> — the from-name string is used as-is in the email envelope, with no AI interpretation. Skip the <code>directive:</code> prefix here. Try things like <code>Evan</code> vs <code>Evan from Argo Books</code> vs <code>Argo Books</code>.</span>
-                    <span id="preheaderHintNote" style="display:none;"><br><strong>Preheader variants are literal-only</strong> — this is the snippet most inboxes show next to the subject. Use short, scannable text. Try things like <code>Quick question about your business</code> vs <code>Free 1-year license inside</code> vs leave one variant blank to test the &ldquo;no preheader&rdquo; baseline.</span>
-                    <span id="formatHintNote" style="display:none;"><br><strong>Format is a fixed two-variant test</strong> — Variant A sends the full styled HTML email (current behaviour); Variant B sends the same content as plain text (no template, no logo, bare URLs). The variant rows below are not used for this test type.</span>
-                    <span id="personalizationHintNote" style="display:none;"><br><strong>Personalization is a fixed two-variant test</strong> — Variant A keeps the AI-generated <code>business_summary</code> (current behaviour, costs a Gemini call per lead). Variant B skips the summary entirely. Use it to find out whether the extra call actually moves CTR.</span>
+                    <span id="senderHintNote" style="display:none;"><br><strong>Sender variants are literal-only:</strong> the from-name string is used as-is in the email envelope, with no AI interpretation. Skip the <code>directive:</code> prefix here. Try things like <code>Evan</code> vs <code>Evan from Argo Books</code> vs <code>Argo Books</code>.</span>
+                    <span id="preheaderHintNote" style="display:none;"><br><strong>Preheader variants are literal-only:</strong> this is the snippet most inboxes show next to the subject. Use short, scannable text. Try things like <code>Quick question about your business</code> vs <code>Free 1-year license inside</code> vs leave one variant blank to test the &ldquo;no preheader&rdquo; baseline.</span>
+                    <span id="formatHintNote" style="display:none;"><br><strong>Format is a fixed two-variant test:</strong> Variant A sends the full styled HTML email (current behaviour); Variant B sends the same content as plain text (no template, no logo, bare URLs). The variant rows below are not used for this test type.</span>
+                    <span id="personalizationHintNote" style="display:none;"><br><strong>Personalization is a fixed two-variant test:</strong> Variant A keeps the AI-generated <code>business_summary</code> (current behaviour, costs a Gemini call per lead). Variant B skips the summary entirely. Use it to find out whether the extra call actually moves CTR.</span>
                 </p>
 
                 <div id="abVariantRows"></div>
 
                 <div id="abFormatFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--gray-input-border); border-radius:6px; margin-top:8px;">
-                    Will create two variants automatically: <strong>A &mdash; <code>html</code></strong> (default) and <strong>B &mdash; <code>plain</code></strong>.
+                    Will create two variants automatically: <strong>A: <code>html</code></strong> (default) and <strong>B: <code>plain</code></strong>.
                 </div>
 
                 <div id="abPersonalizationFixedNotice" class="hint" style="display:none; padding:10px; border:1px dashed var(--gray-input-border); border-radius:6px; margin-top:8px;">
-                    Will create two variants automatically: <strong>A &mdash; <code>on</code></strong> (default, summary included) and <strong>B &mdash; <code>off</code></strong> (summary skipped).
+                    Will create two variants automatically: <strong>A: <code>on</code></strong> (default, summary included) and <strong>B: <code>off</code></strong> (summary skipped).
                 </div>
 
                 <div id="abVariantControls" style="display:flex; gap:8px; margin-top:8px; align-items:center;">
@@ -525,7 +525,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
     $variants = load_variants_with_stats($pdo, $testId);
 
     // Score on reply rate when any variant has a reply, otherwise CTR. The
-    // automation in ab_check_and_promote_active_test() uses the same rule —
+    // automation in ab_check_and_promote_active_test() uses the same rule;
     // mirroring it here keeps the leader badge / confidence column in sync
     // with what would actually drive promotion.
     $totalReplies = array_sum(array_column($variants, 'replied_count'));
@@ -656,7 +656,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                         <?php echo $totalReplies === 1 ? 'reply' : 'replies'; ?>
                         across variants). CTR shown for reference.
                     <?php else: ?>
-                        Leader scored by <strong>CTR</strong> — no replies recorded yet.
+                        Leader scored by <strong>CTR</strong>: no replies recorded yet.
                         Once any variant gets a reply, scoring switches to reply rate.
                     <?php endif; ?>
                 </p>
@@ -672,7 +672,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                         (<?php echo format_ctr((int) $variants[$ctrLeaderIdx]['sent_count'], (int) $variants[$ctrLeaderIdx]['clicked_count']); ?>)
                         but <strong><?php echo htmlspecialchars($variants[$replyLeaderIdx]['label']); ?></strong>
                         leads on reply rate
-                        (<?php echo format_ctr((int) $variants[$replyLeaderIdx]['sent_count'], (int) $variants[$replyLeaderIdx]['replied_count']); ?>) —
+                        (<?php echo format_ctr((int) $variants[$replyLeaderIdx]['sent_count'], (int) $variants[$replyLeaderIdx]['replied_count']); ?>):
                         promoting on reply rate.
                     </p>
                 <?php endif; ?>
@@ -783,7 +783,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
 
         // Highlight the leader bar in green only on the metric that is
         // currently driving promotion (reply rate when any replies exist,
-        // otherwise CTR). Open rate / bounce rate are diagnostic — bars use
+        // otherwise CTR). Open rate / bounce rate are diagnostic, so bars use
         // a uniform color so they don't compete with the leader signal.
         function leaderColors(arr, color) {
             return arr.map(function(_, i) { return i === leaderIdx ? '#22c55e' : color; });
@@ -795,7 +795,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
         var bounceDs  = { label: 'Bounce rate %', data: bounces, backgroundColor: '#ef4444', borderRadius: 4 };
 
         // Order: scoring metric first (leader-highlighted), other primary
-        // metric next, then opens, then bounces — left-to-right roughly
+        // metric next, then opens, then bounces. Left-to-right roughly
         // tracks importance for choosing a winner.
         var datasets = scoringMetric === 'reply_rate'
             ? [replyDs, ctrDs, openDs, bounceDs]

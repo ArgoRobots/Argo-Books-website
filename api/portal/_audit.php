@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * Append-only audit log for refund and email-change events.
- * Single entry point — every state-mutating code path MUST call this.
+ * Single entry point: every state-mutating code path MUST call this.
  *
  * @param string $event_type one of: request_created, code_sent, code_failed,
  *   code_verified, cooling_off_started, cancelled_by_user, cancelled_by_admin,

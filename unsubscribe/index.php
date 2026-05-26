@@ -138,7 +138,7 @@ $title = $titles[$state];
               </ul>
             </div>
 
-            <div class="signature">&mdash; Evan, Argo Books</div>
+            <div class="signature">Evan, Argo Books</div>
 
             <div class="action-buttons">
               <a href="/" class="btn primary-btn">Visit Argo Books</a>
@@ -157,7 +157,7 @@ $title = $titles[$state];
               <?php endif; ?>
             </p>
 
-            <div class="signature">&mdash; Evan, Argo Books</div>
+            <div class="signature">Evan, Argo Books</div>
 
             <div class="action-buttons">
               <a href="/" class="btn primary-btn">Visit Argo Books</a>
@@ -176,7 +176,7 @@ $title = $titles[$state];
               <?php endif; ?>
             </p>
 
-            <div class="signature">&mdash; Evan, Argo Books</div>
+            <div class="signature">Evan, Argo Books</div>
 
             <div class="action-buttons">
               <a href="/" class="btn primary-btn">Visit Argo Books</a>

@@ -2,7 +2,7 @@
 /**
  * Follow-ups tab partial.
  *
- * Renders the static structure of the Follow-ups tab — sub-view pills,
+ * Renders the static structure of the Follow-ups tab: sub-view pills,
  * filters, empty bulk actions bar, and the table tbody that outreach.js
  * populates via `get_followups` API calls.
  */

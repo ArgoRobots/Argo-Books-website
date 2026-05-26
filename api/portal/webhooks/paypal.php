@@ -63,7 +63,7 @@ curl_setopt_array($ch, [
 ]);
 $response = curl_exec($ch);
 if ($response === false) {
-    // 503 forces PayPal to retry — acknowledging without verification would let
+    // 503 forces PayPal to retry; acknowledging without verification would let
     // a forged payload through whenever the token endpoint is briefly unhealthy.
     error_log('PayPal token request failed: ' . curl_error($ch));
     http_response_code(503);
@@ -103,7 +103,7 @@ curl_setopt_array($ch, [
 ]);
 $verifyRaw = curl_exec($ch);
 if ($verifyRaw === false) {
-    // Network failure during verification — 503 forces a retry rather than
+    // Network failure during verification: 503 forces a retry rather than
     // either acknowledging an unverified payload or 400-ing a payload that
     // might actually be legitimate.
     error_log('Portal PayPal webhook: verify-webhook-signature request failed: ' . curl_error($ch));
@@ -168,7 +168,7 @@ switch ($eventType) {
         error_log('Portal PayPal webhook: Payment refunded for capture ' . ($data['resource']['id'] ?? 'unknown'));
 
         // Insert negative-amount portal_payments row + flip original (mirrors
-        // the Stripe webhook behavior). Best-effort — wrap in try/catch so a
+        // the Stripe webhook behavior). Best-effort; wrap in try/catch so a
         // missing original row doesn't 500 the webhook.
         try {
             // For PAYMENT.CAPTURE.REFUNDED, `resource` is the refund object;
@@ -196,9 +196,9 @@ switch ($eventType) {
 
             // Find original payment by capture id (provider_transaction_id) OR by order id (provider_payment_id).
             // No status filter: once cumulative refunds cover the original, the row
-            // flips to 'refunded' (see refund_record_ledger). A subsequent webhook —
-            // an out-of-order redelivery, a late goodwill refund, or a refund issued
-            // via the PayPal dashboard after the flip — must still find the row,
+            // flips to 'refunded' (see refund_record_ledger). A subsequent webhook
+            // (an out-of-order redelivery, a late goodwill refund, or a refund issued
+            // via the PayPal dashboard after the flip) must still find the row,
             // otherwise the negative-amount insert silently no-ops and books drift.
             // amount > 0 still excludes sibling refund rows. Mirrors the Stripe path.
             $stmt = $pdo->prepare("

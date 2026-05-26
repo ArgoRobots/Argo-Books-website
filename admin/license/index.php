@@ -315,7 +315,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 // Update credit_balance for selected subscriptions. Env filter
                 // prevents a stale prod form submit from mutating sandbox subs
-                // (and vice versa) — without it, only the follow-up SELECT was
+                // (and vice versa). Without it, only the follow-up SELECT was
                 // env-scoped, which is too late.
                 $stmt = $pdo->prepare("
                     UPDATE premium_subscriptions
@@ -796,14 +796,14 @@ include __DIR__ . '/../admin_header.php';
                                             <?php if ($fk_redeemed): ?>
                                                 <span class="usage-count <?php echo $fk_scans >= $receipt_limit ? 'usage-maxed' : ''; ?>"><?php echo $fk_scans; ?> / <?php echo $receipt_limit; ?></span>
                                             <?php else: ?>
-                                                <span class="usage-na">&mdash;</span>
+                                                <span class="usage-na">N/A</span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
                                             <?php if ($fk_redeemed): ?>
                                                 <span class="usage-count <?php echo $fk_imports >= $ai_import_limit ? 'usage-maxed' : ''; ?>"><?php echo $fk_imports; ?> / <?php echo $ai_import_limit; ?></span>
                                             <?php else: ?>
-                                                <span class="usage-na">&mdash;</span>
+                                                <span class="usage-na">N/A</span>
                                             <?php endif; ?>
                                         </td>
                                         <td><?php echo date('M j, Y', strtotime($key['created_at'])); ?></td>

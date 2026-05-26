@@ -14,7 +14,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// POST handlers — ad-spend create/update + delete only.
+// POST handlers: ad-spend create/update + delete only.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_token = $_POST['csrf_token'] ?? '';
     if (!is_string($posted_token) || !hash_equals($_SESSION['csrf_token'] ?? '', $posted_token)) {
@@ -407,7 +407,7 @@ include __DIR__ . '/../admin_header.php';
         $per_source = get_funnel_per_source($funnel_period_start_dt, current_environment());
 
         // Source-survey breakdown: unattributed installs only (visitor_id IS NULL),
-        // so it doesn't matter whether a specific source pill is selected — it
+        // so it doesn't matter whether a specific source pill is selected. It
         // always reflects "users we couldn't attribute by token".
         $survey_breakdown = get_unattributed_survey_breakdown($funnel_period_start_dt, current_environment());
 

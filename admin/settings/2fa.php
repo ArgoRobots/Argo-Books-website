@@ -62,7 +62,7 @@ function disable_2fa($username)
         $stmt = $pdo->prepare('UPDATE admin_users SET two_factor_secret = NULL, two_factor_enabled = 0 WHERE username = ?');
         $success = $stmt->execute([$user['username']]) && $stmt->rowCount() > 0;
 
-        // Trusted-device cookies only make sense while 2FA is enabled — they
+        // Trusted-device cookies only make sense while 2FA is enabled. They
         // bypass the TOTP step. Clear them on disable so a re-enable cannot
         // silently re-trust devices the user no longer recognises.
         if ($success) {

@@ -5,11 +5,11 @@
  * POST /api/google/auth - Manage Google OAuth for Sheets/Drive access
  *
  * Actions:
- *   - { action: "initiate" } — Generate OAuth URL, return to app to open in browser
- *   - { action: "status" }   — Check if company has valid Google tokens
- *   - { action: "revoke" }   — Revoke Google tokens for this company
+ *   - { action: "initiate" }: Generate OAuth URL, return to app to open in browser
+ *   - { action: "status" }:   Check if company has valid Google tokens
+ *   - { action: "revoke" }:   Revoke Google tokens for this company
  *
- * Free feature — authentication uses device ID.
+ * Free feature: authentication uses device ID.
  */
 
 require_once __DIR__ . '/google-helper.php';

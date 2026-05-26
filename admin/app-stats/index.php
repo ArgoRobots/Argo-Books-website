@@ -301,7 +301,7 @@ include __DIR__ . '/../admin_header.php';
     margin-bottom: 2rem;
 }
 
-/* Tab styles are shared across admin pages — see admin/common-style.css */
+/* Tab styles are shared across admin pages: see admin/common-style.css */
 
 .stats-grid {
     display: grid;

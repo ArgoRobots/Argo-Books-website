@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * traffic cannot collide with test buckets, and tearDown explicitly clears
  * every IP/prefix combo a test touched.
  *
- * The storage file lives at resources/rate_limits/rate_limits.json — same
+ * The storage file lives at resources/rate_limits/rate_limits.json, the same
  * file the local dev server uses, so contamination would matter if these
  * tests touched real IPs. They don't.
  */
@@ -31,7 +31,7 @@ final class RateLimitStorageTest extends TestCase
     private function uniqueIp(string $tag): string
     {
         // 192.0.2.0/24 is reserved for documentation (RFC 5737). $tag is for
-        // human-readability in failures; uniqueness comes from random_int —
+        // human-readability in failures; uniqueness comes from random_int.
         // crc32 can produce signed-negative values on 32-bit PHP builds,
         // which would make the modulo calculation give an invalid IP.
         unset($tag);
@@ -144,7 +144,7 @@ final class RateLimitStorageTest extends TestCase
         // production-default 900s window (matching what real rate-limit
         // checks use) so this test doesn't prune unrelated dev-server
         // entries that are younger than the window. The injected entry
-        // must be older than 900s to test the prune path — using 1200s.
+        // must be older than 900s to test the prune path. Using 1200s.
         $result = read_rate_limits_locked(900);
         $this->assertNotNull($result['handle'], 'rate-limit storage file must be lockable');
 

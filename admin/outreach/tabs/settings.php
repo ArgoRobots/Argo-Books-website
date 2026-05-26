@@ -14,7 +14,7 @@
  *
  * State values live in outreach_pipeline_state via getState/setState
  * (defined in cron/outreach_pipeline.php, but those helpers are only
- * loaded in CLI context — we define local equivalents here that use
+ * loaded in CLI context, so we define local equivalents here that use
  * the same table).
  */
 
@@ -30,7 +30,7 @@ function settings_tab_get_state($pdo, $key, $default = null)
         $row = $stmt->fetch();
         return $row ? $row['state_value'] : $default;
     } catch (PDOException $e) {
-        // Table may not exist yet on a fresh install — treat as default
+        // Table may not exist yet on a fresh install: treat as default
         return $default;
     }
 }
@@ -134,7 +134,7 @@ function settings_tab_render($pdo)
         ensure_followup_starter_test($pdo);
     }
 
-    // Master enable flag for the whole outreach system — defaults ON so a
+    // Master enable flag for the whole outreach system; defaults ON so a
     // fresh install keeps behaving as before.
     $outreachEnabled = settings_tab_get_state($pdo, 'outreach_enabled', '1') === '1';
 
@@ -154,7 +154,7 @@ function settings_tab_render($pdo)
     $dailyLimit = (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10);
     $followupLimit = (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 30);
 
-    // Active A/B test snapshot — shows the most-recently-started active
+    // Active A/B test snapshot: shows the most-recently-started active
     // test. A first-touch test and a follow-up test can run concurrently;
     // this widget surfaces one; the full list is on the A/B Tests tab.
     $active = null;
@@ -217,7 +217,7 @@ function settings_tab_render($pdo)
         </div>
         <div class="panel-content">
             <p class="hint" style="margin-top:0;">
-                Master switch for the whole pipeline. When OFF, the cron exits without touching anything — no discovery, no drafts, no sends — even if it's still scheduled at the server level. Use this when you want a full pause without deleting the cron job.
+                Master switch for the whole pipeline. When OFF, the cron exits without touching anything (no discovery, no drafts, no sends) even if it's still scheduled at the server level. Use this when you want a full pause without deleting the cron job.
             </p>
             <div class="segmented-toggle">
                 <form method="POST" style="display:contents;">

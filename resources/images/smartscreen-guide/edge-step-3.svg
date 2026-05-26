@@ -46,7 +46,7 @@
   <text x="270" y="259" font-size="13" fill="#ffffff">Delete</text>
   <path d="M319 251 l6 6 l6 -6" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <!-- "Keep anyway" popover (target — outer rect matches Delete's x/width exactly (258, 82) and touches Delete's bottom edge at y=268 with no gap; no drop shadow) -->
+  <!-- "Keep anyway" popover (target: outer rect matches Delete's x/width exactly (258, 82) and touches Delete's bottom edge at y=268 with no gap; no drop shadow) -->
   <rect x="258" y="268" width="82" height="36" rx="6" fill="#0078d4"/>
   <rect x="259.5" y="269.5" width="79" height="33" rx="5" fill="#ffffff"/>
   <text x="299" y="290" text-anchor="middle" font-size="12" fill="#0067c0" font-weight="600">Keep anyway</text>

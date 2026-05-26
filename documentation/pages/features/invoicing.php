@@ -19,10 +19,10 @@ include __DIR__ . '/../../docs-header.php';
             <img src="../../../resources/images/invoice.webp" alt="Argo Books Invoicing" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 
             <h2>Setting Up Payment Integration</h2>
-            <p>This is a one-time setup and should be your first step — it's what enables customers to pay your invoices online. Argo Books supports <strong>Stripe</strong>, <strong>PayPal</strong>, and <strong>Square</strong>, covering credit/debit cards, Apple Pay, Google Pay, PayPal balance, and more.</p>
+            <p>This is a one-time setup and should be your first step: it's what enables customers to pay your invoices online. Argo Books supports <strong>Stripe</strong>, <strong>PayPal</strong>, and <strong>Square</strong>, covering credit/debit cards, Apple Pay, Google Pay, PayPal balance, and more.</p>
             <ol class="steps-list">
                 <li>Go to Settings > Payment Portal</li>
-                <li>Add your company name and logo — these appear on the payment portal your customers see when paying an invoice</li>
+                <li>Add your company name and logo. These appear on the payment portal your customers see when paying an invoice</li>
                 <li>Under "Connected Payment Providers", select your preferred provider (Stripe, PayPal, or Square)</li>
                 <li>Click "Connect" to link your existing account (or create a new one)</li>
                 <li>Authorize Argo Books to process payments on your behalf</li>

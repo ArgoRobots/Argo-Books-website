@@ -114,7 +114,7 @@ function handle_pull_payments(int $companyId): void
         //   - portal_payments.provider_transaction_id usually holds the charge
         //     id (ch_xxx), which is best-effort; the desktop can match this
         //     against the original payment's stored charge id when available.
-        //   - As a last resort, strip "refund_" — but note that for Stripe rows
+        //   - As a last resort, strip "refund_", but note that for Stripe rows
         //     keyed by individual refund id ("refund_<refundId>") this returns
         //     the refund id, not the source payment id, so the link won't
         //     resolve. Kept only for legacy single-full-refund rows.

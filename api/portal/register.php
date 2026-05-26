@@ -144,7 +144,7 @@ if (!empty($ownerEmail)) {
         refund_email_send_registration_code($ownerEmail, $verifyCode);
         $emailVerificationRequired = true;
     } catch (\Throwable $e) {
-        // Don't fail registration if the verification email send fails — the user
+        // Don't fail registration if the verification email send fails. The user
         // can request a resend via /api/portal/account/verify-email/request.php.
         error_log('Portal registration: failed to send verification email: ' . $e->getMessage());
         $emailVerificationRequired = true;

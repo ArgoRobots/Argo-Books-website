@@ -36,6 +36,6 @@ require_once PROJECT_ROOT . '/cron/_purge_helpers.php';
 $GLOBALS['pdo'] = $pdo ?? null;
 
 if ($GLOBALS['pdo'] === null) {
-    fwrite(STDERR, "Test DB connection failed — verify argo_books_test exists and credentials in .env.testing match your local MySQL.\n");
+    fwrite(STDERR, "Test DB connection failed: verify argo_books_test exists and credentials in .env.testing match your local MySQL.\n");
     exit(1);
 }

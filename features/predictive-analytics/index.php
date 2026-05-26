@@ -15,7 +15,7 @@
         content="predictive analytics, financial forecasting, business analytics, sales trend forecasting, ML business analytics, revenue forecasting software, expense prediction, seasonal pattern detection, machine learning forecasting, small business analytics">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Predictive Analytics — Argo Books">
+    <meta property="og:title" content="Predictive Analytics | Argo Books">
     <meta property="og:description"
         content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta property="og:url" content="https://argorobots.com/features/predictive-analytics/">
@@ -28,7 +28,7 @@
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Predictive Analytics — Argo Books">
+    <meta name="twitter:title" content="Predictive Analytics | Argo Books">
     <meta name="twitter:description"
         content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
@@ -72,7 +72,7 @@
                     "name": "Do I need technical skills to use predictive analytics?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Not at all. The analytics engine runs automatically in the background with zero configuration — no formulas, no spreadsheets, no data science degree required. Just use Argo Books normally and forecasts are generated from your real business data. Results are presented in clear, visual charts that anyone can understand."
+                        "text": "Not at all. The analytics engine runs automatically in the background with zero configuration. No formulas, no spreadsheets, no data science degree required. Just use Argo Books normally and forecasts are generated from your real business data. Results are presented in clear, visual charts that anyone can understand."
                     }
                 },
                 {
@@ -88,7 +88,7 @@
                     "name": "Is predictive analytics included in the Free plan?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Basic real-time analytics are included in the Free plan. Predictive analytics — including revenue forecasting, trend detection, and confidence scoring — is a Premium feature. It's one of the most powerful reasons to upgrade, especially for businesses that want to plan ahead with data-driven insights."
+                        "text": "Basic real-time analytics are included in the Free plan. Predictive analytics, including revenue forecasting, trend detection, and confidence scoring, is a Premium feature. It's one of the most powerful reasons to upgrade, especially for businesses that want to plan ahead with data-driven insights."
                     }
                 }
             ]
@@ -115,7 +115,7 @@
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Predictive Analytics — Argo Books</title>
+    <title>Predictive Analytics | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -143,7 +143,7 @@
         </div>
         <div class="container">
             <h1 class="animate-fade-in">See what's coming before it happens</h1>
-            <p class="hero-subtitle animate-fade-in">AI-powered forecasting analyzes your data to predict trends, detect seasonal patterns, and surface insights that help you make smarter business decisions — automatically.</p>
+            <p class="hero-subtitle animate-fade-in">AI-powered forecasting analyzes your data to predict trends, detect seasonal patterns, and surface insights that help you make smarter business decisions, automatically.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -166,7 +166,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Most small businesses are flying blind on finances</h2>
-                    <p>You know what happened last month. But do you know what's coming next month? Most small business owners make financial decisions based on gut feeling, not data. Argo Books changes that by using machine learning to forecast your future revenue, expenses, and profit — based on your actual business data.</p>
+                    <p>You know what happened last month. But do you know what's coming next month? Most small business owners make financial decisions based on gut feeling, not data. Argo Books changes that by using machine learning to forecast your future revenue, expenses, and profit, based on your actual business data.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -178,11 +178,11 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Get actionable insights — not just charts and numbers</span>
+                            <span>Get actionable insights, not just charts and numbers</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>No data science skills needed — Argo Books handles everything</span>
+                            <span>No data science skills needed. Argo Books handles everything</span>
                         </li>
                     </ul>
                 </div>
@@ -197,7 +197,7 @@
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>See what's coming — with Premium</h3>
+                <h3>See what's coming, with Premium</h3>
                 <p>Predictive analytics is included in Argo Books Premium for $10/month. Download for free, add your data, and upgrade whenever you're ready to forecast.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -228,7 +228,7 @@
                 </div>
                 <div class="highlight-item">
                     <h3>0</h3>
-                    <p>Configuration required — works out of the box</p>
+                    <p>Configuration required. Works out of the box</p>
                 </div>
             </div>
         </div>
@@ -245,7 +245,7 @@
                     <span class="section-label">Under the Hood</span>
                     <h2>Machine learning that adapts to your business</h2>
                     <p>Our forecasting system uses multiple ML algorithms to predict future revenue, expenses, and customer growth. It continuously tests predictions against actual outcomes and adapts its methods based on what works best for your specific business.</p>
-                    <p>The system doesn't just look at averages. It detects whether your business is growing, stable, or declining. It identifies seasonal cycles — like higher sales in December or slower months in summer — and factors these patterns into every forecast.</p>
+                    <p>The system doesn't just look at averages. It detects whether your business is growing, stable, or declining. It identifies seasonal cycles, like higher sales in December or slower months in summer, and factors these patterns into every forecast.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -253,7 +253,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Automatic trend detection — growing, stable, or declining</span>
+                            <span>Automatic trend detection: growing, stable, or declining</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -266,14 +266,14 @@
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/analytics-ml-engine.svg" alt="How predictions work — seasonal pattern detection, trend analysis, adaptive model selection, and confidence scoring" loading="lazy">
+                    <img src="../../resources/images/features/analytics-ml-engine.svg" alt="How predictions work: seasonal pattern detection, trend analysis, adaptive model selection, and confidence scoring" loading="lazy">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         HOW IT WORKS — 3 Steps
+         HOW IT WORKS, 3 Steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
@@ -328,7 +328,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Smart Insights</span>
                     <h2>Insights that actually help</h2>
-                    <p>Predictive analytics in Argo Books doesn't just show you charts. It generates plain-language business insights by analyzing your data across multiple dimensions — revenue trends, expense patterns, anomalies, and growth opportunities.</p>
+                    <p>Predictive analytics in Argo Books doesn't just show you charts. It generates plain-language business insights by analyzing your data across multiple dimensions: revenue trends, expense patterns, anomalies, and growth opportunities.</p>
                     <p>Every insight comes with a specific recommendation. If revenue is growing, it tells you to investigate which products drove it. If return rates spike, it flags the affected products. If a seasonal peak is approaching, it suggests preparing inventory and marketing in advance.</p>
                 </div>
                 <div class="feature-detail-visual">
@@ -348,7 +348,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Accuracy You Can Verify</span>
                     <h2>Every prediction is tested against reality</h2>
-                    <p>Most forecasting tools give you a number and ask you to trust it. Argo Books shows you exactly how accurate its predictions have been — so you can decide how much weight to give each forecast.</p>
+                    <p>Most forecasting tools give you a number and ask you to trust it. Argo Books shows you exactly how accurate its predictions have been, so you can decide how much weight to give each forecast.</p>
                     <p>The system tracks every past prediction and compares it to what actually happened. You can see the forecast vs. actual revenue and expenses for each month, along with the accuracy. Over time, the model improves as it learns from its own performance.</p>
                     <ul class="feature-checklist">
                         <li>
@@ -361,7 +361,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Model adapts over time — accuracy improves as more data comes in</span>
+                            <span>Model adapts over time. Accuracy improves as more data comes in</span>
                         </li>
                     </ul>
                 </div>
@@ -373,7 +373,7 @@
     </section>
 
     <!-- =============================================
-         BENEFITS GRID — 6 benefit cards
+         BENEFITS GRID, 6 benefit cards
          ============================================= -->
     <section class="benefits-section" style="background: var(--gray-50);">
         <div class="container">
@@ -395,14 +395,14 @@
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
                     <h3>Catch problems early</h3>
-                    <p>Anomaly detection flags unusual patterns — like a spike in product returns or an unexpected expense increase — before they become bigger issues.</p>
+                    <p>Anomaly detection flags unusual patterns, like a spike in product returns or an unexpected expense increase, before they become bigger issues.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
                         <?= svg_icon('analytics', 22) ?>
                     </div>
                     <h3>Understand your seasonality</h3>
-                    <p>Automatically detect bi-monthly and seasonal patterns in your business. Know when your peak months are and prepare accordingly — stock up, hire temp staff, or boost marketing.</p>
+                    <p>Automatically detect bi-monthly and seasonal patterns in your business. Know when your peak months are and prepare accordingly: stock up, hire temp staff, or boost marketing.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon amber">
@@ -416,14 +416,14 @@
                         <?= svg_icon('shield', 22) ?>
                     </div>
                     <h3>Transparent accuracy</h3>
-                    <p>Every forecast includes a confidence score and historical accuracy data. You can see exactly how reliable the predictions are for your specific business — no black boxes.</p>
+                    <p>Every forecast includes a confidence score and historical accuracy data. You can see exactly how reliable the predictions are for your specific business, with no black boxes.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('star', 22) ?>
                     </div>
                     <h3>Surface hidden opportunities</h3>
-                    <p>Argo Books identifies high-margin products, customer retention opportunities, and approaching seasonal peaks — insights you'd miss from looking at raw numbers alone.</p>
+                    <p>Argo Books identifies high-margin products, customer retention opportunities, and approaching seasonal peaks: insights you'd miss from looking at raw numbers alone.</p>
                 </div>
             </div>
         </div>
@@ -492,14 +492,14 @@
     </section>
 
     <!-- =============================================
-         WHAT MAKES IT SMART — 6 capability cards
+         WHAT MAKES IT SMART, 6 capability cards
          ============================================= -->
     <section class="benefits-section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">What Makes It Smart</span>
                 <h2 class="section-title">Six capabilities working together</h2>
-                <p class="section-desc">Not a single algorithm — a system of interconnected capabilities that produce accurate, useful forecasts.</p>
+                <p class="section-desc">Not a single algorithm, but a system of interconnected capabilities that produce accurate, useful forecasts.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
@@ -514,7 +514,7 @@
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
                     <h3>Trend analysis</h3>
-                    <p>Factors in whether your business is growing, stable, or declining — so predictions aren't just based on averages.</p>
+                    <p>Factors in whether your business is growing, stable, or declining, so predictions aren't just based on averages.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -558,7 +558,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
                     <h2>Your financial data never leaves your computer</h2>
-                    <p>Unlike cloud-based analytics platforms that upload your financial data to third-party servers, Argo Books runs everything on your machine — not on someone else's cloud.</p>
+                    <p>Unlike cloud-based analytics platforms that upload your financial data to third-party servers, Argo Books runs everything on your machine, not on someone else's cloud.</p>
                     <p>The ML processes your data directly on your computer. No data is sent to external servers for analysis. You get enterprise-grade predictive analytics with the privacy of a desktop application.</p>
                     <ul class="feature-checklist">
                         <li>
@@ -575,12 +575,12 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Works offline — generate forecasts without internet</span>
+                            <span>Works offline, generate forecasts without internet</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted, offline-capable, no cloud" loading="lazy">
+                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
                 </div>
             </div>
         </div>

@@ -60,7 +60,7 @@ final class StripeRefundTest extends DatabaseTestCase
                      'USD', 'stripe', ?, 'ch_orig2', ?, 'completed', 'sandbox', NOW())"
         )->execute([$companyId, $providerPaymentId, 'PAY-' . date('Ymd') . '-BBBBBB']);
 
-        // Refund larger than total — should cap balance_due at total_amount
+        // Refund larger than total: should cap balance_due at total_amount
         apply_stripe_refund_to_db($this->pdo, $providerPaymentId, 500.00, 'ch_refund_cap', false);
 
         $stmt = $this->pdo->prepare(

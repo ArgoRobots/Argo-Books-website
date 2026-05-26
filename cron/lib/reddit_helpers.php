@@ -9,9 +9,9 @@
  * - Voice-doc-driven draft generation (Gemini)
  *
  * Used by:
- *   cron/reddit_monitor.php       — daily discovery + draft pipeline
- *   cron/reddit_status_check.php  — every-2h posted-reply status check
- *   admin/outreach/api.php        — admin actions (run now, regenerate, on-demand draft)
+ *   cron/reddit_monitor.php:       daily discovery + draft pipeline
+ *   cron/reddit_status_check.php:  every-2h posted-reply status check
+ *   admin/outreach/api.php:        admin actions (run now, regenerate, on-demand draft)
  *
  * No DB writes here; callers orchestrate persistence.
  */
@@ -26,13 +26,13 @@ const REDDIT_USER_AGENT_PREFIX = 'argobooks-outreach/1.0 by /u/';
 const REDDIT_API_BASE_OAUTH = 'https://oauth.reddit.com';
 const REDDIT_API_BASE_PUBLIC = 'https://www.reddit.com';
 const REDDIT_TOKEN_URL = 'https://www.reddit.com/api/v1/access_token';
-const REDDIT_API_CALL_SLEEP_US = 600000; // 0.6s between calls — stay polite
+const REDDIT_API_CALL_SLEEP_US = 600000; // 0.6s between calls, stay polite
 
 /**
  * True when full OAuth credentials are configured. When false, the helpers
  * fall back to Reddit's public JSON endpoints (no app, no auth, lower rate
  * limits but plenty for our volume). Lets you flip to OAuth later just by
- * filling in the REDDIT_* env vars — no code change needed.
+ * filling in the REDDIT_* env vars, no code change needed.
  */
 function reddit_oauth_configured(): bool
 {
@@ -44,7 +44,7 @@ function reddit_oauth_configured(): bool
 
 /**
  * User-Agent string for outbound Reddit requests. Reddit asks for a
- * descriptive UA on all traffic — we include the configured username if set,
+ * descriptive UA on all traffic. We include the configured username if set,
  * otherwise a generic suffix for unauthenticated calls.
  */
 function reddit_user_agent(): string
@@ -187,7 +187,7 @@ function reddit_get_access_token($pdo): ?string
 /**
  * GET against the Reddit API. Dispatches to OAuth when credentials are
  * configured, otherwise falls back to Reddit's public JSON endpoints (no
- * app, no auth required). The path is the same in both modes — the helper
+ * app, no auth required). The path is the same in both modes: the helper
  * handles the base URL difference and the `.json` suffix for public mode.
  *
  * Returns decoded JSON array on success, null on failure (logs).
@@ -237,7 +237,7 @@ function reddit_api_get_oauth($pdo, string $path, array $query = []): ?array
         // Token may have been revoked; clear cache so next call refreshes.
         $upd = $pdo->prepare("UPDATE reddit_settings SET access_token = NULL, access_token_expires_at = NULL WHERE id = 1");
         $upd->execute();
-        reddit_log("API call 401 ($path) — cleared cached token.");
+        reddit_log("API call 401 ($path), cleared cached token.");
         return null;
     }
     if ($httpCode !== 200) {
@@ -264,7 +264,7 @@ function reddit_api_get_oauth($pdo, string $path, array $query = []): ?array
  * comments) try `.rss` and parse the Atom feed back into Reddit's JSON shape
  * so downstream code doesn't care which format we got. Endpoints with no RSS
  * equivalent (`/api/info`, `/user/X/about`) keep using `.json` and will
- * silently 403 from blocked IPs — those features (reply-status check, account
+ * silently 403 from blocked IPs. Those features (reply-status check, account
  * info card) require OAuth to work.
  *
  * Fill in the REDDIT_* OAuth env vars to upgrade automatically.
@@ -277,7 +277,7 @@ function reddit_api_get_public(string $path, array $query = []): ?array
             return $result;
         }
         // Fall through to JSON only if RSS *didn't* return a parseable feed
-        // (rare — usually it's blocked or it's parseable, no in-between).
+        // (rare: usually it's blocked or it's parseable, no in-between).
     }
     return reddit_api_get_public_json($path, $query);
 }
@@ -286,7 +286,7 @@ function reddit_api_get_public(string $path, array $query = []): ?array
  * Endpoints that Reddit serves over RSS/Atom AND that our parser knows how
  * to handle. Comments listings (`/r/X/comments/Y`) also have RSS but a
  * different shape (mix of post + comments) that the current parser doesn't
- * convert — so they fall through to JSON, which will 403 from blocked IPs.
+ * convert, so they fall through to JSON, which will 403 from blocked IPs.
  * Net effect: AI relevance + draft generation runs without top-comments
  * context, which is a soft signal loss but doesn't break the flow.
  */
@@ -321,7 +321,7 @@ function reddit_api_get_public_json(string $path, array $query = []): ?array
 }
 
 /**
- * RSS-flavoured fetch — same endpoints, `.rss` suffix, parsed back into
+ * RSS-flavoured fetch: same endpoints, `.rss` suffix, parsed back into
  * Reddit's JSON listing shape so callers don't care.
  */
 function reddit_api_get_public_rss(string $path, array $query = []): ?array
@@ -370,7 +370,7 @@ function reddit_http_get(string $url, array $extraHeaders = []): ?array
         return null;
     }
     if ($httpCode === 403) {
-        reddit_log("403 on $url — Reddit blocks unauthenticated traffic from this IP. Fill in REDDIT_* OAuth env vars to upgrade.");
+        reddit_log("403 on $url. Reddit blocks unauthenticated traffic from this IP. Fill in REDDIT_* OAuth env vars to upgrade.");
         return null;
     }
     if ($httpCode !== 200) {
@@ -436,7 +436,7 @@ function reddit_parse_atom_to_listing(string $xml, string $sourcePath): ?array
         $createdUtc = strtotime((string) ($entry->published ?? $entry->updated ?? ''));
         if ($createdUtc === false) $createdUtc = time();
 
-        // <content type="html"> — Reddit wraps the body in HTML. Decode entities,
+        // <content type="html">: Reddit wraps the body in HTML. Decode entities,
         // strip tags, collapse whitespace to a reasonable plaintext body.
         $contentHtml = (string) ($entry->content ?? '');
         $body = trim(preg_replace('/\s+/', ' ', strip_tags(html_entity_decode($contentHtml, ENT_QUOTES | ENT_HTML5))));
@@ -528,7 +528,7 @@ function reddit_fetch_search($pdo, string $keyword, int $limit = 50, string $tim
 function reddit_fetch_top_comments($pdo, string $subreddit, string $postId36, int $limit = 10): array
 {
     // The comments endpoint has no RSS parser shape and 403s from blocked
-    // IPs in unauth mode — skip the request entirely and let the AI score
+    // IPs in unauth mode. Skip the request entirely and let the AI score
     // from title + body only. Restored automatically once OAuth is set up.
     if (!reddit_oauth_configured()) {
         return [];
@@ -567,14 +567,14 @@ function reddit_check_comment_status($pdo, string $commentId36): array
     }
     $children = $data['data']['children'] ?? [];
     if (empty($children)) {
-        // API returned 200 but no comment — removed by mod or shadowbanned.
+        // API returned 200 but no comment, removed by mod or shadowbanned.
         return ['status' => 'removed_or_shadowbanned', 'upvotes' => null, 'replies' => null];
     }
     $c = $children[0]['data'] ?? [];
     $body = $c['body'] ?? '';
     $upvotes = isset($c['ups']) ? (int) $c['ups'] : null;
     // Reddit comment objects expose replies via a `replies` Listing (or empty
-    // string when there are none). There's no `num_replies` scalar — we have
+    // string when there are none). There's no `num_replies` scalar, so we have
     // to count children in the Listing when one is returned. /api/info often
     // doesn't expand the replies tree (it returns ""), in which case we
     // record null rather than misleadingly logging 0.
@@ -687,7 +687,7 @@ function reddit_score_thread(array $thread, array $context = []): int
 
 /**
  * Ask Gemini to score software-recommendation intent on a 0–10 scale.
- * Neutral prompt — does NOT ask "should the founder reply?" since that
+ * Neutral prompt: does NOT ask "should the founder reply?" since that
  * biases toward yes-answers. Caller decides whether to reply.
  *
  * Returns ['score' => int 0-10, 'reason' => string] on success,
@@ -696,12 +696,12 @@ function reddit_score_thread(array $thread, array $context = []): int
 function reddit_ai_relevance(array $thread, array $topComments, $pdo = null): array
 {
     $systemPrompt = <<<'SYS'
-You are evaluating a Reddit thread for software-recommendation intent. Be conservative — most threads do NOT qualify.
+You are evaluating a Reddit thread for software-recommendation intent. Be conservative: most threads do NOT qualify.
 
 A thread qualifies (score 7+) only if ALL of the following are true:
 - The OP is actively looking for, or open to switching, bookkeeping / accounting / invoicing software
 - The OP describes a real problem in their own words (not a generic "what do you guys use" karma-farming post)
-- The thread is not already saturated with software recommendations (look at the top comments — if 3+ commenters already recommended QuickBooks, Wave, FreshBooks, etc., the conversation is done)
+- The thread is not already saturated with software recommendations (look at the top comments: if 3+ commenters already recommended QuickBooks, Wave, FreshBooks, etc., the conversation is done)
 - The OP appears to be a real person running a small business, freelancing, or doing a side hustle (not a corporate procurement question or a student homework post)
 
 A thread does NOT qualify (score ≤4) if:
@@ -710,7 +710,7 @@ A thread does NOT qualify (score ≤4) if:
 - It's a complaint thread with no openness to alternatives
 - It's about an industry too large for Argo Books (enterprise, mid-market with employees, multi-entity)
 
-Score 5–6 for borderline cases — relevant but ambiguous fit.
+Score 5–6 for borderline cases: relevant but ambiguous fit.
 
 Return JSON only: {"relevance": <0-10 integer>, "reason": "<one sentence>"}
 
@@ -731,11 +731,11 @@ SYS;
     // replied) so the AI gradually calibrates to what's actually worked. Only
     // triggers when there's a meaningful sample (3+) to avoid noise from a
     // tiny set of early labels. The negatives block was removed to save
-    // tokens — rejections are inferred from the rules text only.
+    // tokens; rejections are inferred from the rules text only.
     if ($pdo !== null) {
         $examples = reddit_fetch_label_examples($pdo);
         if (!empty($examples['positives']) && count($examples['positives']) >= 3) {
-            $userPrompt .= "\n\n--- Examples the founder ACCEPTED (drafted or replied — treat similar threads as 7+) ---";
+            $userPrompt .= "\n\n--- Examples the founder ACCEPTED (drafted or replied, treat similar threads as 7+) ---";
             foreach ($examples['positives'] as $ex) {
                 $userPrompt .= "\n- r/{$ex['subreddit']} | {$ex['title']}";
             }
@@ -762,7 +762,7 @@ SYS;
  * as positive few-shot examples in the AI relevance prompt. Capped to a few
  * so the prompt doesn't balloon.
  *
- * Returns ['positives' => [...]] — kept as a single-key array (rather than a
+ * Returns ['positives' => [...]], kept as a single-key array (rather than a
  * flat list) so callers can be extended later without changing the shape.
  */
 function reddit_fetch_label_examples($pdo, int $limitEach = 5): array
@@ -781,7 +781,7 @@ function reddit_fetch_label_examples($pdo, int $limitEach = 5): array
         $posStmt->execute();
         $out['positives'] = $posStmt->fetchAll() ?: [];
     } catch (PDOException $e) {
-        // Schema not ready or table empty — just return empties; AI runs without examples.
+        // Schema not ready or table empty; just return empties; AI runs without examples.
     }
     return $out;
 }
@@ -797,7 +797,7 @@ function reddit_generate_draft(array $thread, array $topComments, array $regenCo
 {
     $systemPrompt = REDDIT_VOICE_DOC . "\n\n# Output rules for this task\n"
         . "You are drafting a Reddit reply for the founder to copy-paste manually. "
-        . "Follow the voice rules strictly. Output ONLY the reply text — no preamble, no explanation, "
+        . "Follow the voice rules strictly. Output ONLY the reply text, no preamble, no explanation, "
         . "no markdown formatting unless natural for Reddit. Do not include a URL. "
         . "Do not include disclosure unless mentioning Argo Books. Keep it short: 2–4 short paragraphs at most.";
 
@@ -808,7 +808,7 @@ function reddit_generate_draft(array $thread, array $topComments, array $regenCo
     $userPrompt = "Subreddit: r/" . ($thread['subreddit'] ?? '')
         . "\nThread title: " . ($thread['title'] ?? '')
         . "\nBody: " . (empty($thread['body']) ? '(link post, no body)' : mb_substr((string) $thread['body'], 0, 2000))
-        . "\nTop comments (for context — don't repeat what others already said):\n" . $commentsBlock;
+        . "\nTop comments (for context, don't repeat what others already said):\n" . $commentsBlock;
 
     // Regeneration context: when the founder rejected a previous draft, show
     // the AI what was wrong with it so the next version actually addresses
@@ -823,9 +823,9 @@ function reddit_generate_draft(array $thread, array $topComments, array $regenCo
         }
         if ($feedback !== '') {
             $userPrompt .= "\n\nFounder feedback on what to change:\n" . mb_substr($feedback, 0, 2000);
-            $userPrompt .= "\n\nWrite a new reply that ACTUALLY addresses the feedback — not a cosmetic variation. If the feedback contradicts the voice doc, prefer the feedback.";
+            $userPrompt .= "\n\nWrite a new reply that ACTUALLY addresses the feedback, not a cosmetic variation. If the feedback contradicts the voice doc, prefer the feedback.";
         } else {
-            $userPrompt .= "\n\nWrite a meaningfully different reply (different angle or framing — not just reworded). Don't repeat the previous draft's structure.";
+            $userPrompt .= "\n\nWrite a meaningfully different reply (different angle or framing, not just reworded). Don't repeat the previous draft's structure.";
         }
     }
 

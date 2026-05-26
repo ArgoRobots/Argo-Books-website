@@ -18,7 +18,7 @@ require_once __DIR__ . '/../config/pricing.php';
  *
  * Bases the new period on the LATER of the existing end_date or NOW(). When a
  * cron run is delayed and end_date is already in the past, extending from the
- * stale end_date can leave the new end_date still in the past — causing the
+ * stale end_date can leave the new end_date still in the past, causing the
  * subscription to be picked up again and re-charged on the next run.
  */
 function calculateNewEndDate($currentEndDate, $billing) {
@@ -41,14 +41,14 @@ function calculateNewEndDate($currentEndDate, $billing) {
  * Decide how much to charge for a renewal given the customer's credit balance.
  *
  * Returns:
- *   useCredit       — true only when credit fully covers the renewal
- *   creditUsed      — amount of credit consumed (0 when no credit)
- *   baseAmount      — pre-fee renewal price for the billing cycle
- *   amountToCharge  — final amount to charge the card, INCLUDING the
+ *   useCredit:       true only when credit fully covers the renewal
+ *   creditUsed:      amount of credit consumed (0 when no credit)
+ *   baseAmount:      pre-fee renewal price for the billing cycle
+ *   amountToCharge:  final amount to charge the card, INCLUDING the
  *                     processing fee. 0 when fully credit-covered.
  *
  * The processing fee is intentionally added inside this helper so the call
- * site reflects the same one-shot decision the cron already makes — the
+ * site reflects the same one-shot decision the cron already makes, the
  * single source of truth for "what does the card see this cycle?".
  */
 function decide_renewal_charge(float $creditBalance, string $billing, array $pricingConfig): array

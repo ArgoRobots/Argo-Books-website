@@ -48,10 +48,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     <meta name="twitter:title" content="Argo Books - Smart Business Management Software">
     <meta name="twitter:description"
         content="Transform your business with smart receipt scanning, predictive analytics, and automated business management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -142,7 +142,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <span class="text-gradient">run your business</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
-                    Simple, modern accounting software built for small businesses — with automation that saves time and keeps your finances organized
+                    Simple, modern accounting software built for small businesses, with automation that saves time and keeps your finances organized
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">
@@ -812,21 +812,21 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     <div class="ai-pill-icon"><?= svg_icon('bolt', 18) ?></div>
                     <div class="ai-pill-text">
                         <strong>Instant detection</strong>
-                        <span>Names, emails, dates, currencies — recognized automatically</span>
+                        <span>Names, emails, dates, currencies: recognized automatically</span>
                     </div>
                 </div>
                 <div class="ai-pill">
                     <div class="ai-pill-icon"><?= svg_icon('table', 18) ?></div>
                     <div class="ai-pill-text">
                         <strong>Any format</strong>
-                        <span>Messy columns, unusual names, mixed data — no cleanup needed</span>
+                        <span>Messy columns, unusual names, mixed data: no cleanup needed</span>
                     </div>
                 </div>
                 <div class="ai-pill">
                     <div class="ai-pill-icon"><?= svg_icon('shield', 18) ?></div>
                     <div class="ai-pill-text">
                         <strong>Private &amp; secure</strong>
-                        <span>Encrypted processing — never stored or used for training</span>
+                        <span>Encrypted processing. Never stored or used for training</span>
                     </div>
                 </div>
             </div>
@@ -839,7 +839,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Reports &amp; Insights</span>
                 <h2 class="section-title">Stay tax-ready with clean books and instant reports</h2>
-                <p class="section-description">Every transaction is categorized and matched to its receipt as you go. Generate any report you need in seconds — no spreadsheets, no scrambling at year-end.</p>
+                <p class="section-description">Every transaction is categorized and matched to its receipt as you go. Generate any report you need in seconds. No spreadsheets, no scrambling at year-end.</p>
             </div>
 
             <div class="tax-ready-grid">
@@ -972,7 +972,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <circle cx="26" cy="28" r="3" fill="#cbd5e1"/>
                             <circle cx="36" cy="28" r="3" fill="#cbd5e1"/>
                             <circle cx="46" cy="28" r="3" fill="#cbd5e1"/>
-                            <text x="160" y="32" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="600" fill="#64748b" text-anchor="middle">Argo Books — Dashboard</text>
+                            <text x="160" y="32" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="600" fill="#64748b" text-anchor="middle">Argo Books: Dashboard</text>
                             <!-- Sidebar -->
                             <rect x="12" y="42" width="42" height="184" fill="#fbfbfd"/>
                             <line x1="54" y1="42" x2="54" y2="226" stroke="#f1f5f9"/>
@@ -996,7 +996,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <path d="M 27 188 q 6 -7 12 0" stroke="#94a3b8" stroke-width="1.4" fill="none"/>
                             <!-- Header -->
                             <text x="64" y="62" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#0f172a">Welcome back</text>
-                            <text x="64" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" fill="#94a3b8">April 2026 — Q2 update</text>
+                            <text x="64" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="7.5" fill="#94a3b8">April 2026, Q2 update</text>
                             <rect x="252" y="60" width="46" height="14" rx="7" fill="#f1f5f9"/>
                             <text x="275" y="70" font-family="-apple-system,system-ui,sans-serif" font-size="7" font-weight="600" fill="#475569" text-anchor="middle">Apr 2026</text>
                             <!-- KPI tile: revenue -->
@@ -1174,7 +1174,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                             <div class="terminal-dots">
                                 <span></span><span></span><span></span>
                             </div>
-                            <span class="terminal-title">your_company.argo — encrypted view</span>
+                            <span class="terminal-title">your_company.argo, encrypted view</span>
                         </div>
                         <div class="terminal-body">
                             <div class="terminal-section">
@@ -1269,7 +1269,7 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                 </div>
                 <div class="price-lock-content">
                     <h3>Same price forever. No price creep</h3>
-                    <p>Made in Saskatoon — no "intro pricing" that doubles after a few months, no annual hikes.</p>
+                    <p>Made in Saskatoon. No "intro pricing" that doubles after a few months, no annual hikes.</p>
                 </div>
                 <a href="pricing/" class="price-lock-link">
                     <span>See the promise</span>
@@ -2061,10 +2061,10 @@ if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
                     setTimeout(() => scrambleText(el, 1800), 2800 + i * 1000);
                 });
 
-                // Step 3: Mark complete (7.6s — when last row finishes scrambling)
+                // Step 3: Mark complete (7.6s, when last row finishes scrambling)
                 setTimeout(() => {
                     bar.classList.add('done');
-                    label.textContent = 'Encryption complete — stored locally';
+                    label.textContent = 'Encryption complete. Stored locally';
                 }, 7600);
 
                 // Step 4: Hold, then restart (12s)

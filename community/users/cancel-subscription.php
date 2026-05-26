@@ -379,7 +379,7 @@ $premium_features = get_plan_features()['premium']['features'];
                 <a href="subscription.php" class="btn btn-purple">Keep My Subscription</a>
             </div>
 
-            <p class="cancel-footnote">Need help instead? <a class="link" href="../../contact-us/">Contact support</a> &mdash; we'd love to hear what's not working.</p>
+            <p class="cancel-footnote">Need help instead? <a class="link" href="../../contact-us/">Contact support</a>. We'd love to hear what's not working.</p>
         </div>
     </main>
 

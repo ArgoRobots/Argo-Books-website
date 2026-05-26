@@ -261,7 +261,7 @@ foreach ($subscriptions as $subscription) {
 
             // Wrap the two writes in a transaction so we can never end up with
             // an extended subscription but no payment record (or vice versa).
-            // The charge has already been made by this point — if the DB writes
+            // The charge has already been made by this point; if the DB writes
             // fail we log loudly so an operator can fix the DB state manually.
             $pdo->beginTransaction();
             try {
@@ -290,7 +290,7 @@ foreach ($subscriptions as $subscription) {
                 }
                 logMessage(
                     "CRITICAL: charged $subscriptionId (txn $transactionId, $$amountToCharge) but DB write failed: "
-                    . $dbEx->getMessage() . " — manual fix required",
+                    . $dbEx->getMessage() . ". Manual fix required",
                     'ERROR'
                 );
                 throw $dbEx;
@@ -440,7 +440,7 @@ try {
 // pre-switch subscription; once that event has had a week to arrive, we no
 // longer need the back-reference.
 //
-// Cutoff is keyed on last_cycle_change_at, NOT updated_at — updated_at gets
+// Cutoff is keyed on last_cycle_change_at, NOT updated_at, since updated_at gets
 // auto-bumped by every renewal/admin edit (ON UPDATE CURRENT_TIMESTAMP), so
 // for monthly subs it would never reach the 7-day threshold.
 try {

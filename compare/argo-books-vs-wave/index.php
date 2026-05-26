@@ -20,7 +20,7 @@ $plans = get_plan_features();
         content="Argo Books vs Wave, Wave alternative, Wave accounting alternative, simple bookkeeping software, small business accounting, affordable accounting software, offline accounting software">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Wave — Offline-Capable Finance & Inventory Management">
+    <meta property="og:title" content="Argo Books vs Wave: Offline-Capable Finance & Inventory Management">
     <meta property="og:description"
         content="Compare Argo Books and Wave side by side. See why small businesses are choosing Argo Books for offline-capable finance and inventory management.">
     <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-wave/">
@@ -30,13 +30,13 @@ $plans = get_plan_features();
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Wave — Offline-Capable Finance & Inventory Management">
+    <meta name="twitter:title" content="Argo Books vs Wave: Offline-Capable Finance & Inventory Management">
     <meta name="twitter:description"
         content="Compare Argo Books and Wave side by side. See why small businesses are choosing Argo Books for offline-capable finance and inventory management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -68,7 +68,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $25 CAD/month, and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro)."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $25 CAD/month, and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro)."
                     }
                 },
                 {
@@ -92,7 +92,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to Wave?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Both offer free plans. Wave's Starter is free with manual transaction entry, and the Pro plan is $25 CAD/month for auto bank imports. Receipt scanning costs another $11/month or $96/year on Wave's free Starter plan (it's included on Pro). Argo Books Premium is just $10 CAD/month with unlimited invoicing, AI receipt scanning included, and predictive analytics — less than half of Wave's Pro plan."
+                        "text": "Both offer free plans. Wave's Starter is free with manual transaction entry, and the Pro plan is $25 CAD/month for auto bank imports. Receipt scanning costs another $11/month or $96/year on Wave's free Starter plan (it's included on Pro). Argo Books Premium is just $10 CAD/month with unlimited invoicing, AI receipt scanning included, and predictive analytics, less than half of Wave's Pro plan."
                     }
                 },
                 {
@@ -100,7 +100,7 @@ $plans = get_plan_features();
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. Wave is web-based and also has a mobile app for iOS and Android."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Wave is web-based and also has a mobile app for iOS and Android."
                     }
                 }
             ]
@@ -108,7 +108,7 @@ $plans = get_plan_features();
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Wave — Offline-Capable & Feature-Rich | Argo Books</title>
+    <title>Argo Books vs Wave: Offline-Capable & Feature-Rich | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -135,7 +135,7 @@ $plans = get_plan_features();
         </div>
         <div class="container">
             <h1 class="animate-fade-in">Argo Books vs Wave</h1>
-            <p class="hero-subtitle animate-fade-in">Both free to start — but built for different businesses.</p>
+            <p class="hero-subtitle animate-fade-in">Both free to start, but built for different businesses.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Try Argo Books Free</span>
@@ -169,7 +169,7 @@ $plans = get_plan_features();
                         <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
                     <h3>Works offline</h3>
-                    <p>Wave is cloud-only — no internet, no access. Argo Books is a desktop app that works offline, so you're never locked out of your own data.</p>
+                    <p>Wave is cloud-only: no internet, no access. Argo Books is a desktop app that works offline, so you're never locked out of your own data.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -196,7 +196,7 @@ $plans = get_plan_features();
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
-                            <th class="brand-col">Wave<span class="th-sub">Pro — $25 CAD/month</span></th>
+                            <th class="brand-col">Wave<span class="th-sub">Pro: $25 CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -295,8 +295,8 @@ $plans = get_plan_features();
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
-                <h2>Both are free to start — here's how they compare</h2>
-                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports — and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro). Argo Books Premium is $10 CAD/month with inventory, AI receipt scanning included, and more.</p>
+                <h2>Both are free to start. Here's how they compare</h2>
+                <p class="section-desc">Wave's Starter plan is free, but their Pro plan costs $25 for features like auto bank imports, and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro). Argo Books Premium is $10 CAD/month with inventory, AI receipt scanning included, and more.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -374,7 +374,7 @@ $plans = get_plan_features();
                 </div>
                 <h3>An honest take</h3>
                 <p>Wave is an excellent free option for freelancers and service-based businesses that need invoicing, basic accounting, and bank transaction imports. If those are your core needs, Wave is a solid choice.</p>
-                <p>But if you sell physical products and need inventory management, offline access, predictive analytics, or biometric security — features Wave doesn't offer — Argo Books is built for you.</p>
+                <p>But if you sell physical products and need inventory management, offline access, predictive analytics, or biometric security (features Wave doesn't offer), Argo Books is built for you.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -397,7 +397,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
                             <p>Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $25 CAD/month, and receipt scanning costs another $11/month or $96/year on the free Starter plan (it's included on Pro).</p>
                         </div>
                     </div>
@@ -443,7 +443,7 @@ $plans = get_plan_features();
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Both offer free plans. Wave's Starter is free with manual transaction entry, and the Pro plan is $25 CAD/month for auto bank imports. Receipt scanning costs another $11/month or $96/year on Wave's free Starter plan (it's included on Pro).</p>
-                            <p>Argo Books Premium is just <strong>$10 CAD/month</strong> with unlimited invoicing, AI receipt scanning included, and predictive analytics — less than half of Wave's Pro plan.</p>
+                            <p>Argo Books Premium is just <strong>$10 CAD/month</strong> with unlimited invoicing, AI receipt scanning included, and predictive analytics, less than half of Wave's Pro plan.</p>
                         </div>
                     </div>
                 </div>
@@ -457,7 +457,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Wave is web-based and also has a mobile app for iOS and Android.</p>
                         </div>
                     </div>

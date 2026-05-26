@@ -37,7 +37,7 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <div class="info-box">
-                <strong>Tip:</strong> Accounting reports are generated directly from your transaction records — no Chart of Accounts setup is required.
+                <strong>Tip:</strong> Accounting reports are generated directly from your transaction records, with no Chart of Accounts setup required.
             </div>
 
             <h2>Step 2: Layout Designer</h2>
@@ -45,7 +45,7 @@ include __DIR__ . '/../../docs-header.php';
             <ul>
                 <li><strong>Add Charts:</strong> Choose from 30+ chart types across categories like Revenue, Expenses, Financial, Geographic, Customers, Returns, and more</li>
                 <li><strong>Add Elements:</strong> Include text labels, images, date ranges, summary statistics, and tables</li>
-                <li><strong>Add Accounting Tables:</strong> Insert structured financial tables with section headers, subtotals, and grand totals — available when using accounting report templates</li>
+                <li><strong>Add Accounting Tables:</strong> Insert structured financial tables with section headers, subtotals, and grand totals, available when using accounting report templates</li>
                 <li><strong>Drag and Drop:</strong> Click and drag elements to position them on the canvas</li>
                 <li><strong>Resize:</strong> Select an element and drag the corner handles to resize</li>
                 <li><strong>Customize:</strong> Use the properties panel to adjust colors, fonts, borders, and alignment</li>
@@ -58,13 +58,13 @@ include __DIR__ . '/../../docs-header.php';
             <ul>
                 <li><strong>Add Page:</strong> Use the "Add Page" button in the bottom to add a new page</li>
                 <li><strong>Delete Page:</strong> Use the "Delete Page" button to remove the current page</li>
-                <li><strong>Page Navigation:</strong> Scroll through pages in the designer — all pages are stacked vertically</li>
+                <li><strong>Page Navigation:</strong> Scroll through pages in the designer. All pages are stacked vertically</li>
             </ul>
 
             <h2>Step 3: Preview and Export</h2>
             <p>Review your report and export in your preferred format.</p>
             <ul>
-                <li><strong>Preview:</strong> See how your finished report will look — all pages are displayed in a scrollable view</li>
+                <li><strong>Preview:</strong> See how your finished report will look. All pages are displayed in a scrollable view</li>
                 <li><strong>Page Numbers:</strong> Multi-page reports automatically display "Page X of Y" for easy reference</li>
                 <li><strong>Export Format:</strong> Choose PNG, JPEG, or PDF</li>
                 <li><strong>Export:</strong> Select your save location and click "Export"</li>

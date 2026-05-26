@@ -72,8 +72,8 @@ assert_true(
     "Whitespace-only returns empty string"
 );
 
-// ─── Section 3: evaluate_shopify_candidate — fit path ───
-echo "Section 3: evaluate_shopify_candidate — fit path\n";
+// ─── Section 3: evaluate_shopify_candidate: fit path ───
+echo "Section 3: evaluate_shopify_candidate: fit path\n";
 $caHtml = <<<HTML
 <html>
 <head><title>Cool Maple Co</title></head>
@@ -97,8 +97,8 @@ assert_true(
 $parsedDate = DateTime::createFromFormat('Y-m-d H:i:s', $result['metadata']['first_product_created_at'] ?? '');
 assert_true($parsedDate !== false, "metadata.first_product_created_at is a valid Y-m-d H:i:s datetime");
 
-// ─── Section 4: evaluate_shopify_candidate — reject paths ───
-echo "Section 4: evaluate_shopify_candidate — reject paths\n";
+// ─── Section 4: evaluate_shopify_candidate: reject paths ───
+echo "Section 4: evaluate_shopify_candidate: reject paths\n";
 
 // agency_operated
 $agencyHtml = '<html><body>Made in Canada hello@x.ca. Powered by Awesome Agency.</body></html>';
@@ -106,7 +106,7 @@ $r = evaluate_shopify_candidate('https://test.myshopify.com', $agencyHtml, $caPr
 assert_true($r['reason'] === 'agency_operated', "agency_operated: reason correct");
 assert_true(stripos($r['detail'] ?? '', 'Awesome Agency') !== false, "agency_operated: detail contains 'Awesome Agency'");
 
-// not_shopify — NOTE: not reachable via $productsOverride because any non-null array skips
+// not_shopify, NOTE: not reachable via $productsOverride because any non-null array skips
 // the $productsData === null check. To trigger not_shopify cleanly would require a live
 // network call (or mocking fetch_shopify_products_json). This path is intentionally omitted
 // from offline smoke testing; see report for explanation.
@@ -118,13 +118,13 @@ $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $fewProdu
 assert_true($r['reason'] === 'too_few_products', "too_few_products: reason correct");
 assert_true(str_contains($r['detail'] ?? '', '3'), "too_few_products: detail mentions count 3");
 
-// too_new (~1 month ago — always within the too_new window)
+// too_new (~1 month ago, always within the too_new window)
 $newDate     = (new DateTime('-1 month'))->format(DateTime::RFC3339);
 $newProducts = ['products' => array_fill(0, 10, ['created_at' => $newDate])];
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $newProducts);
 assert_true($r['reason'] === 'too_new', "too_new: reason correct");
 
-// too_old (~27 months ago — past the 24-month ceiling)
+// too_old (~27 months ago, past the 24-month ceiling)
 $oldDate     = (new DateTime('-27 months'))->format(DateTime::RFC3339);
 $oldProducts = ['products' => array_fill(0, 10, ['created_at' => $oldDate])];
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $caHtml, $oldProducts);
@@ -161,7 +161,7 @@ assert_true(str_contains($r['detail'] ?? '', 'support@store.ca'), "gatekept_emai
 // ─── Section 5: Canada-signal detection ───
 echo "Section 5: Canada-signal detection\n";
 
-// Postal code only (no other Canada phrases) — K1A 0B1 is a valid Canadian postal code
+// Postal code only (no other Canada phrases). K1A 0B1 is a valid Canadian postal code
 $postalOnlyHtml = '<html><body>Pickup at K1A 0B1 hello@x.ca</body></html>';
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $postalOnlyHtml, $caProducts);
 assert_true($r['fit'] === true, "Postal code alone (K1A 0B1) passes Canada gate");
@@ -186,7 +186,7 @@ $proudlyHtml = '<html><body>Proudly Canadian. hello@maple.ca</body></html>';
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $proudlyHtml, $caProducts);
 assert_true($r['fit'] === true, "'proudly canadian' phrase passes Canada gate");
 
-// Just the word "Canada" alone (no postal code, no qualifying phrase) — should FAIL
+// Just the word "Canada" alone (no postal code, no qualifying phrase) should FAIL
 $justCanadaHtml = '<html><body>We ship to Canada. hello@x.ca</body></html>';
 $r = evaluate_shopify_candidate('https://test.myshopify.com', $justCanadaHtml, $caProducts);
 assert_true($r['reason'] === 'not_target_country', "Bare 'Canada' without postal code or signal phrase → not_target_country");

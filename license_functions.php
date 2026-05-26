@@ -107,7 +107,7 @@ function redeem_premium_key($key, $device_id) {
         ];
     }
 
-    // Key already redeemed — handle re-redemption (device transfer)
+    // Key already redeemed: handle re-redemption (device transfer)
     if ($validation['status'] === 'redeemed') {
         return _handle_re_redemption($key, $device_id, $validation['subscription_id']);
     }
@@ -124,7 +124,7 @@ function redeem_premium_key($key, $device_id) {
         // Calculate subscription dates
         $startDate = date('Y-m-d H:i:s');
         if ($duration_months == 0) {
-            // Permanent subscription — set end date far in the future
+            // Permanent subscription: set end date far in the future
             $endDate = date('Y-m-d H:i:s', strtotime('+100 years'));
             $billingCycle = 'yearly';
         } elseif ($duration_months >= 12) {
@@ -135,7 +135,7 @@ function redeem_premium_key($key, $device_id) {
             $billingCycle = 'monthly';
         }
 
-        // Create the premium subscription (no user account — user_id and email are NULL)
+        // Create the premium subscription (no user account, so user_id and email are NULL)
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscriptions (
                 subscription_id, billing_cycle, amount, currency,
@@ -264,7 +264,7 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
             ];
         }
 
-        // Subscription is still active — transfer to new device
+        // Subscription is still active. Transfer to new device
         $stmt = $pdo->prepare("
             UPDATE premium_subscription_keys
             SET device_id = ?

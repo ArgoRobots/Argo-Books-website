@@ -4,7 +4,7 @@
  *
  * The AI prompt in outreach_helpers.php uses these as generic industry-level
  * context the AI may gently allude to. They are NOT claims about any specific
- * business — the prompt enforces that framing.
+ * business: the prompt enforces that framing.
  *
  * Keys must exactly match entries in OUTREACH_CATEGORY_POOL in outreach_helpers.php
  * (lowercase, plural form). Unknown categories fall back to '_default'.

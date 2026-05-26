@@ -5,7 +5,7 @@
  * GET /api/exchange-rates - Proxy OpenExchangeRates API calls
  *
  * Fetches exchange rates from OpenExchangeRates using server-side API key.
- * Implements persistent MySQL caching — historical rates are stored permanently
+ * Implements persistent MySQL caching: historical rates are stored permanently
  * (they never change), today's rate is refreshed every hour.
  *
  * Query parameters:
@@ -22,7 +22,7 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['GET']);
 
-// Exchange rates are a free feature available to all users — no license key required.
+// Exchange rates are a free feature available to all users; no license key required.
 // Rate limiting uses device ID if provided, otherwise falls back to IP address.
 $deviceId = authenticate_device_request();
 if ($deviceId) {

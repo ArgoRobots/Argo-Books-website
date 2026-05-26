@@ -29,10 +29,10 @@
     <meta name="twitter:title" content="About Us - Argo Books | Canadian Software Company">
     <meta name="twitter:description"
         content="Learn about Argo, the Canada-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -126,7 +126,7 @@
                             <div class="point-icon">
                                 <?= svg_icon('check-rounded') ?>
                             </div>
-                            <p>Flexible pricing — Use it for free, or unlock more with the premium version</p>
+                            <p>Flexible pricing: Use it for free, or unlock more with the premium version</p>
                         </div>
                     </div>
                 </div>
@@ -203,7 +203,7 @@
                     <p>From humble beginnings with a simple goal: Create the finance tracking tool we
                         wished existed for our own small businesses.</p>
                     <p>What sets us apart is our first-hand experience with the challenges small businesses face. We're
-                        not a large corporation with venture capital funding — we're a small, self-funded business that
+                        not a large corporation with venture capital funding. We're a small, self-funded business that
                         understands what it means to watch every dollar and make smart investments in technology.</p>
                     <div class="story-stats">
                         <div class="stat">

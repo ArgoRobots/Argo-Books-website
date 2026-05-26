@@ -2005,7 +2005,7 @@ tbody tr:hover {
 
 
 /* ══════════════════════════════════════════════════════════════════════
-   Section tabs — shared page-level tab style for all admin pages.
+   Section tabs: shared page-level tab style for all admin pages.
    Markup:
        <div class="section-tabs">
            <button class="section-tab active" data-tab="foo">Foo</button>

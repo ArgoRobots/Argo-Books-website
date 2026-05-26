@@ -35,7 +35,7 @@ refund_assert_state($req['state'], ['pending_code', 'code_verified', 'cooling_of
 // classic TOCTOU window: the cooling-off promoter cron can promote the
 // request between them. Without the predicate, this UPDATE would clobber
 // a finalized refund back to 'cancelled' and the books would diverge
-// from the provider. rowCount = 0 means the cron beat us — surface as
+// from the provider. rowCount = 0 means the cron beat us; surface as
 // 409 so the desktop can re-fetch the current state.
 $upd = $pdo->prepare("
     UPDATE refund_requests

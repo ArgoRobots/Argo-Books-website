@@ -92,7 +92,7 @@
             <div class="review-prefer-contact animate-fade-in">
                 <?= svg_icon('message-circle', 18) ?>
                 <span>
-                    Having an issue? <a href="../contact-us/">Tell us first &mdash; we'd love to fix it.</a>
+                    Having an issue? <a href="../contact-us/">Tell us first. We'd love to fix it.</a>
                 </span>
             </div>
             <div class="hero-ctas animate-fade-in">
@@ -108,7 +108,7 @@
     </section>
 
     <!-- =============================================
-         STATS BANNER — quick reassurance
+         STATS BANNER: quick reassurance
          ============================================= -->
     <section class="highlight-banner">
         <div class="container">
@@ -139,7 +139,7 @@
                     <span class="section-label">About Capterra</span>
                     <h2>An independent review site small businesses trust</h2>
                     <p>
-                        Capterra is one of the largest independent software review sites on the internet, owned by Gartner. It lets real users compare business tools side by side using verified reviews &mdash; not paid ads. People researching accounting software regularly check Capterra before they pick a product, so a thoughtful review from an actual user has real weight.
+                        Capterra is one of the largest independent software review sites on the internet, owned by Gartner. It lets real users compare business tools side by side using verified reviews, not paid ads. People researching accounting software regularly check Capterra before they pick a product, so a thoughtful review from an actual user has real weight.
                     </p>
                     <ul class="feature-checklist">
                         <li>
@@ -148,7 +148,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Capterra is independent &mdash; we don't pay for placement or curate reviews</span>
+                            <span>Capterra is independent: we don't pay for placement or curate reviews</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -177,7 +177,7 @@
                             </div>
                             <div>
                                 <div class="review-info-card-name">Sarah K.</div>
-                                <div class="review-info-card-role">Owner, Retail &mdash; 2-10 employees</div>
+                                <div class="review-info-card-role">Owner, Retail, 2-10 employees</div>
                             </div>
                         </div>
                         <p class="review-info-card-disclaimer">Illustrative example. Reviews on Capterra display first name, role, industry, and company size.</p>
@@ -197,16 +197,16 @@
                     <span class="section-label">What to Expect</span>
                     <h2>Verifying you're a real person</h2>
                     <p>
-                        Before publishing your review, Capterra needs to confirm you're genuinely a user of Argo Books and not a bot, a competitor, or someone connected to us. You'll see this verification screen near the end of the form &mdash; you can choose either path.
+                        Before publishing your review, Capterra needs to confirm you're genuinely a user of Argo Books and not a bot, a competitor, or someone connected to us. You'll see this verification screen near the end of the form, and you can choose either path.
                     </p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span><strong>Sign in with LinkedIn</strong> &mdash; the fastest path. Capterra uses your LinkedIn profile to confirm you're real.</span>
+                            <span><strong>Sign in with LinkedIn:</strong> the fastest path. Capterra uses your LinkedIn profile to confirm you're real.</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span><strong>Continue without LinkedIn</strong> &mdash; enter your name and a contact email manually. Capterra may follow up by email if they have questions.</span>
+                            <span><strong>Continue without LinkedIn:</strong> enter your name and a contact email manually. Capterra may follow up by email if they have questions.</span>
                         </li>
                     </ul>
                     <div class="review-callout">
@@ -223,7 +223,7 @@
                         <div class="review-screenshot-fallback">
                             <?= svg_icon('shield-check', 56) ?>
                             <h3>Identity verification</h3>
-                            <p>Sign in with LinkedIn or continue with manual entry &mdash; both work, both are private.</p>
+                            <p>Sign in with LinkedIn or continue with manual entry. Both work, and both are private.</p>
                         </div>
                     </div>
                 </div>
@@ -261,7 +261,7 @@
                         <?= svg_icon('analytics', 22) ?>
                     </div>
                     <h3>Be balanced</h3>
-                    <p>Highlight what's working and where things could improve. Balanced reviews are the most helpful &mdash; and the ones other small business owners actually trust.</p>
+                    <p>Highlight what's working and where things could improve. Balanced reviews are the most helpful, and the ones other small business owners actually trust.</p>
                 </div>
             </div>
         </div>
@@ -275,7 +275,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Privacy</span>
                 <h2 class="section-title">What's shared, and what stays private</h2>
-                <p class="section-desc">Capterra publishes enough information to make a review credible &mdash; without exposing your full identity or contact details.</p>
+                <p class="section-desc">Capterra publishes enough information to make a review credible, without exposing your full identity or contact details.</p>
             </div>
             <div class="review-privacy-grid">
                 <div class="review-privacy-card review-privacy-public animate-on-scroll">
@@ -309,7 +309,7 @@
     </section>
 
     <!-- =============================================
-         WHAT HAPPENS AFTER YOU SUBMIT — 3 steps
+         WHAT HAPPENS AFTER YOU SUBMIT: 3 steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
@@ -332,7 +332,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Your review goes live</h3>
-                    <p>Once approved &mdash; usually within a few business days &mdash; your review appears on the Argo Books listing on Capterra and starts helping other small businesses make a confident decision.</p>
+                    <p>Once approved, usually within a few business days, your review appears on the Argo Books listing on Capterra and starts helping other small businesses make a confident decision.</p>
                 </div>
             </div>
         </div>

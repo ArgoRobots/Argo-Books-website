@@ -293,7 +293,7 @@ try {
     if ($reactivated) {
         // For Stripe/Square the card has been charged synchronously, so we can
         // safely extend end_date here. For PayPal, activatePayPalSubscription
-        // only un-suspends the subscription — PayPal has NOT collected payment
+        // only un-suspends the subscription. PayPal has NOT collected payment
         // yet. Extending end_date now would give the user a free renewal
         // period if the next PayPal billing attempt fails. For PayPal, only
         // flip status back to active and let PAYMENT.SALE.COMPLETED (handled
@@ -315,7 +315,7 @@ try {
             ");
             $stmt->execute([$new_end_date, $user_id, current_environment()]);
         } else {
-            // PayPal: don't move end_date — webhook will handle it.
+            // PayPal: don't move end_date. The webhook will handle it.
             $new_end_date = $premium_subscription['end_date'];
 
             $stmt = $pdo->prepare("

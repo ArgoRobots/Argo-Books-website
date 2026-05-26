@@ -65,7 +65,7 @@ final class RedeemPremiumKeyTest extends IntegrationTestCase
         $stmt->execute([$result['subscription_id']]);
         $endDate = $stmt->fetch()['end_date'];
 
-        // 100 years out (give or take) — assert at least 99 years from now
+        // 100 years out (give or take). Assert at least 99 years from now
         $minExpected = (new \DateTime('+99 years'))->format('Y-m-d');
         $this->assertGreaterThanOrEqual($minExpected, substr($endDate, 0, 10));
     }

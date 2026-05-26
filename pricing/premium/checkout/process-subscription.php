@@ -47,7 +47,7 @@ $paymentMethod = $input['payment_method'] ?? 'unknown';
 // Use session user_id as authoritative source (POST user_id is untrusted)
 $userId = intval($_SESSION['user_id']);
 
-// Compute server-side total (base price + processing fee) — never trust client amount
+// Compute server-side total (base price + processing fee). Never trust client amount
 $pricingConfig = get_pricing_config();
 $monthlyPrice = $pricingConfig['premium_monthly_price'];
 $yearlyPrice = $pricingConfig['premium_yearly_price'];
@@ -150,7 +150,7 @@ try {
             if ($isPayPalSubscription) {
                 // PayPal Subscriptions API - recurring billing handled by PayPal
                 $paypalSubscriptionId = $input['paypal_subscription_id'] ?? $input['subscriptionID'] ?? '';
-                // Validate format at entry — the id ends up in the DB and in
+                // Validate format at entry: the id ends up in the DB and in
                 // outbound URL paths to PayPal (cancel, refund). Reject
                 // anything that doesn't match the alphanumeric+hyphen format
                 // before it can persist or reach an API call.
@@ -395,7 +395,7 @@ try {
         // PayPal billing engine handles its own first-cycle charge on
         // activation, so override end_date to today + new cycle. The cancel
         // and refund happen post-commit (see below). We MUST proceed even
-        // if some prereqs fail — by this point the new PayPal sub already
+        // if some prereqs fail, because by this point the new PayPal sub already
         // exists on PayPal's side; rolling back here would orphan it.
         $isPayPalCycleSwitch = (
             $cycleSwitch
@@ -431,7 +431,7 @@ try {
                 echo json_encode(['success' => false, 'error' => 'Subscription not found']);
                 exit();
             }
-            // From here on, use $lockedSubscription for all reads — it's the
+            // From here on, use $lockedSubscription for all reads. It's the
             // authoritative row state under the row lock.
             $existingSubscription = $lockedSubscription;
 
@@ -442,7 +442,7 @@ try {
 
             // Status: cycle switch requires an active sub. The
             // existingSubscription query at line 100 includes cancelled and
-            // payment_failed for general payment-method updates — must be
+            // payment_failed for general payment-method updates, so it must be
             // stricter here.
             if (($existingSubscription['status'] ?? '') !== 'active') {
                 $pdo->rollBack();
@@ -453,7 +453,7 @@ try {
 
             // Cooldown: 5 min between cycle changes. Prevents two-tab races
             // (PayPal generates distinct sub ids per approval, so the anti-
-            // replay check below doesn't catch concurrent approvals — the
+            // replay check below doesn't catch concurrent approvals: the
             // cooldown does) and rapid double-click double-billing.
             if (!empty($existingSubscription['last_cycle_change_at'])
                 && (time() - strtotime($existingSubscription['last_cycle_change_at'])) < 300) {
@@ -493,7 +493,7 @@ try {
                 exit();
             }
 
-            // Override end_date — PayPal bills the new sub on activation
+            // Override end_date: PayPal bills the new sub on activation
             $newEndDate = ($billing === 'yearly')
                 ? date('Y-m-d H:i:s', strtotime('+1 year'))
                 : date('Y-m-d H:i:s', strtotime('+1 month'));
@@ -518,7 +518,7 @@ try {
         if ($isPayPalCycleSwitch) {
             // PayPal cycle-switch UPDATE: writes previous_paypal_subscription_id
             // (race fix for the cancel webhook) and stamps last_cycle_change_at.
-            // credit_balance is intentionally NOT touched here — it gets set
+            // credit_balance is intentionally NOT touched here. It gets set
             // post-commit based on refund outcome so a failed refund doesn't
             // also wipe out the user's existing credit.
             $stmt = $pdo->prepare("
@@ -656,7 +656,7 @@ try {
                     $switchWarnings[] = "Your prorated refund of $" . number_format($sw['refund_amount'], 2) . " is processing. If you don't see it within 10 business days, please contact support.";
                 }
             } elseif ($sw['refund_amount'] > 0) {
-                error_log("WARN: cycle switch refund skipped — no completed PayPal sale found. user_id=$userId, subscription_id=$subscriptionId, refund_amount={$sw['refund_amount']}");
+                error_log("WARN: cycle switch refund skipped: no completed PayPal sale found. user_id=$userId, subscription_id=$subscriptionId, refund_amount={$sw['refund_amount']}");
                 $switchWarnings[] = "We couldn't issue your prorated refund automatically because no recent PayPal payment was found. Please contact support if you expected a refund.";
             }
 

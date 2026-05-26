@@ -104,7 +104,7 @@ final class AuthenticateLicenseRequestTest extends DatabaseTestCase
 
     public function test_returns_auth_payload_when_status_is_cancelled_but_end_date_is_future(): void
     {
-        // Cancelled means "active until end_date, no auto-renew" — still
+        // Cancelled means "active until end_date, no auto-renew", still
         // valid for license purposes until end_date passes.
         $endDate = (new DateTimeImmutable('+30 days'))->format('Y-m-d H:i:s');
         $this->seedSubscription('PREM-AUTH-CANC-AAAA-FFFF', $endDate, 'cancelled');

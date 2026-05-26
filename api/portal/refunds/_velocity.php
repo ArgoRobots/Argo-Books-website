@@ -26,7 +26,7 @@ function refund_load_velocity_config(PDO $pdo, int $company_id): array {
     }
     // Final fallback if config table is empty (shouldn't happen post-migration).
     // The *_floor_cents value MUST be strictly greater than *_cooling_cents in
-    // both age brackets — when they're equal, the hard-block check ($today_cents
+    // both age brackets. When they're equal, the hard-block check ($today_cents
     // >= floor) catches every request that the cooling check would catch, and
     // the 'delayed' tier is unreachable.
     if (!$cfg) {

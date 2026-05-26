@@ -169,7 +169,7 @@ function handle_stripe_checkout(array $invoice, int $amountCents, string $curren
  * PayPal portal payments are intentionally disabled at this layer. The
  * customer-facing invoice page does not render the PayPal button (see
  * get_available_payment_methods in portal-helper.php), so this function
- * should never be reached through the normal flow — but if a stale client
+ * should never be reached through the normal flow, but if a stale client
  * or direct POST still calls it, we return a clear 503.
  */
 function handle_paypal_checkout(array $invoice, float $amount, string $currency, array $data): void
@@ -239,7 +239,7 @@ function process_square_payment(array $invoice, array $company, array $data, int
     // Derive idempotency key from invoice+amount+source so retries reuse the same key,
     // but clients cannot manipulate it (server-side HMAC with encryption key as secret).
     // Truncated to 45 chars to fit Square's idempotency_key max length (180 bits of
-    // entropy retained — more than enough for uniqueness).
+    // entropy retained, more than enough for uniqueness).
     $idempotencyKey = substr(hash_hmac('sha256', $invoice['invoice_id'] . ':' . $amountCents . ':' . $data['source_id'], $_ENV['PORTAL_ENCRYPTION_KEY'] ?? ''), 0, 45);
     $referenceNumber = generate_reference_number();
 

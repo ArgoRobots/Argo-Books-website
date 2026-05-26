@@ -21,10 +21,10 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Refund Policy - Argo Books">
     <meta name="twitter:description" content="Read the Argo Books Refund Policy for Premium subscriptions and how to request a refund.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/legal/refund.php">
@@ -76,7 +76,7 @@
             <ul>
                 <li>You can cancel your subscription at any time from your account settings.</li>
                 <li>After cancellation, you retain access to Premium features until the end of your current billing period.</li>
-                <li>Cancellations are not automatically refunded. If you believe you are entitled to a refund, you may request one separately. (Note: switching to a different billing cycle is handled separately &mdash; see "Plan Changes" below.)</li>
+                <li>Cancellations are not automatically refunded. If you believe you are entitled to a refund, you may request one separately. (Note: switching to a different billing cycle is handled separately; see "Plan Changes" below.)</li>
                 <li>Cancellation forfeits any account credit balance on your subscription.</li>
             </ul>
 

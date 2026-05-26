@@ -703,7 +703,7 @@ function shopify_run_dork($pdo)
             if ($canonical === '') continue;
 
             // Already-imported check FIRST, before the expensive evaluator
-            // call. Uses outreach_shopify_candidates.canonical_url (stable —
+            // call. Uses outreach_shopify_candidates.canonical_url (stable,
             // populated at import time) rather than outreach_leads.website
             // (which holds the post-redirect custom domain and won't match
             // a SerpAPI result that points at .myshopify.com).
@@ -769,13 +769,13 @@ function shopify_import($pdo)
         json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
     }
 
-    // No daily-imports cap on the UI path — the operator clicking Import is
+    // No daily-imports cap on the UI path: the operator clicking Import is
     // making a deliberate choice and shouldn't be rationed against the cron's
     // automation throttle. The cron still self-rations via shopify_imports_today
     // (OUTREACH_DAILY_SHOPIFY_DISCOVERY_LIMIT), which the UI deliberately does
     // not touch.
 
-    // Re-evaluate server-side — don't trust client-passed metadata
+    // Re-evaluate server-side, don't trust client-passed metadata
     $result = evaluate_shopify_candidate($canonicalUrl);
     if (empty($result['fit'])) {
         json_response([
@@ -792,7 +792,7 @@ function shopify_import($pdo)
     $businessName = $meta['business_name'] ?? '';
 
     if ($email === '') {
-        json_response(['success' => false, 'message' => 'Re-evaluation returned fit but no email — refusing to import'], 500);
+        json_response(['success' => false, 'message' => 'Re-evaluation returned fit but no email, refusing to import'], 500);
     }
 
     // Dedup against existing leads (email OR website)
@@ -853,7 +853,7 @@ function shopify_import($pdo)
 
         log_activity($pdo, $leadId, 'lead_created', 'Imported from Shopify discovery UI');
 
-        // Intentionally does not increment shopify_imports_today — that
+        // Intentionally does not increment shopify_imports_today, since that
         // counter belongs to the cron's automation throttle and shouldn't
         // be consumed by deliberate user-driven imports.
 
@@ -927,7 +927,7 @@ function send_outreach_email($pdo)
     // status so send_outreach_lead's atomic claim works and the post-send
     // CASE in cron/lib/outreach_helpers.php can promote status back to
     // 'contacted'. The suppression list still blocks sends to the bounced
-    // address itself — if the admin didn't actually fix the email, the new
+    // address itself; if the admin didn't actually fix the email, the new
     // send attempt will be caught and refused as 'suppressed' instead.
     if (!empty($lead['sent_at'])) {
         if (($lead['status'] ?? '') === 'email_bounced') {
@@ -954,7 +954,7 @@ function send_outreach_email($pdo)
     }
 
     // Skip outcomes (already sent / suppressed) are logged inside
-    // send_outreach_lead — don't double-log them as failures here. Map each
+    // send_outreach_lead, so don't double-log them as failures here. Map each
     // to an honest user-facing message and HTTP code.
     if ($reason === 'already_sent') {
         json_response([
@@ -1551,7 +1551,7 @@ function reddit_api_run_now($pdo)
 
     // Release the session lock BEFORE running the inline cron. PHP's default
     // file-based session handler holds an exclusive lock on the session file
-    // for the duration of the request — without this close, page reloads and
+    // for the duration of the request, so without this close, page reloads and
     // the JS progress polling block for the full multi-minute cron runtime.
     if (function_exists('session_write_close')) {
         @session_write_close();
@@ -1743,7 +1743,7 @@ function reddit_api_get_account_info($pdo)
     $info = reddit_fetch_account_about($pdo);
     if ($info === null) {
         $hint = reddit_oauth_configured()
-            ? 'OAuth token request failed — verify REDDIT_CLIENT_ID / SECRET / PASSWORD in .env.'
+            ? 'OAuth token request failed. Verify REDDIT_CLIENT_ID / SECRET / PASSWORD in .env.'
             : 'Without OAuth, Reddit blocks the account-about endpoint from this server\'s IP. Configure REDDIT_* OAuth env vars to enable.';
         json_response(['success' => false, 'message' => $hint]);
     }

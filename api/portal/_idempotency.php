@@ -110,7 +110,7 @@ function with_idempotency(PDO $pdo, int $company_id, string $raw_body, callable 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) {
         // Race: row was released or expired between the INSERT attempt
-        // and this SELECT. Restart the flow once — the second pass will
+        // and this SELECT. Restart the flow once: the second pass will
         // either claim cleanly or hit a now-present cache entry.
         with_idempotency($pdo, $company_id, $raw_body, $handler);
         return;
@@ -137,7 +137,7 @@ function with_idempotency(PDO $pdo, int $company_id, string $raw_body, callable 
         ]);
         return;
     }
-    // Cache hit — replay the stored response.
+    // Cache hit: replay the stored response.
     http_response_code((int)$row['response_status']);
     header('Content-Type: application/json');
     echo $row['response_body'];

@@ -29,10 +29,10 @@
     <meta name="twitter:title" content="What's New - Argo Books | Latest Features & Updates">
     <meta name="twitter:description"
         content="Latest updates and new features in Argo Books. Download the latest release.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -102,27 +102,27 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Invoice refunds</strong> &mdash; Refund a portal payment without leaving Argo Books. Pick which line items or amount to refund and click send.</li>
-                                <li><strong>Send invoices in any currency</strong> &mdash; Bill customers in the currency that works for them, no matter where they're based.</li>
-                                <li><strong>Refund analytics</strong> &mdash; A new Refunds tab in the analytics page shows your refund rate, top reasons, and trends over time.</li>
-                                <li><strong>Customer &amp; supplier avatars</strong> &mdash; Add a profile picture to any customer or supplier.</li>
-                                <li><strong>Rental availability calendar</strong> &mdash; Each rental item now has a calendar view of free and booked counts, plus a quick "next available" answer for any quantity you need.</li>
-                                <li><strong>Forecast scenarios</strong> &mdash; Forecasts now show Conservative, Baseline, and Optimistic ranges instead of a single line, so you can see the uncertainty around future projections.</li>
-                                <li><strong>Change payment portal email</strong> &mdash; Change the email on your account with secure two-step verification. Completed changes can be reverted from a link in your email for 30 days if something goes wrong.</li>
+                                <li><strong>Invoice refunds:</strong> Refund a portal payment without leaving Argo Books. Pick which line items or amount to refund and click send.</li>
+                                <li><strong>Send invoices in any currency:</strong> Bill customers in the currency that works for them, no matter where they're based.</li>
+                                <li><strong>Refund analytics:</strong> A new Refunds tab in the analytics page shows your refund rate, top reasons, and trends over time.</li>
+                                <li><strong>Customer &amp; supplier avatars:</strong> Add a profile picture to any customer or supplier.</li>
+                                <li><strong>Rental availability calendar:</strong> Each rental item now has a calendar view of free and booked counts, plus a quick "next available" answer for any quantity you need.</li>
+                                <li><strong>Forecast scenarios:</strong> Forecasts now show Conservative, Baseline, and Optimistic ranges instead of a single line, so you can see the uncertainty around future projections.</li>
+                                <li><strong>Change payment portal email:</strong> Change the email on your account with secure two-step verification. Completed changes can be reverted from a link in your email for 30 days if something goes wrong.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Faster startup</strong> &mdash; Company data and settings now load in parallel, so the app opens noticeably faster.</li>
-                                <li><strong>Processing fee explainer</strong> &mdash; Processing fee details are now tucked into an info popup, keeping the invoice screen cleaner.</li>
+                                <li><strong>Faster startup:</strong> Company data and settings now load in parallel, so the app opens noticeably faster.</li>
+                                <li><strong>Processing fee explainer:</strong> Processing fee details are now tucked into an info popup, keeping the invoice screen cleaner.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>Receipt list updates instantly</strong> &mdash; Newly scanned receipts now appear on the receipts page right away.</li>
-                                <li><strong>Local time on timestamps</strong> &mdash; Some timestamps were showing in UTC instead of your local time; they now display correctly.</li>
+                                <li><strong>Receipt list updates instantly:</strong> Newly scanned receipts now appear on the receipts page right away.</li>
+                                <li><strong>Local time on timestamps:</strong> Some timestamps were showing in UTC instead of your local time; they now display correctly.</li>
                                 <li>Various bug fixes and stability improvements.</li>
                             </ul>
                         </div>
@@ -145,22 +145,22 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Customizable dashboard</strong> &mdash; The dashboard now has an Edit button that lets you fully customize the layout. Add, remove, resize, and rearrange widgets to highlight what matters most to your business. Everything works the same by default &mdash; customization is there when you want it.</li>
-                                <li><strong>Bulk receipt scanning</strong> &mdash; Scan multiple receipts at once. Drop or select a batch of files, watch them process in real time, then review and approve them all in a carousel view.</li>
-                                <li><strong>PDF receipt scanning</strong> &mdash; You can now scan PDF receipts in addition to images.</li>
-                                <li><strong>Password strength meter</strong> &mdash; A strength indicator now appears when setting or changing your password.</li>
-                                <li><strong>Duplicate customer warning</strong> &mdash; You'll now see a warning when creating a customer that already exists.</li>
-                                <li><strong>Deletion protection</strong> &mdash; Records that are referenced by other data (like a customer linked to invoices) can no longer be deleted.</li>
+                                <li><strong>Customizable dashboard:</strong> The dashboard now has an Edit button that lets you fully customize the layout. Add, remove, resize, and rearrange widgets to highlight what matters most to your business. Everything works the same by default; customization is there when you want it.</li>
+                                <li><strong>Bulk receipt scanning:</strong> Scan multiple receipts at once. Drop or select a batch of files, watch them process in real time, then review and approve them all in a carousel view.</li>
+                                <li><strong>PDF receipt scanning:</strong> You can now scan PDF receipts in addition to images.</li>
+                                <li><strong>Password strength meter:</strong> A strength indicator now appears when setting or changing your password.</li>
+                                <li><strong>Duplicate customer warning:</strong> You'll now see a warning when creating a customer that already exists.</li>
+                                <li><strong>Deletion protection:</strong> Records that are referenced by other data (like a customer linked to invoices) can no longer be deleted.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Improved search</strong> &mdash; The header search bar now searches across all your data, not just quick actions.</li>
-                                <li><strong>Faster performance</strong> &mdash; Numerous speed and memory optimizations throughout the app, especially on pages with large datasets. Invoices and PDFs also render much faster.</li>
-                                <li><strong>Automatic inventory adjustments</strong> &mdash; Inventory now adjusts automatically when you record expenses or revenue, so stock levels stay in sync without manual updates.</li>
-                                <li><strong>Quick entity creation</strong> &mdash; Creating new items like customers or products now opens on top of your current page instead of navigating away.</li>
-                                <li><strong>Phone number validation</strong> &mdash; Phone numbers are now validated before saving to help catch typos.</li>
+                                <li><strong>Improved search:</strong> The header search bar now searches across all your data, not just quick actions.</li>
+                                <li><strong>Faster performance:</strong> Numerous speed and memory optimizations throughout the app, especially on pages with large datasets. Invoices and PDFs also render much faster.</li>
+                                <li><strong>Automatic inventory adjustments:</strong> Inventory now adjusts automatically when you record expenses or revenue, so stock levels stay in sync without manual updates.</li>
+                                <li><strong>Quick entity creation:</strong> Creating new items like customers or products now opens on top of your current page instead of navigating away.</li>
+                                <li><strong>Phone number validation:</strong> Phone numbers are now validated before saving to help catch typos.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -188,19 +188,19 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>AI receipt scanning for everyone</strong> &mdash; AI-powered receipt scanning is now available in the free plan with a 5 receipt per month usage limit.</li>
-                                <li><strong>Company name in payment portal</strong> &mdash; Directly control which business name your customers see in the payment portal. There is now a dedicated control for this in the settings.</li>
-                                <li><strong>Export world map to Excel</strong> &mdash; The world map on the Analytics page can now be exported to Excel.</li>
+                                <li><strong>AI receipt scanning for everyone:</strong> AI-powered receipt scanning is now available in the free plan with a 5 receipt per month usage limit.</li>
+                                <li><strong>Company name in payment portal:</strong> Directly control which business name your customers see in the payment portal. There is now a dedicated control for this in the settings.</li>
+                                <li><strong>Export world map to Excel:</strong> The world map on the Analytics page can now be exported to Excel.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>More accurate receipt scanning</strong> &mdash; The AI receipt scanner is now significantly better at reading receipts, especially ones with complex layouts.</li>
-                                <li><strong>Receipt total mismatch warning</strong> &mdash; You'll now see a warning if the scanned line items don't add up to the receipt total, so you can catch errors before saving.</li>
-                                <li><strong>Fullscreen receipt viewer</strong> &mdash; Toggle fullscreen when reviewing scanned receipts for a better view of the details.</li>
-                                <li><strong>Faster currency switching</strong> &mdash; Exchange rates are now preloaded in bulk, so changing your default currency is noticeably faster.</li>
-                                <li><strong>Faster charts</strong> &mdash; The charts now load significantly faster and are more responsive.</li>
+                                <li><strong>More accurate receipt scanning:</strong> The AI receipt scanner is now significantly better at reading receipts, especially ones with complex layouts.</li>
+                                <li><strong>Receipt total mismatch warning:</strong> You'll now see a warning if the scanned line items don't add up to the receipt total, so you can catch errors before saving.</li>
+                                <li><strong>Fullscreen receipt viewer:</strong> Toggle fullscreen when reviewing scanned receipts for a better view of the details.</li>
+                                <li><strong>Faster currency switching:</strong> Exchange rates are now preloaded in bulk, so changing your default currency is noticeably faster.</li>
+                                <li><strong>Faster charts:</strong> The charts now load significantly faster and are more responsive.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -231,16 +231,16 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Invoice template management</strong> &mdash; Browse and manage your invoice templates in a new view with thumbnail previews.</li>
-                                <li><strong>Multi-currency accounting reports</strong> &mdash; Accounting reports now support multiple currencies.</li>
+                                <li><strong>Invoice template management:</strong> Browse and manage your invoice templates in a new view with thumbnail previews.</li>
+                                <li><strong>Multi-currency accounting reports:</strong> Accounting reports now support multiple currencies.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Undo/redo for invoice templates</strong> &mdash; Undo and redo changes when editing invoice templates.</li>
-                                <li><strong>Localized tax labels</strong> &mdash; Tax labels now automatically match your company's country.</li>
-                                <li><strong>Improved offline experience</strong> &mdash; Better detection and messaging when working offline, with a pending transaction queue so nothing is lost.</li>
+                                <li><strong>Undo/redo for invoice templates:</strong> Undo and redo changes when editing invoice templates.</li>
+                                <li><strong>Localized tax labels:</strong> Tax labels now automatically match your company's country.</li>
+                                <li><strong>Improved offline experience:</strong> Better detection and messaging when working offline, with a pending transaction queue so nothing is lost.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -269,9 +269,9 @@
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Security improvements</strong> &mdash; Strengthened security across the application, including password protection for the payment portal settings.</li>
-                                <li><strong>Smarter receipt scanning</strong> &mdash; AI category suggestions are now more accurate and specific.</li>
-                                <li><strong>Google Sheets export</strong> &mdash; Added a cancel button during export.</li>
+                                <li><strong>Security improvements:</strong> Strengthened security across the application, including password protection for the payment portal settings.</li>
+                                <li><strong>Smarter receipt scanning:</strong> AI category suggestions are now more accurate and specific.</li>
+                                <li><strong>Google Sheets export:</strong> Added a cancel button during export.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -301,23 +301,23 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>AI spreadsheet import</strong> &mdash; Import spreadsheets in any format and let AI automatically detect the data type and map your columns, so you can bring in your data without reformatting.</li>
-                                <li><strong>Accounting reports</strong> &mdash; Generate professional accounting reports including Income Statement, Balance Sheet, Cash Flow Statement, General Ledger, AR Aging, and Tax Summary &mdash; all with localized tax terminology for your country.</li>
-                                <li><strong>Multi-page reports</strong> &mdash; Create reports that span multiple pages. All pages display on the canvas at once, and tables that overflow automatically continue onto the next page.</li>
-                                <li><strong>Company details on reports</strong> &mdash; Reports can now display your company logo, name, address, phone, and email in a header. Enabled by default on accounting templates.</li>
-                                <li><strong>Auto-create revenue from invoices</strong> &mdash; Sending an invoice now automatically creates a matching revenue entry, so your dashboard and reports stay in sync without manual data entry.</li>
-                                <li><strong>Tax analytics</strong> &mdash; A new Taxes tab on the Analytics page with charts for tax collected vs. paid, net tax liability, tax rate distribution, and breakdowns by category and product.</li>
-                                <li><strong>Fullscreen charts</strong> &mdash; A new button in the top-right corner of charts lets you open them in fullscreen for easier viewing and detailed analysis.</li>
+                                <li><strong>AI spreadsheet import:</strong> Import spreadsheets in any format and let AI automatically detect the data type and map your columns, so you can bring in your data without reformatting.</li>
+                                <li><strong>Accounting reports:</strong> Generate professional accounting reports including Income Statement, Balance Sheet, Cash Flow Statement, General Ledger, AR Aging, and Tax Summary, all with localized tax terminology for your country.</li>
+                                <li><strong>Multi-page reports:</strong> Create reports that span multiple pages. All pages display on the canvas at once, and tables that overflow automatically continue onto the next page.</li>
+                                <li><strong>Company details on reports:</strong> Reports can now display your company logo, name, address, phone, and email in a header. Enabled by default on accounting templates.</li>
+                                <li><strong>Auto-create revenue from invoices:</strong> Sending an invoice now automatically creates a matching revenue entry, so your dashboard and reports stay in sync without manual data entry.</li>
+                                <li><strong>Tax analytics:</strong> A new Taxes tab on the Analytics page with charts for tax collected vs. paid, net tax liability, tax rate distribution, and breakdowns by category and product.</li>
+                                <li><strong>Fullscreen charts:</strong> A new button in the top-right corner of charts lets you open them in fullscreen for easier viewing and detailed analysis.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Faster tables</strong> &mdash; Tables now use virtualization so only visible rows are rendered, resulting in noticeably faster page loads and lower memory usage.</li>
-                                <li><strong>Date range label</strong> &mdash; The Dashboard and Analytics pages now display the active date span, and "All Time" starts from your earliest transaction instead of a fixed date.</li>
-                                <li><strong>Sidebar remembers state</strong> &mdash; Sidebar sections stay expanded or collapsed between sessions.</li>
-                                <li><strong>Improved version history</strong> &mdash; History entries are now nested and show exactly which fields changed.</li>
-                                <li><strong>Interactive column resizing</strong> &mdash; Adjust column widths directly in the report designer by dragging column edges.</li>
+                                <li><strong>Faster tables:</strong> Tables now use virtualization so only visible rows are rendered, resulting in noticeably faster page loads and lower memory usage.</li>
+                                <li><strong>Date range label:</strong> The Dashboard and Analytics pages now display the active date span, and "All Time" starts from your earliest transaction instead of a fixed date.</li>
+                                <li><strong>Sidebar remembers state:</strong> Sidebar sections stay expanded or collapsed between sessions.</li>
+                                <li><strong>Improved version history:</strong> History entries are now nested and show exactly which fields changed.</li>
+                                <li><strong>Interactive column resizing:</strong> Adjust column widths directly in the report designer by dragging column edges.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -345,24 +345,24 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Backup &amp; restore</strong> &mdash; Create <code>.argobk</code> backup files of your company data, and restore from them at any time.</li>
-                                <li><strong>Version history &amp; audit trail</strong> &mdash; Every change to your data is now recorded with timestamps and details. Browse, search, and undo/redo past changes from the new version history panel.</li>
-                                <li><strong>New invoice template</strong> &mdash; A new modern invoice featuring decorative wave accents.</li>
-                                <li><strong>Multi-item rentals</strong> &mdash; Rent multiple items in a single transaction, each with its own rate, quantity, and security deposit.</li>
-                                <li><strong>Generate invoices from rentals</strong> &mdash; Create invoices directly from rental records with all fields auto-populated.</li>
-                                <li><strong>Online invoice payments</strong> &mdash; Connect your Stripe, PayPal, or Square account and let your customers view and pay invoices online through a payment portal.</li>
-                                <li><strong>Receipt grid/table toggle</strong> &mdash; Switch between grid and table views on the Receipts page for flexible data browsing.</li>
-                                <li><strong>Default product price</strong> &mdash; Set a default price for products so new entries start with a pre-filled amount.</li>
+                                <li><strong>Backup &amp; restore:</strong> Create <code>.argobk</code> backup files of your company data, and restore from them at any time.</li>
+                                <li><strong>Version history &amp; audit trail:</strong> Every change to your data is now recorded with timestamps and details. Browse, search, and undo/redo past changes from the new version history panel.</li>
+                                <li><strong>New invoice template:</strong> A new modern invoice featuring decorative wave accents.</li>
+                                <li><strong>Multi-item rentals:</strong> Rent multiple items in a single transaction, each with its own rate, quantity, and security deposit.</li>
+                                <li><strong>Generate invoices from rentals:</strong> Create invoices directly from rental records with all fields auto-populated.</li>
+                                <li><strong>Online invoice payments:</strong> Connect your Stripe, PayPal, or Square account and let your customers view and pay invoices online through a payment portal.</li>
+                                <li><strong>Receipt grid/table toggle:</strong> Switch between grid and table views on the Receipts page for flexible data browsing.</li>
+                                <li><strong>Default product price:</strong> Set a default price for products so new entries start with a pre-filled amount.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Rental payment tracking</strong> &mdash; Track paid status and view linked invoices directly from the rentals table.</li>
-                                <li><strong>Improved responsiveness</strong> &mdash; The interface now adapts more smoothly across different screen sizes.</li>
-                                <li><strong>Invoice template color controls</strong> &mdash; Added per-template color settings.</li>
-                                <li><strong>Improved undo/redo</strong> &mdash; Rapid property changes are combined into single entries.</li>
-                                <li><strong>Receipt scanner zoom &amp; pan</strong> &mdash; Added zoom and pan controls to the receipt scanner preview for easier reviewing.</li>
+                                <li><strong>Rental payment tracking:</strong> Track paid status and view linked invoices directly from the rentals table.</li>
+                                <li><strong>Improved responsiveness:</strong> The interface now adapts more smoothly across different screen sizes.</li>
+                                <li><strong>Invoice template color controls:</strong> Added per-template color settings.</li>
+                                <li><strong>Improved undo/redo:</strong> Rapid property changes are combined into single entries.</li>
+                                <li><strong>Receipt scanner zoom &amp; pan:</strong> Added zoom and pan controls to the receipt scanner preview for easier reviewing.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -388,7 +388,7 @@
                 <div class="version-content">
                     <div class="release-post">
                         <p class="intro">
-                            We're excited to announce Argo Books 2.0 &mdash; a complete rebuild from the ground up. This isn't just an update; it's an entirely new application built with modern technology to give you more power, more flexibility, and a dramatically better experience.
+                            We're excited to announce Argo Books 2.0: a complete rebuild from the ground up. This isn't just an update; it's an entirely new application built with modern technology to give you more power, more flexibility, and a dramatically better experience.
                         </p>
 
                         <h3>A New Foundation: Cross-Platform and Modern</h3>
@@ -444,17 +444,17 @@
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Security improvements</strong> &mdash; Strengthened security across the application.</li>
-                                <li><strong>Faster startup</strong> &mdash; Optimized the startup sequence so the app opens quicker.</li>
+                                <li><strong>Security improvements:</strong> Strengthened security across the application.</li>
+                                <li><strong>Faster startup:</strong> Optimized the startup sequence so the app opens quicker.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>Label alignment after language switch</strong> &mdash; Some labels weren't aligning correctly after changing the app language.</li>
-                                <li><strong>SearchBox positioning</strong> &mdash; The SearchBox size and position weren't updating correctly when renaming companies on the Get Started Form.</li>
-                                <li><strong>Font scaling in Recent Companies panel</strong> &mdash; Font sizes now scale properly across different display settings.</li>
-                                <li><strong>Date range panel translation</strong> &mdash; The date range panel wasn't translating in some cases.</li>
+                                <li><strong>Label alignment after language switch:</strong> Some labels weren't aligning correctly after changing the app language.</li>
+                                <li><strong>SearchBox positioning:</strong> The SearchBox size and position weren't updating correctly when renaming companies on the Get Started Form.</li>
+                                <li><strong>Font scaling in Recent Companies panel:</strong> Font sizes now scale properly across different display settings.</li>
+                                <li><strong>Date range panel translation:</strong> The date range panel wasn't translating in some cases.</li>
                             </ul>
                         </div>
                     </div>
@@ -476,14 +476,14 @@
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>More languages</strong> &mdash; Added support for additional languages.</li>
-                                <li><strong>Bulk import controls</strong> &mdash; Added "Yes to all" and "No to all" buttons in import dialogs so you don't have to respond to each duplicate prompt individually.</li>
+                                <li><strong>More languages:</strong> Added support for additional languages.</li>
+                                <li><strong>Bulk import controls:</strong> Added "Yes to all" and "No to all" buttons in import dialogs so you don't have to respond to each duplicate prompt individually.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>Application scaling</strong> &mdash; Fixed scaling issues on high-DPI displays and different screen resolutions.</li>
+                                <li><strong>Application scaling:</strong> Fixed scaling issues on high-DPI displays and different screen resolutions.</li>
                                 <li>Various bug fixes and stability improvements.</li>
                             </ul>
                         </div>
@@ -506,17 +506,17 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Automatic updates</strong> &mdash; The app now checks for new versions on startup and prompts you to install them. You may need to download this version manually to enable auto-updates going forward.</li>
-                                <li><strong>Company logo</strong> &mdash; You can now set a custom company logo that appears in the main interface. Click it or right-click to change it.</li>
-                                <li><strong>Version compatibility check</strong> &mdash; The app now warns you if you try to open a file saved with a newer version.</li>
+                                <li><strong>Automatic updates:</strong> The app now checks for new versions on startup and prompts you to install them. You may need to download this version manually to enable auto-updates going forward.</li>
+                                <li><strong>Company logo:</strong> You can now set a custom company logo that appears in the main interface. Click it or right-click to change it.</li>
+                                <li><strong>Version compatibility check:</strong> The app now warns you if you try to open a file saved with a newer version.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Accountant selection</strong> &mdash; Your accountant choice is now remembered when opening companies, so you don't have to pick one every time.</li>
-                                <li><strong>Return tracking</strong> &mdash; Returned products now show which accountant processed the return.</li>
-                                <li><strong>Translated logs</strong> &mdash; Application logs can now be viewed in other languages.</li>
+                                <li><strong>Accountant selection:</strong> Your accountant choice is now remembered when opening companies, so you don't have to pick one every time.</li>
+                                <li><strong>Return tracking:</strong> Returned products now show which accountant processed the return.</li>
+                                <li><strong>Translated logs:</strong> Application logs can now be viewed in other languages.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -544,21 +544,21 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Product returns</strong> &mdash; Right-click any transaction to process a return. New analytics charts track return patterns and refund amounts.</li>
-                                <li><strong>Geographic analytics map</strong> &mdash; A world map view showing your business data broken down by country.</li>
+                                <li><strong>Product returns:</strong> Right-click any transaction to process a return. New analytics charts track return patterns and refund amounts.</li>
+                                <li><strong>Geographic analytics map:</strong> A world map view showing your business data broken down by country.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Faster charts</strong> &mdash; Rebuilt the chart system for much better performance. Charts now load instantly and have smooth animations (which you can turn off in settings).</li>
-                                <li><strong>Organized analytics</strong> &mdash; Charts are now grouped into tabs for easier navigation.</li>
+                                <li><strong>Faster charts:</strong> Rebuilt the chart system for much better performance. Charts now load instantly and have smooth animations (which you can turn off in settings).</li>
+                                <li><strong>Organized analytics:</strong> Charts are now grouped into tabs for easier navigation.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>Translation gaps</strong> &mdash; Some UI controls weren't being translated in non-English languages.</li>
+                                <li><strong>Translation gaps:</strong> Some UI controls weren't being translated in non-English languages.</li>
                                 <li>General bug fixes.</li>
                             </ul>
                         </div>
@@ -581,15 +581,15 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Receipt import/export</strong> &mdash; Receipts are now included when importing or exporting spreadsheet data.</li>
-                                <li><strong>Export currency selection</strong> &mdash; Choose which currency to use when exporting spreadsheets.</li>
-                                <li><strong>Currency detection</strong> &mdash; Imported spreadsheets are automatically detected for their currency and converted to your default. You can also set it manually if needed.</li>
+                                <li><strong>Receipt import/export:</strong> Receipts are now included when importing or exporting spreadsheet data.</li>
+                                <li><strong>Export currency selection:</strong> Choose which currency to use when exporting spreadsheets.</li>
+                                <li><strong>Currency detection:</strong> Imported spreadsheets are automatically detected for their currency and converted to your default. You can also set it manually if needed.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Better import error handling</strong> &mdash; When importing a spreadsheet with bad data, you can now skip the row, retry it, or cancel the whole import.</li>
+                                <li><strong>Better import error handling:</strong> When importing a spreadsheet with bad data, you can now skip the row, retry it, or cancel the whole import.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
@@ -625,19 +625,19 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Currency change loading indicator</strong> &mdash; Changing your default currency now shows a loading panel, and the currency symbol updates everywhere automatically.</li>
+                                <li><strong>Currency change loading indicator:</strong> Changing your default currency now shows a loading panel, and the currency symbol updates everywhere automatically.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>Live language switching</strong> &mdash; Changing languages now updates all open forms instantly &mdash; no need to close and reopen them.</li>
+                                <li><strong>Live language switching:</strong> Changing languages now updates all open forms instantly, with no need to close and reopen them.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label fix">Fixes</h4>
                             <ul class="changelog-list">
-                                <li><strong>Network check</strong> &mdash; Fixed the internet connection check failing on some public/restricted networks.</li>
+                                <li><strong>Network check:</strong> Fixed the internet connection check failing on some public/restricted networks.</li>
                             </ul>
                         </div>
                     </div>
@@ -659,17 +659,17 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>Chart zoom reset</strong> &mdash; You can now reset the zoom level on charts, plus improved zooming in general.</li>
-                                <li><strong>Offline detection</strong> &mdash; The app now shows a clear message when you lose internet instead of confusing error dialogs.</li>
-                                <li><strong>Cancel button on loading screens</strong> &mdash; You can now cancel out of long-running operations.</li>
+                                <li><strong>Chart zoom reset:</strong> You can now reset the zoom level on charts, plus improved zooming in general.</li>
+                                <li><strong>Offline detection:</strong> The app now shows a clear message when you lose internet instead of confusing error dialogs.</li>
+                                <li><strong>Cancel button on loading screens:</strong> You can now cancel out of long-running operations.</li>
                             </ul>
                         </div>
                         <div class="changelog-section">
                             <h4 class="section-label enhancement">Enhancements</h4>
                             <ul class="changelog-list">
-                                <li><strong>.NET 9 upgrade</strong> &mdash; Migrated to .NET 9, which brings roughly 15&ndash;25% faster performance and 20&ndash;30% lower memory usage across the board.</li>
-                                <li><strong>Chart performance</strong> &mdash; Separated chart instances for purchases and sales so they don't refresh unnecessarily when switching screens.</li>
-                                <li><strong>Faster language switching</strong> &mdash; Translations are now downloaded in a single batch instead of multiple API calls.</li>
+                                <li><strong>.NET 9 upgrade:</strong> Migrated to .NET 9, which brings roughly 15&ndash;25% faster performance and 20&ndash;30% lower memory usage across the board.</li>
+                                <li><strong>Chart performance:</strong> Separated chart instances for purchases and sales so they don't refresh unnecessarily when switching screens.</li>
+                                <li><strong>Faster language switching:</strong> Translations are now downloaded in a single batch instead of multiple API calls.</li>
                             </ul>
                         </div>
                     </div>
@@ -693,7 +693,7 @@
                             <li>Core sales tracking and product management</li>
                             <li>Analytics dashboard with interactive charts for revenue, expenses, and transaction data</li>
                             <li>Receipt manager with date range filtering and bulk selection</li>
-                            <li>Spreadsheet import and export (.xlsx) &mdash; compatible with Excel, Google Sheets, and LibreOffice</li>
+                            <li>Spreadsheet import and export (.xlsx), compatible with Excel, Google Sheets, and LibreOffice</li>
                             <li>Multi-language support</li>
                         </ul>
                     </div>

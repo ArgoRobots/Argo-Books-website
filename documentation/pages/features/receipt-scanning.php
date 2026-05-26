@@ -26,7 +26,7 @@ include __DIR__ . '/../../docs-header.php';
                 <li><strong>Image files</strong> in common formats (JPG, PNG)</li>
                 <li><strong>PDFs</strong> of receipts or invoices</li>
             </ul>
-            <p>It also handles faded thermal paper, wrinkled receipts, and poor lighting — and supports multi-currency for international purchases.</p>
+            <p>It also handles faded thermal paper, wrinkled receipts, and poor lighting, and supports multi-currency for international purchases.</p>
             <p>As a rule of thumb, if you can read the receipt in the image, Argo Books can too.</p>
 
             <h2>How It Works</h2>

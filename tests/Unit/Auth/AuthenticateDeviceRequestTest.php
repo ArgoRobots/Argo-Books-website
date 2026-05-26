@@ -6,8 +6,8 @@ namespace Tests\Unit\Auth;
 use PHPUnit\Framework\TestCase;
 
 /**
- * authenticate_device_request() doesn't touch the database — it just hashes
- * the X-Device-Id header — so this lives in Unit despite belonging to the
+ * authenticate_device_request() doesn't touch the database; it just hashes
+ * the X-Device-Id header, so this lives in Unit despite belonging to the
  * auth family logically.
  */
 final class AuthenticateDeviceRequestTest extends TestCase

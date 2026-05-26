@@ -28,7 +28,7 @@ function create_smtp_mailer()
     }
 
     if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
-        error_log('PHPMailer not installed — falling back to mail(). Run composer install.');
+        error_log('PHPMailer not installed, falling back to mail(). Run composer install.');
         return null;
     }
 

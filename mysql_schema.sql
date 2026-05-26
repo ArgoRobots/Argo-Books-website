@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS admin_users (
 -- Trusted admin devices (skip TOTP step on opted-in devices for 30 days).
 -- Split-token pattern: cookie holds "selector.validator"; DB stores selector
 -- in plaintext (for O(1) lookup) and a SHA-256 hash of the validator so a DB
--- read cannot impersonate the user. The trust cookie ONLY bypasses TOTP --
+-- read cannot impersonate the user. The trust cookie ONLY bypasses TOTP;
 -- the password step is still required on every login.
 CREATE TABLE IF NOT EXISTS admin_trusted_devices (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -745,7 +745,7 @@ CREATE TABLE IF NOT EXISTS invoice_send_usage (
     UNIQUE KEY unique_license_month (license_key, usage_month)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Exchange rates cache (persistent — historical rates never change)
+-- Exchange rates cache (persistent: historical rates never change)
 CREATE TABLE IF NOT EXISTS exchange_rates (
     rate_date DATE NOT NULL,
     rates JSON NOT NULL COMMENT 'All currency rates relative to USD for this date',
@@ -950,7 +950,7 @@ CREATE TABLE IF NOT EXISTS outreach_followups (
     FOREIGN KEY (lead_id) REFERENCES outreach_leads(id) ON DELETE CASCADE,
     UNIQUE KEY uniq_lead_touch (lead_id, touch_number),
     INDEX idx_status_scheduled (status, scheduled_for)
-    -- (no separate idx_lead — uniq_lead_touch already covers lookups by lead_id
+    -- (no separate idx_lead; uniq_lead_touch already covers lookups by lead_id
     -- via the leftmost-prefix rule, and InnoDB implements UNIQUE as a B-tree)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -959,7 +959,7 @@ CREATE TABLE IF NOT EXISTS outreach_followups (
 
 -- Cache of email-scrape results keyed by website URL. The same business often
 -- shows up under multiple search categories (e.g. "spa" and "massage
--- therapists"), and many sites have no scrape-able email at all — without this
+-- therapists"), and many sites have no scrape-able email at all. Without this
 -- cache the cron re-downloads the same dead-ends every run. A NULL email is a
 -- valid cached result meaning "we tried, found nothing"; entries refresh after
 -- 30 days so sites that later add an email get re-checked.
@@ -1104,7 +1104,7 @@ CREATE TABLE IF NOT EXISTS reddit_threads (
     draft_generated_at DATETIME DEFAULT NULL,
     status ENUM('new','drafted','drafted_pending','replied','skipped','not_fit','expired') NOT NULL DEFAULT 'new',
     status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied — counts toward post-limit',
+    mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied; counts toward post-limit',
     reply_permalink VARCHAR(500) DEFAULT NULL,
     reply_comment_id VARCHAR(20) DEFAULT NULL COMMENT 'Base36 comment id (no t1_ prefix) extracted from the permalink; the t1_ prefix is prepended at query time',
     reply_posted_at DATETIME DEFAULT NULL,
@@ -1173,23 +1173,23 @@ INSERT IGNORE INTO reddit_settings (id) VALUES (1);
 
 INSERT IGNORE INTO reddit_subreddits (name, notes) VALUES
     ('smallbusiness', 'general small-business owners'),
-    ('EtsySellers', 'Etsy shop owners — high product-mention tolerance'),
+    ('EtsySellers', 'Etsy shop owners with high product-mention tolerance'),
     ('Flipping', 'resellers and flippers'),
     ('freelance', 'freelancers'),
     ('sidehustle', 'side-hustle starters'),
     ('juststart', 'brand-new entrepreneurs'),
-    ('Bookkeeping', 'small and heavily moderated — tune carefully'),
+    ('Bookkeeping', 'small and heavily moderated, tune carefully'),
     ('Entrepreneur', 'huge but bans self-promo aggressively'),
     ('PersonalFinanceCanada', 'Canadian audience'),
-    ('ecommerce', 'general ecommerce — inventory + invoicing pain'),
+    ('ecommerce', 'general ecommerce: inventory + invoicing pain'),
     ('shopify', 'Shopify store owners'),
-    ('Reselling', 'resellers — inventory + receipt tracking'),
-    ('Landlord', 'landlords — rental income tracking'),
-    ('realestateinvesting', 'real estate investors — rental bookkeeping'),
+    ('Reselling', 'resellers: inventory + receipt tracking'),
+    ('Landlord', 'landlords: rental income tracking'),
+    ('realestateinvesting', 'real estate investors: rental bookkeeping'),
     ('sweatystartup', 'service-business owners'),
-    ('microsaas', 'indie SaaS founders — invoicing + subscription accounting'),
-    ('graphic_design', 'designers — invoicing pain'),
-    ('AmazonSeller', 'Amazon sellers — inventory + fees tracking');
+    ('microsaas', 'indie SaaS founders: invoicing + subscription accounting'),
+    ('graphic_design', 'designers with invoicing pain'),
+    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking');
 
 INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('bookkeeping software', 'broad intent'),
@@ -1216,11 +1216,11 @@ INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('track rental income', 'rental'),
     -- Inventory
     ('small business inventory software', 'inventory'),
-    ('inventory tracking spreadsheet', 'inventory — spreadsheet pain'),
-    ('ecommerce inventory tracking', 'inventory — ecommerce'),
+    ('inventory tracking spreadsheet', 'inventory: spreadsheet pain'),
+    ('ecommerce inventory tracking', 'inventory: ecommerce'),
     -- Customer / supplier
     ('small business CRM', 'customer mgmt'),
-    ('track customers spreadsheet', 'customer mgmt — spreadsheet pain'),
+    ('track customers spreadsheet', 'customer mgmt: spreadsheet pain'),
     ('vendor tracking software', 'supplier mgmt'),
     -- General SMB / self-employed
     ('self-employed accounting', 'self-employed broad intent'),

@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       # Compute mode + composer_changed up front so later steps can short-circuit.
-      # Pure git diff — no composer or PHP needed yet.
+      # Pure git diff: no composer or PHP needed yet.
       #
       # Diff base resolution:
       #   - workflow_dispatch + full_deploy=true  → full mirror
@@ -92,7 +92,7 @@ jobs:
 
       # Only build vendor/ when we actually need to upload it (composer files
       # changed in this commit, or a full deploy was forced). On every other
-      # push, skip composer install entirely — the server keeps the vendor/
+      # push, skip composer install entirely. The server keeps the vendor/
       # from the previous composer-changing deploy.
       - name: Cache Composer dependencies
         if: steps.changes.outputs.composer_changed == 'true'

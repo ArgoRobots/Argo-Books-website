@@ -68,13 +68,13 @@ try {
             }
             // deleted=0 means the row was already gone (concurrent removal,
             // manual cleanup, etc). The transaction still committed cleanly,
-            // so don't count it as a failure — but don't claim we deleted
+            // so don't count it as a failure, but don't claim we deleted
             // something we didn't, either.
             if (($result['deleted'] ?? 0) > 0) {
                 logPurge("Deleted account: $username (#$userId) - scheduled at {$account['deletion_scheduled_at']}");
                 $deletedCount++;
             } else {
-                logPurge("Account $username (#$userId) was already gone before purge ran — skipping", 'WARNING');
+                logPurge("Account $username (#$userId) was already gone before purge ran, skipping", 'WARNING');
             }
         } else {
             logPurge("Failed to delete account $username (#$userId): " . ($result['error'] ?? 'unknown error'), 'ERROR');

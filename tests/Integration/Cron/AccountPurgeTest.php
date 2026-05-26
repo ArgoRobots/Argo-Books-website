@@ -35,7 +35,7 @@ final class AccountPurgeTest extends IntegrationTestCase
     }
 
     /**
-     * Inline community_users seeder — IntegrationTestCase doesn't expose
+     * Inline community_users seeder. IntegrationTestCase doesn't expose
      * one, and DatabaseTestCase's version uses transaction-rollback that
      * doesn't apply here.
      */
@@ -115,7 +115,7 @@ final class AccountPurgeTest extends IntegrationTestCase
     {
         $userId = $this->seedUser(null);
         $this->seedActiveSubForUser($userId, 'PREM-PURGE-SUB1-AAAA');
-        // No need to track in parent's seededSubscriptions — our own
+        // No need to track in parent's seededSubscriptions. Our own
         // tearDown deletes by user_id which catches all subs we seeded.
 
         $result = purge_pending_account($this->pdo, $userId);

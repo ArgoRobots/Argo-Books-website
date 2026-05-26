@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// 2. CSRF — accept token from JSON body or X-CSRF-Token header
+// 2. CSRF: accept token from JSON body or X-CSRF-Token header
 $input = json_decode(file_get_contents('php://input'), true) ?: [];
 $csrfToken = $input['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
 if (empty($_SESSION['csrf_token']) || empty($csrfToken)
@@ -73,7 +73,7 @@ if (strtotime($premium_subscription['end_date']) <= time()) {
     exit;
 }
 
-// PayPal explicitly rejected — Phase 2
+// PayPal explicitly rejected: Phase 2
 if ($payment_method === 'paypal') {
     echo json_encode([
         'success' => false,
@@ -139,7 +139,7 @@ try {
 
             try {
                 if ($confirmedPaymentIntentId) {
-                    // SCA retry path — fetch existing PI, verify ownership and
+                    // SCA retry path: fetch existing PI, verify ownership and
                     // status, then read the proration snapshot back from PI
                     // metadata. Re-computing here would drift from what was
                     // actually charged if the user took time to complete 3DS
@@ -182,7 +182,7 @@ try {
                     $proration['existing_credit_consumed'] = (float) ($piMeta['existing_credit_consumed'] ?? $proration['existing_credit_consumed']);
                     $transaction_id = $paymentIntent->id;
                 } else {
-                    // Fresh charge — embed the proration snapshot in PI metadata
+                    // Fresh charge: embed the proration snapshot in PI metadata
                     // so the SCA retry path can read it back instead of
                     // recomputing (recomputation drifts as time passes).
                     $params = [
@@ -211,7 +211,7 @@ try {
                         $params['customer'] = $stripeCustomerId;
                     }
 
-                    // Deterministic idempotency key — same subscription + new
+                    // Deterministic idempotency key: same subscription + new
                     // cycle + day always produces the same key, so a double-
                     // click, two open tabs, or an SCA-abandon-then-retry within
                     // 24h returns the original PaymentIntent instead of
@@ -232,7 +232,7 @@ try {
                     if ($paymentIntent->status === 'succeeded') {
                         $transaction_id = $paymentIntent->id;
                     } elseif ($paymentIntent->status === 'requires_action') {
-                        // SCA / 3DS — bounce to client to complete
+                        // SCA / 3DS: bounce to client to complete
                         echo json_encode([
                             'success'           => false,
                             'action'            => 'sca_required',
@@ -422,7 +422,7 @@ try {
     exit;
 }
 
-// 9. Notification email — wrap in try/catch, never block success on email failure.
+// 9. Notification email: wrap in try/catch, never block success on email failure.
 try {
     send_premium_subscription_cycle_changed_email(
         $premium_subscription['email'],
@@ -445,7 +445,7 @@ $verb = ($newCycle === 'yearly') ? 'upgraded to yearly' : 'changed to monthly';
 if ($immediateChargeTotal > 0) {
     $message = "Your subscription has been $verb. Charged \$" . number_format($immediateChargeTotal, 2) . ' CAD.';
 } else {
-    $message = "Your subscription has been $verb. No charge today — covered by credit.";
+    $message = "Your subscription has been $verb. No charge today, covered by credit.";
 }
 
 echo json_encode([

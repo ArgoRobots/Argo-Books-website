@@ -88,8 +88,8 @@ include __DIR__ . '/../admin_header.php';
             <h2>Your account is currently protected with 2FA</h2>
 
             <p>
-                <a href="trusted-devices.php" class="link">Manage trusted devices</a>
-                — review the browsers that can skip the 2FA step for 30 days.
+                <a href="trusted-devices.php" class="link">Manage trusted devices</a>:
+                review the browsers that can skip the 2FA step for 30 days.
             </p>
 
             <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">

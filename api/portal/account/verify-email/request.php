@@ -26,9 +26,9 @@ if (!empty($company['email_verified_at'])) {
 
 global $pdo;
 
-// Rolling 24h window. A lifetime cap is wrong here because — unlike the
+// Rolling 24h window. A lifetime cap is wrong here because (unlike the
 // refund flow, where the request advances out of pending_code on successful
-// code entry — an unverified company stays unverified forever. A lifetime
+// code entry) an unverified company stays unverified forever. A lifetime
 // cap eventually walls off legitimate users (typo on first registration,
 // missed inbox, account left dormant) with no recovery path. The window
 // matches the email-change resend-throttle pattern.

@@ -8,7 +8,7 @@
  * (upvotes + replies), then rolls up per-subreddit removal stats and
  * applies the auto-disable rule.
  *
- * Idempotent — safe to run on any schedule. Each row tracks its own
+ * Idempotent: safe to run on any schedule. Each row tracks its own
  * check_count + last_checked_at so we never over-check.
  */
 

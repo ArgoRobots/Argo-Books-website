@@ -19,7 +19,7 @@
  *   }
  *
  * Metrics live in a global accumulator so deeply-nested step functions don't
- * need to thread an array through their signatures — the cron just calls
+ * need to thread an array through their signatures. The cron just calls
  * cron_metric_incr() wherever it counts something.
  */
 
@@ -27,7 +27,7 @@ $GLOBALS['_cron_metrics'] = [];
 
 /**
  * Insert a 'running' row and return its id. Returns 0 if the insert fails
- * (e.g. table missing on a fresh install) — callers should treat 0 as
+ * (e.g. table missing on a fresh install). Callers should treat 0 as
  * "tracking unavailable" and skip the finish call's effect, not abort.
  */
 function cron_run_start(PDO $pdo, string $cronName): int

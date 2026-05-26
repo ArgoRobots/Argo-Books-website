@@ -25,7 +25,7 @@ function marketing_contexts(): array
  * Rules (see plan: Send-time gate):
  * - 'all_marketing' suppression always blocks.
  * - For 'reviews' to a license-key holder: allow unless explicitly suppressed
- *   for 'reviews' or 'all_marketing'. Community-user prefs are NOT consulted —
+ *   for 'reviews' or 'all_marketing'. Community-user prefs are NOT consulted;
  *   purchase establishes an existing business relationship for one ask.
  * - For all other community-driven contexts (and reviews to non-license
  *   holders): require an opted-in community_users row.
@@ -77,7 +77,7 @@ function should_send_marketing_email(string $email, string $context): bool
 }
 
 /**
- * Record that a marketing email was sent. Informational only — used for
+ * Record that a marketing email was sent. Informational only, used for
  * debugging "did this email get sent?" later.
  */
 function mark_marketing_sent(string $email, string $context, ?int $relatedId = null): void
@@ -158,12 +158,12 @@ function send_review_request_email(int $licenseId, string $email): bool
     $body = <<<HTML
         <h2>How is Argo Books working for you?</h2>
         <p>Hey,</p>
-        <p>Thanks for being an Argo Books customer. If the app has helped your bookkeeping, I'd really appreciate a short review on Capterra — it's the single biggest thing that helps other small businesses find Argo.</p>
+        <p>Thanks for being an Argo Books customer. If the app has helped your bookkeeping, I'd really appreciate a short review on Capterra. It's the single biggest thing that helps other small businesses find Argo.</p>
         <p style="margin: 24px 0;">
             <a href="{$review_safe}" class="btn-primary" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Leave a review</a>
         </p>
-        <p>If something's getting in the way or you have feedback, just hit reply — I read every email.</p>
-        <p>&mdash; Evan, Argo Books</p>
+        <p>If something's getting in the way or you have feedback, just hit reply. I read every email.</p>
+        <p>Evan, Argo Books</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">
         <p style="font-size:12px;color:#6b7280;">
             You're receiving this because you purchased an Argo Books license.
@@ -203,10 +203,10 @@ function send_feedback_request_email(int $licenseId, string $email): bool
     $body = <<<HTML
         <h2>Quick check-in on Argo Books</h2>
         <p>Hey,</p>
-        <p>I noticed it's been a little while since you used Argo Books. I wanted to check in — was there something that didn't work for you, or that's missing?</p>
+        <p>I noticed it's been a little while since you used Argo Books. I wanted to check in: was there something that didn't work for you, or that's missing?</p>
         <p>Just reply to this email and let me know. Anything you tell me goes straight to me, and it genuinely helps me decide what to build next.</p>
         <p>You can also email me directly at <a href="mailto:contact@argorobots.com">contact@argorobots.com</a>.</p>
-        <p>&mdash; Evan, Argo Books</p>
+        <p>Evan, Argo Books</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">
         <p style="font-size:12px;color:#6b7280;">
             You're receiving this because you purchased an Argo Books license.

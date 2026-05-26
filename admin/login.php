@@ -1,6 +1,6 @@
 <?php
 // Harden the admin session cookie before session_start. Secure must be off in
-// local dev (HTTP) but on in production (HTTPS) — gate on APP_ENV via env().
+// local dev (HTTP) but on in production (HTTPS): gate on APP_ENV via env().
 require_once __DIR__ . '/../env_helper.php';
 session_set_cookie_params([
     'lifetime' => 0,
@@ -131,7 +131,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 }
 
                 // 2FA is enabled, show the verification form. Don't clear the
-                // password-attempt counter yet — we only count this as success
+                // password-attempt counter yet. We only count this as success
                 // once 2FA also passes.
                 $_SESSION['awaiting_2fa'] = true;
                 $_SESSION['temp_username'] = $actual_username;

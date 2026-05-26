@@ -39,8 +39,8 @@ function _shopify_url_is_safe_external(string $url): bool
 // pairs a "newness" phrase (founded/launched/just opened in the last year
 // or two) with a quoted country signal ("made in canada" / "made in usa" /
 // etc.). Negative terms exclude stores that openly advertise being decades
-// old, which the post-fetch business-age check would reject anyway —
-// filtering at the search level saves credits on candidates we'd otherwise
+// old, which the post-fetch business-age check would reject anyway.
+// Filtering at the search level saves credits on candidates we'd otherwise
 // pay to evaluate and throw out.
 //
 // SHOPIFY_DORK_EXCLUSIONS is appended to every dork. Add new exclusions here
@@ -48,7 +48,7 @@ function _shopify_url_is_safe_external(string $url): bool
 const SHOPIFY_DORK_EXCLUSIONS = ' -"since 19" -"since 200" -"established 19" -"established 200" -"est. 19" -"est. 200"';
 
 const SHOPIFY_DORK_POOL = [
-    // ─── Canada — every dork pairs a newness signal with a quoted CA phrase ───
+    // ─── Canada: every dork pairs a newness signal with a quoted CA phrase ───
     'site:myshopify.com "founded in 2024" "made in canada"',
     'site:myshopify.com "founded in 2025" "made in canada"',
     'site:myshopify.com "launched in 2024" "based in canada"',
@@ -62,7 +62,7 @@ const SHOPIFY_DORK_POOL = [
     'site:myshopify.com "new brand" "made in canada"',
     'site:myshopify.com "small batch" "made in canada"',
 
-    // ─── United States — same structure with US signals ───
+    // ─── United States: same structure with US signals ───
     'site:myshopify.com "founded in 2024" "made in usa"',
     'site:myshopify.com "founded in 2025" "made in usa"',
     'site:myshopify.com "launched in 2024" "made in usa"',
@@ -82,7 +82,7 @@ const SHOPIFY_DORK_POOL = [
  *
  * @param string $query   Google dork query string
  * @param string $apiKey  SerpAPI API key
- * @param int    $limit   Max results (default 100 — Google's per-page cap;
+ * @param int    $limit   Max results (default 100, Google's per-page cap;
  *                        SerpAPI bills per request not per result, so 100
  *                        is the most efficient single-call value)
  * @return array          Array of ['link'=>..., 'title'=>..., 'snippet'=>...] entries
@@ -206,7 +206,7 @@ function serpapi_query_cached(string $query, string $apiKey, int $limit, PDO $pd
  * Canonicalize a candidate Shopify store URL to its origin.
  *
  * Lowercases scheme + host, drops query, fragment, AND path. The candidate
- * identity is the store (one row per store), not the URL — so a SerpAPI hit
+ * identity is the store (one row per store), not the URL, so a SerpAPI hit
  * on /pages/contact and another on /products/foo for the same store dedup
  * to a single row. Returns the original trimmed string on parse_url failure.
  *
@@ -228,7 +228,7 @@ function shopify_canonical_url(string $url): string
     $scheme = isset($parts['scheme']) ? strtolower($parts['scheme']) : 'https';
     $host   = strtolower($parts['host']);
 
-    // Origin only — path is intentionally dropped. SerpAPI dorks that include
+    // Origin only; path is intentionally dropped. SerpAPI dorks that include
     // "contact"/"about" keywords often return deep links, but our candidate
     // identity is the store (one row per store), and downstream evaluator
     // logic needs the origin to build /products.json correctly.
@@ -300,7 +300,7 @@ function fetch_shopify_products_json(string $storefrontUrl, int $timeout = 10): 
  * Detect whether the storefront advertises an existing accounting tool.
  *
  * Returns the matched tool name (e.g. "QuickBooks") or null. If a tool is
- * detected, the lead is not a good fit — they already have accounting
+ * detected, the lead is not a good fit: they already have accounting
  * software and don't need a free trial of ours.
  *
  * Patterns use word boundaries and (where ambiguous) require a qualifier
@@ -444,7 +444,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
         }
 
         if (!empty($effective)) {
-            // Normalize to origin — drops any path the redirect chain ended at,
+            // Normalize to origin; drops any path the redirect chain ended at,
             // so downstream /products.json and contact-page probing work
             // correctly when the candidate URL was a deep link.
             $finalUrl = shopify_canonical_url($effective);
@@ -496,7 +496,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
     // -------------------------------------------------------------------------
     // Step 2c: Accounting-tool detection
     // If the homepage mentions an existing accounting product (QuickBooks,
-    // Xero, etc.), they already have a solution — skip before paying for
+    // Xero, etc.), they already have a solution. Skip before paying for
     // /products.json.
     // -------------------------------------------------------------------------
     $accountingTool = detect_accounting_tool($html);
@@ -542,7 +542,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
     }
 
     // -------------------------------------------------------------------------
-    // Step 4: Age check — find the OLDEST and NEWEST product created_at.
+    // Step 4: Age check. Find the OLDEST and NEWEST product created_at.
     // Newest-product timestamp drives the dormancy check below; newest title
     // is surfaced into business_summary so the AI prompt can reference a real
     // product the lead actually sells.
@@ -626,7 +626,7 @@ function evaluate_shopify_candidate(string $url, ?string $htmlOverride = null, ?
     }
 
     // -------------------------------------------------------------------------
-    // Step 5: Country check — accept Canada OR United States
+    // Step 5: Country check. Accept Canada OR United States
     // Canadian postal code: letter-digit-letter digit-letter-digit, with
     // restricted first letters. US ZIP: 5 digits, usually preceded by a
     // 2-letter state code to avoid false positives on random numbers.

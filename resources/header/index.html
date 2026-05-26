@@ -157,10 +157,10 @@
       // Only intercept on touch devices
       if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) return;
       if (dropdownLi.classList.contains('dropdown-open')) {
-        // Second tap — navigate
+        // Second tap: navigate
         return;
       }
-      // First tap — toggle dropdown open
+      // First tap: toggle dropdown open
       e.preventDefault();
       dropdownLi.classList.add('dropdown-open');
     });

@@ -50,7 +50,7 @@ function refund_paypal_base(array $company): string {
 
 /**
  * Resolve the primary capture ID for a PayPal order without exiting the
- * request on failure — throws RuntimeException instead of echoing JSON
+ * request on failure: throws RuntimeException instead of echoing JSON
  * and calling exit(). Used by background paths (cron, promoter) where
  * the synchronous preflight isn't appropriate.
  */
@@ -145,7 +145,7 @@ function refund_paypal_issue(array $company, array $request): array {
     // If preflight already resolved a capture, use it; otherwise re-resolve.
     // Background callers (cooling-off promoter, stale-processing cron) hit
     // this path because preflight ran in a different request. We must NOT
-    // call refund_paypal_preflight here — it uses `exit` on every error
+    // call refund_paypal_preflight here: it uses `exit` on every error
     // path (transient HTTP failures, missing capture, etc.) which would
     // abort the entire cron loop without ever marking the refund 'failed'.
     // Use the silent resolver that THROWS instead so the outer

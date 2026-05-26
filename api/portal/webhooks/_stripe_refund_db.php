@@ -7,13 +7,13 @@ declare(strict_types=1);
  * Extracted from api/portal/webhooks/stripe.php so the DB-only side of the
  * refund flow can be exercised without standing up a Stripe webhook test
  * harness. The caller (the webhook handler) still owns extraction of the
- * refund amount from the SDK Charge object — currency-divisor logic stays
+ * refund amount from the SDK Charge object; currency-divisor logic stays
  * out of this function.
  *
  * Call ONCE PER INDIVIDUAL Refund (Stripe Refund.id). When a charge has
  * multiple partial refunds, the webhook ships the cumulative amount on
  * $charge->amount_refunded but also lists each individual refund in
- * $charge->refunds->data — iterate that list and call this function per
+ * $charge->refunds->data. Iterate that list and call this function per
  * refund. Keying by individual refund ID (instead of payment intent) lets
  * multiple partial refunds coexist as separate negative-payment rows.
  *
@@ -29,7 +29,7 @@ declare(strict_types=1);
  * at the same connection passed in (production code does this via
  * db_connect.php; tests do it via tests/bootstrap.php). Passing a different
  * PDO would cause the negative-payment INSERT to land on a different
- * connection than the rest of this function — don't do that.
+ * connection than the rest of this function. Don't do that.
  */
 function apply_stripe_refund_to_db(
     PDO $pdo,
@@ -39,7 +39,7 @@ function apply_stripe_refund_to_db(
     bool $isProduction,
     ?string $refundId = null
 ): bool {
-    // Find the original payment regardless of its status — partial-refund
+    // Find the original payment regardless of its status: partial-refund
     // scenarios leave it in 'completed' AND we still want the second refund
     // webhook to land. Matching only on status='completed' was the previous
     // behavior and dropped subsequent partial refunds entirely.
@@ -68,7 +68,7 @@ function apply_stripe_refund_to_db(
     // is idempotent via the UNIQUE index on provider_payment_id; if Stripe
     // retries the same Refund event, the second call no-ops here. We must
     // also skip the invoice balance / original-payment-status updates below
-    // on those retries — otherwise the refund would be double-applied to
+    // on those retries; otherwise the refund would be double-applied to
     // the invoice.
     $recordResult = record_portal_payment([
         'company_id' => $originalPayment['company_id'],
@@ -91,8 +91,8 @@ function apply_stripe_refund_to_db(
 
     // Flip the original payment to 'refunded' only once cumulative refunds
     // cover the original amount. Scope the sum to refunds against THIS
-    // specific charge (provider_transaction_id = chargeId) — not the whole
-    // invoice — so refunds on a sibling payment for the same invoice can't
+    // specific charge (provider_transaction_id = chargeId), not the whole
+    // invoice, so refunds on a sibling payment for the same invoice can't
     // inflate this total and incorrectly flip the wrong payment. Tiny
     // epsilon for cent-level float drift.
     $sumStmt = $pdo->prepare(
@@ -116,7 +116,7 @@ function apply_stripe_refund_to_db(
 
     // MySQL evaluates SET assignments left-to-right; later expressions see
     // already-updated columns. Compute status BEFORE updating balance_due so
-    // the CASE reads the pre-refund balance — otherwise a partial refund
+    // the CASE reads the pre-refund balance; otherwise a partial refund
     // (e.g. $50 of $100 paid) computes "balance_due_new (=$50) + refund
     // (=$50) >= total (=$100)" → TRUE → status flips to "sent" instead of
     // "partial".

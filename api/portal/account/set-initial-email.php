@@ -5,10 +5,10 @@ declare(strict_types=1);
  * POST /api/portal/account/set-initial-email.php
  * Body: { email }
  *
- * Sets owner_email for a portal company that currently has none — the
+ * Sets owner_email for a portal company that currently has none. This is the
  * "complete registration" path for accounts that registered with an empty
  * email. Stores owner_email and emails a 6-digit verification code to it.
- * email_verified_at is NOT set here — the caller must enter the code via
+ * email_verified_at is NOT set here: the caller must enter the code via
  * /verify-email/confirm.php before refunds become available.
  *
  * Why this design: a typo in the typed email (or a malicious attacker
@@ -40,7 +40,7 @@ if (!$email) {
 
 global $pdo;
 
-// Refuse if owner_email is already set — must go through Change flow.
+// Refuse if owner_email is already set: must go through Change flow.
 // Include the current value so the client can reconcile its local state if
 // the user is just trying to recover (e.g. local .argo lost the email).
 if (!empty($company['owner_email'])) {
@@ -66,7 +66,7 @@ if ($stmt->fetch()) {
 
 $pdo->beginTransaction();
 try {
-    // Set owner_email but DO NOT mark email_verified_at — the user has to
+    // Set owner_email but DO NOT mark email_verified_at: the user has to
     // confirm the code we're about to email them first.
     $pdo->prepare("UPDATE portal_companies SET owner_email = ? WHERE id = ?")
         ->execute([$email, $company['id']]);

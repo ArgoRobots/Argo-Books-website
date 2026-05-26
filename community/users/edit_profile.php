@@ -502,7 +502,7 @@ function handle_avatar_removal()
             }
         }
 
-        // Delete account fallback — available immediately before deferred delete-account.js loads
+        // Delete account fallback, available immediately before deferred delete-account.js loads
         function showDeleteModal() {
             document.getElementById('delete-account-modal').style.display = 'block';
             document.getElementById('delete-confirm-input').value = '';

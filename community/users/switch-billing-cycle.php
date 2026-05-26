@@ -44,14 +44,14 @@ $payment_method = strtolower($premium_subscription['payment_method'] ?? '');
 $is_paypal = ($payment_method === 'paypal');
 
 // Only Stripe, Square, and PayPal reach this page. free_key, manual, or
-// unknown payment methods can't switch cycles — redirect rather than
+// unknown payment methods can't switch cycles, so redirect rather than
 // render a confirm UI that would inevitably fail.
 if (!in_array($payment_method, ['stripe', 'square', 'paypal'], true)) {
     $redirect_with_error('Cycle switching is not available for this subscription type. Please contact support.');
 }
 
 // PayPal-specific eligibility: must have at least one completed sale to
-// refund against (otherwise PayPal hasn't billed yet — the user just
+// refund against (otherwise PayPal hasn't billed yet, since the user just
 // subscribed seconds ago and the webhook hasn't arrived). Block here
 // rather than later in the flow.
 if ($is_paypal) {
@@ -213,7 +213,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 // then send the user to checkout where they'll approve a
                 // new PayPal subscription with the new plan_id.
                 // PayPal subscription plans (see webhooks/setup-paypal-plans.php)
-                // are configured with the BASE price only — PayPal does NOT add
+                // are configured with the BASE price only. PayPal does NOT add
                 // our processing fee on top. So "charged today by PayPal" must
                 // show the base, not base+fee, or the user sees one number on
                 // our page and a different number on their PayPal statement.
@@ -266,14 +266,14 @@ $is_upgrade = ($new_cycle === 'yearly');
 
                         <?php if ($proration['prorated_credit'] > 0): ?>
                         <div class="proration-line" style="font-size:13px; color:var(--gray-600); padding-left:12px;">
-                            <span class="label">— Unused <?= htmlspecialchars($old_cycle) ?> period</span>
+                            <span class="label">Unused <?= htmlspecialchars($old_cycle) ?> period</span>
                             <span class="value">$<?= number_format($proration['prorated_credit'], 2) ?> CAD</span>
                         </div>
                         <?php endif; ?>
 
                         <?php if ($existing_credit_used > 0): ?>
                         <div class="proration-line" style="font-size:13px; color:var(--gray-600); padding-left:12px;">
-                            <span class="label">— Existing account credit</span>
+                            <span class="label">Existing account credit</span>
                             <span class="value">$<?= number_format($existing_credit_used, 2) ?> CAD</span>
                         </div>
                         <?php endif; ?>
@@ -294,7 +294,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 </div>
 
             <?php else:
-                // Stripe / Square — render proration breakdown
+                // Stripe / Square: render proration breakdown
                 $charge_today = $proration['immediate_charge_total'];
                 $proc_fee = $proration['processing_fee'];
                 $prorated_credit = $proration['prorated_credit'];
@@ -384,7 +384,7 @@ $is_upgrade = ($new_cycle === 'yearly');
                 <div class="confirm-actions">
                     <button type="button" id="confirm-switch-btn" class="btn btn-purple">
                         <?php if ($charge_today > 0): ?>
-                            Confirm Switch — Charge $<?= number_format($charge_today, 2) ?> CAD
+                            Confirm Switch: Charge $<?= number_format($charge_today, 2) ?> CAD
                         <?php else: ?>
                             Confirm Switch (no charge today)
                         <?php endif; ?>
@@ -398,7 +398,7 @@ $is_upgrade = ($new_cycle === 'yearly');
     </div>
 
     <?php if (!$is_paypal): ?>
-    <!-- Switch confirmation modal — pattern matches retry-payment modal in subscription.php -->
+    <!-- Switch confirmation modal: pattern matches retry-payment modal in subscription.php -->
     <div class="modal-overlay" id="switch-modal">
         <div class="modal-container">
             <button class="modal-close" id="modal-close-btn" aria-label="Close modal">

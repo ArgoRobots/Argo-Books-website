@@ -16,7 +16,7 @@ define('OUTREACH_AB_HELPERS_LOADED', true);
  * Starter variants for the followup_sequence A/B type. Each variant's
  * intent array assumes the default 3-touch sequence config (touches 2, 3, 4).
  * If the admin has changed the touch count, the seeding function will
- * project these to match — for now just keep them aligned with the
+ * project these to match. For now just keep them aligned with the
  * shipped default config.
  */
 const FOLLOWUP_SEQUENCE_SEED_VARIANTS = [
@@ -50,9 +50,9 @@ const FOLLOWUP_SEQUENCE_SEED_VARIANTS = [
  * Two-proportion z-test between a leader variant and another variant.
  * Returns an advisory tag + label for display.
  *
- * 'insufficient' — not enough data, or tied
- * 'trending'     — z >= 1.28 (~80% one-sided)
- * 'significant'  — z >= 1.96 (~95% two-sided)
+ * 'insufficient': not enough data, or tied
+ * 'trending':     z >= 1.28 (~80% one-sided)
+ * 'significant':  z >= 1.96 (~95% two-sided)
  *
  * Fewer than 30 sends on either side is always reported as insufficient.
  */
@@ -237,7 +237,7 @@ function validate_followup_sequence_content(string $contentJson, array $configTo
  * A/B Tests tab.
  *
  * Variant intents are filtered to only the touches present in the current
- * followup_sequence_config — so if admin has 2 touches configured instead
+ * followup_sequence_config, so if admin has 2 touches configured instead
  * of the default 3, only those touches' intents make it onto the variants.
  *
  * Returns the test_id if created, or null if a test already exists.
@@ -329,7 +329,7 @@ function check_followup_sequence_shape_match($pdo): array
             $pdo->prepare("UPDATE outreach_ab_tests SET status = 'paused' WHERE id = ?")
                 ->execute([(int) $test['id']]);
             $reason = sprintf(
-                "followup_sequence test #%d '%s' auto-paused — variant '%s' shape mismatch: %s",
+                "followup_sequence test #%d '%s' auto-paused: variant '%s' shape mismatch: %s",
                 (int) $test['id'],
                 (string) $test['name'],
                 (string) $v['label'],

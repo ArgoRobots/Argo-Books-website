@@ -18,7 +18,7 @@ require_once __DIR__ . '/../track_referral.php';
         content="Argo Books features, AI receipt scanning, expense tracking software, predictive analytics, inventory management, invoicing software, rental management, customer management, spreadsheet import">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Features — AI-Powered Business Tools | Argo Books">
+    <meta property="og:title" content="Features: AI-Powered Business Tools | Argo Books">
     <meta property="og:description"
         content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
     <meta property="og:url" content="https://argorobots.com/features/">
@@ -31,7 +31,7 @@ require_once __DIR__ . '/../track_referral.php';
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Features — AI-Powered Business Tools | Argo Books">
+    <meta name="twitter:title" content="Features: AI-Powered Business Tools | Argo Books">
     <meta name="twitter:description"
         content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+Features&subtitle=AI-powered+business+tools+for+small+businesses.+Receipt+scanning%2C+expense+tracking%2C+analytics%2C+and+more.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
@@ -56,7 +56,7 @@ require_once __DIR__ . '/../track_referral.php';
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
-    <title>Features — AI-Powered Business Tools | Argo Books</title>
+    <title>Features: AI-Powered Business Tools | Argo Books</title>
 
     <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../track_referral.php';
         </div>
         <div class="container">
             <h1 class="animate-fade-in">Everything you need to run your business</h1>
-            <p class="hero-subtitle animate-fade-in">AI-powered tools that automate bookkeeping, track inventory, generate invoices, and give you real-time insights — so you can focus on growing your business.</p>
+            <p class="hero-subtitle animate-fade-in">AI-powered tools that automate bookkeeping, track inventory, generate invoices, and give you real-time insights, so you can focus on growing your business.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -101,7 +101,7 @@ require_once __DIR__ . '/../track_referral.php';
             <div class="section-header animate-on-scroll">
                 <span class="section-label">What's Included</span>
                 <h2 class="section-title">Powerful tools, simple to use</h2>
-                <p class="section-desc">From AI-powered receipt scanning to predictive analytics, Argo Books gives you everything you need to manage your finances — without the learning curve.</p>
+                <p class="section-desc">From AI-powered receipt scanning to predictive analytics, Argo Books gives you everything you need to manage your finances, without the learning curve.</p>
             </div>
             <div class="features-grid">
                 <!-- AI Receipt Scanning -->
@@ -110,7 +110,7 @@ require_once __DIR__ . '/../track_referral.php';
                         <?= svg_icon('receipt-scan-detail', 24) ?>
                     </div>
                     <h3>Receipt Scanning</h3>
-                    <p>Snap a photo of any receipt and let AI extract the details automatically. No more manual data entry — just scan, review, and save.</p>
+                    <p>Snap a photo of any receipt and let AI extract the details automatically. No more manual data entry. Just scan, review, and save.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
 
@@ -180,7 +180,7 @@ require_once __DIR__ . '/../track_referral.php';
                         <?= svg_icon('document-upload', 24) ?>
                     </div>
                     <h3>Spreadsheet Import</h3>
-                    <p>Import data from any spreadsheet format. Our AI automatically maps columns, detects data types, and imports everything cleanly — no manual mapping required.</p>
+                    <p>Import data from any spreadsheet format. Our AI automatically maps columns, detects data types, and imports everything cleanly, with no manual mapping required.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
             </div>
@@ -201,21 +201,21 @@ require_once __DIR__ . '/../track_referral.php';
                         <?= svg_icon('check', 28, '', 2.5) ?>
                     </div>
                     <h3>No accounting knowledge needed</h3>
-                    <p>Guided forms, smart validation, and a clean interface make it easy for anyone to track finances — even if you've never used accounting software before.</p>
+                    <p>Guided forms, smart validation, and a clean interface make it easy for anyone to track finances, even if you've never used accounting software before.</p>
                 </div>
                 <div class="why-card animate-on-scroll">
                     <div class="why-card-icon">
                         <?= svg_icon('shield', 28) ?>
                     </div>
-                    <h3>Works offline — your data stays local</h3>
+                    <h3>Works offline, your data stays local</h3>
                     <p>Argo Books is a desktop app. Your financial data never leaves your computer. No cloud servers, no data sharing, no internet required to get work done.</p>
                 </div>
                 <div class="why-card animate-on-scroll">
                     <div class="why-card-icon">
                         <?= svg_icon('dollar', 28) ?>
                     </div>
-                    <h3>Free forever — premium for power users</h3>
-                    <p>The free version covers the essentials with unlimited products. Premium unlocks AI features, invoicing, and more — all for a fraction of what competitors charge.</p>
+                    <h3>Free forever, premium for power users</h3>
+                    <p>The free version covers the essentials with unlimited products. Premium unlocks AI features, invoicing, and more, all for a fraction of what competitors charge.</p>
                 </div>
             </div>
         </div>

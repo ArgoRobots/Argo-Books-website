@@ -12,7 +12,7 @@
 require_once __DIR__ . '/portal-helper.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-// This is a browser redirect, not an API call — output HTML
+// This is a browser redirect, not an API call. Output HTML
 header('Content-Type: text/html; charset=utf-8');
 
 $provider = $_GET['provider'] ?? '';
@@ -71,7 +71,7 @@ try {
             $callbackUrl = "$callbackBase/api/portal/connect/callback/stripe";
             $result = handle_stripe_callback($pdo, $companyId, $is_production, $isRefresh, $callbackUrl, $state);
             if ($result === 'redirect') {
-                // Onboarding incomplete — keep the state token alive for the next callback
+                // Onboarding incomplete; keep the state token alive for the next callback
                 exit;
             }
             break;
@@ -124,7 +124,7 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
     $account = \Stripe\Account::retrieve($stripeAccountId);
 
     if (!$account->details_submitted || $isRefresh) {
-        // Onboarding incomplete or user requested refresh — send them back to Stripe
+        // Onboarding incomplete or user requested refresh, send them back to Stripe
         $accountLink = \Stripe\AccountLink::create([
             'account' => $stripeAccountId,
             'return_url' => $callbackUrl . '?state=' . $state,
@@ -135,7 +135,7 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
         return 'redirect';
     }
 
-    // Onboarding complete — save the account email (try multiple fields for Express accounts)
+    // Onboarding complete: save the account email (try multiple fields for Express accounts)
     $acctData = $account->toArray();
     $email = $acctData['email']
         ?? $acctData['business_profile']['support_email']
@@ -154,8 +154,8 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
 /**
  * PayPal portal Connect is not currently supported. The flow can't onboard
  * Business merchants because PayPal's "Log in with PayPal" userinfo endpoint
- * refuses tokens issued to Business accounts — confirmed against all three
- * documented endpoint variants. Proper merchant onboarding requires PayPal
+ * refuses tokens issued to Business accounts (confirmed against all three
+ * documented endpoint variants). Proper merchant onboarding requires PayPal
  * Partner Referrals API, which is gated behind PayPal Platforms &
  * Marketplaces enrollment. Until that's in place, the desktop app hides the
  * PayPal Connect button; this stub catches any stale URL that still arrives

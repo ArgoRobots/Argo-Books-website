@@ -121,7 +121,7 @@ function handle_refund(\Stripe\Charge $charge): void
     if (empty($providerPaymentId)) {
         // Charges without a payment_intent (rare, legacy direct charges)
         // can't be tied to a portal payment record; skip silently.
-        error_log("Portal Stripe webhook: skipping charge.refunded for {$charge->id} — no payment_intent");
+        error_log("Portal Stripe webhook: skipping charge.refunded for {$charge->id}: no payment_intent");
         return;
     }
 
@@ -135,7 +135,7 @@ function handle_refund(\Stripe\Charge $charge): void
     $stmt->execute([$providerPaymentId]);
     $row = $stmt->fetch();
     if (!$row) {
-        // No matching portal payment — likely a charge that didn't originate
+        // No matching portal payment: likely a charge that didn't originate
         // from the customer portal (e.g. license/subscription, or a refund
         // for a deleted/migrated record). Log so support can trace
         // disappearing-refund tickets.
@@ -148,7 +148,7 @@ function handle_refund(\Stripe\Charge $charge): void
 
     // Iterate individual Refund objects rather than using the cumulative
     // $charge->amount_refunded. The webhook ships every refund-on-this-charge
-    // and we want distinct negative-payment rows per refund — a second
+    // and we want distinct negative-payment rows per refund. A second
     // partial refund would otherwise hit the unique-key dedup on a single
     // payment-intent-keyed row and silently get dropped.
     if (isset($charge->refunds) && !empty($charge->refunds->data)) {

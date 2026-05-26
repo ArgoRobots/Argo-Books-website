@@ -9,8 +9,8 @@ final class GetClientIpTest extends TestCase
 {
     private array $serverBackup;
     private ?string $envBackup;
-    /** Process-level getenv() may have a value even when $_ENV doesn't —
-     *  vlucas/phpdotenv mirrors values into both. env() in env_helper.php
+    /** Process-level getenv() may have a value even when $_ENV doesn't,
+     *  since vlucas/phpdotenv mirrors values into both. env() in env_helper.php
      *  falls through to getenv() if $_ENV is unset, so we have to clear
      *  both layers to make the "untrusted proxy" test deterministic. */
     private string|false $getenvBackup;

@@ -15,7 +15,7 @@
         content="inventory management software, stock tracking, product catalog management, small business inventory, inventory alerts, purchase orders, stock adjustments, warehouse management, reorder points, low stock alerts">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Inventory Management — Argo Books">
+    <meta property="og:title" content="Inventory Management | Argo Books">
     <meta property="og:description"
         content="Manage your inventory with real-time stock tracking, low-stock alerts, purchase orders, and multi-location support. Argo Books makes inventory simple for small businesses.">
     <meta property="og:url" content="https://argorobots.com/features/inventory-management/">
@@ -28,7 +28,7 @@
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Inventory Management — Argo Books">
+    <meta name="twitter:title" content="Inventory Management | Argo Books">
     <meta name="twitter:description"
         content="Manage your inventory with real-time stock tracking, low-stock alerts, purchase orders, and multi-location support. Argo Books makes inventory simple for small businesses.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Inventory+Management&subtitle=Real-time+stock+tracking%2C+purchase+orders%2C+low-stock+alerts%2C+and+multi-location+support.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
@@ -64,7 +64,7 @@
                     "name": "Can Argo Books track inventory across multiple locations?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can add unlimited locations — warehouses, stores, offices, or any other facility — and track per-location stock levels, inventory value, and capacity. Everything is visible from a single dashboard, so you always know what you have and where it is."
+                        "text": "Yes. You can add unlimited locations, such as warehouses, stores, offices, or any other facility, and track per-location stock levels, inventory value, and capacity. Everything is visible from a single dashboard, so you always know what you have and where it is."
                     }
                 },
                 {
@@ -72,7 +72,7 @@
                     "name": "How do low-stock alerts work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can set a reorder point for each product. When stock drops to that level, Argo Books flags it with a color-coded status badge so you know it's time to restock. No more surprise stockouts — you'll see the warning before it becomes a problem."
+                        "text": "You can set a reorder point for each product. When stock drops to that level, Argo Books flags it with a color-coded status badge so you know it's time to restock. No more surprise stockouts. You'll see the warning before it becomes a problem."
                     }
                 },
                 {
@@ -80,7 +80,7 @@
                     "name": "Can I create and manage purchase orders?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Create purchase orders with supplier details and itemized line items directly in Argo Books. When you mark an order as received, stock levels update automatically — no manual adjustments needed. It keeps your inventory accurate without the extra work."
+                        "text": "Yes. Create purchase orders with supplier details and itemized line items directly in Argo Books. When you mark an order as received, stock levels update automatically, with no manual adjustments needed. It keeps your inventory accurate without the extra work."
                     }
                 },
                 {
@@ -115,7 +115,7 @@
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Inventory Management — Argo Books</title>
+    <title>Inventory Management | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -166,7 +166,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Running out of stock costs you sales and customers</h2>
-                    <p>Most small businesses track inventory in messy spreadsheets. You find out something is out of stock when a customer asks for it. Reorders happen too late, counts are wrong, and you have no idea what's sitting in which location. Argo Books gives you a real-time view of every product, every location, and every stock level — so you always know what you have and when it's time to reorder.</p>
+                    <p>Most small businesses track inventory in messy spreadsheets. You find out something is out of stock when a customer asks for it. Reorders happen too late, counts are wrong, and you have no idea what's sitting in which location. Argo Books gives you a real-time view of every product, every location, and every stock level, so you always know what you have and when it's time to reorder.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -178,7 +178,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Multi-location support — track stock across warehouses and stores</span>
+                            <span>Multi-location support: track stock across warehouses and stores</span>
                         </li>
                     </ul>
                 </div>
@@ -264,14 +264,14 @@
     </section>
 
     <!-- =============================================
-         HOW IT WORKS — 3 Steps
+         HOW IT WORKS, 3 Steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
                 <h2 class="section-title">Three steps to organized inventory</h2>
-                <p class="section-desc">From scattered stock counts to a complete inventory system. No warehouse experience needed — Argo Books keeps it simple.</p>
+                <p class="section-desc">From scattered stock counts to a complete inventory system. No warehouse experience needed. Argo Books keeps it simple.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
@@ -319,11 +319,11 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Stock Adjustments</span>
                     <h2>Every stock change is tracked with a reason</h2>
-                    <p>Not every stock change comes from a sale or a purchase order. Items get damaged, returned, moved between locations, or counted during audits. The stock adjustments page gives you a complete, auditable log of every change — with the product, location, before and after quantities, and a written reason for each adjustment.</p>
+                    <p>Not every stock change comes from a sale or a purchase order. Items get damaged, returned, moved between locations, or counted during audits. The stock adjustments page gives you a complete, auditable log of every change, with the product, location, before and after quantities, and a written reason for each adjustment.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Complete audit trail — every adjustment logged with date, reason, and user</span>
+                            <span>Complete audit trail: every adjustment logged with date, reason, and user</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -352,7 +352,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Multi-Location</span>
                     <h2>Track stock across every warehouse, store, and office</h2>
-                    <p>Add as many locations as you need — warehouses, retail stores, offices, or storage units. The locations dashboard shows total stock items, total inventory value, and other key metrics.</p>
+                    <p>Add as many locations as you need: warehouses, retail stores, offices, or storage units. The locations dashboard shows total stock items, total inventory value, and other key metrics.</p>
                     <p>Every product in your catalog is tracked per location, so you always know not just how many you have in total, but exactly where each unit is.</p>
                 </div>
                 <div class="feature-detail-visual">
@@ -363,14 +363,14 @@
     </section>
 
     <!-- =============================================
-         BENEFITS GRID — 6 benefit cards
+         BENEFITS GRID, 6 benefit cards
          ============================================= -->
     <section class="benefits-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
                 <h2 class="section-title">More than just counting stock</h2>
-                <p class="section-desc">Inventory management in Argo Books isn't a complex warehouse system — it's the stock tracking your business actually needs to avoid stockouts and waste.</p>
+                <p class="section-desc">Inventory management in Argo Books isn't a complex warehouse system. It's the stock tracking your business actually needs to avoid stockouts and waste.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
@@ -385,7 +385,7 @@
                         <?= svg_icon('check', 22, '', 2.5) ?>
                     </div>
                     <h3>Accurate counts, always</h3>
-                    <p>Every sale, purchase order, and stock adjustment updates your counts in real time. No manual spreadsheet updates — your numbers are always current.</p>
+                    <p>Every sale, purchase order, and stock adjustment updates your counts in real time. No manual spreadsheet updates. Your numbers are always current.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -399,7 +399,7 @@
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Purchase order tracking</h3>
-                    <p>Create POs, send them to suppliers, and mark them received. Stock levels update automatically when orders arrive — no double entry required.</p>
+                    <p>Create POs, send them to suppliers, and mark them received. Stock levels update automatically when orders arrive, with no double entry required.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
@@ -446,7 +446,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
                 <h2 class="section-title">Built for every business that sells or manages products</h2>
-                <p class="section-desc">Whether you stock 10 items or 10,000 — inventory management scales with your business.</p>
+                <p class="section-desc">Whether you stock 10 items or 10,000, inventory management scales with your business.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">
@@ -454,7 +454,7 @@
                         <?= svg_icon('package', 22) ?>
                         Retail &amp; e-commerce
                     </h3>
-                    <p>Track product stock across your store and warehouse. Know which items are selling fast, which are sitting, and when to reorder from suppliers — before you lose a sale.</p>
+                    <p>Track product stock across your store and warehouse. Know which items are selling fast, which are sitting, and when to reorder from suppliers, before you lose a sale.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
@@ -491,11 +491,11 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
                     <h2>Your inventory data stays on your computer</h2>
-                    <p>Unlike cloud-based inventory systems that upload your product catalog, stock levels, and supplier details to third-party servers, Argo Books is a desktop application. Your data — products, quantities, and purchase orders — is stored locally on your device.</p>
+                    <p>Unlike cloud-based inventory systems that upload your product catalog, stock levels, and supplier details to third-party servers, Argo Books is a desktop application. Your data, including products, quantities, and purchase orders, is stored locally on your device.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Desktop app — your inventory data stays on your computer</span>
+                            <span>Desktop app: your inventory data stays on your computer</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -503,16 +503,16 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Export to CSV or Excel anytime — no vendor lock-in</span>
+                            <span>Export to CSV or Excel anytime, with no vendor lock-in</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Works offline — manage inventory without internet access</span>
+                            <span>Works offline, manage inventory without internet access</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted, offline-capable, no cloud" loading="lazy">
+                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
                 </div>
             </div>
         </div>
@@ -548,7 +548,7 @@
                         <?= svg_icon('calendar', 22) ?>
                     </div>
                     <h3>Rental Management</h3>
-                    <p>Rental items are tracked in your inventory. See which units are available, which are being rented, and when they're due back — all in one place.</p>
+                    <p>Rental items are tracked in your inventory. See which units are available, which are being rented, and when they're due back, all in one place.</p>
                 </a>
             </div>
         </div>
@@ -563,7 +563,7 @@
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to take control of your inventory?</h2>
-                    <p>Download Argo Books and start tracking stock in minutes. Free to get started — no credit card, no trial period.</p>
+                    <p>Download Argo Books and start tracking stock in minutes. Free to get started, with no credit card and no trial period.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

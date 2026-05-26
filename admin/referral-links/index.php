@@ -20,7 +20,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF check — every state-mutating POST must include the session token.
+    // CSRF check: every state-mutating POST must include the session token.
     $posted_token = $_POST['csrf_token'] ?? '';
     if (!is_string($posted_token) || !hash_equals($_SESSION['csrf_token'] ?? '', $posted_token)) {
         http_response_code(403);

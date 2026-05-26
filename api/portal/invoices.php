@@ -86,7 +86,7 @@ function handle_publish_invoice(): void
     $dueDate = $data['dueDate'] ?? null;
     $allowedStatuses = ['draft', 'pending', 'sent', 'viewed', 'partial', 'paid', 'overdue', 'cancelled'];
     $status = in_array(strtolower($data['status'] ?? 'pending'), $allowedStatuses) ? strtolower($data['status'] ?? 'pending') : 'pending';
-    // Prevent callers from directly setting status to 'paid' — that should only happen through payment processing
+    // Prevent callers from directly setting status to 'paid': that should only happen through payment processing
     if ($status === 'paid') { $status = 'pending'; }
     $passProcessingFee = filter_var($data['passProcessingFee'] ?? true, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
 

@@ -22,7 +22,7 @@ $dotenv->safeLoad();
 set_portal_headers();
 require_method(['POST']);
 
-// Batch requests may fetch many dates from OER — allow up to 2 minutes
+// Batch requests may fetch many dates from OER, allow up to 2 minutes
 set_time_limit(120);
 
 // Rate limiting (counts as 1 request regardless of how many dates)

@@ -28,7 +28,7 @@ if ($view_env !== 'sandbox') {
 
 // SQL conditions for environment filtering (strict allowlist of hardcoded clauses).
 // These are safe to interpolate because $view_env is validated above and no user
-// input flows into the SQL fragments — only constant strings are assigned.
+// input flows into the SQL fragments: only constant strings are assigned.
 // Production mode: only explicitly production-marked records
 // Sandbox mode: everything else (sandbox, unknown/NULL, empty)
 if ($view_env === 'sandbox') {

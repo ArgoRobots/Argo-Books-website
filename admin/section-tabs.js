@@ -54,7 +54,7 @@
                 history.replaceState({}, '', url.toString());
             }
         } catch (e) {
-            // URL APIs missing — ignore; click still works visually.
+            // URL APIs missing, ignore; click still works visually.
         }
     }
 

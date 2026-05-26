@@ -40,7 +40,7 @@ if ($row['state'] !== 'old_verified') {
     send_error_response(409, 'Change request is in state ' . $row['state'], 'WRONG_STATE');
 }
 
-// Expiry check — same 10-minute window as the old-email code.
+// Expiry check: same 10-minute window as the old-email code.
 if (empty($row['new_email_code_expires_at']) || strtotime($row['new_email_code_expires_at']) < time()) {
     audit_log($pdo, (int)$company['id'], 'code_failed', 'owner', null, null, $change_id, [
         'target' => 'new', 'reason' => 'expired',
@@ -48,7 +48,7 @@ if (empty($row['new_email_code_expires_at']) || strtotime($row['new_email_code_e
     send_error_response(410, 'Code expired. Resend a new one.', 'CODE_EXPIRED');
 }
 
-// Attempt-counter check — 5 wrong tries cancels the change request.
+// Attempt-counter check: 5 wrong tries cancels the change request.
 if ((int)$row['new_email_code_attempts'] >= 5) {
     $pdo->prepare("UPDATE email_change_requests SET state='cancelled' WHERE id = ? AND state = 'old_verified'")
         ->execute([$change_id]);

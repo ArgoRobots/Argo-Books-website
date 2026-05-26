@@ -57,7 +57,7 @@ $cronConfig = [
     'account_purge' => [
         'label'     => 'Account Purge',
         'frequency' => 'daily',
-        'description' => "Permanently deletes accounts that were marked for deletion 30+ days ago. The grace period gives users time to change their mind by signing back in — logging in cancels the deletion request.",
+        'description' => "Permanently deletes accounts that were marked for deletion 30+ days ago. The grace period gives users time to change their mind by signing back in. Logging in cancels the deletion request.",
         'metrics'   => [
             'accounts_deleted' => 'Accounts deleted',
         ],
@@ -76,7 +76,7 @@ $cronConfig = [
     'refund_cooling_off_promoter' => [
         'label'     => 'Refund Cooling-Off Promoter',
         'frequency' => 'every minute',
-        'description' => "Pushes refund requests through to the payment provider (Stripe, Square, etc.) once their 24-hour cooling-off window ends. The waiting period is a fraud safeguard — it gives us a chance to spot suspicious refund patterns before the money actually moves.",
+        'description' => "Pushes refund requests through to the payment provider (Stripe, Square, etc.) once their 24-hour cooling-off window ends. The waiting period is a fraud safeguard: it gives us a chance to spot suspicious refund patterns before the money actually moves.",
         'metrics'   => [
             'refunds_promoted'       => 'Refunds promoted',
             'refunds_auto_cancelled' => 'Refunds auto-cancelled',
@@ -86,7 +86,7 @@ $cronConfig = [
     'refund_stale_processing_reconcile' => [
         'label'     => 'Refund Stale Processing',
         'frequency' => 'every 5 minutes',
-        'description' => "When a refund has been 'processing' for over half an hour, this directly asks the payment provider what really happened — useful for the cases where their webhook never reached us. Without this, an actually-completed refund could stay stuck in 'processing' forever in our records.",
+        'description' => "When a refund has been 'processing' for over half an hour, this directly asks the payment provider what really happened. Useful for the cases where their webhook never reached us. Without this, an actually-completed refund could stay stuck in 'processing' forever in our records.",
         'metrics'   => [
             'refunds_reconciled' => 'Refunds reconciled',
         ],
@@ -95,7 +95,7 @@ $cronConfig = [
     'refund_stale_request_cleanup' => [
         'label'     => 'Refund Stale Request Cleanup',
         'frequency' => 'hourly',
-        'description' => "Cancels refund requests where the user started the flow but never confirmed it — e.g. they closed the tab before entering their email-verification code. After an hour, the request is automatically dropped so the audit log doesn't fill up with abandoned attempts.",
+        'description' => "Cancels refund requests where the user started the flow but never confirmed it, e.g. they closed the tab before entering their email-verification code. After an hour, the request is automatically dropped so the audit log doesn't fill up with abandoned attempts.",
         'metrics'   => [
             'requests_cancelled' => 'Requests cancelled',
         ],
@@ -104,7 +104,7 @@ $cronConfig = [
     'refund_velocity_baseline_recompute' => [
         'label'     => 'Refund Velocity Baselines',
         'frequency' => 'nightly',
-        'description' => "Recalculates each company's 'normal' refund volume from their own history. The fraud-detection thresholds (3×, 10×, 25%, 50% of normal) then adapt to each shop's size — so a huge merchant doesn't get blocked by limits set for a small one, and a small merchant can't drain accidentally because the limits were too high.",
+        'description' => "Recalculates each company's 'normal' refund volume from their own history. The fraud-detection thresholds (3×, 10×, 25%, 50% of normal) then adapt to each shop's size, so a huge merchant doesn't get blocked by limits set for a small one, and a small merchant can't drain accidentally because the limits were too high.",
         'metrics'   => [
             'baselines_recomputed' => 'Baselines recomputed',
         ],
@@ -127,7 +127,7 @@ try {
     $tableMissing = true;
 }
 
-// Latest run across all time (even outside the range) — used for the status
+// Latest run across all time (even outside the range), used for the status
 // pill so a card without recent activity still tells you when it last ran.
 $latestByCron = [];
 try {
@@ -139,7 +139,7 @@ try {
         $latestByCron[$r['cron_name']] = $r;
     }
 } catch (PDOException $e) {
-    // table missing — fall through to empty state
+    // table missing, fall through to empty state
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -275,7 +275,7 @@ include __DIR__ . '/../admin_header.php';
 <script>
     // Preserve scroll position when clicking a range filter pill, so the
     // page reload doesn't jump back to the top. Shared sessionStorage key
-    // 'scrollPosition' — matches the pattern used in referral-links,
+    // 'scrollPosition', matches the pattern used in referral-links,
     // website-stats, users, and license pages.
     if (sessionStorage.getItem('scrollPosition')) {
         window.scrollTo(0, sessionStorage.getItem('scrollPosition'));

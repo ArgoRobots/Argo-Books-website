@@ -58,7 +58,7 @@ switch ($eventType) {
     case 'payment.created':
     case 'payment.updated':
         // Square fires payment.created/updated for any status transition.
-        // We only act on COMPLETED — this is the backup confirmation for
+        // We only act on COMPLETED. This is the backup confirmation for
         // payments whose synchronous handling in checkout.php was interrupted.
         $payment = $data['data']['object']['payment'] ?? [];
         $paymentStatus = $payment['status'] ?? '';
@@ -122,7 +122,7 @@ switch ($eventType) {
             if (empty($paymentId)) break;
 
             // Find original payment + insert negative-amount refund row.
-            // No status filter — once cumulative refunds cover the original, the row
+            // No status filter: once cumulative refunds cover the original, the row
             // flips to 'refunded' (see refund_record_ledger). A subsequent webhook
             // (out-of-order redelivery, late dashboard refund, etc.) must still find
             // the row or the negative-amount insert silently no-ops. amount > 0 still

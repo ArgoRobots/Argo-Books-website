@@ -57,7 +57,7 @@ $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 $base64Image = $data['base64Image'] ?? null;
 $mimeType = $data['mimeType'] ?? 'image/jpeg';
 
-// Validate model — Gemini is the only supported provider
+// Validate model: Gemini is the only supported provider
 $geminiModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
 if (!empty($requestedModel) && !in_array($requestedModel, $geminiModels, true)) {
     send_error_response(400, 'Unsupported model. Supported: ' . implode(', ', $geminiModels), 'INVALID_MODEL');
@@ -158,7 +158,7 @@ if (!empty($base64Image)) {
                 error_log('Gemini file processing failed: ' . $statusResponse);
                 send_error_response(502, 'AI service failed to process the PDF.', 'UPSTREAM_ERROR');
             }
-            // Still PROCESSING — wait and retry
+            // Still PROCESSING: wait and retry
             usleep(500000); // 500ms
         }
 

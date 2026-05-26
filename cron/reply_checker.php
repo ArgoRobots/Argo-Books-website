@@ -89,7 +89,7 @@ try {
     foreach ($messages as $msg) {
         if (empty($msg['sender_email'])) continue;
 
-        // Bounce / complaint handling — add bounced address to suppression list
+        // Bounce / complaint handling, add bounced address to suppression list
         if (imap_is_bounce($msg['sender_email'], $msg['subject'])) {
             $body = imap_fetch_body_text($imap, $msg['uid']);
             $bouncedAddr = imap_parse_bounced_address($body);
@@ -107,7 +107,7 @@ try {
                         'Auto-suppressed after bounce from ' . $msg['sender_email'] . ' for address ' . $bouncedAddr);
                 }
                 $bounces++;
-                logReply('Bounce: ' . $bouncedAddr . ' (from ' . $msg['sender_email'] . ') — added to suppression list');
+                logReply('Bounce: ' . $bouncedAddr . ' (from ' . $msg['sender_email'] . ') added to suppression list');
             } else {
                 logReply('Bounce-looking message from ' . $msg['sender_email'] . ' but could not parse bounced address; skipping');
             }

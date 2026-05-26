@@ -15,7 +15,7 @@
         content="expense tracking software, revenue tracking, bookkeeping software, small business expense tracker, income tracking, profit monitoring, receipt management, expense categorization, cash flow tracking, business expense app">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Expense &amp; Revenue Tracking — Argo Books">
+    <meta property="og:title" content="Expense &amp; Revenue Tracking | Argo Books">
     <meta property="og:description"
         content="Track business expenses and revenue with Argo Books. Guided forms, smart validation, and automatic categorization make bookkeeping simple for any small business.">
     <meta property="og:url" content="https://argorobots.com/features/expense-revenue-tracking/">
@@ -28,7 +28,7 @@
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Expense &amp; Revenue Tracking — Argo Books">
+    <meta name="twitter:title" content="Expense &amp; Revenue Tracking | Argo Books">
     <meta name="twitter:description"
         content="Track business expenses and revenue with Argo Books. Guided forms, smart validation, and automatic categorization make bookkeeping simple.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Expense+%26+Revenue+Tracking&subtitle=Track+every+dollar+in+and+out.+Guided+forms%2C+smart+validation%2C+and+real-time+profit+monitoring.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
@@ -64,7 +64,7 @@
                     "name": "Do I need accounting experience to track expenses?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Not at all. Argo Books uses guided forms with smart defaults and built-in validation to make recording expenses and revenue simple for anyone. You don't need to know debits from credits — just fill in the amount, category, and date, and Argo Books handles the rest."
+                        "text": "Not at all. Argo Books uses guided forms with smart defaults and built-in validation to make recording expenses and revenue simple for anyone. You don't need to know debits from credits. Just fill in the amount, category, and date, and Argo Books handles the rest."
                     }
                 },
                 {
@@ -80,7 +80,7 @@
                     "name": "How does receipt management work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos — it extracts the supplier name, line items, taxes, and total with 99% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time."
+                        "text": "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos. It extracts the supplier name, line items, taxes, and total with 99% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time."
                     }
                 },
                 {
@@ -115,7 +115,7 @@
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Expense &amp; Revenue Tracking — Argo Books</title>
+    <title>Expense &amp; Revenue Tracking | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -143,7 +143,7 @@
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1 class="animate-fade-in">Know exactly where every dollar goes — and where it comes from</h1>
+            <h1 class="animate-fade-in">Know exactly where every dollar goes, and where it comes from</h1>
             <p class="hero-subtitle animate-fade-in">Track every expense and revenue transaction in one place. Guided forms, smart validation, and real-time profit monitoring keep your books accurate without accounting experience.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
@@ -167,7 +167,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Spreadsheets weren't built for tracking your money</h2>
-                    <p>Most small businesses start with spreadsheets or shoebox receipts. Formulas break, transactions get missed, and you never know if you're actually profitable until it's too late. Argo Books gives you a purpose-built system for recording every purchase and sale — with guided forms that make it impossible to miss a field.</p>
+                    <p>Most small businesses start with spreadsheets or shoebox receipts. Formulas break, transactions get missed, and you never know if you're actually profitable until it's too late. Argo Books gives you a purpose-built system for recording every purchase and sale, with guided forms that make it impossible to miss a field.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -241,8 +241,8 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Revenue Tracking</span>
                     <h2>See every dollar coming into your business</h2>
-                    <p>The revenue page gives you a complete view of every sale and payment you've received — all in a clean, sortable table. Summary cards at the top show your monthly revenue, total transactions, unique customers, and returns at a glance.</p>
-                    <p>Need to add a sale? Click "Add Revenue" and fill in a guided form. Argo Books auto-populates customers and products from your records, validates amounts, and links the transaction to the right customer profile — so your books stay accurate without extra effort.</p>
+                    <p>The revenue page gives you a complete view of every sale and payment you've received, all in a clean, sortable table. Summary cards at the top show your monthly revenue, total transactions, unique customers, and returns at a glance.</p>
+                    <p>Need to add a sale? Click "Add Revenue" and fill in a guided form. Argo Books auto-populates customers and products from your records, validates amounts, and links the transaction to the right customer profile, so your books stay accurate without extra effort.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -254,7 +254,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Return tracking built in — every refund is accounted for</span>
+                            <span>Return tracking built in, every refund is accounted for</span>
                         </li>
                     </ul>
                 </div>
@@ -266,14 +266,14 @@
     </section>
 
     <!-- =============================================
-         HOW IT WORKS — 3 Steps
+         HOW IT WORKS, 3 Steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
                 <h2 class="section-title">Three steps to organized finances</h2>
-                <p class="section-desc">From scattered records to a clear financial picture in minutes. No accounting background needed — Argo Books guides you through every step.</p>
+                <p class="section-desc">From scattered records to a clear financial picture in minutes. No accounting background needed. Argo Books guides you through every step.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
@@ -289,7 +289,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>See your financial picture</h3>
-                    <p>Summary cards update in real time. See monthly totals, profit margins, transaction counts, and trends — all without exporting to a spreadsheet.</p>
+                    <p>Summary cards update in real time. See monthly totals, profit margins, transaction counts, and trends, all without exporting to a spreadsheet.</p>
                 </div>
             </div>
         </div>
@@ -321,7 +321,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Expense Tracking</span>
                     <h2>Track every purchase, subscription, and cost</h2>
-                    <p>The expenses page mirrors the revenue layout — a clean, filterable table with every purchase your business has made. Summary cards show monthly spending, total transactions, receipts on file, and returns.</p>
+                    <p>The expenses page mirrors the revenue layout: a clean, filterable table with every purchase your business has made. Summary cards show monthly spending, total transactions, receipts on file, and returns.</p>
                     <p>Filter by supplier, date range, or amount to find any transaction instantly. Need to attach a receipt? Link it directly to the expense record, or use <a href="../receipt-scanning/index.php" class="link">AI receipt scanning</a> to auto-create the expense from a photo.</p>
                     <ul class="feature-checklist">
                         <li>
@@ -330,7 +330,7 @@
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Receipt attachment tracking — see which expenses have receipts on file</span>
+                            <span>Receipt attachment tracking, see which expenses have receipts on file</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -359,11 +359,11 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Receipt Archive</span>
                     <h2>Every receipt stored, organized, and searchable</h2>
-                    <p>Argo Books includes a dedicated receipt archive where all your receipts — both expense and revenue — are stored in one place. Search by any field, and filter by type (expense or revenue). It's a complete paper trail without the paper.</p>
+                    <p>Argo Books includes a dedicated receipt archive where all your receipts, both expense and revenue, are stored in one place. Search by any field, and filter by type (expense or revenue). It's a complete paper trail without the paper.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Color-coded badges — green for revenue, red for expenses</span>
+                            <span>Color-coded badges: green for revenue, red for expenses</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -383,14 +383,14 @@
     </section>
 
     <!-- =============================================
-         BENEFITS GRID — 6 benefit cards
+         BENEFITS GRID, 6 benefit cards
          ============================================= -->
     <section class="benefits-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
                 <h2 class="section-title">More than just a ledger</h2>
-                <p class="section-desc">Expense and revenue tracking in Argo Books isn't just about recording numbers — it gives you the financial clarity to make better business decisions.</p>
+                <p class="section-desc">Expense and revenue tracking in Argo Books isn't just about recording numbers. It gives you the financial clarity to make better business decisions.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
@@ -398,7 +398,7 @@
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
                     <h3>Real-time profit visibility</h3>
-                    <p>Summary cards update as you add transactions. See your monthly revenue, expenses, and net profit at any moment — no end-of-month surprises.</p>
+                    <p>Summary cards update as you add transactions. See your monthly revenue, expenses, and net profit at any moment, with no end-of-month surprises.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
@@ -412,14 +412,14 @@
                         <?= svg_icon('search', 22) ?>
                     </div>
                     <h3>Find any transaction instantly</h3>
-                    <p>Search, filter, and sort by supplier, customer, date, amount, or status. Every transaction is indexed and findable in seconds — even years later.</p>
+                    <p>Search, filter, and sort by supplier, customer, date, amount, or status. Every transaction is indexed and findable in seconds, even years later.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon amber">
                         <?= svg_icon('bolt', 22) ?>
                     </div>
                     <h3>Edit on the fly</h3>
-                    <p>Update any transaction straight from the row — change status, mark items as lost or returned, or jump to its receipt without opening a separate page.</p>
+                    <p>Update any transaction straight from the row: change status, mark items as lost or returned, or jump to its receipt without opening a separate page.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
@@ -433,7 +433,7 @@
                         <?= svg_icon('clock', 22) ?>
                     </div>
                     <h3>Complete transaction history</h3>
-                    <p>Every edit, status change, and update is tracked. View the full history of any transaction to see what changed, when, and why — with undo/redo support.</p>
+                    <p>Every edit, status change, and update is tracked. View the full history of any transaction to see what changed, when, and why, with undo/redo support.</p>
                 </div>
             </div>
         </div>
@@ -466,7 +466,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
                 <h2 class="section-title">Built for the way you actually run your business</h2>
-                <p class="section-desc">Whether you sell products, provide services, or run a side hustle — expense and revenue tracking adapts to your workflow.</p>
+                <p class="section-desc">Whether you sell products, provide services, or run a side hustle, expense and revenue tracking adapts to your workflow.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">
@@ -495,7 +495,7 @@
                         <?= svg_icon('document', 22) ?>
                         Side hustles &amp; startups
                     </h3>
-                    <p>Starting small? Argo Books grows with you. Start by tracking a few transactions a week and scale to hundreds — the interface stays simple and fast.</p>
+                    <p>Starting small? Argo Books grows with you. Start by tracking a few transactions a week and scale to hundreds, with an interface that stays simple and fast.</p>
                 </div>
             </div>
         </div>
@@ -511,25 +511,25 @@
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
                     <h2>Your financial data stays on your computer</h2>
-                    <p>Unlike cloud-based bookkeeping tools that upload your revenue and expense data to third-party servers, Argo Books is a desktop application. Your transactions, receipts, and financial records are stored locally on your device — not on someone else's cloud.</p>
+                    <p>Unlike cloud-based bookkeeping tools that upload your revenue and expense data to third-party servers, Argo Books is a desktop application. Your transactions, receipts, and financial records are stored locally on your device, not on someone else's cloud.</p>
                     <p>No vendor lock-in, no worrying about what happens if the service shuts down. Your data is yours, and it stays on your machine. Export anytime to CSV, Excel, PNG, or PDF for your accountant.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Desktop app — your financial data stays on your computer</span>
+                            <span>Desktop app: your financial data stays on your computer</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Export to CSV, Excel, PNG, or PDF anytime — no vendor lock-in</span>
+                            <span>Export to CSV, Excel, PNG, or PDF anytime, with no vendor lock-in</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Works offline — record transactions without internet access</span>
+                            <span>Works offline, record transactions without internet access</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local — encrypted, offline-capable, no cloud" loading="lazy">
+                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
                 </div>
             </div>
         </div>
@@ -580,7 +580,7 @@
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to take control of your finances?</h2>
-                    <p>Download Argo Books and start tracking expenses and revenue today. Free to get started — no credit card, no trial period.</p>
+                    <p>Download Argo Books and start tracking expenses and revenue today. Free to get started, with no credit card and no trial period.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

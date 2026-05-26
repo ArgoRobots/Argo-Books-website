@@ -371,7 +371,7 @@ function record_portal_payment(array $params): array
     $paymentId = $pdo->lastInsertId();
 
     if ($affectedRows !== 1 && !empty($providerPaymentId)) {
-        // Duplicate payment detected — return existing reference.
+        // Duplicate payment detected. Return existing reference.
         // 'inserted' => false lets callers (refund webhooks especially)
         // skip follow-up updates that should only run on first insert,
         // avoiding double-application on webhook retries.
@@ -401,7 +401,7 @@ function record_portal_payment(array $params): array
         // left-to-right and references to a column in subsequent assignments
         // see the NEW (just-assigned) value. We need the CASE to compare
         // against the OLD balance_due, so `status = CASE …` MUST come BEFORE
-        // `balance_due = GREATEST(…)` — otherwise a $50 payment on a $100
+        // `balance_due = GREATEST(…)`; otherwise a $50 payment on a $100
         // invoice would compute new_balance=50 then evaluate (50 - 50 <= 0)
         // and incorrectly set status='paid' instead of 'partial'.
         $stmt = $pdo->prepare(
@@ -559,7 +559,7 @@ function send_invoice_notification(array $params): array
     $dueDate = $params['dueDate'] ?? '';
     $invoiceUrl = $params['invoiceUrl'] ?? '';
     // Default to true to match the schema's column default (pass_processing_fee
-    // DEFAULT 1) — older callers that don't pass the flag still get the
+    // DEFAULT 1). Older callers that don't pass the flag still get the
     // fee-inclusive headline number that the customer will see on the portal.
     $passProcessingFee = !array_key_exists('passProcessingFee', $params)
         ? true
@@ -766,16 +766,16 @@ function send_payment_confirmation(array $params): array
  */
 function build_portal_email_html(array $params): string
 {
-    // Plain-text params — escaped by the helper. Callers should pass raw values.
+    // Plain-text params, escaped by the helper. Callers should pass raw values.
     $headerTitle  = htmlspecialchars((string)($params['headerTitle'] ?? ''), ENT_QUOTES, 'UTF-8');
     $greetingName = htmlspecialchars((string)($params['greetingName'] ?? ''), ENT_QUOTES, 'UTF-8');
 
-    // HTML-by-design params — callers must sanitize/escape any interpolated
+    // HTML-by-design params: callers must sanitize/escape any interpolated
     // user data before passing in. Named with *Html to flag the contract.
     $introHtml   = (string)($params['introHtml'] ?? '');
     $closingHtml = (string)($params['closingHtml'] ?? '');
 
-    // Controlled CSS values — not user input.
+    // Controlled CSS values, not user input.
     $headerGradient = $params['headerGradient'] ?? 'linear-gradient(135deg, #2563eb, #1e40af)';
 
     $detailRows = $params['detailRows'] ?? [];
@@ -783,8 +783,8 @@ function build_portal_email_html(array $params): string
 
     $rowsHtml = '';
     foreach ($detailRows as $row) {
-        // Row label is semantically plain text — escape here.
-        // Row value may be pre-formatted HTML (e.g., bold amounts) — callers must escape.
+        // Row label is semantically plain text, escape here.
+        // Row value may be pre-formatted HTML (e.g., bold amounts), callers must escape.
         $label = htmlspecialchars((string)($row[0] ?? ''), ENT_QUOTES, 'UTF-8');
         $value = (string)($row[1] ?? '');
         $valueStyle = $row[2] ?? 'padding: 8px 0; text-align: right; font-size: 14px; color: #111827;';

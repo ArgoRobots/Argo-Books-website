@@ -1,6 +1,6 @@
 <?php
 /**
- * Trusted device helpers — let an admin skip the TOTP step on devices they've
+ * Trusted device helpers: let an admin skip the TOTP step on devices they've
  * opted in on, for 30 days. The password step is always still required.
  *
  * Storage uses a split-token pattern (selector + validator), the same approach
@@ -9,7 +9,7 @@
  *   cookie value  = "<selector>.<validator>"
  *   DB row        = (selector plaintext for O(1) lookup, validator_hash = sha256(validator))
  *
- * A database read therefore cannot grant authentication on its own — the
+ * A database read therefore cannot grant authentication on its own. The
  * attacker would need the validator from the user's cookie. hash_equals() is
  * used on the validator compare to avoid timing leaks.
  */
@@ -88,7 +88,7 @@ function verify_trusted_device_cookie($ip)
         return null;
     }
 
-    // Trust-cookie verification must NEVER throw — that would block the admin
+    // Trust-cookie verification must NEVER throw. That would block the admin
     // from logging in entirely if the table is missing or the DB hiccups. Any
     // error here falls through to the normal TOTP prompt.
     try {
@@ -115,7 +115,7 @@ function verify_trusted_device_cookie($ip)
 
     // Metadata update is best-effort: the auth decision was already made above
     // when the validator matched. A transient UPDATE failure must not force
-    // the user back to TOTP — they're already authenticated.
+    // the user back to TOTP. They're already authenticated.
     try {
         $upd = $pdo->prepare(
             'UPDATE admin_trusted_devices

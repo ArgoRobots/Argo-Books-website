@@ -7,7 +7,7 @@
  * Receives spreadsheet data from the Argo Books app, creates a Google Sheet
  * using the company's stored OAuth tokens, and returns the spreadsheet URL.
  *
- * Free feature — authentication uses device ID.
+ * Free feature: authentication uses device ID.
  */
 
 require_once __DIR__ . '/../google-helper.php';
@@ -237,7 +237,7 @@ if (!empty($batchRequests)) {
         ['requests' => $batchRequests]
     );
     if ($batchResult === null) {
-        error_log('Google Sheets batchUpdate failed for spreadsheet: ' . $spreadsheetId . ' — requests: ' . json_encode($batchRequests));
+        error_log('Google Sheets batchUpdate failed for spreadsheet: ' . $spreadsheetId . '; requests: ' . json_encode($batchRequests));
     }
 }
 

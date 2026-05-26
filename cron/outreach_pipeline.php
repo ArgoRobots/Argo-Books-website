@@ -62,7 +62,7 @@ define('DAILY_SEND_LIMIT', (int) ($_ENV['OUTREACH_DAILY_SEND_LIMIT'] ?? 10));
 define('DAILY_GOOGLE_DISCOVERY_LIMIT', (int) ($_ENV['OUTREACH_DAILY_GOOGLE_DISCOVERY_LIMIT'] ?? (int) ceil(DAILY_SEND_LIMIT / 2)));
 // Follow-ups have their own daily cap, separate from first-touch sends.
 // With the multi-touch sequence (touches 2 through N), this cap applies
-// across ALL touch positions combined. Default 75 — raise via env var
+// across ALL touch positions combined. Default 75; raise via env var
 // (OUTREACH_DAILY_FOLLOWUP_LIMIT) once domain reputation supports more.
 define('DAILY_FOLLOWUP_LIMIT', (int) ($_ENV['OUTREACH_DAILY_FOLLOWUP_LIMIT'] ?? 75));
 define('DAILY_DRAFT_LIMIT', (int) ($_ENV['OUTREACH_DAILY_DRAFT_LIMIT'] ?? 100));
@@ -79,7 +79,7 @@ $runAll = !$discoverOnly && !$draftOnly && !$sendOnly && !$shopifyOnly;
 // ─── Target Cities (Saskatchewan first, then expand outward) ───
 
 $targetCities = [
-    // Saskatchewan — primary market
+    // Saskatchewan: primary market
     ['city' => 'Saskatoon', 'province' => 'Saskatchewan'],
     ['city' => 'Regina', 'province' => 'Saskatchewan'],
     ['city' => 'Prince Albert', 'province' => 'Saskatchewan'],
@@ -95,7 +95,7 @@ $targetCities = [
     ['city' => 'Melfort', 'province' => 'Saskatchewan'],
     ['city' => 'Meadow Lake', 'province' => 'Saskatchewan'],
     ['city' => 'Lloydminster', 'province' => 'Saskatchewan'],
-    // Alberta — neighboring province
+    // Alberta: neighboring province
     ['city' => 'Edmonton', 'province' => 'Alberta'],
     ['city' => 'Calgary', 'province' => 'Alberta'],
     ['city' => 'Red Deer', 'province' => 'Alberta'],
@@ -105,7 +105,7 @@ $targetCities = [
     ['city' => 'Airdrie', 'province' => 'Alberta'],
     ['city' => 'Spruce Grove', 'province' => 'Alberta'],
     ['city' => 'St. Albert', 'province' => 'Alberta'],
-    // Manitoba — neighboring province
+    // Manitoba: neighboring province
     ['city' => 'Winnipeg', 'province' => 'Manitoba'],
     ['city' => 'Brandon', 'province' => 'Manitoba'],
     ['city' => 'Steinbach', 'province' => 'Manitoba'],
@@ -181,7 +181,7 @@ function setState($pdo, $key, $value)
 // ══════════════════════════════════════════════════════════════
 
 logPipeline('=== Outreach Pipeline Starting ===');
-if ($dryRun) logPipeline('DRY RUN MODE — no changes will be made');
+if ($dryRun) logPipeline('DRY RUN MODE: no changes will be made');
 
 global $pdo;
 $cronRunId = $dryRun ? 0 : cron_run_start($pdo, 'outreach_pipeline');
@@ -221,12 +221,12 @@ try {
     // ─── STEP 4: Auto-Approve ───
     // Runtime-toggled via outreach_pipeline_state.auto_send_mode
     // ('auto' | 'review'). Defaults to 'auto' on a DB that hasn't had the
-    // toggle set yet — admin can flip to review-mode in the Settings tab.
+    // toggle set yet. Admin can flip to review-mode in the Settings tab.
     $autoSendMode = getState($pdo, 'auto_send_mode', 'auto');
     if (($runAll || $draftOnly) && $autoSendMode === 'auto') {
         stepAutoApprove($pdo, $dryRun);
     } elseif (($runAll || $draftOnly) && $autoSendMode === 'review') {
-        logPipeline('Send mode: review — drafts generated but auto-approve skipped.');
+        logPipeline('Send mode: review. Drafts generated but auto-approve skipped.');
     }
 
     // ─── STEP 5: Send Emails ───
@@ -242,7 +242,7 @@ try {
     }
 
     // ─── STEP 5.6: Draft Follow-ups (Gemini, lazy ~1 day before send) ───
-    // Always runs regardless of send mode — Drafting itself is harmless.
+    // Always runs regardless of send mode. Drafting itself is harmless.
     // The review-vs-auto gating happens INSIDE stepDraftFollowups (which
     // advances drafted → approved only when auto_send_mode = 'auto').
     if ($runAll || $sendOnly || $draftOnly) {
@@ -250,8 +250,8 @@ try {
     }
 
     // ─── STEP 6: Send Follow-ups ───
-    // Step 6 always runs — review-vs-auto gating is implicit in row statuses.
-    // (Review mode: rows stay 'drafted' awaiting admin approval — not picked
+    // Step 6 always runs; review-vs-auto gating is implicit in row statuses.
+    // (Review mode: rows stay 'drafted' awaiting admin approval, not picked
     // up by the WHERE status='approved' query.)
     if ($runAll || $sendOnly) {
         stepSendFollowups($pdo, $dryRun);
@@ -370,7 +370,7 @@ function stepDiscover($pdo, $dryRun)
             }
         }
 
-        // If every single API call failed, don't advance state — let the next
+        // If every single API call failed, don't advance state. Let the next
         // pipeline run retry these same categories. Break the loop so we don't
         // burn through every city while the API is down.
         if ($apiErrors > 0 && $apiErrors === $categoriesSearched) {
@@ -434,7 +434,7 @@ function stepDiscover($pdo, $dryRun)
         setState($pdo, 'last_discovery_city', "$city, $province");
 
         // Decide whether to continue looping or stop. If we cycled through every
-        // category for this city, the city is "done" for now — advance the
+        // category for this city, the city is "done" for now. Advance the
         // pointer and let the loop pick up the next city. If we stopped before
         // cycling all categories, it means we hit the per-city cap; save the
         // offset so the next pipeline run resumes here, and break.
@@ -462,7 +462,7 @@ function stepDiscover($pdo, $dryRun)
             logPipeline("Pruned $deleted expired scrape-cache rows.");
         }
     } catch (PDOException $e) {
-        // Cleanup failure shouldn't fail the pipeline — table may not exist yet.
+        // Cleanup failure shouldn't fail the pipeline; table may not exist yet.
     }
 }
 
@@ -558,7 +558,7 @@ function stepDiscoverShopify($pdo, $dryRun)
         // SerpAPI call via 14-day response cache. Append global exclusions
         // so we don't pay for results that openly advertise being decades
         // old. num=100 is Google's per-page cap and costs the same as
-        // num=10 on SerpAPI — 10x the candidates per credit. Cache hits
+        // num=10 on SerpAPI, 10x the candidates per credit. Cache hits
         // do NOT consume daily SerpAPI quota.
         $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
         $queryResult = serpapi_query_cached($queryWithExclusions, $serpapiKey, 100, $pdo);
@@ -637,7 +637,7 @@ function stepDiscoverShopify($pdo, $dryRun)
                          WHERE canonical_url = ?"
                     );
                     $upd->execute([$canonical]);
-                    logPipeline("Shopify candidate '$canonical' skipped — already in outreach_leads (duplicate).");
+                    logPipeline("Shopify candidate '$canonical' skipped: already in outreach_leads (duplicate).");
                     $totalRejected++;
                     continue;
                 }
@@ -705,7 +705,7 @@ function stepDiscoverShopify($pdo, $dryRun)
                 );
                 $updRej->execute([$rejectReason, $rejectDetail, $canonical]);
 
-                logPipeline("Shopify candidate '$canonical' rejected: $rejectReason — $rejectDetail");
+                logPipeline("Shopify candidate '$canonical' rejected: $rejectReason: $rejectDetail");
                 $totalRejected++;
             }
         }
@@ -767,7 +767,7 @@ function stepManageAbTests($pdo, $dryRun)
             cron_metric_incr('ab_tests_promoted');
             $metric = $evalResult['metric'] ?? 'ctr';
             logPipeline(sprintf(
-                "A/B auto-promoted winner: %s test #%d '%s' — variant %s wins (reply rate %.2f%%, CTR %.2f%%) via %s by %s after %d days.",
+                "A/B auto-promoted winner: %s test #%d '%s': variant %s wins (reply rate %.2f%%, CTR %.2f%%) via %s by %s after %d days.",
                 $type,
                 $evalResult['test_id'],
                 $evalResult['test_name'],
@@ -780,7 +780,7 @@ function stepManageAbTests($pdo, $dryRun)
             ));
         } elseif ($evalResult['action'] === 'none' && ($evalResult['reason'] ?? '') === 'criteria_not_met') {
             logPipeline(sprintf(
-                "A/B %s test #%d '%s' still running (age %d days, min sent %d) — no promotion criteria met yet.",
+                "A/B %s test #%d '%s' still running (age %d days, min sent %d): no promotion criteria met yet.",
                 $type,
                 $evalResult['test_id'] ?? 0,
                 $evalResult['test_name'] ?? '',
@@ -794,7 +794,7 @@ function stepManageAbTests($pdo, $dryRun)
     // 3) Auto-create the next cycle. The ab_auto_next_type pointer rotates
     //    across ab_auto_rotation_order() so the pipeline tests one lever,
     //    then the next, and so on. body / cta / preheader aren't in the
-    //    rotation — they need crafted copy and stay admin-initiated.
+    //    rotation; they need crafted copy and stay admin-initiated.
     $order = ab_auto_rotation_order();
     $cycleType = getState($pdo, 'ab_auto_next_type', $order[0]);
     if (!in_array($cycleType, $order, true)) {
@@ -1059,7 +1059,7 @@ function stepSendEmails($pdo, $dryRun)
 
                 // Schedule the multi-touch follow-up sequence (if any configured).
                 // For the followup_sequence A/B assignment, we look up the active
-                // followup_sequence test and pick a variant for this lead now —
+                // followup_sequence test and pick a variant for this lead now,
                 // separate from any A/B variant the first-touch is on (which is
                 // usually subject/sender/format/etc., not followup_sequence).
                 $fuVariantId = null;

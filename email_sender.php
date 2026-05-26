@@ -8,7 +8,7 @@ require_once __DIR__ . '/_email_helpers.php';
 // call into helpers from email_marketing.php (should_send_marketing_email,
 // community_user_unsubscribe_url, mark_marketing_sent). Callers of those
 // senders must require_once email_marketing.php themselves. We don't
-// require it here to avoid a circular include — email_marketing.php
+// require it here to avoid a circular include. email_marketing.php
 // already requires this file.
 
 /**
@@ -147,7 +147,7 @@ function send_styled_email($to_email, $subject, $body_content, $header_style = '
         'Message-ID: ' . $generated_message_id,
         'X-Mailer: PHP/' . phpversion()
     ];
-    // Append extra headers to the fallback path too — without this, threading
+    // Append extra headers to the fallback path too. Without this, threading
     // headers (In-Reply-To, References) only work when SMTP is configured.
     if (!empty($extra_headers) && is_array($extra_headers)) {
         foreach ($extra_headers as $name => $value) {
@@ -1217,7 +1217,7 @@ function send_post_reply_email(int $postAuthorId, int $postId, int $commentId, s
         <p style="margin: 24px 0;">
             <a href="{$post_safe}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">View the discussion</a>
         </p>
-        <p>&mdash; Argo Community</p>
+        <p>Argo Community</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">
         <p style="font-size:12px;color:#6b7280;">
             You're receiving this because you opted in to community notifications.
@@ -1283,7 +1283,7 @@ function send_mention_email(int $mentionedUserId, int $postId, int $commentId, s
         <p style="margin: 24px 0;">
             <a href="{$post_safe}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:6px;text-decoration:none;display:inline-block;">Open in Argo Community</a>
         </p>
-        <p>&mdash; Argo Community</p>
+        <p>Argo Community</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:32px 0 16px;">
         <p style="font-size:12px;color:#6b7280;">
             You're receiving this because you opted in to community notifications.

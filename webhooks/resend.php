@@ -79,10 +79,10 @@ $resendEmailId = isset($data['email_id']) ? (string) $data['email_id'] : null;
 
 // Resend always includes email_id on the email.* events we subscribe to.
 // If it's missing, the event is malformed (or a non-email event we don't
-// store). We can't dedupe without it — the (message_id, event_type) UNIQUE
+// store). We can't dedupe without it: the (message_id, event_type) UNIQUE
 // key treats NULLs as distinct, so a NULL message_id would let retries
 // accumulate duplicate rows. 200 OK so Resend stops retrying, but skip the
-// insert. Defense-in-depth — should never fire in normal Resend traffic.
+// insert. Defense-in-depth: should never fire in normal Resend traffic.
 if ($resendEmailId === null || $resendEmailId === '') {
     error_log('Resend webhook: event missing email_id; skipping insert.');
     http_response_code(200);
@@ -107,14 +107,14 @@ $shortType = (strpos($eventType, 'email.') === 0)
     : $eventType;
 
 $occurredAt = isset($event['created_at']) ? (string) $event['created_at'] : '';
-// Use gmdate (UTC) for the fallback so occurred_at is always UTC — matches
+// Use gmdate (UTC) for the fallback so occurred_at is always UTC. Matches
 // what format_iso8601_for_mysql() does when created_at is present.
 $occurredAtSql = $occurredAt !== '' ? format_iso8601_for_mysql($occurredAt) : gmdate('Y-m-d H:i:s');
 
 // Match the event back to an outreach lead by recipient address. We send each
 // lead at most once, so the most recent contacted lead with a matching email
 // is the right target. If no match, this is almost certainly a non-outreach
-// email sent through the same Resend account (premium receipts, etc.) — we
+// email sent through the same Resend account (premium receipts, etc.), so we
 // 200 OK silently so Resend doesn't retry, but we don't store the event.
 $leadId = null;
 if ($primaryTo !== '') {
@@ -196,7 +196,7 @@ if ($shouldSuppress && $primaryTo !== '') {
         $logStmt->execute([$leadId, $suppressReason]);
     } catch (PDOException $e) {
         error_log('Resend webhook: suppression update failed: ' . $e->getMessage());
-        // Don't fail the webhook on side-effect errors — the event row is
+        // Don't fail the webhook on side-effect errors. The event row is
         // already saved and a future job can reconcile.
     }
 }

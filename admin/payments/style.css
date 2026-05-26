@@ -48,7 +48,7 @@
     color: var(--amber-800);
 }
 
-/* Tab styles are shared across admin pages — see admin/common-style.css (.section-tabs / .section-tab / .tab-content) */
+/* Tab styles are shared across admin pages: see admin/common-style.css (.section-tabs / .section-tab / .tab-content) */
 
 /* ============================================================
    Stats Grid

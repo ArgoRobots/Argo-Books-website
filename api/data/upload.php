@@ -5,7 +5,7 @@ session_start();
 require_once __DIR__ . '/../../vendor/autoload.php';
 require_once __DIR__ . '/../portal/portal-helper.php';
 require_once __DIR__ . '/telemetry_filter.php';
-// Provides lookup_country_for_ip() — DB-cached + ipinfo.io fallback.
+// Provides lookup_country_for_ip(): DB-cached + ipinfo.io fallback.
 require_once __DIR__ . '/../../track_referral_event.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
@@ -121,7 +121,7 @@ function telemetry_country_name_from_code(?string $code): ?string
  * Backfill geoLocation when the desktop app couldn't resolve it client-side
  * (firewall, rate limiting, etc). Reuses the website's lookup_country_for_ip()
  * so a single shared IP lookup serves both the funnel tracker and telemetry.
- * Only fills missing fields — never overwrites whatever the client sent.
+ * Only fills missing fields, never overwrites whatever the client sent.
  */
 function backfill_geolocation_from_request(array $payload): array
 {

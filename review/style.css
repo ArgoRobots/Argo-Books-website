@@ -1,8 +1,8 @@
 /* ========================================
-   Review page — bits not covered by features/style.css
+   Review page: bits not covered by features/style.css
    ======================================== */
 
-/* "Tell us first" notice inside the hero — softens the funnel by
+/* "Tell us first" notice inside the hero, softens the funnel by
    offering a contact path to anyone who's hit a problem, before they
    click through to Capterra. Visible to every visitor (not gated). */
 .review-prefer-contact {
@@ -218,7 +218,7 @@
 }
 
 /* ========================================
-   Privacy grid — "Shown publicly" / "Kept private" cards
+   Privacy grid: "Shown publicly" / "Kept private" cards
    ======================================== */
 .review-privacy-grid {
   display: grid;

@@ -75,7 +75,7 @@ $inWindowStmt->execute([$leadId]);
 $inWindowCount = (int) $inWindowStmt->fetchColumn();
 assert_true($inWindowCount === 1, "Touch 2 (scheduled now) is in the draft window (count=$inWindowCount)");
 
-// (Actual Gemini call not mocked here — the test just verifies the eligibility query.
+// (Actual Gemini call not mocked here. The test just verifies the eligibility query.
 // To smoke-test the full Gemini path, set GEMINI_API_KEY and run --dry-run separately.)
 
 // ─── Test 3: halt step halts follow-ups when lead replies ───
@@ -93,8 +93,8 @@ $reasonsStmt->execute([$leadId]);
 $reasons = $reasonsStmt->fetchAll(PDO::FETCH_COLUMN);
 assert_true(in_array('replied', $reasons, true), "halt_reason 'replied' present");
 
-// ─── Test 4: atomic send claim — second concurrent claim loses ───
-echo "Test 4: atomic claim — only one process can flip approved → sent\n";
+// ─── Test 4: atomic send claim, second concurrent claim loses ───
+echo "Test 4: atomic claim, only one process can flip approved → sent\n";
 $pdo->prepare("INSERT INTO outreach_leads (business_name, email, status, sent_at, unsubscribe_token) VALUES ('Smoke4', 'smoke4@example.com', 'contacted', NOW(), 'tok4')")->execute();
 $leadId4 = (int) $pdo->lastInsertId();
 $createdLeadIds[] = $leadId4;
@@ -102,12 +102,12 @@ $pdo->prepare("INSERT INTO outreach_followups (lead_id, touch_number, scheduled_
     ->execute([$leadId4]);
 $fuId = (int) $pdo->lastInsertId();
 
-// First claim — should succeed
+// First claim, should succeed
 $claim1 = $pdo->prepare("UPDATE outreach_followups SET status = 'sent', sent_at = NOW() WHERE id = ? AND status = 'approved'");
 $claim1->execute([$fuId]);
 assert_true($claim1->rowCount() === 1, "First claim wins (rowCount=1)");
 
-// Second claim — should lose (status is now 'sent', not 'approved')
+// Second claim, should lose (status is now 'sent', not 'approved')
 $claim2 = $pdo->prepare("UPDATE outreach_followups SET status = 'sent', sent_at = NOW() WHERE id = ? AND status = 'approved'");
 $claim2->execute([$fuId]);
 assert_true($claim2->rowCount() === 0, "Second claim loses (rowCount=0)");

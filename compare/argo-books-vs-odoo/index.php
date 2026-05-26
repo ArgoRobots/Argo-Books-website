@@ -20,7 +20,7 @@ $plans = get_plan_features();
         content="Argo Books vs Odoo, Odoo alternative, Odoo alternative small business, simple bookkeeping software, small business accounting, affordable accounting software, Odoo accounting alternative">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Odoo — Simple Finance Management Without the ERP Complexity">
+    <meta property="og:title" content="Argo Books vs Odoo: Simple Finance Management Without the ERP Complexity">
     <meta property="og:description"
         content="Compare Argo Books and Odoo side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
     <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-odoo/">
@@ -30,13 +30,13 @@ $plans = get_plan_features();
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Odoo — Simple Finance Management Without the ERP Complexity">
+    <meta name="twitter:title" content="Argo Books vs Odoo: Simple Finance Management Without the ERP Complexity">
     <meta name="twitter:description"
         content="Compare Argo Books and Odoo side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -68,7 +68,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month."
                     }
                 },
                 {
@@ -84,7 +84,7 @@ $plans = get_plan_features();
                     "name": "Does Argo Books have CRM or HR features?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice. Argo Books is designed to do fewer things really well — it's simple to learn and doesn't require a consultant to set up."
+                        "text": "No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice. Argo Books is designed to do fewer things really well: it's simple to learn and doesn't require a consultant to set up."
                     }
                 },
                 {
@@ -100,7 +100,7 @@ $plans = get_plan_features();
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy."
                     }
                 }
             ]
@@ -108,7 +108,7 @@ $plans = get_plan_features();
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Odoo — Simpler & More Affordable | Argo Books</title>
+    <title>Argo Books vs Odoo: Simpler & More Affordable | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -162,14 +162,14 @@ $plans = get_plan_features();
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>Odoo Enterprise charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $10 CAD/month — no per-user fees.</p>
+                    <p>Odoo Enterprise charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $10 CAD/month, with no per-user fees.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
                         <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
                     <h3>Simple from day one</h3>
-                    <p>Odoo's learning curve is steep — it's a full ERP with hundreds of modules. Argo Books is focused and intuitive, so you can get started in minutes, not weeks.</p>
+                    <p>Odoo's learning curve is steep: it's a full ERP with hundreds of modules. Argo Books is focused and intuitive, so you can get started in minutes, not weeks.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -290,7 +290,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Flat pricing vs per-user fees</h2>
-                <p class="section-desc">Odoo's Enterprise plan starts at $44 CAD/user/month and scales up with every team member. Argo Books is a flat $10 CAD/month for Premium — no per-user charges.</p>
+                <p class="section-desc">Odoo's Enterprise plan starts at $44 CAD/user/month and scales up with every team member. Argo Books is a flat $10 CAD/month for Premium, with no per-user charges.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -375,7 +375,7 @@ $plans = get_plan_features();
                 </div>
                 <h3>An honest take</h3>
                 <p>Odoo is a powerful, full-featured ERP platform with CRM, HR, manufacturing, e-commerce, and hundreds of other modules. If your business needs an all-in-one enterprise system, Odoo is hard to beat.</p>
-                <p>But if you're a small business that just needs straightforward finance management, inventory tracking, and invoicing without configuring an entire ERP — Argo Books gets you there in minutes, not weeks.</p>
+                <p>But if you're a small business that just needs straightforward finance management, inventory tracking, and invoicing without configuring an entire ERP, Argo Books gets you there in minutes, not weeks.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -398,7 +398,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
                             <p>Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month.</p>
                         </div>
                     </div>
@@ -429,7 +429,7 @@ $plans = get_plan_features();
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>No. Argo Books is focused on finance management, inventory, invoicing, and financial reporting. If you need CRM, HR, manufacturing, or other enterprise modules, Odoo is the better choice.</p>
-                            <p>Argo Books is designed to do fewer things really well — it's simple to learn and doesn't require a consultant to set up.</p>
+                            <p>Argo Books is designed to do fewer things really well: it's simple to learn and doesn't require a consultant to set up.</p>
                         </div>
                     </div>
                 </div>
@@ -458,7 +458,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Odoo Online is web-based, and self-hosted Odoo can run on any server but requires technical expertise to deploy.</p>
                         </div>
                     </div>

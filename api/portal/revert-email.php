@@ -96,7 +96,7 @@ function revert_layout(string $title, string $body): string {
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>$titleSafe — Argo Books</title>
+            <title>$titleSafe | Argo Books</title>
             <style>
                 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; max-width: 540px; margin: 4rem auto; padding: 2rem; color: #111; }
                 h2 { margin-top: 0; }

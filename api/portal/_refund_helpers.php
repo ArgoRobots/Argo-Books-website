@@ -37,7 +37,7 @@ function refund_mask_email(string $email): string {
 
 /**
  * Reject the request with 409 if the current state isn't in $allowed.
- * Echoes JSON body and calls exit() — caller does not return.
+ * Echoes JSON body and calls exit(). Caller does not return.
  */
 function refund_assert_state(string $current, array $allowed, string $action): void {
     if (!in_array($current, $allowed, true)) {
@@ -139,7 +139,7 @@ HTML;
 
 /**
  * Notification sent to the *customer* when a refund completes. Distinct from
- * refund_email_send_issued (which goes to the business owner) — wording is
+ * refund_email_send_issued (which goes to the business owner). Wording is
  * customer-facing and tells them what to expect in their bank/card account.
  */
 function refund_email_send_customer_refunded(string $to, ?string $customer_name, string $invoice_number, int $amount_cents, string $currency, ?string $business_name = null, ?string $reason = null): void {
@@ -149,7 +149,7 @@ function refund_email_send_customer_refunded(string $to, ?string $customer_name,
     $business_safe = !empty($business_name) ? htmlspecialchars($business_name) : 'the merchant';
     $subject       = "Your refund for invoice $invoice_safe has been issued";
 
-    // Optional reason from the merchant — surfaced in a quoted block so the
+    // Optional reason from the merchant: surfaced in a quoted block so the
     // customer sees the explanation the business owner typed. The UI tells
     // the owner that this will be shown.
     $reason_html = '';
@@ -177,7 +177,7 @@ HTML;
  * Single point that fires *all* notifications when a refund_request transitions
  * to 'completed'. Always emails the business owner; additionally emails the
  * customer if portal_invoices has a customer_email on file. Safe to call
- * multiple times — the underlying mailer sends per call, so callers should
+ * multiple times: the underlying mailer sends per call, so callers should
  * only invoke this once per actual state transition (i.e. inside the same
  * `if (state was not yet completed)` guard that issues the UPDATE).
  */
@@ -253,7 +253,7 @@ function refund_email_send_change_new_code(string $to, string $code): void {
         <p>You're being added as the new owner email for an Argo Books portal account.</p>
         <p>Confirm with this code:</p>
         <p style="font-size:28px;font-weight:bold;letter-spacing:6px;">$code</p>
-        <p>If you didn't expect this, ignore this email — without confirmation the change cannot complete.</p>
+        <p>If you didn't expect this, ignore this email. Without confirmation the change cannot complete.</p>
 HTML;
     send_styled_email($to, "Confirm this is your new Argo Books email", $body, 'blue');
 }
@@ -291,7 +291,7 @@ HTML;
  * but gives them a permanent inbox record + a clean reply-to-resolve flow.
  * Reply-To is set to contact@argorobots.com so a plain Reply gets the
  * message to the admin inbox (where the matching admin alert already lives).
- * Best-effort — caller wraps in try/catch.
+ * Best-effort, caller wraps in try/catch.
  */
 function refund_email_send_hard_block(string $to, array $req): void {
     $amount_str = htmlspecialchars(number_format($req['amount_cents'] / 100, 2) . ' ' . $req['currency']);
@@ -311,7 +311,7 @@ HTML;
  * hard-blocks a refund (and locks the merchant's account). The alert carries
  * enough context to investigate the lock without logging into the DB:
  * company info, refund details, the velocity diagnostic that tripped, and a
- * link to the audit log entry. Best-effort — caller wraps in try/catch.
+ * link to the audit log entry. Best-effort, caller wraps in try/catch.
  */
 function refund_notify_admin_of_hard_block(array $company, array $request, array $velocity, int $request_id): void {
     $base = rtrim($_ENV['SITE_URL'] ?? 'https://argorobots.com', '/');
@@ -334,7 +334,7 @@ function refund_notify_admin_of_hard_block(array $company, array $request, array
 
     $subject = "[Argo Books] Refund hard-block: company #$company_id ($company_name)";
     $body = <<<HTML
-        <p><strong>An automated safety check has paused refunds on a portal account.</strong> This often catches false positives — review and unlock if legitimate.</p>
+        <p><strong>An automated safety check has paused refunds on a portal account.</strong> This often catches false positives. Review and unlock if legitimate.</p>
 
         <h3 style="margin-top:24px;">Company</h3>
         <ul>
@@ -382,9 +382,9 @@ HTML;
 
 /**
  * Map a provider's refund-API response status to one of:
- *   'completed'  — terminal success; money is back on the customer's card
- *   'failed'     — terminal failure; refund will not happen
- *   'processing' — non-terminal (PENDING etc.); webhook/cron must finalize
+ *   'completed':  terminal success; money is back on the customer's card
+ *   'failed':     terminal failure; refund will not happen
+ *   'processing': non-terminal (PENDING etc.); webhook/cron must finalize
  *
  * Critically: a non-throwing provider call is NOT proof of success. PayPal and
  * Square frequently return PENDING for bank-funded refunds that later fail or
@@ -393,7 +393,7 @@ HTML;
  */
 function refund_classify_provider_status(string $provider, ?string $status): string {
     if ($status === null) {
-        // No status field returned — be conservative.
+        // No status field returned; be conservative.
         return 'processing';
     }
     switch ($provider) {
@@ -423,7 +423,7 @@ function refund_classify_provider_status(string $provider, ?string $status): str
  * Idempotently write the negative-amount portal_payments row + flip the
  * original payment's status + update the invoice balance. Mirrors what
  * the provider webhook does. Safe to call from both the synchronous path
- * and the webhook — record_portal_payment is keyed on provider_payment_id
+ * and the webhook: record_portal_payment is keyed on provider_payment_id
  * ('refund_' . $refund_id) so the second call is a no-op.
  *
  * Returns true if this call inserted a new ledger row, false if it was
@@ -462,7 +462,7 @@ function refund_record_ledger(PDO $pdo, array $req, string $refund_id, ?array $c
         return false; // webhook (or a prior call) already wrote this row
     }
 
-    // Cumulative-refund check — flip the original payment to 'refunded'
+    // Cumulative-refund check: flip the original payment to 'refunded'
     // only once refunds cover its full amount. Without this guard, a
     // partial refund flips the original to 'refunded' and the books read
     // as fully refunded.
@@ -572,12 +572,12 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         }
 
         if ($outcome === 'processing') {
-            // Non-terminal status — the request stays in 'processing'.
+            // Non-terminal status: the request stays in 'processing'.
             // The provider webhook will flip to completed (and write the
             // ledger row) when the money actually moves. If the webhook
             // is lost, the stale-processing cron picks the request up
             // 30 minutes after updated_at and reconciles via the
-            // provider's API. NO customer notification is sent here —
+            // provider's API. NO customer notification is sent here:
             // we don't tell the customer the refund is done until it is.
             audit_log($pdo, (int)$company['id'], 'provider_pending', 'system', null, $request_id, null, [
                 'provider_status' => $status,
@@ -586,7 +586,7 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
             return;
         }
 
-        // outcome === 'completed' — write the negative-amount portal_payments
+        // outcome === 'completed': write the negative-amount portal_payments
         // row + invoice balance update BEFORE marking the refund_request
         // completed. record_portal_payment is keyed on provider_payment_id
         // ('refund_' . $refund_id) and is idempotent, so the webhook arriving
@@ -598,7 +598,7 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
 
         // CAS-style transition: only flip if still in a pre-completed state.
         // Guards against a race where the provider webhook arrives between
-        // refund_record_ledger above and this UPDATE — in that case the
+        // refund_record_ledger above and this UPDATE: in that case the
         // webhook's CAS update wins, this one is a no-op, and notification
         // fires once over there.
         // cancel_token = NULL alongside the terminal transition (see /failed/ note above).
@@ -613,7 +613,7 @@ function refund_execute_against_provider(PDO $pdo, array $company, int $request_
         ]);
         $req['state'] = 'completed';
         $req['provider_refund_id'] = $refund_id;
-        // Notification is best-effort — the money is already back.
+        // Notification is best-effort: the money is already back.
         // SMTP/SQL hiccups must not propagate to the outer catch.
         try { refund_notify_completion($pdo, $req); }
         catch (\Throwable $notifyEx) {

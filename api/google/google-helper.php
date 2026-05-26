@@ -3,7 +3,7 @@
  * Google OAuth Helper Functions
  *
  * Shared authentication and token management for Google API endpoints.
- * Google Sheets is a free feature — authentication uses device ID.
+ * Google Sheets is a free feature: authentication uses device ID.
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
@@ -103,7 +103,7 @@ function store_google_oauth_state(array $authContext, string $state): void
  * Prefers the dedicated GOOGLE_ENCRYPTION_KEY (64-char hex, like
  * PORTAL_ENCRYPTION_KEY). Falls back to deriving from GOOGLE_CLIENT_SECRET
  * for backwards compatibility with tokens encrypted before this env var
- * existed. Returns [primaryKey, fallbackKey|null] — encrypt with primary,
+ * existed. Returns [primaryKey, fallbackKey|null]: encrypt with primary,
  * decrypt by trying primary first then fallback.
  */
 function _google_encryption_keys(): array

@@ -445,7 +445,7 @@ function reddit_settings_tab_render($pdo)
 
 /**
  * Insert the singleton settings row if missing. Defaults are spec-aligned.
- * Tolerates missing table on a fresh install (silent — Phase 1 schema must be run).
+ * Tolerates missing table on a fresh install (silent: Phase 1 schema must be run).
  */
 function reddit_settings_tab_ensure_singleton($pdo): void
 {
@@ -494,7 +494,7 @@ function reddit_settings_tab_fetch_settings($pdo): array
         'auto_disable_removal_rate' => 60,
         'auto_disable_min_replies' => 3,
     ];
-    // `enabled` column was added later — try selecting it, fall back to the
+    // `enabled` column was added later; try selecting it, fall back to the
     // pre-migration schema (and treat the channel as enabled) if it's missing.
     try {
         $stmt = $pdo->prepare("SELECT enabled, rules_score_floor, ai_relevance_floor, daily_post_limit, weekly_post_limit,

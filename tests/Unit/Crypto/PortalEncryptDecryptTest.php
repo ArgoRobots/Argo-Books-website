@@ -20,7 +20,7 @@ final class PortalEncryptDecryptTest extends TestCase
 
     protected function tearDown(): void
     {
-        // Restore the exact prior state — distinguish "set to empty string"
+        // Restore the exact prior state, distinguishing "set to empty string"
         // from "unset" so later tests see the same env they would normally see.
         if ($this->hadOriginalKey) {
             $_ENV['PORTAL_ENCRYPTION_KEY'] = $this->originalKey;
@@ -51,7 +51,7 @@ final class PortalEncryptDecryptTest extends TestCase
     public function test_decrypt_throws_on_tampered_ciphertext(): void
     {
         $ciphertext = portal_encrypt('original');
-        // Flip a byte in the middle of the base64 payload — corrupts ciphertext
+        // Flip a byte in the middle of the base64 payload. This corrupts ciphertext
         // (and tag), causing GCM verification to fail.
         $tampered = substr_replace($ciphertext, 'X', strlen($ciphertext) - 4, 1);
 

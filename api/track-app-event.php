@@ -216,7 +216,7 @@ if ($machine_uuid !== '') {
             exit;
         }
     } catch (PDOException $e) {
-        // Continue — duplicate detection failure shouldn't drop the event.
+        // Continue: duplicate detection failure shouldn't drop the event.
         error_log('track-app-event dedup check failed: ' . $e->getMessage());
     }
 }

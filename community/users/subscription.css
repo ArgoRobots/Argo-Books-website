@@ -189,7 +189,7 @@
     box-shadow: 0 6px 16px rgba(124, 58, 237, 0.28);
 }
 
-/* Scoped neutral cancel — softer than the global .btn-outline-red so it
+/* Scoped neutral cancel: softer than the global .btn-outline-red so it
    doesn't compete with the primary Switch action. Red emerges on hover. */
 .subscription-actions .btn-outline-red {
     background: var(--white);

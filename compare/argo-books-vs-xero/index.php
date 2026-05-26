@@ -20,7 +20,7 @@ $plans = get_plan_features();
         content="Argo Books vs Xero, Xero alternative, Xero alternative Canada, cheap Xero alternative, simple bookkeeping software, small business accounting, affordable accounting software, offline accounting">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books vs Xero — Simpler, Offline-Capable & More Affordable">
+    <meta property="og:title" content="Argo Books vs Xero: Simpler, Offline-Capable & More Affordable">
     <meta property="og:description"
         content="Compare Argo Books and Xero side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management with offline access.">
     <meta property="og:url" content="https://argorobots.com/compare/argo-books-vs-xero/">
@@ -30,13 +30,13 @@ $plans = get_plan_features();
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books vs Xero — Simpler, Offline-Capable & More Affordable">
+    <meta name="twitter:title" content="Argo Books vs Xero: Simpler, Offline-Capable & More Affordable">
     <meta name="twitter:description"
         content="Compare Argo Books and Xero side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management with offline access.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -68,7 +68,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Xero does not offer a free plan — pricing starts at $25 CAD/month after a 30-day trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Xero does not offer a free plan; pricing starts at $25 CAD/month after a 30-day trial."
                     }
                 },
                 {
@@ -100,7 +100,7 @@ $plans = get_plan_features();
                     "name": "What platforms does Argo Books run on?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners. Xero is web-based and also has a mobile app for iOS and Android."
+                        "text": "Argo Books runs natively on Windows, macOS, and Linux. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners. Xero is web-based and also has a mobile app for iOS and Android."
                     }
                 }
             ]
@@ -108,7 +108,7 @@ $plans = get_plan_features();
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books vs Xero — Simpler & More Affordable | Argo Books</title>
+    <title>Argo Books vs Xero: Simpler & More Affordable | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -135,7 +135,7 @@ $plans = get_plan_features();
         </div>
         <div class="container">
             <h1 class="animate-fade-in">Argo Books vs Xero</h1>
-            <p class="hero-subtitle animate-fade-in">Simpler, more affordable finance management — without the cloud dependency.</p>
+            <p class="hero-subtitle animate-fade-in">Simpler, more affordable finance management, without the cloud dependency.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Try Argo Books Free</span>
@@ -169,7 +169,7 @@ $plans = get_plan_features();
                         <?= svg_icon('bolt', 28, '', 1.5) ?>
                     </div>
                     <h3>Works offline</h3>
-                    <p>Xero is cloud-only — no internet, no access to your data. Argo Books is a desktop app that works offline, so your finances are always available and stored locally on your device.</p>
+                    <p>Xero is cloud-only: no internet, no access to your data. Argo Books is a desktop app that works offline, so your finances are always available and stored locally on your device.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
@@ -196,7 +196,7 @@ $plans = get_plan_features();
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
                             <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
-                            <th class="brand-col">Xero<span class="th-sub">Starter — $25 CAD/month</span></th>
+                            <th class="brand-col">Xero<span class="th-sub">Starter: $25 CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -302,7 +302,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">Xero charges $25 to $80 CAD/month depending on the plan — and the Starter plan's 20-invoice cap means most businesses end up on the $60/month plan. Argo Books keeps it simple with affordable pricing.</p>
+                <p class="section-desc">Xero charges $25 to $80 CAD/month depending on the plan, and the Starter plan's 20-invoice cap means most businesses end up on the $60/month plan. Argo Books keeps it simple with affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -387,7 +387,7 @@ $plans = get_plan_features();
                 </div>
                 <h3>An honest take</h3>
                 <p>Xero is a polished, globally popular platform with strong app integrations, unlimited users on every plan, and a clean UI. If your business already works with an accountant or needs deep third-party integrations, Xero is a solid choice.</p>
-                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $60+/month for unlimited invoices — Argo Books is built for you.</p>
+                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $60+/month for unlimited invoices, Argo Books is built for you.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -410,8 +410,8 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever — no credit card, no trial period, no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
-                            <p>Xero does not offer a free plan — pricing starts at $25 CAD/month after a 30-day trial.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Xero does not offer a free plan. Pricing starts at $25 CAD/month after a 30-day trial.</p>
                         </div>
                     </div>
                 </div>
@@ -470,7 +470,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive — no browser tabs, no loading spinners.</p>
+                            <p>Argo Books runs natively on <strong>Windows</strong>, <strong>macOS</strong>, and <strong>Linux</strong>. Because it's a desktop app, it's fast and responsive, with no browser tabs and no loading spinners.</p>
                             <p>Xero is web-based and also has a mobile app for iOS and Android.</p>
                         </div>
                     </div>

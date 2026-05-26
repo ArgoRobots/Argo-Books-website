@@ -39,10 +39,10 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     <meta name="twitter:title" content="Pricing - Argo Books">
     <meta name="twitter:description"
         content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses%2C+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+%E2%80%94+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses%2C+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/pricing/">
@@ -58,7 +58,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "How does the Free plan work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is free to download and use — no credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month. You can use it for as long as you like."
+                        "text": "Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month. You can use it for as long as you like."
                     }
                 },
                 {
@@ -66,7 +66,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "What does Premium unlock?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year — the annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
+                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
                     }
                 },
                 {
@@ -74,7 +74,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "I have multiple companies. Do I need to pay extra?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "No. Argo Books supports an unlimited number of companies — even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized. There's no per-company fee, no upgrade required, and no cap on how many businesses you can run."
+                        "text": "No. Argo Books supports an unlimited number of companies, even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized. There's no per-company fee, no upgrade required, and no cap on how many businesses you can run."
                     }
                 },
                 {
@@ -82,7 +82,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Can I cancel or change my plan anytime?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can cancel your Premium subscription at any time from your customer portal — no phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period. You can also switch between monthly and yearly billing whenever it suits you."
+                        "text": "Yes. You can cancel your Premium subscription at any time from your customer portal. No phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period. You can also switch between monthly and yearly billing whenever it suits you."
                     }
                 },
                 {
@@ -90,7 +90,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Do I need to install anything?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes — Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
+                        "text": "Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too. You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import."
                     }
                 },
                 {
@@ -98,7 +98,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Is my payment information secure?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely. All payments are processed through Stripe, PayPal, or Square — we never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide. Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks."
+                        "text": "Absolutely. All payments are processed through Stripe, PayPal, or Square. We never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide. Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks."
                     }
                 },
                 {
@@ -106,7 +106,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "Do I still need an accountant?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books — it keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare. If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in report generator can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries — everything an accountant typically asks for."
+                        "text": "For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books. It keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare. If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in report generator can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries: everything an accountant typically asks for."
                     }
                 },
                 {
@@ -114,7 +114,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "What if I need help getting started?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "We've got you covered. All users have access to our documentation and community forum. Premium subscribers get priority support with faster response times. You can also reach us through our contact page — we're a small team and we personally read every message."
+                        "text": "We've got you covered. All users have access to our documentation and community forum. Premium subscribers get priority support with faster response times. You can also reach us through our contact page. We're a small team and we personally read every message."
                     }
                 }
             ]
@@ -223,7 +223,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <span>Made in Saskatoon, Canada</span>
                 </div>
                 <h2>Same price forever. No price creep</h2>
-                <p class="honest-pricing-lede">We're a small Canadian team — no investors pushing us to inflate prices or game your renewal. The price you see is the price you pay. This year, next year, always.</p>
+                <p class="honest-pricing-lede">We're a small Canadian team, with no investors pushing us to inflate prices or game your renewal. The price you see is the price you pay. This year, next year, always.</p>
 
                 <div class="honest-pricing-compare">
                     <div class="compare-card compare-them">
@@ -233,7 +233,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                             <span class="compare-arrow">&rarr;</span>
                             <span class="compare-price-end">$26<small>/mo</small></span>
                         </div>
-                        <p class="compare-desc">"70% off for 4 months" — then a 233% price jump on the 5th bill.</p>
+                        <p class="compare-desc">"70% off for 4 months", then a 233% price jump on the 5th bill.</p>
                     </div>
                     <div class="compare-card compare-us">
                         <span class="compare-label">Argo Books</span>
@@ -251,7 +251,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </li>
                     <li>
                         <?= svg_icon('check', 18) ?>
-                        <span>No annual price hikes — your rate is locked in</span>
+                        <span>No annual price hikes. Your rate is locked in</span>
                     </li>
                     <li>
                         <?= svg_icon('check', 18) ?>
@@ -259,7 +259,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </li>
                     <li>
                         <?= svg_icon('check', 18) ?>
-                        <span>Cancel in two clicks — no phone calls</span>
+                        <span>Cancel in two clicks, no phone calls</span>
                     </li>
                 </ul>
             </div>
@@ -277,7 +277,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <span>Premium Features</span>
                 </div>
                 <h2>Everything you unlock with Premium</h2>
-                <p>The complete toolkit for running your business — AI-powered, unlimited, and built to save you time.</p>
+                <p>The complete toolkit for running your business: AI-powered, unlimited, and built to save you time.</p>
             </div>
         </div>
     </section>
@@ -292,7 +292,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <div class="feature-detail-text">
                     <span class="section-label">AI-Powered</span>
                     <h2>Scan receipts in seconds, not minutes</h2>
-                    <p>Point your camera at any receipt and Argo Books extracts the supplier, date, and total automatically — no typing required. Receipts are categorized and attached to your expense records instantly.</p>
+                    <p>Point your camera at any receipt and Argo Books extracts the supplier, date, and total automatically, with no typing required. Receipts are categorized and attached to your expense records instantly.</p>
                     <ul class="feature-checklist">
                         <li><?= svg_icon('check', 20) ?><span>500 receipt scans per month</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Auto-categorized by expense type</span></li>
@@ -316,7 +316,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <div class="feature-detail-text">
                     <span class="section-label">Smart Insights</span>
                     <h2>See where your revenue is heading</h2>
-                    <p>Argo Books analyzes your historical data to surface trends and forecast revenue. Built-in charts show where your business is headed — no spreadsheets or external tools needed.</p>
+                    <p>Argo Books analyzes your historical data to surface trends and forecast revenue. Built-in charts show where your business is headed, with no spreadsheets or external tools needed.</p>
                     <ul class="feature-checklist">
                         <li><?= svg_icon('check', 20) ?><span>Revenue and expense forecasting</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Seasonal trend detection</span></li>
@@ -362,7 +362,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                 <div class="feature-detail-text">
                     <span class="section-label">Get Paid Faster</span>
                     <h2>Send unlimited invoices and accept online payments</h2>
-                    <p>The free plan caps invoices at 25 per month. Premium removes that limit entirely — and adds online payment links so customers can pay directly from the invoice by credit card.</p>
+                    <p>The free plan caps invoices at 25 per month. Premium removes that limit entirely, and adds online payment links so customers can pay directly from the invoice by credit card.</p>
                     <ul class="feature-checklist">
                         <li><?= svg_icon('check', 20) ?><span>Unlimited invoices with no monthly cap</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Online payment links via Stripe, PayPal &amp; Square</span></li>
@@ -406,7 +406,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Unlimited Invoices</h3>
-                    <p>Send as many invoices as your business demands and accept online payments directly — no monthly cap, ever.</p>
+                    <p>Send as many invoices as your business demands and accept online payments directly. No monthly cap, ever.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon amber">
@@ -420,14 +420,14 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <?= svg_icon('message-circle', 22) ?>
                     </div>
                     <h3>Priority Support</h3>
-                    <p>Premium subscribers get to the front of the queue — real help, faster, when something needs attention.</p>
+                    <p>Premium subscribers get to the front of the queue: real help, faster, when something needs attention.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
                     <h3>Higher AI Limits</h3>
-                    <p>500 receipt scans and expanded AI headroom each month — built to keep up as your business grows.</p>
+                    <p>500 receipt scans and expanded AI headroom each month, built to keep up as your business grows.</p>
                 </div>
             </div>
         </div>
@@ -465,7 +465,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is free to download and use — no credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month.</p>
+                            <p>Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month.</p>
                             <p>You can use it for as long as you like. When your business needs more, upgrading to Premium takes just a few clicks.</p>
                         </div>
                     </div>
@@ -481,7 +481,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support.</p>
-                            <p>Premium is available at <strong>$<?php echo number_format($monthlyPrice, 0); ?> CAD/month</strong> or <strong>$<?php echo number_format($yearlyPrice, 0); ?> CAD/year</strong> — the annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
+                            <p>Premium is available at <strong>$<?php echo number_format($monthlyPrice, 0); ?> CAD/month</strong> or <strong>$<?php echo number_format($yearlyPrice, 0); ?> CAD/year</strong>. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
                         </div>
                     </div>
                 </div>
@@ -495,7 +495,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>No. Argo Books supports an unlimited number of companies — even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized.</p>
+                            <p>No. Argo Books supports an unlimited number of companies, even on the Free plan. Each business gets its own separate transactions, invoices, and reports, so you can keep everything cleanly organized.</p>
                             <p>There's no per-company fee, no upgrade required, and no cap on how many businesses you can run.</p>
                         </div>
                     </div>
@@ -510,7 +510,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. You can cancel your Premium subscription at any time from your <a href="../portal/">customer portal</a> — no phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period.</p>
+                            <p>Yes. You can cancel your Premium subscription at any time from your <a href="../portal/">customer portal</a>. No phone calls, no hoops to jump through. Your Premium features stay active until the end of your current billing period.</p>
                             <p>You can also switch between monthly and yearly billing whenever it suits you. If you believe you're entitled to a refund, <a href="../contact.php">get in touch</a> and we'll review your request. <a href="../legal/refund.php">View full refund policy</a></p>
                         </div>
                     </div>
@@ -525,7 +525,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes — Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
+                            <p>Yes. Argo Books is a desktop application, which is what makes it fast and private. Download the installer for Windows, macOS, or Linux, and you're up and running in under a minute. Because your data lives on your computer, Argo Books works offline too.</p>
                             <p>You only need an internet connection for AI-powered features like receipt scanning and spreadsheet import. <a href="../downloads/">Download Argo Books</a></p>
                         </div>
                     </div>
@@ -540,7 +540,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Absolutely. All payments are processed through Stripe, PayPal, or Square — we never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide.</p>
+                            <p>Absolutely. All payments are processed through Stripe, PayPal, or Square. We never see or store your card details. These are PCI-compliant payment processors trusted by millions of businesses worldwide.</p>
                             <p>Your Argo Books business data is also encrypted locally with AES-256-GCM, the same standard used by banks.</p>
                         </div>
                     </div>
@@ -555,8 +555,8 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books — it keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare.</p>
-                            <p>If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in <a href="../documentation/pages/features/report-generator.php">report generator</a> can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries — everything an accountant typically asks for.</p>
+                            <p>For day-to-day bookkeeping, probably not. Argo Books is designed to be simple enough that any small business owner can manage their own books. It keeps your transactions organized and produces the financial reports you'd otherwise pay someone to prepare.</p>
+                            <p>If you do work with an accountant at tax time, you can simply hand them your Argo Books file. The built-in <a href="../documentation/pages/features/report-generator.php">report generator</a> can produce income statements, balance sheets, cash flow statements, general ledgers, accounts receivable aging, and tax summaries: everything an accountant typically asks for.</p>
                         </div>
                     </div>
                 </div>
@@ -571,7 +571,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>We've got you covered. All users have access to our <a href="../documentation/">documentation</a> and <a href="../community/">community forum</a>. Premium subscribers get priority support with faster response times.</p>
-                            <p>You can also reach us through our <a href="../contact.php">contact page</a> — we're a small team and we personally read every message.</p>
+                            <p>You can also reach us through our <a href="../contact.php">contact page</a>. We're a small team and we personally read every message.</p>
                         </div>
                     </div>
                 </div>

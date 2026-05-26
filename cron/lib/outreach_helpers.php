@@ -64,7 +64,7 @@ require_once __DIR__ . '/ab_helpers.php';
 
 /**
  * Which A/B phase a variant type belongs to. The framework keeps one test
- * active per phase — first-touch tests (subject/body/cta/sender/preheader/
+ * active per phase. First-touch tests (subject/body/cta/sender/preheader/
  * format/personalization) and follow-up tests (followup_sequence) measure
  * different emails, so they can run concurrently without confounding.
  */
@@ -109,7 +109,7 @@ function get_active_ab_test($pdo, $variantType)
 /**
  * Find the single active first-touch A/B test (subject / body / cta / sender /
  * preheader / format / personalization) and its variants, or null. Used by
- * the draft generator for outgoing first emails — followup_sequence tests
+ * the draft generator for outgoing first emails. followup_sequence tests
  * are looked up separately at follow-up-schedule time, so they should not
  * leak into first-email attribution.
  */
@@ -136,7 +136,7 @@ function get_single_active_first_touch_test($pdo)
  * Pick a variant for the given lead, deterministically per-(lead, test).
  *
  * Previously this counted leads-already-assigned and used count % variants for
- * exact round-robin — but the count was read before the caller persisted the
+ * exact round-robin, but the count was read before the caller persisted the
  * assignment, so two concurrent draft-generation calls (the bulk-draft batch
  * runs three at a time) would both read the same count and assign the same
  * variant. Hashing (leadId, testId) instead is race-free and gives an even
@@ -147,7 +147,7 @@ function pick_ab_variant($pdo, $test, $variants, $lead = null)
     $count = count($variants);
     $leadId = is_array($lead) && isset($lead['id']) ? (int) $lead['id'] : 0;
     if ($leadId <= 0) {
-        // Defensive fallback for callers that don't pass a lead — pick a
+        // Defensive fallback for callers that don't pass a lead: pick a
         // uniformly random variant rather than collapsing to index 0.
         $idx = random_int(0, $count - 1);
     } else {
@@ -183,14 +183,14 @@ function ab_subject_instruction_for_variant($variant)
 {
     $parsed = ab_parse_variant_content($variant);
     if ($parsed['mode'] === 'directive') {
-        return "\n- SUBJECT LINE OVERRIDE: The text inside the quotes below is a STYLE INSTRUCTION, not the subject itself. Generate your own original short subject line (under 60 characters, no em dashes) in the style described — do NOT copy, echo, paraphrase, or include any of the instruction's wording in your output. Style instruction: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
+        return "\n- SUBJECT LINE OVERRIDE: The text inside the quotes below is a STYLE INSTRUCTION, not the subject itself. Generate your own original short subject line (under 60 characters, no em dashes) in the style described. Do NOT copy, echo, paraphrase, or include any of the instruction's wording in your output. Style instruction: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
     }
     return "\n- SUBJECT LINE OVERRIDE: use exactly this subject line, word for word, with no changes: \"" . $parsed['text'] . "\". This overrides any other guidance about subject lines above.";
 }
 
 /**
- * Body instruction builder. The override controls body shape — paragraph
- * count, opener style, tone, length — but explicitly preserves the
+ * Body instruction builder. The override controls body shape (paragraph
+ * count, opener style, tone, length) but explicitly preserves the
  * non-negotiable structural elements (website URL, {UNSUBSCRIBE_URL}
  * placeholder, three-line sign-off).
  */
@@ -200,7 +200,7 @@ function ab_body_instruction_for_variant($variant)
     if ($parsed['mode'] === 'directive') {
         return "\n- BODY OVERRIDE: write the email body in the style described by this directive: \"" . $parsed['text'] . "\". This style guidance overrides the paragraph count, opener style, and tone rules above. You MUST still include the https://argorobots.com/ link, the {UNSUBSCRIBE_URL} placeholder line, and the \"All the best, / Evan / Argo Books\" sign-off exactly as specified.";
     }
-    return "\n- BODY OVERRIDE: the email body must be exactly this text, word for word: \"" . $parsed['text'] . "\". The {UNSUBSCRIBE_URL} placeholder and the https://argorobots.com/ link inside this text will be processed before sending — keep them as written.";
+    return "\n- BODY OVERRIDE: the email body must be exactly this text, word for word: \"" . $parsed['text'] . "\". The {UNSUBSCRIBE_URL} placeholder and the https://argorobots.com/ link inside this text will be processed before sending; keep them as written.";
 }
 
 /**
@@ -214,7 +214,7 @@ function ab_cta_instruction_for_variant($variant)
     if ($parsed['mode'] === 'directive') {
         return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. Instead, phrase the offer in line with this directive: \"" . $parsed['text'] . "\". Work it in naturally; do not list it like a bullet point.";
     }
-    return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. The offer in this email must be exactly: \"" . $parsed['text'] . "\". Phrase it naturally inside the body — do not just paste it as a quoted line.";
+    return "\n- OFFER OVERRIDE: ignore the \"free 1-year premium license in exchange for feedback\" offer above. The offer in this email must be exactly: \"" . $parsed['text'] . "\". Phrase it naturally inside the body; do not just paste it as a quoted line.";
 }
 
 /**
@@ -256,11 +256,11 @@ function log_activity($pdo, $lead_id, $action_type, $details = null)
  * The optional &$reason out-param disambiguates non-success outcomes for
  * callers that need to distinguish a real send failure from a benign skip
  * (race-condition guard, suppression list, invalid email). Possible values:
- *   'sent'         — email delivered, lead marked contacted
- *   'already_sent' — atomic claim lost (another process already sent it)
- *   'suppressed'   — email is on the outreach suppression list
- *   'invalid_email'— lead's email is missing or malformed
- *   'smtp_failed'  — SMTP/transport failure (the only "real failure" reason)
+ *   'sent':          email delivered, lead marked contacted
+ *   'already_sent':  atomic claim lost (another process already sent it)
+ *   'suppressed':    email is on the outreach suppression list
+ *   'invalid_email': lead's email is missing or malformed
+ *   'smtp_failed':   SMTP/transport failure (the only "real failure" reason)
  * Existing callers that ignore the param still get the correct bool result.
  */
 function send_outreach_lead($pdo, $lead, &$reason = null)
@@ -275,7 +275,7 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
     // This sets sent_at = NOW() up front so only one process wins. If the
     // SMTP send subsequently fails, we restore sent_at = NULL below so the
     // lead remains sendable. The remaining failure mode is a process crash
-    // between this claim and the actual send — sent_at would stay set with
+    // between this claim and the actual send. sent_at would stay set with
     // no email having gone out. That's preferable to duplicate sends to a
     // prospect, and is recoverable by manually clearing sent_at.
     $claimStmt = $pdo->prepare(
@@ -338,7 +338,7 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
             if ($vRow['variant_type'] === 'sender') {
                 // Strip CR/LF defensively. PHPMailer sanitizes headers, but
                 // the mail() fallback path concatenates $fromName into the
-                // From: header verbatim — a stray newline could enable
+                // From: header verbatim, so a stray newline could enable
                 // header injection if a variant's content was malformed.
                 $fromName = preg_replace('/[\r\n]+/', ' ', $vContent);
             } elseif ($vRow['variant_type'] === 'preheader') {
@@ -429,7 +429,7 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
         return true;
     }
 
-    // SMTP send failed — release the claim so retries / manual re-send work.
+    // SMTP send failed: release the claim so retries / manual re-send work.
     $pdo->prepare("UPDATE outreach_leads SET sent_at = NULL WHERE id = ?")->execute([$id]);
     $reason = 'smtp_failed';
     return false;
@@ -442,8 +442,8 @@ function send_outreach_lead($pdo, $lead, &$reason = null)
  * (set during first-touch drafting) onto every follow-up row so all touches
  * in the sequence use the same followup_sequence variant.
  *
- * Idempotent at the row level via UNIQUE KEY (lead_id, touch_number) —
- * a re-call (e.g. after a manual resend) will silently no-op on already-
+ * Idempotent at the row level via UNIQUE KEY (lead_id, touch_number).
+ * A re-call (e.g. after a manual resend) will silently no-op on already-
  * existing rows.
  *
  * Returns the number of rows actually inserted.
@@ -460,12 +460,12 @@ function schedule_followups_for_lead($pdo, int $leadId, ?int $abTestId = null, ?
 
     $config = json_decode($configJson, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log('schedule_followups_for_lead: followup_sequence_config contains invalid JSON (' . json_last_error_msg() . ') — no follow-ups scheduled for lead #' . $leadId);
+        error_log('schedule_followups_for_lead: followup_sequence_config contains invalid JSON (' . json_last_error_msg() . '), no follow-ups scheduled for lead #' . $leadId);
         return 0;
     }
     if (!is_array($config) || empty($config)) return 0;
 
-    // The lead's first-touch sent_at — needed as the anchor for scheduled_for.
+    // The lead's first-touch sent_at: needed as the anchor for scheduled_for.
     $leadStmt = $pdo->prepare("SELECT sent_at FROM outreach_leads WHERE id = ?");
     $leadStmt->execute([$leadId]);
     $leadRow = $leadStmt->fetch();
@@ -527,7 +527,7 @@ function draft_followup_via_gemini($pdo, array $followupRow): bool
     $leadStmt->execute([$leadId]);
     $lead = $leadStmt->fetch();
     if (!$lead) {
-        // Lead deleted — mark followup failed permanently
+        // Lead deleted: mark followup failed permanently
         $pdo->prepare("UPDATE outreach_followups SET status = 'failed', draft_attempts = draft_attempts + 1 WHERE id = ?")
             ->execute([$followupId]);
         return false;
@@ -612,7 +612,7 @@ function draft_followup_via_gemini($pdo, array $followupRow): bool
         . "- Signs off 'All the best,\\nEvan\\nArgo Books'.\n"
         . "\n"
         . "Output as JSON exactly: {\"subject\": \"...\", \"body\": \"...\"}\n"
-        . "The subject should NOT include 'Re:' — that prefix is added automatically.";
+        . "The subject should NOT include 'Re:'; that prefix is added automatically.";
 
     // call_gemini($systemPrompt, $userPrompt) returns ['content' => '...'] on success
     // or ['error' => '...'] on failure.
@@ -671,7 +671,7 @@ function halt_followups_for_lead($pdo, int $leadId, string $haltReason = 'manual
  * Bulk halt: mark pre-sent follow-up rows as halted for any lead in a
  * stop-condition status, or whose email is in email_suppressions (context='outreach').
  *
- * Called from stepHaltFollowups on each cron tick. Idempotent — only touches
+ * Called from stepHaltFollowups on each cron tick. Idempotent: only touches
  * rows still in scheduled/drafted/approved state.
  *
  * Returns an associative array of halt_reason => count for logging.
@@ -752,7 +752,7 @@ function send_followup_row($pdo, array $followupRow, ?string &$reason = null): b
         return false;
     }
 
-    // Atomic claim — only one process can flip approved → sent
+    // Atomic claim: only one process can flip approved → sent
     $claim = $pdo->prepare(
         "UPDATE outreach_followups
          SET status = 'sent', sent_at = NOW()
@@ -847,7 +847,7 @@ function send_followup_row($pdo, array $followupRow, ?string &$reason = null): b
         return true;
     }
 
-    // SMTP failed — release the claim
+    // SMTP failed: release the claim
     $pdo->prepare("UPDATE outreach_followups SET status = 'approved', sent_at = NULL WHERE id = ?")
         ->execute([$followupId]);
     $reason = 'smtp_failed';
@@ -857,8 +857,8 @@ function send_followup_row($pdo, array $followupRow, ?string &$reason = null): b
 // ─── Email Gatekeeping Helper ───
 
 /**
- * Returns true if the email's local part matches a "gatekept" role prefix —
- * signals a multi-person operation (support desk, partnerships team, etc.)
+ * Returns true if the email's local part matches a "gatekept" role prefix,
+ * signalling a multi-person operation (support desk, partnerships team, etc.)
  * rather than a solo-founder inbox. CASL implied-consent outreach targets
  * individual business owners, so these addresses should be rejected.
  * Returns true for empty/malformed input as a defensive default.
@@ -888,7 +888,7 @@ function filter_gatekept_email($email)
 /**
  * Public entry point for scraping a contact email out of a website. Wraps the
  * actual scraper with a 30-day result cache (table: outreach_scrape_cache) so
- * the same URL doesn't get re-downloaded every cron run — many businesses show
+ * the same URL doesn't get re-downloaded every cron run. Many businesses show
  * up under multiple search queries, and most sites have no scrape-able email
  * at all. A cached NULL is a valid result ("tried, found nothing") so we don't
  * re-attempt for 30 days; after that, the entry expires and we re-check (sites
@@ -899,7 +899,7 @@ function scrape_email_from_website($url)
     if (empty($url)) return null;
 
     // Normalize once and use the same value for the cache key AND the live
-    // scrape — otherwise leading/trailing whitespace produces avoidable scrape
+    // scrape, otherwise leading/trailing whitespace produces avoidable scrape
     // failures and cache mismatches between what we look up and what we store.
     $url = rtrim(trim($url), '/');
     if ($url === '') return null;
@@ -917,10 +917,10 @@ function scrape_email_from_website($url)
                 $stmt->execute([$url]);
                 $row = $stmt->fetch();
                 if ($row !== false) {
-                    return $row['email']; // string OR null — both are valid cached outcomes
+                    return $row['email']; // string OR null, both are valid cached outcomes
                 }
             } catch (PDOException $e) {
-                // Table missing or query failed — fall through to live scrape.
+                // Table missing or query failed: fall through to live scrape.
             }
         }
     }
@@ -945,7 +945,7 @@ function scrape_email_from_website($url)
 }
 
 /**
- * Live email scraper. Don't call directly — use scrape_email_from_website()
+ * Live email scraper. Don't call directly: use scrape_email_from_website()
  * so results get cached.
  */
 function _scrape_email_from_website_uncached($url)
@@ -1072,7 +1072,7 @@ function _scrape_email_from_website_uncached($url)
  * Used by both the admin API endpoint and the cron pipeline.
  *
  * Uses Places API (New) at places.googleapis.com/v1/places:searchText with a
- * FieldMask header so website + phone come back in the search response — no
+ * FieldMask header so website + phone come back in the search response, with no
  * separate Place Details fan-out, which used to dominate the per-lead cost.
  */
 function search_businesses_core($city, $province, $category, $limit, $apiKey, $excludePlaceIds = [], $maxRounds = 5)
@@ -1184,7 +1184,7 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
 
         $result = $callSearchText($body);
         // Only retry on INVALID_ARGUMENT (the status returned for unknown
-        // includedType values) — retrying on auth/rate-limit/5xx errors would
+        // includedType values). Retrying on auth/rate-limit/5xx errors would
         // just double the cost without changing the outcome.
         if (isset($result['error'])
             && isset($body['includedType'])
@@ -1214,12 +1214,12 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
                 if ($placeId && isset($seenPlaceIds[$placeId])) continue;
                 if ($placeId) $seenPlaceIds[$placeId] = true;
 
-                // Filter out closed / temporarily closed places — no useful contact info
+                // Filter out closed / temporarily closed places: no useful contact info
                 $bizStatus = $place['businessStatus'] ?? 'OPERATIONAL';
                 if ($bizStatus !== 'OPERATIONAL') continue;
 
                 $website = $place['websiteUri'] ?? null;
-                // Skip immediately if no website — saves the email scrape attempt
+                // Skip immediately if no website: saves the email scrape attempt
                 if (empty($website)) continue;
 
                 $types = $place['types'] ?? [];
@@ -1324,7 +1324,7 @@ function call_gemini($systemPrompt, $userPrompt)
     // count against maxOutputTokens, so a partial response is a real risk.
     $finishReason = $result['candidates'][0]['finishReason'] ?? '';
     if ($finishReason === 'MAX_TOKENS') {
-        return ['error' => 'Gemini output truncated (MAX_TOKENS) — increase maxOutputTokens or shorten the prompt'];
+        return ['error' => 'Gemini output truncated (MAX_TOKENS): increase maxOutputTokens or shorten the prompt'];
     }
 
     return ['content' => $result['candidates'][0]['content']['parts'][0]['text'] ?? ''];
@@ -1383,7 +1383,7 @@ function generate_draft_for_lead($pdo, $lead)
 
     // A/B variant lookup must happen before the summary block so a
     // personalization test can gate the AI summary call entirely.
-    // Only the active first-touch test is considered here — follow-up tests
+    // Only the active first-touch test is considered here; follow-up tests
     // are looked up separately at follow-up-schedule time so their variants
     // don't leak into first-email attribution.
     //
@@ -1438,7 +1438,7 @@ function generate_draft_for_lead($pdo, $lead)
         // their dispatched instruction is empty and they apply at send time.
     }
 
-    // Generate a business summary if we don't have one yet — unless the lead
+    // Generate a business summary if we don't have one yet, unless the lead
     // is in the 'off' arm of an active personalization test, in which case we
     // skip the AI call entirely. If a stored summary exists from before
     // the test started, mask it for this draft so the prompt truly operates
@@ -1470,7 +1470,7 @@ function generate_draft_for_lead($pdo, $lead)
     } elseif ($isCanadian) {
         $localInstruction = "- The business is outside Saskatchewan but in Canada. Evan is a Canadian software developer. Say \"Canadian software developer\" or \"fellow Canadian small business\", do NOT say \"local\" and do NOT mention Saskatoon or Saskatchewan.";
     } else {
-        $localInstruction = "- The business is in the United States. Evan is an independent software developer (he is Canadian, but do NOT lead with that — it adds nothing for a US recipient and can read as out-of-place). Say \"independent software developer\" or \"solo developer\". Do NOT say \"local\", do NOT mention Saskatoon or Saskatchewan, and do NOT say \"fellow Canadian\".";
+        $localInstruction = "- The business is in the United States. Evan is an independent software developer (he is Canadian, but do NOT lead with that, since it adds nothing for a US recipient and can read as out-of-place). Say \"independent software developer\" or \"solo developer\". Do NOT say \"local\", do NOT mention Saskatoon or Saskatchewan, and do NOT say \"fellow Canadian\".";
     }
 
     $inPersonInstruction = $isSaskatoon
@@ -1512,7 +1512,7 @@ PERSONALIZATION (this is critical):
 - Instead of asserting facts about their business, use general industry knowledge. Say things like \"businesses like yours often deal with...\" or \"in the [industry] space, invoicing can be a hassle\" rather than \"I know you do X\"
 - Only reference Argo Books features that are relevant to their general industry. Do not list every feature
 - If a business summary is provided, use it ONLY to understand their industry and tailor which Argo features to mention. Do NOT parrot back details from the summary as if you personally know about their business
-- EXCEPTION: if the summary lists a \"Recently added product\" name, you MAY reference it ONCE in a natural way (e.g. \"loved the [product name] on your store\"). This is public information from their store, not creepy. Keep it brief and only if it flows naturally — do not force it
+- EXCEPTION: if the summary lists a \"Recently added product\" name, you MAY reference it ONCE in a natural way (e.g. \"loved the [product name] on your store\"). This is public information from their store, not creepy. Keep it brief and only if it flows naturally; do not force it
 - If no summary is available, keep it more general but still mention their industry/category if known
 $painPointsInstruction
 
@@ -1523,10 +1523,10 @@ $painPointsInstruction
 - NEVER use placeholders like [Your Name], [Your Title], [Your Company], etc.
 - ALWAYS include the website link https://argorobots.com/ in the email body. This is required in every single email, no exceptions
 - NEVER use em dashes in the email. Use commas, periods, or regular hyphens instead
-- The subject line should sound like a short personal email one human would send to one specific business owner — NOT marketing copy. Keep it under 7 words, reference the recipient's business if natural, and avoid clickbait hooks like \"A surprising way to...\", \"The secret to...\", \"How [business] can...\", or anything that pattern-matches as a sales template. Lowercase is fine. Good examples: \"Quick question about [business name]\", \"Thought of you guys\", \"feedback on Argo Books?\", \"[business name] — bookkeeping question\". Bad examples: \"A surprising way to save time for [business]\", \"Unlock growth for [business]\", \"Transform your bookkeeping today\"$abSubjectOverride
+- The subject line should sound like a short personal email one human would send to one specific business owner, NOT marketing copy. Keep it under 7 words, reference the recipient's business if natural, and avoid clickbait hooks like \"A surprising way to...\", \"The secret to...\", \"How [business] can...\", or anything that pattern-matches as a sales template. Lowercase is fine. Good examples: \"Quick question about [business name]\", \"Thought of you guys\", \"feedback on Argo Books?\", \"[business name]: bookkeeping question\". Bad examples: \"A surprising way to save time for [business]\", \"Unlock growth for [business]\", \"Transform your bookkeeping today\"$abSubjectOverride
 - You MUST include the line \"You can check it out here: https://argorobots.com/\" (or similar natural phrasing with that exact URL) somewhere in the email body, ideally after mentioning what Argo Books is
 - End the email body with a line like \"Feel free to reply to this email if you have any questions!\" or similar, before the sign-off
-- After that line, add ONE short, respectful unsubscribe line on its own paragraph, such as: \"Not interested? {UNSUBSCRIBE_URL} and I'll stop emailing you.\" The literal token {UNSUBSCRIBE_URL} will be replaced with a tracked unsubscribe link before sending — include it verbatim, do NOT invent or replace the placeholder yourself. Keep the tone soft, brief, and non-pushy.
+- After that line, add ONE short, respectful unsubscribe line on its own paragraph, such as: \"Not interested? {UNSUBSCRIBE_URL} and I'll stop emailing you.\" The literal token {UNSUBSCRIBE_URL} will be replaced with a tracked unsubscribe link before sending. Include it verbatim, and do NOT invent or replace the placeholder yourself. Keep the tone soft, brief, and non-pushy.
 - Always sign off with three separate lines: \"All the best,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
 
 Return your response as JSON with two fields:
@@ -1568,7 +1568,7 @@ Return ONLY the JSON, no other text.";
         return ['success' => true, 'needs_review' => true, 'subject' => $fallbackSubject, 'body' => $placeholderBody];
     }
 
-    // Ensure the website URL is in the body — inject before sign-off if AI omitted it
+    // Ensure the website URL is in the body. Inject before sign-off if AI omitted it
     if (stripos($parsed['body'], 'argorobots.com') === false) {
         $parsed['body'] = preg_replace(
             '/(Feel free to|Don\'t hesitate|Let me know|Reply to this)/i',
@@ -1685,7 +1685,7 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
 
     $trigger = null;
 
-    // Criterion (a) — leader is statistically significant on the chosen
+    // Criterion (a): leader is statistically significant on the chosen
     // metric vs every other variant
     if ($leaderIdx !== null && $minSent >= 30) {
         $allSig = true;
@@ -1702,7 +1702,7 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
         $trigger = 'timebox';
     }
 
-    // Criterion (c) — force-close even if nothing has been sent yet
+    // Criterion (c): force-close even if nothing has been sent yet
     if (!$trigger && $ageDays >= 28) {
         $trigger = 'hard_timeout';
         if ($leaderIdx === null) {
@@ -1757,7 +1757,7 @@ function ab_check_and_promote_active_test($pdo, $variantType = 'subject')
 function generate_ab_subject_variants($pdo, $count = 3)
 {
     // Prefer subjects that actually got a reply over subjects that just got
-    // clicks — replies are the conversion signal we now optimize for. Falls
+    // clicks, since replies are the conversion signal we now optimize for. Falls
     // back to past CTR winners during cold-start (when the replied-subject
     // pool is too small to seed three distinct examples).
     $repliedStmt = $pdo->prepare("
@@ -1795,9 +1795,9 @@ function generate_ab_subject_variants($pdo, $count = 3)
     $winnersText = '';
     if (!empty($priorWinners)) {
         $label = $seedSource === 'replies'
-            ? "Subjects that have actually gotten replies recently — generate variations in this register:"
+            ? "Subjects that have actually gotten replies recently. Generate variations in this register:"
             : ($seedSource === 'replies+winners'
-                ? "Mix of subjects that got replies and past CTR winners (cold-start blend) — generate variations in this register:"
+                ? "Mix of subjects that got replies and past CTR winners (cold-start blend). Generate variations in this register:"
                 : "Recent winning subject strategies (most recent first):");
         $winnersText = "\n\n" . $label . "\n";
         foreach ($priorWinners as $w) {
@@ -1807,7 +1807,7 @@ function generate_ab_subject_variants($pdo, $count = 3)
 
     $systemPrompt = "You generate subject-line directives for an A/B test on a small-business outreach email from Evan, a solo developer, about a simple bookkeeping app called Argo Books.\n\n"
         . "Return STRICT JSON: { \"directives\": [\"directive 1\", \"directive 2\", ...] } with exactly $count entries.\n\n"
-        . "CRITICAL: Each directive describes a STYLE for the writer to follow when crafting one specific lead's subject — it is NOT the subject itself. A second AI will read your directive and generate a fresh subject in that style for each lead. Your directive must NOT look like a subject line.\n\n"
+        . "CRITICAL: Each directive describes a STYLE for the writer to follow when crafting one specific lead's subject; it is NOT the subject itself. A second AI will read your directive and generate a fresh subject in that style for each lead. Your directive must NOT look like a subject line.\n\n"
         . "Bad examples (these read like subject lines, not styles): \"Lead with a personal touch about Argo Books\" / \"Quick question for {business}\" / \"Let's simplify your bookkeeping\"\n"
         . "Good examples (these describe HOW to write, not WHAT to write): \"Open with a one-line curiosity question that mentions the recipient's industry, no product names\" / \"Frame as a peer-to-peer note from one local Saskatoon business owner to another, max 5 words\" / \"Reference a specific category-typical pain point as a question, avoid sounding salesy\"\n\n"
         . "Rules for each directive:\n"
@@ -1860,7 +1860,7 @@ function generate_ab_subject_variants($pdo, $count = 3)
  * 'literal' is true when the contents are stored verbatim (no 'directive: '
  * prefix); ab_start_new_cycle uses that flag to decide whether to carry the
  * prior winner forward. Returns ['directives' => [], 'source' => 'unsupported']
- * for types with no generator — caller treats as failure.
+ * for types with no generator; caller treats as failure.
  */
 function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
 {
@@ -1868,7 +1868,7 @@ function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
         case 'subject':
             return generate_ab_subject_variants($pdo, $count);
         case 'sender':
-            // Small fixed pool — content is the literal from-name.
+            // Small fixed pool: content is the literal from-name.
             return [
                 'directives' => ['Evan', 'Evan from Argo Books', 'Argo Books'],
                 'source' => 'fixed',
@@ -1886,7 +1886,7 @@ function generate_ab_variants_for_type($pdo, $variantType, $count = 3)
                 'source' => 'fixed',
                 'literal' => true,
             ];
-        // body / cta / preheader stay admin-initiated — they need carefully
+        // body / cta / preheader stay admin-initiated: they need carefully
         // crafted copy and have no AI generator. ab_auto_rotation_order()
         // omits them so the cron's rotation never lands here.
         default:
@@ -1918,7 +1918,7 @@ function ab_start_new_cycle($pdo, $variantType = 'subject')
     if ($variantType === 'followup_sequence') {
         $cfgRow = $pdo->query("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'followup_sequence_config'")->fetch();
         if (!$cfgRow) {
-            return ['action' => 'failed', 'variant_type' => $variantType, 'error' => 'followup_sequence_config not set — cannot start cycle'];
+            return ['action' => 'failed', 'variant_type' => $variantType, 'error' => 'followup_sequence_config not set, cannot start cycle'];
         }
         $cfg = json_decode((string) $cfgRow['state_value'], true);
         if (!is_array($cfg) || empty($cfg)) {

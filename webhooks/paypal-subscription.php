@@ -56,7 +56,7 @@ $webhookId = $isProduction
     ? ($_ENV['PAYPAL_LIVE_WEBHOOK_ID'] ?? '')
     : ($_ENV['PAYPAL_SANDBOX_WEBHOOK_ID'] ?? '');
 
-// Verify webhook signature — mandatory in BOTH sandbox and production. Without
+// Verify webhook signature: mandatory in BOTH sandbox and production. Without
 // a configured webhook ID we cannot verify the request and any unauthenticated
 // caller could POST fake billing events to extend subscriptions or insert
 // payment rows.
@@ -137,7 +137,7 @@ try {
 
 /**
  * Handle subscription activated event
- * Called when a subscription is activated — either a new subscription or a reactivation of a suspended one
+ * Called when a subscription is activated: either a new subscription or a reactivation of a suspended one
  */
 function handleSubscriptionActivated($resource) {
     global $pdo;
@@ -427,7 +427,7 @@ function handlePaymentCompleted($resource) {
     // Detection is deterministic: real renewals fire when end_date is at
     // or near NOW. A cycle switch resets end_date to today + full cycle,
     // so for the first-bill-after-switch case end_date is far in the
-    // future. Threshold is 70% of the cycle to allow some slack — even
+    // future. Threshold is 70% of the cycle to allow some slack: even
     // an "early" PayPal renewal won't arrive when end_date is still 70%
     // of a cycle out, but a freshly-switched sub will be ~100%.
     $cycleSecs = ($subscription['billing_cycle'] === 'yearly')
@@ -476,7 +476,7 @@ function handlePaymentCompleted($resource) {
     }
 
     if ($cycleSwitchFirstBill) {
-        // First bill after a cycle switch — record the sale (above), but
+        // First bill after a cycle switch: record the sale (above), but
         // don't extend end_date and don't send a renewal email. Both were
         // already handled when the user confirmed the switch.
         logPayPalWebhookEvent('PAYMENT.SALE.COMPLETED', $resource, 'cycle_switch_first_bill_recorded');

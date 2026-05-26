@@ -121,7 +121,7 @@ function is_rate_limited(string $ip, int $maxAttempts = 10, int $windowSeconds =
  * Uses file locking to prevent race conditions under concurrent requests.
  *
  * $windowSeconds must match the window passed to is_rate_limited() by the same
- * caller — it controls which stale entries get pruned during the read. Passing
+ * caller: it controls which stale entries get pruned during the read. Passing
  * a smaller window here than is_rate_limited uses will silently shorten the
  * effective rate-limit window.
  *

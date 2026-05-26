@@ -88,7 +88,7 @@ foreach ($rows as $r) {
                     $reconciled++;
                 }
             } elseif (in_array($found->status, ['failed','canceled'], true)) {
-                // CAS guard: same rationale as the success branch above —
+                // CAS guard: same rationale as the success branch above,
                 // a webhook (or another reconciler) may have flipped this
                 // row to 'completed' between our SELECT and this UPDATE,
                 // and we must not overwrite that with 'failed'.

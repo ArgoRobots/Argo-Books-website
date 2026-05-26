@@ -10,12 +10,12 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses — organize contacts, addresses, and notes without a full CRM.">
+        content="Track customer information, purchase history, and contact details with Argo Books. A simple customer database built for small businesses, organizing contacts, addresses, and notes without a full CRM.">
     <meta name="keywords"
         content="customer management, CRM, customer tracking, customer database, small business CRM, customer profiles, contact management, customer address book, customer notes, customer purchase history">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Customer Management — Argo Books">
+    <meta property="og:title" content="Customer Management | Argo Books">
     <meta property="og:description"
         content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
     <meta property="og:url" content="https://argorobots.com/features/customer-management/">
@@ -28,7 +28,7 @@
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Customer Management — Argo Books">
+    <meta name="twitter:title" content="Customer Management | Argo Books">
     <meta name="twitter:description"
         content="Track customer information, purchase history, and contact details with Argo Books. Simple customer management built for small businesses.">
     <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Customer+Management&subtitle=Keep+a+complete+record+of+every+customer.+Contacts%2C+addresses%2C+purchase+history%2C+and+notes+in+one+place.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
@@ -64,7 +64,7 @@
                     "name": "Does Argo Books include a built-in customer database?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes for every client. It integrates directly with invoicing, revenue tracking, and rental management — so when you create an invoice or rental, your customer details auto-populate without re-entering anything."
+                        "text": "Yes. Argo Books includes a built-in customer database where you can store names, emails, phone numbers, addresses, and notes for every client. It integrates directly with invoicing, revenue tracking, and rental management, so when you create an invoice or rental, your customer details auto-populate without re-entering anything."
                     }
                 },
                 {
@@ -80,7 +80,7 @@
                     "name": "Is my customer data private and secure?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Absolutely. Argo Books is a desktop application, so all customer data is stored locally on your computer — nothing is uploaded to cloud servers. Your data is encrypted with AES-256-GCM, the same standard used by banks and government agencies. You have full control over your customer information at all times."
+                        "text": "Absolutely. Argo Books is a desktop application, so all customer data is stored locally on your computer. Nothing is uploaded to cloud servers. Your data is encrypted with AES-256-GCM, the same standard used by banks and government agencies. You have full control over your customer information at all times."
                     }
                 },
                 {
@@ -88,7 +88,7 @@
                     "name": "Can I import my existing customer list?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. You can import customers from Excel or CSV files using the AI Spreadsheet Import feature. The AI automatically detects your columns and maps them to the right fields, so you can migrate your existing customer data into Argo Books in minutes — no manual data entry required."
+                        "text": "Yes. You can import customers from Excel or CSV files using the AI Spreadsheet Import feature. The AI automatically detects your columns and maps them to the right fields, so you can migrate your existing customer data into Argo Books in minutes, with no manual data entry required."
                     }
                 }
             ]
@@ -115,7 +115,7 @@
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>Customer Management — Argo Books</title>
+    <title>Customer Management | Argo Books</title>
 
     <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
@@ -143,7 +143,7 @@
         </div>
         <div class="container">
             <h1 class="animate-fade-in">Know your customers, grow your business</h1>
-            <p class="hero-subtitle animate-fade-in">Keep a complete record of every customer — names, contact details, addresses, and notes — in one organized place. Build stronger relationships with the people who matter most to your business.</p>
+            <p class="hero-subtitle animate-fade-in">Keep a complete record of every customer: names, contact details, addresses, and notes, in one organized place. Build stronger relationships with the people who matter most to your business.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -166,7 +166,7 @@
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Scattered contacts cost you customers and credibility</h2>
-                    <p>Most small businesses track customers across spreadsheets, email inboxes, sticky notes, and phone contacts. When a customer calls, you scramble to find their details. When it's time to send an invoice, you're guessing at addresses. And when a customer hasn't ordered in months, you don't even notice. Argo Books gives you a single, searchable customer database with every detail you need — so you always know who your customers are and how to reach them.</p>
+                    <p>Most small businesses track customers across spreadsheets, email inboxes, sticky notes, and phone contacts. When a customer calls, you scramble to find their details. When it's time to send an invoice, you're guessing at addresses. And when a customer hasn't ordered in months, you don't even notice. Argo Books gives you a single, searchable customer database with every detail you need, so you always know who your customers are and how to reach them.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -248,7 +248,7 @@
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Full address fields — street, city, state, postal code, and country</span>
+                            <span>Full address fields: street, city, state, postal code, and country</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -268,14 +268,14 @@
     </section>
 
     <!-- =============================================
-         HOW IT WORKS — 3 Steps
+         HOW IT WORKS, 3 Steps
          ============================================= -->
     <section class="how-it-works">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
                 <h2 class="section-title">Three steps to an organized customer base</h2>
-                <p class="section-desc">From scattered contacts to a complete customer database. No CRM experience needed — Argo Books keeps it simple.</p>
+                <p class="section-desc">From scattered contacts to a complete customer database. No CRM experience needed. Argo Books keeps it simple.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
@@ -291,7 +291,7 @@
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Use everywhere in Argo Books</h3>
-                    <p>Customer profiles flow into invoicing, revenue tracking, and rental management — no retyping.</p>
+                    <p>Customer profiles flow into invoicing, revenue tracking, and rental management, with no retyping.</p>
                 </div>
             </div>
         </div>
@@ -324,11 +324,11 @@
                     <span class="section-label">Customer Dashboard</span>
                     <h2>See your entire customer base at a glance</h2>
                     <p>The customers page shows every customer in a clean, sortable table. Summary cards at the top show your total customers and other key metrics.</p>
-                    <p>Use the search bar to find any customer. Click the filter button to narrow results by country, status, or date added. Edit their details, or remove them — all in an easy-to-use interface.</p>
+                    <p>Use the search bar to find any customer. Click the filter button to narrow results by country, status, or date added. Edit their details, or remove them, all in an easy-to-use interface.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Summary cards — total customers, active, banned, and new this month</span>
+                            <span>Summary cards: total customers, active, banned, and new this month</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -348,14 +348,14 @@
     </section>
 
     <!-- =============================================
-         BENEFITS GRID — 6 benefit cards
+         BENEFITS GRID, 6 benefit cards
          ============================================= -->
     <section class="benefits-section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
                 <h2 class="section-title">More than just a contact list</h2>
-                <p class="section-desc">Customer management in Argo Books isn't a full CRM — it's the organized, searchable customer database your business actually needs.</p>
+                <p class="section-desc">Customer management in Argo Books isn't a full CRM. It's the organized, searchable customer database your business actually needs.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
@@ -370,7 +370,7 @@
                         <?= svg_icon('search', 22) ?>
                     </div>
                     <h3>Find anyone instantly</h3>
-                    <p>Search across names, emails, phone numbers, and addresses. Every customer is findable in seconds — even if you have hundreds of records.</p>
+                    <p>Search across names, emails, phone numbers, and addresses. Every customer is findable in seconds, even if you have hundreds of records.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon purple">
@@ -391,14 +391,14 @@
                         <?= svg_icon('shield', 22) ?>
                     </div>
                     <h3>Data stays on your computer</h3>
-                    <p>Customer names, emails, phone numbers, and addresses are stored locally on your device. No cloud uploads, no third-party access — your customer data is yours.</p>
+                    <p>Customer names, emails, phone numbers, and addresses are stored locally on your device. No cloud uploads, no third-party access. Your customer data is yours.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
                     <h3>Grow without complexity</h3>
-                    <p>Start with 5 customers, scale to 500. The interface stays clean and fast. No CRM training, no complex pipelines — just the customer info your business needs.</p>
+                    <p>Start with 5 customers, scale to 500. The interface stays clean and fast. No CRM training, no complex pipelines, just the customer info your business needs.</p>
                 </div>
             </div>
         </div>
@@ -431,7 +431,7 @@
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
                 <h2 class="section-title">Built for every business that has customers</h2>
-                <p class="section-desc">Whether you have 10 or 10,000 clients — customer management scales with your business.</p>
+                <p class="section-desc">Whether you have 10 or 10,000 clients, customer management scales with your business.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">
@@ -439,7 +439,7 @@
                         <?= svg_icon('users', 22) ?>
                         Freelancers &amp; consultants
                     </h3>
-                    <p>Keep track of every client's contact details, billing address, and project notes. When it's time to invoice, their profile is one click away — no digging through old emails.</p>
+                    <p>Keep track of every client's contact details, billing address, and project notes. When it's time to invoice, their profile is one click away, with no digging through old emails.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
@@ -482,7 +482,7 @@
                         <?= svg_icon('document', 22) ?>
                     </div>
                     <h3>Invoicing</h3>
-                    <p>Create an invoice and select a customer — their name, email, and billing address auto-populate. No retyping, no errors, no wasted time.</p>
+                    <p>Create an invoice and select a customer. Their name, email, and billing address auto-populate. No retyping, no errors, no wasted time.</p>
                 </a>
                 <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
@@ -511,7 +511,7 @@
             <div class="container">
                 <div class="cta-card animate-on-scroll">
                     <h2>Ready to organize your customers?</h2>
-                    <p>Download Argo Books and build your customer database in minutes. Free to get started — no credit card, no trial period.</p>
+                    <p>Download Argo Books and build your customer database in minutes. Free to get started, with no credit card and no trial period.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

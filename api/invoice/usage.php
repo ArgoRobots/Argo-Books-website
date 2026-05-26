@@ -192,7 +192,7 @@ try {
     $monthly_limit = $tierInfo['limit'];
     $identifier = $tierInfo['identifier'];
 
-    // Premium users are unlimited — skip DB tracking
+    // Premium users are unlimited; skip DB tracking
     if ($tier === 'premium') {
         echo json_encode(buildResponse(0, $monthly_limit, $tier));
         exit();

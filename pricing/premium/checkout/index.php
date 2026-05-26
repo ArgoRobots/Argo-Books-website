@@ -97,7 +97,7 @@
     $renewalFee = calculate_processing_fee($renewalBase);
     $renewalTotal = $renewalBase + $renewalFee;
 
-    // Cycle-switch refund disclosure banner — PayPal only. Stripe and
+    // Cycle-switch refund disclosure banner: PayPal only. Stripe and
     // Square cycle switches are handled entirely by switch-billing-cycle-
     // ajax.php and never reach this checkout page; the banner below is
     // therefore correctly suppressed for non-PayPal users because
@@ -193,7 +193,7 @@
             <?php if ($is_cycle_switch && $cycleSwitchOldCycle && $cycleSwitchOldCycle !== $billing): ?>
                 <div class="cycle-switch-banner">
                     <strong>Switching from <?php echo htmlspecialchars(ucfirst($cycleSwitchOldCycle)); ?> to <?php echo htmlspecialchars(ucfirst($billing)); ?>.</strong>
-                    PayPal will bill <strong>$<?php echo number_format($basePrice, 2); ?> CAD</strong> on activation (subscription only — no processing fee on PayPal).
+                    PayPal will bill <strong>$<?php echo number_format($basePrice, 2); ?> CAD</strong> on activation (subscription only, with no processing fee on PayPal).
                     <?php if ($cycleSwitchRefundEstimate > 0): ?>
                         Your prorated refund of about <strong>$<?php echo number_format($cycleSwitchRefundEstimate, 2); ?> CAD</strong> will appear in your PayPal account within 5–10 business days.
                     <?php endif; ?>

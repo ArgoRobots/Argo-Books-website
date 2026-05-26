@@ -82,7 +82,7 @@ foreach ($rows as $row) {
     $upd = $pdo->prepare("UPDATE refund_requests SET state='processing', updated_at=NOW() WHERE id = ? AND state = 'cooling_off'");
     $upd->execute([$row['id']]);
     if ($upd->rowCount() === 0) {
-        // State changed under us (cancelled, completed, etc.) — skip.
+        // State changed under us (cancelled, completed, etc.); skip.
         continue;
     }
     audit_log($pdo, (int)$row['company_id'], 'processing', 'system', null, (int)$row['id'], null, [

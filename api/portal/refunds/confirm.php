@@ -99,11 +99,11 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
         // (surfaced as the 423 ACCOUNT_LOCKED message in refund_ensure_company_active).
         // The first-attempt message returned below is the one shown on the
         // failure screen the moment the block happens. Both messages emphasise
-        // that the system is automated and sometimes wrong — a legitimate
+        // that the system is automated and sometimes wrong; a legitimate
         // merchant hitting this shouldn't read "fraud" or "frozen". The
         // technical velocity reason is preserved in the audit_log calls so
         // support can see exactly what tripped without exposing it to the user.
-        $userFriendlyLockReason = 'Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds — email contact@argorobots.com and we will resume refunds within one business day.';
+        $userFriendlyLockReason = 'Refunds on this account are paused while our automated safety check reviews recent activity. The system sometimes flags legitimate refunds. Email contact@argorobots.com and we will resume refunds within one business day.';
         $pdo->beginTransaction();
         $pdo->prepare("UPDATE portal_companies SET locked = 1, lock_reason = ?, locked_at = NOW() WHERE id = ?")
             ->execute([$userFriendlyLockReason, $company['id']]);
@@ -113,7 +113,7 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
         audit_log($pdo, (int)$company['id'], 'failed', 'system', null, $request_id, null, ['reason' => 'hard_block', 'velocity_reason' => $velocity['reason'] ?? null]);
         $pdo->commit();
 
-        // Notify the admin so we can investigate quickly. Best-effort — wrap in
+        // Notify the admin so we can investigate quickly. Best-effort; wrap in
         // try/catch so an SMTP hiccup never breaks the lock-down code path
         // (the lock has already been written; the email is just a heads-up).
         try {
@@ -124,7 +124,7 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
         // Also send a heads-up to the merchant's owner_email so they have a
         // permanent inbox record even if they closed the modal. Reply-To on
         // that email goes to contact@argorobots.com so plain Reply reaches us.
-        // Same best-effort pattern — SMTP failure must not break the lock.
+        // Same best-effort pattern: SMTP failure must not break the lock.
         if (!empty($company['owner_email'])) {
             try {
                 refund_email_send_hard_block($company['owner_email'], $request);
@@ -139,7 +139,7 @@ with_idempotency($pdo, (int)$company['id'], $raw, function() use ($pdo, $company
             'state' => 'failed',
             'velocityTier' => $velocity['tier'],
             'errorCode' => 'HARD_BLOCK',
-            'message' => 'This refund was flagged by our automated safety check. The system sometimes flags legitimate refunds — please email contact@argorobots.com and we will review and process this refund within one business day. Other parts of your account continue to work normally.',
+            'message' => 'This refund was flagged by our automated safety check. The system sometimes flags legitimate refunds. Please email contact@argorobots.com and we will review and process this refund within one business day. Other parts of your account continue to work normally.',
         ]);
         return;
     }

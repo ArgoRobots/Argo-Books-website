@@ -18,7 +18,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>The modal displays a chronological list of all changes. Each event shows:</p>
             <ul>
                 <li><strong>Timestamp:</strong> When the change was made</li>
-                <li><strong>Action Type:</strong> The kind of change — Added, Modified, Deleted, Undone, or Redone</li>
+                <li><strong>Action Type:</strong> The kind of change: Added, Modified, Deleted, Undone, or Redone</li>
                 <li><strong>Entity Details:</strong> The type and name of the item that was changed (e.g., a customer, product, or expense)</li>
                 <li><strong>Description:</strong> A summary of what happened</li>
             </ul>
@@ -30,7 +30,7 @@ include __DIR__ . '/../../docs-header.php';
             <p>Use the search bar or filter controls to find specific events.</p>
 
             <div class="info-box">
-                <strong>Tip:</strong> The system automatically prevents actions that don't make sense — for example, you can't undo an "Add" if the item was later deleted. This ensures your data stays consistent.
+                <strong>Tip:</strong> The system automatically prevents actions that don't make sense. For example, you can't undo an "Add" if the item was later deleted. This ensures your data stays consistent.
             </div>
 
             <div class="page-navigation">

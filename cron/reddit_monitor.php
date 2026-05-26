@@ -32,7 +32,7 @@ if (!defined('REDDIT_MONITOR_INLINE') && php_sapi_name() !== 'cli' && !empty($_S
     die('Access denied. CLI/cron only.');
 }
 
-// Skip duplicate bootstrap when included from admin/outreach/api.php — the
+// Skip duplicate bootstrap when included from admin/outreach/api.php; the
 // autoloader, env vars, and DB connection are already in scope. Loading
 // Dotenv twice is safe (immutable) but cheaper to skip.
 if (!defined('REDDIT_MONITOR_INLINE')) {
@@ -98,7 +98,7 @@ try {
             exit(0);
         }
     } catch (PDOException $e) {
-        // `enabled` column not yet added — assume enabled.
+        // `enabled` column not yet added; assume enabled.
     }
 
     $cfg = $pdo->query("SELECT rules_score_floor, ai_relevance_floor FROM reddit_settings WHERE id = 1")->fetch();
@@ -132,7 +132,7 @@ try {
         foreach ($threads as $t) {
             $rid = $t['reddit_id'];
             if (isset($discovered[$rid])) {
-                // Already from watchlist — upgrade to 'both' and append keyword
+                // Already from watchlist; upgrade to 'both' and append keyword
                 $discovered[$rid]['discovery_source'] = 'both';
                 $existing = $discovered[$rid]['matched_keywords'] ?? [];
                 $discovered[$rid]['matched_keywords'] = array_values(array_unique(array_merge($existing, [$kw])));
@@ -196,7 +196,7 @@ try {
         $aiReason = $rel['reason'];
 
         if ($aiScore === null) {
-            rmon_say("  $rid AI relevance failed: $aiReason — storing as new");
+            rmon_say("  $rid AI relevance failed: $aiReason. Storing as new");
             // Persist so we don't re-process; status='new' lets retry on next run
             if (!$dryRun) {
                 $insertStmt->execute([
@@ -238,7 +238,7 @@ try {
                 reddit_progress_write(['drafted' => $threadsDrafted]);
                 rmon_say("  $rid pre-drafted (ai_relevance=$aiScore)");
             } else {
-                rmon_say("  $rid draft generation failed: " . ($draft['error'] ?? 'unknown') . ' — keeping as drafted_pending');
+                rmon_say("  $rid draft generation failed: " . ($draft['error'] ?? 'unknown') . '. Keeping as drafted_pending');
             }
         } else {
             rmon_say("  $rid drafted_pending (ai_relevance=$aiScore, will draft on demand)");

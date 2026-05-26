@@ -21,7 +21,7 @@ $flash = null;
 $flash_type = null;
 
 /**
- * Eligibility query — license keys we can send to.
+ * Eligibility query: license keys we can send to.
  * Re-used both for rendering and for the POST handler (defence in depth).
  */
 function fetch_eligible_licenses(PDO $pdo, ?array $idFilter = null): array
@@ -111,7 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                             WHERE id = ? AND review_email_sent_at IS NULL");
                     $claim->execute([$variant, $licenseId]);
                     if ($claim->rowCount() === 0) {
-                        // Already claimed by another request — skip silently.
+                        // Already claimed by another request. Skip silently.
                         continue;
                     }
 
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
 
-                $flash = "Sent {$sent} email(s)." . ($failed > 0 ? " {$failed} failed — check error logs." : '');
+                $flash = "Sent {$sent} email(s)." . ($failed > 0 ? " {$failed} failed, check error logs." : '');
                 $flash_type = $failed > 0 ? 'error' : 'success';
             }
         }

@@ -57,7 +57,7 @@
     <path d="M4 5 v14 a2 2 0 0 0 2 2 h8 a2 2 0 0 0 2 -2 v-14"/>
   </g>
 
-  <!-- ⋯ button (target — highlighted with blue border + blue dots) -->
+  <!-- ⋯ button (target: highlighted with blue border + blue dots) -->
   <rect x="318" y="96" width="28" height="24" rx="5" fill="#ffffff" stroke="#0078d4" stroke-width="1.5"/>
   <g transform="translate(326,108)" fill="#0067c0">
     <circle cx="0" cy="0" r="1.6"/>

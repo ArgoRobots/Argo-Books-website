@@ -115,7 +115,7 @@ async function api(action, options = {}) {
     if (action === 'export_csv') return res;
 
     if (res.status === 401) {
-        // Session expired — redirect to login
+        // Session expired, redirect to login
         window.location.href = '../login.php';
         throw new Error('Session expired. Redirecting to login...');
     }
@@ -483,7 +483,7 @@ function renderBulkSendList() {
                 <span class="bulk-send-item-email">${hasEmail ? esc(lead.email) : '<span class="bulk-send-item-no-email">No email address</span>'}</span>
             </div>
             <div class="bulk-send-item-draft">
-                ${!hasEmail ? '<span class="bulk-send-item-no-email">Will be skipped — no email address</span>' :
+                ${!hasEmail ? '<span class="bulk-send-item-no-email">Will be skipped (no email address)</span>' :
                   hasDraft ? `<div class="bulk-send-item-subject">Subject: ${esc(lead.draft_subject)}</div><div class="bulk-send-item-body">${esc(lead.draft_body)}</div>` :
                   '<span class="bulk-send-item-generating">Draft will be generated...</span>'}
             </div>
@@ -567,7 +567,7 @@ async function openLeadDetail(id) {
         updateDraftStatus(lead);
         updateFollowupStatus(lead);
 
-        // Reset to info tab (scope to the modal — the page now has its own .tab bar)
+        // Reset to info tab (scope to the modal, since the page now has its own .tab bar)
         switchTab('tabInfo', document.querySelector('#leadDetailModal .tab'));
 
         // Load activity
@@ -615,7 +615,7 @@ function updateDraftStatus(lead) {
 
     // Info section
     let info = '';
-    if (!lead.email) info = 'No email address — email sending is disabled for this lead.';
+    if (!lead.email) info = 'No email address. Email sending is disabled for this lead.';
     document.getElementById('draftInfo').textContent = info;
 }
 
@@ -628,7 +628,7 @@ function updateFollowupStatus(lead) {
     if ((lead.followup_count | 0) > 0 && lead.last_followup_at) {
         el.textContent = 'Follow-up #' + lead.followup_count + ' sent ' + formatDateTime(lead.last_followup_at);
     } else if (replied) {
-        el.textContent = 'Lead responded — no follow-up needed.';
+        el.textContent = 'Lead responded, no follow-up needed.';
     } else if (lead.next_followup_due_at) {
         const due = new Date(lead.next_followup_due_at);
         if (due <= new Date()) {
@@ -637,9 +637,9 @@ function updateFollowupStatus(lead) {
             el.textContent = 'Follow-up scheduled for ' + formatDateTime(lead.next_followup_due_at);
         }
     } else if (lead.sent_at) {
-        el.textContent = 'No follow-up scheduled (legacy send — backfill migration may not have run).';
+        el.textContent = 'No follow-up scheduled (legacy send; backfill migration may not have run).';
     } else {
-        el.textContent = 'Not sent yet — follow-up will be scheduled at send time.';
+        el.textContent = 'Not sent yet. Follow-up will be scheduled at send time.';
     }
 }
 
@@ -776,7 +776,7 @@ async function searchBusinesses() {
     // Keep paging Google Places until we have `limit` results matching the
     // filter, or the API stops returning new businesses (exhausted area).
     // 10 is a safety cap so a city + category with no matches doesn't loop
-    // forever — each round already excludes places_ids already collected.
+    // forever; each round already excludes places_ids already collected.
     const maxAttempts = 10;
     let lastNote = null;
 
@@ -819,7 +819,7 @@ async function searchBusinesses() {
         }
 
         // Drop items that don't match the size filter so they never land in
-        // discoveryResults — they shouldn't be displayed OR imported.
+        // discoveryResults, since they shouldn't be displayed OR imported.
         const matchingBatch = sizeFilter
             ? newBatch.filter(b => b.company_size === sizeFilter)
             : newBatch;
@@ -1303,7 +1303,7 @@ window.approveFollowup = async function(id) {
     if (subjectInput && bodyInput) {
         const saveResult = await api('save_followup_draft', { method: 'POST', body: { id: id, subject: subjectInput.value, body: bodyInput.value } });
         if (!saveResult.success) {
-            alert('Save failed: ' + (saveResult.message || 'unknown') + ' — not approving.');
+            alert('Save failed: ' + (saveResult.message || 'unknown') + '. Not approving.');
             return;
         }
     }
@@ -1478,7 +1478,7 @@ function renderShopifyResults() {
     const importAllBtn = document.getElementById('shopifyImportAllBtn');
     const safe = (s) => escapeHtml(String(s ?? ''));
 
-    // Table only ever holds importable fits — already-imported rows are
+    // Table only ever holds importable fits. Already-imported rows are
     // filtered server-side at search time and removed locally after each
     // successful import.
     let summary = `${shopifyResults.length} fit`;
@@ -1513,7 +1513,7 @@ function renderShopifyResults() {
             if (shopifyLastSummary.rejected_count > 0) reasons.push(`${shopifyLastSummary.rejected_count} rejected`);
             if (shopifyLastSummary.already_imported_count > 0) reasons.push(`${shopifyLastSummary.already_imported_count} already imported`);
             emptyMsg = reasons.length
-                ? `No new fits — all ${shopifyLastSummary.total_evaluated} results across ${queriesRunN} ${queryWord} were filtered (${reasons.join(', ')}).`
+                ? `No new fits. All ${shopifyLastSummary.total_evaluated} results across ${queriesRunN} ${queryWord} were filtered (${reasons.join(', ')}).`
                 : `SerpAPI returned results across ${queriesRunN} ${queryWord} but none passed the filter.`;
         }
         body.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:#888;">${emptyMsg}</td></tr>`;
@@ -1812,7 +1812,7 @@ let redditProgressPollTimer = null;
 let redditDiscoveryWasRunning = false;
 
 async function loadRedditPipelineStatus() {
-    // Kept for backwards compat — delegates to the progress poller which has
+    // Kept for backwards compat. Delegates to the progress poller which has
     // strictly more info.
     return loadRedditPipelineProgress();
 }
@@ -1840,7 +1840,7 @@ async function loadRedditPipelineProgress() {
             banner.innerHTML = `<span class="bulk-draft-spinner"></span> <span class="reddit-progress-msg">${escapeHtml(msg)}</span> ${counts}`;
             banner.style.display = 'flex';
         } else if (progress.completed && redditDiscoveryWasRunning) {
-            // Just finished — show the summary briefly, then refresh and hide.
+            // Just finished. Show the summary briefly, then refresh and hide.
             const msg = progress.error
                 ? `Discovery failed: ${progress.error}`
                 : (progress.message || `Discovery complete. Found ${progress.found ?? 0}, drafted ${progress.drafted ?? 0}.`);
@@ -1906,7 +1906,7 @@ function fillRedditThreadModal(t) {
     document.getElementById('redditThreadStatus').textContent = t.status || '';
     document.getElementById('redditThreadPosted').textContent = t.posted_at || '';
     document.getElementById('redditThreadUrl').href = t.url || '#';
-    document.getElementById('redditThreadBody').textContent = t.body || '(link post — no self-text)';
+    document.getElementById('redditThreadBody').textContent = t.body || '(link post, no self-text)';
     document.getElementById('redditThreadReason').textContent = t.ai_relevance_reason || '(no AI reasoning recorded)';
     document.getElementById('redditDraftBody').value = t.draft_body || '';
 

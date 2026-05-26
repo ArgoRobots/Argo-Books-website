@@ -623,7 +623,7 @@ namespace {
      *   immediate_charge_total  = immediate_charge_base + processing_fee
      *   credit_balance_after    = max(0, prorated_credit + existing_credit - new_base)
      *
-     * Proration uses BASE prices from the pricing config — never the `amount`
+     * Proration uses BASE prices from the pricing config, never the `amount`
      * column, which includes a processing fee from the prior period.
      *
      * Period length is derived from the *cycle* (end_date - 1 month or

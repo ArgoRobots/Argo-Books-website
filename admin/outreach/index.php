@@ -331,6 +331,7 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="interested">Interested</option>
                     <option value="not_interested">Not Interested</option>
                     <option value="onboarded">Onboarded</option>
+                    <option value="disqualified">Disqualified</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -524,6 +525,7 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                             <option value="interested">Interested</option>
                             <option value="not_interested">Not Interested</option>
                             <option value="onboarded">Onboarded</option>
+                            <option value="disqualified">Disqualified</option>
                         </select>
                     </div>
                     <div class="form-group">

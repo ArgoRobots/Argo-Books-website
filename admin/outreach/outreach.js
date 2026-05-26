@@ -586,8 +586,15 @@ function updateDraftStatus(lead) {
 
     let statusHtml = '';
     const isSent = ['contacted','replied','interested','not_interested','onboarded'].includes(lead.status);
+    const isDisqualified = lead.status === 'disqualified';
 
-    if (isSent && lead.sent_at) {
+    if (isDisqualified) {
+        const reasonTag = lead.disqualified_reason ? ` (${escapeHtml(lead.disqualified_reason)})` : '';
+        statusHtml = `<span class="badge badge-status-disqualified">Disqualified</span>${reasonTag}`;
+        sendBtn.disabled = true;
+        genBtn.style.display = 'none';
+        sendBtn.style.display = 'none';
+    } else if (isSent && lead.sent_at) {
         statusHtml = `<span class="badge badge-status-contacted">Sent</span> on ${formatDateTime(lead.sent_at)}`;
         sendBtn.disabled = true;
         genBtn.style.display = 'none';

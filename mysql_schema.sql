@@ -769,7 +769,8 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
     category VARCHAR(100) DEFAULT NULL,
     city VARCHAR(100) DEFAULT NULL,
     source VARCHAR(100) DEFAULT 'manual',
-    status ENUM('new','draft_generated','approved','contacted','replied','interested','not_interested','onboarded','email_bounced') DEFAULT 'new',
+    status ENUM('new','draft_generated','approved','contacted','replied','interested','not_interested','onboarded','email_bounced','disqualified') DEFAULT 'new',
+    disqualified_reason VARCHAR(80) DEFAULT NULL,
     response_status ENUM('no_response','positive','neutral','negative') DEFAULT 'no_response',
     approval_status ENUM('not_drafted','draft_ready','needs_review','approved','sent') DEFAULT 'not_drafted',
     date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -819,6 +820,13 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 -- so the Resend webhook can flag bounced/complained recipients:
 --   ALTER TABLE outreach_leads
 --     MODIFY COLUMN status ENUM('new','draft_generated','approved','contacted','replied','interested','not_interested','onboarded','email_bounced') DEFAULT 'new';
+--
+-- For existing installs, add the auto-filter "disqualified" status + reason tag.
+-- The outreach pipeline marks leads disqualified when a chain-domain / place-type
+-- / role-mailbox / AI size-gate filter fires, so they never get drafted or sent:
+--   ALTER TABLE outreach_leads
+--     MODIFY COLUMN status ENUM('new','draft_generated','approved','contacted','replied','interested','not_interested','onboarded','email_bounced','disqualified') DEFAULT 'new',
+--     ADD COLUMN disqualified_reason VARCHAR(80) DEFAULT NULL AFTER status;
 
 -- Email suppression list (unsubscribes, opt-outs across all email contexts)
 -- Known context values:

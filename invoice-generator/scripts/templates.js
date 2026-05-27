@@ -1,12 +1,18 @@
 // invoice-generator/scripts/templates.js
 // Template style registry + applier. Styles are pure CSS variable swaps driven by [data-template] on the body.
 
+// Five template styles mirroring the Argo Books desktop app's invoice
+// templates so the web tool and the app feel like the same product. Each
+// id ties to a [data-template="<id>"] CSS scope in tool.css and a per-id
+// branch in scripts/docx.js. The user-facing display name (`name`) is shown
+// in the toolbar dropdown; some names diverge from their ids so the dropdown
+// reads naturally (e.g. id="minimal" displays as "Formal").
 export const TEMPLATES = [
-  { id: 'classic', name: 'Classic', description: 'Traditional and conservative.' },
-  { id: 'modern', name: 'Modern', description: 'Clean sans-serif, accent color.' },
-  { id: 'minimal', name: 'Minimal', description: 'Stripped down, lots of whitespace.' },
-  { id: 'bold', name: 'Bold', description: 'Yellow accent header, high contrast.' },
-  { id: 'professional', name: 'Professional', description: 'Serif headings with a thin accent rule.' },
+  { id: 'classic', name: 'Classic', description: 'Clean default with a dark table header.' },
+  { id: 'modern', name: 'Modern', description: 'Slate left rail, light header band, dark table header.' },
+  { id: 'minimal', name: 'Formal', description: 'Georgia serif on a navy header and total band.' },
+  { id: 'bold', name: 'Elegant', description: 'Multicolor gradient ribbon, indigo total due.' },
+  { id: 'professional', name: 'Ribbon', description: 'Soft watercolor wave decoration along the left.' },
 ];
 
 export function applyTemplate(templateId) {

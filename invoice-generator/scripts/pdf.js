@@ -152,10 +152,6 @@ export async function downloadPdf(state) {
 
   const { html2canvas, jsPDF } = await loadLibs();
 
-  const root = document.documentElement;
-  const prevTheme = root.getAttribute('data-theme');
-  if (prevTheme === 'dark') root.removeAttribute('data-theme');
-
   invoice.classList.add('invgen-capturing');
 
   try {
@@ -202,6 +198,5 @@ export async function downloadPdf(state) {
     trackEvent('invgen_pdf_downloaded', state.template);
   } finally {
     invoice.classList.remove('invgen-capturing');
-    if (prevTheme === 'dark') root.setAttribute('data-theme', 'dark');
   }
 }

@@ -257,7 +257,9 @@ const TOP_LEVEL_FIELDS = {
 };
 
 // Show the right $/% affix around the tax + discount inputs based on the
-// current mode. Called after hydration and after any swap-button click.
+// current mode, and surface the currency-code suffix ("CAD" / "USD" / "AUD")
+// wherever the prefix is $ so the reader can tell ambiguous-dollar currencies
+// apart. Called after hydration and after any swap-button click.
 function updateAffixes() {
   const taxIsFixed = state.taxRateMode === 'fixed';
   const taxPrefix = $('[data-tax-prefix]');
@@ -270,6 +272,32 @@ function updateAffixes() {
   const discountSuffix = $('[data-discount-suffix]');
   if (discountPrefix) discountPrefix.hidden = !discountIsFixed;
   if (discountSuffix) discountSuffix.hidden = discountIsFixed;
+
+  syncCurrencyCodeSuffix();
+}
+
+// Show the ISO code (e.g. "CAD") after each money input when the active
+// currency uses "$" as its symbol. For tax and discount rows the code
+// only shows in fixed-dollar mode (in percent mode the "%" suffix is what
+// belongs on the right). Other rows always show the code when the symbol
+// is "$". Non-dollar currencies hide the suffix entirely.
+function syncCurrencyCodeSuffix() {
+  const symbol = currencySymbolFor(state.currency, state.locale);
+  const showForDollar = symbol === '$' && !!state.currency;
+  const taxIsFixed = state.taxRateMode === 'fixed';
+  const discountIsFixed = state.discount && state.discount.mode === 'fixed';
+
+  $$('[data-currency-code]').forEach((el) => {
+    const group = el.closest('.totals-input-group');
+    const row = group ? group.closest('.totals-row') : null;
+    let show = showForDollar;
+    if (row && row.classList.contains('totals-tax')) show = show && taxIsFixed;
+    else if (row && row.classList.contains('totals-discount')) show = show && discountIsFixed;
+    // Leading non-breaking space so the code reads as " CAD" with a visible
+    // gap from the number, even when the affix has zero padding (capture mode).
+    el.textContent = show ? ` ${state.currency}` : '';
+    el.hidden = !show;
+  });
 }
 
 // Single input listener at document level. Event delegation covers initial
@@ -460,8 +488,10 @@ function currencySymbolFor(code, locale) {
 function syncCurrencyAffixes() {
   const symbol = currencySymbolFor(state.currency, state.locale);
   $$('.totals-input-affix').forEach((el) => {
-    // Skip the percent suffixes used by the tax/discount mode swap.
+    // Skip the percent suffixes used by the tax/discount mode swap, and
+    // the ISO-code suffix which is managed by syncCurrencyCodeSuffix().
     if (el.hasAttribute('data-tax-suffix') || el.hasAttribute('data-discount-suffix')) return;
+    if (el.hasAttribute('data-currency-code')) return;
     el.textContent = symbol;
   });
 }
@@ -470,6 +500,7 @@ function applyCurrency(code) {
   state.currency = code;
   state.locale = LOCALE_FOR_CURRENCY[code] || 'en-US';
   syncCurrencyAffixes();
+  syncCurrencyCodeSuffix();
   rerenderAndSave();
 }
 
@@ -692,27 +723,6 @@ function wirePitchTracking() {
 
 // Wires the toolbar's Download PDF button. The pdf.js module is loaded lazily
 // on first click so the html2pdf bundle does not block the initial page load.
-// Light / dark theme toggle. We flip a data-theme attribute on <html>; the
-// CSS overrides for [data-theme="dark"] do the actual recoloring. The chosen
-// theme persists in its own localStorage key (separate from the invoice
-// draft) so clearing a draft does not also wipe the theme.
-//
-// Note: the theme is on-screen only. PDF and Word downloads use hard-coded
-// hex colors in pdf.js / docx.js, so the downloaded file is always light.
-const THEME_STORAGE_KEY = 'argobooks.invoiceGenerator.theme';
-
-function wireThemeToggle() {
-  const btn = $('[data-action="toggle-theme"]');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem(THEME_STORAGE_KEY, next); }
-    catch (_e) { /* swallow */ }
-  });
-}
-
 function wireDownloadPdf() {
   const btn = $('[data-action="download-pdf"]');
   if (!btn) return;
@@ -828,7 +838,6 @@ async function init() {
   wireDownloadDocx();
   wirePostDownloadModal();
   wirePitchTracking();
-  wireThemeToggle();
 
   // 5. Initial totals render + logo render from any persisted draft.
   renderTotals(state);

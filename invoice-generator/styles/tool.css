@@ -9,7 +9,6 @@
    reads from; templates only need to redefine these aliases. */
 
 @import url('../../resources/styles/custom-colors.css');
-@import url('./professional.css');
 @import url('./template-page.css');
 
 :root {
@@ -37,35 +36,478 @@
   --tool-danger: var(--red-600);
 }
 
+/* ============================================================
+ * TEMPLATE STYLES
+ * Each [data-template="X"] block sets the color palette via
+ * variable overrides, then adds template-specific structural
+ * rules (font swaps, banners, decorations) below it. The five
+ * designs mirror the Argo Books desktop app's invoice templates
+ * so the brand feels consistent across the web tool and the app.
+ * ============================================================ */
+
+/* --- Classic: clean default. Uses :root values; no overrides. --- */
 [data-template="classic"] {
   /* defaults above */
 }
 
+/* --- Modern: slate dark left rail, light gray header band,
+ *     dark navy table header. --- */
 [data-template="modern"] {
-  --invoice-accent: var(--secondary-blue);
-  --invoice-header-bg: transparent;
-  --invoice-header-text: var(--invoice-text);
+  --invoice-bg: var(--white);
+  --invoice-text: var(--gray-900);
+  --invoice-accent: var(--sky-500);
+  --invoice-header-bg: var(--gray-900);
+  --invoice-header-text: var(--white);
+  --invoice-border: var(--gray-200);
+  --invoice-muted: var(--gray-500);
+  --invoice-row-alt-bg: var(--gray-100);
 }
 
+[data-template="modern"] .invoice {
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  padding: 0;
+  border-left: 10px solid var(--gray-900);
+  overflow: hidden;
+}
+
+[data-template="modern"] .invoice-header {
+  background: var(--gray-100);
+  padding: 28px 32px;
+  margin: 0 0 24px;
+  border-bottom: none;
+  align-items: center;
+}
+
+[data-template="modern"] input.editable-business-title {
+  font-size: 28px;
+  color: var(--gray-900);
+  line-height: 1.4;
+}
+
+[data-template="modern"] input.editable-document-title {
+  color: var(--gray-900);
+  font-weight: 800;
+  font-size: 32px;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+[data-template="modern"] .invoice-number-field {
+  color: var(--gray-500);
+  font-size: 14px;
+}
+
+[data-template="modern"] .invoice-meta {
+  padding: 0 32px;
+  margin-bottom: 28px;
+}
+
+[data-template="modern"] .meta-info {
+  background: var(--gray-100);
+  padding: 16px 18px;
+  border-radius: 6px;
+}
+
+[data-template="modern"] .invoice-items {
+  padding: 0 32px;
+  margin-bottom: 24px;
+}
+
+[data-template="modern"] .line-items thead th {
+  background: var(--gray-900);
+  color: var(--white);
+  padding: 14px 16px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+[data-template="modern"] .invoice-footer {
+  padding: 0 32px 32px;
+}
+
+[data-template="modern"] .totals-total {
+  border-top: 2px solid var(--gray-900);
+}
+
+[data-template="modern"] .totals-total .editable-totals-label,
+[data-template="modern"] .totals-total .totals-value {
+  color: var(--gray-900);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* --- Minimal (display name "Formal"): formal Georgia serif, navy header
+ *     band, navy total band. Mirrors the desktop app's Classic style. --- */
 [data-template="minimal"] {
-  --invoice-header-bg: transparent;
-  --invoice-header-text: var(--invoice-text);
-  --invoice-border: transparent;
+  --invoice-bg: var(--white);
+  --invoice-text: #1a1a1a;
+  --invoice-accent: var(--navy-1e3a5f);
+  --invoice-header-bg: var(--navy-1e3a5f);
+  --invoice-header-text: var(--white);
+  --invoice-border: #c7ccd1;
+  --invoice-muted: var(--gray-500);
 }
 
-/* Forward-looking template defined now so Phase B can ship without
-   another CSS migration. Harmless while no UI exposes it. */
+[data-template="minimal"] .invoice {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  padding: 0;
+}
+
+[data-template="minimal"] .invoice-header {
+  padding: 32px 32px 12px;
+  border-bottom: 2px solid var(--navy-1e3a5f);
+  margin-bottom: 0;
+}
+
+[data-template="minimal"] input.editable-business-title {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+[data-template="minimal"] input.editable-document-title {
+  font-family: Georgia, serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--navy-1e3a5f);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  max-width: none;
+}
+
+[data-template="minimal"] .invoice-number-field,
+[data-template="minimal"] .invoice-number-field input,
+[data-template="minimal"] .invoice-number-prefix {
+  font-family: Georgia, serif;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+[data-template="minimal"] .invoice-meta {
+  background: var(--gray-100);
+  padding: 22px 32px;
+  margin: 0 0 24px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+[data-template="minimal"] .invoice-items {
+  padding: 0 32px;
+  margin-bottom: 16px;
+}
+
+[data-template="minimal"] .line-items thead th {
+  background: var(--navy-1e3a5f);
+  color: var(--white);
+  padding: 14px 16px;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+[data-template="minimal"] .invoice-footer {
+  padding: 0 32px 0;
+  gap: 24px;
+}
+
+[data-template="minimal"] .totals-total {
+  background: var(--navy-1e3a5f);
+  padding: 14px 16px;
+  margin: 8px 0 0;
+  border-top: none;
+  border-radius: 4px;
+}
+
+[data-template="minimal"] .totals-total .editable-totals-label,
+[data-template="minimal"] .totals-total .totals-value {
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 700;
+  font-family: Georgia, serif;
+  background: transparent;
+}
+
+[data-template="minimal"] .totals-total input.editable-totals-label:hover,
+[data-template="minimal"] .totals-total input.editable-totals-label:focus {
+  border-color: var(--white-alpha-50);
+  background: var(--white-alpha-10);
+  color: var(--white);
+}
+
+/* Navy bottom band, matching the desktop Classic template's "Thank you for
+ * your business!" footer strip. Implemented as a thick bottom border so it
+ * follows the rounded corners of the surrounding invoice card. */
+[data-template="minimal"] .invoice {
+  border-bottom: 32px solid var(--navy-1e3a5f);
+}
+
+/* --- Bold (display name "Elegant"): Georgia serif, multicolor gradient
+ *     ribbon at the top, indigo accent line beside Bill To, and a large
+ *     indigo Total Due. --- */
 [data-template="bold"] {
-  --invoice-accent: var(--brand-yellow);
-  --invoice-header-bg: var(--brand-yellow);
-  --invoice-header-text: var(--dark-gray);
+  --invoice-bg: var(--white);
+  --invoice-text: #1f2937;
+  --invoice-accent: var(--indigo-500);
+  --invoice-header-bg: transparent;
+  --invoice-header-text: #1f2937;
+  --invoice-border: var(--gray-border);
+  --invoice-muted: var(--gray-500);
 }
 
+[data-template="bold"] .invoice {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-template="bold"] .invoice::before {
+  content: "";
+  display: block;
+  height: 6px;
+  background: linear-gradient(90deg,
+    var(--purple-500) 0%,
+    var(--indigo-500) 30%,
+    var(--sky-400) 65%,
+    var(--emerald-400) 100%);
+}
+
+[data-template="bold"] .invoice-header {
+  padding: 28px 32px 16px;
+  border-bottom: none;
+  margin-bottom: 12px;
+}
+
+[data-template="bold"] input.editable-business-title {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+[data-template="bold"] input.editable-document-title {
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--indigo-500);
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+[data-template="bold"] .invoice-number-field,
+[data-template="bold"] .invoice-number-field input,
+[data-template="bold"] .invoice-number-prefix {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+[data-template="bold"] .invoice-meta {
+  padding: 0 32px;
+  margin-bottom: 28px;
+}
+
+[data-template="bold"] .meta-billto {
+  border-left: 3px solid var(--indigo-500);
+  padding-left: 14px;
+}
+
+[data-template="bold"] .invoice-items {
+  padding: 0 32px;
+  margin-bottom: 24px;
+}
+
+[data-template="bold"] .line-items thead th {
+  background: transparent;
+  color: var(--gray-500);
+  border-top: 1px solid var(--gray-300);
+  border-bottom: 1px solid var(--gray-300);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  font-family: "Segoe UI", Arial, sans-serif;
+  padding: 12px;
+}
+
+[data-template="bold"] .line-items thead th .editable-th {
+  color: var(--gray-500);
+}
+
+[data-template="bold"] .invoice-footer {
+  padding: 0 32px 28px;
+}
+
+[data-template="bold"] .totals-total {
+  border-top: none;
+  padding-top: 12px;
+}
+
+[data-template="bold"] .totals-total .editable-totals-label {
+  color: var(--gray-500);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+[data-template="bold"] .totals-total .totals-value {
+  color: var(--indigo-500);
+  font-family: Georgia, serif;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* --- Professional (display name "Ribbon"): watercolor wave decoration
+ *     on the left side, Open Sans body, navy uppercase headings. The
+ *     wave SVG is rendered as a real DOM element in _fragment.php; here
+ *     we just position and reveal it. --- */
 [data-template="professional"] {
-  --invoice-accent: var(--primary-blue);
+  --invoice-bg: var(--white);
+  --invoice-text: #2c3e50;
+  --invoice-accent: var(--navy-1a365d);
   --invoice-header-bg: transparent;
-  --invoice-header-text: var(--invoice-text);
-  --invoice-border: var(--gray-border);
+  --invoice-header-text: var(--navy-1a365d);
+  --invoice-border: #e0e0e0;
+  --invoice-muted: var(--gray-500);
+}
+
+[data-template="professional"] .invoice {
+  font-family: "Open Sans", "Segoe UI", Arial, sans-serif;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  min-height: 720px;
+}
+
+[data-template="professional"] .invoice-ribbon-deco {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 220px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-template="professional"] .invoice-ribbon-deco svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+[data-template="professional"] .invoice > section {
+  position: relative;
+  z-index: 1;
+}
+
+[data-template="professional"] .invoice-header,
+[data-template="professional"] .invoice-meta,
+[data-template="professional"] .invoice-items,
+[data-template="professional"] .invoice-footer {
+  padding-left: 130px;
+  padding-right: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+[data-template="professional"] .invoice-footer {
+  padding-bottom: 40px;
+}
+
+[data-template="professional"] .invoice-header {
+  padding-top: 32px;
+  padding-bottom: 16px;
+  border-bottom: none;
+  margin-bottom: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+[data-template="professional"] .invoice-header-left,
+[data-template="professional"] .invoice-header-right {
+  align-items: flex-start;
+  text-align: left;
+}
+
+[data-template="professional"] .invoice-header-right {
+  order: -1;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 18px;
+}
+
+[data-template="professional"] input.editable-document-title {
+  font-family: "Open Sans", "Segoe UI", Arial, sans-serif;
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--navy-1a365d);
+  text-transform: uppercase;
+  text-align: left;
+  max-width: none;
+  width: auto;
+}
+
+[data-template="professional"] input.editable-business-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy-1a365d);
+}
+
+[data-template="professional"] .invoice-number-field,
+[data-template="professional"] .invoice-number-field input,
+[data-template="professional"] .invoice-number-prefix {
+  color: var(--navy-1a365d);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+[data-template="professional"] input.editable-label {
+  color: var(--navy-1a365d);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+}
+
+[data-template="professional"] .line-items thead {
+  border-top: 2px solid var(--navy-1a365d);
+  border-bottom: 1px solid var(--sky-400);
+}
+
+[data-template="professional"] .line-items thead th {
+  background: transparent;
+  color: var(--navy-1a365d);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  padding: 14px 12px;
+}
+
+[data-template="professional"] .line-items thead th .editable-th {
+  color: var(--navy-1a365d);
+}
+
+[data-template="professional"] .totals-total {
+  border-top: 2px solid var(--navy-1a365d);
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+[data-template="professional"] .totals-total .editable-totals-label,
+[data-template="professional"] .totals-total .totals-value {
+  color: var(--navy-1a365d);
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* Hide the ribbon decoration for every template that is not "professional"
+ * so the SVG element in _fragment.php stays invisible elsewhere. */
+.invoice-ribbon-deco {
+  display: none;
 }
 
 * {
@@ -128,47 +570,6 @@ body {
   width: auto;
   max-width: 180px;
 }
-
-.site-header-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  flex: 0 0 auto;
-}
-
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 1px solid var(--tool-border);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--tool-text);
-  cursor: pointer;
-}
-
-.theme-toggle:hover,
-.theme-toggle:focus {
-  background: var(--tool-secondary);
-  color: var(--tool-primary);
-  border-color: var(--tool-primary);
-}
-
-.theme-toggle svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* Default (light theme): show the moon icon (clicking switches to dark). */
-.theme-icon-sun { display: none; }
-.theme-icon-moon { display: block; }
-
-/* Dark theme: show the sun icon (clicking switches to light). */
-[data-theme="dark"] .theme-icon-sun { display: block; }
-[data-theme="dark"] .theme-icon-moon { display: none; }
 
 @media (max-width: 540px) {
   .site-header-inner {
@@ -1157,6 +1558,45 @@ textarea:focus {
   #download-pdf {
     width: 100%;
   }
+
+  /* Template-specific mobile resets. The custom templates use a full-bleed
+   * layout with padding pushed onto inner sections; on small screens we
+   * collapse those paddings so the content does not get squeezed. The
+   * Ribbon SVG is hidden entirely on mobile, where there is not enough
+   * room for a decorative left rail. */
+  [data-template="modern"] .invoice-header,
+  [data-template="modern"] .invoice-meta,
+  [data-template="modern"] .invoice-items,
+  [data-template="modern"] .invoice-footer,
+  [data-template="minimal"] .invoice-header,
+  [data-template="minimal"] .invoice-meta,
+  [data-template="minimal"] .invoice-items,
+  [data-template="minimal"] .invoice-footer,
+  [data-template="bold"] .invoice-header,
+  [data-template="bold"] .invoice-meta,
+  [data-template="bold"] .invoice-items,
+  [data-template="bold"] .invoice-footer,
+  [data-template="professional"] .invoice-header,
+  [data-template="professional"] .invoice-meta,
+  [data-template="professional"] .invoice-items,
+  [data-template="professional"] .invoice-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  [data-template="modern"] .invoice {
+    border-left-width: 6px;
+  }
+
+  [data-template="professional"] .invoice-ribbon-deco {
+    display: none;
+  }
+
+  [data-template="professional"] .invoice-header-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 
 /* ---------- Hide delete on the only line item (CSS-only) ---------- */
@@ -1324,52 +1764,6 @@ input.editable-document-title {
   max-width: 220px;
 }
 
-/* ---------- Dark theme overrides ---------- */
-/* All on-screen colors flip via these variable swaps. PDF and Word
-   downloads do NOT read these variables (pdf.js and docx.js use hard-
-   coded hex), so the downloaded invoice always stays light. */
-[data-theme="dark"] {
-  --invoice-bg: #1f2937;
-  --invoice-text: #f3f4f6;
-  --invoice-accent: #60a5fa;
-  --invoice-border: #374151;
-  --invoice-muted: #9ca3af;
-  --invoice-header-bg: #111827;
-  --invoice-header-text: #f3f4f6;
-  --invoice-row-alt-bg: #374151;
-
-  --tool-bg: #0f172a;
-  --tool-surface: #1f2937;
-  --tool-text: #f3f4f6;
-  --tool-muted: #9ca3af;
-  --tool-border: #374151;
-  --tool-primary: #60a5fa;
-  --tool-primary-text: #0f172a;
-  --tool-secondary: #374151;
-  --tool-secondary-text: #f3f4f6;
-}
-
-[data-theme="dark"] body {
-  color: var(--tool-text);
-  background: var(--tool-bg);
-}
-
-[data-theme="dark"] .invoice {
-  background: var(--invoice-bg);
-  color: var(--invoice-text);
-}
-
-/* Logo in dark mode: swap to the white variant so it stays readable. */
-[data-theme="dark"] .site-brand img[src*="argo-logo-black"] {
-  content: url("../../resources/images/argo-logo/argo-logo-white.png");
-}
-
-/* Editable label hover/focus background tweak so the surface shows through. */
-[data-theme="dark"] input.editable-text:focus,
-[data-theme="dark"] textarea.editable-text:focus {
-  background: var(--invoice-bg);
-}
-
 /* ---------- PDF capture mode ---------- */
 /* When pdf.js is rendering the invoice into a PDF via html2canvas, it adds
    .invgen-capturing to the .invoice element. We use that flag to strip
@@ -1400,11 +1794,53 @@ input.editable-document-title {
   background: transparent !important;
 }
 
-/* Inputs inside the totals-input-group keep the group border (the wrapper),
-   so individual inputs stay transparent and the group looks like one box. */
+/* In the live editor the totals-input-group is one bordered rectangle that
+   holds the currency / percent prefix, the number, and the optional swap
+   button. In the captured PDF we strip the wrapper border + background so
+   the finished invoice reads as a flat "$1,234.00" row instead of a form
+   field. The affixes ($/%) match the body text color, sit flush against
+   the number, and inherit the parent row's font-size so the symbol and
+   the number render at the same scale.
+
+   The explicit height (36px) on the live group is removed during capture
+   so the group height collapses to its inline content. Without that, the
+   group's stretched flex items render at 36px tall and the small affix
+   text floats at the top, making "$" look superscript-sized next to the
+   number. */
 .invgen-capturing .totals-input-group {
-  border-color: var(--invoice-border) !important;
-  background: var(--invoice-bg) !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  justify-content: flex-end !important;
+  align-items: baseline !important;
+  height: auto !important;
+  font-size: inherit !important;
+}
+
+.invgen-capturing .totals-input-affix {
+  color: var(--invoice-text) !important;
+  padding: 0 !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+/* pdf.js replaces every <input>/<textarea> in the cloned DOM with a <span>
+   carrying the live value (html2canvas does not render dirty input values
+   reliably). The replacement copies computed styles from the live input,
+   including its fixed pixel width and 14px font-size, which leaves a gap
+   between the affix and the number and renders the number larger than the
+   symbol. Override both so the replacement sizes to its content, inherits
+   the parent row's font-size, and sits flush against the $ / % symbol.
+   .totals-input-affix lets us distinguish replacements (no class) from
+   affix spans. */
+.invgen-capturing .totals-input-group > span:not(.totals-input-affix) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: 0 0 auto !important;
+  padding: 0 !important;
+  color: var(--invoice-text) !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
 }
 
 /* Hide native date-picker indicator entirely during capture so it does not

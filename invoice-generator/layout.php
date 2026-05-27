@@ -70,16 +70,6 @@ $site_schema = [
 <link rel="alternate" hreflang="<?= htmlspecialchars($alt['lang']) ?>" href="<?= htmlspecialchars($alt['href']) ?>">
 <?php endforeach; ?>
 
-<script>
-// Apply persisted theme before CSS paints so the page does not flash light
-// then snap to dark on reload. Stored value is 'light' or 'dark'.
-(function(){
-  try {
-    var t = localStorage.getItem('argobooks.invoiceGenerator.theme');
-    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
-  } catch (e) { /* ignore */ }
-})();
-</script>
 <link rel="stylesheet" href="<?= INVGEN_BASE ?>/invoice-generator/styles/tool.css">
 <script>window.INVGEN_BASE = <?= json_encode(INVGEN_BASE) ?>;</script>
 <?= $extra_head ?>

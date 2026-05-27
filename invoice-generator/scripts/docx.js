@@ -24,16 +24,16 @@ let countriesPromise = null;
 
 // Per-template visual cues for the Word document. The DOCX engine builds
 // documents from scratch (it does not capture the styled DOM), so each
-// template needs an explicit code branch. Keep this minimal: we vary
-// the "INVOICE" heading font / color, and apply a single distinctive
-// cue per style (yellow band for Bold, thin navy rule for Professional).
-// Classic / Modern / Minimal stay close to the Phase A baseline.
+// template needs an explicit code branch. Each entry mirrors the on-screen
+// scope of the same id in tool.css: the heading font and color match the
+// "INVOICE" wordmark, and headerFill / headerRule add a single distinctive
+// banner cue (slate band for Modern, navy band for Formal, etc.).
 const TEMPLATE_STYLE = {
-  classic:      { headingFont: 'Arial',   headingColor: '1A1A1A', headerFill: null,     headerRule: null },
-  modern:       { headingFont: 'Arial',   headingColor: '2C7A7B', headerFill: null,     headerRule: null },
-  minimal:      { headingFont: 'Arial',   headingColor: '1A1A1A', headerFill: null,     headerRule: null },
-  bold:         { headingFont: 'Arial',   headingColor: '1A1A1A', headerFill: 'FBBF24', headerRule: null },
-  professional: { headingFont: 'Georgia', headingColor: '1A1A1A', headerFill: null,     headerRule: '0A2540' },
+  classic:      { headingFont: 'Arial',         headingColor: '1A1A1A', headerFill: null,     headerRule: null },
+  modern:       { headingFont: 'Segoe UI',      headingColor: '0F172A', headerFill: 'F1F5F9', headerRule: '0F172A' },
+  minimal:      { headingFont: 'Georgia',       headingColor: '1E3A5F', headerFill: '1E3A5F', headerRule: null },
+  bold:         { headingFont: 'Georgia',       headingColor: '6366F1', headerFill: null,     headerRule: '6366F1' },
+  professional: { headingFont: 'Open Sans',     headingColor: '1A365D', headerFill: null,     headerRule: '1A365D' },
 };
 
 function styleForTemplate(templateId) {

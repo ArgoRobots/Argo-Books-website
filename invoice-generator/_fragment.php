@@ -24,17 +24,6 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
     <a class="site-brand" href="<?= INVGEN_BASE ?>/" aria-label="Argo Books home">
       <img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
     </a>
-    <div class="site-header-actions">
-      <button type="button" class="theme-toggle" data-action="toggle-theme" aria-label="Switch between light and dark theme" title="Switch theme">
-        <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="12" r="4"></circle>
-          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
-        </svg>
-        <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </button>
-    </div>
   </div>
 </header>
 
@@ -59,9 +48,9 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
         <select data-field="template" aria-label="Invoice template">
           <option value="classic">Classic</option>
           <option value="modern">Modern</option>
-          <option value="minimal">Minimal</option>
-          <option value="bold">Bold</option>
-          <option value="professional">Professional</option>
+          <option value="minimal">Formal</option>
+          <option value="bold">Elegant</option>
+          <option value="professional">Ribbon</option>
         </select>
       </label>
 
@@ -115,6 +104,42 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
   </header>
 
   <main class="invoice" aria-label="Invoice editor">
+
+    <!-- Watercolor wave decoration: visible only for [data-template="professional"]
+         (the "Ribbon" style). Three overlapping wave paths, each filled with a
+         vertical gradient at low opacity, give the soft watercolor look from
+         the desktop app's Ribbon template. Hidden by default via CSS. -->
+    <div class="invoice-ribbon-deco" aria-hidden="true">
+      <svg viewBox="0 0 280 1100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="invgenRibbonAccent" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#86efac" stop-opacity="0.85"/>
+            <stop offset="25%" stop-color="#86efac" stop-opacity="1"/>
+            <stop offset="50%" stop-color="#86efac" stop-opacity="0.55"/>
+            <stop offset="75%" stop-color="#86efac" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#86efac" stop-opacity="0.7"/>
+          </linearGradient>
+          <linearGradient id="invgenRibbonPrimary" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.7"/>
+            <stop offset="25%" stop-color="#7dd3fc" stop-opacity="0.9"/>
+            <stop offset="50%" stop-color="#7dd3fc" stop-opacity="0.5"/>
+            <stop offset="75%" stop-color="#7dd3fc" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#7dd3fc" stop-opacity="0.85"/>
+          </linearGradient>
+          <linearGradient id="invgenRibbonSecondary" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#fde68a" stop-opacity="0.85"/>
+            <stop offset="25%" stop-color="#fde68a" stop-opacity="1"/>
+            <stop offset="50%" stop-color="#fde68a" stop-opacity="0.6"/>
+            <stop offset="75%" stop-color="#fde68a" stop-opacity="1"/>
+            <stop offset="100%" stop-color="#fde68a" stop-opacity="0.75"/>
+          </linearGradient>
+          <path id="invgenRibbonWave" d="M140,0 C170,80 190,160 190,250 C190,340 150,420 150,510 C150,600 190,680 190,770 C190,860 150,940 150,1030 C150,1120 190,1200 190,1290 C190,1380 150,1460 150,1550 C150,1640 190,1720 190,1810 C190,1900 150,1980 150,2070 L10,2070 C10,1980 50,1900 50,1810 C50,1720 10,1640 10,1550 C10,1460 50,1380 50,1290 C50,1200 10,1120 10,1030 C10,940 50,860 50,770 C50,680 10,600 10,510 C10,420 50,340 50,250 C50,160 30,80 0,0 Z"/>
+        </defs>
+        <use href="#invgenRibbonWave" fill="url(#invgenRibbonAccent)" opacity="0.225" transform="translate(-50, 0)"/>
+        <use href="#invgenRibbonWave" fill="url(#invgenRibbonPrimary)" opacity="0.225" transform="translate(-10, -130)"/>
+        <use href="#invgenRibbonWave" fill="url(#invgenRibbonSecondary)" opacity="0.225" transform="translate(30, -260)"/>
+      </svg>
+    </div>
 
     <section class="invoice-header">
       <div class="invoice-header-left">
@@ -243,6 +268,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
             <span class="totals-input-affix" data-tax-prefix hidden>$</span>
             <input type="number" inputmode="decimal" data-field="taxRatePercent" value="0" min="0" step="0.001" aria-label="Tax">
             <span class="totals-input-affix totals-input-affix-right" data-tax-suffix>%</span>
+            <span class="totals-input-affix totals-input-affix-right" data-currency-code hidden></span>
             <button type="button" class="totals-input-swap" data-action="toggle-tax-mode" aria-label="Switch tax between percent and fixed amount" title="Switch between percent and fixed amount">&#x21c4;</button>
           </span>
         </div>
@@ -252,6 +278,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
           <span class="totals-input-group">
             <span class="totals-input-affix">$</span>
             <input type="number" inputmode="decimal" data-field="shipping-value" value="0" min="0" step="0.01" aria-label="Shipping">
+            <span class="totals-input-affix totals-input-affix-right" data-currency-code hidden></span>
           </span>
         </div>
 
@@ -261,6 +288,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
             <span class="totals-input-affix" data-discount-prefix hidden>$</span>
             <input type="number" inputmode="decimal" data-field="discount-value" value="0" min="0" step="0.01" aria-label="Discount">
             <span class="totals-input-affix totals-input-affix-right" data-discount-suffix>%</span>
+            <span class="totals-input-affix totals-input-affix-right" data-currency-code hidden></span>
             <button type="button" class="totals-input-swap" data-action="toggle-discount-mode" aria-label="Switch discount between percent and fixed amount" title="Switch between percent and fixed amount">&#x21c4;</button>
           </span>
         </div>
@@ -280,6 +308,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
           <span class="totals-input-group">
             <span class="totals-input-affix">$</span>
             <input type="number" inputmode="decimal" data-field="amountPaid" value="0" min="0" step="0.01" aria-label="Amount paid">
+            <span class="totals-input-affix totals-input-affix-right" data-currency-code hidden></span>
           </span>
         </div>
 

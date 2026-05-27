@@ -9,6 +9,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Load environment variables so price overrides (PREMIUM_MONTHLY_PRICE, etc.) are
+// applied. get_pricing_config() reads $_ENV, which is only populated once the .env
+// is loaded; without this the endpoint silently serves the default prices.
+require_once __DIR__ . '/../../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+$dotenv->safeLoad();
+
 require_once __DIR__ . '/../../config/pricing.php';
 
 $pricing = get_pricing_config();

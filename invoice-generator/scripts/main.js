@@ -790,6 +790,23 @@ async function init() {
     trackEvent('invgen_niche_default_used', slug);
   }
 
+  // ?template= URL parameter overrides the persisted state.template. Used
+  // by /invoice-template/{style}-{format}/ landing pages to deep-link into
+  // the live tool with a specific style preselected. Validated against
+  // the TEMPLATES registry so we cannot apply an unknown id.
+  try {
+    const { parseTemplateParam } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
+    const { TEMPLATES } = await import(`${BASE}/invoice-generator/scripts/templates.js`);
+    const allowedIds = TEMPLATES.map(t => t.id);
+    const fromUrl = parseTemplateParam(window.location.search, allowedIds);
+    if (fromUrl) {
+      state.template = fromUrl;
+      handleSaveResult(saveDraft(state));
+    }
+  } catch (_e) {
+    // URL-param parsing is best-effort; failure must not break the tool.
+  }
+
   // 2. Apply template immediately so the page paints correctly.
   applyTemplate(state.template);
 

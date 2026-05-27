@@ -35,6 +35,30 @@ foreach (glob(__DIR__ . '/niches/data/*.php') as $file) {
   ];
 }
 
+// Template hub.
+$urls[] = [
+  'loc' => 'https://argorobots.com/invoice-template/',
+  'lastmod' => date('Y-m-d', filemtime(__DIR__ . '/invoice-template/index.php')),
+  'priority' => '0.8',
+];
+
+// Template format-generic and style-format pages. Every
+// invoice-template/data/*.php (except the schema template) becomes one URL.
+foreach (glob(__DIR__ . '/invoice-template/data/*.php') as $file) {
+  $slug = basename($file, '.php');
+  if ($slug === '_template') continue;
+  $data = require $file;
+  $url_slug = $data['slug'] ?? $slug;
+  $kind = $data['kind'] ?? 'style-format';
+  $urls[] = [
+    'loc' => "https://argorobots.com/invoice-template/{$url_slug}/",
+    'lastmod' => date('Y-m-d', filemtime($file)),
+    // Format-generic pages slightly higher than style-format pages so
+    // Search Console picks them as the entry point of the cluster.
+    'priority' => $kind === 'format-generic' ? '0.8' : '0.7',
+  ];
+}
+
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap-0.9">' . "\n";
 foreach ($urls as $u) {

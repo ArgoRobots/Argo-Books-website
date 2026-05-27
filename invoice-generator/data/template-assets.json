@@ -1,0 +1,23 @@
+{
+  "excel": {
+    "classic": "classic.xlsx",
+    "modern": "modern.xlsx",
+    "minimal": "minimal.xlsx",
+    "bold": "bold.xlsx",
+    "professional": "professional.xlsx"
+  },
+  "google-docs": {
+    "classic": "",
+    "modern": "",
+    "minimal": "",
+    "bold": "",
+    "professional": ""
+  },
+  "google-sheets": {
+    "classic": "",
+    "modern": "",
+    "minimal": "",
+    "bold": "",
+    "professional": ""
+  }
+}

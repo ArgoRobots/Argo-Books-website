@@ -9,6 +9,8 @@
    reads from; templates only need to redefine these aliases. */
 
 @import url('../../resources/styles/custom-colors.css');
+@import url('./professional.css');
+@import url('./template-page.css');
 
 :root {
   /* Invoice surface defaults map to main-site variables. */
@@ -57,6 +59,13 @@
   --invoice-accent: var(--brand-yellow);
   --invoice-header-bg: var(--brand-yellow);
   --invoice-header-text: var(--dark-gray);
+}
+
+[data-template="professional"] {
+  --invoice-accent: var(--primary-blue);
+  --invoice-header-bg: transparent;
+  --invoice-header-text: var(--invoice-text);
+  --invoice-border: var(--gray-border);
 }
 
 * {

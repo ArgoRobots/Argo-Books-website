@@ -5,6 +5,8 @@ export const TEMPLATES = [
   { id: 'classic', name: 'Classic', description: 'Traditional and conservative.' },
   { id: 'modern', name: 'Modern', description: 'Clean sans-serif, accent color.' },
   { id: 'minimal', name: 'Minimal', description: 'Stripped down, lots of whitespace.' },
+  { id: 'bold', name: 'Bold', description: 'Yellow accent header, high contrast.' },
+  { id: 'professional', name: 'Professional', description: 'Serif headings with a thin accent rule.' },
 ];
 
 export function applyTemplate(templateId) {

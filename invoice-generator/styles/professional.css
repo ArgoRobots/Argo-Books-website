@@ -1,0 +1,52 @@
+/* invoice-generator/styles/professional.css
+ * Visual rules specific to [data-template="professional"]. The variable
+ * overrides for this template live in tool.css alongside the other
+ * [data-template="..."] blocks. This file is the place to put extra
+ * structural rules (font swaps, divider line) that cannot be expressed
+ * as a variable swap.
+ *
+ * Imported from tool.css. Imported once so dark-mode rules in tool.css
+ * still apply on top.
+ */
+
+/* Use the same serif stack everywhere we need a formal heading look.
+ * Georgia is the safest cross-platform serif: ships with macOS, Windows,
+ * Android, and most Linux distros. Cambria is the Windows-native
+ * Microsoft serif that html2canvas captures cleanly on Windows users.
+ *
+ * Selectors target the actual class names emitted by _fragment.php:
+ *   .editable-business-title  (the business name input)
+ *   .editable-document-title  (the "INVOICE" input)
+ *   .editable-label           (every section / column / totals label)
+ *   .line-items th            (the table-header row in the items table)
+ */
+[data-template="professional"] .editable-business-title,
+[data-template="professional"] .editable-document-title,
+[data-template="professional"] .editable-label,
+[data-template="professional"] .line-items th {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+  letter-spacing: 0.02em;
+}
+
+[data-template="professional"] .editable-document-title {
+  /* The "INVOICE" word at the top right. Slightly heavier than the body
+   * to anchor the header. */
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Thin accent rule directly under the header band. The color comes from
+ * --invoice-accent so it picks up dark-mode overrides automatically. */
+[data-template="professional"] .invoice-header {
+  border-bottom: 1px solid var(--invoice-accent);
+  padding-bottom: 10px;
+  margin-bottom: 18px;
+}
+
+/* The bill-to / ship-to / metadata row gets a subtle bottom divider too,
+ * so the eye reads three banded sections (header, parties, line items). */
+[data-template="professional"] .invoice-meta {
+  border-bottom: 1px solid var(--invoice-border);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}

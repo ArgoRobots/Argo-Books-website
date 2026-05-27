@@ -22,6 +22,24 @@ const COUNTRIES_URL = `${BASE}/invoice-generator/data/countries.json`;
 let docxPromise = null;
 let countriesPromise = null;
 
+// Per-template visual cues for the Word document. The DOCX engine builds
+// documents from scratch (it does not capture the styled DOM), so each
+// template needs an explicit code branch. Keep this minimal: we vary
+// the "INVOICE" heading font / color, and apply a single distinctive
+// cue per style (yellow band for Bold, thin navy rule for Professional).
+// Classic / Modern / Minimal stay close to the Phase A baseline.
+const TEMPLATE_STYLE = {
+  classic:      { headingFont: 'Arial',   headingColor: '1A1A1A', headerFill: null,     headerRule: null },
+  modern:       { headingFont: 'Arial',   headingColor: '2C7A7B', headerFill: null,     headerRule: null },
+  minimal:      { headingFont: 'Arial',   headingColor: '1A1A1A', headerFill: null,     headerRule: null },
+  bold:         { headingFont: 'Arial',   headingColor: '1A1A1A', headerFill: 'FBBF24', headerRule: null },
+  professional: { headingFont: 'Georgia', headingColor: '1A1A1A', headerFill: null,     headerRule: '0A2540' },
+};
+
+function styleForTemplate(templateId) {
+  return TEMPLATE_STYLE[templateId] || TEMPLATE_STYLE.classic;
+}
+
 // Inject a <script> tag and resolve when it loads. Reject on error so the
 // caller can surface a user-readable message (e.g. CDN blocked, ad blocker).
 function loadScript(src) {
@@ -133,6 +151,7 @@ function paragraphsFromMultiline(text, opts, d) {
 
 function buildHeader(state, d) {
   const { Paragraph, TextRun, Table, TableRow, TableCell, AlignmentType, WidthType, BorderStyle, ImageRun, HeadingLevel } = d;
+  const style = styleForTemplate(state.template);
 
   const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
   const cellBorders = {
@@ -165,7 +184,13 @@ function buildHeader(state, d) {
   const invoiceNumberText = state.invoiceNumber ? `# ${state.invoiceNumber}` : '';
   const rightChildren = [
     new Paragraph({
-      children: [new TextRun({ text: 'INVOICE', bold: true, size: 44 })],
+      children: [new TextRun({
+        text: 'INVOICE',
+        bold: true,
+        size: 44,
+        font: style.headingFont,
+        color: style.headingColor,
+      })],
       alignment: AlignmentType.RIGHT,
       heading: HeadingLevel.HEADING_1,
     }),
@@ -191,7 +216,17 @@ function buildHeader(state, d) {
           }),
           new TableCell({
             width: { size: 40, type: WidthType.PERCENTAGE },
-            borders: cellBorders,
+            borders: {
+              top: noBorder,
+              bottom: style.headerRule
+                ? { style: BorderStyle.SINGLE, size: 6, color: style.headerRule }
+                : noBorder,
+              left: noBorder,
+              right: noBorder,
+            },
+            shading: style.headerFill
+              ? { type: d.ShadingType.CLEAR, color: 'auto', fill: style.headerFill }
+              : undefined,
             children: rightChildren,
           }),
         ],

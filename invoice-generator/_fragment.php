@@ -60,6 +60,8 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
           <option value="classic">Classic</option>
           <option value="modern">Modern</option>
           <option value="minimal">Minimal</option>
+          <option value="bold">Bold</option>
+          <option value="professional">Professional</option>
         </select>
       </label>
 

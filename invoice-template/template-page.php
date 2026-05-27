@@ -1,0 +1,256 @@
+<?php
+// invoice-template/template-page.php
+//
+// Shared template for every page under /invoice-template/. Driven by data
+// files in invoice-template/data/{slug}.php.
+//
+// Routing:
+//   - /invoice-template/{slug}/  rewrites here with ?slug={slug}
+//   - /invoice-template/         serves invoice-template/index.php (hub).
+//
+// Heading structure:
+//   <h1>     target keyword
+//   <h2>     About this template
+//   <h2>     Download (style-format pages) OR Choose a style (format-generic pages)
+//   <h2>     Frequently asked questions
+//   <h2>     Related templates
+
+require_once __DIR__ . '/../invoice-generator/_base.php';
+
+// --- 1. Sanitize the slug -----------------------------------------------------
+
+$slug_raw = $_GET['slug'] ?? '';
+$slug = is_string($slug_raw) ? strtolower($slug_raw) : '';
+
+if ($slug === '' || !preg_match('/^[a-z0-9-]+$/', $slug)) {
+    template_render_404();
+    exit;
+}
+
+// --- 2. Load the data file ----------------------------------------------------
+
+$data_file = __DIR__ . '/data/' . $slug . '.php';
+if (!is_file($data_file)) {
+    template_render_404();
+    exit;
+}
+
+$data = require $data_file;
+
+if (!is_array($data) || empty($data['h1']) || empty($data['format'])) {
+    template_render_404();
+    exit;
+}
+
+// --- 3. Server-side page view (post-404) --------------------------------------
+
+if (PHP_SAPI !== 'cli') {
+    require_once __DIR__ . '/../statistics.php';
+    $safe_slug_for_event = preg_replace('/[^a-z0-9_-]/', '', $slug);
+    track_page_view('invgen_template_' . $safe_slug_for_event);
+}
+
+// --- 4. Page metadata ---------------------------------------------------------
+
+$page_title = $data['meta_title'] ?? ($data['h1'] . ' | Argo Books');
+$page_description = $data['meta_description'] ?? '';
+$canonical_url = 'https://argorobots.com/invoice-template/' . $slug . '/';
+
+// --- 5. JSON-LD ---------------------------------------------------------------
+
+$faq_items = [];
+foreach (($data['faqs'] ?? []) as $faq) {
+    if (empty($faq['q']) || empty($faq['a'])) {
+        continue;
+    }
+    $faq_items[] = [
+        '@type' => 'Question',
+        'name' => $faq['q'],
+        'acceptedAnswer' => [
+            '@type' => 'Answer',
+            'text' => $faq['a'],
+        ],
+    ];
+}
+$page_schema_json = null;
+if (!empty($faq_items)) {
+    $page_schema_json = json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'FAQPage',
+        'mainEntity' => $faq_items,
+    ], JSON_UNESCAPED_SLASHES);
+}
+
+$breadcrumb_items = [
+    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
+    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Invoice Templates', 'item' => 'https://argorobots.com/invoice-template/'],
+    ['@type' => 'ListItem', 'position' => 3, 'name' => $data['h1'], 'item' => $canonical_url],
+];
+$breadcrumb_schema_json = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => $breadcrumb_items,
+], JSON_UNESCAPED_SLASHES);
+
+// --- 6. Asset config ----------------------------------------------------------
+
+$assets_file = __DIR__ . '/../invoice-generator/data/template-assets.json';
+$assets = is_file($assets_file) ? json_decode(file_get_contents($assets_file), true) : [];
+$assets = is_array($assets) ? $assets : [];
+
+// --- 7. Compose the body ------------------------------------------------------
+
+$kind = $data['kind'] ?? 'format-generic';
+$style = $data['style'] ?? null;
+$format = $data['format'] ?? '';
+$invgen_ref = 'invgen-template-' . $slug;
+
+ob_start();
+?>
+<article class="template-page" data-kind="<?= htmlspecialchars($kind) ?>" data-format="<?= htmlspecialchars($format) ?>"<?php if ($style): ?> data-style="<?= htmlspecialchars($style) ?>"<?php endif; ?>>
+
+  <h1><?= htmlspecialchars($data['h1']) ?></h1>
+
+  <section class="template-intro">
+    <?= $data['intro_html'] ?? '' ?>
+  </section>
+
+  <section class="template-body">
+    <h2>About this template</h2>
+    <?= $data['body_html'] ?? '' ?>
+  </section>
+
+  <?php if ($kind === 'style-format' && $style && $format): ?>
+  <section class="template-download">
+    <h2>Download this template</h2>
+    <?php
+      // Preview thumbnail. PNG is committed in invoice-template/preview/{style}.png.
+      $preview_src = '/invoice-template/preview/' . rawurlencode($style) . '.png';
+    ?>
+    <img class="template-preview"
+         src="<?= htmlspecialchars($preview_src) ?>"
+         alt="<?= htmlspecialchars(ucfirst($style)) ?> style invoice preview"
+         loading="lazy"
+         width="600" height="450">
+
+    <?php
+      // CTA varies by format. PDF and Word link into the live tool with
+      // ?template=<style>; Excel serves a static file; Google Docs/Sheets
+      // open a "Make a copy" Google URL.
+      $cta_label = '';
+      $cta_href  = '';
+      $cta_event = 'invgen_template_cta_clicked';
+
+      if ($format === 'pdf' || $format === 'word') {
+          $cta_label = $format === 'pdf' ? 'Customize and download PDF' : 'Customize and download Word';
+          $cta_href = '/invoice-generator/?template=' . rawurlencode($style) . '&source=' . rawurlencode($invgen_ref);
+      } elseif ($format === 'excel') {
+          $filename = $assets['excel'][$style] ?? ($style . '.xlsx');
+          $cta_label = 'Download Excel template';
+          $cta_href = '/invoice-generator/templates/' . rawurlencode($filename);
+          $cta_event = 'invgen_template_download';
+      } elseif ($format === 'google-docs') {
+          $cta_label = 'Make a copy in Google Docs';
+          $cta_href = $assets['google-docs'][$style] ?? '#';
+          $cta_event = 'invgen_template_download';
+      } elseif ($format === 'google-sheets') {
+          $cta_label = 'Make a copy in Google Sheets';
+          $cta_href = $assets['google-sheets'][$style] ?? '#';
+          $cta_event = 'invgen_template_download';
+      }
+    ?>
+
+    <a class="template-cta-button"
+       href="<?= htmlspecialchars($cta_href) ?>"
+       data-template-cta="<?= htmlspecialchars($cta_event) ?>"
+       data-template-style="<?= htmlspecialchars($style) ?>"
+       data-template-format="<?= htmlspecialchars($format) ?>"<?php if (in_array($format, ['google-docs', 'google-sheets'], true)): ?> target="_blank" rel="noopener"<?php endif; ?>>
+      <?= htmlspecialchars($cta_label) ?>
+    </a>
+  </section>
+  <?php elseif ($kind === 'format-generic' && $format): ?>
+  <section class="template-style-grid">
+    <h2>Choose a style</h2>
+    <ul class="template-style-list">
+      <?php foreach (['classic', 'modern', 'minimal', 'bold', 'professional'] as $s): ?>
+        <li class="template-style-card">
+          <a href="/invoice-template/<?= htmlspecialchars($s) ?>-<?= htmlspecialchars($format) ?>/">
+            <img src="/invoice-template/preview/<?= rawurlencode($s) ?>.png"
+                 alt="<?= htmlspecialchars(ucfirst($s)) ?> invoice template preview"
+                 loading="lazy" width="300" height="225">
+            <span class="template-style-name"><?= htmlspecialchars(ucfirst($s)) ?></span>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
+  <?php if (!empty($data['faqs'])): ?>
+  <section class="template-faqs">
+    <h2>Frequently asked questions</h2>
+    <?php foreach ($data['faqs'] as $faq): ?>
+      <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
+      <div class="template-faq">
+        <h3><?= htmlspecialchars($faq['q']) ?></h3>
+        <p><?= htmlspecialchars($faq['a']) ?></p>
+      </div>
+    <?php endforeach; ?>
+  </section>
+  <?php endif; ?>
+
+  <section class="template-related">
+    <h2>Related templates</h2>
+    <?php $rel = $data['related_slugs'] ?? []; ?>
+    <?php if (!empty($rel)): ?>
+      <ul class="template-related-list">
+        <?php foreach ($rel as $rs): ?>
+          <?php if (!is_string($rs) || !preg_match('/^[a-z0-9-]+$/', $rs)) continue; ?>
+          <li><a href="/invoice-template/<?= htmlspecialchars($rs) ?>/"><?= htmlspecialchars(ucwords(str_replace('-', ' ', $rs))) ?></a></li>
+        <?php endforeach; ?>
+      </ul>
+    <?php else: ?>
+      <p>More templates are on the way.</p>
+    <?php endif; ?>
+  </section>
+
+  <section class="template-cta">
+    <p class="template-cta-text">
+      <a href="https://argorobots.com/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1&amp;placement=footer"
+         data-pitch-placement="template-footer">
+        If you want to handle payments, refunds, and track everything, use Argo Books.
+      </a>
+    </p>
+  </section>
+
+</article>
+<?php
+$body_content = ob_get_clean();
+
+$extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/invoice-template/scripts/template-page-tracker.js"></script>';
+
+include __DIR__ . '/../invoice-generator/layout.php';
+
+// -----------------------------------------------------------------------------
+
+function template_render_404(): void
+{
+    http_response_code(404);
+    if (!headers_sent()) {
+        header('Content-Type: text/html; charset=utf-8');
+    }
+    ?><!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Template not found | Argo Books</title>
+<meta name="robots" content="noindex">
+</head>
+<body>
+<h1>Template not found</h1>
+<p>The template you asked for does not exist. Browse <a href="/invoice-template/">all templates</a>.</p>
+</body>
+</html>
+<?php
+}

@@ -34,6 +34,9 @@ $allowed = [
     'invgen_currency_changed',
     'invgen_niche_default_used',
     'invgen_logo_uploaded',
+    // Phase B: template library
+    'invgen_template_cta_clicked',  // Customize and download (PDF/Word) on a template page
+    'invgen_template_download',     // Excel direct download / Google Docs or Sheets copy click
 ];
 if (!in_array($event_type, $allowed, true)) {
     http_response_code(400);

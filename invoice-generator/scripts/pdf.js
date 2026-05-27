@@ -1,6 +1,11 @@
 // invoice-generator/scripts/pdf.js
 // Generates the invoice as a single-page PDF by capturing the live .invoice
-// element. Uses html2canvas (1.4.1) for the bitmap capture and jsPDF (2.5.2)
+// element. Template-specific styling is delivered entirely through CSS
+// variables and rules in tool.css; html2canvas captures the styled DOM, so
+// adding a new template only requires CSS work. Do not add per-template
+// branching here.
+//
+// Uses html2canvas (1.4.1) for the bitmap capture and jsPDF (2.5.2)
 // to compose the document. Both are vendored separately:
 //   - vendor/html2canvas.min.js   (from cdn.jsdelivr.net/npm/html2canvas@1.4.1)
 //   - vendor/jspdf.umd.min.js     (from cdn.jsdelivr.net/npm/jspdf@2.5.2)

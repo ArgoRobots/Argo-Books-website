@@ -484,6 +484,92 @@ function get_niche_traffic(?string $period_start): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Phase B template library metrics.
+ *
+ * Page views into /invoice-template/{slug}/ are written by track_page_view()
+ * with event_type='page_view' and event_data='invgen_template_<slug>'. CTA
+ * clicks and direct downloads are written by track_event() with event_type
+ * 'invgen_template_cta_clicked' or 'invgen_template_download' and event_data
+ * '<style>|<format>'.
+ */
+function get_template_page_views(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
+               FROM statistics
+              WHERE event_type = 'page_view'
+                AND event_data LIKE 'invgen\\_template\\_%'
+                AND created_at >= ?
+           GROUP BY event_data
+           ORDER BY views DESC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT REPLACE(event_data, 'invgen_template_', '') AS slug, COUNT(*) AS views
+               FROM statistics
+              WHERE event_type = 'page_view'
+                AND event_data LIKE 'invgen\\_template\\_%'
+           GROUP BY event_data
+           ORDER BY views DESC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
+function get_template_cta_clicks(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT event_data AS style_format, COUNT(*) AS clicks
+               FROM statistics
+              WHERE event_type = 'invgen_template_cta_clicked'
+                AND created_at >= ?
+           GROUP BY event_data
+           ORDER BY clicks DESC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT event_data AS style_format, COUNT(*) AS clicks
+               FROM statistics
+              WHERE event_type = 'invgen_template_cta_clicked'
+           GROUP BY event_data
+           ORDER BY clicks DESC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
+function get_template_downloads(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT event_data AS style_format, COUNT(*) AS downloads
+               FROM statistics
+              WHERE event_type = 'invgen_template_download'
+                AND created_at >= ?
+           GROUP BY event_data
+           ORDER BY downloads DESC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT event_data AS style_format, COUNT(*) AS downloads
+               FROM statistics
+              WHERE event_type = 'invgen_template_download'
+           GROUP BY event_data
+           ORDER BY downloads DESC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
 // Resolve which tab is active. Default to funnel.
 $allowed_tabs = ['funnel', 'spend', 'tools'];
 $current_tab  = $_GET['tab'] ?? 'funnel';
@@ -1140,6 +1226,107 @@ include __DIR__ . '/../admin_header.php';
                             <tr>
                                 <td><code><?php echo htmlspecialchars($r['niche']); ?></code></td>
                                 <td><?php echo number_format((int)$r['views']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <?php
+        $template_views     = get_template_page_views($funnel_period_start_dt);
+        $template_cta       = get_template_cta_clicks($funnel_period_start_dt);
+        $template_downloads = get_template_downloads($funnel_period_start_dt);
+    ?>
+
+    <h2 style="margin-top:32px;">Template library</h2>
+
+    <div class="table-container">
+        <h3>Template page views</h3>
+        <p class="subtext" style="margin-top:0;">
+            Page views on /invoice-template/{slug}/. Slug `hub` is the index page; `pdf` / `word` / `excel` / `google-docs` / `google-sheets` are format-generic pages; `{style}-{format}` are style-format pages.
+        </p>
+        <?php if (empty($template_views)): ?>
+            <div class="empty-state">
+                <p>No template page views recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25">
+                    <thead>
+                        <tr>
+                            <th>Slug</th>
+                            <th>Views</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($template_views as $r): ?>
+                            <tr>
+                                <td><code><?php echo htmlspecialchars($r['slug']); ?></code></td>
+                                <td><?php echo number_format((int)$r['views']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="table-container">
+        <h3>Customize-and-download CTA clicks</h3>
+        <p class="subtext" style="margin-top:0;">
+            Clicks on the &quot;Customize and download PDF/Word&quot; CTA on a /invoice-template/{style}-{pdf|word}/ page. event_data is &quot;{style}|{format}&quot;.
+        </p>
+        <?php if (empty($template_cta)): ?>
+            <div class="empty-state">
+                <p>No template CTA clicks recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25">
+                    <thead>
+                        <tr>
+                            <th>Style and format</th>
+                            <th>Clicks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($template_cta as $r): ?>
+                            <tr>
+                                <td><code><?php echo htmlspecialchars($r['style_format']); ?></code></td>
+                                <td><?php echo number_format((int)$r['clicks']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="table-container">
+        <h3>Direct downloads (Excel and Google copies)</h3>
+        <p class="subtext" style="margin-top:0;">
+            Excel .xlsx downloads plus &quot;Make a copy in Google Docs/Sheets&quot; clicks. event_data is &quot;{style}|{format}&quot;.
+        </p>
+        <?php if (empty($template_downloads)): ?>
+            <div class="empty-state">
+                <p>No template downloads recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25">
+                    <thead>
+                        <tr>
+                            <th>Style and format</th>
+                            <th>Downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($template_downloads as $r): ?>
+                            <tr>
+                                <td><code><?php echo htmlspecialchars($r['style_format']); ?></code></td>
+                                <td><?php echo number_format((int)$r['downloads']); ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>

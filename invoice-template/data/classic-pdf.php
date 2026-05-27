@@ -1,0 +1,28 @@
+<?php
+// invoice-template/data/classic-pdf.php
+// /invoice-template/classic-pdf/
+
+return [
+  'slug' => 'classic-pdf',
+  'kind' => 'style-format',
+  'style' => 'classic',
+  'format' => 'pdf',
+
+  'h1' => 'Classic PDF invoice template',
+  'meta_title' => 'Classic PDF Invoice Template | Free Download | Argo Books',
+  'meta_description' => 'Free Classic-style PDF invoice template. Traditional dark header, sans-serif body, ready to customize and download in seconds.',
+
+  'intro_html' => '<p>The Classic style pairs a dark header band with a clean sans-serif body. It is the safest default for businesses that send invoices to clients in finance, legal, accounting, and other industries where understatement reads as professional. Click "Customize and download PDF" to open the generator with Classic preselected.</p>',
+
+  'body_html' =>
+    '<p>The Classic PDF template suits established businesses that want their invoice to look familiar to every recipient. The dark header anchors the page, the "INVOICE" label is unambiguous at first glance, and the table of line items reads cleanly even when printed on plain paper.</p>'
+    . '<p>You can edit every label on the invoice surface. If your business uses "Description" rather than "Service", change the column header. If you charge a flat fee rather than billing by quantity and rate, you can rename those columns too. The PDF download captures whatever you see on screen.</p>',
+
+  'faqs' => [
+    ['q' => 'Can I use the Classic template for a freelance invoice?', 'a' => 'Yes. The Classic style works for any business, freelance or otherwise. Fill in your name in the From block, set your terms, and download.'],
+    ['q' => 'How do I change the currency on the Classic PDF template?', 'a' => 'Open the generator and pick a currency from the toolbar. The generator covers 27 currencies and the change applies to every total on the invoice.'],
+    ['q' => 'Will my logo fit in the Classic header?', 'a' => 'Yes. The generator resizes large logos automatically to keep the saved draft under the local-storage quota. PNG and JPG both work.'],
+  ],
+
+  'related_slugs' => ['pdf', 'classic-word', 'classic-excel', 'modern-pdf', 'professional-pdf'],
+];

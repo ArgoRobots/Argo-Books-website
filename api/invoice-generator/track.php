@@ -1,0 +1,53 @@
+<?php
+// api/invoice-generator/track.php
+//
+// Lightweight client-side event endpoint for the free invoice generator tool.
+// The browser POSTs JSON like { "event_type": "invgen_pdf_downloaded", "event_data": "classic" }
+// and we forward to track_event() which handles admin-skip, bot-skip, and
+// one-per-IP-per-day dedup internally.
+//
+// All accepted event types are prefixed "invgen_" and listed in $allowed below
+// so the endpoint cannot be used to spray arbitrary statistics rows.
+
+require_once __DIR__ . '/../../statistics.php';
+
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'POST required']);
+    exit;
+}
+
+$body = json_decode(file_get_contents('php://input'), true);
+$event_type = is_array($body) ? (string)($body['event_type'] ?? '') : '';
+$event_data = is_array($body) ? ($body['event_data'] ?? '') : '';
+
+// Allowlist of event types the tool is allowed to emit. Keep this list in
+// sync with invoice-generator/scripts/tracker.js + its callers.
+$allowed = [
+    'invgen_pdf_downloaded',
+    'invgen_docx_downloaded',
+    'invgen_cta_clicked',
+    'invgen_template_changed',
+    'invgen_country_changed',
+    'invgen_currency_changed',
+    'invgen_niche_default_used',
+    'invgen_logo_uploaded',
+];
+if (!in_array($event_type, $allowed, true)) {
+    http_response_code(400);
+    echo json_encode(['error' => 'unknown event_type']);
+    exit;
+}
+
+// Cap event_data so a malformed client cannot bloat the statistics table.
+if (!is_string($event_data)) {
+    $event_data = '';
+}
+if (strlen($event_data) > 200) {
+    $event_data = substr($event_data, 0, 200);
+}
+
+$ok = track_event($event_type, $event_data);
+echo json_encode(['ok' => (bool)$ok]);

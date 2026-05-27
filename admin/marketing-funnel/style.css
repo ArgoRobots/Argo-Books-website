@@ -433,6 +433,17 @@
 }
 
 
+/* ─── Tools tab (invoice-generator metrics) ───────────────────────────── */
+
+/* Right-align numeric columns in the per-day tables so the daily series is
+   easy to scan vertically. The placement / niche tables stay left-aligned
+   because the first column is a short identifier. */
+.tool-day-table th + th,
+.tool-day-table td + td {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
 /* ─── Source Survey: Other freeform list ─────────────────────────────── */
 
 .survey-other-details {

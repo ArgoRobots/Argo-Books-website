@@ -1,0 +1,8 @@
+{
+  "name": "argo-books-invoice-generator-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test invoice-generator/scripts/*.test.js"
+  }
+}

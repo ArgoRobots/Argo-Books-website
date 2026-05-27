@@ -1,0 +1,1424 @@
+/* invoice-generator/styles/tool.css
+   Skeleton styles for the free invoice generator tool.
+   Polish lands in later tasks. Keep it functional and clean.
+
+   Palette: we re-use the main site's variables (see
+   /resources/styles/custom-colors.css) so the tool always tracks brand
+   colors and inherits dark-mode overrides automatically. The --invoice-*
+   and --tool-* names below are local aliases that the rest of the file
+   reads from; templates only need to redefine these aliases. */
+
+@import url('../../resources/styles/custom-colors.css');
+
+:root {
+  /* Invoice surface defaults map to main-site variables. */
+  --invoice-bg: var(--white);
+  --invoice-text: var(--dark-gray);
+  --invoice-accent: var(--primary-blue);
+  --invoice-header-bg: var(--dark-gray);
+  --invoice-header-text: var(--white);
+  --invoice-border: var(--gray-border);
+  --invoice-muted: var(--gray-placeholder);
+  --invoice-row-alt-bg: var(--gray-bg-light);
+
+  /* Tool chrome (outside the invoice surface). Kept on the same palette
+     so template switching does not visually break the toolbar. */
+  --tool-bg: var(--light-page-bg);
+  --tool-surface: var(--white);
+  --tool-text: var(--dark-gray);
+  --tool-muted: var(--gray-placeholder);
+  --tool-border: var(--gray-input-border);
+  --tool-primary: var(--primary-blue);
+  --tool-primary-text: var(--white);
+  --tool-secondary: var(--gray-bg-light);
+  --tool-secondary-text: var(--dark-gray);
+  --tool-danger: var(--red-600);
+}
+
+[data-template="classic"] {
+  /* defaults above */
+}
+
+[data-template="modern"] {
+  --invoice-accent: var(--secondary-blue);
+  --invoice-header-bg: transparent;
+  --invoice-header-text: var(--invoice-text);
+}
+
+[data-template="minimal"] {
+  --invoice-header-bg: transparent;
+  --invoice-header-text: var(--invoice-text);
+  --invoice-border: transparent;
+}
+
+/* Forward-looking template defined now so Phase B can ship without
+   another CSS migration. Harmless while no UI exposes it. */
+[data-template="bold"] {
+  --invoice-accent: var(--brand-yellow);
+  --invoice-header-bg: var(--brand-yellow);
+  --invoice-header-text: var(--dark-gray);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, Helvetica, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--tool-text);
+  background: var(--tool-bg);
+}
+
+/* ---------- App shell ---------- */
+
+.invoice-app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 96px;
+}
+
+/* ---------- Top site header ---------- */
+/* Full-width branding strip that sits OUTSIDE the .invoice-app container,
+   so the background and bottom border span the entire viewport. The
+   .site-header-inner holds the brand + CTA within a centered max-width so
+   they line up with the invoice surface below. */
+.site-header {
+  width: 100%;
+  background: var(--tool-surface);
+  border-bottom: 1px solid var(--tool-border);
+}
+
+.site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 14px 20px;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--tool-text);
+  flex: 0 0 auto;
+}
+
+.site-brand img {
+  display: block;
+  height: 28px;
+  width: auto;
+  max-width: 180px;
+}
+
+.site-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--tool-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--tool-text);
+  cursor: pointer;
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus {
+  background: var(--tool-secondary);
+  color: var(--tool-primary);
+  border-color: var(--tool-primary);
+}
+
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Default (light theme): show the moon icon (clicking switches to dark). */
+.theme-icon-sun { display: none; }
+.theme-icon-moon { display: block; }
+
+/* Dark theme: show the sun icon (clicking switches to light). */
+[data-theme="dark"] .theme-icon-sun { display: block; }
+[data-theme="dark"] .theme-icon-moon { display: none; }
+
+@media (max-width: 540px) {
+  .site-header-inner {
+    padding: 12px 16px;
+  }
+}
+
+/* ---------- Conversion-pitch banner above the invoice ---------- */
+
+.page-banner {
+  margin: 0 0 20px;
+  padding: 10px 16px;
+  background: var(--tool-secondary);
+  border: 1px solid var(--tool-border);
+  border-radius: 6px;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.page-banner-text {
+  color: var(--invoice-text);
+}
+
+.page-banner-link {
+  color: var(--tool-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.page-banner-link:hover,
+.page-banner-link:focus {
+  text-decoration-thickness: 2px;
+}
+
+/* ---------- Hero (only on standalone tool page) ---------- */
+
+.site-hero {
+  text-align: center;
+  padding: 16px 0 28px;
+}
+
+.site-hero-title {
+  margin: 0 0 8px;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--tool-text);
+}
+
+.site-hero-tagline {
+  margin: 0;
+  font-size: 16px;
+  color: var(--invoice-text);
+  max-width: 580px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 540px) {
+  .site-hero-title {
+    font-size: 28px;
+  }
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 16px;
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.toolbar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 140px;
+}
+
+.toolbar-label {
+  font-size: 12px;
+  color: var(--invoice-text);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn,
+.btn-icon {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  min-height: 40px;
+  background: var(--tool-secondary);
+  color: var(--tool-secondary-text);
+}
+
+.btn-primary {
+  background: var(--tool-primary);
+  color: var(--tool-primary-text);
+  border-color: var(--tool-primary);
+}
+
+.btn-secondary {
+  background: var(--tool-secondary);
+  color: var(--tool-secondary-text);
+  border-color: var(--tool-border);
+}
+
+.btn-add {
+  background: transparent;
+  color: var(--tool-primary);
+  border: 1px dashed var(--tool-border);
+}
+
+.btn-icon {
+  background: transparent;
+  color: var(--tool-muted);
+  border: 1px solid transparent;
+  padding: 6px 10px;
+  min-height: 36px;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.btn-icon:hover,
+.btn-icon:focus {
+  color: var(--tool-danger);
+  border-color: var(--tool-border);
+}
+
+#logo-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+  min-width: 180px;
+  padding: 12px 20px;
+  background: transparent;
+  border: 2px dashed var(--invoice-border);
+  border-radius: 6px;
+  color: var(--invoice-muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+#logo-slot:hover,
+#logo-slot:focus {
+  border-color: var(--invoice-accent);
+  color: var(--invoice-accent);
+}
+
+/* Rendered logo with hover-only remove button */
+.logo-rendered {
+  position: relative;
+  display: inline-block;
+}
+
+.logo-rendered .logo-image {
+  display: block;
+  max-width: 200px;
+  max-height: 80px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.logo-remove {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--invoice-bg);
+  color: var(--invoice-text);
+  border: 1px solid var(--invoice-border);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.logo-rendered:hover .logo-remove,
+.logo-rendered:focus-within .logo-remove,
+.logo-remove:focus {
+  opacity: 1;
+}
+
+.logo-remove:hover,
+.logo-remove:focus {
+  border-color: var(--invoice-accent);
+  color: var(--invoice-accent);
+}
+
+/* ---------- Invoice surface ---------- */
+
+.invoice {
+  background: var(--invoice-bg);
+  color: var(--invoice-text);
+  border: 1px solid var(--invoice-border);
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--invoice-border);
+  margin-bottom: 24px;
+}
+
+.invoice-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.invoice-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.invoice-title {
+  margin: 0 0 8px;
+  font-size: 36px;
+  letter-spacing: 0.08em;
+  color: var(--invoice-accent);
+}
+
+.invoice-number-field {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  color: var(--invoice-muted);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.invoice-number-prefix {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.invoice-number-field input {
+  width: 140px;
+  text-align: right;
+}
+
+/* ---------- Meta row (Parties on the left, info on the right) ---------- */
+/* Two-column outer split. The parties column stacks FROM on top with a
+   side-by-side BILL TO / SHIP TO sub-row below. The info column packs the
+   date / terms / due date / PO into compact horizontal label-input rows. */
+.invoice-meta {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+  align-items: start;
+}
+
+.meta-parties {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.meta-bill-ship {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.meta-block textarea,
+.meta-block input {
+  width: 100%;
+}
+
+.meta-shipto-toggle {
+  margin-top: 4px;
+}
+
+/* The SHIP TO column has no real label when collapsed, but BILL TO does.
+   This invisible placeholder takes the same vertical space as a label so
+   the "+ Ship To" button lines up with the BILL TO textarea. Hidden once
+   the SHIP TO row is expanded (it brings its own label). */
+.meta-label-spacer {
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
+}
+
+.meta-shipto-col:has(#field-shipTo-wrap:not([hidden])) .meta-label-spacer {
+  display: none;
+}
+
+/* SHIP TO content: the textarea takes the full column width (matching the
+   BILL TO textarea so their right edges align with the FROM textarea
+   above). The remove "x" sits absolutely in the bottom-right corner of
+   the textarea, where the browser's resize handle would otherwise live;
+   we disable native resize so they do not collide. */
+.meta-shipto {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.meta-shipto textarea {
+  resize: none;
+}
+
+.meta-shipto > .invgen-section-remove {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+}
+
+/* Right-side info: each row is "label | input" so the section reads compact. */
+.meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.meta-field-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.meta-field-row input.editable-label {
+  margin: 0;
+}
+
+.meta-field-row > input:not(.editable-label),
+.meta-field-row > input[type="date"],
+.meta-field-row > input[type="text"]:not(.editable-label) {
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .invoice-meta {
+    grid-template-columns: 1fr;
+  }
+  .meta-bill-ship {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Line items ---------- */
+
+.invoice-items {
+  margin-bottom: 32px;
+}
+
+.line-items {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.line-items thead th {
+  text-align: left;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--invoice-header-text);
+  background: var(--invoice-header-bg);
+  padding: 10px 12px;
+}
+
+.line-items tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--invoice-border);
+  vertical-align: middle;
+}
+
+.col-quantity,
+.col-rate,
+.col-amount {
+  width: 120px;
+  text-align: right;
+}
+
+.col-delete {
+  width: 48px;
+  text-align: center;
+}
+
+.line-items input[type="text"],
+.line-items input[type="number"] {
+  width: 100%;
+}
+
+.line-items .col-quantity input,
+.line-items .col-rate input {
+  text-align: right;
+}
+
+.line-items output {
+  display: inline-block;
+  width: 100%;
+  text-align: right;
+}
+
+.line-items-actions {
+  margin-top: 12px;
+}
+
+/* ---------- Footer (notes + totals) ---------- */
+
+.invoice-footer {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+}
+
+.invoice-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+
+.notes-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.notes-block label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--invoice-text);
+  font-weight: 600;
+}
+
+.notes-block textarea {
+  width: 100%;
+}
+
+.invoice-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+/* Three-column row: label (auto-sized, no wrap), input-or-amount (right-
+   aligned with a sensible cap), and the remove "x" if present. The label
+   column hugs its content so multi-word labels like "Amount Paid" never
+   wrap. The middle column sizes to the input group, which itself has a
+   cap so it never bullies the label out of its lane. */
+.totals-row {
+  display: grid;
+  grid-template-columns: auto 1fr 32px;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.totals-row .totals-label,
+.totals-row .editable-totals-label {
+  grid-column: 1;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.totals-row .totals-input-group {
+  grid-column: 2;
+  justify-self: end;
+  width: 100%;
+  max-width: 180px;
+}
+
+.totals-row .totals-value {
+  grid-column: 2;
+  justify-self: end;
+}
+
+.totals-row .invgen-section-remove {
+  grid-column: 3;
+}
+
+.totals-label,
+.editable-totals-label {
+  color: var(--invoice-text);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.totals-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  text-align: right;
+}
+
+.totals-total {
+  border-top: 1px solid var(--invoice-border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.totals-total .totals-label,
+.totals-total .editable-totals-label,
+.totals-total .totals-value {
+  font-weight: 700;
+  color: var(--invoice-text);
+  font-size: 17px;
+}
+
+.totals-balance {
+  border-top: 1px solid var(--invoice-border);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.totals-balance .totals-label,
+.totals-balance .editable-totals-label,
+.totals-balance .totals-value {
+  font-weight: 700;
+  color: var(--invoice-accent);
+  font-size: 17px;
+}
+
+/* "+ Shipping" / "+ Discount" toggle group. Both buttons live in one row
+   below the editable totals. Each button hides itself when its row is
+   expanded; the row collapses when all buttons are hidden. */
+.totals-toggle-row {
+  display: flex;
+  gap: 18px;
+  padding: 2px 0;
+}
+
+.totals-toggle-row:not(:has(.totals-toggle:not([hidden]))) {
+  display: none;
+}
+
+.totals-toggle {
+  background: transparent;
+  border: none;
+  color: var(--tool-primary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  min-height: 0;
+}
+
+.totals-toggle:hover,
+.totals-toggle:focus {
+  text-decoration: underline;
+  background: transparent;
+}
+
+/* Combined input control used in Tax / Shipping / Discount / Amount Paid.
+   One bordered rectangle that holds an optional prefix ($), the number
+   input, an optional suffix (%), and an optional swap button. The whole
+   group reads as one input field, matching invoice-generator.com. */
+.totals-input-group {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--gray-input-border, var(--invoice-border));
+  border-radius: 6px;
+  background: var(--invoice-bg);
+  overflow: hidden;
+  height: 36px;
+}
+
+.totals-input-group:focus-within {
+  border-color: var(--invoice-accent);
+}
+
+.totals-input-affix {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 14px;
+  color: var(--invoice-muted);
+  background: transparent;
+  flex: 0 0 auto;
+}
+
+.totals-input-affix-right {
+  border-left: 1px solid transparent;
+}
+
+.totals-input-group input[type="number"] {
+  border: none;
+  background: transparent;
+  text-align: right;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 6px;
+  font-size: 14px;
+  height: 100%;
+}
+
+.totals-input-group input[type="number"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.totals-input-swap {
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--gray-input-border, var(--invoice-border));
+  color: var(--invoice-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+.totals-input-swap:hover,
+.totals-input-swap:focus {
+  color: var(--invoice-text);
+  background: var(--tool-secondary);
+}
+
+/* ---------- Inputs / selects / textareas ---------- */
+
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="email"],
+select,
+textarea {
+  font: inherit;
+  font-size: 16px; /* prevent iOS Safari auto-zoom on focus */
+  color: var(--invoice-text);
+  background: var(--invoice-bg);
+  border: 1px solid var(--invoice-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  width: 100%;
+  max-width: 100%;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+  overflow-wrap: break-word;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--invoice-accent);
+  outline-offset: 1px;
+}
+
+/* ---------- Utility ---------- */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- Toast ---------- */
+
+.invgen-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  z-index: 50;
+  max-width: min(90vw, 420px);
+  padding: 10px 16px;
+  background: rgba(26, 26, 26, 0.92);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.invgen-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* "x" remove control inside discount / shipping / shipTo sections. Hidden
+   until the user hovers (or keyboard-focuses inside) the row, then turns
+   red on direct hover. */
+.invgen-section-remove {
+  width: 32px;
+  height: 32px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--invoice-muted);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.totals-row:hover .invgen-section-remove,
+.totals-row:focus-within .invgen-section-remove,
+.meta-shipto:hover .invgen-section-remove,
+.meta-shipto:focus-within .invgen-section-remove,
+.invgen-section-remove:focus {
+  opacity: 1;
+}
+
+.invgen-section-remove:hover,
+.invgen-section-remove:focus {
+  color: var(--tool-danger);
+  background: var(--tool-secondary);
+}
+
+/* ---------- Post-download conversion modal ---------- */
+
+.invgen-modal {
+  border: 1px solid var(--tool-border);
+  border-radius: 8px;
+  background: var(--tool-surface);
+  color: var(--tool-text);
+  padding: 24px;
+  max-width: 420px;
+  width: calc(100% - 32px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.invgen-modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.invgen-modal h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  color: var(--tool-text);
+}
+
+.invgen-modal p {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.invgen-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.invgen-modal-actions .btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Mobile: <= 720px ---------- */
+
+@media (max-width: 720px) {
+  .invoice-app {
+    padding: 16px 12px 96px;
+  }
+
+  .invoice {
+    padding: 16px;
+  }
+
+  /* Stack toolbar */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .toolbar-controls,
+  .toolbar-actions {
+    width: 100%;
+  }
+
+  .toolbar-field {
+    width: 100%;
+  }
+
+  /* Stack invoice header */
+  .invoice-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .invoice-header-right {
+    text-align: left;
+  }
+
+  .invoice-number-field input {
+    width: 100%;
+  }
+
+  /* Stack the meta row */
+  .invoice-meta {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Stack notes + totals */
+  .invoice-footer {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  /* Line items become stacked cards */
+  .line-items,
+  .line-items thead,
+  .line-items tbody,
+  .line-items tr,
+  .line-items td,
+  .line-items th {
+    display: block;
+    width: 100%;
+  }
+
+  .line-items thead {
+    /* Hide the header row visually but keep it for assistive tech */
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+  }
+
+  .line-items tbody tr.line-item {
+    border: 1px solid var(--invoice-border);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: var(--invoice-bg);
+  }
+
+  .line-items tbody td {
+    border-bottom: none;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .line-items tbody td::before {
+    content: attr(data-label);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--invoice-muted);
+    flex: 0 0 auto;
+  }
+
+  .line-items tbody td.col-delete::before {
+    content: "";
+  }
+
+  .line-items tbody td.col-delete {
+    justify-content: flex-end;
+  }
+
+  .line-items input,
+  .line-items output {
+    flex: 1 1 auto;
+    width: auto;
+    text-align: right;
+  }
+
+  /* Tap targets at least 44px */
+  .btn,
+  .btn-icon,
+  button,
+  select,
+  input[type="date"] {
+    min-height: 44px;
+  }
+
+  .btn-icon {
+    min-width: 44px;
+    font-size: 20px;
+  }
+
+  #logo-slot {
+    width: 100%;
+    min-height: 80px;
+  }
+
+  /* Sticky download bar at the bottom of the viewport on mobile */
+  .toolbar-actions {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 12px;
+    margin: 0 -12px -12px;
+    background: var(--tool-surface);
+    border-top: 1px solid var(--tool-border);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+    z-index: 5;
+  }
+
+  .toolbar-actions .btn {
+    flex: 1 1 0;
+  }
+
+  #download-pdf {
+    width: 100%;
+  }
+}
+
+/* ---------- Hide delete on the only line item (CSS-only) ---------- */
+/* When there's just one row left, the delete button is a no-op (main.js
+   keeps at least one row), so we hide it to remove the misleading affordance.
+   When the user adds more rows, the delete button reappears on every row. */
+[data-line-items-body] .line-item:only-child .btn-icon[data-action="delete-line-item"] {
+  display: none;
+}
+
+/* ---------- Hide native number-input spinners ---------- */
+/* The up/down arrows browsers add to <input type="number"> clutter the
+   compact totals inputs and our right-aligned numbers. Hide them; the
+   inputmode="decimal"/"numeric" attributes still give the right mobile
+   keyboard. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* ---------- Line items: align numeric columns ---------- */
+/* Quantity, Rate, and Amount are numeric. Right-align both the header
+   cell and the value cell so the column reads as a vertical column of
+   numbers instead of misaligned text and digits. */
+.line-items thead th.col-quantity,
+.line-items thead th.col-rate,
+.line-items tbody td.col-quantity,
+.line-items tbody td.col-rate {
+  text-align: left;
+}
+.line-items thead th.col-amount,
+.line-items tbody td.col-amount {
+  text-align: right;
+}
+.line-items tbody td.col-quantity input,
+.line-items tbody td.col-rate input {
+  text-align: right;
+}
+
+/* ---------- Editable text labels ---------- */
+/* Inputs styled to look like plain text. No border or background by
+   default, so they blend into the invoice. On hover or focus a blue
+   border appears. The selectors below all start with `input` to bump
+   specificity above the global `input[type="text"]` rule, which would
+   otherwise re-apply the form-input border + white background. */
+input.editable-text,
+textarea.editable-text {
+  border: 1px solid transparent;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  padding: 4px 6px;
+  border-radius: 6px;
+  width: 100%;
+  text-align: inherit;
+  font-size: inherit;
+  box-shadow: none;
+}
+
+input.editable-text::placeholder,
+textarea.editable-text::placeholder {
+  color: var(--invoice-muted);
+  opacity: 1;
+}
+
+input.editable-text:hover,
+textarea.editable-text:hover {
+  border-color: var(--invoice-accent);
+  background: transparent;
+}
+
+input.editable-text:focus,
+textarea.editable-text:focus {
+  border-color: var(--invoice-accent);
+  outline: none;
+  background: transparent;
+}
+
+/* Small uppercase label variant: matches the old <label> styling for
+   FROM / BILL TO / DATE / NOTES / TERMS etc. */
+input.editable-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--invoice-text);
+  display: block;
+}
+
+/* Table header variant: same background as the surrounding <th> (dark
+   strip on the classic template, transparent on modern/minimal), white
+   text on the dark backgrounds. Specificity is bumped so the global
+   input rule cannot reset the background back to white. */
+.line-items thead th .editable-th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--invoice-header-text);
+  background: transparent;
+  padding: 4px 6px;
+}
+
+.line-items thead th .editable-th::placeholder {
+  color: var(--invoice-header-text);
+  opacity: 0.7;
+}
+
+.line-items thead th .editable-th:hover,
+.line-items thead th .editable-th:focus {
+  border-color: var(--invoice-accent);
+  background: transparent;
+  color: var(--invoice-header-text);
+}
+
+/* Right-align the numeric column headers so the editable input matches the
+   right-aligned values below. */
+.line-items thead th.col-quantity .editable-th,
+.line-items thead th.col-rate .editable-th,
+.line-items thead th.col-amount .editable-th {
+  text-align: right;
+}
+
+/* Totals labels are sized to a uniform comfortable width so every row's
+   hover border looks the same. Wider than the longest label text
+   ("Balance Due" in bold) so there is breathing room, but narrower than
+   the browser's ~200px text-input default that the global rule would
+   otherwise apply. */
+input.editable-totals-label {
+  width: 140px;
+  max-width: 100%;
+}
+
+/* Business title sits to the right of the logo on the same horizontal row.
+   This is the dominant visual element of the header, so it gets the big
+   type weight; the document title shrinks to make room. */
+input.editable-business-title {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--invoice-text);
+  text-align: left;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+/* Document title (default "INVOICE") sits where the old hard-coded title
+   lived. Kept slim so the business title dominates. */
+input.editable-document-title {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--invoice-accent);
+  text-align: right;
+  margin-bottom: 4px;
+  /* Keep the text big but constrain the input's footprint so it does not
+     fight the business title for header width. */
+  width: auto;
+  max-width: 220px;
+}
+
+/* ---------- Dark theme overrides ---------- */
+/* All on-screen colors flip via these variable swaps. PDF and Word
+   downloads do NOT read these variables (pdf.js and docx.js use hard-
+   coded hex), so the downloaded invoice always stays light. */
+[data-theme="dark"] {
+  --invoice-bg: #1f2937;
+  --invoice-text: #f3f4f6;
+  --invoice-accent: #60a5fa;
+  --invoice-border: #374151;
+  --invoice-muted: #9ca3af;
+  --invoice-header-bg: #111827;
+  --invoice-header-text: #f3f4f6;
+  --invoice-row-alt-bg: #374151;
+
+  --tool-bg: #0f172a;
+  --tool-surface: #1f2937;
+  --tool-text: #f3f4f6;
+  --tool-muted: #9ca3af;
+  --tool-border: #374151;
+  --tool-primary: #60a5fa;
+  --tool-primary-text: #0f172a;
+  --tool-secondary: #374151;
+  --tool-secondary-text: #f3f4f6;
+}
+
+[data-theme="dark"] body {
+  color: var(--tool-text);
+  background: var(--tool-bg);
+}
+
+[data-theme="dark"] .invoice {
+  background: var(--invoice-bg);
+  color: var(--invoice-text);
+}
+
+/* Logo in dark mode: swap to the white variant so it stays readable. */
+[data-theme="dark"] .site-brand img[src*="argo-logo-black"] {
+  content: url("../../resources/images/argo-logo/argo-logo-white.png");
+}
+
+/* Editable label hover/focus background tweak so the surface shows through. */
+[data-theme="dark"] input.editable-text:focus,
+[data-theme="dark"] textarea.editable-text:focus {
+  background: var(--invoice-bg);
+}
+
+/* ---------- PDF capture mode ---------- */
+/* When pdf.js is rendering the invoice into a PDF via html2canvas, it adds
+   .invgen-capturing to the .invoice element. We use that flag to strip
+   UI-only affordances (toggle buttons, remove "x" controls, the delete
+   column on line items, the date picker indicator) so the captured image
+   matches what a finished invoice should look like. */
+.invgen-capturing .totals-input-swap,
+.invgen-capturing .totals-toggle-row,
+.invgen-capturing .meta-shipto-toggle,
+.invgen-capturing .invgen-section-remove,
+.invgen-capturing .logo-remove,
+.invgen-capturing [data-action="delete-line-item"],
+.invgen-capturing .col-delete,
+.invgen-capturing .meta-label-spacer,
+.invgen-capturing .line-items-actions,
+.invgen-capturing #logo-slot {
+  display: none !important;
+}
+
+/* Force editable fields to render flat with no border, matching the visual
+   the user sees when they are not hovering. */
+.invgen-capturing input,
+.invgen-capturing textarea,
+.invgen-capturing select {
+  border-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Inputs inside the totals-input-group keep the group border (the wrapper),
+   so individual inputs stay transparent and the group looks like one box. */
+.invgen-capturing .totals-input-group {
+  border-color: var(--invoice-border) !important;
+  background: var(--invoice-bg) !important;
+}
+
+/* Hide native date-picker indicator entirely during capture so it does not
+   leave a faint stripe in the snapshot. */
+.invgen-capturing input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
+
+/* ---------- Date inputs ---------- */
+/* Hide the browser's built-in calendar icon on <input type="date">. The whole
+   input becomes the click target via showPicker() wired in main.js. */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  background: transparent;
+}
+
+input[type="date"] {
+  position: relative;
+  cursor: pointer;
+}

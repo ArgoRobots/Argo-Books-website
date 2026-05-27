@@ -1,0 +1,18 @@
+// invoice-generator/scripts/templates.js
+// Template style registry + applier. Styles are pure CSS variable swaps driven by [data-template] on the body.
+
+export const TEMPLATES = [
+  { id: 'classic', name: 'Classic', description: 'Traditional and conservative.' },
+  { id: 'modern', name: 'Modern', description: 'Clean sans-serif, accent color.' },
+  { id: 'minimal', name: 'Minimal', description: 'Stripped down, lots of whitespace.' },
+];
+
+export function applyTemplate(templateId) {
+  const valid = TEMPLATES.find(t => t.id === templateId);
+  if (!valid) return null;
+  document.body.setAttribute('data-template', templateId);
+  // Mirror on the invoice-app wrapper so static-rendered pages without JS get a sane default too.
+  const wrapper = document.querySelector('.invoice-app');
+  if (wrapper) wrapper.setAttribute('data-template', templateId);
+  return valid;
+}

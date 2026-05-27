@@ -361,8 +361,131 @@ function get_campaign_spend_rows(): array
     return $stmt->fetchAll();
 }
 
+/**
+ * Invoice-generator tool metrics, all derived from the statistics table.
+ *
+ * Event shape (see api/invoice-generator/track.php and statistics.php):
+ *   - Page views into the tool ecosystem are written by track_page_view()
+ *     with event_type='page_view' and event_data='invgen_tool' or
+ *     'invgen_niche_<slug>'.
+ *   - Explicit events (downloads, CTA clicks, etc.) are written by
+ *     track_event() with event_type='invgen_*' and event_data describing
+ *     the variant (template name, placement, slug, etc.).
+ *
+ * Note: statistics has no environment column, so the tool metrics are not
+ * environment-scoped. statistics.track_event() also dedupes by IP per day,
+ * which means counts are unique-visitor-per-day rather than raw events.
+ */
+function get_tool_sessions_per_day(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
+               FROM statistics
+              WHERE event_type = 'page_view'
+                AND event_data LIKE 'invgen\\_%'
+                AND created_at >= ?
+           GROUP BY day
+           ORDER BY day ASC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT DATE(created_at) AS day, COUNT(*) AS sessions
+               FROM statistics
+              WHERE event_type = 'page_view'
+                AND event_data LIKE 'invgen\\_%'
+           GROUP BY day
+           ORDER BY day ASC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
+function get_tool_downloads_per_day(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT DATE(created_at) AS day,
+                    SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
+                    SUM(event_type = 'invgen_docx_downloaded') AS docx
+               FROM statistics
+              WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded')
+                AND created_at >= ?
+           GROUP BY day
+           ORDER BY day ASC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT DATE(created_at) AS day,
+                    SUM(event_type = 'invgen_pdf_downloaded')  AS pdf,
+                    SUM(event_type = 'invgen_docx_downloaded') AS docx
+               FROM statistics
+              WHERE event_type IN ('invgen_pdf_downloaded','invgen_docx_downloaded')
+           GROUP BY day
+           ORDER BY day ASC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
+function get_cta_ctr_by_placement(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT event_data AS placement, COUNT(*) AS clicks
+               FROM statistics
+              WHERE event_type = 'invgen_cta_clicked'
+                AND created_at >= ?
+           GROUP BY event_data
+           ORDER BY clicks DESC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT event_data AS placement, COUNT(*) AS clicks
+               FROM statistics
+              WHERE event_type = 'invgen_cta_clicked'
+           GROUP BY event_data
+           ORDER BY clicks DESC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
+function get_niche_traffic(?string $period_start): array
+{
+    global $pdo;
+    if ($period_start !== null) {
+        $stmt = $pdo->prepare(
+            "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
+               FROM statistics
+              WHERE event_type = 'page_view'
+                AND event_data LIKE 'invgen\\_niche\\_%'
+                AND created_at >= ?
+           GROUP BY event_data
+           ORDER BY views DESC"
+        );
+        $stmt->execute([$period_start]);
+    } else {
+        $stmt = $pdo->query(
+            "SELECT REPLACE(event_data, 'invgen_niche_', '') AS niche, COUNT(*) AS views
+               FROM statistics
+              WHERE event_type = 'page_view'
+                AND event_data LIKE 'invgen\\_niche\\_%'
+           GROUP BY event_data
+           ORDER BY views DESC"
+        );
+    }
+    return $stmt->fetchAll();
+}
+
 // Resolve which tab is active. Default to funnel.
-$allowed_tabs = ['funnel', 'spend'];
+$allowed_tabs = ['funnel', 'spend', 'tools'];
 $current_tab  = $_GET['tab'] ?? 'funnel';
 if (!in_array($current_tab, $allowed_tabs, true)) {
     $current_tab = 'funnel';
@@ -399,6 +522,7 @@ include __DIR__ . '/../admin_header.php';
     <div class="section-tabs">
         <button class="section-tab <?php echo $current_tab === 'funnel' ? 'active' : ''; ?>" data-tab="funnel">Funnel</button>
         <button class="section-tab <?php echo $current_tab === 'spend'  ? 'active' : ''; ?>" data-tab="spend">Spend</button>
+        <button class="section-tab <?php echo $current_tab === 'tools'  ? 'active' : ''; ?>" data-tab="tools">Tools</button>
     </div>
 
     <div id="funnel" class="tab-content <?php echo $current_tab === 'funnel' ? 'active' : ''; ?>">
@@ -825,6 +949,205 @@ include __DIR__ . '/../admin_header.php';
         <?php endif; ?>
     </div>
     </div><!-- /#spend -->
+
+    <div id="tools" class="tab-content <?php echo $current_tab === 'tools' ? 'active' : ''; ?>">
+    <?php
+        $tool_sessions    = get_tool_sessions_per_day($funnel_period_start_dt);
+        $tool_downloads   = get_tool_downloads_per_day($funnel_period_start_dt);
+        $tool_cta_clicks  = get_cta_ctr_by_placement($funnel_period_start_dt);
+        $tool_niche_views = get_niche_traffic($funnel_period_start_dt);
+
+        $total_tool_sessions = 0;
+        foreach ($tool_sessions as $r) { $total_tool_sessions += (int)$r['sessions']; }
+        $total_tool_pdf = 0; $total_tool_docx = 0;
+        foreach ($tool_downloads as $r) {
+            $total_tool_pdf  += (int)$r['pdf'];
+            $total_tool_docx += (int)$r['docx'];
+        }
+        $total_tool_downloads = $total_tool_pdf + $total_tool_docx;
+        $total_tool_clicks = 0;
+        foreach ($tool_cta_clicks as $r) { $total_tool_clicks += (int)$r['clicks']; }
+
+        $download_rate = $total_tool_sessions > 0
+            ? round(($total_tool_downloads / $total_tool_sessions) * 100, 1)
+            : null;
+        $cta_rate = $total_tool_sessions > 0
+            ? round(($total_tool_clicks / $total_tool_sessions) * 100, 1)
+            : null;
+    ?>
+    <div class="funnel-controls">
+        <span class="control-label">Period:</span>
+        <div class="funnel-pill-row">
+            <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
+                $href = 'index.php?' . http_build_query(['tab' => 'tools', 'funnel_period' => $pkey]);
+            ?>
+                <a href="<?php echo htmlspecialchars($href); ?>"
+                   class="funnel-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
+                    <?php echo $plabel; ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Tool sessions</h3>
+            <div class="value"><?php echo number_format($total_tool_sessions); ?></div>
+            <div class="subtext">unique visitors per day across invoice-generator pages</div>
+        </div>
+        <div class="stat-card">
+            <h3>Downloads</h3>
+            <div class="value"><?php echo number_format($total_tool_downloads); ?></div>
+            <div class="subtext">
+                PDF <?php echo number_format($total_tool_pdf); ?>
+                &middot; DOCX <?php echo number_format($total_tool_docx); ?>
+            </div>
+        </div>
+        <div class="stat-card">
+            <h3>Download rate</h3>
+            <div class="value"><?php echo $download_rate !== null ? $download_rate . '%' : '—'; ?></div>
+            <div class="subtext">downloads &divide; sessions</div>
+        </div>
+        <div class="stat-card">
+            <h3>CTA click rate</h3>
+            <div class="value"><?php echo $cta_rate !== null ? $cta_rate . '%' : '—'; ?></div>
+            <div class="subtext"><?php echo number_format($total_tool_clicks); ?> clicks on Argo Books pitches</div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>Sessions per day</h3>
+        <?php if (empty($tool_sessions)): ?>
+            <div class="empty-state">
+                <p>No invoice-generator traffic recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25" class="tool-day-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Sessions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($tool_sessions as $r): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($r['day']); ?></td>
+                                <td><?php echo number_format((int)$r['sessions']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="chart-container">
+        <h3>Downloads per day (PDF vs DOCX)</h3>
+        <?php if (empty($tool_downloads)): ?>
+            <div class="empty-state">
+                <p>No downloads recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25" class="tool-day-table">
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>PDF</th>
+                            <th>DOCX</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($tool_downloads as $r):
+                            $pdf  = (int)$r['pdf'];
+                            $docx = (int)$r['docx'];
+                        ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($r['day']); ?></td>
+                                <td><?php echo number_format($pdf); ?></td>
+                                <td><?php echo number_format($docx); ?></td>
+                                <td><?php echo number_format($pdf + $docx); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="table-container">
+        <h2>CTA click-through by placement</h2>
+        <p class="subtext" style="margin-top:0;">
+            Where invoice-generator visitors click through to argorobots.com. Percent is share of total CTA clicks
+            in this period, which is a useful ranking but not a true click-through rate (clicks per impression).
+        </p>
+        <?php if (empty($tool_cta_clicks)): ?>
+            <div class="empty-state">
+                <p>No CTA clicks recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25">
+                    <thead>
+                        <tr>
+                            <th>Placement</th>
+                            <th>Clicks</th>
+                            <th>Share</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($tool_cta_clicks as $r):
+                            $clicks = (int)$r['clicks'];
+                            $share = $total_tool_clicks > 0
+                                ? round(($clicks / $total_tool_clicks) * 100, 1)
+                                : 0;
+                        ?>
+                            <tr>
+                                <td><code><?php echo htmlspecialchars($r['placement'] !== '' ? $r['placement'] : '(unspecified)'); ?></code></td>
+                                <td><?php echo number_format($clicks); ?></td>
+                                <td><?php echo $share; ?>%</td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="table-container">
+        <h2>Niche traffic</h2>
+        <p class="subtext" style="margin-top:0;">
+            Page views on each niche landing page (e.g. /niches/photographer-invoice). One row per niche per visitor per day.
+        </p>
+        <?php if (empty($tool_niche_views)): ?>
+            <div class="empty-state">
+                <p>No niche-page views recorded for this period yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="table-responsive">
+                <table data-paginate="25">
+                    <thead>
+                        <tr>
+                            <th>Niche</th>
+                            <th>Views</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($tool_niche_views as $r): ?>
+                            <tr>
+                                <td><code><?php echo htmlspecialchars($r['niche']); ?></code></td>
+                                <td><?php echo number_format((int)$r['views']); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
+    </div><!-- /#tools -->
 </div>
 
 <!-- Ad spend modal -->

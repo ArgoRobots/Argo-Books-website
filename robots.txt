@@ -34,3 +34,4 @@ Disallow: /composer.lock
 
 # Sitemap location
 Sitemap: https://argorobots.com/sitemap.xml
+Sitemap: https://argorobots.com/sitemap-tools.xml

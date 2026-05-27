@@ -1,0 +1,104 @@
+{
+  "default": {
+    "name": "Other",
+    "default_currency": "USD",
+    "tax_label": "Tax",
+    "tax_number_label": "Tax Number"
+  },
+  "US": {
+    "name": "United States",
+    "default_currency": "USD",
+    "tax_label": "Sales Tax",
+    "tax_number_label": "EIN"
+  },
+  "CA": {
+    "name": "Canada",
+    "default_currency": "CAD",
+    "tax_label": "GST/HST",
+    "tax_number_label": "GST/HST Number"
+  },
+  "GB": {
+    "name": "United Kingdom",
+    "default_currency": "GBP",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "AU": {
+    "name": "Australia",
+    "default_currency": "AUD",
+    "tax_label": "GST",
+    "tax_number_label": "ABN"
+  },
+  "IE": {
+    "name": "Ireland",
+    "default_currency": "EUR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "DE": {
+    "name": "Germany",
+    "default_currency": "EUR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "FR": {
+    "name": "France",
+    "default_currency": "EUR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "ES": {
+    "name": "Spain",
+    "default_currency": "EUR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "IT": {
+    "name": "Italy",
+    "default_currency": "EUR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "NL": {
+    "name": "Netherlands",
+    "default_currency": "EUR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "NZ": {
+    "name": "New Zealand",
+    "default_currency": "NZD",
+    "tax_label": "GST",
+    "tax_number_label": "GST Number"
+  },
+  "IN": {
+    "name": "India",
+    "default_currency": "INR",
+    "tax_label": "GST",
+    "tax_number_label": "GSTIN"
+  },
+  "ZA": {
+    "name": "South Africa",
+    "default_currency": "ZAR",
+    "tax_label": "VAT",
+    "tax_number_label": "VAT Number"
+  },
+  "MX": {
+    "name": "Mexico",
+    "default_currency": "MXN",
+    "tax_label": "IVA",
+    "tax_number_label": "RFC"
+  },
+  "BR": {
+    "name": "Brazil",
+    "default_currency": "BRL",
+    "tax_label": "Tax",
+    "tax_number_label": "CNPJ"
+  },
+  "JP": {
+    "name": "Japan",
+    "default_currency": "JPY",
+    "tax_label": "Consumption Tax",
+    "tax_number_label": "Corporate Number"
+  }
+}

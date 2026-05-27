@@ -16,6 +16,13 @@
  */
 
 /**
+ * Allowed format for an option key, shared by JSON parsing and the receiver's
+ * degraded-mode validation so both stay consistent. Lowercase letters, digits,
+ * underscores and hyphens; 2-40 chars.
+ */
+const SURVEY_KEY_PATTERN = '/^[a-z0-9_-]{2,40}$/';
+
+/**
  * Returns the survey options as an array of {key, label, freeform?} maps, or
  * null if config/survey-options.json is missing/malformed. Cached per request.
  *
@@ -30,24 +37,42 @@ function get_survey_options() {
     $options = null;
 
     $json = @file_get_contents(__DIR__ . '/survey-options.json');
-    if ($json !== false) {
-        $data = json_decode($json, true);
-        if (is_array($data) && isset($data['options']) && is_array($data['options'])) {
-            $parsed = [];
-            foreach ($data['options'] as $o) {
-                if (!is_array($o) || empty($o['key']) || !isset($o['label'])) {
-                    continue;
-                }
-                $entry = ['key' => (string)$o['key'], 'label' => (string)$o['label']];
-                if (!empty($o['freeform'])) {
-                    $entry['freeform'] = true;
-                }
-                $parsed[] = $entry;
-            }
-            if (count($parsed) > 0) {
-                $options = $parsed;
-            }
+    if ($json === false) {
+        // Log so a broken deploy (missing JSON) is noticeable rather than silently
+        // degrading to the app's bundled defaults + lenient server validation.
+        error_log('survey_options: unable to read config/survey-options.json');
+        return $options;
+    }
+
+    $data = json_decode($json, true);
+    if (!is_array($data) || !isset($data['options']) || !is_array($data['options'])) {
+        error_log('survey_options: config/survey-options.json is missing or malformed');
+        return $options;
+    }
+
+    $parsed = [];
+    foreach ($data['options'] as $o) {
+        if (!is_array($o) || empty($o['key']) || !isset($o['label'])) {
+            continue;
         }
+        // Normalize and validate the key so a config typo fails fast (and visibly)
+        // instead of producing a key the app can never match.
+        $key = strtolower(trim((string)$o['key']));
+        if (!preg_match(SURVEY_KEY_PATTERN, $key)) {
+            error_log('survey_options: skipping option with invalid key: ' . json_encode($o['key']));
+            continue;
+        }
+        $entry = ['key' => $key, 'label' => (string)$o['label']];
+        if (!empty($o['freeform'])) {
+            $entry['freeform'] = true;
+        }
+        $parsed[] = $entry;
+    }
+
+    if (count($parsed) > 0) {
+        $options = $parsed;
+    } else {
+        error_log('survey_options: config/survey-options.json contained no valid options');
     }
 
     return $options;

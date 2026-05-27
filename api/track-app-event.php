@@ -77,7 +77,8 @@ if ($event_type === 'signup_survey') {
         // The options JSON is unavailable (broken deploy). The app is serving its
         // own bundled fallback list, so validate leniently rather than rejecting
         // every answer and silently losing survey responses during the outage.
-        if (!preg_match('/^[a-z]{3,30}$/', $answer)) {
+        // Use the same key format as the JSON path so degraded mode stays consistent.
+        if (!preg_match(SURVEY_KEY_PATTERN, $answer)) {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Invalid answer']);
             exit;

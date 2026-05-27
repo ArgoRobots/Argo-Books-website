@@ -73,7 +73,16 @@ if ($event_type === 'signup_survey') {
     // reads), so adding a survey option needs only that one file edit.
     require_once __DIR__ . '/../config/survey_options.php';
     $allowed = get_survey_option_keys();
-    if (!in_array($answer, $allowed, true)) {
+    if ($allowed === null) {
+        // The options JSON is unavailable (broken deploy). The app is serving its
+        // own bundled fallback list, so validate leniently rather than rejecting
+        // every answer and silently losing survey responses during the outage.
+        if (!preg_match('/^[a-z]{3,30}$/', $answer)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error' => 'Invalid answer']);
+            exit;
+        }
+    } elseif (!in_array($answer, $allowed, true)) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid answer']);
         exit;
@@ -86,9 +95,14 @@ if ($event_type === 'signup_survey') {
 
     // Freeform text accompanies any option flagged freeform in the JSON (today
     // just "other"). Trim, cap at 200 chars, strip control characters so it
-    // stores cleanly. Ignore for non-freeform answers.
+    // stores cleanly. Ignore for non-freeform answers. When the JSON is
+    // unavailable, fall back to the conventional "other" freeform key.
+    $freeform_keys = get_survey_freeform_keys();
+    $is_freeform = $freeform_keys === null
+        ? ($answer === 'other')
+        : in_array($answer, $freeform_keys, true);
     $other_text = null;
-    if (in_array($answer, get_survey_freeform_keys(), true)) {
+    if ($is_freeform) {
         $raw_other = trim((string)($data['other_text'] ?? ''));
         if ($raw_other === '') {
             http_response_code(400);

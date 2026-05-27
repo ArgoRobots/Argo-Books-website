@@ -32,6 +32,15 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
 
 require_once __DIR__ . '/../config/survey_options.php';
 
+$options = get_survey_options();
+if ($options === null) {
+    // JSON missing/malformed. Return an error (not a partial list) so the app
+    // falls back to its own bundled default list, the single offline fallback.
+    http_response_code(500);
+    echo json_encode(['error' => 'Options unavailable']);
+    exit;
+}
+
 // Allow brief client/proxy caching; option changes propagate within minutes.
 header('Cache-Control: public, max-age=300');
-echo json_encode(['options' => get_survey_options()]);
+echo json_encode(['options' => $options]);

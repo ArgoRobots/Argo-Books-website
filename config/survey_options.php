@@ -8,45 +8,26 @@
  * (api/track-app-event.php) read from here, so adding/removing an option is a
  * single edit to config/survey-options.json with no other code changes.
  *
- * Options live in config/survey-options.json (data, no PHP). This file provides
- * accessors with a hardcoded fallback so the survey keeps working if the JSON
- * is missing or malformed.
+ * There is intentionally NO hardcoded fallback list here. The desktop app ships
+ * its own bundled default list and uses it whenever this endpoint is unreachable
+ * or returns a non-2xx, so the app is the single source of the offline fallback.
+ * If the JSON cannot be read, accessors return null and callers degrade
+ * accordingly (the options endpoint 500s; the receiver validates leniently).
  */
 
 /**
- * Default options, used when survey-options.json cannot be read or parsed.
- * Keys must stay in sync with the app's bundled SourceSurveyOptionsService.DefaultOptions.
+ * Returns the survey options as an array of {key, label, freeform?} maps, or
+ * null if config/survey-options.json is missing/malformed. Cached per request.
  *
- * @return array<int, array{key:string,label:string,freeform?:bool}>
- */
-function _survey_default_options() {
-    return [
-        ['key' => 'google',      'label' => 'Google'],
-        ['key' => 'bing',        'label' => 'Bing'],
-        ['key' => 'youtube',     'label' => 'YouTube'],
-        ['key' => 'reddit',      'label' => 'Reddit'],
-        ['key' => 'friend',      'label' => 'A friend'],
-        ['key' => 'email',       'label' => 'Email'],
-        ['key' => 'capterra',    'label' => 'Capterra'],
-        ['key' => 'producthunt', 'label' => 'Product Hunt'],
-        ['key' => 'other',       'label' => 'Other', 'freeform' => true],
-    ];
-}
-
-/**
- * Returns the survey options as an array of {key, label, freeform?} maps.
- * Reads config/survey-options.json; falls back to defaults on any failure.
- * Result is cached per request.
- *
- * @return array<int, array{key:string,label:string,freeform?:bool}>
+ * @return array<int, array{key:string,label:string,freeform?:bool}>|null
  */
 function get_survey_options() {
-    static $options = null;
-    if ($options !== null) {
+    static $options = false; // false = not yet computed (null is a valid result)
+    if ($options !== false) {
         return $options;
     }
 
-    $options = _survey_default_options();
+    $options = null;
 
     $json = @file_get_contents(__DIR__ . '/survey-options.json');
     if ($json !== false) {
@@ -73,26 +54,35 @@ function get_survey_options() {
 }
 
 /**
- * Returns the set of valid answer keys (lowercased) for server-side validation.
+ * Returns the valid answer keys (lowercased), or null if options are unavailable.
  *
- * @return string[]
+ * @return string[]|null
  */
 function get_survey_option_keys() {
+    $opts = get_survey_options();
+    if ($opts === null) {
+        return null;
+    }
     $keys = [];
-    foreach (get_survey_options() as $o) {
+    foreach ($opts as $o) {
         $keys[] = strtolower($o['key']);
     }
     return $keys;
 }
 
 /**
- * Returns the set of option keys (lowercased) that carry freeform text.
+ * Returns the option keys (lowercased) that carry freeform text, or null if
+ * options are unavailable.
  *
- * @return string[]
+ * @return string[]|null
  */
 function get_survey_freeform_keys() {
+    $opts = get_survey_options();
+    if ($opts === null) {
+        return null;
+    }
     $keys = [];
-    foreach (get_survey_options() as $o) {
+    foreach ($opts as $o) {
         if (!empty($o['freeform'])) {
             $keys[] = strtolower($o['key']);
         }

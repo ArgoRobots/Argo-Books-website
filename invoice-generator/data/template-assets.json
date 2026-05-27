@@ -2,22 +2,22 @@
   "excel": {
     "classic": "classic.xlsx",
     "modern": "modern.xlsx",
-    "minimal": "minimal.xlsx",
-    "bold": "bold.xlsx",
-    "professional": "professional.xlsx"
+    "formal": "formal.xlsx",
+    "elegant": "elegant.xlsx",
+    "ribbon": "ribbon.xlsx"
   },
   "google-docs": {
     "classic": "",
     "modern": "",
-    "minimal": "",
-    "bold": "",
-    "professional": ""
+    "formal": "",
+    "elegant": "",
+    "ribbon": ""
   },
   "google-sheets": {
     "classic": "",
     "modern": "",
-    "minimal": "",
-    "bold": "",
-    "professional": ""
+    "formal": "",
+    "elegant": "",
+    "ribbon": ""
   }
 }

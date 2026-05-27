@@ -4,15 +4,13 @@
 // Five template styles mirroring the Argo Books desktop app's invoice
 // templates so the web tool and the app feel like the same product. Each
 // id ties to a [data-template="<id>"] CSS scope in tool.css and a per-id
-// branch in scripts/docx.js. The user-facing display name (`name`) is shown
-// in the toolbar dropdown; some names diverge from their ids so the dropdown
-// reads naturally (e.g. id="minimal" displays as "Formal").
+// branch in scripts/docx.js.
 export const TEMPLATES = [
-  { id: 'classic', name: 'Classic', description: 'Clean default with a dark table header.' },
-  { id: 'modern', name: 'Modern', description: 'Slate left rail, light header band, dark table header.' },
-  { id: 'minimal', name: 'Formal', description: 'Georgia serif on a navy header and total band.' },
-  { id: 'bold', name: 'Elegant', description: 'Multicolor gradient ribbon, indigo total due.' },
-  { id: 'professional', name: 'Ribbon', description: 'Soft watercolor wave decoration along the left.' },
+  { id: 'classic', name: 'Classic', description: 'Traditional and conservative.' },
+  { id: 'modern', name: 'Modern', description: 'Clean sans-serif, accent color.' },
+  { id: 'formal', name: 'Formal', description: 'Stripped down, lots of whitespace.' },
+  { id: 'elegant', name: 'Elegant', description: 'Yellow accent header, high contrast.' },
+  { id: 'ribbon', name: 'Ribbon', description: 'Serif headings with a thin accent rule.' },
 ];
 
 export function applyTemplate(templateId) {

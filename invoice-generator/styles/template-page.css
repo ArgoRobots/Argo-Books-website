@@ -6,6 +6,8 @@
  * uses [data-template] swaps).
  */
 
+@import url('../../resources/styles/link.css');
+
 .template-page,
 .template-hub {
   max-width: 920px;
@@ -89,7 +91,25 @@
 
 .template-hub-grid {
   display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 24px;
+}
+
+.template-hub-grid > h2 {
+  grid-column: 1 / -1;
+}
+
+/* Breathing room above the closing CTA banner. Only when it follows
+ * other content; the top-of-page banner stays flush to the article. */
+.template-hub > .page-banner:not(:first-child),
+.template-page > .page-banner:not(:first-child) {
+  margin-top: 32px;
+}
+
+@media (max-width: 720px) {
+  .template-hub-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .template-hub-style-block {

@@ -24,5 +24,5 @@ return [
     ['q' => 'How do I add more line items to the Modern Google Sheets template?', 'a' => 'Right click a row inside the line items range, choose Insert row, then drag the formulas down. The subtotal includes the inserted rows automatically.'],
   ],
 
-  'related_slugs' => ['google-sheets', 'modern-excel', 'modern-google-docs', 'classic-google-sheets', 'minimal-google-sheets'],
+  'related_slugs' => ['google-sheets', 'modern-excel', 'modern-google-docs', 'classic-google-sheets', 'formal-google-sheets'],
 ];

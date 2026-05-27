@@ -24,5 +24,5 @@ return [
     ['q' => 'How big is the downloaded Word file?', 'a' => 'Under 100 KB without a logo. With a logo, the file size depends on the logo dimensions but is typically still under 500 KB.'],
   ],
 
-  'related_slugs' => ['word', 'classic-pdf', 'classic-google-docs', 'modern-word', 'professional-word'],
+  'related_slugs' => ['word', 'classic-pdf', 'classic-google-docs', 'modern-word', 'ribbon-word'],
 ];

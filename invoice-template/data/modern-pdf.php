@@ -24,5 +24,5 @@ return [
     ['q' => 'Will my logo fit in the Modern header?', 'a' => 'Yes. The generator resizes large logos automatically to keep the saved draft under the local-storage quota. PNG and JPG both work.'],
   ],
 
-  'related_slugs' => ['pdf', 'modern-word', 'modern-excel', 'classic-pdf', 'professional-pdf'],
+  'related_slugs' => ['pdf', 'modern-word', 'modern-excel', 'classic-pdf', 'ribbon-pdf'],
 ];

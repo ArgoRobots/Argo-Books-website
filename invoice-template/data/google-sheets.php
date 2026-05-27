@@ -25,5 +25,5 @@ return [
     ['q' => 'Are the totals auto-calculated in Google Sheets?', 'a' => 'Yes. Line amount, subtotal, tax, total, and balance due are all formulas in the Google Sheets templates.'],
   ],
 
-  'related_slugs' => ['excel', 'google-docs', 'classic-google-sheets', 'modern-google-sheets', 'minimal-google-sheets', 'bold-google-sheets', 'professional-google-sheets'],
+  'related_slugs' => ['excel', 'google-docs', 'classic-google-sheets', 'modern-google-sheets', 'formal-google-sheets', 'elegant-google-sheets', 'ribbon-google-sheets'],
 ];

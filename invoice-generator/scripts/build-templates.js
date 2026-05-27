@@ -1,6 +1,6 @@
 // invoice-generator/scripts/build-templates.js
 // Generates static .xlsx and .docx invoice templates per visual style
-// (classic, modern, minimal, bold, professional). The .xlsx files are
+// (classic, modern, formal, elegant, ribbon). The .xlsx files are
 // committed to invoice-generator/templates/ and served as direct downloads
 // from /invoice-generator/templates/{style}.xlsx. The .docx files are
 // dev-only artifacts intended for upload to Google Drive (where each is
@@ -42,22 +42,22 @@ const STYLES = {
     headerFill: null,
     accentColor: '2C7A7B',
   },
-  minimal: {
-    label: 'Minimal',
+  formal: {
+    label: 'Formal',
     headingFont: 'Arial',
     headingColor: '1A1A1A',
     headerFill: null,
     accentColor: 'CCCCCC',
   },
-  bold: {
-    label: 'Bold',
+  elegant: {
+    label: 'Elegant',
     headingFont: 'Arial',
     headingColor: '1A1A1A',
     headerFill: 'FBBF24',
     accentColor: 'FBBF24',
   },
-  professional: {
-    label: 'Professional',
+  ribbon: {
+    label: 'Ribbon',
     headingFont: 'Georgia',
     headingColor: '1A1A1A',
     headerFill: null,
@@ -113,8 +113,8 @@ async function buildXlsx(styleId) {
   ws.getCell('G2').value = '1042';
   ws.getCell('G2').alignment = { horizontal: 'right' };
 
-  // Thin accent rule under header band (Professional only).
-  if (styleId === 'professional') {
+  // Thin accent rule under header band (Ribbon only).
+  if (styleId === 'ribbon') {
     ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5'].forEach((addr) => {
       ws.getCell(addr).border = {
         bottom: { style: 'thin', color: { argb: style.accentColor } },
@@ -167,10 +167,10 @@ async function buildXlsx(styleId) {
     if (styleId === 'classic') {
       c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1A1A1A' } };
       c.font = { name: 'Arial', size: 11, bold: true, color: { argb: 'FFFFFF' } };
-    } else if (styleId === 'bold') {
+    } else if (styleId === 'elegant') {
       c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: style.headerFill } };
       c.font = { name: 'Arial', size: 11, bold: true, color: { argb: style.headingColor } };
-    } else if (styleId === 'minimal') {
+    } else if (styleId === 'formal') {
       c.font = { name: 'Arial', size: 11, bold: true, color: { argb: '1A1A1A' } };
       c.border = { bottom: { style: 'thin', color: { argb: '1A1A1A' } } };
     } else {
@@ -191,7 +191,7 @@ async function buildXlsx(styleId) {
     ws.getCell(`E${r}`).value = { formula: `IF(C${r}*D${r}=0,"",C${r}*D${r})` };
     ws.getCell(`E${r}`).numFmt = '"$"#,##0.00';
     ws.getCell(`E${r}`).alignment = { horizontal: 'right' };
-    if (styleId !== 'minimal') {
+    if (styleId !== 'formal') {
       ['A', 'C', 'D', 'E'].forEach((col) => {
         ws.getCell(`${col}${r}`).border = {
           bottom: { style: 'hair', color: { argb: 'DDDDDD' } },
@@ -284,7 +284,7 @@ function buildHeaderTable(style, styleId) {
 
   const rightCellBorders = {
     top: noBorder,
-    bottom: styleId === 'professional'
+    bottom: styleId === 'ribbon'
       ? { style: BorderStyle.SINGLE, size: 6, color: style.accentColor }
       : noBorder,
     left: noBorder,
@@ -374,7 +374,7 @@ function buildLineItemsTable(style, styleId) {
     let fill = 'F3F5F8';
     let textColor = '1A1A1A';
     if (styleId === 'classic') { fill = '1A1A1A'; textColor = 'FFFFFF'; }
-    if (styleId === 'bold') { fill = style.headerFill; textColor = style.headingColor; }
+    if (styleId === 'elegant') { fill = style.headerFill; textColor = style.headingColor; }
     return new TableCell({
       shading: { type: ShadingType.CLEAR, color: 'auto', fill },
       children: [new Paragraph({

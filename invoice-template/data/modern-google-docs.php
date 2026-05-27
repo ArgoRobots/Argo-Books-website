@@ -24,5 +24,5 @@ return [
     ['q' => 'Will the teal accent survive in Google Docs?', 'a' => 'Yes. Google Docs supports text colors and styling, which is what the teal accent uses.'],
   ],
 
-  'related_slugs' => ['google-docs', 'modern-word', 'modern-google-sheets', 'classic-google-docs', 'minimal-google-docs'],
+  'related_slugs' => ['google-docs', 'modern-word', 'modern-google-sheets', 'classic-google-docs', 'formal-google-docs'],
 ];

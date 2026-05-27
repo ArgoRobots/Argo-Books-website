@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseTemplateParam } from './url-params.js';
 
-const VALID = ['classic', 'modern', 'minimal', 'bold', 'professional'];
+const VALID = ['classic', 'modern', 'formal', 'elegant', 'ribbon'];
 
 test('parseTemplateParam returns null for empty string', () => {
   assert.equal(parseTemplateParam('', VALID), null);
@@ -14,14 +14,14 @@ test('parseTemplateParam returns null when param missing entirely', () => {
 });
 
 test('parseTemplateParam returns the value when it is in the allowlist', () => {
-  assert.equal(parseTemplateParam('?template=bold', VALID), 'bold');
-  assert.equal(parseTemplateParam('?template=professional', VALID), 'professional');
+  assert.equal(parseTemplateParam('?template=elegant', VALID), 'elegant');
+  assert.equal(parseTemplateParam('?template=ribbon', VALID), 'ribbon');
   assert.equal(parseTemplateParam('?foo=1&template=modern&bar=2', VALID), 'modern');
 });
 
 test('parseTemplateParam is case insensitive on the value', () => {
-  assert.equal(parseTemplateParam('?template=BOLD', VALID), 'bold');
-  assert.equal(parseTemplateParam('?template=Professional', VALID), 'professional');
+  assert.equal(parseTemplateParam('?template=ELEGANT', VALID), 'elegant');
+  assert.equal(parseTemplateParam('?template=Ribbon', VALID), 'ribbon');
 });
 
 test('parseTemplateParam returns null when value is not in the allowlist', () => {

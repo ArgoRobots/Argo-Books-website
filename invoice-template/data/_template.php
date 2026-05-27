@@ -10,15 +10,15 @@
 
 return [
   // Slug for canonical URL building. Should match the filename. Examples:
-  // 'pdf', 'word', 'classic-pdf', 'professional-google-sheets'.
+  // 'pdf', 'word', 'classic-pdf', 'ribbon-google-sheets'.
   'slug' => '',
 
   // 'format-generic' (e.g. /invoice-template/pdf/) or 'style-format'
-  // (e.g. /invoice-template/bold-pdf/). Drives layout choices in
+  // (e.g. /invoice-template/elegant-pdf/). Drives layout choices in
   // template-page.php (presence of grid vs. preview, etc.).
   'kind' => 'format-generic',
 
-  // For style-format pages only. One of: classic, modern, minimal, bold, professional.
+  // For style-format pages only. One of: classic, modern, formal, elegant, ribbon.
   'style' => null,
 
   // One of: pdf, word, excel, google-docs, google-sheets.

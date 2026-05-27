@@ -25,5 +25,5 @@ return [
     ['q' => 'Are the templates protected?', 'a' => 'No. There is no password, no locked cells, no macros. Edit anything you like.'],
   ],
 
-  'related_slugs' => ['google-sheets', 'pdf', 'classic-excel', 'modern-excel', 'minimal-excel', 'bold-excel', 'professional-excel'],
+  'related_slugs' => ['google-sheets', 'pdf', 'classic-excel', 'modern-excel', 'formal-excel', 'elegant-excel', 'ribbon-excel'],
 ];

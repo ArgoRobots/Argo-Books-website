@@ -18,15 +18,9 @@
 $invgen_ref = $invgen_ref ?? 'invgen-tool';
 require_once __DIR__ . '/_base.php';
 $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-generator&amp;utm_medium=tool&amp;utm_campaign=phase1';
+// The site-header (logo bar) is rendered once for every tool page by layout.php,
+// so this fragment no longer emits its own.
 ?>
-<header class="site-header">
-  <div class="site-header-inner">
-    <a class="site-brand" href="<?= INVGEN_BASE ?>/" aria-label="Argo Books home">
-      <img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
-    </a>
-  </div>
-</header>
-
 <div class="invoice-app" data-template="classic">
 
   <?php if (!empty($show_tool_hero)): ?>
@@ -48,9 +42,9 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
         <select data-field="template" aria-label="Invoice template">
           <option value="classic">Classic</option>
           <option value="modern">Modern</option>
-          <option value="minimal">Formal</option>
-          <option value="bold">Elegant</option>
-          <option value="professional">Ribbon</option>
+          <option value="formal">Formal</option>
+          <option value="elegant">Elegant</option>
+          <option value="ribbon">Ribbon</option>
         </select>
       </label>
 
@@ -105,10 +99,10 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
 
   <main class="invoice" aria-label="Invoice editor">
 
-    <!-- Watercolor wave decoration: visible only for [data-template="professional"]
-         (the "Ribbon" style). Three overlapping wave paths, each filled with a
-         vertical gradient at low opacity, give the soft watercolor look from
-         the desktop app's Ribbon template. Hidden by default via CSS. -->
+    <!-- Watercolor wave decoration: visible only for [data-template="ribbon"].
+         Three overlapping wave paths, each filled with a vertical gradient at
+         low opacity, give the soft watercolor look from the desktop app's
+         Ribbon template. Hidden by default via CSS. -->
     <div class="invoice-ribbon-deco" aria-hidden="true">
       <svg viewBox="0 0 280 1100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
         <defs>

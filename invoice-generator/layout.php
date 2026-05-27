@@ -88,6 +88,13 @@ $site_schema = [
 <?php endif; ?>
 </head>
 <body>
+<header class="site-header">
+  <div class="site-header-inner">
+    <a class="site-brand" href="<?= INVGEN_BASE ?>/" aria-label="Argo Books home">
+      <img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
+    </a>
+  </div>
+</header>
 <?= $body_content ?>
 <?= $extra_scripts ?>
 </body>

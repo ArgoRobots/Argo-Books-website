@@ -24,5 +24,5 @@ return [
     ['q' => 'Will the dark header band survive in Google Docs?', 'a' => 'Yes. Google Docs supports cell shading and bold text, which is what the dark header band uses.'],
   ],
 
-  'related_slugs' => ['google-docs', 'classic-word', 'classic-google-sheets', 'modern-google-docs', 'professional-google-docs'],
+  'related_slugs' => ['google-docs', 'classic-word', 'classic-google-sheets', 'modern-google-docs', 'ribbon-google-docs'],
 ];

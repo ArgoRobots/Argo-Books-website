@@ -136,9 +136,9 @@
   font-weight: 800;
 }
 
-/* --- Minimal (display name "Formal"): formal Georgia serif, navy header
- *     band, navy total band. Mirrors the desktop app's Classic style. --- */
-[data-template="minimal"] {
+/* --- Formal: Georgia serif, navy header band, navy total band.
+ *     Mirrors the desktop app's Classic style. --- */
+[data-template="formal"] {
   --invoice-bg: var(--white);
   --invoice-text: #1a1a1a;
   --invoice-accent: var(--navy-1e3a5f);
@@ -148,25 +148,25 @@
   --invoice-muted: var(--gray-500);
 }
 
-[data-template="minimal"] .invoice {
+[data-template="formal"] .invoice {
   font-family: Georgia, Cambria, "Times New Roman", Times, serif;
   padding: 0;
 }
 
-[data-template="minimal"] .invoice-header {
+[data-template="formal"] .invoice-header {
   padding: 32px 32px 12px;
   border-bottom: 2px solid var(--navy-1e3a5f);
   margin-bottom: 0;
 }
 
-[data-template="minimal"] input.editable-business-title {
+[data-template="formal"] input.editable-business-title {
   font-family: Georgia, serif;
   font-size: 30px;
   font-weight: 700;
   color: #1a1a1a;
 }
 
-[data-template="minimal"] input.editable-document-title {
+[data-template="formal"] input.editable-document-title {
   font-family: Georgia, serif;
   font-size: 42px;
   font-weight: 700;
@@ -176,28 +176,28 @@
   max-width: none;
 }
 
-[data-template="minimal"] .invoice-number-field,
-[data-template="minimal"] .invoice-number-field input,
-[data-template="minimal"] .invoice-number-prefix {
+[data-template="formal"] .invoice-number-field,
+[data-template="formal"] .invoice-number-field input,
+[data-template="formal"] .invoice-number-prefix {
   font-family: Georgia, serif;
   color: #1a1a1a;
   font-weight: 700;
   font-size: 17px;
 }
 
-[data-template="minimal"] .invoice-meta {
+[data-template="formal"] .invoice-meta {
   background: var(--gray-100);
   padding: 22px 32px;
   margin: 0 0 24px;
   border-bottom: 1px solid var(--gray-200);
 }
 
-[data-template="minimal"] .invoice-items {
+[data-template="formal"] .invoice-items {
   padding: 0 32px;
   margin-bottom: 16px;
 }
 
-[data-template="minimal"] .line-items thead th {
+[data-template="formal"] .line-items thead th {
   background: var(--navy-1e3a5f);
   color: var(--white);
   padding: 14px 16px;
@@ -206,12 +206,12 @@
   letter-spacing: 0.06em;
 }
 
-[data-template="minimal"] .invoice-footer {
+[data-template="formal"] .invoice-footer {
   padding: 0 32px 0;
   gap: 24px;
 }
 
-[data-template="minimal"] .totals-total {
+[data-template="formal"] .totals-total {
   background: var(--navy-1e3a5f);
   padding: 14px 16px;
   margin: 8px 0 0;
@@ -219,8 +219,8 @@
   border-radius: 4px;
 }
 
-[data-template="minimal"] .totals-total .editable-totals-label,
-[data-template="minimal"] .totals-total .totals-value {
+[data-template="formal"] .totals-total .editable-totals-label,
+[data-template="formal"] .totals-total .totals-value {
   color: var(--white);
   font-size: 20px;
   font-weight: 700;
@@ -228,8 +228,8 @@
   background: transparent;
 }
 
-[data-template="minimal"] .totals-total input.editable-totals-label:hover,
-[data-template="minimal"] .totals-total input.editable-totals-label:focus {
+[data-template="formal"] .totals-total input.editable-totals-label:hover,
+[data-template="formal"] .totals-total input.editable-totals-label:focus {
   border-color: var(--white-alpha-50);
   background: var(--white-alpha-10);
   color: var(--white);
@@ -238,14 +238,13 @@
 /* Navy bottom band, matching the desktop Classic template's "Thank you for
  * your business!" footer strip. Implemented as a thick bottom border so it
  * follows the rounded corners of the surrounding invoice card. */
-[data-template="minimal"] .invoice {
+[data-template="formal"] .invoice {
   border-bottom: 32px solid var(--navy-1e3a5f);
 }
 
-/* --- Bold (display name "Elegant"): Georgia serif, multicolor gradient
- *     ribbon at the top, indigo accent line beside Bill To, and a large
- *     indigo Total Due. --- */
-[data-template="bold"] {
+/* --- Elegant: Georgia serif, multicolor gradient ribbon at the top,
+ *     indigo accent line beside Bill To, and a large indigo Total Due. --- */
+[data-template="elegant"] {
   --invoice-bg: var(--white);
   --invoice-text: #1f2937;
   --invoice-accent: var(--indigo-500);
@@ -255,14 +254,14 @@
   --invoice-muted: var(--gray-500);
 }
 
-[data-template="bold"] .invoice {
+[data-template="elegant"] .invoice {
   font-family: Georgia, Cambria, "Times New Roman", Times, serif;
   padding: 0;
   position: relative;
   overflow: hidden;
 }
 
-[data-template="bold"] .invoice::before {
+[data-template="elegant"] .invoice::before {
   content: "";
   display: block;
   height: 6px;
@@ -273,20 +272,20 @@
     var(--emerald-400) 100%);
 }
 
-[data-template="bold"] .invoice-header {
+[data-template="elegant"] .invoice-header {
   padding: 28px 32px 16px;
   border-bottom: none;
   margin-bottom: 12px;
 }
 
-[data-template="bold"] input.editable-business-title {
+[data-template="elegant"] input.editable-business-title {
   font-family: Georgia, serif;
   font-size: 30px;
   font-weight: 700;
   color: #1a1a1a;
 }
 
-[data-template="bold"] input.editable-document-title {
+[data-template="elegant"] input.editable-document-title {
   font-size: 13px;
   letter-spacing: 0.2em;
   color: var(--indigo-500);
@@ -295,31 +294,31 @@
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-[data-template="bold"] .invoice-number-field,
-[data-template="bold"] .invoice-number-field input,
-[data-template="bold"] .invoice-number-prefix {
+[data-template="elegant"] .invoice-number-field,
+[data-template="elegant"] .invoice-number-field input,
+[data-template="elegant"] .invoice-number-prefix {
   font-family: Georgia, serif;
   font-size: 30px;
   font-weight: 700;
   color: #1a1a1a;
 }
 
-[data-template="bold"] .invoice-meta {
+[data-template="elegant"] .invoice-meta {
   padding: 0 32px;
   margin-bottom: 28px;
 }
 
-[data-template="bold"] .meta-billto {
+[data-template="elegant"] .meta-billto {
   border-left: 3px solid var(--indigo-500);
   padding-left: 14px;
 }
 
-[data-template="bold"] .invoice-items {
+[data-template="elegant"] .invoice-items {
   padding: 0 32px;
   margin-bottom: 24px;
 }
 
-[data-template="bold"] .line-items thead th {
+[data-template="elegant"] .line-items thead th {
   background: transparent;
   color: var(--gray-500);
   border-top: 1px solid var(--gray-300);
@@ -330,20 +329,20 @@
   padding: 12px;
 }
 
-[data-template="bold"] .line-items thead th .editable-th {
+[data-template="elegant"] .line-items thead th .editable-th {
   color: var(--gray-500);
 }
 
-[data-template="bold"] .invoice-footer {
+[data-template="elegant"] .invoice-footer {
   padding: 0 32px 28px;
 }
 
-[data-template="bold"] .totals-total {
+[data-template="elegant"] .totals-total {
   border-top: none;
   padding-top: 12px;
 }
 
-[data-template="bold"] .totals-total .editable-totals-label {
+[data-template="elegant"] .totals-total .editable-totals-label {
   color: var(--gray-500);
   font-size: 12px;
   letter-spacing: 0.12em;
@@ -352,18 +351,17 @@
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
-[data-template="bold"] .totals-total .totals-value {
+[data-template="elegant"] .totals-total .totals-value {
   color: var(--indigo-500);
   font-family: Georgia, serif;
   font-size: 28px;
   font-weight: 700;
 }
 
-/* --- Professional (display name "Ribbon"): watercolor wave decoration
- *     on the left side, Open Sans body, navy uppercase headings. The
- *     wave SVG is rendered as a real DOM element in _fragment.php; here
- *     we just position and reveal it. --- */
-[data-template="professional"] {
+/* --- Ribbon: watercolor wave decoration on the left side, Open Sans body,
+ *     navy uppercase headings. The wave SVG is rendered as a real DOM element
+ *     in _fragment.php; here we just position and reveal it. --- */
+[data-template="ribbon"] {
   --invoice-bg: var(--white);
   --invoice-text: #2c3e50;
   --invoice-accent: var(--navy-1a365d);
@@ -373,7 +371,7 @@
   --invoice-muted: var(--gray-500);
 }
 
-[data-template="professional"] .invoice {
+[data-template="ribbon"] .invoice {
   font-family: "Open Sans", "Segoe UI", Arial, sans-serif;
   padding: 0;
   position: relative;
@@ -381,7 +379,7 @@
   min-height: 720px;
 }
 
-[data-template="professional"] .invoice-ribbon-deco {
+[data-template="ribbon"] .invoice-ribbon-deco {
   display: block;
   position: absolute;
   left: 0;
@@ -392,32 +390,32 @@
   z-index: 0;
 }
 
-[data-template="professional"] .invoice-ribbon-deco svg {
+[data-template="ribbon"] .invoice-ribbon-deco svg {
   display: block;
   width: 100%;
   height: 100%;
 }
 
-[data-template="professional"] .invoice > section {
+[data-template="ribbon"] .invoice > section {
   position: relative;
   z-index: 1;
 }
 
-[data-template="professional"] .invoice-header,
-[data-template="professional"] .invoice-meta,
-[data-template="professional"] .invoice-items,
-[data-template="professional"] .invoice-footer {
+[data-template="ribbon"] .invoice-header,
+[data-template="ribbon"] .invoice-meta,
+[data-template="ribbon"] .invoice-items,
+[data-template="ribbon"] .invoice-footer {
   padding-left: 130px;
   padding-right: 32px;
   position: relative;
   z-index: 1;
 }
 
-[data-template="professional"] .invoice-footer {
+[data-template="ribbon"] .invoice-footer {
   padding-bottom: 40px;
 }
 
-[data-template="professional"] .invoice-header {
+[data-template="ribbon"] .invoice-header {
   padding-top: 32px;
   padding-bottom: 16px;
   border-bottom: none;
@@ -427,20 +425,20 @@
   gap: 14px;
 }
 
-[data-template="professional"] .invoice-header-left,
-[data-template="professional"] .invoice-header-right {
+[data-template="ribbon"] .invoice-header-left,
+[data-template="ribbon"] .invoice-header-right {
   align-items: flex-start;
   text-align: left;
 }
 
-[data-template="professional"] .invoice-header-right {
+[data-template="ribbon"] .invoice-header-right {
   order: -1;
   flex-direction: row;
   align-items: baseline;
   gap: 18px;
 }
 
-[data-template="professional"] input.editable-document-title {
+[data-template="ribbon"] input.editable-document-title {
   font-family: "Open Sans", "Segoe UI", Arial, sans-serif;
   font-size: 52px;
   font-weight: 800;
@@ -452,33 +450,33 @@
   width: auto;
 }
 
-[data-template="professional"] input.editable-business-title {
+[data-template="ribbon"] input.editable-business-title {
   font-size: 18px;
   font-weight: 700;
   color: var(--navy-1a365d);
 }
 
-[data-template="professional"] .invoice-number-field,
-[data-template="professional"] .invoice-number-field input,
-[data-template="professional"] .invoice-number-prefix {
+[data-template="ribbon"] .invoice-number-field,
+[data-template="ribbon"] .invoice-number-field input,
+[data-template="ribbon"] .invoice-number-prefix {
   color: var(--navy-1a365d);
   font-size: 22px;
   font-weight: 700;
 }
 
-[data-template="professional"] input.editable-label {
+[data-template="ribbon"] input.editable-label {
   color: var(--navy-1a365d);
   font-size: 13px;
   letter-spacing: 0.08em;
   font-weight: 700;
 }
 
-[data-template="professional"] .line-items thead {
+[data-template="ribbon"] .line-items thead {
   border-top: 2px solid var(--navy-1a365d);
   border-bottom: 1px solid var(--sky-400);
 }
 
-[data-template="professional"] .line-items thead th {
+[data-template="ribbon"] .line-items thead th {
   background: transparent;
   color: var(--navy-1a365d);
   font-size: 13px;
@@ -487,24 +485,24 @@
   padding: 14px 12px;
 }
 
-[data-template="professional"] .line-items thead th .editable-th {
+[data-template="ribbon"] .line-items thead th .editable-th {
   color: var(--navy-1a365d);
 }
 
-[data-template="professional"] .totals-total {
+[data-template="ribbon"] .totals-total {
   border-top: 2px solid var(--navy-1a365d);
   padding-top: 12px;
   margin-top: 8px;
 }
 
-[data-template="professional"] .totals-total .editable-totals-label,
-[data-template="professional"] .totals-total .totals-value {
+[data-template="ribbon"] .totals-total .editable-totals-label,
+[data-template="ribbon"] .totals-total .totals-value {
   color: var(--navy-1a365d);
   font-size: 22px;
   font-weight: 800;
 }
 
-/* Hide the ribbon decoration for every template that is not "professional"
+/* Hide the ribbon decoration for every template that is not "ribbon"
  * so the SVG element in _fragment.php stays invisible elsewhere. */
 .invoice-ribbon-deco {
   display: none;
@@ -1568,18 +1566,18 @@ textarea:focus {
   [data-template="modern"] .invoice-meta,
   [data-template="modern"] .invoice-items,
   [data-template="modern"] .invoice-footer,
-  [data-template="minimal"] .invoice-header,
-  [data-template="minimal"] .invoice-meta,
-  [data-template="minimal"] .invoice-items,
-  [data-template="minimal"] .invoice-footer,
-  [data-template="bold"] .invoice-header,
-  [data-template="bold"] .invoice-meta,
-  [data-template="bold"] .invoice-items,
-  [data-template="bold"] .invoice-footer,
-  [data-template="professional"] .invoice-header,
-  [data-template="professional"] .invoice-meta,
-  [data-template="professional"] .invoice-items,
-  [data-template="professional"] .invoice-footer {
+  [data-template="formal"] .invoice-header,
+  [data-template="formal"] .invoice-meta,
+  [data-template="formal"] .invoice-items,
+  [data-template="formal"] .invoice-footer,
+  [data-template="elegant"] .invoice-header,
+  [data-template="elegant"] .invoice-meta,
+  [data-template="elegant"] .invoice-items,
+  [data-template="elegant"] .invoice-footer,
+  [data-template="ribbon"] .invoice-header,
+  [data-template="ribbon"] .invoice-meta,
+  [data-template="ribbon"] .invoice-items,
+  [data-template="ribbon"] .invoice-footer {
     padding-left: 16px;
     padding-right: 16px;
   }
@@ -1588,11 +1586,11 @@ textarea:focus {
     border-left-width: 6px;
   }
 
-  [data-template="professional"] .invoice-ribbon-deco {
+  [data-template="ribbon"] .invoice-ribbon-deco {
     display: none;
   }
 
-  [data-template="professional"] .invoice-header-right {
+  [data-template="ribbon"] .invoice-header-right {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
@@ -1693,7 +1691,7 @@ input.editable-label {
 }
 
 /* Table header variant: same background as the surrounding <th> (dark
-   strip on the classic template, transparent on modern/minimal), white
+   strip on the classic template, transparent on modern/formal), white
    text on the dark backgrounds. Specificity is bumped so the global
    input rule cannot reset the background back to white. */
 .line-items thead th .editable-th {

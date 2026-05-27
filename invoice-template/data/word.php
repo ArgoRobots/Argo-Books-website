@@ -25,5 +25,5 @@ return [
     ['q' => 'Why is the Word template not pixel-identical to the on-screen preview?', 'a' => 'Word reflows content based on the system fonts and document margins. The generator picks the closest match available. For pixel-exact output, use a PDF template.'],
   ],
 
-  'related_slugs' => ['pdf', 'google-docs', 'classic-word', 'modern-word', 'minimal-word', 'bold-word', 'professional-word'],
+  'related_slugs' => ['pdf', 'google-docs', 'classic-word', 'modern-word', 'formal-word', 'elegant-word', 'ribbon-word'],
 ];

@@ -24,5 +24,5 @@ return [
     ['q' => 'How do I change the currency symbol in the Modern Excel template?', 'a' => 'Select the cells in columns D and E from row 16 down, right click, Format Cells, Currency, pick your symbol.'],
   ],
 
-  'related_slugs' => ['excel', 'modern-pdf', 'modern-google-sheets', 'classic-excel', 'professional-excel'],
+  'related_slugs' => ['excel', 'modern-pdf', 'modern-google-sheets', 'classic-excel', 'ribbon-excel'],
 ];

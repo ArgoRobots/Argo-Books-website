@@ -29,11 +29,11 @@ let countriesPromise = null;
 // "INVOICE" wordmark, and headerFill / headerRule add a single distinctive
 // banner cue (slate band for Modern, navy band for Formal, etc.).
 const TEMPLATE_STYLE = {
-  classic:      { headingFont: 'Arial',         headingColor: '1A1A1A', headerFill: null,     headerRule: null },
-  modern:       { headingFont: 'Segoe UI',      headingColor: '0F172A', headerFill: 'F1F5F9', headerRule: '0F172A' },
-  minimal:      { headingFont: 'Georgia',       headingColor: '1E3A5F', headerFill: '1E3A5F', headerRule: null },
-  bold:         { headingFont: 'Georgia',       headingColor: '6366F1', headerFill: null,     headerRule: '6366F1' },
-  professional: { headingFont: 'Open Sans',     headingColor: '1A365D', headerFill: null,     headerRule: '1A365D' },
+  classic: { headingFont: 'Arial',     headingColor: '1A1A1A', headerFill: null,     headerRule: null },
+  modern:  { headingFont: 'Segoe UI',  headingColor: '0F172A', headerFill: 'F1F5F9', headerRule: '0F172A' },
+  formal:  { headingFont: 'Georgia',   headingColor: '1E3A5F', headerFill: '1E3A5F', headerRule: null },
+  elegant: { headingFont: 'Georgia',   headingColor: '6366F1', headerFill: null,     headerRule: '6366F1' },
+  ribbon:  { headingFont: 'Open Sans', headingColor: '1A365D', headerFill: null,     headerRule: '1A365D' },
 };
 
 function styleForTemplate(templateId) {

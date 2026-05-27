@@ -104,10 +104,16 @@ $kind = $data['kind'] ?? 'format-generic';
 $style = $data['style'] ?? null;
 $format = $data['format'] ?? '';
 $invgen_ref = 'invgen-template-' . $slug;
+$ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1';
 
 ob_start();
 ?>
 <article class="template-page" data-kind="<?= htmlspecialchars($kind) ?>" data-format="<?= htmlspecialchars($format) ?>"<?php if ($style): ?> data-style="<?= htmlspecialchars($style) ?>"<?php endif; ?>>
+
+  <aside class="page-banner" role="complementary">
+    <span class="page-banner-text">Want to handle payments, refunds, and track everything?</span>
+    <a class="link page-banner-link" data-pitch-placement="template-banner" href="<?= INVGEN_BASE ?>/features/invoicing/<?= $ref_qs ?>&amp;placement=banner">Try Argo Books <span aria-hidden="true">&rarr;</span></a>
+  </aside>
 
   <h1><?= htmlspecialchars($data['h1']) ?></h1>
 
@@ -125,7 +131,7 @@ ob_start();
     <h2>Download this template</h2>
     <?php
       // Preview thumbnail. PNG is committed in invoice-template/preview/{style}.png.
-      $preview_src = '/invoice-template/preview/' . rawurlencode($style) . '.png';
+      $preview_src = INVGEN_BASE . '/invoice-template/preview/' . rawurlencode($style) . '.png';
     ?>
     <img class="template-preview"
          src="<?= htmlspecialchars($preview_src) ?>"
@@ -143,11 +149,11 @@ ob_start();
 
       if ($format === 'pdf' || $format === 'word') {
           $cta_label = $format === 'pdf' ? 'Customize and download PDF' : 'Customize and download Word';
-          $cta_href = '/invoice-generator/?template=' . rawurlencode($style) . '&source=' . rawurlencode($invgen_ref);
+          $cta_href = INVGEN_BASE . '/invoice-generator/?template=' . rawurlencode($style) . '&source=' . rawurlencode($invgen_ref);
       } elseif ($format === 'excel') {
           $filename = $assets['excel'][$style] ?? ($style . '.xlsx');
           $cta_label = 'Download Excel template';
-          $cta_href = '/invoice-generator/templates/' . rawurlencode($filename);
+          $cta_href = INVGEN_BASE . '/invoice-generator/templates/' . rawurlencode($filename);
           $cta_event = 'invgen_template_download';
       } elseif ($format === 'google-docs') {
           $cta_label = 'Make a copy in Google Docs';
@@ -160,7 +166,7 @@ ob_start();
       }
     ?>
 
-    <a class="template-cta-button"
+    <a class="link template-cta-button"
        href="<?= htmlspecialchars($cta_href) ?>"
        data-template-cta="<?= htmlspecialchars($cta_event) ?>"
        data-template-style="<?= htmlspecialchars($style) ?>"
@@ -172,10 +178,10 @@ ob_start();
   <section class="template-style-grid">
     <h2>Choose a style</h2>
     <ul class="template-style-list">
-      <?php foreach (['classic', 'modern', 'minimal', 'bold', 'professional'] as $s): ?>
+      <?php foreach (['classic', 'modern', 'formal', 'elegant', 'ribbon'] as $s): ?>
         <li class="template-style-card">
-          <a href="/invoice-template/<?= htmlspecialchars($s) ?>-<?= htmlspecialchars($format) ?>/">
-            <img src="/invoice-template/preview/<?= rawurlencode($s) ?>.png"
+          <a class="link" href="<?= INVGEN_BASE ?>/invoice-template/<?= htmlspecialchars($s) ?>-<?= htmlspecialchars($format) ?>/">
+            <img src="<?= INVGEN_BASE ?>/invoice-template/preview/<?= rawurlencode($s) ?>.png"
                  alt="<?= htmlspecialchars(ucfirst($s)) ?> invoice template preview"
                  loading="lazy" width="300" height="225">
             <span class="template-style-name"><?= htmlspecialchars(ucfirst($s)) ?></span>
@@ -206,7 +212,7 @@ ob_start();
       <ul class="template-related-list">
         <?php foreach ($rel as $rs): ?>
           <?php if (!is_string($rs) || !preg_match('/^[a-z0-9-]+$/', $rs)) continue; ?>
-          <li><a href="/invoice-template/<?= htmlspecialchars($rs) ?>/"><?= htmlspecialchars(ucwords(str_replace('-', ' ', $rs))) ?></a></li>
+          <li><a class="link" href="<?= INVGEN_BASE ?>/invoice-template/<?= htmlspecialchars($rs) ?>/"><?= htmlspecialchars(ucwords(str_replace('-', ' ', $rs))) ?></a></li>
         <?php endforeach; ?>
       </ul>
     <?php else: ?>
@@ -214,14 +220,14 @@ ob_start();
     <?php endif; ?>
   </section>
 
-  <section class="template-cta">
-    <p class="template-cta-text">
-      <a href="https://argorobots.com/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1&amp;placement=footer"
-         data-pitch-placement="template-footer">
-        If you want to handle payments, refunds, and track everything, use Argo Books.
-      </a>
-    </p>
-  </section>
+  <aside class="page-banner" role="complementary">
+    <span class="page-banner-text">If you want to handle payments, refunds, and track everything,</span>
+    <a class="link page-banner-link"
+       data-pitch-placement="template-footer"
+       href="https://argorobots.com/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1&amp;placement=footer">
+      use Argo Books <span aria-hidden="true">&rarr;</span>
+    </a>
+  </aside>
 
 </article>
 <?php
@@ -249,7 +255,7 @@ function template_render_404(): void
 </head>
 <body>
 <h1>Template not found</h1>
-<p>The template you asked for does not exist. Browse <a href="/invoice-template/">all templates</a>.</p>
+<p>The template you asked for does not exist. Browse <a class="link" href="/invoice-template/">all templates</a>.</p>
 </body>
 </html>
 <?php

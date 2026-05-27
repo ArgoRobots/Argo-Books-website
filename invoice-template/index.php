@@ -13,7 +13,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $page_title = 'Free Invoice Templates | Argo Books';
-$page_description = 'Free invoice templates in PDF, Word, Excel, Google Docs, and Google Sheets. Pick a style: Classic, Modern, Minimal, Bold, or Professional.';
+$page_description = 'Free invoice templates in PDF, Word, Excel, Google Docs, and Google Sheets. Pick a style: Classic, Modern, Formal, Elegant, or Ribbon.';
 $canonical_url = 'https://argorobots.com/invoice-template/';
 
 $page_schema_json = json_encode([
@@ -33,7 +33,7 @@ $breadcrumb_schema_json = json_encode([
     ],
 ], JSON_UNESCAPED_SLASHES);
 
-$styles = ['classic', 'modern', 'minimal', 'bold', 'professional'];
+$styles = ['classic', 'modern', 'formal', 'elegant', 'ribbon'];
 $formats = [
     'pdf' => 'PDF',
     'word' => 'Word',
@@ -42,9 +42,17 @@ $formats = [
     'google-sheets' => 'Google Sheets',
 ];
 
+$invgen_ref = 'invgen-template-hub';
+$ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1';
+
 ob_start();
 ?>
 <article class="template-hub">
+
+  <aside class="page-banner" role="complementary">
+    <span class="page-banner-text">Want to handle payments, refunds, and track everything?</span>
+    <a class="link page-banner-link" data-pitch-placement="template-hub-banner" href="<?= INVGEN_BASE ?>/features/invoicing/<?= $ref_qs ?>&amp;placement=banner">Try Argo Books <span aria-hidden="true">&rarr;</span></a>
+  </aside>
 
   <h1>Free invoice templates</h1>
 
@@ -56,7 +64,7 @@ ob_start();
     <h2>By format</h2>
     <ul class="template-hub-format-list">
       <?php foreach ($formats as $slug => $name): ?>
-        <li><a href="/invoice-template/<?= htmlspecialchars($slug) ?>/"><?= htmlspecialchars($name) ?> invoice templates</a></li>
+        <li><a class="link" href="<?= INVGEN_BASE ?>/invoice-template/<?= htmlspecialchars($slug) ?>/"><?= htmlspecialchars($name) ?> invoice templates</a></li>
       <?php endforeach; ?>
     </ul>
   </section>
@@ -67,26 +75,26 @@ ob_start();
       <div class="template-hub-style-block">
         <h3><?= htmlspecialchars(ucfirst($style)) ?></h3>
         <img class="template-hub-preview"
-             src="/invoice-template/preview/<?= rawurlencode($style) ?>.png"
+             src="<?= INVGEN_BASE ?>/invoice-template/preview/<?= rawurlencode($style) ?>.png"
              alt="<?= htmlspecialchars(ucfirst($style)) ?> invoice template preview"
              loading="lazy" width="400" height="300">
         <ul class="template-hub-format-list">
           <?php foreach ($formats as $f => $fname): ?>
-            <li><a href="/invoice-template/<?= htmlspecialchars($style) ?>-<?= htmlspecialchars($f) ?>/"><?= htmlspecialchars(ucfirst($style)) ?> <?= htmlspecialchars($fname) ?></a></li>
+            <li><a class="link" href="<?= INVGEN_BASE ?>/invoice-template/<?= htmlspecialchars($style) ?>-<?= htmlspecialchars($f) ?>/"><?= htmlspecialchars(ucfirst($style)) ?> <?= htmlspecialchars($fname) ?></a></li>
           <?php endforeach; ?>
         </ul>
       </div>
     <?php endforeach; ?>
   </section>
 
-  <section class="template-hub-cta">
-    <p>
-      <a href="https://argorobots.com/?source=invgen-template-hub&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1&amp;placement=footer"
-         data-pitch-placement="template-hub-footer">
-        If you want to handle payments, refunds, and track everything, use Argo Books.
-      </a>
-    </p>
-  </section>
+  <aside class="page-banner" role="complementary">
+    <span class="page-banner-text">If you want to handle payments, refunds, and track everything,</span>
+    <a class="link page-banner-link"
+       data-pitch-placement="template-hub-footer"
+       href="https://argorobots.com/?source=invgen-template-hub&amp;utm_source=invoice-generator&amp;utm_medium=template&amp;utm_campaign=phase1&amp;placement=footer">
+      use Argo Books <span aria-hidden="true">&rarr;</span>
+    </a>
+  </aside>
 
 </article>
 <?php

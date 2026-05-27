@@ -25,5 +25,5 @@ return [
     ['q' => 'Are the totals auto-calculated in Google Docs?', 'a' => 'No. Google Docs holds plain numbers. If you want auto-calculation, use the Google Sheets templates.'],
   ],
 
-  'related_slugs' => ['word', 'google-sheets', 'classic-google-docs', 'modern-google-docs', 'minimal-google-docs', 'bold-google-docs', 'professional-google-docs'],
+  'related_slugs' => ['word', 'google-sheets', 'classic-google-docs', 'modern-google-docs', 'formal-google-docs', 'elegant-google-docs', 'ribbon-google-docs'],
 ];

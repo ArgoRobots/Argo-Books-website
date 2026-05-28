@@ -7,7 +7,6 @@ export function emptyState() {
   return {
     template: 'classic',
     country: 'US',
-    subregion: null,
     currency: 'USD',
     locale: 'en-US',
     logoDataUrl: null,

@@ -1,37 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { lookupRate, computeTax } from './tax.js';
-
-const sampleData = {
-  US: { subregions: [
-    { code: 'CA', name: 'California', rate: 7.25 },
-    { code: 'TX', name: 'Texas', rate: 6.25 },
-  ]},
-  CA: { subregions: [
-    { code: 'ON', name: 'Ontario', rate: 13, type: 'hst' },
-    { code: 'AB', name: 'Alberta', rate: 5, type: 'gst_only' },
-  ]},
-  GB: { rate: 20 },
-  AU: { rate: 10 },
-};
-
-test('lookupRate returns flat rate for non-subregion countries', () => {
-  assert.equal(lookupRate(sampleData, 'GB').rate, 20);
-  assert.equal(lookupRate(sampleData, 'AU').rate, 10);
-});
-
-test('lookupRate returns subregion rate when subregion provided', () => {
-  assert.equal(lookupRate(sampleData, 'US', 'CA').rate, 7.25);
-  assert.equal(lookupRate(sampleData, 'CA', 'ON').rate, 13);
-});
-
-test('lookupRate returns null for unknown country', () => {
-  assert.equal(lookupRate(sampleData, 'XX'), null);
-});
-
-test('lookupRate returns null for subregion-required country with no subregion', () => {
-  assert.equal(lookupRate(sampleData, 'US'), null);
-});
+import { computeTax } from './tax.js';
 
 test('computeTax exclusive mode adds tax on top', () => {
   assert.equal(computeTax(100, 10, 'exclusive'), 10);

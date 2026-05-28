@@ -32,30 +32,6 @@ function setFieldValue(el, value) {
 let state = emptyState();
 let bootstrapped = false;
 
-// Map of country code -> reasonable Intl locale used when a country is selected.
-const COUNTRY_LOCALES = {
-  US: 'en-US',
-  CA: 'en-CA',
-  GB: 'en-GB',
-  AU: 'en-AU',
-  IE: 'en-IE',
-  NZ: 'en-NZ',
-  IN: 'en-IN',
-  ZA: 'en-ZA',
-  DE: 'de-DE',
-  FR: 'fr-FR',
-  ES: 'es-ES',
-  IT: 'it-IT',
-  NL: 'nl-NL',
-  MX: 'es-MX',
-  BR: 'pt-BR',
-  JP: 'ja-JP',
-};
-
-function localeForCountry(code) {
-  return COUNTRY_LOCALES[code] || 'en-US';
-}
-
 // ---------- toast ----------
 
 function showToast(message) {
@@ -105,7 +81,6 @@ function hydrateFromState() {
   setFieldValue($('[data-field="notes"]'), state.notes);
   setFieldValue($('[data-field="terms"]'), state.terms);
   setFieldValue($('[data-field="taxRatePercent"]'), state.taxRatePercent);
-  setFieldValue($('[data-field="taxMode"]'), state.taxMode);
   setFieldValue($('[data-field="amountPaid"]'), state.amountPaid);
 
   // Ship To: shown only when state.shipTo is not null.
@@ -243,7 +218,6 @@ const TOP_LEVEL_FIELDS = {
   poNumber: (v) => { state.poNumber = v; },
   notes: (v) => { state.notes = v; },
   terms: (v) => { state.terms = v; },
-  taxMode: (v) => { state.taxMode = v; },
   taxRatePercent: (v) => { state.taxRatePercent = Number(v) || 0; },
   amountPaid: (v) => { state.amountPaid = Number(v) || 0; },
   'discount-value': (v) => {
@@ -454,7 +428,7 @@ function wireLogoUpload() {
   if (input) input.addEventListener('change', handleLogoFileChange);
 }
 
-// ---------- country / subregion ----------
+// ---------- currency ----------
 
 // Locale fallback per currency so Intl.NumberFormat picks a sensible default
 // (decimal separators, symbol placement) when the user changes currency.

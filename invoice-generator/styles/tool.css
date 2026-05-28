@@ -622,6 +622,194 @@ body {
   text-decoration: underline;
 }
 
+/* ---------- Article pages ---------- */
+/* Long-form informational articles at root-level URLs (e.g.
+   /how-to-invoice-clients/). Shares the .faq-* and .page-banner
+   components with niche pages; only article-specific layout lives here. */
+
+.article-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 20px 80px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--dark-gray);
+}
+
+.article-breadcrumb {
+  margin: 0 0 24px;
+  font-size: 14px;
+}
+
+.article-breadcrumb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gray-500);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.article-breadcrumb-link:hover {
+  color: var(--primary-blue);
+}
+
+.article-head h1 {
+  font-size: 32px;
+  line-height: 1.2;
+  margin: 0 0 8px;
+}
+
+.article-meta {
+  color: var(--gray-placeholder);
+  font-size: 14px;
+  margin: 0 0 24px;
+}
+
+.article-meta .article-updated + .article-reading-time::before {
+  content: ' \00b7 ';
+  margin: 0 6px;
+}
+
+.article-intro p:first-child {
+  font-size: 19px;
+  line-height: 1.55;
+}
+
+.article-section {
+  margin-top: 32px;
+}
+
+.article-section h2 {
+  font-size: 24px;
+  line-height: 1.3;
+  margin: 0 0 12px;
+}
+
+.article-section h3 {
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 24px 0 8px;
+}
+
+.article-section ul,
+.article-section ol {
+  padding-left: 22px;
+  margin: 12px 0;
+}
+
+.article-section li {
+  margin: 6px 0;
+}
+
+.article-section table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 15px;
+}
+
+.article-section th,
+.article-section td {
+  border: 1px solid var(--gray-border);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-section thead th {
+  background: var(--white);
+  font-weight: 600;
+}
+
+/* In-content tool callout. Subtle: bordered card with an accent stripe.
+   Reads as a friendly nudge between sections, not an advertisement. */
+.tool-callout {
+  margin: 28px 0;
+  padding: 18px 22px;
+  border: 1px solid var(--gray-border);
+  border-left: 4px solid var(--primary-blue);
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .tool-callout {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+}
+
+.tool-callout-text {
+  margin: 0;
+  font-size: 16px;
+  color: var(--dark-gray);
+}
+
+.tool-callout-link {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--primary-blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tool-callout-link:hover {
+  text-decoration: underline;
+}
+
+.article-related-niches,
+.article-related-articles {
+  margin-top: 40px;
+}
+
+.article-related-niches h2,
+.article-related-articles h2 {
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+
+.article-related-list {
+  list-style: disc;
+  padding-left: 22px;
+  margin: 0;
+}
+
+.article-related-list li {
+  margin: 6px 0;
+}
+
+.article-related-list a {
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.article-related-list a:hover {
+  text-decoration: underline;
+}
+
+.article-faqs {
+  margin-top: 40px;
+}
+
+@media (max-width: 560px) {
+  .article-page {
+    font-size: 16px;
+    padding: 24px 16px 64px;
+  }
+  .article-head h1 {
+    font-size: 26px;
+  }
+  .article-section h2 {
+    font-size: 21px;
+  }
+}
+
 /* ---------- Niche page: collapsible FAQ component ---------- */
 /* Visual match for the main-site .faq-item pattern (resources/styles/faq.css).
    The outer section keeps the niche-page rhythm; only the inner

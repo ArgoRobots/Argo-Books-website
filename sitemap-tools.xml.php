@@ -59,6 +59,27 @@ foreach (glob(__DIR__ . '/invoice-template/data/*.php') as $file) {
   ];
 }
 
+// Articles hub: curated editorial index of all the guides.
+$urls[] = [
+  'loc' => 'https://argorobots.com/invoice-guides/',
+  'lastmod' => date('Y-m-d', filemtime(__DIR__ . '/invoice-guides/index.php')),
+  'priority' => '0.8',
+];
+
+// Articles. Every articles/data/*.php (except the schema template) becomes
+// one URL at the root-level path matching the slug.
+foreach (glob(__DIR__ . '/articles/data/*.php') as $file) {
+  $slug = basename($file, '.php');
+  if ($slug === '_template') continue;
+  $data = require $file;
+  $url_slug = $data['slug'] ?? $slug;
+  $urls[] = [
+    'loc' => "https://argorobots.com/{$url_slug}/",
+    'lastmod' => date('Y-m-d', filemtime($file)),
+    'priority' => '0.7',
+  ];
+}
+
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap-0.9">' . "\n";
 foreach ($urls as $u) {

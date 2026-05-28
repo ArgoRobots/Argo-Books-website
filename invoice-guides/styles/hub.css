@@ -1,0 +1,384 @@
+/* invoice-guides/styles/hub.css
+   Editorial index for the Phase D guides. Distinct typographic system
+   from the rest of the tool surface so the hub reads as a "magazine
+   cover" while individual guides keep the article template's voice.
+
+   Loaded only on /invoice-guides/. Articles themselves stay in the
+   system-font treatment defined by .article-page in tool.css. */
+
+@import url('../../resources/styles/custom-colors.css');
+
+:root {
+  --hub-bg: #fbf9f4;
+  --hub-surface: #ffffff;
+  --hub-text: #000000;
+  --hub-text-soft: #000000;
+  --hub-muted: #000000;
+  --hub-rule: #cdc7b9;
+  --hub-rule-soft: #dad5c7;
+  --hub-num: #6b7280;
+  --hub-accent: var(--primary-blue);
+  --hub-accent-soft: rgba(59, 130, 246, 0.08);
+  --hub-serif: 'Fraunces', 'Iowan Old Style', 'Cambria', 'Georgia', serif;
+  --hub-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+body:has(.guides-hub) {
+  background: var(--hub-bg);
+}
+
+.guides-hub {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 64px 32px 96px;
+  color: var(--hub-text);
+  font-family: var(--hub-sans);
+  font-feature-settings: 'ss01', 'ss02';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hero ----------------------------------------------------------- */
+
+.guides-hub-head {
+  margin: 16px 0 88px;
+  max-width: 760px;
+}
+
+.guides-hub-eyebrow {
+  font-family: var(--hub-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+  margin: 0 0 28px;
+}
+
+.guides-hub-eyebrow span {
+  display: inline-block;
+  margin: 0 8px;
+  color: var(--hub-num);
+}
+
+.guides-hub-title {
+  font-family: var(--hub-serif);
+  font-weight: 400;
+  font-size: clamp(42px, 6.4vw, 80px);
+  line-height: 0.96;
+  letter-spacing: -0.022em;
+  color: var(--hub-text);
+  margin: 0 0 32px;
+}
+
+.guides-hub-title em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--hub-accent);
+}
+
+.guides-hub-lede {
+  font-family: var(--hub-serif);
+  font-weight: 300;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.55;
+  color: var(--hub-text-soft);
+  margin: 0;
+  max-width: 640px;
+}
+
+/* --- The list ------------------------------------------------------- */
+
+.guides-hub-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.guides-hub-group {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 56px 0 4px;
+  padding-top: 28px;
+}
+
+.guides-hub-group:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.guides-hub-group-label {
+  font-family: var(--hub-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+}
+
+.guides-hub-group-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--hub-rule);
+}
+
+.guides-hub-entry {
+  border-top: 1px solid var(--hub-rule-soft);
+}
+
+.guides-hub-entry:first-of-type,
+.guides-hub-group + .guides-hub-entry {
+  border-top-color: transparent;
+}
+
+.guides-hub-link {
+  display: grid;
+  grid-template-columns: 118px 1fr auto;
+  column-gap: 36px;
+  align-items: start;
+  padding: 30px 0 32px;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: guides-fade-in 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  animation-delay: var(--entry-delay, 0ms);
+}
+
+@keyframes guides-fade-in {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.guides-hub-num {
+  font-family: var(--hub-serif);
+  font-feature-settings: 'tnum', 'lnum';
+  font-weight: 400;
+  font-size: 104px;
+  line-height: 0.82;
+  color: var(--hub-num);
+  letter-spacing: -0.05em;
+  transition: color 0.4s ease, transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1);
+  align-self: start;
+}
+
+.guides-hub-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 10px;
+  min-width: 0;
+}
+
+.guides-hub-headline {
+  font-family: var(--hub-serif);
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 1.22;
+  letter-spacing: -0.012em;
+  color: var(--hub-text);
+  transition: color 0.35s ease;
+}
+
+.guides-hub-desc {
+  font-family: var(--hub-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--hub-text-soft);
+  max-width: 540px;
+}
+
+.guides-hub-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.guides-hub-chip {
+  font-family: var(--hub-sans);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+  border: 1px solid var(--hub-rule);
+  padding: 5px 11px 4px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.guides-hub-chip--howto {
+  color: var(--hub-accent);
+  border-color: rgba(59, 130, 246, 0.32);
+  background: var(--hub-accent-soft);
+}
+
+.guides-hub-arrow {
+  font-family: var(--hub-serif);
+  font-size: 26px;
+  color: var(--hub-num);
+  padding-top: 18px;
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), color 0.35s ease;
+}
+
+/* Hover state. Numeral colors, headline takes accent, arrow slides. */
+.guides-hub-link:hover .guides-hub-num,
+.guides-hub-link:focus-visible .guides-hub-num {
+  color: var(--hub-accent);
+  transform: translateX(-2px);
+}
+
+.guides-hub-link:hover .guides-hub-headline,
+.guides-hub-link:focus-visible .guides-hub-headline {
+  color: var(--hub-accent);
+}
+
+.guides-hub-link:hover .guides-hub-arrow,
+.guides-hub-link:focus-visible .guides-hub-arrow {
+  color: var(--hub-accent);
+  transform: translateX(8px);
+}
+
+.guides-hub-link:focus-visible {
+  outline: 2px solid var(--hub-accent);
+  outline-offset: 6px;
+}
+
+/* --- Footer banner -------------------------------------------------- */
+
+.guides-hub-banner {
+  margin-top: 96px;
+  padding: 40px 44px;
+  background: var(--hub-surface);
+  border: 1px solid var(--hub-rule);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 40px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.guides-hub-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--hub-accent);
+}
+
+.guides-hub-banner-copy {
+  min-width: 0;
+}
+
+.guides-hub-banner-eyebrow {
+  font-family: var(--hub-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--hub-muted);
+  margin: 0 0 10px;
+}
+
+.guides-hub-banner-text {
+  font-family: var(--hub-serif);
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.5;
+  color: var(--hub-text);
+  margin: 0;
+  max-width: 540px;
+}
+
+.guides-hub-banner-link {
+  font-family: var(--hub-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--hub-accent);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.guides-hub-banner-link:hover {
+  opacity: 0.7;
+}
+
+/* --- Responsive ---------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .guides-hub {
+    padding: 44px 22px 72px;
+  }
+  .guides-hub-head {
+    margin: 8px 0 56px;
+  }
+  .guides-hub-eyebrow {
+    margin-bottom: 22px;
+  }
+  .guides-hub-title {
+    font-size: clamp(34px, 9vw, 50px);
+    margin-bottom: 24px;
+  }
+  .guides-hub-lede {
+    font-size: 17px;
+  }
+  .guides-hub-group {
+    margin-top: 40px;
+    gap: 14px;
+  }
+  .guides-hub-link {
+    grid-template-columns: 64px 1fr auto;
+    column-gap: 18px;
+    padding: 22px 0 24px;
+  }
+  .guides-hub-num {
+    font-size: 56px;
+    padding-top: 2px;
+  }
+  .guides-hub-body {
+    padding-top: 4px;
+    gap: 10px;
+  }
+  .guides-hub-headline {
+    font-size: 19px;
+  }
+  .guides-hub-desc {
+    font-size: 14px;
+  }
+  .guides-hub-arrow {
+    font-size: 18px;
+    padding-top: 10px;
+  }
+  .guides-hub-banner {
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 28px;
+    margin-top: 64px;
+  }
+  .guides-hub-banner-text {
+    font-size: 17px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guides-hub-link {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .guides-hub-link:hover .guides-hub-num,
+  .guides-hub-link:hover .guides-hub-arrow {
+    transform: none;
+  }
+}

@@ -748,6 +748,55 @@ function wireDownloadDocx() {
   });
 }
 
+// ---------- copy share link ----------
+
+// Wires the toolbar's Copy share link button. Serializes the whitelisted
+// pre-fill fields from state into the canonical /invoice-generator/ URL and
+// puts it on the clipboard. Uses navigator.clipboard when available, with a
+// textarea-execCommand fallback for non-HTTPS or older browsers.
+function wireCopyShareLink() {
+  const btn = $('[data-action="copy-share-link"]');
+  if (!btn) return;
+  btn.addEventListener('click', async (e) => {
+    const button = e.currentTarget;
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Copying...';
+    try {
+      const { serializeShareLink } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
+      const shareUrl = serializeShareLink(window.location.origin + '/invoice-generator/', state);
+      let copied = false;
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          copied = true;
+        } catch (_e) { /* fall through to the textarea fallback */ }
+      }
+      if (!copied) {
+        const ta = document.createElement('textarea');
+        ta.value = shareUrl;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { copied = document.execCommand('copy'); }
+        catch (_e) { copied = false; }
+        finally { document.body.removeChild(ta); }
+      }
+      showToast(copied ? 'Share link copied to clipboard.' : 'Could not copy. The link is in your address bar.');
+      if (copied) {
+        try { trackEvent('invgen_share_link_copied', ''); } catch (_e) { /* tracking is best-effort */ }
+      }
+    } catch (err) {
+      console.error('Share link copy failed:', err);
+      showToast('Could not generate a share link. Please try again.');
+    } finally {
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  });
+}
+
 // ---------- bootstrap ----------
 
 async function init() {
@@ -774,17 +823,18 @@ async function init() {
     trackEvent('invgen_niche_default_used', slug);
   }
 
-  // ?template= URL parameter overrides the persisted state.template. Used
-  // by /invoice-template/{style}-{format}/ landing pages to deep-link into
-  // the live tool with a specific style preselected. Validated against
-  // the TEMPLATES registry so we cannot apply an unknown id.
+  // Share-link URL parameters override the persisted draft. Whitelist of
+  // pre-fill fields lives in url-params.js (template, currency, from, billTo,
+  // invoiceNumber, paymentTerms, taxRatePercent, taxRateMode). Used by the
+  // /invoice-template/{style}-{format}/ landing pages (template only) and by
+  // the "Copy share link" button (full whitelist).
   try {
-    const { parseTemplateParam } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
+    const { parseShareLink } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
     const { TEMPLATES } = await import(`${BASE}/invoice-generator/scripts/templates.js`);
     const allowedIds = TEMPLATES.map(t => t.id);
-    const fromUrl = parseTemplateParam(window.location.search, allowedIds);
-    if (fromUrl) {
-      state.template = fromUrl;
+    const fromUrl = parseShareLink(window.location.search, allowedIds);
+    if (Object.keys(fromUrl).length > 0) {
+      Object.assign(state, fromUrl);
       handleSaveResult(saveDraft(state));
     }
   } catch (_e) {
@@ -810,6 +860,7 @@ async function init() {
   wireLogoUpload();
   wireDownloadPdf();
   wireDownloadDocx();
+  wireCopyShareLink();
   wirePostDownloadModal();
   wirePitchTracking();
 

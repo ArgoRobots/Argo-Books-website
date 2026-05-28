@@ -94,6 +94,7 @@ $ref_qs = '?source=' . htmlspecialchars($invgen_ref) . '&amp;utm_source=invoice-
     <div class="toolbar-actions">
       <button type="button" id="download-pdf" class="btn btn-primary" data-action="download-pdf">Download PDF</button>
       <button type="button" id="download-word" class="btn btn-secondary" data-action="download-word">Download Word</button>
+      <button type="button" id="copy-share-link" class="btn btn-secondary" data-action="copy-share-link" aria-label="Copy a shareable link to this pre-filled invoice">Copy share link</button>
     </div>
   </header>
 

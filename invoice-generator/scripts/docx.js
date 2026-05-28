@@ -18,6 +18,14 @@ const BASE = (typeof window !== 'undefined' && window.INVGEN_BASE) || '';
 const DOCX_SRC = `${BASE}/invoice-generator/vendor/docx.umd.js`;
 const COUNTRIES_URL = `${BASE}/invoice-generator/data/countries.json`;
 
+// Letter (8.5") at default 1" margins = 6.5" content = 9360 twentieths-of-a-
+// point (DXA). We use DXA for every table and cell width because the docx
+// library's PERCENTAGE width writes OOXML pct values that Google Docs reads
+// as 50ths-of-a-percent per spec, collapsing columns to one character wide.
+// Word and LibreOffice are forgiving; Google Docs is not.
+const DXA_FULL = 9360;
+const dxa = (pct) => Math.round((DXA_FULL * pct) / 100);
+
 // Module-level promise caches so repeat clicks reuse the same network requests.
 let docxPromise = null;
 let countriesPromise = null;
@@ -201,7 +209,8 @@ function buildHeader(state, d) {
   ];
 
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: { size: DXA_FULL, type: WidthType.DXA },
+    columnWidths: [dxa(60), dxa(40)],
     borders: {
       top: noBorder, bottom: noBorder, left: noBorder, right: noBorder,
       insideHorizontal: noBorder, insideVertical: noBorder,
@@ -210,12 +219,12 @@ function buildHeader(state, d) {
       new TableRow({
         children: [
           new TableCell({
-            width: { size: 60, type: WidthType.PERCENTAGE },
+            width: { size: dxa(60), type: WidthType.DXA },
             borders: cellBorders,
             children: leftChildren,
           }),
           new TableCell({
-            width: { size: 40, type: WidthType.PERCENTAGE },
+            width: { size: dxa(40), type: WidthType.DXA },
             borders: {
               top: noBorder,
               bottom: style.headerRule
@@ -255,14 +264,14 @@ function buildPartiesAndMeta(state, d) {
   }
 
   const partyCells = [
-    new TableCell({ width: { size: 33, type: WidthType.PERCENTAGE }, borders: cellBorders, children: partyStack('Bill To', state.billTo) }),
+    new TableCell({ width: { size: dxa(33), type: WidthType.DXA }, borders: cellBorders, children: partyStack('Bill To', state.billTo) }),
   ];
   // Ship To: include only when the textbox actually has content. A toggled-on
   // but empty Ship To should not print a stray label.
   const shipToText = state.shipTo == null ? '' : String(state.shipTo).trim();
   if (shipToText) {
     partyCells.push(new TableCell({
-      width: { size: 33, type: WidthType.PERCENTAGE },
+      width: { size: dxa(33), type: WidthType.DXA },
       borders: cellBorders,
       children: partyStack('Ship To', shipToText),
     }));
@@ -288,13 +297,18 @@ function buildPartiesAndMeta(state, d) {
 
   const metaCellWidth = shipToText ? 34 : 67;
   partyCells.push(new TableCell({
-    width: { size: metaCellWidth, type: WidthType.PERCENTAGE },
+    width: { size: dxa(metaCellWidth), type: WidthType.DXA },
     borders: cellBorders,
     children: metaChildren.length ? metaChildren : [new Paragraph('')],
   }));
 
+  const partyColumnWidths = shipToText
+    ? [dxa(33), dxa(33), dxa(34)]
+    : [dxa(33), dxa(67)];
+
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: { size: DXA_FULL, type: WidthType.DXA },
+    columnWidths: partyColumnWidths,
     borders: {
       top: noBorder, bottom: noBorder, left: noBorder, right: noBorder,
       insideHorizontal: noBorder, insideVertical: noBorder,
@@ -356,7 +370,8 @@ function buildLineItemsTable(state, d) {
   });
 
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: { size: DXA_FULL, type: WidthType.DXA },
+    columnWidths: [dxa(50), dxa(10), dxa(20), dxa(20)],
     borders: {
       top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder,
       insideHorizontal: thinBorder, insideVertical: thinBorder,
@@ -380,7 +395,7 @@ function buildTotals(state, totals, taxLabel, d) {
     rows.push(new TableRow({
       children: [
         new TableCell({
-          width: { size: 70, type: WidthType.PERCENTAGE },
+          width: { size: dxa(70), type: WidthType.DXA },
           borders: cellBorders,
           children: [new Paragraph({
             children: [new TextRun({ text: label, bold, size: 20, color: bold ? '000000' : '555555' })],
@@ -388,7 +403,7 @@ function buildTotals(state, totals, taxLabel, d) {
           })],
         }),
         new TableCell({
-          width: { size: 30, type: WidthType.PERCENTAGE },
+          width: { size: dxa(30), type: WidthType.DXA },
           borders: cellBorders,
           children: [new Paragraph({
             children: [new TextRun({ text: value, bold, size: 20 })],
@@ -416,7 +431,8 @@ function buildTotals(state, totals, taxLabel, d) {
   }
 
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: { size: DXA_FULL, type: WidthType.DXA },
+    columnWidths: [dxa(70), dxa(30)],
     borders: {
       top: noBorder, bottom: noBorder, left: noBorder, right: noBorder,
       insideHorizontal: noBorder, insideVertical: noBorder,
@@ -458,7 +474,8 @@ function buildBottomRow(state, totals, taxLabel, d) {
   const rightChildren = [buildTotals(state, totals, taxLabel, d)];
 
   return new Table({
-    width: { size: 100, type: WidthType.PERCENTAGE },
+    width: { size: DXA_FULL, type: WidthType.DXA },
+    columnWidths: [dxa(55), dxa(45)],
     borders: {
       top: noBorder, bottom: noBorder, left: noBorder, right: noBorder,
       insideHorizontal: noBorder, insideVertical: noBorder,
@@ -466,8 +483,8 @@ function buildBottomRow(state, totals, taxLabel, d) {
     rows: [
       new TableRow({
         children: [
-          new TableCell({ width: { size: 55, type: WidthType.PERCENTAGE }, borders: cellBorders, children: leftChildren }),
-          new TableCell({ width: { size: 45, type: WidthType.PERCENTAGE }, borders: cellBorders, children: rightChildren }),
+          new TableCell({ width: { size: dxa(55), type: WidthType.DXA }, borders: cellBorders, children: leftChildren }),
+          new TableCell({ width: { size: dxa(45), type: WidthType.DXA }, borders: cellBorders, children: rightChildren }),
         ],
       }),
     ],

@@ -115,6 +115,10 @@ ob_start();
     <a class="link page-banner-link" data-pitch-placement="template-banner" href="<?= INVGEN_BASE ?>/features/invoicing/<?= $ref_qs ?>&amp;placement=banner">Try Argo Books <span aria-hidden="true">&rarr;</span></a>
   </aside>
 
+  <nav class="template-breadcrumb" aria-label="Breadcrumb">
+    <a class="link" href="<?= INVGEN_BASE ?>/invoice-template/"><span aria-hidden="true">&larr;</span> All invoice templates</a>
+  </nav>
+
   <h1><?= htmlspecialchars($data['h1']) ?></h1>
 
   <section class="template-intro">

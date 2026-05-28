@@ -16,6 +16,11 @@
   color: var(--tool-text);
 }
 
+.template-breadcrumb {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
 .template-page h1,
 .template-hub h1 {
   font-size: 32px;

@@ -7,17 +7,17 @@
     "ribbon": "ribbon.xlsx"
   },
   "google-docs": {
-    "classic": "",
-    "modern": "",
-    "formal": "",
-    "elegant": "",
-    "ribbon": ""
+    "classic": "https://docs.google.com/document/d/1aEnCYzXydYksWky2dBTf5HZkV190iQioQ7y7PXQmbJU/copy",
+    "modern": "https://docs.google.com/document/d/15siaHcdOGbZx0Nziu3o3PqWVK7-kDQqizkC1zSLP5Ok/copy",
+    "formal": "https://docs.google.com/document/d/110U4HLi78dfiXBb68FuBZbgyFbmMB8OpoyUIeXORu3Q/copy",
+    "elegant": "https://docs.google.com/document/d/1mGT7SMf3kOVJM6sr7VBMVCd5iP2IsEG7Hg_GKc2lQkU/copy",
+    "ribbon": "https://docs.google.com/document/d/1OhzFTARL2Mx0sTbWqLVIAAQpsG4Xvzm1z98iyGvd-8s/copy"
   },
   "google-sheets": {
-    "classic": "",
-    "modern": "",
-    "formal": "",
-    "elegant": "",
-    "ribbon": ""
+    "classic": "https://docs.google.com/spreadsheets/d/15_Fkg3rxIQMxpjdGGvYRx_EXizy5xKcZL9DdcJxIo5U/copy",
+    "modern": "https://docs.google.com/spreadsheets/d/152NrQbhqm5IDEQfk-D5GiHGtLsNW2DE88p84YdrFyCQ/copy",
+    "formal": "https://docs.google.com/spreadsheets/d/1M7KRMZi2YeS2Lwppnf6bvy1hvWYwfMnOoF4TI8WXCTg/copy",
+    "elegant": "https://docs.google.com/spreadsheets/d/1KMOl73uWlSzKqWlKEYFsTX1hZ9yB6ZU1lcYCYVLTPbE/copy",
+    "ribbon": "https://docs.google.com/spreadsheets/d/1f3OEBR-8_O6eCEsbO7vyGc_URYTgSJ0EXgdytAEETNA/copy"
   }
 }

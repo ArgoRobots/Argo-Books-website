@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -107,7 +111,7 @@
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "CAD",
-                "description": "Free plan available. Premium for $10/month."
+                "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
             "description": "Import spreadsheets into Argo Books with automatic column mapping. Supports Excel and CSV files with clean, validated imports.",
             "featureList": "Automatic column mapping, Excel and CSV support, Data validation before import, One-click undo for every import"

@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -107,7 +111,7 @@
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "CAD",
-                "description": "Free plan available. Premium for $10/month."
+                "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
             "description": "Manage rental bookings, track rental periods, handle returns, and monitor revenue with Argo Books. Built for equipment rental and any rental-based business.",
             "featureList": "Rental booking and return tracking, Automatic overdue detection, Deposit and revenue management, One-click invoice generation from rentals"

@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -107,7 +111,7 @@
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "CAD",
-                "description": "Free plan available. Premium for $10/month."
+                "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
             "description": "Create professional invoices with Argo Books. Customizable templates, automatic line-item calculations, online payment links, and payment tracking.",
             "featureList": "Professional invoice templates with branding, Online payment links via Stripe and Square, Automatic tax and total calculations, Real-time payment status tracking"

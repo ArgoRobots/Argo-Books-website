@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -107,7 +111,7 @@
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "CAD",
-                "description": "Free plan available. Premium for $10/month."
+                "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
             "description": "Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.",
             "featureList": "AI-powered revenue and expense forecasting, Seasonal pattern detection, Accuracy tracking with confidence scores, Plain-language business insights"
@@ -198,7 +202,7 @@
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
                 <h3>See what's coming, with Premium</h3>
-                <p>Predictive analytics is included in Argo Books Premium for $10/month. Download for free, add your data, and upgrade whenever you're ready to forecast.</p>
+                <p>Predictive analytics is included in Argo Books Premium for $<?= $argo_monthly ?>/month. Download for free, add your data, and upgrade whenever you're ready to forecast.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>

@@ -2,7 +2,12 @@
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
-$plans = get_plan_features();
+$plans         = get_plan_features();
+$pricing       = get_pricing_config();
+$argo_monthly  = (int) $pricing['premium_monthly_price'];
+$xero_starter  = competitor_price('xero', 'starter');
+$xero_standard = competitor_price('xero', 'standard');
+$xero_premium  = competitor_price('xero', 'premium');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +73,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Xero does not offer a free plan; pricing starts at $25 CAD/month after a 30-day trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Xero does not offer a free plan; pricing starts at $<?= $xero_starter ?> CAD/month after a 30-day trial."
                     }
                 },
                 {
@@ -92,7 +97,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to Xero?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Xero starts at $25 CAD/month for Starter (limited to 20 invoices) and goes up to $80/month for Premium. Argo Books has no client limits or invoice caps on Premium."
+                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $<?= $argo_monthly ?> CAD/month. Xero starts at $<?= $xero_starter ?> CAD/month for Starter (limited to 20 invoices) and goes up to $<?= $xero_premium ?>/month for Premium. Argo Books has no client limits or invoice caps on Premium."
                     }
                 },
                 {
@@ -162,7 +167,7 @@ $plans = get_plan_features();
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>No invoice caps</h3>
-                    <p>Xero's Starter plan limits you to 20 invoices per month, pushing most businesses to the $60/month Standard plan. Argo Books Premium includes unlimited invoicing for $10 CAD/month.</p>
+                    <p>Xero's Starter plan limits you to 20 invoices per month, pushing most businesses to the $<?= $xero_standard ?>/month Standard plan. Argo Books Premium includes unlimited invoicing for $<?= $argo_monthly ?> CAD/month.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -195,8 +200,8 @@ $plans = get_plan_features();
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
-                            <th class="brand-col">Xero<span class="th-sub">Starter: $25 CAD/month</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Xero<span class="th-sub">Starter: $<?= $xero_starter ?> CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -302,7 +307,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">Xero charges $25 to $80 CAD/month depending on the plan, and the Starter plan's 20-invoice cap means most businesses end up on the $60/month plan. Argo Books keeps it simple with affordable pricing.</p>
+                <p class="section-desc">Xero charges $<?= $xero_starter ?> to $<?= $xero_premium ?> CAD/month depending on the plan, and the Starter plan's 20-invoice cap means most businesses end up on the $<?= $xero_standard ?>/month plan. Argo Books keeps it simple with affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -327,7 +332,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$10</span>
+                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
@@ -348,7 +353,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Starter</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$25</span>
+                                    <span class="tier-amount">$<?= $xero_starter ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">20 invoices, 5 bills per month</span>
@@ -357,7 +362,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Standard</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$60</span>
+                                    <span class="tier-amount">$<?= $xero_standard ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Unlimited invoices &amp; bills</span>
@@ -366,7 +371,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$80</span>
+                                    <span class="tier-amount">$<?= $xero_premium ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Multi-currency &amp; advanced reporting</span>
@@ -387,7 +392,7 @@ $plans = get_plan_features();
                 </div>
                 <h3>An honest take</h3>
                 <p>Xero is a polished, globally popular platform with strong app integrations, unlimited users on every plan, and a clean UI. If your business already works with an accountant or needs deep third-party integrations, Xero is a solid choice.</p>
-                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $60+/month for unlimited invoices, Argo Books is built for you.</p>
+                <p>But if you're a small business owner who wants an app that is really easy to use, with offline access, local data storage, and straightforward finance management without paying $<?= $xero_standard ?>+/month for unlimited invoices, Argo Books is built for you.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -411,7 +416,7 @@ $plans = get_plan_features();
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
-                            <p>Xero does not offer a free plan. Pricing starts at $25 CAD/month after a 30-day trial.</p>
+                            <p>Xero does not offer a free plan. Pricing starts at $<?= $xero_starter ?> CAD/month after a 30-day trial.</p>
                         </div>
                     </div>
                 </div>
@@ -455,7 +460,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Xero starts at $25 CAD/month for Starter (limited to 20 invoices) and goes up to $80/month for Premium.</p>
+                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong>. Xero starts at $<?= $xero_starter ?> CAD/month for Starter (limited to 20 invoices) and goes up to $<?= $xero_premium ?>/month for Premium.</p>
                             <p>Argo Books has no client limits or invoice caps on Premium.</p>
                         </div>
                     </div>

@@ -2,7 +2,11 @@
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
-$plans = get_plan_features();
+$plans         = get_plan_features();
+$pricing       = get_pricing_config();
+$argo_monthly  = (int) $pricing['premium_monthly_price'];
+$odoo_standard = competitor_price('odoo', 'standard');
+$odoo_custom   = competitor_price('odoo', 'custom');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +72,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month."
                     }
                 },
                 {
@@ -92,7 +96,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to Odoo?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $44+ CAD/user/month. Costs escalate quickly as you add modules and users."
+                        "text": "Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just $<?= $argo_monthly ?> CAD/month. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $<?= $odoo_standard ?>+ CAD/user/month. Costs escalate quickly as you add modules and users."
                     }
                 },
                 {
@@ -162,7 +166,7 @@ $plans = get_plan_features();
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>Odoo Enterprise charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $10 CAD/month, with no per-user fees.</p>
+                    <p>Odoo Enterprise charges per user per month, and costs add up fast as your team grows. Argo Books has a free version and Premium at a flat $<?= $argo_monthly ?> CAD/month, with no per-user fees.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -195,8 +199,8 @@ $plans = get_plan_features();
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
-                            <th class="brand-col">Odoo<span class="th-sub">One App Free / $44+ CAD/user/mo</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">Odoo<span class="th-sub">One App Free / $<?= $odoo_standard ?>+ CAD/user/mo</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -290,7 +294,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Flat pricing vs per-user fees</h2>
-                <p class="section-desc">Odoo's Enterprise plan starts at $44 CAD/user/month and scales up with every team member. Argo Books is a flat $10 CAD/month for Premium, with no per-user charges.</p>
+                <p class="section-desc">Odoo's Enterprise plan starts at $<?= $odoo_standard ?> CAD/user/month and scales up with every team member. Argo Books is a flat $<?= $argo_monthly ?> CAD/month for Premium, with no per-user charges.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -315,7 +319,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$10</span>
+                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
@@ -345,7 +349,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Standard</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$44</span>
+                                    <span class="tier-amount">$<?= $odoo_standard ?></span>
                                     <span class="tier-period">CAD/user/month</span>
                                 </div>
                                 <span class="tier-limit">All apps, cloud hosting</span>
@@ -354,7 +358,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Custom</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$69</span>
+                                    <span class="tier-amount">$<?= $odoo_custom ?></span>
                                     <span class="tier-period">CAD/user/month</span>
                                 </div>
                                 <span class="tier-limit">All apps, multi-company, on-premise</span>
@@ -399,7 +403,7 @@ $plans = get_plan_features();
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
-                            <p>Odoo's free plan is limited to a single app, and adding a second module starts at $44 CAD/user/month.</p>
+                            <p>Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month.</p>
                         </div>
                     </div>
                 </div>
@@ -443,7 +447,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $44+ CAD/user/month.</p>
+                            <p>Argo Books is much simpler and more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong>. Odoo's free tier is limited to one app, and as soon as you need invoicing plus inventory (two apps), pricing jumps to $<?= $odoo_standard ?>+ CAD/user/month.</p>
                             <p>Costs escalate quickly as you add modules and users.</p>
                         </div>
                     </div>

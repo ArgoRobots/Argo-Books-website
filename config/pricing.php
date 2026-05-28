@@ -144,6 +144,115 @@ function render_feature_label($feature) {
 }
 
 /**
+ * Get the competitor pricing data from competitors.json.
+ *
+ * Single source of truth for prices of other accounting tools quoted on the
+ * comparison pages and in articles. Update a price in competitors.json and
+ * every page that references it via competitor_price() or {placeholder}
+ * substitution will update on the next render.
+ *
+ * Uses static caching so the file is only read once per request.
+ *
+ * @return array Competitor data keyed by competitor slug
+ */
+function get_competitors() {
+    static $competitors = null;
+
+    if ($competitors !== null) {
+        return $competitors;
+    }
+
+    $json = file_get_contents(__DIR__ . '/competitors.json');
+    $competitors = json_decode($json, true) ?: [];
+    return $competitors;
+}
+
+/**
+ * Look up a competitor plan price.
+ *
+ * @param string $competitor Slug from competitors.json (e.g. 'quickbooks')
+ * @param string $plan       Plan key within that competitor (e.g. 'easystart')
+ * @param string $period     'monthly' (default) or 'yearly'
+ * @return int|float|null    Price, or null if the competitor/plan/period isn't defined
+ */
+function competitor_price($competitor, $plan, $period = 'monthly') {
+    $competitors = get_competitors();
+    return $competitors[$competitor]['plans'][$plan][$period] ?? null;
+}
+
+/**
+ * Build the full placeholder map used by pricing_substitute().
+ *
+ * Keys are the literal strings written into article HTML and other templates
+ * (e.g. "{argo_premium_monthly}", "{quickbooks_easystart}"). Values are
+ * stringified numbers ready to be dropped into the surrounding "$..." copy.
+ *
+ * Argo's own prices come from .env via get_pricing_config(); competitor
+ * prices come from competitors.json. This is the single function that knows
+ * the placeholder naming convention.
+ */
+function pricing_template_vars() {
+    static $vars = null;
+
+    if ($vars !== null) {
+        return $vars;
+    }
+
+    $cfg = get_pricing_config();
+    $monthly       = (float) $cfg['premium_monthly_price'];
+    $yearly        = (float) $cfg['premium_yearly_price'];
+    $yearlyPerMo   = $monthly > 0 ? $yearly / 12 : 0;
+
+    $vars = [
+        '{argo_premium_monthly}'         => _pricing_format_amount($monthly),
+        '{argo_premium_yearly}'          => _pricing_format_amount($yearly),
+        '{argo_premium_yearly_per_month}' => $monthly > 0 ? _pricing_format_amount($yearlyPerMo, 2) : '0',
+    ];
+
+    foreach (get_competitors() as $slug => $brand) {
+        foreach (($brand['plans'] ?? []) as $planKey => $plan) {
+            if (isset($plan['monthly'])) {
+                $vars['{' . $slug . '_' . $planKey . '}'] = _pricing_format_amount($plan['monthly']);
+                $vars['{' . $slug . '_' . $planKey . '_monthly}'] = _pricing_format_amount($plan['monthly']);
+            }
+            if (isset($plan['yearly'])) {
+                $vars['{' . $slug . '_' . $planKey . '_yearly}'] = _pricing_format_amount($plan['yearly']);
+            }
+        }
+    }
+
+    return $vars;
+}
+
+/**
+ * Replace pricing placeholders in a chunk of HTML/text.
+ *
+ * Articles, comparison-page copy, and other templates can include
+ * {argo_premium_monthly} / {quickbooks_easystart} / etc. and this function
+ * substitutes the current values from .env + competitors.json. Strings with
+ * no placeholders pass through unchanged.
+ */
+function pricing_substitute($html) {
+    if ($html === null || $html === '') {
+        return $html;
+    }
+    return strtr($html, pricing_template_vars());
+}
+
+/**
+ * Format a price for inline display: integer if whole, two decimals otherwise.
+ */
+function _pricing_format_amount($amount, $forceDecimals = null) {
+    if ($forceDecimals !== null) {
+        return number_format($amount, $forceDecimals, '.', '');
+    }
+    if (floor($amount) == $amount) {
+        return (string) (int) $amount;
+    }
+    return number_format($amount, 2, '.', '');
+}
+
+/**
  * Calculate the processing fee for a given subtotal.
  * Returns 0 if subtotal is zero or negative (e.g. credit-covered payments).
  *

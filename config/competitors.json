@@ -1,0 +1,63 @@
+{
+  "_comment": "Single source of truth for competitor plan pricing shown on comparison pages and in articles. All prices are in CAD per month unless otherwise noted. Update a price here and every comparison page, FAQ schema, article paragraph, etc. that references it via {placeholder} will update on the next page load.",
+
+  "quickbooks": {
+    "name": "QuickBooks",
+    "currency": "CAD",
+    "plans": {
+      "easystart": { "label": "EasyStart", "monthly": 30  },
+      "plus":      { "label": "Plus",      "monthly": 110 },
+      "advanced":  { "label": "Advanced",  "monthly": 220 }
+    }
+  },
+
+  "freshbooks": {
+    "name": "FreshBooks",
+    "currency": "CAD",
+    "plans": {
+      "lite":    { "label": "Lite",    "monthly": 26, "client_limit": 5 },
+      "plus":    { "label": "Plus",    "monthly": 42, "client_limit": 50 },
+      "premium": { "label": "Premium", "monthly": 72 }
+    }
+  },
+
+  "wave": {
+    "name": "Wave",
+    "currency": "CAD",
+    "plans": {
+      "starter":         { "label": "Starter", "monthly": 0  },
+      "pro":             { "label": "Pro",     "monthly": 25 },
+      "receipt_addon":   { "label": "Receipt scanning add-on (on Starter)", "monthly": 11, "yearly": 96 }
+    }
+  },
+
+  "xero": {
+    "name": "Xero",
+    "currency": "CAD",
+    "plans": {
+      "starter":  { "label": "Starter",  "monthly": 25, "invoice_limit": 20 },
+      "standard": { "label": "Standard", "monthly": 60 },
+      "premium":  { "label": "Premium",  "monthly": 80 }
+    }
+  },
+
+  "zipbooks": {
+    "name": "ZipBooks",
+    "currency": "CAD",
+    "plans": {
+      "starter":       { "label": "Starter",       "monthly": 0  },
+      "smarter":       { "label": "Smarter",       "monthly": 20 },
+      "sophisticated": { "label": "Sophisticated", "monthly": 50 }
+    }
+  },
+
+  "odoo": {
+    "name": "Odoo",
+    "currency": "CAD",
+    "plans": {
+      "one_app_free": { "label": "One App Free", "monthly": 0 },
+      "standard":     { "label": "Standard",     "monthly": 44, "per_user": true },
+      "custom":       { "label": "Custom",       "monthly": 69, "per_user": true }
+    }
+  }
+}

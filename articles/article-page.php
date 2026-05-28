@@ -17,6 +17,7 @@
 //   <h2>            Related articles (when $data['related_article_slugs'] non-empty)
 
 require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../config/pricing.php';
 
 // --- 1. Sanitize the slug -----------------------------------------------------
 
@@ -151,7 +152,7 @@ ob_start();
   </header>
 
   <section class="article-intro">
-    <?= $data['intro_html'] ?? '' ?>
+    <?= pricing_substitute($data['intro_html'] ?? '') ?>
   </section>
 
   <?php foreach ($data['sections'] as $i => $section): ?>
@@ -159,7 +160,7 @@ ob_start();
       <?php if (!empty($section['h2'])): ?>
         <h2><?= htmlspecialchars($section['h2']) ?></h2>
       <?php endif; ?>
-      <?= $section['html'] ?? '' ?>
+      <?= pricing_substitute($section['html'] ?? '') ?>
     </section>
 
     <?php if ($i === $callout_after): ?>
@@ -182,7 +183,7 @@ ob_start();
           <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
           <div class="faq-item">
             <button type="button" class="faq-question" aria-expanded="false">
-              <h3><?= htmlspecialchars($faq['q']) ?></h3>
+              <h3><?= htmlspecialchars(pricing_substitute($faq['q'])) ?></h3>
               <span class="faq-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <polyline points="6,9 12,15 18,9"/>
@@ -191,7 +192,7 @@ ob_start();
             </button>
             <div class="faq-answer">
               <div class="faq-answer-content">
-                <p><?= htmlspecialchars($faq['a']) ?></p>
+                <p><?= htmlspecialchars(pricing_substitute($faq['a'])) ?></p>
               </div>
             </div>
           </div>

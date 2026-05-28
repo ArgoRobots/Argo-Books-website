@@ -2,7 +2,11 @@
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
-$plans = get_plan_features();
+$plans              = get_plan_features();
+$pricing            = get_pricing_config();
+$argo_monthly       = (int) $pricing['premium_monthly_price'];
+$zb_smarter         = competitor_price('zipbooks', 'smarter');
+$zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -84,7 +88,7 @@ $plans = get_plan_features();
                     "name": "How is Argo Books different from ZipBooks?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management, all at a lower premium price ($10 CAD/month vs $20+ CAD). ZipBooks is cloud-based and focused on invoicing and time tracking for freelancers."
+                        "text": "Both are simple, non-accountant-friendly tools with free tiers. Argo Books' key advantages are local data storage for privacy, offline access, AI receipt scanning, predictive analytics, and inventory management, all at a lower premium price ($<?= $argo_monthly ?> CAD/month vs $<?= $zb_smarter ?>+ CAD). ZipBooks is cloud-based and focused on invoicing and time tracking for freelancers."
                     }
                 },
                 {
@@ -92,7 +96,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to ZipBooks?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is $10 CAD/month vs ZipBooks Smarter at $20 CAD/month. You get more features for less with Argo Books."
+                        "text": "Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is $<?= $argo_monthly ?> CAD/month vs ZipBooks Smarter at $<?= $zb_smarter ?> CAD/month. You get more features for less with Argo Books."
                     }
                 },
                 {
@@ -162,7 +166,7 @@ $plans = get_plan_features();
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>Lower premium price</h3>
-                    <p>ZipBooks' paid plans start at $20 CAD/month. Argo Books Premium is $10 CAD/month, with AI receipt scanning, predictive analytics, and inventory management included.</p>
+                    <p>ZipBooks' paid plans start at $<?= $zb_smarter ?> CAD/month. Argo Books Premium is $<?= $argo_monthly ?> CAD/month, with AI receipt scanning, predictive analytics, and inventory management included.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -195,7 +199,7 @@ $plans = get_plan_features();
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
                             <th class="brand-col">ZipBooks<span class="th-sub">Starter: Free</span></th>
                         </tr>
                     </thead>
@@ -284,7 +288,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Both free to start. Here's how they compare</h2>
-                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $20 CAD/month, while Argo Books Premium is $10 CAD/month with AI receipt scanning, inventory, and predictive analytics included.</p>
+                <p class="section-desc">ZipBooks and Argo Books both offer a free tier. But ZipBooks' paid plans start at $<?= $zb_smarter ?> CAD/month, while Argo Books Premium is $<?= $argo_monthly ?> CAD/month with AI receipt scanning, inventory, and predictive analytics included.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -309,7 +313,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$10</span>
+                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
@@ -339,7 +343,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Smarter</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$20</span>
+                                    <span class="tier-amount">$<?= $zb_smarter ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Recurring invoices, time tracking</span>
@@ -348,7 +352,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Sophisticated</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$50</span>
+                                    <span class="tier-amount">$<?= $zb_sophisticated ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Tagging, custom categories</span>
@@ -437,7 +441,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is <strong>$10 CAD/month</strong> vs ZipBooks Smarter at $20 CAD/month.</p>
+                            <p>Both offer free plans, but Argo Books' Free tier is more feature-rich with AI capabilities and inventory management. For paid plans, Argo Books Premium is <strong>$<?= $argo_monthly ?> CAD/month</strong> vs ZipBooks Smarter at $<?= $zb_smarter ?> CAD/month.</p>
                             <p>You get more features for less with Argo Books.</p>
                         </div>
                     </div>

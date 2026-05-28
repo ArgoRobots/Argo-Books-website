@@ -28,7 +28,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Net 30 is the most common payment term for invoices, meaning payment is due 30 days after the invoice date. Shorter terms like Net 7 or Net 15 are normal for smaller jobs or new clients, and a 50 percent deposit up front is reasonable for larger projects. If you want to encourage faster payment, add a clear late fee (often 1.5 percent per month on overdue balances) and state your accepted payment methods directly in the Terms section.</p>
+<p>The most common payment term for invoices is due 30 days after the invoice date (often written as Net 30). Shorter windows like due within a week or due 15 days after the invoice date (Net 7 or Net 15) are normal for smaller jobs or new clients, and a 50 percent deposit up front is reasonable for larger projects. If you want to encourage faster payment, add a clear late fee (often 1.5 percent per month on overdue balances) and state your accepted payment methods directly in the Terms section.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
@@ -62,8 +62,13 @@ HTML,
     ],
   ],
 
-  // Empty for now. Phase C will add niche pages that this page can link to.
-  'related_slugs' => [],
+  'related_slugs' => [
+    'freelance', 'contractor', 'consultant', 'designer', 'developer',
+    'photographer', 'cleaning', 'plumber', 'electrician', 'tutor',
+    'usa', 'canada', 'uk', 'australia', 'india',
+  ],
+
+  'related_template_slugs' => ['pdf', 'word', 'excel'],
 
   'cta_text' => 'If you want to handle payments, refunds, and track everything, use Argo Books.',
 

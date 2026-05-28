@@ -10,7 +10,9 @@
 //
 // To add a new niche page:
 //   1. Copy this file to niches/data/{your-slug}.php.
-//   2. Fill in every key. Do not skip optional-looking ones; the template
+//   2. Fill in every required key. The only optional field is
+//      `related_template_slugs`, which may be left as an empty array or
+//      omitted entirely. Every other key must be filled in; the template
 //      assumes they are all present.
 //   3. Reference the new slug from at least 3 other niche data files via
 //      `related_slugs`. The niche template prints a dev-mode warning when
@@ -86,6 +88,16 @@ return [
     // 'contractors',
     // 'consultants',
   ],
+
+  // Optional slugs of related /invoice-template/ pages. The niche template
+  // renders these as internal links to /invoice-template/{slug}/, immediately
+  // below the "Related guides and tools" section, under the heading
+  // "Related templates to download". Aim for 0 to 3 entries. Empty or missing
+  // means the section is skipped entirely.
+  //
+  // Valid slugs are filenames in invoice-template/data/*.php (without the .php
+  // suffix), e.g. 'pdf', 'word', 'classic-pdf', 'modern-google-sheets'.
+  'related_template_slugs' => [],
 
   // Conversion CTA shown at the bottom of the page. Plain text.
   'cta_text' => 'If you want to handle payments, refunds, and track everything, use Argo Books.',

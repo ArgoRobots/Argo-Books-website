@@ -199,13 +199,26 @@ ob_start();
   <?php if (!empty($data['faqs'])): ?>
   <section class="template-faqs">
     <h2>Frequently asked questions</h2>
-    <?php foreach ($data['faqs'] as $faq): ?>
-      <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
-      <div class="template-faq">
-        <h3><?= htmlspecialchars($faq['q']) ?></h3>
-        <p><?= htmlspecialchars($faq['a']) ?></p>
-      </div>
-    <?php endforeach; ?>
+    <div class="faq-grid">
+      <?php foreach ($data['faqs'] as $faq): ?>
+        <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false">
+            <h3><?= htmlspecialchars($faq['q']) ?></h3>
+            <span class="faq-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6,9 12,15 18,9"/>
+              </svg>
+            </span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p><?= htmlspecialchars($faq['a']) ?></p>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </section>
   <?php endif; ?>
 
@@ -238,6 +251,33 @@ ob_start();
 $body_content = ob_get_clean();
 
 $extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/invoice-template/scripts/template-page-tracker.js"></script>';
+
+// Collapsible FAQ click handler. Shares the .faq-item / .faq-question
+// component with /free-invoice-generator/ niche pages; CSS lives in
+// invoice-generator/styles/tool.css.
+$extra_scripts .= <<<'HTML'
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var items = document.querySelectorAll('.template-faqs .faq-item');
+  items.forEach(function (item) {
+    var question = item.querySelector('.faq-question');
+    if (!question) return;
+    question.addEventListener('click', function () {
+      var wasActive = item.classList.contains('active');
+      items.forEach(function (other) {
+        other.classList.remove('active');
+        var btn = other.querySelector('.faq-question');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasActive) {
+        item.classList.add('active');
+        question.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+});
+</script>
+HTML;
 
 include __DIR__ . '/../invoice-generator/layout.php';
 

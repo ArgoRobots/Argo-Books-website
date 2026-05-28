@@ -160,6 +160,13 @@ if (function_exists('current_environment')) {
     $is_dev = current_environment() !== 'production';
 }
 
+// INVGEN_BASE has to be defined before the body buffer starts so the
+// related-niche and related-template anchors below can prefix their
+// hrefs. On Laragon the prefix is '/argo-books-website', on production
+// it is empty. Required again later for script paths (require_once
+// makes the second call a no-op).
+require_once __DIR__ . '/../invoice-generator/_base.php';
+
 ob_start();
 ?>
 <article class="niche-page">
@@ -178,21 +185,32 @@ ob_start();
   <?php if (!empty($data['sample_line_items'])): ?>
   <section class="niche-samples">
     <h2>Sample line items</h2>
-    <ul class="niche-sample-list">
-      <?php foreach ($data['sample_line_items'] as $item): ?>
-        <?php
-          $desc = $item['description'] ?? '';
-          $rate = isset($item['rate']) ? (float)$item['rate'] : 0.0;
-          $qty = isset($item['quantity']) ? (float)$item['quantity'] : 0.0;
-          $amount = $rate * $qty;
-        ?>
-        <li class="niche-sample-item">
-          <span class="niche-sample-desc"><?= htmlspecialchars($desc) ?></span>
-          <span class="niche-sample-rate"><?= htmlspecialchars(number_format($rate, 2)) ?> &times; <?= htmlspecialchars((string)$qty) ?></span>
-          <span class="niche-sample-amount">$<?= htmlspecialchars(number_format($amount, 2)) ?></span>
-        </li>
-      <?php endforeach; ?>
-    </ul>
+    <table class="niche-samples-table">
+      <thead>
+        <tr>
+          <th scope="col">Item</th>
+          <th scope="col" class="num">Rate</th>
+          <th scope="col" class="num">Qty</th>
+          <th scope="col" class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach ($data['sample_line_items'] as $item): ?>
+          <?php
+            $desc = $item['description'] ?? '';
+            $rate = isset($item['rate']) ? (float)$item['rate'] : 0.0;
+            $qty = isset($item['quantity']) ? (float)$item['quantity'] : 0.0;
+            $amount = $rate * $qty;
+          ?>
+          <tr>
+            <th scope="row" class="niche-sample-desc"><?= htmlspecialchars($desc) ?></th>
+            <td class="num">$<?= htmlspecialchars(number_format($rate, 2)) ?></td>
+            <td class="num"><?= htmlspecialchars(rtrim(rtrim(number_format($qty, 2), '0'), '.')) ?></td>
+            <td class="num niche-sample-amount">$<?= htmlspecialchars(number_format($amount, 2)) ?></td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
   </section>
   <?php endif; ?>
 
@@ -213,13 +231,26 @@ ob_start();
   <?php if (!empty($data['faqs'])): ?>
   <section class="niche-faqs">
     <h2>Frequently asked questions</h2>
-    <?php foreach ($data['faqs'] as $faq): ?>
-      <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
-      <div class="niche-faq">
-        <h3><?= htmlspecialchars($faq['q']) ?></h3>
-        <p><?= htmlspecialchars($faq['a']) ?></p>
-      </div>
-    <?php endforeach; ?>
+    <div class="faq-grid">
+      <?php foreach ($data['faqs'] as $faq): ?>
+        <?php if (empty($faq['q']) || empty($faq['a'])) continue; ?>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false">
+            <h3><?= htmlspecialchars($faq['q']) ?></h3>
+            <span class="faq-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6,9 12,15 18,9"/>
+              </svg>
+            </span>
+          </button>
+          <div class="faq-answer">
+            <div class="faq-answer-content">
+              <p><?= htmlspecialchars($faq['a']) ?></p>
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
   </section>
   <?php endif; ?>
 
@@ -230,7 +261,7 @@ ob_start();
         <?php foreach ($related_slugs as $rs): ?>
           <?php if (!is_string($rs) || !preg_match('/^[a-z0-9-]+$/', $rs)) continue; ?>
           <li>
-            <a href="/free-invoice-generator/<?= htmlspecialchars($rs) ?>/">
+            <a href="<?= INVGEN_BASE ?>/free-invoice-generator/<?= htmlspecialchars($rs) ?>/">
               <?= htmlspecialchars(ucwords(str_replace('-', ' ', $rs))) ?>
             </a>
           </li>
@@ -247,13 +278,36 @@ ob_start();
     <?php endif; ?>
   </section>
 
-  <section class="niche-cta">
-    <p class="niche-cta-text">
-      <a href="https://argorobots.com/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=invoice-generator&amp;utm_medium=niche&amp;utm_campaign=phase1&amp;placement=footer&amp;niche=<?= htmlspecialchars($slug) ?>" data-pitch-placement="footer">
-        <?= htmlspecialchars($data['cta_text'] ?? 'If you want to handle payments, refunds, and track everything, use Argo Books.') ?>
-      </a>
-    </p>
+  <?php
+    $related_template_slugs = $data['related_template_slugs'] ?? [];
+    $related_template_slugs = array_values(array_filter(
+      $related_template_slugs,
+      fn($s) => is_string($s) && preg_match('/^[a-z0-9-]+$/', $s)
+    ));
+  ?>
+  <?php if (!empty($related_template_slugs)): ?>
+  <section class="niche-related-templates">
+    <h2>Related templates to download</h2>
+    <ul class="niche-related-list">
+      <?php foreach ($related_template_slugs as $ts): ?>
+        <li>
+          <a href="<?= INVGEN_BASE ?>/invoice-template/<?= htmlspecialchars($ts) ?>/">
+            <?= htmlspecialchars(ucwords(str_replace('-', ' ', $ts))) ?> template
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
   </section>
+  <?php endif; ?>
+
+  <aside class="page-banner" role="complementary">
+    <span class="page-banner-text">If you want to handle payments, refunds, and track everything,</span>
+    <a class="link page-banner-link"
+       data-pitch-placement="footer"
+       href="https://argorobots.com/?source=<?= htmlspecialchars($invgen_ref) ?>&amp;utm_source=invoice-generator&amp;utm_medium=niche&amp;utm_campaign=phase1&amp;placement=footer&amp;niche=<?= htmlspecialchars($slug) ?>">
+      use Argo Books <span aria-hidden="true">&rarr;</span>
+    </a>
+  </aside>
 
 </article>
 <?php
@@ -273,6 +327,33 @@ if (!empty($data['generator_defaults'])) {
 }
 require_once __DIR__ . '/../invoice-generator/_base.php';
 $extra_scripts .= '<script type="module" src="' . INVGEN_BASE . '/invoice-generator/scripts/main.js"></script>';
+
+// Collapsible FAQ click handler. One open at a time, matching the main
+// site's pricing-page pattern. Inline (not loaded via main.js) because
+// it is niche-page-only and trivial.
+$extra_scripts .= <<<'HTML'
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var items = document.querySelectorAll('.niche-faqs .faq-item');
+  items.forEach(function (item) {
+    var question = item.querySelector('.faq-question');
+    if (!question) return;
+    question.addEventListener('click', function () {
+      var wasActive = item.classList.contains('active');
+      items.forEach(function (other) {
+        other.classList.remove('active');
+        var btn = other.querySelector('.faq-question');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      });
+      if (!wasActive) {
+        item.classList.add('active');
+        question.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+});
+</script>
+HTML;
 
 include __DIR__ . '/../invoice-generator/layout.php';
 

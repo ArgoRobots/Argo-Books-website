@@ -81,10 +81,14 @@ const STYLES = {
   },
   elegant: {
     label: 'Elegant',
-    headingFont: 'Arial',
-    headingColor: '1A1A1A',
-    headerFill: 'FBBF24',
-    accentColor: 'FBBF24',
+    // Georgia serif + indigo accent, mirroring the live tool's Elegant
+    // template. The docx export marks the INVOICE wordmark with a thin
+    // indigo bottom rule on the right header cell (handled in
+    // buildHeaderTable via the same path as Ribbon).
+    headingFont: 'Georgia',
+    headingColor: '6366F1',
+    headerFill: null,
+    accentColor: '6366F1',
     xlsxBodyFont: 'Arial',
     xlsxHeadingFont: 'Georgia',
     xlsxInvoiceColor: '4338CA',
@@ -437,7 +441,10 @@ function buildHeaderTable(style, styleId) {
 
   const rightCellBorders = {
     top: noBorder,
-    bottom: styleId === 'ribbon'
+    // Ribbon and Elegant both anchor their wordmark with a thin accent
+    // rule under the INVOICE cell. Other styles either fill the cell
+    // (none currently) or leave it borderless.
+    bottom: (styleId === 'ribbon' || styleId === 'elegant')
       ? { style: BorderStyle.SINGLE, size: 6, color: style.accentColor }
       : noBorder,
     left: noBorder,
@@ -532,7 +539,6 @@ function buildLineItemsTable(style, styleId) {
     let fill = 'F3F5F8';
     let textColor = '1A1A1A';
     if (styleId === 'classic') { fill = '1A1A1A'; textColor = 'FFFFFF'; }
-    if (styleId === 'elegant') { fill = style.headerFill; textColor = style.headingColor; }
     return new TableCell({
       width: { size: widthDxa, type: WidthType.DXA },
       shading: { type: ShadingType.CLEAR, color: 'auto', fill },

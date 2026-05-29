@@ -71,11 +71,11 @@ $site_schema = [
 <?php endforeach; ?>
 
 <link rel="stylesheet" href="<?= INVGEN_BASE ?>/invoice-generator/styles/tool.css">
-<script>window.INVGEN_BASE = <?= json_encode(INVGEN_BASE) ?>;</script>
+<script>window.INVGEN_BASE = <?= json_encode(INVGEN_BASE, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
 <?= $extra_head ?>
 
 <?php /* Sitewide Organization + WebSite JSON-LD (E-E-A-T) */ ?>
-<script type="application/ld+json"><?= json_encode($site_schema, JSON_UNESCAPED_SLASHES) ?></script>
+<script type="application/ld+json"><?= json_encode($site_schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?></script>
 
 <?php /* Per-page primary schema (SoftwareApplication on the tool, FAQPage on niche pages, etc.) */ ?>
 <?php if ($page_schema_json !== null): ?>

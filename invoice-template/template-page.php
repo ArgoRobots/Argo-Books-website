@@ -78,7 +78,7 @@ if (!empty($faq_items)) {
         '@context' => 'https://schema.org',
         '@type' => 'FAQPage',
         'mainEntity' => $faq_items,
-    ], JSON_UNESCAPED_SLASHES);
+    ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 }
 
 $breadcrumb_items = [
@@ -90,7 +90,7 @@ $breadcrumb_schema_json = json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'BreadcrumbList',
     'itemListElement' => $breadcrumb_items,
-], JSON_UNESCAPED_SLASHES);
+], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // --- 6. Asset config ----------------------------------------------------------
 
@@ -285,22 +285,8 @@ include __DIR__ . '/../invoice-generator/layout.php';
 
 function template_render_404(): void
 {
-    http_response_code(404);
-    if (!headers_sent()) {
-        header('Content-Type: text/html; charset=utf-8');
-    }
-    ?><!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Template not found | Argo Books</title>
-<meta name="robots" content="noindex">
-</head>
-<body>
-<h1>Template not found</h1>
-<p>The template you asked for does not exist. Browse <a class="link" href="/invoice-template/">all templates</a>.</p>
-</body>
-</html>
-<?php
+    invgen_render_404(
+        'Template not found',
+        '<p>The template you asked for does not exist. Browse <a class="link" href="' . INVGEN_BASE . '/invoice-template/">all templates</a>.</p>'
+    );
 }

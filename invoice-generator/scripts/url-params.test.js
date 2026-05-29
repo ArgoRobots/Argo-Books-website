@@ -1,37 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseTemplateParam, parseShareLink, serializeShareLink } from './url-params.js';
+import { parseShareLink, serializeShareLink } from './url-params.js';
 
 const VALID = ['classic', 'modern', 'formal', 'elegant', 'ribbon'];
-
-test('parseTemplateParam returns null for empty string', () => {
-  assert.equal(parseTemplateParam('', VALID), null);
-});
-
-test('parseTemplateParam returns null when param missing entirely', () => {
-  assert.equal(parseTemplateParam(null, VALID), null);
-  assert.equal(parseTemplateParam(undefined, VALID), null);
-});
-
-test('parseTemplateParam returns the value when it is in the allowlist', () => {
-  assert.equal(parseTemplateParam('?template=elegant', VALID), 'elegant');
-  assert.equal(parseTemplateParam('?template=ribbon', VALID), 'ribbon');
-  assert.equal(parseTemplateParam('?foo=1&template=modern&bar=2', VALID), 'modern');
-});
-
-test('parseTemplateParam is case insensitive on the value', () => {
-  assert.equal(parseTemplateParam('?template=ELEGANT', VALID), 'elegant');
-  assert.equal(parseTemplateParam('?template=Ribbon', VALID), 'ribbon');
-});
-
-test('parseTemplateParam returns null when value is not in the allowlist', () => {
-  assert.equal(parseTemplateParam('?template=fancy', VALID), null);
-  assert.equal(parseTemplateParam('?template=<script>', VALID), null);
-});
-
-test('parseTemplateParam returns null when the param is the empty string', () => {
-  assert.equal(parseTemplateParam('?template=', VALID), null);
-});
 
 // --- parseShareLink ---
 
@@ -83,6 +54,18 @@ test('parseShareLink truncates over-long string fields', () => {
   const big = 'x'.repeat(500);
   const out = parseShareLink(`?from=${big}`, VALID);
   assert.equal(out.from.length, 200);
+});
+
+test('parseShareLink truncates by codepoint, not code unit, so emoji stays intact', () => {
+  // 199 ASCII chars then a single emoji (one codepoint, two UTF-16 units).
+  // The emoji should survive the 200-codepoint truncation as a complete pair,
+  // not be split into a lone high surrogate.
+  const value = 'x'.repeat(199) + '😀';
+  const out = parseShareLink(`?from=${encodeURIComponent(value)}`, VALID);
+  // 199 x + emoji counts as 200 codepoints; nothing should be cut.
+  assert.equal(out.from, value);
+  // Round-trip via JSON to confirm no lone surrogate sneaked in.
+  assert.equal(JSON.parse(JSON.stringify(out.from)), value);
 });
 
 test('parseShareLink ignores empty values', () => {

@@ -33,7 +33,7 @@ $page_schema_json = json_encode([
   'offers' => ['@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD'],
   'creator' => ['@id' => 'https://argorobots.com/#organization'],
   'url' => 'https://argorobots.com/invoice-generator/',
-], JSON_UNESCAPED_SLASHES);
+], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 ob_start();
 include __DIR__ . '/_fragment.php';

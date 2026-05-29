@@ -24,7 +24,6 @@ export function emptyState() {
     discount: null, // null means hidden; { mode: 'percent'|'fixed', value: number } when shown
     shipping: null, // same pattern: null or { value: number }
     taxRatePercent: 0,
-    taxMode: 'exclusive',   // 'exclusive' | 'inclusive' (legacy, kept for math)
     taxRateMode: 'percent', // 'percent' (rate * subtotal) | 'fixed' (flat dollar amount)
     notes: '',
     terms: '',

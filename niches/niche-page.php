@@ -25,6 +25,11 @@
 // H2 (the H1 already serves as that section's heading; adding another H2
 // would create a duplicate logical section).
 
+// _base.php defines INVGEN_BASE and the shared invgen_render_404() helper
+// that niche_render_404() at the bottom of this file delegates to. Must be
+// required BEFORE the 404 fallbacks fire below.
+require_once __DIR__ . '/../invoice-generator/_base.php';
+
 // --- 1. Sanitize the slug -----------------------------------------------------
 
 $slug_raw = $_GET['slug'] ?? '';
@@ -100,7 +105,7 @@ if (!empty($faq_items)) {
         '@context' => 'https://schema.org',
         '@type' => 'FAQPage',
         'mainEntity' => $faq_items,
-    ], JSON_UNESCAPED_SLASHES);
+    ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 }
 
 // BreadcrumbList: Home > Free Invoice Generator > [Niche Name]
@@ -121,7 +126,7 @@ $breadcrumb_schema_json = json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'BreadcrumbList',
     'itemListElement' => $breadcrumb_items,
-], JSON_UNESCAPED_SLASHES);
+], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // --- 4b. Hreflang alternates --------------------------------------------------
 // Country-specific niche pages reference each other via hreflang so the right
@@ -131,10 +136,20 @@ $breadcrumb_schema_json = json_encode([
 
 $hreflang_alternates = [];
 if (!empty($data['concept']) && !empty($data['country'])) {
-    foreach (glob(__DIR__ . '/data/*.php') as $sibling_file) {
+    // glob() can return false on I/O error (open_basedir, transient permission);
+    // foreach over false fatals in PHP 8. Default to an empty list instead.
+    $sibling_files = glob(__DIR__ . '/data/*.php') ?: [];
+    foreach ($sibling_files as $sibling_file) {
         $sibling_slug = basename($sibling_file, '.php');
         if ($sibling_slug === '_template') continue;
-        $sibling = require $sibling_file;
+        // A malformed sibling data file (returns non-array, or has a runtime error)
+        // must not bring down every country-tagged niche page.
+        try {
+            $sibling = require $sibling_file;
+        } catch (\Throwable $_e) {
+            continue;
+        }
+        if (!is_array($sibling)) continue;
         if (($sibling['concept'] ?? null) !== $data['concept']) continue;
 
         $sibling_slug_val = $sibling['slug'] ?? $sibling_slug;
@@ -359,28 +374,10 @@ include __DIR__ . '/../invoice-generator/layout.php';
 
 // -----------------------------------------------------------------------------
 
-/**
- * Emit a minimal 404 page and set the response status.
- * Kept intentionally bare so we never depend on data we may not have.
- */
 function niche_render_404(): void
 {
-    http_response_code(404);
-    if (!headers_sent()) {
-        header('Content-Type: text/html; charset=utf-8');
-    }
-    ?><!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Page not found | Argo Books</title>
-<meta name="robots" content="noindex">
-</head>
-<body>
-<h1>Page not found</h1>
-<p>The page you asked for does not exist. Try the <a href="/free-invoice-generator/">free invoice generator</a>.</p>
-</body>
-</html>
-<?php
+    invgen_render_404(
+        'Page not found',
+        '<p>The page you asked for does not exist. Try the <a href="' . INVGEN_BASE . '/free-invoice-generator/">free invoice generator</a>.</p>'
+    );
 }

@@ -37,6 +37,11 @@ function current_environment(): string
     return ($_ENV['APP_ENV'] ?? '') === 'production' ? 'production' : 'sandbox';
 }
 
+// site_url() lives in env_helper.php (already required at the top of this
+// file). Use it for sitemap loc URLs, canonical hrefs, Open Graph og:url,
+// and JSON-LD @id values that need an absolute URL. For in-page asset paths,
+// keep using INVGEN_BASE (the request-relative prefix).
+
 /**
  * Encrypt a string using AES-256-GCM.
  * Requires PORTAL_ENCRYPTION_KEY environment variable (64-char hex = 256 bits).

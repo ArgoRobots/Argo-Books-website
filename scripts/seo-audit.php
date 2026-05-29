@@ -22,6 +22,17 @@ $out_path = $opts['out'] ?? (__DIR__ . '/../read-me/seo/phase-e-audit-' . date('
 $findings = [];
 $rows = [];
 
+// Disable TLS verification only for dev hosts. Auditing production with a
+// silently-trusted forged cert would let a transparent MITM proxy hand the
+// script attacker-controlled HTML and report a green run.
+function is_dev_host(string $url): bool {
+    $host = parse_url($url, PHP_URL_HOST) ?: '';
+    return $host === '127.0.0.1'
+        || $host === 'localhost'
+        || str_ends_with($host, '.test')
+        || str_ends_with($host, '.localhost');
+}
+
 function fetch(string $url): array {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -30,7 +41,8 @@ function fetch(string $url): array {
         CURLOPT_USERAGENT => 'argo-seo-audit/1.0',
         CURLOPT_TIMEOUT => 15,
         CURLOPT_HEADER => false,
-        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYPEER => !is_dev_host($url),
+        CURLOPT_SSL_VERIFYHOST => is_dev_host($url) ? 0 : 2,
     ]);
     $body = curl_exec($ch);
     $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
@@ -192,8 +204,15 @@ foreach ($bad_slug_results as $p => $status) {
 $report = ob_get_clean();
 
 $dir = dirname($out_path);
-if (!is_dir($dir)) mkdir($dir, 0775, true);
-file_put_contents($out_path, $report);
+if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+    fwrite(STDERR, "ERROR: could not create report directory {$dir}\n");
+    exit(2);
+}
+$bytes = file_put_contents($out_path, $report);
+if ($bytes === false) {
+    fwrite(STDERR, "ERROR: could not write report to {$out_path}\n");
+    exit(2);
+}
 
 fwrite(STDOUT, "Audit complete. Report: {$out_path}\n");
 fwrite(STDOUT, "Findings: " . count($findings) . "\n");

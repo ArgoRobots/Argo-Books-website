@@ -96,7 +96,7 @@ $page_schema_json = json_encode([
             'numberOfItems' => count($item_list),
         ],
     ],
-], JSON_UNESCAPED_SLASHES);
+], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 $breadcrumb_schema_json = json_encode([
     '@context' => 'https://schema.org',
@@ -105,7 +105,7 @@ $breadcrumb_schema_json = json_encode([
         ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
         ['@type' => 'ListItem', 'position' => 2, 'name' => 'Invoice Guides', 'item' => $canonical_url],
     ],
-], JSON_UNESCAPED_SLASHES);
+], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // Fraunces serif is loaded for this page only. CSP already permits
 // fonts.googleapis.com (style-src) and fonts.gstatic.com (font-src) per

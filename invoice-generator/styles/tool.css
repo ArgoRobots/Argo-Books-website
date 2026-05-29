@@ -614,11 +614,15 @@ body {
    guides, related templates, and the CTA. Tool pages are intentionally
    isolated from /resources/styles/link.css, so we restate the color here
    using the same brand variable the main site reads from. */
-.niche-page a {
+/* Prose links only. Exclude .btn so anchors styled as buttons (e.g. the
+   post-download modal CTA) keep their button text color instead of being
+   recolored to var(--primary-blue), which matches the button background
+   and renders the label invisible. */
+.niche-page a:not(.btn) {
   color: var(--primary-blue);
 }
 
-.niche-page a:hover {
+.niche-page a:not(.btn):hover {
   text-decoration: underline;
 }
 

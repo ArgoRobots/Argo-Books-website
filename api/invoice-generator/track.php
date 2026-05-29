@@ -37,6 +37,8 @@ $allowed = [
     // Phase B: template library
     'invgen_template_cta_clicked',  // Customize and download (PDF/Word) on a template page
     'invgen_template_download',     // Excel direct download / Google Docs or Sheets copy click
+    // Phase E: share-link copy
+    'invgen_share_link_copied',     // User clicked the toolbar "Copy share link" button
 ];
 if (!in_array($event_type, $allowed, true)) {
     http_response_code(400);

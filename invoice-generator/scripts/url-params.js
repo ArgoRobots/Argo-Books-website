@@ -1,26 +1,12 @@
 // invoice-generator/scripts/url-params.js
 // Parses URL query parameters for the invoice generator.
 //
-// Two surfaces:
-// - parseTemplateParam: original Phase A helper that picks the ?template= value off the URL
-//   and validates it against the TEMPLATES registry. Still used by callers that only care
-//   about the template id.
-// - parseShareLink + serializeShareLink: Phase E share-link helpers. Parse a wider
-//   whitelist of pre-fill fields (template, currency, from, billTo, invoiceNumber,
-//   paymentTerms, taxRatePercent, taxRateMode) so a user can copy a permalink that
-//   restores a sensible starting invoice. The whitelist deliberately excludes line
-//   items, notes, terms, addresses, and the logo so URLs stay short and never carry
-//   accidental PII from one user to another.
-
-export function parseTemplateParam(search, allowed) {
-  if (!search || typeof search !== 'string') return null;
-  // URLSearchParams handles a leading '?' just fine.
-  const params = new URLSearchParams(search.startsWith('?') ? search : '?' + search);
-  const raw = params.get('template');
-  if (!raw) return null;
-  const lower = raw.toLowerCase();
-  return Array.isArray(allowed) && allowed.includes(lower) ? lower : null;
-}
+// parseShareLink + serializeShareLink: share-link helpers. Parse a whitelist
+// of pre-fill fields (template, currency, from, billTo, invoiceNumber,
+// paymentTerms, taxRatePercent, taxRateMode) so a user can copy a permalink
+// that restores a sensible starting invoice. The whitelist deliberately
+// excludes line items, notes, terms, addresses, and the logo so URLs stay
+// short and never carry accidental PII from one user to another.
 
 const MAX_STR = 200;
 const MAX_SHORT_STR = 40;
@@ -55,7 +41,11 @@ function coerce(key, raw, templates) {
       return /^[A-Z]{3}$/.test(v) ? v : undefined;
     }
     case 'string': {
-      const v = String(raw).slice(0, spec.max);
+      // Truncate by codepoints (Array.from splits on full code points) so
+      // we never leave a lone surrogate when the cut falls inside a
+      // non-BMP character like an emoji.
+      const cps = Array.from(String(raw));
+      const v = cps.length > spec.max ? cps.slice(0, spec.max).join('') : cps.join('');
       return v || undefined;
     }
     case 'float': {

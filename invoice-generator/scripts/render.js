@@ -24,16 +24,12 @@ export function computeTotals(state) {
   const taxBase = subtotal - discount + shipping;
 
   // taxRateMode 'fixed' treats the tax field as a flat dollar amount.
-  // 'percent' (default) routes through computeTax, which still respects
-  // the exclusive / inclusive taxMode semantics from earlier tasks.
-  let tax;
-  if (state.taxRateMode === 'fixed') {
-    tax = Number(state.taxRatePercent) || 0;
-  } else {
-    tax = computeTax(taxBase, state.taxRatePercent, state.taxMode);
-  }
+  // 'percent' (default) routes through computeTax (rate * taxBase).
+  const tax = state.taxRateMode === 'fixed'
+    ? Number(state.taxRatePercent) || 0
+    : computeTax(taxBase, state.taxRatePercent);
 
-  const total = state.taxMode === 'inclusive' ? taxBase : taxBase + tax;
+  const total = taxBase + tax;
   const balanceDue = total - (Number(state.amountPaid) || 0);
   return { subtotal, discount, shipping, tax, total, balanceDue };
 }

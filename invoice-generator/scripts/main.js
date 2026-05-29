@@ -764,7 +764,7 @@ function wireCopyShareLink() {
     button.textContent = 'Copying...';
     try {
       const { serializeShareLink } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
-      const shareUrl = serializeShareLink(window.location.origin + '/invoice-generator/', state);
+      const shareUrl = serializeShareLink(`${window.location.origin}${BASE}/invoice-generator/`, state);
       let copied = false;
       if (navigator.clipboard && window.isSecureContext) {
         try {
@@ -823,11 +823,17 @@ async function init() {
     trackEvent('invgen_niche_default_used', slug);
   }
 
-  // Share-link URL parameters override the persisted draft. Whitelist of
-  // pre-fill fields lives in url-params.js (template, currency, from, billTo,
+  // Share-link URL parameters override the persisted draft for THIS session
+  // only. Whitelist lives in url-params.js (template, currency, from, billTo,
   // invoiceNumber, paymentTerms, taxRatePercent, taxRateMode). Used by the
   // /invoice-template/{style}-{format}/ landing pages (template only) and by
   // the "Copy share link" button (full whitelist).
+  //
+  // We deliberately do NOT saveDraft here: if a user with a real in-progress
+  // invoice clicks a marketing/share link, navigating back to /invoice-generator/
+  // with no query should restore their original draft. Any actual edit triggers
+  // saveDraft via onAnyInput, so the merged state persists the moment the user
+  // engages with the pre-filled invoice.
   try {
     const { parseShareLink } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
     const { TEMPLATES } = await import(`${BASE}/invoice-generator/scripts/templates.js`);
@@ -835,7 +841,13 @@ async function init() {
     const fromUrl = parseShareLink(window.location.search, allowedIds);
     if (Object.keys(fromUrl).length > 0) {
       Object.assign(state, fromUrl);
-      handleSaveResult(saveDraft(state));
+      // Currency carries a paired locale that drives Intl.NumberFormat output.
+      // Object.assign only sets the explicitly named keys, so when a share
+      // link sets currency we mirror the LOCALE_FOR_CURRENCY mapping that
+      // setCurrency() applies on UI changes.
+      if (fromUrl.currency) {
+        state.locale = LOCALE_FOR_CURRENCY[fromUrl.currency] || 'en-US';
+      }
     }
   } catch (_e) {
     // URL-param parsing is best-effort; failure must not break the tool.

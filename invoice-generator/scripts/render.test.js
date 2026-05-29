@@ -22,11 +22,11 @@ test('computeDiscount handles null discount as 0', () => {
   assert.equal(computeDiscount(200, null), 0);
 });
 
-test('computeTotals exclusive tax with no discount or shipping', () => {
+test('computeTotals percent tax with no discount or shipping', () => {
   const state = {
     lineItems: [{quantity: 1, rate: 100}],
     discount: null, shipping: null,
-    taxRatePercent: 10, taxMode: 'exclusive',
+    taxRatePercent: 10,
     amountPaid: 0,
   };
   const t = computeTotals(state);
@@ -41,7 +41,7 @@ test('computeTotals discount reduces the tax base', () => {
     lineItems: [{quantity: 1, rate: 100}],
     discount: {mode: 'percent', value: 10},
     shipping: null,
-    taxRatePercent: 10, taxMode: 'exclusive',
+    taxRatePercent: 10,
     amountPaid: 0,
   };
   const t = computeTotals(state);
@@ -56,7 +56,7 @@ test('computeTotals shipping adds to the tax base', () => {
     lineItems: [{quantity: 1, rate: 100}],
     discount: null,
     shipping: {value: 25},
-    taxRatePercent: 10, taxMode: 'exclusive',
+    taxRatePercent: 10,
     amountPaid: 0,
   };
   const t = computeTotals(state);
@@ -66,43 +66,23 @@ test('computeTotals shipping adds to the tax base', () => {
   assert.equal(t.total, 137.5);
 });
 
-test('computeTotals inclusive tax does not add tax on top', () => {
-  const state = {
-    lineItems: [{quantity: 1, rate: 110}],
-    discount: null, shipping: null,
-    taxRatePercent: 10, taxMode: 'inclusive',
-    amountPaid: 0,
-  };
-  const t = computeTotals(state);
-  assert.equal(t.subtotal, 110);
-  assert.ok(Math.abs(t.tax - 10) < 0.001);
-  assert.equal(t.total, 110);
-});
-
-test('computeTotals tricky combo: inclusive + discount + shipping', () => {
-  // Subtotal 100, discount 10 = 90, shipping 25 = taxBase 115.
-  // Inclusive 10%: tax extracted from 115 = 115 - 115/1.1 = ~10.45.
-  // Total = taxBase = 115 (inclusive means the tax is part of the price, not added).
+test('computeTotals taxRateMode "fixed" treats taxRatePercent as a flat dollar amount', () => {
   const state = {
     lineItems: [{quantity: 1, rate: 100}],
-    discount: {mode: 'fixed', value: 10},
-    shipping: {value: 25},
-    taxRatePercent: 10, taxMode: 'inclusive',
+    discount: null, shipping: null,
+    taxRatePercent: 7, taxRateMode: 'fixed',
     amountPaid: 0,
   };
   const t = computeTotals(state);
-  assert.equal(t.subtotal, 100);
-  assert.equal(t.discount, 10);
-  assert.equal(t.shipping, 25);
-  assert.equal(t.total, 115);
-  assert.ok(Math.abs(t.tax - 10.4545) < 0.01);
+  assert.equal(t.tax, 7);
+  assert.equal(t.total, 107);
 });
 
 test('computeTotals balanceDue subtracts amountPaid', () => {
   const state = {
     lineItems: [{quantity: 1, rate: 100}],
     discount: null, shipping: null,
-    taxRatePercent: 0, taxMode: 'exclusive',
+    taxRatePercent: 0,
     amountPaid: 40,
   };
   const t = computeTotals(state);

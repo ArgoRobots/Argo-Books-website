@@ -108,7 +108,7 @@ if ($schema_type === 'HowTo') {
     }
 }
 
-$page_schema_json = json_encode($base_schema, JSON_UNESCAPED_SLASHES);
+$page_schema_json = json_encode($base_schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 $breadcrumb_items = [
   ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
@@ -119,7 +119,7 @@ $breadcrumb_schema_json = json_encode([
   '@context' => 'https://schema.org',
   '@type' => 'BreadcrumbList',
   'itemListElement' => $breadcrumb_items,
-], JSON_UNESCAPED_SLASHES);
+], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
 // --- 6. Body ------------------------------------------------------------------
 
@@ -209,9 +209,9 @@ ob_start();
         fn($s) => is_string($s) && preg_match('/^[a-z0-9-]+$/', $s)
       ));
     ?>
-    <?php if (count($related_niche_slugs) < 3): ?>
+    <?php if (count($related_niche_slugs) < 3 && function_exists('current_environment') && current_environment() === 'sandbox'): ?>
       <p class="article-dev-warning" style="border:2px solid #c00;background:#fff5f5;color:#900;padding:10px 14px;font-weight:600;">
-        MISSING INTERNAL LINKS: <?= count($related_niche_slugs) ?>/3
+        MISSING INTERNAL LINKS: <?= count($related_niche_slugs) ?>/3 (visible in sandbox only)
       </p>
     <?php endif; ?>
     <ul class="article-related-list">
@@ -335,22 +335,8 @@ function article_prefix_internal_links(string $html): string
 
 function article_render_404(): void
 {
-    http_response_code(404);
-    if (!headers_sent()) {
-        header('Content-Type: text/html; charset=utf-8');
-    }
-    ?><!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Article not found | Argo Books</title>
-<meta name="robots" content="noindex">
-</head>
-<body>
-<h1>Article not found</h1>
-<p>The page you asked for does not exist. Try the <a href="/free-invoice-generator/">free invoice generator</a>.</p>
-</body>
-</html>
-<?php
+    invgen_render_404(
+        'Article not found',
+        '<p>The page you asked for does not exist. Try the <a href="' . INVGEN_BASE . '/free-invoice-generator/">free invoice generator</a>.</p>'
+    );
 }

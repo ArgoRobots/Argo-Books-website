@@ -6,13 +6,15 @@
 // Kept separate from the main site sitemap so the tool ecosystem can be
 // submitted to Search Console as its own property if needed.
 
+require_once __DIR__ . '/db_connect.php';
+
 header('Content-Type: application/xml; charset=utf-8');
 
 $urls = [];
 
 // The standalone tool page.
 $urls[] = [
-  'loc' => 'https://argorobots.com/invoice-generator/',
+  'loc' => site_url('/invoice-generator/'),
   'lastmod' => date('Y-m-d', filemtime(__DIR__ . '/invoice-generator/index.php')),
   'priority' => '0.9',
 ];
@@ -26,8 +28,8 @@ foreach (glob(__DIR__ . '/niches/data/*.php') as $file) {
   $url_slug = $data['slug'] ?? $slug;
   // Generic seed lives at /free-invoice-generator/ (no slug in URL).
   $loc = $url_slug === 'generic'
-    ? 'https://argorobots.com/free-invoice-generator/'
-    : "https://argorobots.com/free-invoice-generator/{$url_slug}/";
+    ? site_url('/free-invoice-generator/')
+    : site_url("/free-invoice-generator/{$url_slug}/");
   $urls[] = [
     'loc' => $loc,
     'lastmod' => date('Y-m-d', filemtime($file)),
@@ -37,7 +39,7 @@ foreach (glob(__DIR__ . '/niches/data/*.php') as $file) {
 
 // Template hub.
 $urls[] = [
-  'loc' => 'https://argorobots.com/invoice-template/',
+  'loc' => site_url('/invoice-template/'),
   'lastmod' => date('Y-m-d', filemtime(__DIR__ . '/invoice-template/index.php')),
   'priority' => '0.8',
 ];
@@ -51,7 +53,7 @@ foreach (glob(__DIR__ . '/invoice-template/data/*.php') as $file) {
   $url_slug = $data['slug'] ?? $slug;
   $kind = $data['kind'] ?? 'style-format';
   $urls[] = [
-    'loc' => "https://argorobots.com/invoice-template/{$url_slug}/",
+    'loc' => site_url("/invoice-template/{$url_slug}/"),
     'lastmod' => date('Y-m-d', filemtime($file)),
     // Format-generic pages slightly higher than style-format pages so
     // Search Console picks them as the entry point of the cluster.
@@ -61,7 +63,7 @@ foreach (glob(__DIR__ . '/invoice-template/data/*.php') as $file) {
 
 // Articles hub: curated editorial index of all the guides.
 $urls[] = [
-  'loc' => 'https://argorobots.com/invoice-guides/',
+  'loc' => site_url('/invoice-guides/'),
   'lastmod' => date('Y-m-d', filemtime(__DIR__ . '/invoice-guides/index.php')),
   'priority' => '0.8',
 ];
@@ -74,7 +76,7 @@ foreach (glob(__DIR__ . '/articles/data/*.php') as $file) {
   $data = require $file;
   $url_slug = $data['slug'] ?? $slug;
   $urls[] = [
-    'loc' => "https://argorobots.com/{$url_slug}/",
+    'loc' => site_url("/{$url_slug}/"),
     'lastmod' => date('Y-m-d', filemtime($file)),
     'priority' => '0.7',
   ];

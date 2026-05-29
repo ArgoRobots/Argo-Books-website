@@ -38,9 +38,9 @@ HTML,
 <p>The single biggest reason invoices get paid late isn't the invoice. It's the conversation that never happened before the work started. If the client and you have different numbers in your heads, the invoice is going to feel like a surprise, and a surprise invoice gets parked on someone's desk.</p>
 <p>Pick one of three billing models and write it down somewhere both sides can see, even if that's just a paragraph in an email reply:</p>
 <ul>
-<li><strong>Hourly.</strong> Best when the scope is genuinely unclear, for example IT support, ongoing consulting, or quick patch jobs. Agree the hourly rate, the rounding rule (most people round to the nearest 15 minutes), and a not-to-exceed ceiling so the client isn't staring down an open invoice.</li>
+<li><strong>Hourly.</strong> Best when the scope is genuinely unclear, for example IT support, ongoing consulting, or quick patch jobs. Agree to the hourly rate, the rounding rule (most people round to the nearest 15 minutes), and a not-to-exceed ceiling so the client isn't staring down an open invoice.</li>
 <li><strong>Fixed-fee.</strong> Best when both sides understand the deliverable, for example a logo design, a one-page website, or a kitchen tile job. Write down exactly what's included, and what counts as a change order. Two revision rounds is a common ceiling. Anything past that is billed at your hourly rate.</li>
-<li><strong>Milestone or progress billing.</strong> Best for projects over a few thousand dollars or longer than a couple of weeks. A common split is 50 percent up front, 25 percent at the midpoint, and 25 percent on completion. For construction and renovation work, a 30/30/30/10 split is also normal, with the final 10 percent held until snagging is signed off.</li>
+<li><strong>Milestone or progress billing.</strong> Best for projects over a few thousand dollars or longer than a couple of weeks. A common split is 50 percent up front, 25 percent at the midpoint, and 25 percent on completion. For construction and renovation work, a 30/30/30/10 split is also normal, with the final 10 percent held until final inspection is signed off.</li>
 </ul>
 <p>Three numbers go in the agreement: the price, the billing model, and any deposit. A plumber finishing a Saturday job for a homeowner will usually have all three settled before the van gets unloaded. A consultant taking on a six-month engagement will have them in a one-page scope document. The format doesn't matter, but the writing-it-down does. If the only place the price exists is a verbal call, the invoice is going to feel like a quote, and quotes get negotiated.</p>
 HTML,
@@ -55,10 +55,10 @@ HTML,
 <p>Every invoice needs the same six pieces of information. Get them on the screen before you start filling in line items, and the rest of the process takes about three minutes.</p>
 <ul>
 <li><strong>Your business name and address.</strong> The legal name if you have a registered business, or your own name if you're a sole trader operating under your name. Include a phone number and an email. If you have a tax ID (ABN in Australia, EIN in the United States, GST/HST number in Canada, VAT number in the UK and EU), that goes here too.</li>
-<li><strong>Client name and address.</strong> Use the legal name of the business you're billing, not a trading name or a contact person. If the client is an individual, their full name and address. The address is what gets your invoice through accounts payable on the other side. Without it, an AP clerk will sometimes bounce the invoice back.</li>
-<li><strong>Invoice number.</strong> A unique number that doesn't repeat. The simplest scheme is sequential: 0001, 0002, 0003. Many businesses prefix the year (2026-0001) so the books reset cleanly each year. Whatever scheme you pick, never reuse a number. See <a href="/invoice-numbering-best-practices/">invoice numbering best practices</a> for the full set of options.</li>
+<li><strong>Client name and address.</strong> Use the legal name of the business you're billing, not a trading name or a contact person. If the client is an individual, include their full name and address. The address is what gets your invoice through accounts payable on the other side. Without it, an AP clerk will sometimes bounce the invoice back.</li>
+<li><strong>Invoice number.</strong> A unique number that doesn't repeat. The simplest scheme is sequential: 0001, 0002, 0003. Many businesses prefix the year (2026-0001) so the books reset cleanly each year. Whatever scheme you pick, never reuse a number. See <a href="/invoice-numbering-best-practices/">invoice numbering best practices</a> for different options.</li>
 <li><strong>Invoice date.</strong> The day you're sending it, not the day the work happened. The due date is calculated from this.</li>
-<li><strong>Due date.</strong> Calculated from the invoice date plus your payment terms. Net 30 means 30 days from the invoice date.</li>
+<li><strong>Due date.</strong> Calculated from the invoice date plus your payment terms. For example, 30 days from the invoice date.</li>
 <li><strong>Purchase order or job reference.</strong> If the client gave you a PO number, put it on the invoice. Larger clients won't pay without it. Small clients usually don't have one, and that's fine.</li>
 </ul>
 <p>Spending two minutes on this list before you open the invoice form is the difference between a finished invoice and three rounds of email back and forth asking for a missing address.</p>
@@ -78,9 +78,9 @@ HTML,
 <li>Description: "Consulting (per hour)". Quantity: 12. Rate: 150. Line total: 1800.</li>
 </ul>
 <p>Use one line per distinct thing you're billing for, not one line per task. Three lines of "Email", "Phone call", and "Notes" reads as nickel-and-diming. One line of "Project setup and discovery, 4 hours" reads as a professional billing for their time.</p>
-<p>Set the tax rate next. The rate depends on where you are and what you sell:</p>
+<p>Set the tax rate next. The rate depends on where you are and what you sell. For example:</p>
 <ul>
-<li>Sales tax in the United States: varies by state and sometimes by city. Most states tax goods but not most services. Some states tax labor on new construction but not on repair. Check your state revenue site.</li>
+<li>Sales tax in the United States: varies by state and sometimes by city. Most states tax goods but not most services. Some states tax labour on new construction but not on repair. Check your state revenue site.</li>
 <li>GST in Australia: a flat 10 percent if you're registered. You must register once turnover passes $75,000 AUD.</li>
 <li>GST/HST in Canada: 5 to 15 percent depending on province. Registration is mandatory once you pass $30,000 CAD in revenue over four quarters.</li>
 <li>VAT in the UK: standard rate is 20 percent, with a registration threshold of GBP 90,000 over a rolling 12 months.</li>
@@ -103,7 +103,7 @@ HTML,
 <li><strong>Net 30.</strong> Payment due 30 days after the invoice date. The standard for commercial clients, agencies, and anyone running a formal accounts-payable cycle. If you're billing a corporate client, expect Net 30 by default and Net 45 or Net 60 in some industries.</li>
 </ul>
 <p>Shorter terms get paid faster on average than longer ones, and clients tend to push toward the back of any window you give them. A Net 30 invoice typically lands in the bank around five to six weeks after it goes out. A Due on Receipt invoice tends to clear in one to two weeks. The trade-off is whether the speed-up is worth the relationship cost on bigger clients who run on monthly cycles.</p>
-<p>Write a late fee into the Terms section so it isn't a surprise later. The standard is 1.5 percent per month on overdue balances, which works out to 18 percent per year. Some states cap late fees, so check your local rules before going higher.</p>
+<p>Write a late fee into the Terms section so it isn't a surprise later. The standard is 1.5 percent per month on overdue balances, which works out to 18 percent per year. Some states cap late fees, so check your local rules.</p>
 <p>For the full breakdown of when to use each, see <a href="/net-30-vs-due-on-receipt/">Net 30 vs Due on Receipt</a>.</p>
 HTML,
     ],
@@ -123,7 +123,7 @@ HTML,
 <p><em>Thanks,<br>[Your name]</em></p>
 <p>That's it. Attach the PDF and send. Two extra notes:</p>
 <ul>
-<li>CC accounts payable if the client has given you their AP email. At larger companies, the person who hired you is rarely the person who pays you, and sending only to the hiring contact adds days to the cycle.</li>
+<li>CC accounts payable if the client has given you their contact email. At larger companies, the person who hired you is rarely the person who pays you, and sending only to the hiring contact adds days to the cycle.</li>
 <li>Keep your sent folder. The email is the timestamp on when the invoice was delivered, and it's what you reach for if the client later claims they never got it.</li>
 </ul>
 HTML,

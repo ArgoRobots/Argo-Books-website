@@ -152,11 +152,12 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <div class="hero-content">
                 <div class="hero-app-title animate-fade-in">Argo Books</div>
                 <h1 class="hero-title animate-fade-in-up">
-                    The smarter way to<br>
-                    <span class="text-gradient">run your business</span>
+                    Run your business<br>
+                    <span class="text-gradient">without spreadsheets or chaos</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
-                    Simple, modern accounting software built for small businesses, with automation that saves time and keeps your finances organized
+                    Modern bookkeeping and operations software for small business owners. 
+                    Manage invoicing, expenses, inventory, and receipts in one clean system.
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">

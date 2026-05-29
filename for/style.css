@@ -1,0 +1,190 @@
+/* ========================================
+   Paid-Ad Landing Pages (/for-*) shared styles
+   Layered on top of /compare/style.css.
+   ======================================== */
+
+/* ---------- Hero reassurance line ---------- */
+.hero-reassurance {
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: var(--white);
+  opacity: 0.85;
+}
+
+/* ---------- Made-for-niche intro strip ---------- */
+.made-for-intro {
+  padding: 100px 0 60px;
+}
+
+.made-for-intro .section-header {
+  margin-bottom: 0;
+}
+
+/* ---------- Four feature blocks ---------- */
+.feature-blocks {
+  padding: 60px 0 100px;
+}
+
+.feature-block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.feature-block {
+  background: var(--white);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--gray-200);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-block:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--shadow);
+}
+
+.feature-block-icon {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--blue-50), var(--blue-100));
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 20px;
+}
+
+.feature-block-icon svg {
+  width: 28px;
+  height: 28px;
+  color: var(--primary-blue);
+}
+
+.feature-block-icon.purple {
+  background: linear-gradient(135deg, var(--purple-50), var(--purple-100));
+}
+
+.feature-block-icon.purple svg {
+  color: var(--purple-500);
+}
+
+.feature-block-icon.green {
+  background: linear-gradient(135deg, var(--green-50), var(--green-100));
+}
+
+.feature-block-icon.green svg {
+  color: var(--emerald-500);
+}
+
+.feature-block-icon.amber {
+  background: linear-gradient(135deg, var(--amber-50), var(--amber-100));
+}
+
+.feature-block-icon.amber svg {
+  color: var(--amber-600);
+}
+
+.feature-block h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+.feature-block p {
+  font-size: 0.95rem;
+  color: var(--black);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ---------- Screenshot strip ---------- */
+.screenshot-strip {
+  padding: 60px 0 100px;
+  background: var(--gray-50);
+}
+
+.screenshot-item {
+  max-width: 900px;
+  margin: 0 auto 56px;
+}
+
+.screenshot-item:last-child {
+  margin-bottom: 0;
+}
+
+.screenshot-frame {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px var(--shadow);
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+}
+
+.screenshot-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.screenshot-caption {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--gray-600);
+  line-height: 1.6;
+}
+
+/* ---------- Pricing strip intro ---------- */
+.pricing-strip-intro {
+  max-width: 700px;
+  margin: 0 auto 40px;
+  text-align: center;
+  font-size: 1rem;
+  color: var(--black);
+  line-height: 1.7;
+}
+
+/* ---------- Honest take padding override ---------- */
+.honest-take-alt {
+  padding: 100px 0 20px 0;
+}
+
+@media (max-width: 600px) {
+  .honest-take-alt {
+    padding-top: 60px;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .feature-block-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .made-for-intro {
+    padding: 60px 0 30px;
+  }
+
+  .feature-blocks {
+    padding: 30px 0 60px;
+  }
+
+  .screenshot-strip {
+    padding: 60px 0;
+  }
+
+  .screenshot-item {
+    margin-bottom: 40px;
+  }
+
+  .feature-block {
+    padding: 24px;
+  }
+}

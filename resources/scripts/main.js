@@ -43,7 +43,8 @@ function getBasePath() {
                    '/for-landscapers/', '/for-contractors/', '/for-repair-shops/',
                    '/for-rental-businesses/', '/for-cleaning-companies/',
                    '/for-local-wholesalers/', '/for-resellers/',
-                   '/for-auto-detailing/', '/for-solo-operators/'];
+                   '/for-auto-detailing/', '/for-solo-operators/',
+                   '/who-its-for/'];
 
   var isRootPath = sitePaths.some(function(p) { return path.startsWith(p); }) || path === '/' || path === '/index.php';
 

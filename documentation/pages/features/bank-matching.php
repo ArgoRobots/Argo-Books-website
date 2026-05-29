@@ -48,6 +48,16 @@ include __DIR__ . '/../../docs-header.php';
             <h2>Missing from Statement Tab</h2>
             <p>The <strong>Missing from statement</strong> tab is the other side of the check: it lists your recorded revenue and expenses that no statement line matched. These are entries that may be missing from your bank statement, or that you may have recorded twice. Records with the same amount around the same date are flagged as a <strong>possible duplicate</strong>. You can search these records and filter them by date range and record type.</p>
 
+            <h2>List and Calendar Views</h2>
+            <p>Both tabs have a <strong>List</strong> and a <strong>Calendar</strong> toggle in the top right of the table, next to the search and filter buttons. List is the detailed table described above. Calendar gives you a year-at-a-glance overview, so you can see which months are fully checked and which still need attention.</p>
+            <p>The calendar shows a grid of all twelve months for one year. Use the arrows beside the year to step between years. Each month tile shows a count of how many lines (or records) are matched out of the total for that month, and is colored by status:</p>
+            <ul>
+                <li><strong>Green (Fully matched):</strong> every line that month is matched, or set aside.</li>
+                <li><strong>Amber (Partially matched):</strong> some lines that month are still outstanding.</li>
+                <li><strong>Red (Not matched):</strong> nothing that month is matched yet.</li>
+                <li><strong>Grey:</strong> nothing recorded for that month.</li>
+            </ul>
+
             <div class="page-navigation">
                 <a href="invoicing.php" class="nav-button prev">
                     <span class="nav-label">Previous</span>

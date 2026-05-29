@@ -22,3 +22,5 @@ reset_admin_password.php
 .phpunit.result.cache
 /tests/coverage/
 /.superpowers/
+/node_modules/
+package-lock.json

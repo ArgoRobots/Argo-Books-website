@@ -2,7 +2,13 @@
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
-$plans = get_plan_features();
+$plans        = get_plan_features();
+$pricing      = get_pricing_config();
+$argo_monthly = (int) $pricing['premium_monthly_price'];
+$argo_yearly  = (int) $pricing['premium_yearly_price'];
+$fb_lite      = competitor_price('freshbooks', 'lite');
+$fb_plus      = competitor_price('freshbooks', 'plus');
+$fb_premium   = competitor_price('freshbooks', 'premium');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +74,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $26 CAD/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $<?= $fb_lite ?> CAD/month."
                     }
                 },
                 {
@@ -92,7 +98,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to FreshBooks?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month (or $96/year). FreshBooks starts at $26 CAD/month for its Lite plan with a 5-client limit, and goes up to $72/month for Premium. Argo Books has no client limits on any plan."
+                        "text": "Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just $<?= $argo_monthly ?> CAD/month (or $<?= $argo_yearly ?>/year). FreshBooks starts at $<?= $fb_lite ?> CAD/month for its Lite plan with a 5-client limit, and goes up to $<?= $fb_premium ?>/month for Premium. Argo Books has no client limits on any plan."
                     }
                 },
                 {
@@ -162,7 +168,7 @@ $plans = get_plan_features();
                         <?= svg_icon('dollar', 28, '', 1.5) ?>
                     </div>
                     <h3>More affordable</h3>
-                    <p>FreshBooks starts at $26 CAD/month for just 5 clients. Argo Books has a free version with core features, and Premium is a fraction of the cost with no client limits.</p>
+                    <p>FreshBooks starts at $<?= $fb_lite ?> CAD/month for just 5 clients. Argo Books has a free version with core features, and Premium is a fraction of the cost with no client limits.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -195,8 +201,8 @@ $plans = get_plan_features();
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD/month</span></th>
-                            <th class="brand-col">FreshBooks<span class="th-sub">Lite: $26 CAD/month</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD/month</span></th>
+                            <th class="brand-col">FreshBooks<span class="th-sub">Lite: $<?= $fb_lite ?> CAD/month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -296,7 +302,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">FreshBooks charges $26 to $60+ CAD/month depending on the plan, and limits the number of clients on lower tiers. Argo Books keeps it simple.</p>
+                <p class="section-desc">FreshBooks charges $<?= $fb_lite ?> to $<?= $fb_premium ?> CAD/month depending on the plan, and limits the number of clients on lower tiers. Argo Books keeps it simple.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -321,7 +327,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$10</span>
+                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
@@ -342,7 +348,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Lite</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$26</span>
+                                    <span class="tier-amount">$<?= $fb_lite ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Up to 5 clients</span>
@@ -351,7 +357,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Plus</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$42</span>
+                                    <span class="tier-amount">$<?= $fb_plus ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Up to 50 clients</span>
@@ -360,7 +366,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$72</span>
+                                    <span class="tier-amount">$<?= $fb_premium ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <span class="tier-limit">Unlimited clients</span>
@@ -381,7 +387,7 @@ $plans = get_plan_features();
                 </div>
                 <h3>An honest take</h3>
                 <p>FreshBooks excels at invoicing, time tracking, and client management, especially for freelancers and service-based businesses. If those are your core needs, FreshBooks is a great tool.</p>
-                <p>But if you're a product-based small business that needs inventory management, offline access, and straightforward finance tracking without paying $26+ CAD/month, Argo Books is built for you.</p>
+                <p>But if you're a product-based small business that needs inventory management, offline access, and straightforward finance tracking without paying $<?= $fb_lite ?>+ CAD/month, Argo Books is built for you.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>
@@ -405,7 +411,7 @@ $plans = get_plan_features();
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
-                            <p>FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $26 CAD/month.</p>
+                            <p>FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $<?= $fb_lite ?> CAD/month.</p>
                         </div>
                     </div>
                 </div>
@@ -449,7 +455,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong> (or $96/year). FreshBooks starts at $26 CAD/month for its Lite plan with a 5-client limit, and goes up to $72/month for Premium.</p>
+                            <p>Argo Books is significantly more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong> (or $<?= $argo_yearly ?>/year). FreshBooks starts at $<?= $fb_lite ?> CAD/month for its Lite plan with a 5-client limit, and goes up to $<?= $fb_premium ?>/month for Premium.</p>
                             <p>Argo Books has no client limits on any plan.</p>
                         </div>
                     </div>

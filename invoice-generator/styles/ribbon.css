@@ -1,0 +1,7 @@
+/* invoice-generator/styles/ribbon.css
+ *
+ * Intentionally empty. The visual rules that lived here were folded into
+ * tool.css alongside the other four template scopes when the templates
+ * were redesigned to mirror the Argo Books desktop app. Kept as a stub so
+ * the old import path does not 404 if any cached page still requests it.
+ */

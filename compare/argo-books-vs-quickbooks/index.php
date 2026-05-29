@@ -2,7 +2,12 @@
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/../../track_referral.php';
-$plans = get_plan_features();
+$plans        = get_plan_features();
+$pricing      = get_pricing_config();
+$argo_monthly = (int) $pricing['premium_monthly_price'];
+$qb_easystart = competitor_price('quickbooks', 'easystart');
+$qb_plus      = competitor_price('quickbooks', 'plus');
+$qb_advanced  = competitor_price('quickbooks', 'advanced');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +73,7 @@ $plans = get_plan_features();
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. QuickBooks does not offer a free plan; pricing starts at $22 CAD/month after a limited trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. QuickBooks does not offer a free plan; pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial."
                     }
                 },
                 {
@@ -92,7 +97,7 @@ $plans = get_plan_features();
                     "name": "How does Argo Books pricing compare to QuickBooks?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is dramatically more affordable. The Free plan covers most small business needs at no cost. Premium is just $10 CAD/month. QuickBooks starts at $22 CAD/month for Simple Start and goes up to $76/month for Advanced, and that's before add-ons like payroll. Argo Books has no hidden fees or client limits."
+                        "text": "Argo Books is dramatically more affordable. The Free plan covers most small business needs at no cost. Premium is just $<?= $argo_monthly ?> CAD/month. QuickBooks starts at $<?= $qb_easystart ?> CAD/month for EasyStart and goes up to $<?= $qb_advanced ?>/month for Advanced, and that's before add-ons like payroll. Argo Books has no hidden fees or client limits."
                     }
                 },
                 {
@@ -160,21 +165,21 @@ $plans = get_plan_features();
             <div class="diff-grid">
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon">
-                        <?= svg_icon('dollar', 28, '', 1.5) ?>
+                        <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
                     <h3>No price creep</h3>
-                    <p>QuickBooks prices have risen 60-80% since 2020. Their cheapest plan is now $28 CAD/month. Argo Books has a free version with core features, and Premium is $10 CAD/month, with no annual price increases.</p>
+                    <p>QuickBooks has raised their prices twice since we launched this comparison page, and we've had to update these numbers each time. Their cheapest plan is now $<?= $qb_easystart ?> CAD/month. Argo Books has a free version with core features, and Premium is $<?= $argo_monthly ?> CAD/month.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
-                        <?= svg_icon('bolt', 28, '', 1.5) ?>
+                        <?= svg_icon('bolt', 30, '', 1.5) ?>
                     </div>
                     <h3>No feature gating</h3>
-                    <p>QuickBooks locks inventory management and other core features behind their $80+/month plans. Argo Books Premium gives you everything for $10 CAD/month: no upsells, no surprises.</p>
+                    <p>QuickBooks locks inventory management and other core features behind their $<?= $qb_plus ?>+/month plans. Argo Books Premium gives you everything for $<?= $argo_monthly ?> CAD/month: no upsells, no surprises.</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon green">
-                        <?= svg_icon('map-pin', 28, '', 1.5) ?>
+                        <?= svg_icon('map-pin', 30, '', 1.5) ?>
                     </div>
                     <h3>Made in Canada</h3>
                     <p>Built by a Canadian startup that understands Canadian small businesses. Our pricing is in CAD, and our team is based in Saskatchewan.</p>
@@ -196,8 +201,8 @@ $plans = get_plan_features();
                         <tr>
                             <th class="feature-col">Feature</th>
                             <th class="brand-col">Argo Free<span class="th-sub">$0 forever</span></th>
-                            <th class="brand-col">Argo Premium<span class="th-sub">$10 CAD / month</span></th>
-                            <th class="brand-col">QuickBooks<span class="th-sub">EasyStart: $28 CAD / month</span></th>
+                            <th class="brand-col">Argo Premium<span class="th-sub">$<?= $argo_monthly ?> CAD / month</span></th>
+                            <th class="brand-col">QuickBooks<span class="th-sub">EasyStart: $<?= $qb_easystart ?> CAD / month</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -297,7 +302,7 @@ $plans = get_plan_features();
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $28 to $160 CAD/month depending on the plan, and those prices keep climbing every year. Argo Books keeps it simple with predictable, affordable pricing.</p>
+                <p class="section-desc">QuickBooks charges $<?= $qb_easystart ?> to $<?= $qb_advanced ?> CAD/month depending on the plan, and those prices keep climbing every year (we've had to update this page twice already to keep up). Argo Books keeps it simple with predictable, affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">
@@ -322,7 +327,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Premium</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$10</span>
+                                    <span class="tier-amount">$<?= $argo_monthly ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                                 <ul class="tier-features">
@@ -343,7 +348,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">EasyStart</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$28</span>
+                                    <span class="tier-amount">$<?= $qb_easystart ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -351,7 +356,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Plus</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$95</span>
+                                    <span class="tier-amount">$<?= $qb_plus ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -359,7 +364,7 @@ $plans = get_plan_features();
                             <div class="pricing-tier">
                                 <span class="tier-name">Advanced</span>
                                 <div class="tier-price">
-                                    <span class="tier-amount">$190</span>
+                                    <span class="tier-amount">$<?= $qb_advanced ?></span>
                                     <span class="tier-period">CAD/month</span>
                                 </div>
                             </div>
@@ -375,7 +380,7 @@ $plans = get_plan_features();
         <div class="container">
             <div class="honest-card animate-on-scroll">
                 <div class="honest-icon">
-                    <?= svg_icon('help-circle', 28) ?>
+                    <?= svg_icon('help-circle', 30) ?>
                 </div>
                 <h3>The most confusing office tool in America</h3>
                 <p>According to a <a class="link" href="https://www.digitaljournal.com/tech-science/the-most-puzzling-office-apps-in-the-u-s-revealed/article" target="_blank" rel="noopener noreferrer">study by Digital Adoption</a>, QuickBooks is the most confusing office application in the U.S., generating over 68,000 support-related Google searches every month. The most common query? "QuickBooks customer service," searched 19,000 times per month in the U.S. alone.</p>
@@ -414,7 +419,7 @@ $plans = get_plan_features();
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
-                            <p>QuickBooks does not offer a free plan. Pricing starts at $22 CAD/month after a limited trial.</p>
+                            <p>QuickBooks does not offer a free plan. Pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial.</p>
                         </div>
                     </div>
                 </div>
@@ -458,7 +463,7 @@ $plans = get_plan_features();
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is dramatically more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$10 CAD/month</strong>. QuickBooks starts at $22 CAD/month for Simple Start and goes up to $76/month for Advanced, and that's before add-ons like payroll.</p>
+                            <p>Argo Books is dramatically more affordable. The Free plan covers most small business needs at no cost. Premium is just <strong>$<?= $argo_monthly ?> CAD/month</strong>. QuickBooks starts at $<?= $qb_easystart ?> CAD/month for EasyStart and goes up to $<?= $qb_advanced ?>/month for Advanced, and that's before add-ons like payroll.</p>
                             <p>Argo Books has no hidden fees or client limits.</p>
                         </div>
                     </div>

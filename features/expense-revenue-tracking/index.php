@@ -1,4 +1,8 @@
-<?php require_once __DIR__ . '/../../resources/icons.php'; ?>
+<?php
+require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../config/pricing.php';
+$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -107,7 +111,7 @@
                 "@type": "Offer",
                 "price": "0",
                 "priceCurrency": "CAD",
-                "description": "Free plan available. Premium for $10/month."
+                "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
             "description": "Track business expenses and revenue with Argo Books. Guided forms, smart validation, receipt archiving, and real-time profit monitoring make bookkeeping simple.",
             "featureList": "Guided expense and revenue entry forms, Real-time profit and cash flow monitoring, Receipt archive with AI scanning, Tax-ready categorized records"

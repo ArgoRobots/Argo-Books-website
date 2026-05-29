@@ -104,6 +104,7 @@ The `read-me/` directory has authoritative reference docs that are kept current.
 - `read-me/Admin guide.md`: admin dashboard tour
 - `read-me/setup/Payment provider setup.md`: Stripe / PayPal / Square provider config
 - `read-me/testing/Payment provider testing.md`: sandbox testing procedures
+- `read-me/testing/First-run install tracking.md`: how the install funnel attributes back to the originating ad click, why your own machine deduplicates itself, and the end-to-end test procedure
 - `read-me/setup/Local email setup.md`: MailHog setup
 - `read-me/setup/Google Ads campaign setup.md`: Google Ads campaign + UET/gtag wiring
 - `read-me/setup/Advanced Installer project setup.md` - recovery guide for the Windows installer project (tooling install, project recreation, signing, the WriteInstallToken custom action for funnel attribution)

@@ -101,6 +101,19 @@
 }
 
 /* Dark theme overrides */
+/* The shared .btn-gray has no dark variant, so the Skip button renders
+   light-on-dark without this. */
+[data-theme="dark"] .btn-gray {
+    background-color: var(--gray-700);
+    color: var(--gray-200);
+    border-color: var(--black);
+}
+
+[data-theme="dark"] .btn-gray:hover {
+    background-color: var(--gray-600);
+    color: var(--gray-100);
+}
+
 [data-theme="dark"] .reviews-intro {
     background: var(--blue-alpha-15);
     border-left-color: var(--blue-400);

@@ -158,6 +158,18 @@
   box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
+/* The shared dark-theme input rules only cover text/number/email/password, so
+   the date pickers keep their white background here; style them explicitly. */
+[data-theme="dark"] .filter-group input[type="date"] {
+  background: var(--gray-700);
+  border-color: var(--black);
+  color: var(--gray-200);
+}
+
+[data-theme="dark"] .filter-group input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 .custom-date-range {
   display: flex;
   gap: 1rem;

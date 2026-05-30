@@ -372,7 +372,8 @@
     background: var(--white);
     border-radius: 10px;
     width: 100%;
-    height: 80vh;
+    height: auto;
+    max-height: 85vh;
     overflow-y: auto;
     box-shadow: 0 20px 60px var(--overlay-light);
 }

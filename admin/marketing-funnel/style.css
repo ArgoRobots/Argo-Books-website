@@ -413,6 +413,63 @@
     color: var(--black);
 }
 
+[data-theme="dark"] #spendModalTitle {
+    color: var(--gray-100);
+}
+
+/* The month picker and textarea aren't covered by the shared input sizing
+   rules (which only target text/number/email/password), so size them here to
+   match the other modal fields. */
+#spendModal input[type="month"],
+#spendModal textarea,
+#spendModal #spend_currency {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--gray-input-border);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+    font-family: inherit;
+}
+
+#spendModal textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+/* Make the native calendar icon visible against the dark field background. */
+[data-theme="dark"] #spendModal input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* Amount + currency share a row; currency only needs room for a 3-letter code. */
+.spend-form-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.spend-amount-group {
+    flex: 2;
+}
+
+.spend-currency-group {
+    flex: 1;
+}
+
+/* btn-gray has no dark variant in the shared button styles, so the Cancel
+   button renders light-on-dark without this. */
+[data-theme="dark"] #spendModal .btn-gray {
+    background-color: var(--gray-700);
+    color: var(--gray-200);
+    border-color: var(--black);
+}
+
+[data-theme="dark"] #spendModal .btn-gray:hover {
+    background-color: var(--gray-600);
+    color: var(--gray-100);
+}
+
 /* ─── Mobile responsive ────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

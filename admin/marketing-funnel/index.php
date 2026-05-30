@@ -1363,18 +1363,26 @@ include __DIR__ . '/../admin_header.php';
                 <input type="month" name="spend_period" id="spend_period" required>
                 <small>Spend is tracked one calendar month at a time.</small>
             </div>
-            <div class="form-group">
-                <label for="spend_amount">Amount *</label>
-                <input type="number" name="spend_amount" id="spend_amount" step="0.01" min="0" required>
-                <small>Total ad-platform spend for the chosen source + month.</small>
-            </div>
-            <div class="form-group">
-                <label for="spend_currency">Currency</label>
-                <input type="text" name="spend_currency" id="spend_currency" maxlength="3" value="CAD">
+            <div class="spend-form-row">
+                <div class="form-group spend-amount-group">
+                    <label for="spend_amount">Amount *</label>
+                    <input type="number" name="spend_amount" id="spend_amount" step="0.01" min="0" required>
+                    <small>Total ad-platform spend for the chosen source + month.</small>
+                </div>
+                <div class="form-group spend-currency-group">
+                    <label for="spend_currency">Currency</label>
+                    <select name="spend_currency" id="spend_currency">
+                        <option value="CAD" selected>CAD - Canadian Dollar</option>
+                        <option value="USD">USD - US Dollar</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                        <option value="AUD">AUD - Australian Dollar</option>
+                    </select>
+                </div>
             </div>
             <div class="form-group">
                 <label for="spend_notes">Notes</label>
-                <textarea name="spend_notes" id="spend_notes" rows="2"></textarea>
+                <textarea name="spend_notes" id="spend_notes" rows="4"></textarea>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-blue">Save</button>

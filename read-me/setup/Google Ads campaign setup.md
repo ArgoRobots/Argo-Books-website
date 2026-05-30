@@ -291,7 +291,7 @@ Across all of this, these things end up in the repo:
 
 | Where | What |
 |---|---|
-| `resources/scripts/main.js` (top) | The Google gtag (AW-17210317271) and the Microsoft UET tag (ti: 187252936). Both fire from `<head>` on every page automatically. |
+| `resources/scripts/main.js` (top) | The Google gtag (AW-17210317271). Fires from `<head>` on every page automatically. |
 | `downloads/index.php` (head, after main.js) | The Google Ads conversion event snippet. Fires when someone lands on the downloads page. |
 | Each landing page used in the campaign | `require_once __DIR__ . '/../track_referral.php';` (or `/../../` depending on depth). Reads `?source=` from the URL and writes it to the `referral_visits` table. |
 | `admin/referral-links/` | A row with `source_code = google-ads-qb-alt` so visits get a proper display name in the admin dashboard. |

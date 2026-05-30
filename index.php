@@ -279,7 +279,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         <div class="tab-content-inner">
                             <div class="tab-content-text">
                                 <h3>Scan receipts instantly</h3>
-                                <p>Take a photo of any receipt with your phone or upload from your computer. The system automatically extracts supplier, date, amount, and line items with 99% accuracy.</p>
+                                <p>Take a photo of any receipt with your phone or upload from your computer. The system automatically extracts supplier, date, amount, and line items with 99.9% accuracy.</p>
                                 <ul class="feature-list">
                                     <li>
                                         <?= svg_icon('check', 20) ?>

@@ -84,7 +84,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     "name": "How does receipt management work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos. It extracts the supplier name, line items, taxes, and total with 99% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time."
+                        "text": "You can attach receipts to any expense record for your records. Even better, AI receipt scanning can automatically create expense entries from receipt photos. It extracts the supplier name, line items, taxes, and total with 99.9% accuracy. All receipts are stored in a searchable archive so you're always ready for tax time."
                     }
                 },
                 {

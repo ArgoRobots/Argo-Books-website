@@ -14,7 +14,7 @@ include __DIR__ . '/../../docs-header.php';
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 
-            <p>Turn any receipt into a digital record in under 5 seconds with our AI-powered scanner. It achieves 99% accuracy and lets you quickly make adjustments before saving.</p>
+            <p>Turn any receipt into a digital record in under 5 seconds with our AI-powered scanner. It achieves 99.9% accuracy and lets you quickly make adjustments before saving.</p>
 
             <img src="../../../resources/images/ai-receipt-scanner.webp" alt="AI Receipt Scanner" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
 

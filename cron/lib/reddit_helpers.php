@@ -800,7 +800,8 @@ function reddit_generate_draft(array $thread, array $topComments, array $regenCo
         . "Follow the voice rules strictly. Output ONLY the reply text, no preamble, no explanation, "
         . "no markdown formatting unless natural for Reddit. Do not include a URL. "
         . "Do not claim to have built, founded, or developed Argo Books. "
-        . "Keep it short: 2 to 4 short paragraphs at most.";
+        . "Keep it short: 1 to 2 short paragraphs at most. "
+        . "Do not be a therapist: skip the empathy/validation opener, don't mirror their feelings or say things like \"that sounds frustrating\". Get straight to the substance.";
 
     $topCommentsForDraft = array_slice($topComments, 0, 5);
     $commentsBlock = empty($topCommentsForDraft)

@@ -19,7 +19,7 @@ HTML,
 
   'sample_line_items' => [
     ['description' => '60-minute tutoring session', 'rate' => 60, 'quantity' => 4],
-    ['description' => 'Package of 10 sessions (prepaid, 10 percent off)', 'rate' => 540, 'quantity' => 1],
+    ['description' => 'Package of 10 sessions (prepaid, 10% off)', 'rate' => 540, 'quantity' => 1],
     ['description' => 'Workbook and printed materials', 'rate' => 35, 'quantity' => 1],
     ['description' => 'Online lesson surcharge (per session)', 'rate' => 10, 'quantity' => 4],
     ['description' => 'Late cancellation (less than 24 hours notice)', 'rate' => 60, 'quantity' => 1],
@@ -82,7 +82,7 @@ HTML,
     'paymentTerms' => 'Due on receipt',
     'lineItems' => [
       ['description' => '60-minute tutoring session', 'quantity' => 4, 'rate' => 60],
-      ['description' => 'Package of 10 sessions (prepaid, 10 percent off)', 'quantity' => 1, 'rate' => 540],
+      ['description' => 'Package of 10 sessions (prepaid, 10% off)', 'quantity' => 1, 'rate' => 540],
       ['description' => 'Workbook and printed materials', 'quantity' => 1, 'rate' => 35],
       ['description' => 'Online lesson surcharge (per session)', 'quantity' => 4, 'rate' => 10],
     ],

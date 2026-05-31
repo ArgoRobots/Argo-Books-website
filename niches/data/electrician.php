@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most electrician invoices start with a service-call fee, then add hourly labor for the time on site, with parts and fixtures itemized at the prices you actually paid plus any agreed markup. Residential work is usually due on completion, often paid by card or check before the truck leaves the driveway. Commercial clients and property managers typically pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30). Permit fees are billed separately as a pass-through line when a permit is pulled, since the amount is set by the city and is not part of your labor rate. A late fee of 1.5 percent per month on overdue balances is standard and worth listing in the Terms section.</p>
+<p>Most electrician invoices start with a service-call fee, then add hourly labor for the time on site, with parts and fixtures itemized at the prices you actually paid plus any agreed markup. Residential work is usually due on completion, often paid by card or check before the truck leaves the driveway. Commercial clients and property managers typically pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30). Permit fees are billed separately as a pass-through line when a permit is pulled, since the amount is set by the city and is not part of your labor rate. A late fee of 1.5% per month on overdue balances is standard and worth listing in the Terms section.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'

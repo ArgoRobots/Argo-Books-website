@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most photographers ask for a retainer up front, usually 30 to 50 percent, with the balance due on delivery of the final gallery or prints. The retainer holds the date and covers planning time, so it is normally non-refundable and worth stating in the Terms section. Image licensing is best itemized on its own line so the client sees what the fee covers, separate from shoot time and editing. Prints, albums, and extra hours are typically billed as add-ons after the shoot, often on a second invoice once the client picks their selections. Bank transfer, Stripe, and major cards are the usual payment options.</p>
+<p>Most photographers ask for a retainer up front, usually 30 to 50%, with the balance due on delivery of the final gallery or prints. The retainer holds the date and covers planning time, so it is normally non-refundable and worth stating in the Terms section. Image licensing is best itemized on its own line so the client sees what the fee covers, separate from shoot time and editing. Prints, albums, and extra hours are typically billed as add-ons after the shoot, often on a second invoice once the client picks their selections. Bank transfer, Stripe, and major cards are the usual payment options.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
@@ -36,7 +36,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'How do I bill a retainer or deposit on a photography invoice?',
-      'a' => "Add the retainer as its own line item with a clear label (for example, '40 percent booking retainer') and send it as the first invoice when the client books. When the shoot is delivered, send the final invoice with the full package price listed and use the 'Amount paid' field to subtract the retainer so the balance due is correct. Both invoices stay tied to the same job in the client's records.",
+      'a' => "Add the retainer as its own line item with a clear label (for example, '40% booking retainer') and send it as the first invoice when the client books. When the shoot is delivered, send the final invoice with the full package price listed and use the 'Amount paid' field to subtract the retainer so the balance due is correct. Both invoices stay tied to the same job in the client's records.",
     ],
     [
       'q' => 'Should image licensing be a separate line item?',

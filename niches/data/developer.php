@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Developer rates usually fall in the $75 to $200 per hour range, with senior specialists charging more. Hourly billing due 15 to 30 days after the invoice date (often written as Net 15 or Net 30) is the most common setup for ongoing work, with the clock starting the day the invoice is sent. Sprint-based retainers are popular for longer engagements, where you invoice a fixed amount at the end of each two-week sprint. Fixed-scope projects usually run on milestone payments, often split as 50 percent up front and the balance on delivery. A late fee of 1.5 percent per month on overdue balances is worth stating in the Terms section.</p>
+<p>Developer rates usually fall in the $75 to $200 per hour range, with senior specialists charging more. Hourly billing due 15 to 30 days after the invoice date (often written as Net 15 or Net 30) is the most common setup for ongoing work, with the clock starting the day the invoice is sent. Sprint-based retainers are popular for longer engagements, where you invoice a fixed amount at the end of each two-week sprint. Fixed-scope projects usually run on milestone payments, often split as 50% up front and the balance on delivery. A late fee of 1.5% per month on overdue balances is worth stating in the Terms section.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'

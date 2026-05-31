@@ -26,11 +26,11 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most Canadian clients pay 30 days after the invoice date (often written as Net 30), with the clock starting the day the invoice is sent. For new clients or larger project work, a deposit up front is normal and the balance falls due once the work is delivered. A late fee of 2 percent per month on overdue balances is common and worth stating in the Terms section so it does not feel like a surprise. Interac e-Transfer is the easiest option for paying small invoices in CAD, while EFT and credit card cover larger amounts and out-of-province clients. You can list any of these methods in Notes or Terms.</p>
+<p>Most Canadian clients pay 30 days after the invoice date (often written as Net 30), with the clock starting the day the invoice is sent. For new clients or larger project work, a deposit up front is normal and the balance falls due once the work is delivered. A late fee of 2% per month on overdue balances is common and worth stating in the Terms section so it does not feel like a surprise. Interac e-Transfer is the easiest option for paying small invoices in CAD, while EFT and credit card cover larger amounts and out-of-province clients. You can list any of these methods in Notes or Terms.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
-<p>Canada layers federal GST on top of provincial rules, so the right rate depends on where your customer is located, not where you are. The federal GST is 5 percent. Ontario, New Brunswick, Nova Scotia, Newfoundland and Labrador, and Prince Edward Island use a harmonized HST that combines the federal and provincial portions into a single rate. British Columbia, Saskatchewan, and Manitoba charge a separate PST alongside GST, and Quebec charges QST. Registration becomes mandatory once your worldwide taxable supplies cross $30,000, measured either in a single calendar quarter or as a running total across the last four quarters (the rolling 12-month threshold). Use place-of-supply rules to pick the right rate for each customer, and consult your accountant or check the CRA guidance for your specific situation.</p>
+<p>Canada layers federal GST on top of provincial rules, so the right rate depends on where your customer is located, not where you are. The federal GST is 5%. Ontario, New Brunswick, Nova Scotia, Newfoundland and Labrador, and Prince Edward Island use a harmonized HST that combines the federal and provincial portions into a single rate. British Columbia, Saskatchewan, and Manitoba charge a separate PST alongside GST, and Quebec charges QST. Registration becomes mandatory once your worldwide taxable supplies cross $30,000, measured either in a single calendar quarter or as a running total across the last four quarters (the rolling 12-month threshold). Use place-of-supply rules to pick the right rate for each customer, and consult your accountant or check the CRA guidance for your specific situation.</p>
 HTML,
 
   'faqs' => [
@@ -40,7 +40,7 @@ HTML,
     ],
     [
       'q' => 'Which province\'s tax rate should I apply?',
-      'a' => 'The rate follows the customer, not your own location. If you are a Toronto designer billing a client in Calgary, you charge 5 percent GST because Alberta has no provincial sales tax. The same designer billing a client in Halifax would charge 15 percent HST. Set the rate in the Tax field for each invoice based on where your customer is, and check the CRA place-of-supply rules if you are not sure.',
+      'a' => 'The rate follows the customer, not your own location. If you are a Toronto designer billing a client in Calgary, you charge 5% GST because Alberta has no provincial sales tax. The same designer billing a client in Halifax would charge 15% HST. Set the rate in the Tax field for each invoice based on where your customer is, and check the CRA place-of-supply rules if you are not sure.',
     ],
     [
       'q' => 'Do I need to put my GST/HST number on the invoice?',

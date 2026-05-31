@@ -30,7 +30,7 @@ HTML,
 HTML,
 
   'tax_notes_html' => <<<'HTML'
-<p>The UK standard VAT rate is 20 percent, with a 5 percent reduced rate for items like domestic fuel and power and child car seats, and a 0 percent zero rate for goods like most food, books, and children's clothes. You must register for VAT once your taxable turnover passes the threshold, which is 90,000 pounds per year as of 2024. Once registered, every invoice must show your VAT number, the VAT rate on each line, the total excluding VAT, the VAT amount, and the total including VAT. Making Tax Digital for VAT also applies, so VAT-registered businesses keep digital records and submit returns through compatible software. Check the current HMRC guidance or speak to your accountant before assuming a rate or exemption.</p>
+<p>The UK standard VAT rate is 20%, with a 5% reduced rate for items like domestic fuel and power and child car seats, and a 0% zero rate for goods like most food, books, and children's clothes. You must register for VAT once your taxable turnover passes the threshold, which is 90,000 pounds per year as of 2024. Once registered, every invoice must show your VAT number, the VAT rate on each line, the total excluding VAT, the VAT amount, and the total including VAT. Making Tax Digital for VAT also applies, so VAT-registered businesses keep digital records and submit returns through compatible software. Check the current HMRC guidance or speak to your accountant before assuming a rate or exemption.</p>
 HTML,
 
   'faqs' => [

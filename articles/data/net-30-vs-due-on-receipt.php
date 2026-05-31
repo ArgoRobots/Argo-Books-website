@@ -104,7 +104,7 @@ HTML,
   <li><strong>Net 14:</strong> "Payment due within 14 days of invoice date."</li>
   <li><strong>Net 30:</strong> "Payment due within 30 days of invoice date."</li>
   <li><strong>Due on Receipt:</strong> "Payment due on receipt of invoice."</li>
-  <li><strong>Net 30 with late fee:</strong> "Payment due within 30 days of invoice date. A 1.5 percent monthly late fee applies to overdue balances."</li>
+  <li><strong>Net 30 with late fee:</strong> "Payment due within 30 days of invoice date. A 1.5% monthly late fee applies to overdue balances."</li>
 </ul>
 HTML,
     ],
@@ -119,7 +119,7 @@ HTML,
 <p><strong>Net 14 (or Net 15).</strong> Payment due 14 or 15 days from the invoice date. The middle ground that a lot of freelancers and small agencies live on. Feels professional, gets the money in within two weeks, and works for most client types.</p>
 <p><strong>Net 45.</strong> Payment due 45 days from the invoice date. Less common, usually requested by larger companies with slow internal cycles. Push back if you can, because 45 days is a long time to wait, and most clients will accept Net 30 if you ask.</p>
 <p><strong>Net 60.</strong> Payment due 60 days from the invoice date. The standard for some big enterprise buyers, government contracts, and certain industries. If a client asks for Net 60, you either build it into the price, ask for a deposit up front, or both. Two full months of waiting is real money in your cash flow.</p>
-<p><strong>2/10 Net 30.</strong> An early-payment discount term that reads "2 percent off if you pay within 10 days, otherwise the full amount is due in 30". On a $5,000 invoice, paying inside 10 days saves the client $100. Some clients chase the discount, some don't. The math works out to roughly a 36 percent annualised return for paying early, which is why bigger finance teams take it. Only offer it if the cash speed-up is worth the 2 percent to you.</p>
+<p><strong>2/10 Net 30.</strong> An early-payment discount term that reads "2% off if you pay within 10 days, otherwise the full amount is due in 30". On a $5,000 invoice, paying inside 10 days saves the client $100. Some clients chase the discount, some don't. The math works out to roughly a 36% annualised return for paying early, which is why bigger finance teams take it. Only offer it if the cash speed-up is worth the 2% to you.</p>
 <p><strong>EOM (end of month).</strong> Adds onto another term, like Net 30 EOM. The clock starts at the end of the month rather than the invoice date. Common on monthly billing cycles. Be careful with it, because invoicing on the 2nd of the month with Net 30 EOM means you wait almost two months for the money.</p>
 HTML,
     ],
@@ -135,11 +135,11 @@ HTML,
 <ul>
   <li>"Payment due by [date]. Net 30 from invoice date."</li>
   <li>"Payment due on receipt of invoice. Please settle within 5 business days."</li>
-  <li>"Payment due within 14 days of invoice date. Late payments are subject to a 1.5 percent monthly fee."</li>
-  <li>"50 percent deposit on signing, balance due within 15 days of project completion."</li>
+  <li>"Payment due within 14 days of invoice date. Late payments are subject to a 1.5% monthly fee."</li>
+  <li>"50% deposit on signing, balance due within 15 days of project completion."</li>
 </ul>
 <p>One thing to avoid: the bare phrase "ASAP". It tells the client nothing, sets no deadline, and gives you no ground to stand on if they pay 60 days later. If you need it fast, set a date.</p>
-<p>If you charge late fees, write the rate into the Terms section on every invoice, not just the first one or the ones where the client is already late. Something like "A late fee of 1.5 percent per month applies to overdue balances" is enough. The fee isn't enforceable if it was never disclosed, and putting it on every invoice means you can apply it without a separate conversation.</p>
+<p>If you charge late fees, write the rate into the Terms section on every invoice, not just the first one or the ones where the client is already late. Something like "A late fee of 1.5% per month applies to overdue balances" is enough. The fee isn't enforceable if it was never disclosed, and putting it on every invoice means you can apply it without a separate conversation.</p>
 <p>Last note: include your preferred payment methods near the terms. Bank transfer details, a payment link, a check mailing address. The faster and easier it is for the client to pay, the more often you get paid on time. For more on the full invoice structure, see <a href="/how-to-invoice-clients/">How to invoice clients</a>, and for the late-fee specifics see <a href="/late-fees-when-and-how-to-charge/">Late fees: when and how to charge</a>.</p>
 HTML,
     ],
@@ -162,7 +162,7 @@ HTML,
     ],
     [
       'q' => 'Do I need a late fee written down even with Net 30?',
-      'a' => 'Yes. The late fee isn\'t enforceable if it was never disclosed. Put the rate in the Terms section on every invoice you send, something like "A 1.5 percent monthly late fee applies to overdue balances". That way, when an invoice goes past due, you can apply the fee without a separate conversation or argument. The fee doesn\'t have to be large to work. The point is that the client knows there\'s a cost to ignoring the invoice, which gets the bill paid faster than no fee at all. Check your local rules, because some places cap how much you can charge.',
+      'a' => 'Yes. The late fee isn\'t enforceable if it was never disclosed. Put the rate in the Terms section on every invoice you send, something like "A 1.5% monthly late fee applies to overdue balances". That way, when an invoice goes past due, you can apply the fee without a separate conversation or argument. The fee doesn\'t have to be large to work. The point is that the client knows there\'s a cost to ignoring the invoice, which gets the bill paid faster than no fee at all. Check your local rules, because some places cap how much you can charge.',
     ],
     [
       'q' => 'What does Net 30 EOM mean?',

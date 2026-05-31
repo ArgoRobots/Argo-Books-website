@@ -40,7 +40,7 @@ HTML,
 <ul>
 <li><strong>Hourly.</strong> Best when the scope is genuinely unclear, for example IT support, ongoing consulting, or quick patch jobs. Agree to the hourly rate, the rounding rule (most people round to the nearest 15 minutes), and a not-to-exceed ceiling so the client isn't staring down an open invoice.</li>
 <li><strong>Fixed-fee.</strong> Best when both sides understand the deliverable, for example a logo design, a one-page website, or a kitchen tile job. Write down exactly what's included, and what counts as a change order. Two revision rounds is a common ceiling. Anything past that is billed at your hourly rate.</li>
-<li><strong>Milestone or progress billing.</strong> Best for projects over a few thousand dollars or longer than a couple of weeks. A common split is 50 percent up front, 25 percent at the midpoint, and 25 percent on completion. For construction and renovation work, a 30/30/30/10 split is also normal, with the final 10 percent held until final inspection is signed off.</li>
+<li><strong>Milestone or progress billing.</strong> Best for projects over a few thousand dollars or longer than a couple of weeks. A common split is 50% up front, 25% at the midpoint, and 25% on completion. For construction and renovation work, a 30/30/30/10 split is also normal, with the final 10% held until final inspection is signed off.</li>
 </ul>
 <p>Three numbers go in the agreement: the price, the billing model, and any deposit. A plumber finishing a Saturday job for a homeowner will usually have all three settled before the van gets unloaded. A consultant taking on a six-month engagement will have them in a one-page scope document. The format doesn't matter, but the writing-it-down does. If the only place the price exists is a verbal call, the invoice is going to feel like a quote, and quotes get negotiated.</p>
 HTML,
@@ -81,9 +81,9 @@ HTML,
 <p>Set the tax rate next. The rate depends on where you are and what you sell. For example:</p>
 <ul>
 <li>Sales tax in the United States: varies by state and sometimes by city. Most states tax goods but not most services. Some states tax labour on new construction but not on repair. Check your state revenue site.</li>
-<li>GST in Australia: a flat 10 percent if you're registered. You must register once turnover passes $75,000 AUD.</li>
-<li>GST/HST in Canada: 5 to 15 percent depending on province. Registration is mandatory once you pass $30,000 CAD in revenue over four quarters.</li>
-<li>VAT in the UK: standard rate is 20 percent, with a registration threshold of GBP 90,000 over a rolling 12 months.</li>
+<li>GST in Australia: a flat 10% if you're registered. You must register once turnover passes $75,000 AUD.</li>
+<li>GST/HST in Canada: 5 to 15% depending on province. Registration is mandatory once you pass $30,000 CAD in revenue over four quarters.</li>
+<li>VAT in the UK: standard rate is 20%, with a registration threshold of GBP 90,000 over a rolling 12 months.</li>
 </ul>
 <p>If you're below the registration threshold for your country, you usually don't add tax. If you're above it, you do. Rules vary, so check with an accountant for your situation before making a final call.</p>
 <p>Check the totals at the bottom one more time. The subtotal is the sum of the line items. Tax is calculated on the subtotal (or on each taxable line, if you have a mix). The total is what the client owes. If you've already taken a deposit, enter it in the amount paid field so the balance due reflects what's actually outstanding.</p>
@@ -103,7 +103,7 @@ HTML,
 <li><strong>Net 30.</strong> Payment due 30 days after the invoice date. The standard for commercial clients, agencies, and anyone running a formal accounts-payable cycle. If you're billing a corporate client, expect Net 30 by default and Net 45 or Net 60 in some industries.</li>
 </ul>
 <p>Shorter terms get paid faster on average than longer ones, and clients tend to push toward the back of any window you give them. A Net 30 invoice typically lands in the bank around five to six weeks after it goes out. A Due on Receipt invoice tends to clear in one to two weeks. The trade-off is whether the speed-up is worth the relationship cost on bigger clients who run on monthly cycles.</p>
-<p>Write a late fee into the Terms section so it isn't a surprise later. The standard is 1.5 percent per month on overdue balances, which works out to 18 percent per year. Some states cap late fees, so check your local rules.</p>
+<p>Write a late fee into the Terms section so it isn't a surprise later. The standard is 1.5% per month on overdue balances, which works out to 18% per year. Some states cap late fees, so check your local rules.</p>
 <p>For the full breakdown of when to use each, see <a href="/net-30-vs-due-on-receipt/">Net 30 vs Due on Receipt</a>.</p>
 HTML,
     ],
@@ -153,7 +153,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'Do I need a tax ID on every invoice?',
-      'a' => 'It depends on where you are and whether you\'re registered for the relevant tax. In Australia, your ABN has to appear on every invoice, and without it the buyer is required to withhold PAYG at 47 percent. In Canada, if you\'re registered for GST/HST you have to show the registration number on invoices of $100 or more (tax-inclusive), and add the buyer\'s name once an invoice reaches $500 or more. In the United States, an EIN isn\'t required on most invoices, though larger clients often ask for a W-9. In the UK and EU, VAT-registered businesses must show the VAT number. If you\'re not registered for any tax and you\'re below the threshold for your country, you usually don\'t need a tax ID on the invoice at all.',
+      'a' => 'It depends on where you are and whether you\'re registered for the relevant tax. In Australia, your ABN has to appear on every invoice, and without it the buyer is required to withhold PAYG at 47%. In Canada, if you\'re registered for GST/HST you have to show the registration number on invoices of $100 or more (tax-inclusive), and add the buyer\'s name once an invoice reaches $500 or more. In the United States, an EIN isn\'t required on most invoices, though larger clients often ask for a W-9. In the UK and EU, VAT-registered businesses must show the VAT number. If you\'re not registered for any tax and you\'re below the threshold for your country, you usually don\'t need a tax ID on the invoice at all.',
     ],
     [
       'q' => 'How soon should I send the invoice after finishing work?',

@@ -2,7 +2,6 @@
 /**
  * Receipt Scan Usage Tracking API
  * Tracks and enforces monthly scan limits.
- * Free tier: 5 scans/month. Premium tier: 500 scans/month.
  */
 
 header('Content-Type: application/json');

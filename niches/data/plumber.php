@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most plumber invoices combine a flat call-out fee with hourly labor for the time spent on site, plus parts billed at a marked-up rate that covers sourcing and the trip to the supply house. Markups commonly run from 20 to 40 percent on smaller fittings and a little lower on big-ticket fixtures. Residential customers typically pay on completion by card, e-transfer, or check before you leave the property, while commercial clients and property managers usually settle 15 days after the invoice date (often written as Net 15). After-hours, weekend, and holiday calls carry a premium rate, often time-and-a-half on the labor line, and it helps to spell that out in the Terms section.</p>
+<p>Most plumber invoices combine a flat call-out fee with hourly labor for the time spent on site, plus parts billed at a marked-up rate that covers sourcing and the trip to the supply house. Markups commonly run from 20 to 40% on smaller fittings and a little lower on big-ticket fixtures. Residential customers typically pay on completion by card, e-transfer, or check before you leave the property, while commercial clients and property managers usually settle 15 days after the invoice date (often written as Net 15). After-hours, weekend, and holiday calls carry a premium rate, often time-and-a-half on the labor line, and it helps to spell that out in the Terms section.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
@@ -40,7 +40,7 @@ HTML,
     ],
     [
       'q' => 'How do I bill for parts and mark them up?',
-      'a' => "List each part on its own line with the marked-up price, not the cost from the supply house. A P-trap, a shutoff valve, and a faucet should each be separate lines so the customer sees exactly what went into the wall. Most plumbers run a markup of 20 to 40 percent on small parts to cover the trip, storage, and the time spent sourcing the right fitting.",
+      'a' => "List each part on its own line with the marked-up price, not the cost from the supply house. A P-trap, a shutoff valve, and a faucet should each be separate lines so the customer sees exactly what went into the wall. Most plumbers run a markup of 20 to 40% on small parts to cover the trip, storage, and the time spent sourcing the right fitting.",
     ],
     [
       'q' => 'What rate should I charge for after-hours or emergency calls?',

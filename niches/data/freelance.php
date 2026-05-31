@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most freelance clients pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30), with the clock starting the day the invoice is sent. For new clients or larger projects, a 50 percent deposit up front protects your time, and the balance falls due once the work is delivered. A late fee of 1.5 percent per month on overdue balances is common and worth stating in the Terms section so it does not feel like a surprise. Bank transfer, Stripe, and PayPal are the usual options, and you can list any of them in Notes or Terms.</p>
+<p>Most freelance clients pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30), with the clock starting the day the invoice is sent. For new clients or larger projects, a 50% deposit up front protects your time, and the balance falls due once the work is delivered. A late fee of 1.5% per month on overdue balances is common and worth stating in the Terms section so it does not feel like a surprise. Bank transfer, Stripe, and PayPal are the usual options, and you can list any of them in Notes or Terms.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
@@ -40,7 +40,7 @@ HTML,
     ],
     [
       'q' => 'How do I bill a deposit on a freelance project?',
-      'a' => "Add the deposit as its own line item with the dollar amount and a quantity of one, label it clearly (for example, '50 percent project deposit'), and send it as the first invoice. When you send the final invoice, list the full project fee and use the 'Amount paid' field to subtract the deposit so the balance due is correct.",
+      'a' => "Add the deposit as its own line item with the dollar amount and a quantity of one, label it clearly (for example, '50% project deposit'), and send it as the first invoice. When you send the final invoice, list the full project fee and use the 'Amount paid' field to subtract the deposit so the balance due is correct.",
     ],
     [
       'q' => 'Can I send an invoice in a currency other than US dollars?',

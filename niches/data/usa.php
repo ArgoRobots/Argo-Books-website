@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most US clients pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30), with the clock starting the day the invoice is sent. For new clients or larger project work, a deposit up front is normal and the balance falls due once the work is delivered. A late fee of 1.5 percent per month on overdue balances is common, but state usury caps limit how high you can go, so check your state rules before setting a higher rate. ACH bank transfer is the lowest-cost option for paying invoices in USD, while checks, credit cards, Zelle, and wire transfers cover faster turnarounds, larger amounts, and out-of-state clients. You can list any of these methods in Notes or Terms.</p>
+<p>Most US clients pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30), with the clock starting the day the invoice is sent. For new clients or larger project work, a deposit up front is normal and the balance falls due once the work is delivered. A late fee of 1.5% per month on overdue balances is common, but state usury caps limit how high you can go, so check your state rules before setting a higher rate. ACH bank transfer is the lowest-cost option for paying invoices in USD, while checks, credit cards, Zelle, and wire transfers cover faster turnarounds, larger amounts, and out-of-state clients. You can list any of these methods in Notes or Terms.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'

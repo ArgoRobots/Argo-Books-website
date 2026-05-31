@@ -81,7 +81,7 @@ I sent a reminder on May 23 about invoice 1023 for $[amount], and I haven't hear
 
 Could you let me know where it sits on your end, and roughly when payment will be processed? If there's a hold-up I can help with, I'm happy to jump on a quick call.
 
-As a reminder, the terms on the invoice include a 1.5 percent monthly late fee on overdue balances, which would start applying from today if the invoice isn't paid this week.
+As a reminder, the terms on the invoice include a 1.5% monthly late fee on overdue balances, which would start applying from today if the invoice isn't paid this week.
 
 Thanks,
 [Your first name]</pre>
@@ -121,7 +121,7 @@ HTML,
 <p>Issue a new invoice with a new invoice number. Don't edit the original invoice. Keep it on file as the original record, and send a separate document for the updated balance, so both sides have a clean paper trail. The new invoice has two line items:</p>
 <ul>
 <li><strong>Line 1.</strong> The original work, as a single line, with the same description and amount as the original invoice. In the description, reference the original invoice number, for example "Re-issued from invoice 1023, dated May 8, for [project description]".</li>
-<li><strong>Line 2.</strong> The late fee, as a separate line. Label it "Late fee per agreed terms" and enter the dollar amount. The standard is 1.5 percent per month on the overdue balance, so a $2,000 invoice that's one month overdue carries a $30 late fee. If the invoice is two months overdue, the late fee is $60. State the calculation in the description if you want to be explicit: "Late fee: 1.5 percent of $2,000 for one month overdue".</li>
+<li><strong>Line 2.</strong> The late fee, as a separate line. Label it "Late fee per agreed terms" and enter the dollar amount. The standard is 1.5% per month on the overdue balance, so a $2,000 invoice that's one month overdue carries a $30 late fee. If the invoice is two months overdue, the late fee is $60. State the calculation in the description if you want to be explicit: "Late fee: 1.5% of $2,000 for one month overdue".</li>
 </ul>
 <p>Set the due date to seven days from the new invoice date, which is short on purpose. Send the new invoice by email, with a short body that names the missed commitment from the phone call. Something like: "Hi [name], following our call on May 30 and the commitment to pay by June 6, I'm attaching a fresh invoice 1024 covering the original amount plus the late fee per the terms on the original invoice. Payment is due by June 13."</p>
 <p>The late fee isn't a punishment, it's a contract term. It was on the original invoice in the Terms section, and applying it now is consistent with what both sides agreed to at the start. For a full walkthrough of how to set the rate, what some states cap it at, and when to waive it for a good client, see <a href="/late-fees-when-and-how-to-charge/">late fees: when and how to charge</a>.</p>
@@ -170,7 +170,7 @@ I sent a reminder on May 23 about invoice 1023 for $[amount], and I haven't hear
 
 Could you let me know where it sits on your end, and roughly when payment will be processed? If there's a hold-up I can help with, I'm happy to jump on a quick call.
 
-As a reminder, the terms on the invoice include a 1.5 percent monthly late fee on overdue balances, which would start applying from today if the invoice isn't paid this week.
+As a reminder, the terms on the invoice include a 1.5% monthly late fee on overdue balances, which would start applying from today if the invoice isn't paid this week.
 
 Thanks,
 [Your first name]</pre>

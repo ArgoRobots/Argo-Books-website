@@ -13,7 +13,7 @@ return [
   'meta_description' => 'Free invoice generator for Australian sole traders and small businesses. Bill in AUD, show your ABN, add GST, and download a clean PDF or Word file.',
 
   'intro_html' => <<<'HTML'
-<p>Built for Australian sole traders, freelancers, contractors, and small business owners who bill in AUD and work under ATO rules. Enter your business details, list your hours or project fees, add your ABN, set GST at 10 percent if you are registered, and produce a clean invoice in a minute. The form handles hourly work, fixed project fees, deposits, materials, and monthly retainers, so the same setup works whether you are a tradie quoting a kitchen job in Brisbane or a consultant billing a client in Sydney.</p>
+<p>Built for Australian sole traders, freelancers, contractors, and small business owners who bill in AUD and work under ATO rules. Enter your business details, list your hours or project fees, add your ABN, set GST at 10% if you are registered, and produce a clean invoice in a minute. The form handles hourly work, fixed project fees, deposits, materials, and monthly retainers, so the same setup works whether you are a tradie quoting a kitchen job in Brisbane or a consultant billing a client in Sydney.</p>
 <p>There is no signup, no email gate, and no watermark on the finished file. Pick Australia in the country dropdown and the currency switches to AUD and the tax row relabels to GST. Drop in your logo, add your ABN to the business details, mark any deposit already received, and download the invoice as a PDF for sending or a Word file if you want to keep editing it later. Everything runs in your browser, so client names and totals stay on your device.</p>
 HTML,
 
@@ -30,7 +30,7 @@ HTML,
 HTML,
 
   'tax_notes_html' => <<<'HTML'
-<p>The standard GST rate in Australia is a flat 10 percent on most taxable supplies, and you must register for GST once your annual turnover passes $75,000 AUD (taxi and rideshare drivers have to register from the first dollar). Once registered, any sale over $82.50 AUD including GST means you have to issue a tax invoice rather than a regular one, and that tax invoice must show your ABN, the words "Tax invoice", the GST amount, and the GST-inclusive total. Most small businesses report GST quarterly through a Business Activity Statement, with monthly or annual cycles for higher and lower turnovers. If you do not quote an ABN, the buyer must withhold PAYG at 47 percent from the payment. Check the ATO guidance or ask your accountant before making a call on registration or GST-free supplies.</p>
+<p>The standard GST rate in Australia is a flat 10% on most taxable supplies, and you must register for GST once your annual turnover passes $75,000 AUD (taxi and rideshare drivers have to register from the first dollar). Once registered, any sale over $82.50 AUD including GST means you have to issue a tax invoice rather than a regular one, and that tax invoice must show your ABN, the words "Tax invoice", the GST amount, and the GST-inclusive total. Most small businesses report GST quarterly through a Business Activity Statement, with monthly or annual cycles for higher and lower turnovers. If you do not quote an ABN, the buyer must withhold PAYG at 47% from the payment. Check the ATO guidance or ask your accountant before making a call on registration or GST-free supplies.</p>
 HTML,
 
   'faqs' => [
@@ -40,7 +40,7 @@ HTML,
     ],
     [
       'q' => 'Do I have to put my ABN on every invoice?',
-      'a' => 'Yes. If you run a business in Australia and you do not quote your ABN on the invoice, the buyer is required to withhold PAYG at 47 percent from the payment and send it to the ATO. That applies whether or not you are registered for GST. Add your ABN to the business details so it appears on every invoice you generate, and you avoid the withholding rule entirely.',
+      'a' => 'Yes. If you run a business in Australia and you do not quote your ABN on the invoice, the buyer is required to withhold PAYG at 47% from the payment and send it to the ATO. That applies whether or not you are registered for GST. Add your ABN to the business details so it appears on every invoice you generate, and you avoid the withholding rule entirely.',
     ],
     [
       'q' => 'What is the difference between a tax invoice and a regular invoice?',

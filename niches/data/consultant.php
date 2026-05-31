@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most consulting clients pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30), with the clock starting the day the invoice is sent. Monthly retainers are usually billed in advance, with the invoice going out at the start of the period rather than the end. Hourly work is commonly tracked in 15-minute increments and rounded up, which is worth stating in your Terms so the math is not a surprise. A late fee of 1.5 percent per month on overdue balances is standard for B2B engagements. Bank transfer and credit card via Stripe are the usual options for larger invoices.</p>
+<p>Most consulting clients pay 15 to 30 days after the invoice date (often written as Net 15 or Net 30), with the clock starting the day the invoice is sent. Monthly retainers are usually billed in advance, with the invoice going out at the start of the period rather than the end. Hourly work is commonly tracked in 15-minute increments and rounded up, which is worth stating in your Terms so the math is not a surprise. A late fee of 1.5% per month on overdue balances is standard for B2B engagements. Bank transfer and credit card via Stripe are the usual options for larger invoices.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'

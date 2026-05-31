@@ -13,12 +13,12 @@ return [
   'meta_description' => 'Free contractor invoice generator for tradespeople. No signup. Handle deposits, progress payments, and materials, then download a clean PDF or Word file.',
 
   'intro_html' => <<<'HTML'
-<p>Built for general contractors, sub-contractors, and tradespeople who bill for construction, renovation, and repair work. Enter your business details, list your labor hours, materials, and any permits or disposal fees, set a tax rate if your work is taxable, and produce a clean invoice in a couple of minutes. The form handles a 50 percent deposit up front, a midpoint draw, and a final balance, so progress billing on multi-week jobs lines up the way most contracts already read.</p>
+<p>Built for general contractors, sub-contractors, and tradespeople who bill for construction, renovation, and repair work. Enter your business details, list your labor hours, materials, and any permits or disposal fees, set a tax rate if your work is taxable, and produce a clean invoice in a couple of minutes. The form handles a 50% deposit up front, a midpoint draw, and a final balance, so progress billing on multi-week jobs lines up the way most contracts already read.</p>
 <p>There is no signup, no email gate, and no watermark on the finished file. Everything runs locally in your browser, which means client addresses, job site details, rates, and totals stay on your device. Pick an invoice style that matches your brand, drop in your company logo, record any deposit already collected, and download the result as a PDF for emailing to the homeowner or a Word file if you want to tweak the wording before sending.</p>
 HTML,
 
   'sample_line_items' => [
-    ['description' => 'Project deposit (50 percent)', 'rate' => 2500, 'quantity' => 1],
+    ['description' => 'Project deposit (50%)', 'rate' => 2500, 'quantity' => 1],
     ['description' => 'Labor (per hour)', 'rate' => 75, 'quantity' => 40],
     ['description' => 'Materials and supplies', 'rate' => 1850, 'quantity' => 1],
     ['description' => 'Permit and inspection fees', 'rate' => 320, 'quantity' => 1],
@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most contractor invoices are billed in stages: a deposit before any work begins, a midpoint draw once framing or rough-in is complete, and the balance due on substantial completion. Payment due 15 days after the invoice date (often written as Net 15) is common for homeowners, and 30 days after the invoice date (Net 30) is typical for commercial clients or property managers. Materials can either be invoiced separately at cost, marked up and bundled into a single line, or itemized line by line so the customer sees exactly what was bought. A late fee of 1.5 percent per month on overdue balances is standard, and worth listing in the Terms section so it does not feel like a surprise later.</p>
+<p>Most contractor invoices are billed in stages: a deposit before any work begins, a midpoint draw once framing or rough-in is complete, and the balance due on substantial completion. Payment due 15 days after the invoice date (often written as Net 15) is common for homeowners, and 30 days after the invoice date (Net 30) is typical for commercial clients or property managers. Materials can either be invoiced separately at cost, marked up and bundled into a single line, or itemized line by line so the customer sees exactly what was bought. A late fee of 1.5% per month on overdue balances is standard, and worth listing in the Terms section so it does not feel like a surprise later.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
@@ -44,7 +44,7 @@ HTML,
     ],
     [
       'q' => 'Should I mark up materials on a contractor invoice?',
-      'a' => 'Most contractors do, with a markup somewhere between 10 and 30 percent to cover sourcing, pickup, and storage. You can either roll the markup into a single materials line, or list materials at cost and add a separate handling fee. Either way, agree on the approach with the customer in the written contract so the final invoice does not surprise them.',
+      'a' => 'Most contractors do, with a markup somewhere between 10 and 30% to cover sourcing, pickup, and storage. You can either roll the markup into a single materials line, or list materials at cost and add a separate handling fee. Either way, agree on the approach with the customer in the written contract so the final invoice does not surprise them.',
     ],
     [
       'q' => 'Can I record a partial payment on a contractor invoice?',
@@ -79,7 +79,7 @@ HTML,
   'generator_defaults' => [
     'paymentTerms' => '50% deposit, balance due in 15 days',
     'lineItems' => [
-      ['description' => 'Project deposit (50 percent)', 'quantity' => 1, 'rate' => 2500],
+      ['description' => 'Project deposit (50%)', 'quantity' => 1, 'rate' => 2500],
       ['description' => 'Materials and supplies', 'quantity' => 1, 'rate' => 1850],
       ['description' => 'Labor (per hour)', 'quantity' => 40, 'rate' => 75],
     ],

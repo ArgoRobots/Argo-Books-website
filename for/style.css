@@ -116,7 +116,7 @@
 
 .screenshot-frame {
   position: relative;
-  border-radius: 16px;
+  border-radius: 38px;
   overflow: hidden;
   box-shadow: 0 12px 40px var(--shadow);
   background: var(--white);

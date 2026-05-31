@@ -26,7 +26,7 @@ HTML,
   ],
 
   'typical_payment_terms_html' => <<<'HTML'
-<p>Most design projects bill 50 percent up front to lock the schedule, with the balance due on final delivery. For established clients, a single project invoice due 30 days after the invoice date (often written as Net 30) is also common. List revision rounds beyond the agreed scope as their own line items rather than absorbing them into the project fee, so the client sees what each round costs. Final files are usually released once payment clears, and stating that in the Terms section saves a lot of awkward email later. A late fee of 1.5 percent per month on overdue balances is standard and worth spelling out the same way.</p>
+<p>Most design projects bill 50% up front to lock the schedule, with the balance due on final delivery. For established clients, a single project invoice due 30 days after the invoice date (often written as Net 30) is also common. List revision rounds beyond the agreed scope as their own line items rather than absorbing them into the project fee, so the client sees what each round costs. Final files are usually released once payment clears, and stating that in the Terms section saves a lot of awkward email later. A late fee of 1.5% per month on overdue balances is standard and worth spelling out the same way.</p>
 HTML,
 
   'tax_notes_html' => <<<'HTML'
@@ -36,7 +36,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'How do I bill a project deposit on a design invoice?',
-      'a' => "Add the deposit as its own line item with a quantity of one and the dollar amount of the deposit, label it clearly (for example, '50 percent project deposit'), and send it as the first invoice. On the final invoice, list the full project fee and use the 'Amount paid' field to subtract the deposit so the balance due is correct.",
+      'a' => "Add the deposit as its own line item with a quantity of one and the dollar amount of the deposit, label it clearly (for example, '50% project deposit'), and send it as the first invoice. On the final invoice, list the full project fee and use the 'Amount paid' field to subtract the deposit so the balance due is correct.",
     ],
     [
       'q' => 'How should I charge for extra revision rounds?',

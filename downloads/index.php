@@ -188,11 +188,6 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
     <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
 
-    <!-- Google Ads conversion: Download Installer -->
-    <script>
-      gtag('event', 'conversion', {'send_to': 'AW-17210317271/niGZCJv2vbkbENezwo5A'});
-    </script>
-
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
@@ -382,6 +377,9 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                         'event_label': 'argo_books_' + platform,
                         'platform': platform
                     });
+
+                    // Google Ads conversion: fire on the download click
+                    gtag('event', 'conversion', {'send_to': 'AW-17210317271/niGZCJv2vbkbENezwo5A'});
                 }
 
                 if (platform === 'windows' && smartScreenGuide) {

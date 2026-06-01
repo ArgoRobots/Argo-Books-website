@@ -33,14 +33,14 @@ HTML,
       'h2' => 'Why invoice numbers matter',
       'anchor' => 'why-it-matters',
       'html' => <<<'HTML'
-<p>Every invoice you send needs its own unique number. That number is what your client writes on the cheque, what your bank statement quotes when the payment lands, and what your accountant uses to tie a sale to a deposit. If the number is fuzzy, everything downstream gets fuzzy too.</p>
+<p>Every invoice you send needs its own unique number. That number is what your client writes on the cheque, what your bank statement quotes when the payment lands, and what you or your accountant use to tie a sale to a deposit.</p>
 <p>Three concrete reasons the number matters:</p>
 <ul>
   <li><strong>Tax audits.</strong> Tax offices in most countries can ask to see a continuous list of invoices for a given year. They're checking that you didn't quietly skip a sale. In Australia, the UK, Canada, and most of the EU, gaps in your numbering are a flag to look closer. In the US, the IRS doesn't require sequential numbers by federal rule, but state sales-tax auditors often expect them, and a clean sequence is much easier to defend than a messy one either way.</li>
-  <li><strong>Finding the invoice in an email thread.</strong> A client emails you saying "I paid invoice 47 last week, why are you chasing me?" If you have one invoice numbered 47, you can pull it up in two seconds. If you reset your numbers every January and have three different invoice 47s sitting in your sent folder, you'll spend ten minutes scrolling.</li>
+  <li><strong>Finding the invoice in an email thread.</strong> A client emails you saying "I paid invoice 47 last week, why are you chasing me?" If you have one invoice numbered 47, you can pull it up in two seconds. If you reset your numbers every January and have three different invoice 47s sitting in your sent folder, you'll waste time trying to figure it out.</li>
   <li><strong>Double-billing.</strong> If you ever accidentally send the same invoice twice with two different numbers, the client may pay it twice, and you have a refund to issue. A clean numbering scheme makes duplicates obvious before they go out.</li>
 </ul>
-<p>The good news: this is a one-time decision. Pick a system in the next five minutes, write it down somewhere you'll see it again, and you're done. The rest of this guide is the five rules that make the choice almost automatic.</p>
+<p>The good news: this is a one-time decision. Pick a system in the next five minutes, write it down somewhere you'll see it again, and you're done. The rest of this guide are the five rules that make the choice almost automatic.</p>
 HTML,
     ],
 
@@ -55,7 +55,7 @@ HTML,
 <ul>
   <li><strong>Start at 1001.</strong> This is what most consultants and freelancers do. It avoids the optics of sending a client "Invoice 1", which some people worry signals you just started out. Whether a client actually notices is a different question (more on that in the FAQ below), but 1001 is a safe, common starting point.</li>
   <li><strong>Start at 0001.</strong> Padded with zeros so the number is always four digits. Looks tidy in a spreadsheet because every row is the same width. The downside: once you cross 9999, you have to add a fifth digit, which can look odd next to the older ones.</li>
-  <li><strong>Start at INV-2026-001.</strong> A year prefix plus a counter. Good if you want the invoice date visible right in the number, and useful if you file invoices in folders by year.</li>
+  <li><strong>Start at INV-2026-001.</strong> A year prefix plus a counter. Good if you want the invoice year visible right in the number, and useful if you file invoices in folders by year.</li>
 </ul>
 <p>People sometimes argue that starting at a higher number, like 5000 or 10000, makes a new business look more established. There's no real evidence clients care. What they care about is that the invoice is clear, accurate, and matches the work you did. Starting at 1001 versus 5001 versus 10001 is cosmetic. Pick the one you find easiest to remember and move on.</p>
 <p>One practical note: don't start at a giant random number like 837492. If you ever need to type the invoice number into a payment processor, a bank reference field, or a spreadsheet, shorter numbers are faster and less mistake-prone. Four to six digits is the sweet spot.</p>
@@ -70,9 +70,8 @@ HTML,
       'step_text' => 'Choose between sequential numbers, a date prefix, or a client prefix. Sequential is simplest. Date prefixes group by year. Client prefixes can cause duplicates across customers.',
       'html' => <<<'HTML'
 <p>Once you know your starting number, decide on the shape of every invoice number after it. Three formats cover almost every small business.</p>
-<p><strong>Sequential.</strong> Just a counter. 1001, 1002, 1003, 1004. This is the simplest format and the easiest to keep straight in your head. Most accounting software defaults to this. If you're billing fewer than a hundred invoices a year and only have a handful of clients, sequential is almost always the right answer.</p>
+<p><strong>Sequential.</strong> Just a counter. 1001, 1002, 1003, 1004, etc. This is the simplest format and the easiest to keep straight in your head. Most accounting software defaults to this. If you're billing fewer than a hundred invoices a year and only have a handful of clients, sequential is almost always the right answer.</p>
 <p><strong>Date-prefixed.</strong> A year (and sometimes a month) followed by a counter. 2026-001, 2026-002, or 2026-05-001 for May 2026 invoice one. Pros: you can tell when the invoice was issued just by looking at the number, and filing by year in folders is automatic. Cons: longer to type and read, and the year prefix can look like the invoice is part of a yearly batch, which makes it tempting to restart the counter each January. Restarting per year is one of the most common mistakes (see the last section).</p>
-<p><strong>Client-prefixed.</strong> Two or three letters from the client name then a counter. ACME-001, ACME-002, BETA-001, BETA-002. People reach for this when they want each client to have their own clean sequence. The trade-off is that two different invoices can end up sharing the same final digits (ACME-001 and BETA-001), which causes confusion in your bank statement and in any spreadsheet that lists invoices across clients. If you really want client info in the number, append it instead of prefixing: 1001-ACME, 1002-BETA. That way the leading counter is still unique across all clients.</p>
 <p>For most small businesses, plain sequential with a four-digit counter is the simplest format that survives growth, software changes, and audits. Date-prefixed is fine if you genuinely want the year visible. Client-prefixed is the format that causes the most headaches later.</p>
 HTML,
     ],
@@ -93,9 +92,9 @@ HTML,
 </ul>
 <p>What to do if you void an invoice:</p>
 <ol>
-  <li>Mark the original invoice as voided in your records. A "VOIDED" stamp or a status flag in your accounting tool is enough if the invoice has never left your system. If you already sent the invoice to a VAT-registered customer or filed it in a VAT return period, you must issue a formal credit note (sometimes called a credit memo) with its own separate sequence (CN-001, CN-002) that references the original invoice number. That's the required mechanism in the UK, the EU, and Australia once an invoice is "in the wild". The credit note cancels the original; the original invoice number stays in the sequence, you don't delete or reuse it.</li>
+  <li>Mark the original invoice as voided in your records. A "VOIDED" stamp or a status flag in your accounting tool is enough if the invoice has never left your system. If you already sent the invoice to a VAT-registered customer or filed it in a VAT return period, you must issue a formal credit note (sometimes called a credit memo) with its own separate sequence (CN-001, CN-002) that references the original invoice number. That's the required mechanism in the UK, the EU, and Australia. The credit note cancels the original; the original invoice number stays in the sequence, you don't delete or reuse it.</li>
   <li>If you're issuing a replacement, give it the next number in line. So if 1024 was voided, the replacement is 1025, not 1024-A or 1024-v2.</li>
-  <li>Keep a one-line note (in the invoice notes field, or in a side log) explaining which invoice was voided and why. Two months from now you won't remember, and your accountant will appreciate the breadcrumb.</li>
+  <li>Keep a one-line note (in the invoice notes field, or in a side log) explaining which invoice was voided and why. Two months from now you won't remember, and your accountant will appreciate the explanation.</li>
 </ol>
 <p>The credit note approach isn't optional for VAT-registered businesses once an invoice has been sent to a customer or included in a filed VAT return. The internal "VOIDED" stamp is fine only for invoices that never left your records.</p>
 HTML,
@@ -136,7 +135,7 @@ HTML,
 </ul>
 <p>Formats that often cause import problems:</p>
 <ul>
-  <li>Slashes inside the number: <code>2026/05/001</code>. Some tools interpret the slash as a path separator and choke.</li>
+  <li>Slashes inside the number: <code>2026/05/001</code>. Some tools interpret the slash as a path separator and fail.</li>
   <li>Spaces: <code>INV 1001</code>. Get stripped or replaced inconsistently between tools.</li>
   <li>Symbols beyond the hyphen: <code>#1001</code>, <code>1001*</code>, <code>1001!</code>. Often rejected by stricter validators.</li>
   <li>Mixed case in unpredictable spots: <code>Inv-1001</code> in some, <code>INV-1002</code> in others. Importers may treat these as different prefixes.</li>
@@ -154,7 +153,7 @@ HTML,
 <p>The same handful of mistakes come up over and over. They're easy to avoid once you've seen them.</p>
 <p><strong>Restarting the numbering each year without a year prefix.</strong> This is the most common mistake. You finish 2025 at 1001, then on January 1st you start 2026 back at 0001 (or 1001) with no year in the number. Now you have two invoice 1001s in your records, one from each year. Both your accounting software and any tax audit treat that as a duplicate. If you do want to reset per year, embed the year in the format: 2026-001, 2027-001. That keeps every number unique across your history while still letting you start fresh each year, and it's the standard way to do it in the UK and EU. The mistake is only the unprefixed reset, not the reset itself.</p>
 <p><strong>Restarting per client.</strong> Each client gets their own counter starting at 001. ACME gets ACME-001, ACME-002. BETA gets BETA-001, BETA-002. Looks tidy from one client's view. The problem hits when you list invoices across all clients: you have three different invoice 001s sitting in the same spreadsheet, and your bank statement quotes "Payment for 001" with no way to tell which client paid. If you want client info, append it (1001-ACME) so the leading counter stays unique across the whole business.</p>
-<p><strong>Using human names.</strong> Naming invoices things like "Smith renovation invoice" or "March consulting work" instead of a real number. Accounting software can't sort these, auditors can't follow them, and you can't find them in an inbox search. You can put a description in the invoice notes or memo field, but the number itself should be a number (with an optional prefix).</p>
+<p><strong>Using human names.</strong> Naming invoices things like "Smith renovation invoice" or "March consulting work" instead of a real number. Accounting software can't sort these, auditors can't follow them, and you can't find them in an inbox search. You can put a description in the invoice notes or memo field, but the name itself should be a number (with an optional prefix).</p>
 <p><strong>Using random numbers.</strong> Picking a fresh random number for each invoice so they "look like" big-company invoices. Defeats the entire point of having a sequence. You can't verify completeness, you can't tell which invoice came first, and duplicates are easy to create without noticing. Random is the opposite of what you want.</p>
 <p>Avoid these four and the rest of the system almost takes care of itself.</p>
 HTML,

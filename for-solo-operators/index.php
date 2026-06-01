@@ -124,7 +124,6 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books for Solo Operators with Inventory: One Person, All the Hats</title>
 
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="../compare/style.css">
@@ -139,7 +138,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -420,7 +419,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         </section>
 
         <footer class="footer">
-            <div id="includeFooter"></div>
+            <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
         </footer>
     </div>
 

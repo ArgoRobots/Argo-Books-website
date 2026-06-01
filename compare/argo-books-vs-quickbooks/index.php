@@ -115,7 +115,6 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs QuickBooks: Simpler & More Affordable | Argo Books</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="../style.css">
@@ -129,7 +128,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -511,7 +510,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
         </section>
 
         <footer class="footer">
-            <div id="includeFooter"></div>
+            <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
         </footer>
     </div>
 

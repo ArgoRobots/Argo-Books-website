@@ -54,53 +54,34 @@ function setDefaultAvatar() {
   }
 }
 
-// Fix all root-relative links to work with BASE_PATH
-function fixLinks(container) {
-  $(container + " a").each(function () {
-    var href = $(this).attr("href");
-    // Only fix links that start with / but not // (protocol-relative)
-    if (href && href.startsWith("/") && !href.startsWith("//") && BASE_PATH !== "/") {
-      $(this).attr("href", BASE_PATH + href.substring(1));
-    }
-  });
+// Populate the account avatar in the (now server-rendered) header. Leaves the
+// default avatar SVG in place when logged out or on error.
+function loadAvatar() {
+  const accountAvatar = document.querySelector(".account-avatar");
+  if (!accountAvatar) return;
 
-  $(container + " img").each(function () {
-    var src = $(this).attr("src");
-    // Only fix images that start with / but not // (protocol-relative)
-    if (src && src.startsWith("/") && !src.startsWith("//") && BASE_PATH !== "/") {
-      $(this).attr("src", BASE_PATH + src.substring(1));
-    }
-  });
+  fetch(BASE_PATH + "community/get_avatar_info.php")
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.logged_in && data.has_avatar) {
+        // Apply BASE_PATH to avatar URL if it starts with /
+        var avatarUrl = data.avatar_url;
+        if (avatarUrl && avatarUrl.startsWith("/") && !avatarUrl.startsWith("//") && BASE_PATH !== "/") {
+          avatarUrl = BASE_PATH + avatarUrl.substring(1);
+        }
+        accountAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile">`;
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching avatar info:", error);
+      setDefaultAvatar();
+    });
 }
 
-// Load header and footer with dynamic base path
-$(document).ready(function () {
-  $("#includeHeader").load(BASE_PATH + "resources/header/index.html", function () {
-    fixLinks("#includeHeader");
-
-    // Load the avatar after the header is loaded
-    const accountAvatar = document.querySelector(".account-avatar");
-    fetch(BASE_PATH + "community/get_avatar_info.php")
-      .then((response) => response.json())
-      .then((data) => {
-        if (accountAvatar && data.logged_in && data.has_avatar) {
-          // Apply BASE_PATH to avatar URL if it starts with /
-          var avatarUrl = data.avatar_url;
-          if (avatarUrl && avatarUrl.startsWith("/") && !avatarUrl.startsWith("//") && BASE_PATH !== "/") {
-            avatarUrl = BASE_PATH + avatarUrl.substring(1);
-          }
-          accountAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile">`;
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching avatar info:", error);
-        setDefaultAvatar();
-      });
-  });
-
-  $("#includeFooter").load(BASE_PATH + "resources/footer/index.html", function () {
-    fixLinks("#includeFooter");
-  });
+// The header and footer are now rendered server-side (PHP includes), so they
+// are already in the DOM. On ready we just load the avatar and the cursor orb.
+document.addEventListener("DOMContentLoaded", function () {
+  loadAvatar();
 
   // Load cursor orb script
   var cursorOrbScript = document.createElement('script');

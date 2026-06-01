@@ -443,7 +443,6 @@ if ($user) {
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title><?php echo $user_not_found ? 'User Not Found' : htmlspecialchars($user['username']) . "'s Profile"; ?> - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
     <script src="../../resources/scripts/utc-to-local.js" defer></script>
     <script src="../../resources/notifications/notifications.js" defer></script>
@@ -464,7 +463,7 @@ if ($user) {
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <?php if ($user_not_found): ?>
@@ -970,7 +969,7 @@ if ($user) {
     <?php endif; ?>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 
     <!-- Report Modal -->

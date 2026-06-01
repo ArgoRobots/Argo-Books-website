@@ -111,7 +111,6 @@ if (empty($_SESSION['csrf_token'])) {
     <title><?php echo htmlspecialchars($post['title']); ?> - Argo Community</title>
 
     <script src="view-post.js"></script>
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
     <script src="../resources/notifications/notifications.js" defer></script>
     <script src="../resources/scripts/utc-to-local.js" defer></script>
@@ -137,7 +136,7 @@ if (empty($_SESSION['csrf_token'])) {
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
 
     <div class="hero hero-compact">
@@ -478,7 +477,7 @@ if (empty($_SESSION['csrf_token'])) {
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
     </footer>
 
     <!-- This will be used by mentions.js -->

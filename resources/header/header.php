@@ -1,11 +1,12 @@
+<?php require_once __DIR__ . '/../includes/site-base-path.php'; $base = site_base_path(); ?>
 <!-- BURGER MENU -->
 <input class="menu-btn" type="checkbox" id="menu-btn" onclick="headerToggleMenu()">
 <label class="menu-icon" id="menu-icon" for="menu-btn"><span class="nav-icon"></span></label>
 
 <div class="header-inner">
   <!-- LOGO -->
-  <a href="/">
-    <img class="logo" id="logo" alt="Argo Books Logo" src="/resources/images/argo-logo/argo-logo-white.png">
+  <a href="<?= $base ?>">
+    <img class="logo" id="logo" alt="Argo Books Logo" src="<?= $base ?>resources/images/argo-logo/argo-logo-white.png">
   </a>
 
   <div class="menu-container" id="menu-container">
@@ -13,45 +14,45 @@
     <nav aria-label="Main navigation">
       <ul class="menu">
         <li class="has-dropdown">
-          <a class="features" href="/features/">Features
+          <a class="features" href="<?= $base ?>features/">Features
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9 12,15 18,9"/></svg>
           </a>
           <div class="dropdown-menu">
             <div class="dropdown-columns">
               <div class="dropdown-col">
                 <span class="dropdown-col-header">Automation</span>
-                <a class="dropdown-item" href="/features/receipt-scanning/">Receipt Scanning</a>
-                <a class="dropdown-item" href="/features/spreadsheet-import/">Spreadsheet Import</a>
-                <a class="dropdown-item" href="/features/predictive-analytics/">Predictive Analytics</a>
+                <a class="dropdown-item" href="<?= $base ?>features/receipt-scanning/">Receipt Scanning</a>
+                <a class="dropdown-item" href="<?= $base ?>features/spreadsheet-import/">Spreadsheet Import</a>
+                <a class="dropdown-item" href="<?= $base ?>features/predictive-analytics/">Predictive Analytics</a>
               </div>
               <div class="dropdown-col">
                 <span class="dropdown-col-header">Financial Tools</span>
-                <a class="dropdown-item" href="/features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
-                <a class="dropdown-item" href="/features/invoicing/">Invoicing</a>
-                <a class="dropdown-item" href="/features/customer-management/">Customer Management</a>
+                <a class="dropdown-item" href="<?= $base ?>features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
+                <a class="dropdown-item" href="<?= $base ?>features/invoicing/">Invoicing</a>
+                <a class="dropdown-item" href="<?= $base ?>features/customer-management/">Customer Management</a>
               </div>
               <div class="dropdown-col">
                 <span class="dropdown-col-header">Operations</span>
-                <a class="dropdown-item" href="/features/inventory-management/">Inventory Management</a>
-                <a class="dropdown-item" href="/features/rental-management/">Rental Management</a>
-                <a class="dropdown-item" href="/features/">View All Features →</a>
+                <a class="dropdown-item" href="<?= $base ?>features/inventory-management/">Inventory Management</a>
+                <a class="dropdown-item" href="<?= $base ?>features/rental-management/">Rental Management</a>
+                <a class="dropdown-item" href="<?= $base ?>features/">View All Features →</a>
               </div>
             </div>
           </div>
         </li>
-        <li><a class="pricing" href="/pricing/">Pricing</a></li>
-        <li><a class="whats-new" href="/whats-new/">What's new</a></li>
-        <li><a class="about-us" href="/about-us/">About us</a></li>
-        <li><a class="documentation" href="/documentation/">Documentation</a></li>
-        <!-- <li><a class="community" href="/community/">Community</a></li> -->
-        <li><a class="contact-us" href="/contact-us/">Contact us</a></li>
+        <li><a class="pricing" href="<?= $base ?>pricing/">Pricing</a></li>
+        <li><a class="whats-new" href="<?= $base ?>whats-new/">What's new</a></li>
+        <li><a class="about-us" href="<?= $base ?>about-us/">About us</a></li>
+        <li><a class="documentation" href="<?= $base ?>documentation/">Documentation</a></li>
+        <!-- <li><a class="community" href="<?= $base ?>community/">Community</a></li> -->
+        <li><a class="contact-us" href="<?= $base ?>contact-us/">Contact us</a></li>
       </ul>
     </nav>
   </div>
 
   <!-- Account Button -->
   <div class="right-container">
-    <a id="account-button" class="account-button" href="/community/users/profile.php">
+    <a id="account-button" class="account-button" href="<?= $base ?>community/users/profile.php">
       <div class="account-avatar">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
@@ -66,14 +67,14 @@
 <div id="menu" class="hamburger-nav-menu">
   <nav aria-label="Mobile navigation">
     <ul>
-      <li><a href="/features/">Features</a></li>
-      <li><a href="/pricing/">Pricing</a></li>
-      <li><a href="/whats-new/">What's new</a></li>
-      <li><a href="/about-us/">About us</a></li>
-      <li><a href="/documentation/">Documentation</a></li>
-      <!-- <li><a href="/community/">Community</a></li> -->
-      <li><a href="/contact-us/">Contact Us</a></li>
-      <li><a href="/community/users/login.php" id="mobile-account-link">My Account</a></li>
+      <li><a href="<?= $base ?>features/">Features</a></li>
+      <li><a href="<?= $base ?>pricing/">Pricing</a></li>
+      <li><a href="<?= $base ?>whats-new/">What's new</a></li>
+      <li><a href="<?= $base ?>about-us/">About us</a></li>
+      <li><a href="<?= $base ?>documentation/">Documentation</a></li>
+      <!-- <li><a href="<?= $base ?>community/">Community</a></li> -->
+      <li><a href="<?= $base ?>contact-us/">Contact Us</a></li>
+      <li><a href="<?= $base ?>community/users/login.php" id="mobile-account-link">My Account</a></li>
     </ul>
   </nav>
 </div>

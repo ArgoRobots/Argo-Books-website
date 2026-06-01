@@ -132,7 +132,6 @@ foreach ($platforms as $key => $platform) {
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Older Versions - Argo Books | Previous Releases</title>
 
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -145,7 +144,7 @@ foreach ($platforms as $key => $platform) {
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -249,7 +248,7 @@ foreach ($platforms as $key => $platform) {
     </main>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
     </footer>
 
     <script>

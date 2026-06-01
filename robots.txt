@@ -1,5 +1,5 @@
 # robots.txt for ArgoRobots
-# Last updated: 2025-10-30
+# Last updated: 2026-05-31
 
 # Allow all search engines to crawl the site
 User-agent: *
@@ -17,8 +17,13 @@ Disallow: /community/users/
 # Disallow database directory
 Disallow: /database/
 
-# Disallow resources directory (backend files)
+# Disallow resources directory (backend/data files), but allow the
+# render-critical assets. Google needs CSS, JS, and images to render pages
+# correctly when evaluating layout and mobile-friendliness.
 Disallow: /resources/
+Allow: /resources/styles/
+Allow: /resources/scripts/
+Allow: /resources/images/
 
 # Disallow error pages
 Disallow: /error-pages/

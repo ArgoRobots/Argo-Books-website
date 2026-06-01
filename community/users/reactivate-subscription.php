@@ -113,7 +113,6 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Reactivate Subscription - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="subscription.css">
@@ -128,7 +127,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <div class="confirm-page-container">
@@ -255,7 +254,7 @@ $billing_cycle = $premium_subscription['billing_cycle'] ?? 'monthly';
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 </body>
 

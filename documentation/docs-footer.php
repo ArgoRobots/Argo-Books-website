@@ -25,7 +25,7 @@
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
     </footer>
 
     <script>

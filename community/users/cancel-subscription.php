@@ -129,7 +129,6 @@ $premium_features = get_plan_features()['premium']['features'];
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Cancel Subscription - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="../../resources/styles/button.css">
@@ -339,7 +338,7 @@ $premium_features = get_plan_features()['premium']['features'];
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <main class="cancel-page">
@@ -384,7 +383,7 @@ $premium_features = get_plan_features()['premium']['features'];
     </main>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 </body>
 

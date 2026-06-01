@@ -58,7 +58,6 @@ require_once __DIR__ . '/../track_referral.php';
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Features: AI-Powered Business Tools | Argo Books</title>
 
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -70,7 +69,7 @@ require_once __DIR__ . '/../track_referral.php';
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -245,7 +244,7 @@ require_once __DIR__ . '/../track_referral.php';
         </section>
 
         <footer class="footer">
-            <div id="includeFooter"></div>
+            <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
         </footer>
     </div>
 

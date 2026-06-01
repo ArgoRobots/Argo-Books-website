@@ -67,7 +67,6 @@ if ($premium_subscription) {
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Premium Subscription - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="subscription.css">
@@ -81,7 +80,7 @@ if ($premium_subscription) {
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <div class="subscription-page-container">
@@ -350,7 +349,7 @@ if ($premium_subscription) {
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 
     <!-- Retry Payment Modal -->

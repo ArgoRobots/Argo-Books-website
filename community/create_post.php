@@ -185,7 +185,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>Create New Post - Argo Community</title>
 
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
     <script src="formatting/text-formatting.js" defer></script>
     <script src="preview.js" defer></script>
@@ -206,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
 
     <div class="hero">
@@ -326,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
     </footer>
 
     <!-- Mention dropdown -->

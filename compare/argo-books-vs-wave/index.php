@@ -115,7 +115,6 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books vs Wave: Offline-Capable & Feature-Rich | Argo Books</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="../style.css">
@@ -128,7 +127,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -495,7 +494,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
         </section>
 
         <footer class="footer">
-            <div id="includeFooter"></div>
+            <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
         </footer>
     </div>
 

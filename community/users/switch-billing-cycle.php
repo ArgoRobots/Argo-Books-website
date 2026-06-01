@@ -113,7 +113,6 @@ $is_upgrade = ($new_cycle === 'yearly');
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title>Switch Billing Cycle - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
     <?php if ($payment_method === 'stripe' && !empty($stripe_publishable_key)): ?>
         <script src="https://js.stripe.com/v3/"></script>
@@ -199,7 +198,7 @@ $is_upgrade = ($new_cycle === 'yearly');
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <div class="confirm-page-container">
@@ -437,7 +436,7 @@ $is_upgrade = ($new_cycle === 'yearly');
     <?php endif; ?>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 
     <?php if (!$is_paypal): ?>

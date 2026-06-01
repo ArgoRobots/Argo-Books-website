@@ -60,7 +60,6 @@ $page_title = 'Resend License Key';
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($page_title); ?> - Argo Community</title>
 
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="auth.css">
@@ -118,7 +117,7 @@ $page_title = 'Resend License Key';
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <div class="auth-container">
@@ -154,7 +153,7 @@ $page_title = 'Resend License Key';
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 </body>
 

@@ -29,7 +29,6 @@
   <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
   <title>Argo Books - Message Sent Successfully</title>
 
-  <script src="../../resources/scripts/jquery-3.6.0.js"></script>
   <script src="../../resources/scripts/main.js"></script>
 
   <link rel="stylesheet" href="style.css">
@@ -41,7 +40,7 @@
 
 <body>
   <header>
-    <div id="includeHeader"></div>
+    <?php include __DIR__ . '/../../resources/header/header.php'; ?>
   </header>
   <main>
 
@@ -75,7 +74,7 @@
   </main>
 
   <footer class="footer">
-    <div id="includeFooter"></div>
+    <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
   </footer>
 </body>
 

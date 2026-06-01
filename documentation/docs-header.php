@@ -63,7 +63,6 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
     <link rel="shortcut icon" type="image/x-icon" href="<?php echo $resourcePath; ?>resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($fullTitle); ?></title>
 
-    <script src="<?php echo $resourcePath; ?>resources/scripts/jquery-3.6.0.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/levenshtein.js"></script>
     <script src="<?php echo $docsPath; ?>search.js"></script>
@@ -80,7 +79,7 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
 
 <body class="docs-page">
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
 
     <div class="docs-layout">

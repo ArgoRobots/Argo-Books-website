@@ -280,7 +280,6 @@ function handle_avatar_removal()
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
 
     <script src="delete-account.js" defer></script>
-    <script src="../../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../../resources/scripts/main.js"></script>
     <script src="../../resources/notifications/notifications.js" defer></script>
 
@@ -297,7 +296,7 @@ function handle_avatar_removal()
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
     <?php if (!empty($success_message)): ?>
@@ -430,7 +429,7 @@ function handle_avatar_removal()
     </div>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../../resources/footer/footer.php'; ?>
     </footer>
 
     <script>

@@ -67,7 +67,6 @@
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title>About Us - Argo Books | Canadian Software Company</title>
 
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
 
     <link rel="stylesheet" href="style.css">
@@ -79,7 +78,7 @@
 
 <body>
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -295,7 +294,7 @@
         </section>
 
         <footer class="footer">
-            <div id="includeFooter"></div>
+            <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
         </footer>
     </div>
 

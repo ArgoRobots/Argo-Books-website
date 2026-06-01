@@ -41,7 +41,6 @@ $isDocsLanding = true;
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
     <title><?php echo htmlspecialchars($pageTitle); ?> - Argo Books</title>
 
-    <script src="../resources/scripts/jquery-3.6.0.js"></script>
     <script src="../resources/scripts/main.js"></script>
     <script src="../resources/scripts/ScrollToCenter.js"></script>
     <script src="../resources/scripts/levenshtein.js"></script>
@@ -58,7 +57,7 @@ $isDocsLanding = true;
 
 <body class="docs-landing">
     <header>
-        <div id="includeHeader"></div>
+        <?php include __DIR__ . '/../resources/header/header.php'; ?>
     </header>
     <main>
 
@@ -418,7 +417,7 @@ $isDocsLanding = true;
     </main>
 
     <footer class="footer">
-        <div id="includeFooter"></div>
+        <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
     </footer>
 
     <script>

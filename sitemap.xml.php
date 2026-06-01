@@ -107,7 +107,7 @@ foreach (glob(__DIR__ . '/invoice-template/data/*.php') as $file) {
 }
 
 // --- Articles: editorial hub + each guide ---
-add_url($urls, site_url('/invoice-guides/'), __DIR__ . '/invoice-guides/index.php', '0.8', 'weekly');
+add_url($urls, site_url('/guides/'), __DIR__ . '/guides/index.php', '0.8', 'weekly');
 foreach (glob(__DIR__ . '/articles/data/*.php') as $file) {
     $slug = basename($file, '.php');
     if ($slug === '_template') continue;

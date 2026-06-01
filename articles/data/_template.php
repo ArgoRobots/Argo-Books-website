@@ -45,6 +45,17 @@ return [
   // `step_name` is emitted as a HowToStep, in document order.
   'schema_type' => 'HowTo',
 
+  // Guides hub category. Required. Controls which section of /guides/ the
+  // article appears under. One of:
+  //   'invoicing' | 'receipts-expenses' | 'bookkeeping' | 'choosing-software'
+  // Any unrecognized value falls into a trailing "More" section so the
+  // article is never silently dropped.
+  'category' => 'invoicing',
+
+  // Ordering within the category on /guides/. Lower lists first. Use
+  // multiples of 10 so new articles can slot between existing ones.
+  'hub_weight' => 50,
+
   // ISO date string. Used for datePublished AND dateModified when
   // `updated` is not set. Set on creation, do not change.
   'published' => '2026-05-30',
@@ -103,6 +114,13 @@ return [
   // of value plus a button label.
   'tool_callout_text' => 'Open the free invoice generator and fill in the fields as you read.',
   'tool_callout_cta' => 'Open the invoice generator',
+
+  // Optional. Site-relative URL the callout links to, e.g.
+  // '/features/receipt-scanning/' or '/downloads/'. When omitted, the
+  // callout points at the invoice generator with UTM tracking, which is
+  // the right default for invoicing articles. Set it for articles whose
+  // natural next step is a different page.
+  'tool_callout_url' => '/features/receipt-scanning/',
 
   // Optional. 4 to 8 FAQ pairs. The template renders them as
   // <h3>question</h3> followed by <p>answer</p>. Counts toward the

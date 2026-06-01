@@ -1,9 +1,9 @@
-/* invoice-guides/styles/hub.css
+/* guides/styles/hub.css
    Editorial index for the Phase D guides. Distinct typographic system
    from the rest of the tool surface so the hub reads as a "magazine
    cover" while individual guides keep the article template's voice.
 
-   Loaded only on /invoice-guides/. Articles themselves stay in the
+   Loaded only on /guides/. Articles themselves stay in the
    system-font treatment defined by .article-page in tool.css. */
 
 @import url('../../resources/styles/custom-colors.css');

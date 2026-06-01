@@ -145,6 +145,17 @@ if ($resolved_source === null && !empty($_SERVER['HTTP_REFERER'])) {
 }
 
 if ($resolved_source !== null) {
+    // Auto-register guides-hub and per-article (guide-*) sources so they show
+    // up in the referral admin without manual setup, the same way UTM and
+    // referrer sources self-register. Ad and sponsor sources are still added
+    // by hand so their names and targets stay curated.
+    if ($resolved_source === 'guides-hub' || strncmp($resolved_source, 'guide-', 6) === 0) {
+        $auto_name = $resolved_source === 'guides-hub'
+            ? 'Guides hub'
+            : 'Guide: ' . ucwords(str_replace('-', ' ', substr($resolved_source, 6)));
+        ensure_auto_referral_link($resolved_source, $auto_name);
+    }
+
     track_referral_visit($resolved_source, $_SERVER['REQUEST_URI']);
 }
 

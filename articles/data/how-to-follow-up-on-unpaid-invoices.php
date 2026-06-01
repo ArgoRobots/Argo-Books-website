@@ -14,6 +14,10 @@ return [
 
   'schema_type' => 'HowTo',
 
+  // Guides hub: category + ordering (lower hub_weight lists first).
+  'category' => 'invoicing',
+  'hub_weight' => 70,
+
   'published' => '2026-05-30',
 
   'updated' => '2026-05-30',

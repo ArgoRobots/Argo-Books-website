@@ -53,7 +53,7 @@
     <ul class="footer-links">
       <li><a href="<?= $base ?>about-us/">About Us</a></li>
       <li><a href="<?= $base ?>contact-us/">Contact Us</a></li>
-      <li><a href="<?= $base ?>invoice-guides/">Articles</a></li>
+      <li><a href="<?= $base ?>guides/">Guides</a></li>
       <li><a href="<?= $base ?>review/">Leave a Review</a></li>
     </ul>
   </div>

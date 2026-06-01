@@ -47,12 +47,15 @@ if (!is_array($data) || empty($data['h1']) || empty($data['sections'])) {
 // --- 3. Server-side page view (post-404) --------------------------------------
 
 if (PHP_SAPI !== 'cli') {
+    // Referral tracking: capture ?source so a direct landing on this article
+    // (from YouTube, an ad, a newsletter) is attributed in the funnel.
+    require_once __DIR__ . '/../track_referral.php';
     require_once __DIR__ . '/../statistics.php';
     $safe_slug_for_event = preg_replace('/[^a-z0-9_-]/', '', $slug);
     track_page_view('invgen_article_' . $safe_slug_for_event);
 }
 
-$invgen_ref = 'invgen-article-' . $slug;
+$invgen_ref = 'guide-' . $slug;
 $utm_qs = '?source=' . htmlspecialchars($invgen_ref)
         . '&amp;utm_source=invoice-generator&amp;utm_medium=article&amp;utm_campaign=phase1';
 
@@ -112,7 +115,7 @@ $page_schema_json = json_encode($base_schema, JSON_UNESCAPED_SLASHES | JSON_HEX_
 
 $breadcrumb_items = [
   ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://argorobots.com/'],
-  ['@type' => 'ListItem', 'position' => 2, 'name' => 'Invoice Guides', 'item' => 'https://argorobots.com/invoice-guides/'],
+  ['@type' => 'ListItem', 'position' => 2, 'name' => 'Guides', 'item' => 'https://argorobots.com/guides/'],
   ['@type' => 'ListItem', 'position' => 3, 'name' => $data['h1'], 'item' => $canonical_url],
 ];
 $breadcrumb_schema_json = json_encode([
@@ -127,13 +130,68 @@ $callout_after = isset($data['callout_after_section_index']) ? (int)$data['callo
 $tool_callout_text = $data['tool_callout_text'] ?? 'Open the free invoice generator and fill in your details now.';
 $tool_callout_cta = $data['tool_callout_cta'] ?? 'Open the invoice generator';
 
+// Optional site-relative callout target (e.g. '/features/receipt-scanning/').
+// When unset, the callout points at the invoice generator. Either way it
+// carries ?source so the funnel attributes the click to this article. The
+// href is built with HTML-encoded ampersands and echoed raw (do not wrap in
+// htmlspecialchars, or the &amp; entities double-encode).
+$tool_callout_url = $data['tool_callout_url'] ?? null;
+if ($tool_callout_url !== null) {
+    $callout_sep = strpos($tool_callout_url, '?') !== false ? '&amp;' : '?';
+    $tool_callout_href = INVGEN_BASE . $tool_callout_url . $callout_sep . 'source=' . htmlspecialchars($invgen_ref);
+} else {
+    $tool_callout_href = INVGEN_BASE . '/invoice-generator/' . $utm_qs . '&amp;placement=inline';
+}
+
+// Tag every internal link in the article body with ?source so a click through
+// to downloads, features, or the generator is credited to this article.
+// Leaves external links, anchors, and already-tagged links untouched.
+if (!function_exists('article_tag_source')) {
+    function article_tag_source(string $html, string $source): string
+    {
+        // Single-segment paths that are articles or the guides hub are content
+        // navigation, not "main site" destinations, so they stay clean (no
+        // tracking params on internal cross-links, which is better for SEO).
+        static $skip = null;
+        if ($skip === null) {
+            $skip = ['guides' => true];
+            foreach (glob(__DIR__ . '/data/*.php') as $af) {
+                $as = basename($af, '.php');
+                if ($as !== '_template') {
+                    $skip[$as] = true;
+                }
+            }
+        }
+        return preg_replace_callback('/href="([^"]+)"/i', function ($m) use ($source, $skip) {
+            $url = $m[1];
+            $internal = (str_starts_with($url, '/') && !str_starts_with($url, '//'))
+                || stripos($url, 'argorobots.com') !== false;
+            if (!$internal || preg_match('/[?&](amp;)?source=/i', $url)) {
+                return $m[0];
+            }
+            $path = parse_url($url, PHP_URL_PATH);
+            $seg = $path !== null ? trim($path, '/') : '';
+            if ($seg !== '' && strpos($seg, '/') === false && isset($skip[$seg])) {
+                return $m[0];
+            }
+            $frag = '';
+            if (($h = strpos($url, '#')) !== false) {
+                $frag = substr($url, $h);
+                $url = substr($url, 0, $h);
+            }
+            $sep = strpos($url, '?') !== false ? '&amp;' : '?';
+            return 'href="' . $url . $sep . 'source=' . $source . $frag . '"';
+        }, $html);
+    }
+}
+
 ob_start();
 ?>
 <article class="article-page">
 
   <nav class="article-breadcrumb" aria-label="Breadcrumb">
-    <a class="article-breadcrumb-link" href="<?= INVGEN_BASE ?>/invoice-guides/">
-      <span aria-hidden="true">&larr;</span> All invoice guides
+    <a class="article-breadcrumb-link" href="<?= INVGEN_BASE ?>/guides/">
+      <span aria-hidden="true">&larr;</span> All guides
     </a>
   </nav>
 
@@ -152,7 +210,7 @@ ob_start();
   </header>
 
   <section class="article-intro">
-    <?= pricing_substitute($data['intro_html'] ?? '') ?>
+    <?= article_tag_source(pricing_substitute($data['intro_html'] ?? ''), $invgen_ref) ?>
   </section>
 
   <?php foreach ($data['sections'] as $i => $section): ?>
@@ -160,7 +218,7 @@ ob_start();
       <?php if (!empty($section['h2'])): ?>
         <h2><?= htmlspecialchars($section['h2']) ?></h2>
       <?php endif; ?>
-      <?= pricing_substitute($section['html'] ?? '') ?>
+      <?= article_tag_source(pricing_substitute($section['html'] ?? ''), $invgen_ref) ?>
     </section>
 
     <?php if ($i === $callout_after): ?>
@@ -168,7 +226,7 @@ ob_start();
         <p class="tool-callout-text"><?= htmlspecialchars($tool_callout_text) ?></p>
         <a class="tool-callout-link"
            data-pitch-placement="article-inline"
-           href="<?= INVGEN_BASE ?>/invoice-generator/<?= $utm_qs ?>&amp;placement=inline">
+           href="<?= $tool_callout_href ?>">
           <?= htmlspecialchars($tool_callout_cta) ?> <span aria-hidden="true">&rarr;</span>
         </a>
       </aside>

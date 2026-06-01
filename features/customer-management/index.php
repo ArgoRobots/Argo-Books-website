@@ -1,4 +1,6 @@
 <?php
+// Referral tracking: capture ?source so article/ad clicks landing here attribute.
+require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];

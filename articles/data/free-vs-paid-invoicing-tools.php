@@ -14,6 +14,10 @@ return [
 
   'schema_type' => 'Article',
 
+  // Guides hub: category + ordering (lower hub_weight lists first).
+  'category' => 'invoicing',
+  'hub_weight' => 100,
+
   'published' => '2026-05-30',
 
   'updated' => '2026-05-30',
@@ -103,7 +107,7 @@ HTML,
 <li><strong>Wave.</strong> The big freemium player. The core invoicing and accounting product is  free, with no invoice cap and no time limit. But you pay when you take card payments (a per-transaction fee), use the payroll product, or pay for the new Pro tier with extras like automatic reminders. The trade-off: free support is limited, the product is less actively developed than it used to be, and the Pro tier (around ${wave_pro} CAD a month) unlocks features that used to be free, which has annoyed some long-time users.</li>
 <li><strong>Xero.</strong> Strong in the UK, Australia, and New Zealand, growing in North America. Clean interface, strong on multi-currency invoicing and bank feeds, popular with bookkeepers. The trade-off: in lower-tier plans, the number of invoices per month is capped (the Starter plan in many regions caps you at around 20 invoices a month), which can be a surprise if you scale up mid-year.</li>
 <li><strong>Zoho Invoice / Zoho Books.</strong> Zoho Invoice is the free tier (mentioned above). Zoho Books is the paid step up, with full accounting, expense tracking, and recurring invoices. Strong if you already use other Zoho products like CRM. The trade-off: the interface has a learning curve, and the broader Zoho suite can feel like it wants to absorb your whole business.</li>
-<li><strong>Argo Books.</strong> Newer than the others, freemium with a generous free tier (25 invoices a month, basic bookkeeping, no time limit) and a Premium tier at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher invoice volumes, receipt scanning, and more advanced features. Built on a desktop app (Windows and Linux today, with macOS in active development) so your data lives on your machine rather than only in the cloud. Trade-off: smaller accountant ecosystem and fewer integrations than the older players, and the desktop-first model takes some getting used to if you're coming from a browser-only tool.</li>
+<li><strong>Argo Books.</strong> Newer than the others, freemium with a generous free tier (25 invoices a month, basic bookkeeping, no time limit) and a Premium tier at ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year for higher invoice volumes, receipt scanning, and more advanced features. Built on a desktop app (Windows, Linux, and macOS) so your data lives on your machine rather than only in the cloud. Trade-off: smaller accountant ecosystem and fewer integrations than the older players, and the desktop-first model takes some getting used to if you're coming from a browser-only tool.</li>
 </ul>
 <p>For most small businesses the realistic shortlist is two or three of these, not all six. If your accountant uses QuickBooks, that's a heavy nudge toward QuickBooks. If you're a service business with a manageable client list, FreshBooks is a clean fit. If you want a real free tier you can grow on, Wave and Argo Books are worth a look (both are freemium, with no time limit on the free side). If you're based outside the US, Xero is often the easier pick than QuickBooks. Pick one, try it for a month, and switch if it's wrong.</p>
 HTML,

@@ -167,7 +167,7 @@ $robots = fetch("{$base}/robots.txt");
 if ($robots['status'] !== 200) {
     $findings[] = "robots.txt returned HTTP {$robots['status']}";
 } else {
-    $expected_allows = ['/invoice-generator/', '/free-invoice-generator/', '/invoice-template/', '/invoice-guides/'];
+    $expected_allows = ['/invoice-generator/', '/free-invoice-generator/', '/invoice-template/', '/guides/'];
     foreach ($expected_allows as $path) {
         if (preg_match('#Disallow:\s*' . preg_quote($path, '#') . '\b#i', $robots['body'])) {
             $findings[] = "robots.txt explicitly disallows {$path}";

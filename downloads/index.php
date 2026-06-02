@@ -115,7 +115,7 @@ function detectBrowserForGuide(): string
 $smartScreenGuides = [
     'edge' => [
         'browser_name' => 'Microsoft Edge',
-        'intro' => 'Edge will ask you to confirm this download. This is a normal extra step for new app. Here\'s how to keep the installer:',
+        'intro' => 'Edge may ask you to confirm this download. This is a normal extra step for new app. Here\'s how to keep the installer:',
         'steps' => [
             [
                 'title' => 'Open the Downloads panel, hover the file, and click the ⋯ menu',

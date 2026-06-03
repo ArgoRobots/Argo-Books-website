@@ -44,10 +44,11 @@ $isDocsLanding = true;
     <script src="../resources/scripts/main.js"></script>
     <script src="../resources/scripts/ScrollToCenter.js"></script>
     <script src="../resources/scripts/levenshtein.js"></script>
+    <script src="../resources/scripts/site-search.js"></script>
     <script src="search.js"></script>
 
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="search.css">
+    <link rel="stylesheet" href="../resources/styles/site-search.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/styles/button.css">

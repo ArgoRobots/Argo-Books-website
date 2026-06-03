@@ -79,6 +79,20 @@ foreach ($groups as $g) {
     }
 }
 
+// Search index for the shared SiteSearch engine (resources/scripts/site-search.js):
+// every guide keyed by title, section, and meta description, linking to its page.
+$search_items = [];
+foreach ($groups as $g) {
+    foreach ($g['items'] as $it) {
+        $search_items[] = [
+            'title' => $it['h1'],
+            'category' => $g['label'],
+            'keywords' => $it['meta_description'] ?? '',
+            'url' => INVGEN_BASE . '/' . $it['slug'] . '/',
+        ];
+    }
+}
+
 $page_title = 'Guides for Small Businesses | Argo Books';
 $page_description = 'Plain-language guides on invoicing, receipts and expenses, bookkeeping, and choosing the right software. Written for small businesses doing their own books.';
 $canonical_url = 'https://argorobots.com/guides/';
@@ -126,7 +140,10 @@ $breadcrumb_schema_json = json_encode([
 $extra_head = '<link rel="preconnect" href="https://fonts.googleapis.com">'
     . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
     . '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap">'
-    . '<link rel="stylesheet" href="' . INVGEN_BASE . '/guides/styles/hub.css">';
+    . '<link rel="stylesheet" href="' . INVGEN_BASE . '/guides/styles/hub.css">'
+    . '<link rel="stylesheet" href="' . INVGEN_BASE . '/resources/styles/site-search.css">'
+    . '<script src="' . INVGEN_BASE . '/resources/scripts/levenshtein.js"></script>'
+    . '<script src="' . INVGEN_BASE . '/resources/scripts/site-search.js"></script>';
 
 $invgen_ref = 'guides-hub';
 
@@ -139,6 +156,25 @@ ob_start();
     <h1 class="guides-hub-title">Guides for small <em>businesses</em>.</h1>
     <p class="guides-hub-lede">Plain-language guides for people who do their own books: getting invoices out the door, scanning receipts and tracking expenses, the bookkeeping basics for your trade, and picking software that fits without overpaying.</p>
   </header>
+
+  <div class="guides-search">
+    <div class="guides-search-wrap">
+      <svg class="guides-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      <input type="text" id="guidesSearchInput" placeholder="Search the guides..." aria-label="Search guides" autocomplete="off">
+    </div>
+    <div id="guidesSearchResults" class="search-results"></div>
+  </div>
+
+  <script>
+    (function () {
+      var items = <?= json_encode($search_items, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+      document.addEventListener('DOMContentLoaded', function () {
+        if (window.SiteSearch) {
+          new SiteSearch({ inputId: 'guidesSearchInput', resultsId: 'guidesSearchResults', items: items });
+        }
+      });
+    })();
+  </script>
 
   <ol class="guides-hub-list" role="list">
     <?php $position = 0; ?>

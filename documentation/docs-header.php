@@ -65,11 +65,12 @@ $currentCategory = $categoryInfo[$pageCategory] ?? ['name' => 'Documentation', '
 
     <script src="<?php echo $resourcePath; ?>resources/scripts/main.js"></script>
     <script src="<?php echo $resourcePath; ?>resources/scripts/levenshtein.js"></script>
+    <script src="<?php echo $resourcePath; ?>resources/scripts/site-search.js"></script>
     <script src="<?php echo $docsPath; ?>search.js"></script>
     <script src="<?php echo $docsPath; ?>main.js" defer></script>
 
     <link rel="stylesheet" href="<?php echo $docsPath; ?>style.css">
-    <link rel="stylesheet" href="<?php echo $docsPath; ?>search.css">
+    <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/site-search.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/custom-colors.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/link.css">
     <link rel="stylesheet" href="<?php echo $resourcePath; ?>resources/styles/button.css">

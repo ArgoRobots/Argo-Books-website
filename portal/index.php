@@ -126,7 +126,7 @@ $currencySymbol = $currencySymbols[$currency] ?? '$';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Invoice Portal - <?php echo htmlspecialchars($companyName); ?></title>
+    <title>Invoice Portal<?php echo $companyName !== '' ? ' - ' . htmlspecialchars($companyName) : ''; ?></title>
     <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
 
     <link rel="stylesheet" href="/resources/styles/custom-colors.css">
@@ -141,8 +141,12 @@ $currencySymbol = $currencySymbols[$currency] ?? '$';
                     <img src="<?php echo htmlspecialchars($companyLogo); ?>" alt="<?php echo htmlspecialchars($companyName); ?>" class="company-logo">
                 <?php endif; ?>
                 <div class="company-info">
-                    <h1 class="company-name"><?php echo htmlspecialchars($companyName); ?></h1>
-                    <span class="portal-subtitle">Invoice Portal</span>
+                    <?php if ($companyName !== ''): ?>
+                        <h1 class="company-name"><?php echo htmlspecialchars($companyName); ?></h1>
+                        <span class="portal-subtitle">Invoice Portal</span>
+                    <?php else: ?>
+                        <h1 class="company-name">Invoice Portal</h1>
+                    <?php endif; ?>
                 </div>
             </div>
         </header>

@@ -134,7 +134,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Invoice <?php echo htmlspecialchars($invoiceId); ?> - <?php echo htmlspecialchars($companyName); ?></title>
+    <title>Invoice <?php echo htmlspecialchars($invoiceId); ?><?php echo $companyName !== '' ? ' - ' . htmlspecialchars($companyName) : ''; ?></title>
     <link rel="shortcut icon" type="image/x-icon" href="/resources/images/argo-logo/argo-icon.ico">
 
     <link rel="stylesheet" href="/resources/styles/custom-colors.css">
@@ -179,8 +179,12 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     <img src="<?php echo htmlspecialchars($companyLogo); ?>" alt="<?php echo htmlspecialchars($companyName); ?>" class="company-logo">
                 <?php endif; ?>
                 <div class="company-info">
-                    <h1 class="company-name"><?php echo htmlspecialchars($companyName); ?></h1>
-                    <span class="portal-subtitle">Invoice Portal</span>
+                    <?php if ($companyName !== ''): ?>
+                        <h1 class="company-name"><?php echo htmlspecialchars($companyName); ?></h1>
+                        <span class="portal-subtitle">Invoice Portal</span>
+                    <?php else: ?>
+                        <h1 class="company-name">Invoice Portal</h1>
+                    <?php endif; ?>
                 </div>
                 <?php if (!empty($invoice['customer_token'])): ?>
                     <a href="/portal/<?php echo htmlspecialchars($invoice['customer_token']); ?>" class="portal-all-invoices-link">
@@ -261,7 +265,9 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                     <div class="invoice-parties">
                         <div class="party-info">
                             <span class="party-label">From</span>
-                            <strong><?php echo htmlspecialchars($companyName); ?></strong>
+                            <?php if ($companyName !== ''): ?>
+                                <strong><?php echo htmlspecialchars($companyName); ?></strong>
+                            <?php endif; ?>
                             <?php if ($companyAddress): ?>
                                 <span class="party-detail"><?php echo nl2br(htmlspecialchars($companyAddress)); ?></span>
                             <?php endif; ?>
@@ -426,7 +432,7 @@ $isPaid = $status === 'paid' || $balanceDue <= 0;
                 </div>
             <?php else: ?>
                 <div class="invoice-no-methods">
-                    <p>Online payments are not available for this invoice. Please contact <?php echo htmlspecialchars($companyName); ?> for payment instructions.</p>
+                    <p>Online payments are not available for this invoice. Please contact <?php echo $companyName !== '' ? htmlspecialchars($companyName) : 'the sender'; ?> for payment instructions.</p>
                 </div>
             <?php endif; ?>
 

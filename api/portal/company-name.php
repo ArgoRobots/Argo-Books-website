@@ -7,6 +7,7 @@
  * Requires API key authentication (Argo Books -> Server).
  *
  * Expects JSON body: { "companyName": "New Company Name" }
+ * A blank name is accepted while no payment provider is connected.
  */
 
 require_once __DIR__ . '/portal-helper.php';
@@ -28,13 +29,18 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     send_error_response(400, 'Invalid JSON: ' . json_last_error_msg(), 'INVALID_JSON');
 }
 
-if (empty($data['companyName']) || !is_string($data['companyName'])) {
+if (!is_array($data) || !array_key_exists('companyName', $data) || !is_string($data['companyName'])) {
     send_error_response(400, 'Missing or invalid required field: companyName', 'MISSING_FIELDS');
 }
 
 $companyName = trim($data['companyName']);
-if ($companyName === '') {
-    send_error_response(400, 'Company name cannot be blank.', 'INVALID_NAME');
+
+// A blank name is only allowed while no payment provider is connected
+$hasConnectedProvider = !empty($company['stripe_account_id'])
+    || !empty($company['paypal_merchant_id'])
+    || !empty($company['square_merchant_id']);
+if ($companyName === '' && $hasConnectedProvider) {
+    send_error_response(400, 'Company name cannot be blank while a payment provider is connected.', 'INVALID_NAME');
 }
 if (mb_strlen($companyName) > 255) {
     send_error_response(400, 'Company name must be 255 characters or fewer.', 'NAME_TOO_LONG');

@@ -317,4 +317,6 @@ php_value upload_max_filesize 10M
     RewriteRule ^best-quickbooks-alternatives/?$ articles/article-page.php?slug=best-quickbooks-alternatives [L,QSA]
     RewriteRule ^bookkeeping-for-contractors/?$ articles/article-page.php?slug=bookkeeping-for-contractors [L,QSA]
     RewriteRule ^how-to-send-an-invoice-for-free/?$ articles/article-page.php?slug=how-to-send-an-invoice-for-free [L,QSA]
+    RewriteRule ^bookkeeping-for-rental-businesses/?$ articles/article-page.php?slug=bookkeeping-for-rental-businesses [L,QSA]
+    RewriteRule ^inventory-tracking-for-small-businesses/?$ articles/article-page.php?slug=inventory-tracking-for-small-businesses [L,QSA]
 </IfModule>

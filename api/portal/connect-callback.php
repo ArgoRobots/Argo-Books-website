@@ -110,12 +110,17 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
         : ($_ENV['STRIPE_SANDBOX_SECRET_KEY'] ?? '');
     \Stripe\Stripe::setApiKey($secretKey);
 
-    // Look up the stored Stripe account ID for this company
-    $stmt = $db->prepare('SELECT stripe_account_id FROM portal_companies WHERE id = ?');
+    // Look up the stored Stripe account ID for this company. The account is
+    // held in stripe_pending_account_id until onboarding completes; only then
+    // is it promoted to stripe_account_id (which status/checkout treat as
+    // "connected").
+    $stmt = $db->prepare('SELECT stripe_account_id, stripe_pending_account_id FROM portal_companies WHERE id = ?');
     $stmt->execute([$companyId]);
     $row = $stmt->fetch();
 
-    $stripeAccountId = $row['stripe_account_id'] ?? '';
+    $stripeAccountId = !empty($row['stripe_account_id'])
+        ? $row['stripe_account_id']
+        : ($row['stripe_pending_account_id'] ?? '');
     if (empty($stripeAccountId)) {
         throw new Exception('No Stripe account found. Please initiate the connection again from Argo Books.');
     }
@@ -135,7 +140,8 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
         return 'redirect';
     }
 
-    // Onboarding complete: save the account email (try multiple fields for Express accounts)
+    // Onboarding complete: promote the account to "connected" and save the
+    // account email (try multiple fields for Express accounts)
     $acctData = $account->toArray();
     $email = $acctData['email']
         ?? $acctData['business_profile']['support_email']
@@ -143,10 +149,10 @@ function handle_stripe_callback(PDO $db, int $companyId, bool $is_production, bo
         ?? null;
     $stmt = $db->prepare(
         'UPDATE portal_companies
-         SET stripe_email = ?, updated_at = NOW()
+         SET stripe_account_id = ?, stripe_pending_account_id = NULL, stripe_email = ?, updated_at = NOW()
          WHERE id = ?'
     );
-    $stmt->execute([$email, $companyId]);
+    $stmt->execute([$stripeAccountId, $email, $companyId]);
 
     return null;
 }

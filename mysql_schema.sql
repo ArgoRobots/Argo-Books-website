@@ -423,7 +423,8 @@ CREATE TABLE IF NOT EXISTS portal_companies (
     company_name VARCHAR(255) NOT NULL,
     company_logo_url VARCHAR(500) DEFAULT NULL,
     -- Connected payment provider accounts (money goes to these, not to ArgoRobots)
-    stripe_account_id VARCHAR(255) DEFAULT NULL COMMENT 'Stripe Connect account ID',
+    stripe_account_id VARCHAR(255) DEFAULT NULL COMMENT 'Stripe Connect account ID (set only once Express onboarding is complete)',
+    stripe_pending_account_id VARCHAR(255) DEFAULT NULL COMMENT 'Stripe Express account created at Connect initiation; promoted to stripe_account_id when onboarding completes',
     stripe_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected Stripe account',
     paypal_merchant_id VARCHAR(255) DEFAULT NULL COMMENT 'PayPal merchant ID for marketplace',
     paypal_email VARCHAR(255) DEFAULT NULL COMMENT 'Email on the connected PayPal account',

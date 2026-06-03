@@ -72,23 +72,31 @@ function initiate_connect(array $company, string $provider): void
             try {
                 \Stripe\Stripe::setApiKey($secretKey);
 
-                // Check if this company already has a Stripe Express account
+                // Check if this company already has a Stripe Express account,
+                // either fully connected (stripe_account_id, onboarding done)
+                // or in-progress (stripe_pending_account_id). The connected ID
+                // is only written by the callback once onboarding completes,
+                // so "connected" status never shows before it's real.
                 $stripeAccountId = null;
                 $stmtCheck = $pdo->prepare(
-                    'SELECT stripe_account_id FROM portal_companies WHERE id = ?'
+                    'SELECT stripe_account_id, stripe_pending_account_id FROM portal_companies WHERE id = ?'
                 );
                 $stmtCheck->execute([$company['id']]);
                 $row = $stmtCheck->fetch();
 
-                if (!empty($row['stripe_account_id'])) {
+                $storedId = !empty($row['stripe_account_id'])
+                    ? $row['stripe_account_id']
+                    : ($row['stripe_pending_account_id'] ?? null);
+
+                if (!empty($storedId)) {
                     // Verify the stored account exists and matches the current mode (live vs test)
                     try {
-                        $existingAccount = \Stripe\Account::retrieve($row['stripe_account_id']);
+                        $existingAccount = \Stripe\Account::retrieve($storedId);
                         // Verify the account was created in the same mode (live vs test)
                         $acctData = $existingAccount->toArray();
                         $acctLivemode = isset($acctData['livemode']) ? $acctData['livemode'] : null;
                         if ($acctLivemode === $is_production) {
-                            $stripeAccountId = $row['stripe_account_id'];
+                            $stripeAccountId = $storedId;
                         }
                     } catch (\Stripe\Exception\ApiErrorException $e) {
                         // Account doesn't exist or can't be accessed; the stored ID
@@ -97,7 +105,7 @@ function initiate_connect(array $company, string $provider): void
 
                     if (!$stripeAccountId) {
                         $stmtClear = $pdo->prepare(
-                            'UPDATE portal_companies SET stripe_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
+                            'UPDATE portal_companies SET stripe_account_id = NULL, stripe_pending_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
                         );
                         $stmtClear->execute([$company['id']]);
                     }
@@ -114,9 +122,11 @@ function initiate_connect(array $company, string $provider): void
                     ]);
                     $stripeAccountId = $account->id;
 
-                    // Store the account ID immediately
+                    // Store as PENDING only. stripe_account_id (which the
+                    // status endpoint and checkout treat as "connected") is
+                    // written by the callback after onboarding completes.
                     $stmtStore = $pdo->prepare(
-                        'UPDATE portal_companies SET stripe_account_id = ?, updated_at = NOW() WHERE id = ?'
+                        'UPDATE portal_companies SET stripe_pending_account_id = ?, updated_at = NOW() WHERE id = ?'
                     );
                     $stmtStore->execute([$stripeAccountId, $company['id']]);
                 }
@@ -189,7 +199,7 @@ function disconnect_provider(array $company, string $provider): void
     switch ($provider) {
         case 'stripe':
             $stmt = $pdo->prepare(
-                'UPDATE portal_companies SET stripe_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
+                'UPDATE portal_companies SET stripe_account_id = NULL, stripe_pending_account_id = NULL, stripe_email = NULL, updated_at = NOW() WHERE id = ?'
             );
             break;
         case 'paypal':

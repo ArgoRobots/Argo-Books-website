@@ -7,6 +7,10 @@ declare(strict_types=1);
  *
  * Confirms the registration verification code. Until this succeeds, the
  * company's email_verified_at is NULL and refund endpoints return 412.
+ *
+ * For the set-initial-email flow the pending address lives on the
+ * email_verifications row, not on portal_companies: a correct code is what
+ * actually writes owner_email. Abandoning verification leaves nothing set.
  */
 
 require_once __DIR__ . '/../../portal-helper.php';
@@ -62,13 +66,40 @@ if (!hash_equals($row['code_hash'], $expected)) {
     exit;
 }
 
+// The pending address from the verification row becomes the owner_email.
+// Companies registered via the legacy paths already have owner_email set;
+// only write it when it's currently empty (set-initial-email flow).
+$pendingEmail = (string)($row['email'] ?? '');
+$writeOwnerEmail = empty($company['owner_email']) && $pendingEmail !== '';
+
+// Re-check uniqueness at confirm time: another account may have claimed the
+// same address between set-initial-email and now.
+if ($writeOwnerEmail) {
+    $stmt = $pdo->prepare("SELECT id FROM portal_companies WHERE owner_email = ? AND id != ?");
+    $stmt->execute([$pendingEmail, $company['id']]);
+    if ($stmt->fetch()) {
+        send_error_response(409, 'That email is already used by another portal account.', 'EMAIL_IN_USE');
+    }
+}
+
 $pdo->beginTransaction();
 $pdo->prepare("UPDATE email_verifications SET consumed_at = NOW() WHERE id = ?")->execute([$row['id']]);
-$pdo->prepare("UPDATE portal_companies SET email_verified_at = NOW() WHERE id = ?")->execute([$company['id']]);
+if ($writeOwnerEmail) {
+    $pdo->prepare("UPDATE portal_companies SET owner_email = ?, email_verified_at = NOW() WHERE id = ?")
+        ->execute([$pendingEmail, $company['id']]);
+    audit_log($pdo, (int)$company['id'], 'email_changed', 'owner', null, null, null, [
+        'reason' => 'set_initial_email_verified',
+        'old' => null,
+        'new' => $pendingEmail,
+    ]);
+} else {
+    $pdo->prepare("UPDATE portal_companies SET email_verified_at = NOW() WHERE id = ?")->execute([$company['id']]);
+}
 audit_log($pdo, (int)$company['id'], 'email_registration_verified', 'owner', null, null, null, []);
 $pdo->commit();
 
 send_json_response(200, [
     'success' => true,
     'verifiedAt' => date('c'),
+    'ownerEmail' => $writeOwnerEmail ? $pendingEmail : ($company['owner_email'] ?? null),
 ]);

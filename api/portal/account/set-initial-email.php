@@ -5,16 +5,19 @@ declare(strict_types=1);
  * POST /api/portal/account/set-initial-email.php
  * Body: { email }
  *
- * Sets owner_email for a portal company that currently has none. This is the
- * "complete registration" path for accounts that registered with an empty
- * email. Stores owner_email and emails a 6-digit verification code to it.
- * email_verified_at is NOT set here: the caller must enter the code via
- * /verify-email/confirm.php before refunds become available.
+ * Begins first-time owner email setup for a portal company that currently
+ * has none. This is the "complete registration" path for accounts that
+ * registered with an empty email. The email is NOT written to owner_email
+ * here: it is held as a pending value on the email_verifications row, and a
+ * 6-digit verification code is emailed to it. Only when the caller confirms
+ * the code via /verify-email/confirm.php does owner_email get set (along
+ * with email_verified_at).
  *
  * Why this design: a typo in the typed email (or a malicious attacker
- * setting an email they don't actually own) shouldn't unlock refunds.
- * Requiring the code prevents both. The matching VerifyEmailModal on the
- * desktop pops automatically after this endpoint succeeds.
+ * setting an email they don't actually own) shouldn't stick. If the user
+ * abandons verification, nothing is set and they can simply retry with a
+ * corrected address. The matching VerifyEmailModal on the desktop pops
+ * automatically after this endpoint succeeds.
  *
  * Refuses (409) if owner_email is already set: in that case, the caller must
  * use the 4-step email-change flow which verifies both old and new addresses.
@@ -64,25 +67,39 @@ if ($stmt->fetch()) {
     send_error_response(409, 'That email is already used by another portal account.', 'EMAIL_IN_USE');
 }
 
+// Throttle code sends. Since owner_email is no longer written here, a caller
+// could otherwise loop this endpoint to send unlimited emails. Same limits
+// as /verify-email/request.php: max 3 codes per rolling 24h, 60s apart.
+$stmt = $pdo->prepare("
+    SELECT COUNT(*) AS c, MAX(created_at) AS latest
+    FROM email_verifications
+    WHERE company_id = ? AND purpose = 'registration'
+      AND created_at > DATE_SUB(NOW(), INTERVAL 24 HOUR)
+");
+$stmt->execute([$company['id']]);
+$throttle = $stmt->fetch(PDO::FETCH_ASSOC);
+if ((int)$throttle['c'] >= 3) {
+    send_error_response(429, 'Maximum verification attempts reached. Try again later.', 'MAX_RESENDS');
+}
+if ($throttle['latest'] && (time() - strtotime($throttle['latest'])) < 60) {
+    send_error_response(429, 'Please wait at least 60 seconds between attempts.', 'TOO_SOON');
+}
+
 $pdo->beginTransaction();
 try {
-    // Set owner_email but DO NOT mark email_verified_at: the user has to
-    // confirm the code we're about to email them first.
-    $pdo->prepare("UPDATE portal_companies SET owner_email = ? WHERE id = ?")
-        ->execute([$email, $company['id']]);
+    // Invalidate any prior unconsumed registration codes so only the latest
+    // pending email/code pair can be confirmed.
+    $pdo->prepare("UPDATE email_verifications SET consumed_at = COALESCE(consumed_at, NOW()) WHERE company_id = ? AND purpose = 'registration' AND consumed_at IS NULL")
+        ->execute([$company['id']]);
 
     // Issue verification code (purpose='registration' so the existing
-    // /verify-email/confirm.php endpoint accepts it).
+    // /verify-email/confirm.php endpoint accepts it). The pending email
+    // rides on this row; owner_email is only written on confirm.
     $code = refund_generate_code();
     $hash = refund_hash_code($code, (string)$company['id']);
     $pdo->prepare("INSERT INTO email_verifications (company_id, email, purpose, code_hash, expires_at) VALUES (?, ?, 'registration', ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))")
         ->execute([$company['id'], $email, $hash]);
 
-    audit_log($pdo, (int)$company['id'], 'email_changed', 'owner', null, null, null, [
-        'reason' => 'set_initial_email',
-        'old' => null,
-        'new' => $email,
-    ]);
     audit_log($pdo, (int)$company['id'], 'code_sent', 'system', null, null, null, [
         'purpose' => 'registration',
         'trigger' => 'set_initial_email',

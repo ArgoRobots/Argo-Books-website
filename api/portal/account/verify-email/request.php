@@ -47,6 +47,23 @@ if ($row['latest'] && (time() - strtotime($row['latest'])) < 60) {
     send_error_response(429, 'Please wait at least 60 seconds between resends.', 'TOO_SOON');
 }
 
+// Resolve the address to resend to. In the set-initial-email flow,
+// owner_email is not written until the code is confirmed, so the pending
+// address lives on the latest registration verification row.
+$targetEmail = (string)($company['owner_email'] ?? '');
+if ($targetEmail === '') {
+    $stmt = $pdo->prepare("
+        SELECT email FROM email_verifications
+        WHERE company_id = ? AND purpose = 'registration' AND email IS NOT NULL AND email != ''
+        ORDER BY id DESC LIMIT 1
+    ");
+    $stmt->execute([$company['id']]);
+    $targetEmail = (string)($stmt->fetchColumn() ?: '');
+}
+if ($targetEmail === '') {
+    send_error_response(409, 'No pending email to verify. Set the owner email first.', 'NO_PENDING_EMAIL');
+}
+
 // Invalidate any prior unconsumed codes
 $pdo->prepare("UPDATE email_verifications SET consumed_at = COALESCE(consumed_at, NOW()) WHERE company_id = ? AND purpose = 'registration' AND consumed_at IS NULL")
     ->execute([$company['id']]);
@@ -54,12 +71,12 @@ $pdo->prepare("UPDATE email_verifications SET consumed_at = COALESCE(consumed_at
 $code = refund_generate_code();
 $hash = refund_hash_code($code, (string)$company['id']);
 $pdo->prepare("INSERT INTO email_verifications (company_id, email, purpose, code_hash, expires_at) VALUES (?, ?, 'registration', ?, DATE_ADD(NOW(), INTERVAL 10 MINUTE))")
-    ->execute([$company['id'], $company['owner_email'], $hash]);
+    ->execute([$company['id'], $targetEmail, $hash]);
 
 audit_log($pdo, (int)$company['id'], 'code_sent', 'owner', null, null, null, [
     'purpose' => 'registration',
     'resend' => true,
 ]);
-refund_email_send_registration_code($company['owner_email'], $code);
+refund_email_send_registration_code($targetEmail, $code);
 
-send_json_response(200, ['success' => true, 'maskedEmail' => refund_mask_email($company['owner_email'])]);
+send_json_response(200, ['success' => true, 'maskedEmail' => refund_mask_email($targetEmail)]);

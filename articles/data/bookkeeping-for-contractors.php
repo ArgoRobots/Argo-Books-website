@@ -64,7 +64,7 @@ HTML,
       'html' => <<<'HTML'
 <p>This is the habit that turns bookkeeping from a tax chore into a tool that makes you money. For each job, track what came in and what went out: the deposit and final payment on the income side, and the materials, subcontractors, rentals, and any direct labour on the cost side. The gap between the two is what that job actually earned.</p>
 <p>This is often called job costing, and it doesn't need special software to start. A simple approach: give every job a short name or number, and tag every expense and payment with it. At the end of the job, total the income and the costs and look at the difference. Do that for a few months and patterns appear fast. You'll find some kinds of work earn well and others barely break even once materials and time are counted, and you can quote and choose work accordingly.</p>
-<p>The receipts are where job costing usually breaks down, because a pile of untagged receipts at month-end can't be split back to jobs from memory. The fix is to capture each receipt at the moment you get it and note the job then, while you still remember. A phone photo with the job name, or a receipt-scanning app that lets you tag the job, both work. The tool matters less than doing it on the spot.</p>
+<p>The receipts are where job costing usually breaks down, because a pile of untagged receipts at month-end can't be split back to jobs from memory. The fix is to capture each receipt at the moment you get it and note the job then, while you still remember. A phone photo with the job name, or a <a href="/best-free-ai-receipt-scanner/">receipt-scanning app</a> that lets you tag the job, both work. The tool matters less than doing it on the spot.</p>
 HTML,
     ],
 

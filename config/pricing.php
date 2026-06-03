@@ -207,6 +207,11 @@ function pricing_template_vars() {
         '{argo_premium_monthly}'         => _pricing_format_amount($monthly),
         '{argo_premium_yearly}'          => _pricing_format_amount($yearly),
         '{argo_premium_yearly_per_month}' => $monthly > 0 ? _pricing_format_amount($yearlyPerMo, 2) : '0',
+        // Plan limits, so articles can quote them without hardcoding the numbers.
+        '{argo_free_invoice_limit}'       => (string) $cfg['free_invoice_monthly_limit'],
+        '{argo_free_receipt_scan_limit}'  => (string) $cfg['free_receipt_scan_monthly_limit'],
+        '{argo_receipt_scan_limit}'       => (string) $cfg['receipt_scan_monthly_limit'],
+        '{argo_ai_import_limit}'          => (string) $cfg['ai_import_monthly_limit'],
     ];
 
     foreach (get_competitors() as $slug => $brand) {

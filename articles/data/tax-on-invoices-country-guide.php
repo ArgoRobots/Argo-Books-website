@@ -82,9 +82,9 @@ HTML,
       'html' => <<<'HTML'
 <p>The UK uses Value Added Tax (VAT) as its single consumption tax. As of writing, the standard rate is 20% and covers most goods and services. A reduced rate of 5% applies to a narrow list of categories, including domestic fuel and power, energy-saving materials in some cases, and child car seats. A zero rate of 0% applies to most food, books, newspapers, and children's clothes, which is different from being exempt because zero-rated sales still count toward your taxable turnover.</p>
 <p>The VAT registration threshold is 90,000 pounds in taxable turnover over a rolling 12-month period, which has been the level since April 2024. Once you cross that line, you have to register within 30 days and start charging VAT on every taxable invoice going forward. You can also register voluntarily below the threshold, which can make sense when most of your clients are VAT-registered themselves and can reclaim the VAT you charge.</p>
-<p>A UK VAT invoice has to show specific fields. As of writing, HMRC expects all of the following on a full VAT invoice:</p>
+<p>A UK VAT invoice has to show <a href="/what-to-include-on-an-invoice/">specific fields</a>. As of writing, HMRC expects all of the following on a full VAT invoice:</p>
 <ul>
-<li>A unique sequential invoice number.</li>
+<li>A unique <a href="/invoice-numbering-best-practices/">sequential invoice number</a>.</li>
 <li>Your business name, address, and VAT registration number.</li>
 <li>The customer's name and address.</li>
 <li>The invoice date and the tax point (date of supply) if different.</li>

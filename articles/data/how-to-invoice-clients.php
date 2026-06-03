@@ -82,7 +82,7 @@ HTML,
 <li>Description: "Consulting (per hour)". Quantity: 12. Rate: 150. Line total: 1800.</li>
 </ul>
 <p>Use one line per distinct thing you're billing for, not one line per task. Three lines of "Email", "Phone call", and "Notes" reads as nickel-and-diming. One line of "Project setup and discovery, 4 hours" reads as a professional billing for their time.</p>
-<p>Set the tax rate next. The rate depends on where you are and what you sell. For example:</p>
+<p>Set the <a href="/tax-on-invoices-country-guide/">tax rate</a> next. The rate depends on where you are and what you sell. For example:</p>
 <ul>
 <li>Sales tax in the United States: varies by state and sometimes by city. Most states tax goods but not most services. Some states tax labour on new construction but not on repair. Check your state revenue site.</li>
 <li>GST in Australia: a flat 10% if you're registered. You must register once turnover passes $75,000 AUD.</li>
@@ -107,7 +107,7 @@ HTML,
 <li><strong>Net 30.</strong> Payment due 30 days after the invoice date. The standard for commercial clients, agencies, and anyone running a formal accounts-payable cycle. If you're billing a corporate client, expect Net 30 by default and Net 45 or Net 60 in some industries.</li>
 </ul>
 <p>Shorter terms get paid faster on average than longer ones, and clients tend to push toward the back of any window you give them. A Net 30 invoice typically lands in the bank around five to six weeks after it goes out. A Due on Receipt invoice tends to clear in one to two weeks. The trade-off is whether the speed-up is worth the relationship cost on bigger clients who run on monthly cycles.</p>
-<p>Write a late fee into the Terms section so it isn't a surprise later. The standard is 1.5% per month on overdue balances, which works out to 18% per year. Some states cap late fees, so check your local rules.</p>
+<p>Write a <a href="/late-fees-when-and-how-to-charge/">late fee</a> into the Terms section so it isn't a surprise later. The standard is 1.5% per month on overdue balances, which works out to 18% per year. Some states cap late fees, so check your local rules.</p>
 <p>For the full breakdown of when to use each, see <a href="/net-30-vs-due-on-receipt/">Net 30 vs Due on Receipt</a>.</p>
 HTML,
     ],

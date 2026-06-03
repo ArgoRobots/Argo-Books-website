@@ -316,4 +316,5 @@ php_value upload_max_filesize 10M
     RewriteRule ^best-free-ai-receipt-scanner/?$ articles/article-page.php?slug=best-free-ai-receipt-scanner [L,QSA]
     RewriteRule ^best-quickbooks-alternatives/?$ articles/article-page.php?slug=best-quickbooks-alternatives [L,QSA]
     RewriteRule ^bookkeeping-for-contractors/?$ articles/article-page.php?slug=bookkeeping-for-contractors [L,QSA]
+    RewriteRule ^how-to-send-an-invoice-for-free/?$ articles/article-page.php?slug=how-to-send-an-invoice-for-free [L,QSA]
 </IfModule>

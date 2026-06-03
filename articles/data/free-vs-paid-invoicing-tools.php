@@ -39,7 +39,7 @@ HTML,
       'anchor' => 'honest-answer',
       'html' => <<<'HTML'
 <p>Free invoicing tools are good enough for most sole traders, side hustlers, and very small businesses. If you send under five invoices a month, bill one or two clients, don't take card payments through the invoice, and only see your accountant once a year, you're spending money for no reason if you pay for invoicing software.</p>
-<p>Paid tools earn their cost in specific places. The big ones: recurring billing on a fixed schedule, integrated card and bank payments, expense and revenue tracking that flows through to tax-time reports, multiple users on the same set of books, and a client portal that lets customers pay and download past invoices on their own. None of those are gimmicks. They each save hours a month for the right business, and at $15 to $40 a month a paid tool only has to save you two hours to pay for itself.</p>
+<p>Paid tools earn their cost in specific places. The big ones: <a href="/recurring-invoices-when-to-use-them/">recurring billing on a fixed schedule</a>, integrated card and bank payments, expense and revenue tracking that flows through to tax-time reports, multiple users on the same set of books, and a client portal that lets customers pay and download past invoices on their own. None of those are gimmicks. They each save hours a month for the right business, and at $15 to $40 a month a paid tool only has to save you two hours to pay for itself.</p>
 <p>The trick is matching your real workload to the right side of that line, not the side a sales page wants you on. Most of the people we talk to who are paying for software they don't need are doing it because somebody talked them out of a free tool that was working fine. And most of the people we talk to who are buried in admin are running a real five-employee business on a spreadsheet and a free generator, because they got the message that paid software is only for big companies. Both of those are wrong.</p>
 <p>The rest of this article is the test for which side you're on, and the names of the tools worth looking at on each side.</p>
 HTML,
@@ -53,7 +53,7 @@ HTML,
 <ul>
 <li><strong>Sole trader, under about $10,000 in annual revenue.</strong> At this size, the time spent learning a paid tool is more expensive than the tool itself. A spreadsheet and a free PDF generator will hold the whole business.</li>
 <li><strong>Under five invoices a month.</strong> Five invoices a month is roughly one a week. That's a 10-minute job in a free generator. A paid tool doesn't save you meaningful time at this volume.</li>
-<li><strong>One or two clients total.</strong> If you bill the same one client every month, you don't need software to manage clients. You need a folder of past invoices and a numbering scheme.</li>
+<li><strong>One or two clients total.</strong> If you bill the same one client every month, you don't need software to manage clients. You need a folder of past invoices and a <a href="/invoice-numbering-best-practices/">numbering scheme</a>.</li>
 <li><strong>No recurring billing on a schedule.</strong> If every invoice is unique work (a project, a job, a one-off), there's no recurring engine for paid software to run for you.</li>
 <li><strong>No card or bank payments through the invoice.</strong> If your clients pay by bank transfer, check, or e-transfer, the payment-integration features of paid tools are wasted.</li>
 <li><strong>No tax-time export needed.</strong> If your accountant takes your bank statements and a list of expenses once a year, you don't need software writing reports for them.</li>
@@ -90,7 +90,7 @@ HTML,
 <li><strong>Mileage and time tracking.</strong> Trades, consultants, and any business that bills by the hour or claims vehicle deductions benefit from automatic mileage logs and built-in timers. A free generator can't do this.</li>
 <li><strong>Multiple users on one set of books.</strong> If a partner, a spouse, an office manager, or a bookkeeper also needs to see the books, you need a shared system. Spreadsheets and folder-based invoices don't handle this well.</li>
 <li><strong>A client portal.</strong> Paid tools give your clients a login where they can see past invoices, download receipts, and pay outstanding balances. Cuts down on "can you resend last March's invoice?" emails.</li>
-<li><strong>Automatic late-payment reminders.</strong> Most paid tools will send a polite reminder email a few days before the due date, on the due date, and again a week after. About 80% of late payments come unstuck after one reminder, and not having to write that email yourself is real time back.</li>
+<li><strong>Automatic late-payment reminders.</strong> Most paid tools will send a polite <a href="/how-to-follow-up-on-unpaid-invoices/">reminder email</a> a few days before the due date, on the due date, and again a week after. About 80% of late payments come unstuck after one reminder, and not having to write that email yourself is real time back.</li>
 </ul>
 <p>If two or more of those describe your situation, paid software pays for itself most months. If none of them do, free is still the right answer.</p>
 HTML,
@@ -137,7 +137,7 @@ HTML,
 <p>The cleanest time to move is the start of a fiscal year. Close out the old year in your existing setup, run any tax-time reports you need, archive the PDFs in a folder, and start the new year fresh in the new tool. Mid-year migrations are doable but messy, because your year-end reports will span two systems and your accountant will have to stitch them together. If you absolutely have to move mid-year, pick the start of a quarter and accept that you'll be doing some manual stitching at tax time.</p>
 <p>A few practical tips for the move:</p>
 <ul>
-<li><strong>Export your client list as a CSV from your current tool, or build one in a spreadsheet.</strong> The columns most paid tools expect are: client name, contact name, email, billing address, phone, and any tax ID. Format these cleanly before the import.</li>
+<li><strong>Export your client list as a CSV from your current tool, or build one in a spreadsheet.</strong> The columns most paid tools expect are: client name, contact name, email, billing address, phone, and any <a href="/tax-on-invoices-country-guide/">tax ID</a>. Format these cleanly before the import.</li>
 <li><strong>Keep the old PDFs.</strong> Whatever you migrate, hold on to the original downloaded invoices in a labelled folder. They're the source of truth if the new tool ever shows the wrong number for a past job.</li>
 <li><strong>Run both tools in parallel for a month if you can.</strong> Issue invoices from the new tool, but keep the old one accessible for lookups. After 30 days, if nothing is missing, decommission the old setup.</li>
 </ul>

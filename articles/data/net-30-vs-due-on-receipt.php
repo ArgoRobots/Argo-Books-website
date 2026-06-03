@@ -90,7 +90,7 @@ HTML,
   <li>The client is an individual or sole owner, not a finance department.</li>
   <li>You've already collected a deposit and this is the final small balance.</li>
 </ul>
-<p>One more thing. Due on Receipt doesn't give you the right to chase the client on day 2. A polite reminder is fair on day 5 or day 7. Anything sooner reads as pushy, even when the term technically supports it. The goal is to get paid and keep the door open for next time.</p>
+<p>One more thing. Due on Receipt doesn't give you the right to chase the client on day 2. A <a href="/how-to-follow-up-on-unpaid-invoices/">polite reminder</a> is fair on day 5 or day 7. Anything sooner reads as pushy, even when the term technically supports it. The goal is to get paid and keep the door open for next time.</p>
 HTML,
     ],
 

@@ -140,6 +140,10 @@ include __DIR__ . '/../../docs-header.php';
                 <strong>Why the difference?</strong> Cash basis answers "did money actually arrive?" Accrual basis answers "did I do the work that earned the money?" Both are valid views; small businesses usually want the cash-basis dashboard for day-to-day decisions and the accrual report for taxes and accountants.
             </div>
 
+            <h2 id="inventory-balance-sheet">Inventory on the Balance Sheet</h2>
+            <p>The Balance Sheet lists your stock on hand as a current asset. It values each item at its current unit cost (Argo Books doesn't keep a history of past costs) and works out how much stock you held as of the report date from your recorded stock movements.</p>
+            <p>Buying stock is still recorded as an expense when you purchase it, so adding inventory here doesn't change your profit. Only the Balance Sheet treats unsold stock as something you own.</p>
+
             <h2 id="currency">Currency display</h2>
             <p>Argo Books stores every amount internally in US dollars so that businesses dealing in multiple currencies (e.g., invoicing some customers in EUR and others in USD) still get one consistent set of totals. The display currency is whatever you picked in Settings.</p>
             <ul>

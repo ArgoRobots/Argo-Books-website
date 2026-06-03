@@ -321,4 +321,6 @@ php_value upload_max_filesize 10M
     RewriteRule ^inventory-tracking-for-small-businesses/?$ articles/article-page.php?slug=inventory-tracking-for-small-businesses [L,QSA]
     RewriteRule ^how-to-track-business-expenses-without-spreadsheets/?$ articles/article-page.php?slug=how-to-track-business-expenses-without-spreadsheets [L,QSA]
     RewriteRule ^best-free-accounting-software-for-small-business/?$ articles/article-page.php?slug=best-free-accounting-software-for-small-business [L,QSA]
+    RewriteRule ^small-business-tax-deductions/?$ articles/article-page.php?slug=small-business-tax-deductions [L,QSA]
+    RewriteRule ^bookkeeping-for-cleaning-companies/?$ articles/article-page.php?slug=bookkeeping-for-cleaning-companies [L,QSA]
 </IfModule>

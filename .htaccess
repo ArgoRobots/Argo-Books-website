@@ -319,4 +319,6 @@ php_value upload_max_filesize 10M
     RewriteRule ^how-to-send-an-invoice-for-free/?$ articles/article-page.php?slug=how-to-send-an-invoice-for-free [L,QSA]
     RewriteRule ^bookkeeping-for-rental-businesses/?$ articles/article-page.php?slug=bookkeeping-for-rental-businesses [L,QSA]
     RewriteRule ^inventory-tracking-for-small-businesses/?$ articles/article-page.php?slug=inventory-tracking-for-small-businesses [L,QSA]
+    RewriteRule ^how-to-track-business-expenses-without-spreadsheets/?$ articles/article-page.php?slug=how-to-track-business-expenses-without-spreadsheets [L,QSA]
+    RewriteRule ^best-free-accounting-software-for-small-business/?$ articles/article-page.php?slug=best-free-accounting-software-for-small-business [L,QSA]
 </IfModule>

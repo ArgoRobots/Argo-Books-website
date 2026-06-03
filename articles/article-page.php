@@ -55,7 +55,10 @@ if (PHP_SAPI !== 'cli') {
     track_page_view('invgen_article_' . $safe_slug_for_event);
 }
 
-$invgen_ref = 'guide-' . $slug;
+// Cap at 50: referral source_code columns are VARCHAR(50). Long slugs are
+// truncated deterministically so the visit and the auto-registered link still
+// match on the same value.
+$invgen_ref = substr('guide-' . $slug, 0, 50);
 $utm_qs = '?source=' . htmlspecialchars($invgen_ref)
         . '&amp;utm_source=invoice-generator&amp;utm_medium=article&amp;utm_campaign=phase1';
 

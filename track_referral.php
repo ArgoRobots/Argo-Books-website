@@ -9,6 +9,11 @@
  *   3. HTTP Referer header mapped to a known channel (AI chats, social sites)
  */
 
+// Staging password wall. dev-gate.php gates the dev subdomain only; it checks
+// HTTP_HOST and is a no-op on production, so including it here is safe on
+// every page that tracks referrals (which is every public page).
+require_once __DIR__ . '/dev-gate.php';
+
 require_once __DIR__ . '/statistics.php';
 require_once __DIR__ . '/track_referral_event.php';
 

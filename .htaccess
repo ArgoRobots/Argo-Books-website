@@ -47,6 +47,12 @@ Order allow,deny
 Deny from all
 </Files>
 
+# Never serve the staging password file
+<Files ".htpasswd">
+Order allow,deny
+Deny from all
+</Files>
+
 # Protect database directory and vendor/cron internals
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -57,6 +63,22 @@ Deny from all
 
 # Prevent directory listing
 Options -Indexes
+
+# --- Staging password protection (dev.argorobots.com only) ---
+# Restores the Basic Auth popup on the dev subdomain. Kept in the repo so a
+# deploy can't wipe it again: a full mirror previously overwrote the server's
+# hand-added copy. Production never triggers auth because the host check below
+# is satisfied first, so the AuthUserFile path only has to be valid on dev.
+<IfModule mod_auth_basic.c>
+    AuthType Basic
+    AuthName "Argo Books Staging"
+    AuthBasicProvider file
+    AuthUserFile "/home/argorobots/dev.argorobots.com/.htpasswd"
+    <RequireAny>
+        Require expr "%{HTTP_HOST} != 'dev.argorobots.com'"
+        Require valid-user
+    </RequireAny>
+</IfModule>
 
 # Set default character set
 AddDefaultCharset UTF-8
@@ -306,6 +328,10 @@ php_value upload_max_filesize 10M
     RewriteRule ^download/?$ /downloads/ [R=301,L]
     RewriteRule ^contact\.php$ /contact-us/ [R=301,L]
     RewriteRule ^index\.html$ / [R=301,L]
+
+    # Renamed pages (old slugs Google still has crawled).
+    RewriteRule ^features/ai-spreadsheet-import/?$ /features/spreadsheet-import/ [R=301,L]
+    RewriteRule ^upgrade(/index\.php)?/?$ /pricing/ [R=301,L]
 
     # --- Free invoice generator informational articles ---
 

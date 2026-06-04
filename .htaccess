@@ -64,22 +64,6 @@ Deny from all
 # Prevent directory listing
 Options -Indexes
 
-# --- Staging password protection (dev.argorobots.com only) ---
-# Restores the Basic Auth popup on the dev subdomain. Kept in the repo so a
-# deploy can't wipe it again: a full mirror previously overwrote the server's
-# hand-added copy. Production never triggers auth because the host check below
-# is satisfied first, so the AuthUserFile path only has to be valid on dev.
-<IfModule mod_auth_basic.c>
-    AuthType Basic
-    AuthName "Argo Books Staging"
-    AuthBasicProvider file
-    AuthUserFile "/home/argorobots/dev.argorobots.com/.htpasswd"
-    <RequireAny>
-        Require expr "%{HTTP_HOST} != 'dev.argorobots.com'"
-        Require valid-user
-    </RequireAny>
-</IfModule>
-
 # Set default character set
 AddDefaultCharset UTF-8
 

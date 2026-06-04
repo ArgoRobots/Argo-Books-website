@@ -130,7 +130,7 @@ HTML,
   'callout_after_section_index' => 3,
 
   'tool_callout_text' => 'Argo Books is one free QuickBooks alternative on this list, with a no-time-limit free tier you can try before deciding.',
-  'tool_callout_cta' => 'Try Argo Books free',
+  'tool_callout_cta' => 'Try Argo Books for free',
   'tool_callout_url' => '/downloads/',
 
   'faqs' => [

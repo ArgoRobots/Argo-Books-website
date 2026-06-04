@@ -114,7 +114,7 @@ HTML,
   'callout_after_section_index' => 2,
 
   'tool_callout_text' => 'Argo Books is free to download with a no-time-limit free tier, basic bookkeeping, receipt scanning, and inventory built in. Try it before you decide.',
-  'tool_callout_cta' => 'Try Argo Books free',
+  'tool_callout_cta' => 'Try Argo Books for free',
   'tool_callout_url' => '/downloads/',
 
   'faqs' => [

@@ -323,4 +323,7 @@ php_value upload_max_filesize 10M
     RewriteRule ^best-free-accounting-software-for-small-business/?$ articles/article-page.php?slug=best-free-accounting-software-for-small-business [L,QSA]
     RewriteRule ^small-business-tax-deductions/?$ articles/article-page.php?slug=small-business-tax-deductions [L,QSA]
     RewriteRule ^bookkeeping-for-cleaning-companies/?$ articles/article-page.php?slug=bookkeeping-for-cleaning-companies [L,QSA]
+    RewriteRule ^small-business-bookkeeping-basics/?$ articles/article-page.php?slug=small-business-bookkeeping-basics [L,QSA]
+    RewriteRule ^bookkeeping-for-landscapers/?$ articles/article-page.php?slug=bookkeeping-for-landscapers [L,QSA]
+    RewriteRule ^best-invoicing-software-for-small-business/?$ articles/article-page.php?slug=best-invoicing-software-for-small-business [L,QSA]
 </IfModule>

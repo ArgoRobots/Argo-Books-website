@@ -47,12 +47,6 @@ Order allow,deny
 Deny from all
 </Files>
 
-# Never serve the staging password file
-<Files ".htpasswd">
-Order allow,deny
-Deny from all
-</Files>
-
 # Protect database directory and vendor/cron internals
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -225,7 +219,13 @@ php_value upload_max_filesize 10M
 # Rewrite rules
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
+
+    # Forward the Authorization header to PHP so HTTP Basic Auth works under
+    # PHP-FPM/CGI (used only by the dev staging gate; harmless on production,
+    # which sends no Authorization header and has no gate active).
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
     # Protect database directory
     RewriteRule ^database/ - [F,L]
     

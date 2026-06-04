@@ -1,4 +1,2 @@
-# Server-critical files must stay LF. CRLF breaks Apache .htaccess parsing
-# and appends a stray \r to password hashes, which fails Basic Auth.
-.htpasswd text eol=lf
+# Keep .htaccess LF. CRLF can break Apache parsing on some setups.
 .htaccess text eol=lf

@@ -119,6 +119,14 @@ document.addEventListener("DOMContentLoaded", function () {
       " " +
       currency +
       "</button>" +
+      '<div class="payment-secured-badge">' +
+      '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>' +
+      '<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>' +
+      "</svg>" +
+      "<span>Secure payment, powered by</span>" +
+      '<img src="../resources/images/Stripe-logo.svg" alt="Stripe">' +
+      "</div>" +
       "</form>";
 
     // Initialize Stripe with the connected account
@@ -409,6 +417,14 @@ document.addEventListener("DOMContentLoaded", function () {
       " " +
       currency +
       "</button>" +
+      '<div class="payment-secured-badge">' +
+      '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>' +
+      '<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>' +
+      "</svg>" +
+      "<span>Secure payment, powered by</span>" +
+      '<img src="../resources/images/Square-logo.svg" alt="Square">' +
+      "</div>" +
       "</form>";
 
     // First get Square config

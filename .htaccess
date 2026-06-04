@@ -299,6 +299,14 @@ php_value upload_max_filesize 10M
     # The invoice-guides hub was generalized and moved to /guides/.
     RewriteRule ^invoice-guides/?$ /guides/ [R=301,L]
 
+    # Legacy URLs Google still has indexed from the old site structure.
+    # 301 them to their current homes so the old links keep their value
+    # instead of returning 404 and getting dropped from the index.
+    RewriteRule ^download\.php$ /downloads/ [R=301,L]
+    RewriteRule ^download/?$ /downloads/ [R=301,L]
+    RewriteRule ^contact\.php$ /contact-us/ [R=301,L]
+    RewriteRule ^index\.html$ / [R=301,L]
+
     # --- Free invoice generator informational articles ---
 
     # Each article URL is an exact slug at root. Listed explicitly so we do

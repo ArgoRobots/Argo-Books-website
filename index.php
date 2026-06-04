@@ -126,7 +126,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <script src="resources/scripts/main.js"></script>
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . '/style.css') ?>">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">
     <link rel="stylesheet" href="resources/styles/pricing-cards.css">
@@ -151,8 +151,9 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <div class="hero-content">
                 <div class="hero-app-title animate-fade-in">Argo Books</div>
                 <h1 class="hero-title animate-fade-in-up">
-                    Run your business<br>
-                    <span class="text-gradient">without spreadsheets or chaos</span>
+                    <span class="hero-title-line">Run your business</span>
+                    <span class="hero-title-line text-gradient">without spreadsheets</span>
+                    <span class="hero-title-line text-gradient">or chaos</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
                     Modern bookkeeping and operations software for small business owners. 

@@ -552,6 +552,7 @@ a {
 }
 
 .hero-app-title {
+    font-family: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 4.5rem;
     font-weight: 800;
     margin-bottom: 24px;
@@ -563,14 +564,22 @@ a {
 }
 
 .hero-title {
-    font-size: 3.75rem;
+    font-family: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 24px;
     line-height: 1.1;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
     position: relative;
     z-index: 2;
     mix-blend-mode: plus-lighter;
+}
+
+/* Each headline line is locked to one row so the wrap point is identical
+   across browsers (Chrome/Edge shape the fallback font slightly differently). */
+.hero-title-line {
+    display: block;
+    white-space: nowrap;
 }
 
 .text-gradient {

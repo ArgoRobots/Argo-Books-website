@@ -53,6 +53,10 @@ Deny from all
     RewriteRule ^database/ - [F,L]
     RewriteRule ^vendor/ - [F,L]
     RewriteRule ^cron/logs/ - [F,L]
+    # Stored telemetry + crash reports are read only by the authenticated admin
+    # pages (via the filesystem), never served as static files. The endpoints
+    # write here over the filesystem too, so blocking web access is safe.
+    RewriteRule ^admin/data-logs/ - [F,L]
 </IfModule>
 
 # Prevent directory listing
@@ -278,6 +282,9 @@ php_value upload_max_filesize 10M
 
     # Telemetry data upload
     RewriteRule ^api/data/upload/?$ api/data/upload.php [L,QSA]
+
+    # Desktop app crash reports
+    RewriteRule ^api/data/crash/?$ api/data/crash.php [L,QSA]
 
     # --- Avalonia (cross-platform) download routes ---
 

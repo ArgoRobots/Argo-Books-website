@@ -20,7 +20,7 @@
                        sparkle:edSignature="QLJy8J4suSblWOu/wJH8EtznmRNuk2gp/HV5zmPkOmFLC0MP43yKh1a4kdCM5byEmVnGSD/HSJpvA+gwWDL0Dg==" />
 
             <!-- macOS -->
-            <enclosure url="https://argorobots.com/download/avalonia/mac"
+            <enclosure url=""
                        sparkle:version="2.0.8"
                        sparkle:os="macos"
                        type="application/octet-stream"

@@ -275,6 +275,7 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                         <?= svg_icon('download', null, 'btn-icon') ?>
                         Download for Linux
                     </a>
+                    <button type="button" class="install-help-link" id="linuxInstallHelp">Installation instructions</button>
                 </div>
             </div>
         </div>
@@ -359,6 +360,23 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
 
     </main>
 
+    <!-- Linux installation instructions modal -->
+    <div class="install-modal" id="linuxInstallModal">
+        <div class="install-modal-backdrop"></div>
+        <div class="install-modal-content" role="dialog" aria-modal="true" aria-labelledby="linuxInstallModalTitle">
+            <button class="install-modal-close" aria-label="Close">&times;</button>
+            <h2 id="linuxInstallModalTitle">Installing on Linux</h2>
+            <ol class="install-modal-steps">
+                <li>Download the AppImage file.</li>
+                <li>Right-click the downloaded file and choose <strong>Properties</strong>.</li>
+                <li>In the <strong>Permissions</strong> tab, check <strong>"Allow executing file as program"</strong> (the wording varies slightly between distros).</li>
+                <li>Double-click the file to launch Argo Books.</li>
+            </ol>
+            <p class="install-modal-alt">Prefer the terminal? Run <code>chmod +x ArgoBooks-<?php echo $latestVersion ? htmlspecialchars($latestVersion['version']) : 'X.X.X'; ?>-linux-x64.AppImage</code> instead of steps 2 and 3.</p>
+            <p class="install-modal-note">AppImages are self-contained: there's nothing else to install, and you can keep the file anywhere you like. See the <a href="../documentation/pages/getting-started/installation.php">full installation guide</a> for more.</p>
+        </div>
+    </div>
+
     <footer class="footer">
         <?php include __DIR__ . '/../resources/footer/footer.php'; ?>
     </footer>
@@ -394,6 +412,29 @@ $smartScreenGuide = $smartScreenGuides[$browserKey] ?? null;
                 }
             });
         });
+
+        // Linux installation instructions modal
+        const installModal = document.getElementById('linuxInstallModal');
+        const installHelpLink = document.getElementById('linuxInstallHelp');
+
+        function closeInstallModal() {
+            installModal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (installModal && installHelpLink) {
+            installHelpLink.addEventListener('click', function() {
+                installModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+            installModal.querySelector('.install-modal-close').addEventListener('click', closeInstallModal);
+            installModal.querySelector('.install-modal-backdrop').addEventListener('click', closeInstallModal);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && installModal.classList.contains('active')) {
+                    closeInstallModal();
+                }
+            });
+        }
     </script>
 </body>
 

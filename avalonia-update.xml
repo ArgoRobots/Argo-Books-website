@@ -16,21 +16,24 @@
                        sparkle:version="2.0.8"
                        sparkle:os="windows"
                        type="application/octet-stream"
-                       length="0" />
+                       length="0"
+                       sparkle:edSignature="Tw6+WIKENEUD5mVsnyv3k/7elZSNHAHyNKGwVlqvQrz0CJT0lCGdI4fFY5cyXTFm/DIjuhl6KAjYZ5m58negAg==" />
 
             <!-- macOS -->
             <enclosure url="https://argorobots.com/download/avalonia/mac"
                        sparkle:version="2.0.8"
                        sparkle:os="macos"
                        type="application/octet-stream"
-                       length="0" />
+                       length="0"
+                       sparkle:edSignature="" />
 
             <!-- Linux -->
             <enclosure url="https://argorobots.com/download/avalonia/linux"
                        sparkle:version="2.0.8"
                        sparkle:os="linux"
                        type="application/octet-stream"
-                       length="0" />
+                       length="0"
+                       sparkle:edSignature="tIt2WCoheON+NXrPi1JQDHYwBXHsaYsZkVQ0674rBdsTnhiTBCYmUO2EOJyazAwDhgvsNbHpMZrsrxYd0ezDAg==" />
         </item>
     </channel>
 </rss>

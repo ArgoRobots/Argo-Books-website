@@ -45,13 +45,16 @@ foreach ($crashFiles as $crashFile) {
         $source = (string) ($c['source'] ?? '');
         $sig = $type . '|' . $source;
         $ts = $c['timestamp'] ?? $meta['receivedAt'];
+        // Compare on parsed epochs, not raw strings: reports use ISO 8601 while
+        // the receivedAt fallback is "Y-m-d H:i:s", which don't sort together.
+        $tsEpoch = $ts !== null ? (strtotime((string) $ts) ?: 0) : 0;
 
         if (!isset($crashGroups[$sig])) {
             $crashGroups[$sig] = [
                 'type' => $type, 'source' => $source, 'count' => 0,
                 'platforms' => [], 'versions' => [], 'devices' => [],
-                'first' => null, 'last' => null,
-                'sample' => null, 'sampleMeta' => [], 'sampleTs' => '', 'occurrences' => [],
+                'first' => null, 'last' => null, 'firstEpoch' => null, 'lastEpoch' => null,
+                'sample' => null, 'sampleMeta' => [], 'sampleEpoch' => -1, 'occurrences' => [],
             ];
         }
 
@@ -62,17 +65,19 @@ foreach ($crashFiles as $crashFile) {
             $crashGroups[$sig]['devices'][$meta['authId']] = true;
         }
         if ($ts !== null) {
-            if ($crashGroups[$sig]['first'] === null || $ts < $crashGroups[$sig]['first']) {
+            if ($crashGroups[$sig]['firstEpoch'] === null || $tsEpoch < $crashGroups[$sig]['firstEpoch']) {
+                $crashGroups[$sig]['firstEpoch'] = $tsEpoch;
                 $crashGroups[$sig]['first'] = $ts;
             }
-            if ($crashGroups[$sig]['last'] === null || $ts > $crashGroups[$sig]['last']) {
+            if ($crashGroups[$sig]['lastEpoch'] === null || $tsEpoch > $crashGroups[$sig]['lastEpoch']) {
+                $crashGroups[$sig]['lastEpoch'] = $tsEpoch;
                 $crashGroups[$sig]['last'] = $ts;
             }
         }
-        if ($crashGroups[$sig]['sample'] === null || (string) $ts >= $crashGroups[$sig]['sampleTs']) {
+        if ($crashGroups[$sig]['sample'] === null || $tsEpoch >= $crashGroups[$sig]['sampleEpoch']) {
             $crashGroups[$sig]['sample'] = $c;
             $crashGroups[$sig]['sampleMeta'] = $meta;
-            $crashGroups[$sig]['sampleTs'] = (string) $ts;
+            $crashGroups[$sig]['sampleEpoch'] = $tsEpoch;
         }
         if (count($crashGroups[$sig]['occurrences']) < 30) {
             $crashGroups[$sig]['occurrences'][] = [

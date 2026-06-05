@@ -64,7 +64,7 @@ function crashCheckBucket(string $bucketKey, int $maxPerHour): bool
 
 function crashCheckRateLimit(string $authId, int $maxPerHour, ?int $ipMaxPerHour = null): bool
 {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $ip = get_client_ip();
     if (!crashCheckBucket($authId . '|' . $ip, $maxPerHour)) {
         return false;
     }
@@ -92,7 +92,7 @@ function crashLog(string $event, string $details = ''): void
 {
     error_log(json_encode([
         'timestamp' => date('Y-m-d H:i:s'),
-        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+        'ip' => get_client_ip(),
         'event' => 'crash_' . $event,
         'details' => $details,
     ]));
@@ -186,14 +186,19 @@ try {
         exit;
     }
 
+    // Sniff the MIME type when fileinfo is available. If the extension is
+    // missing, finfo_open() returns false; skip the sniff in that case and rely
+    // on the JSON content validation below, rather than emit warnings.
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    $mime = finfo_file($finfo, $uploaded['tmp_name']);
-    finfo_close($finfo);
-    if (!in_array($mime, CRASH_ALLOWED_MIME, true)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid file type', 'detected' => $mime]);
-        crashLog('invalid_mime', (string) $mime);
-        exit;
+    if ($finfo !== false) {
+        $mime = finfo_file($finfo, $uploaded['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($mime, CRASH_ALLOWED_MIME, true)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Invalid file type', 'detected' => $mime]);
+            crashLog('invalid_mime', (string) $mime);
+            exit;
+        }
     }
 
     $content = file_get_contents($uploaded['tmp_name']);
@@ -235,7 +240,7 @@ try {
     $country = null;
     if (function_exists('lookup_country_for_ip')) {
         try {
-            $country = lookup_country_for_ip($_SERVER['REMOTE_ADDR'] ?? '');
+            $country = lookup_country_for_ip(get_client_ip());
         } catch (Throwable $e) {
             $country = null;
         }

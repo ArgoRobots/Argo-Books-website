@@ -138,6 +138,8 @@ function crashSanitizeReport(array $r): array
         'stackTrace'    => $str($r['stackTrace'] ?? null, 8000),
         'innerException' => $str($r['innerException'] ?? null, 2000),
         'osVersion'     => $str($r['osVersion'] ?? null, 120),
+        'appVersion'    => $str($r['appVersion'] ?? null, 40),
+        'platform'      => $str($r['platform'] ?? null, 40),
         'breadcrumbs'   => $breadcrumbs ?: null,
     ], fn ($v) => $v !== null);
 }

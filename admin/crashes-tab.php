@@ -30,7 +30,6 @@ foreach ($crashFiles as $crashFile) {
         'authId'     => $data['authId'] ?? null,
         'receivedAt' => $data['receivedAt'] ?? null,
     ];
-    $crashVersions[$meta['appVersion']] = true;
 
     foreach ($data['crashes'] as $c) {
         if (!is_array($c)) {
@@ -40,6 +39,14 @@ foreach ($crashFiles as $crashFile) {
         if ($meta['authId']) {
             $crashDevices[$meta['authId']] = true;
         }
+
+        // Prefer the version/platform stamped into each crash at capture time,
+        // falling back to the upload's file-level values for older reports. This
+        // avoids attributing a crash to whatever version the app updated to
+        // before the report was uploaded on the next launch.
+        $cVersion = (string) ($c['appVersion'] ?? $meta['appVersion']);
+        $cPlatform = (string) ($c['platform'] ?? $meta['platform']);
+        $crashVersions[$cVersion] = true;
 
         $type = (string) ($c['exceptionType'] ?? 'UnknownException');
         $source = (string) ($c['source'] ?? '');
@@ -59,8 +66,8 @@ foreach ($crashFiles as $crashFile) {
         }
 
         $crashGroups[$sig]['count']++;
-        $crashGroups[$sig]['platforms'][$meta['platform']] = true;
-        $crashGroups[$sig]['versions'][$meta['appVersion']] = true;
+        $crashGroups[$sig]['platforms'][$cPlatform] = true;
+        $crashGroups[$sig]['versions'][$cVersion] = true;
         if ($meta['authId']) {
             $crashGroups[$sig]['devices'][$meta['authId']] = true;
         }
@@ -76,13 +83,13 @@ foreach ($crashFiles as $crashFile) {
         }
         if ($crashGroups[$sig]['sample'] === null || $tsEpoch >= $crashGroups[$sig]['sampleEpoch']) {
             $crashGroups[$sig]['sample'] = $c;
-            $crashGroups[$sig]['sampleMeta'] = $meta;
+            $crashGroups[$sig]['sampleMeta'] = ['platform' => $cPlatform, 'appVersion' => $cVersion, 'country' => $meta['country']];
             $crashGroups[$sig]['sampleEpoch'] = $tsEpoch;
         }
         if (count($crashGroups[$sig]['occurrences']) < 30) {
             $crashGroups[$sig]['occurrences'][] = [
-                'ts' => $ts, 'platform' => $meta['platform'],
-                'version' => $meta['appVersion'], 'country' => $meta['country'],
+                'ts' => $ts, 'platform' => $cPlatform,
+                'version' => $cVersion, 'country' => $meta['country'],
             ];
         }
     }

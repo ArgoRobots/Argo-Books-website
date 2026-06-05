@@ -86,6 +86,46 @@
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.8 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.8</span>
+                        <span class="date-tag">June 4 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Bank statement matching:</strong> Import a bank statement and Argo Books automatically matches each line against your recorded expenses and revenue, so you can spot anything missing or doubled up in minutes instead of checking line by line. Includes a month calendar view of your matched activity.</li>
+                                <li><strong>Email purchase orders to suppliers:</strong> Send a purchase order straight to your supplier as a PDF without leaving Argo Books, and save their email for next time.</li>
+                                <li><strong>Inventory on the Balance Sheet:</strong> Your inventory value now appears as a current asset, giving a more complete picture of what your business owns.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Better receipt scanning:</strong> WebP images are now supported, and drag-and-drop is smoother.</li>
+                                <li><strong>Smoother first-time setup:</strong> The setup checklist now highlights each step as you go, and the app tour is shorter and clearer.</li>
+                                <li><strong>Currency check:</strong> When creating a company, Argo Books gives you a heads-up if the selected currency doesn't match your country.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Accurate unsaved-changes indicator:</strong> Undoing back to your last save now clears the unsaved-changes marker in the title bar.</li>
+                                <li><strong>Steadier receipt viewer:</strong> The receipt panel keeps its size in fullscreen mode.</li>
+                                <li>Various bug fixes and stability improvements.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.7 -->
             <div class="version-card">
                 <div class="version-header">

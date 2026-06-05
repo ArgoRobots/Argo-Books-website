@@ -1,0 +1,222 @@
+name: Deploy to dev subdomain
+
+# Mirrors deploy.yml but is wired to the `dev` branch and deploys to the dev
+# subdomain only (FTP_DEV_SERVER_DIR); production (FTP_SERVER_DIR) is never
+# touched here. Use it to test work-in-progress on dev.argorobots.com without
+# going through main. Regenerated from deploy.yml so the deploy logic stays
+# identical; the only differences are the trigger branch (dev) and
+# DEPLOY_TARGETS (dev dir only).
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      full_deploy:
+        description: 'Force full deployment (re-upload all files)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  deploy:
+    name: Deploy via SFTP (dev only)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Full history so we can diff against the previous branch tip even
+          # when a push contains many commits. fetch-depth: 2 was only enough
+          # to diff the single most recent commit, silently dropping earlier
+          # commits in the same push from the incremental deploy.
+          fetch-depth: 0
+
+      # Compute mode + composer_changed up front so later steps can short-circuit.
+      # Pure git diff: no composer or PHP needed yet.
+      #
+      # Diff base resolution:
+      #   - workflow_dispatch + full_deploy=true  → full mirror
+      #   - push event with valid before-SHA      → BASE=before-SHA (covers ALL
+      #     commits in the push, not just the latest one)
+      #   - push event with zero before-SHA       → first push to branch, full
+      #   - push event with unreachable before    → force-push, full (safe)
+      #   - workflow_dispatch + full_deploy=false → BASE=HEAD~1 (legacy behavior)
+      #   - anything else / HEAD~1 missing        → full
+      - name: Determine changed files
+        id: changes
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          FULL_DEPLOY="${{ github.event.inputs.full_deploy }}"
+          ZERO_SHA="0000000000000000000000000000000000000000"
+          BASE=""
+
+          if [ "$FULL_DEPLOY" = "true" ]; then
+            echo "Full deploy forced via workflow_dispatch input"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            if [ -z "$BEFORE_SHA" ] || [ "$BEFORE_SHA" = "$ZERO_SHA" ]; then
+              echo "First push to branch (no before-SHA), doing full deploy"
+            elif ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+              echo "before-SHA $BEFORE_SHA not reachable (force-push?), doing full deploy"
+            else
+              BASE="$BEFORE_SHA"
+              echo "Incremental diff from $BASE..HEAD (covers all commits in this push)"
+            fi
+          elif git rev-parse HEAD~1 >/dev/null 2>&1; then
+            BASE="HEAD~1"
+            echo "Manual dispatch (full_deploy=false), incremental from HEAD~1"
+          else
+            echo "First commit / unable to determine range, doing full deploy"
+          fi
+
+          if [ -z "$BASE" ]; then
+            echo "mode=full" >> "$GITHUB_OUTPUT"
+            echo "composer_changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=incremental" >> "$GITHUB_OUTPUT"
+
+            # Files that were added, copied, modified, or renamed
+            git diff --name-only --diff-filter=ACMR "$BASE" HEAD > /tmp/changed_files.txt || true
+            # Files that were deleted
+            git diff --name-only --diff-filter=D "$BASE" HEAD > /tmp/deleted_files.txt || true
+
+            # Check if composer files changed (need to rebuild + re-upload vendor/)
+            if git diff --name-only "$BASE" HEAD | grep -qE '^composer\.(json|lock)$'; then
+              echo "composer_changed=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "composer_changed=false" >> "$GITHUB_OUTPUT"
+            fi
+
+            echo "=== Changed files ==="
+            cat /tmp/changed_files.txt
+            echo "=== Deleted files ==="
+            cat /tmp/deleted_files.txt
+          fi
+
+      # Only build vendor/ when we actually need to upload it (composer files
+      # changed in this commit, or a full deploy was forced). On every other
+      # push, skip composer install entirely. The server keeps the vendor/
+      # from the previous composer-changing deploy.
+      - name: Cache Composer dependencies
+        if: steps.changes.outputs.composer_changed == 'true'
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install PHP dependencies
+        if: steps.changes.outputs.composer_changed == 'true'
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          # Remove passphrase from key so lftp can use it non-interactively
+          ssh-keygen -p -f ~/.ssh/deploy_key -P "${{ secrets.SSH_PASSPHRASE }}" -N ""
+          ssh-keyscan -T 10 ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Deploy (full mirror)
+        if: steps.changes.outputs.mode == 'full'
+        run: |
+          DEPLOY_TARGETS="${{ secrets.FTP_DEV_SERVER_DIR }}"
+
+          for REMOTE_DIR in $DEPLOY_TARGETS; do
+            echo "=== Full mirror deploy to ${REMOTE_DIR} ==="
+            lftp -u "${{ secrets.FTP_USERNAME }}," \
+              -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts'; \
+                  mirror --reverse --delete --verbose --no-perms \
+                    --exclude ^\.git/$ \
+                    --exclude ^\.github/$ \
+                    --exclude ^\.gitignore$ \
+                    --exclude ^README\.md$ \
+                    --exclude ^CLAUDE\.md$ \
+                    --exclude ^read-me/$ \
+                    --exclude ^composer\.json$ \
+                    --exclude ^composer\.lock$ \
+                    --exclude ^mysql_schema\.sql$ \
+                    --exclude ^phpunit\.xml$ \
+                    --exclude ^tests/$ \
+                    --exclude ^\.ftp-deploy-sync-state\.json$ \
+                    ./ ${REMOTE_DIR}; \
+                  bye" \
+              sftp://${{ secrets.FTP_SERVER }}
+          done
+
+      - name: Deploy (incremental)
+        if: steps.changes.outputs.mode == 'incremental'
+        run: |
+          DEPLOY_TARGETS="${{ secrets.FTP_DEV_SERVER_DIR }}"
+
+          # Function to check if a file should be excluded
+          is_excluded() {
+            case "$1" in
+              .git/*|.github/*|.gitignore|README.md|CLAUDE.md|read-me/*|composer.json|composer.lock|mysql_schema.sql|phpunit.xml|tests/*|.ftp-deploy-sync-state.json) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          for REMOTE_DIR in $DEPLOY_TARGETS; do
+            echo "=== Incremental deploy to ${REMOTE_DIR} ==="
+
+            # Write lftp commands to a script file to avoid quoting/escaping issues
+            SCRIPT_FILE=$(mktemp /tmp/lftp_script.XXXXXX)
+            HAS_COMMANDS=false
+
+            # Upload changed files
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              is_excluded "$file" && continue
+              [ ! -f "$file" ] && continue
+              dir=$(dirname "$file")
+              if [ "$dir" != "." ]; then
+                printf 'mkdir -p -f "%s/%s"\n' "${REMOTE_DIR}" "${dir}" >> "$SCRIPT_FILE"
+              fi
+              printf 'put "./%s" -o "%s/%s"\n' "${file}" "${REMOTE_DIR}" "${file}" >> "$SCRIPT_FILE"
+              HAS_COMMANDS=true
+            done < /tmp/changed_files.txt
+
+            # Delete removed files from remote
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              is_excluded "$file" && continue
+              printf 'rm -f "%s/%s"\n' "${REMOTE_DIR}" "${file}" >> "$SCRIPT_FILE"
+              HAS_COMMANDS=true
+            done < /tmp/deleted_files.txt
+
+            # If composer deps changed, mirror the entire vendor/ directory
+            if [ "${{ steps.changes.outputs.composer_changed }}" = "true" ]; then
+              echo "Composer files changed, re-uploading vendor/"
+              printf 'mirror --reverse --delete --verbose --no-perms vendor/ "%s/vendor/"\n' "${REMOTE_DIR}" >> "$SCRIPT_FILE"
+              HAS_COMMANDS=true
+            fi
+
+            if [ "$HAS_COMMANDS" = "false" ]; then
+              echo "No files to deploy to ${REMOTE_DIR}"
+              rm -f "$SCRIPT_FILE"
+              continue
+            fi
+
+            echo "Deploying changed files to ${REMOTE_DIR}..."
+            echo "=== lftp script ==="
+            cat "$SCRIPT_FILE"
+            echo "==================="
+
+            lftp -u "${{ secrets.FTP_USERNAME }}," \
+              -e "set sftp:connect-program 'ssh -a -x -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts'; \
+                  source ${SCRIPT_FILE}; \
+                  bye" \
+              sftp://${{ secrets.FTP_SERVER }}
+
+            rm -f "$SCRIPT_FILE"
+          done

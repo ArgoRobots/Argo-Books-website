@@ -12,7 +12,10 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 $page_title = "Argo Books Statistics";
 $page_description = "View and analyze anonymous user data with geo-location insights from the Argo Books application";
 
-$dataDir = '../data-logs/';
+// Telemetry files now live in data-logs/telemetry/. The legacy data-logs/ root
+// is still read during the transition so files not yet moved keep showing.
+$dataDir = '../data-logs/telemetry/';
+$legacyDataDir = '../data-logs/';
 $errorMessage = '';
 
 // Tier filter: 'all' (default), 'free', 'premium'
@@ -145,11 +148,24 @@ function processEvent($event, $sourceFile, $sessionMeta = []) {
     }
 }
 
-if (!is_dir($dataDir)) {
+$dataDirs = array_values(array_filter([$dataDir, $legacyDataDir], 'is_dir'));
+if (empty($dataDirs)) {
     $errorMessage = "Directory 'data-logs/' does not exist.";
 } else {
-    $dataFiles = glob($dataDir . '*.json');
-    if (!$dataFiles || count($dataFiles) === 0) {
+    // Read from both the new telemetry/ folder and the legacy root, de-duping by
+    // filename so a file present in both places is only counted once.
+    $dataFiles = [];
+    $seenNames = [];
+    foreach ($dataDirs as $dir) {
+        foreach (glob($dir . '*.json') ?: [] as $f) {
+            $name = basename($f);
+            if (!isset($seenNames[$name])) {
+                $seenNames[$name] = true;
+                $dataFiles[] = $f;
+            }
+        }
+    }
+    if (count($dataFiles) === 0) {
         $errorMessage = "No anonymous data files found.";
     } else {
         // Sort files by modification time (newest first) for file info display
@@ -514,7 +530,7 @@ include __DIR__ . '/../admin_header.php';
         <div class="no-data">
             <h3>No Data Available</h3>
             <p><?= htmlspecialchars($errorMessage) ?></p>
-            <p><small>Make sure the data directory exists and contains valid JSON files at: <code>admin/data-logs/</code></small></p>
+            <p><small>Make sure the data directory exists and contains valid JSON files at: <code>admin/data-logs/telemetry/</code></small></p>
         </div>
     <?php elseif (!$currentViewHasData): ?>
         <div class="no-data">
@@ -523,7 +539,7 @@ include __DIR__ . '/../admin_header.php';
                 <p>No <?= htmlspecialchars($tierFilter) ?>-tier data has been collected yet. Switch to a different tier above.</p>
             <?php else: ?>
                 <p>No anonymous data has been collected yet. Data will appear here once users start using the application and uploading their analytics.</p>
-                <p><small>Data files are automatically uploaded to: <code>admin/data-logs/</code></small></p>
+                <p><small>Data files are automatically uploaded to: <code>admin/data-logs/telemetry/</code></small></p>
             <?php endif; ?>
         </div>
     <?php else: ?>
@@ -555,6 +571,7 @@ include __DIR__ . '/../admin_header.php';
                 <button class="section-tab" data-tab="errors">Errors</button>
                 <button class="section-tab" data-tab="usage">Usage</button>
                 <button class="section-tab" data-tab="api">API Usage</button>
+                <button class="section-tab" data-tab="crashes">Crashes</button>
             </div>
 
             <!-- Active Users Tab -->
@@ -873,6 +890,11 @@ include __DIR__ . '/../admin_header.php';
                         <canvas id="aiImportDurationByTypeChart"></canvas>
                     </div>
                 </div>
+            </div>
+
+            <!-- Crashes Tab -->
+            <div id="crashes" class="tab-content">
+                <?php include __DIR__ . '/../crashes-tab.php'; ?>
             </div>
 
         </div>

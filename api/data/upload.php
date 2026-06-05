@@ -21,7 +21,7 @@ header('Content-Type: application/json');
 define('MAX_FILE_SIZE_PREMIUM', 10 * 1024 * 1024); // 10MB max for Premium uploads
 define('MAX_FILE_SIZE_FREE', 256 * 1024);          // 256KB max for free-tier uploads
 define('ALLOWED_MIME_TYPES', ['application/json', 'text/plain']);
-define('DATA_DIR', __DIR__ . '/../../admin/data-logs');
+define('DATA_DIR', __DIR__ . '/../../admin/data-logs/telemetry');
 define('MAX_UPLOADS_PER_HOUR_PREMIUM', 100);
 define('MAX_UPLOADS_PER_HOUR_FREE', 6);
 // Coarse per-IP cap for free tier so rotating X-Device-Id values from a single IP

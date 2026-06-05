@@ -1,5 +1,10 @@
 name: Deploy to server
 
+# SIBLING WORKFLOW: .github/workflows/deploy-dev.yml is this file wired to the
+# `dev` branch and the dev subdomain only. The two share all deploy logic, so
+# if you change how deployment works here, mirror the change in deploy-dev.yml
+# (and vice versa) or they will drift apart.
+
 on:
   push:
     branches:

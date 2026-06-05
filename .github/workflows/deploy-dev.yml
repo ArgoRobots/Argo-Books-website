@@ -6,6 +6,10 @@ name: Deploy to dev subdomain
 # going through main. Regenerated from deploy.yml so the deploy logic stays
 # identical; the only differences are the trigger branch (dev) and
 # DEPLOY_TARGETS (dev dir only).
+#
+# SIBLING WORKFLOW: keep this in sync with .github/workflows/deploy.yml. If you
+# change how deployment works in either file, mirror the change in the other or
+# they will drift apart.
 
 on:
   push:

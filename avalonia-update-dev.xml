@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Argo Books Avalonia Updates</title>
+        <link>https://argorobots.com</link>
+        <description>Updates for Argo Books (cross-platform)</description>
+        <language>en</language>
+        <item>
+            <title>Version 2.0.8</title>
+            <sparkle:version>2.0.8</sparkle:version>
+            <sparkle:releaseNotesLink>https://argorobots.com/whats-new/</sparkle:releaseNotesLink>
+            <pubDate>Thu, 01 Jan 2026 10:00:00 +0000</pubDate>
+
+            <!-- Windows -->
+            <enclosure url="https://dev.argorobots.com/resources/downloads/2.0.8/Argo%20Books%20Installer%20V.2.0.8.exe"
+                       sparkle:version="2.0.8"
+                       sparkle:os="windows"
+                       type="application/octet-stream"
+                       length="0"
+                       sparkle:edSignature="QLJy8J4suSblWOu/wJH8EtznmRNuk2gp/HV5zmPkOmFLC0MP43yKh1a4kdCM5byEmVnGSD/HSJpvA+gwWDL0Dg==" />
+
+            <!-- macOS -->
+            <enclosure url=""
+                       sparkle:version="2.0.8"
+                       sparkle:os="macos"
+                       type="application/octet-stream"
+                       length="0"
+                       sparkle:edSignature="" />
+
+            <!-- Linux -->
+            <enclosure url="https://dev.argorobots.com/resources/downloads/2.0.8/ArgoBooks-2.0.8-linux-x64.AppImage"
+                       sparkle:version="2.0.8"
+                       sparkle:os="linux"
+                       type="application/octet-stream"
+                       length="0"
+                       sparkle:edSignature="/T8kyJF+4cFlCCw9+4ylCGLlOjk0HkPXC6lmNp2qBF/rNE2CDqNnWBeB0t2SyeIVwZutsvKb51IyPQYTpbN9AQ==" />
+        </item>
+    </channel>
+</rss>

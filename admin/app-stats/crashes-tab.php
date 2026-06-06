@@ -5,7 +5,7 @@
 // them grouped by exception signature. Reuses .stats-grid / .stat-card /
 // .section-title from the host page's styles.
 
-$crashDir = __DIR__ . '/data-logs/crashes';
+$crashDir = __DIR__ . '/../data-logs/crashes';
 $crashFiles = is_dir($crashDir) ? (glob($crashDir . '/argo_crash_*.json') ?: []) : [];
 
 $crashGroups = [];
@@ -159,7 +159,7 @@ if (!function_exists('crash_fmt')) {
 
 <?php if (count($crashGroups) === 0): ?>
     <div class="crash-empty">
-        <div class="big">No crashes reported &#127881;</div>
+        <div class="big">No crashes reported</div>
         <div>Either nothing has crashed, or no reports have arrived yet.</div>
     </div>
 <?php else: ?>

@@ -563,14 +563,15 @@ include __DIR__ . '/../admin_header.php';
         <div class="tabs-container">
             <div class="section-tabs">
                 <button class="section-tab active" data-tab="active-users">Active Users</button>
+                <button class="section-tab" data-tab="user-activity">User Activity</button>
                 <?php if ($aggregatedData['geoLocationEnabled']): ?>
                 <button class="section-tab" data-tab="geographic">Geographic</button>
                 <?php endif; ?>
                 <button class="section-tab" data-tab="versions">Versions</button>
                 <button class="section-tab" data-tab="features">Features</button>
-                <button class="section-tab" data-tab="errors">Errors</button>
                 <button class="section-tab" data-tab="usage">Usage</button>
                 <button class="section-tab" data-tab="api">API Usage</button>
+                <button class="section-tab" data-tab="errors">Errors</button>
                 <button class="section-tab" data-tab="crashes">Crashes</button>
             </div>
 
@@ -660,6 +661,11 @@ include __DIR__ . '/../admin_header.php';
                         <tbody></tbody>
                     </table>
                 </div>
+            </div>
+
+            <!-- User Activity Tab -->
+            <div id="user-activity" class="tab-content">
+                <?php include __DIR__ . '/user-activity-tab.php'; ?>
             </div>
 
             <!-- Geographic Tab -->
@@ -752,34 +758,6 @@ include __DIR__ . '/../admin_header.php';
                         <h2>Feature Usage Over Time</h2>
                         <canvas id="featureTimelineChart"></canvas>
                     </div>
-                </div>
-            </div>
-
-            <!-- Errors Tab -->
-            <div id="errors" class="tab-content">
-                <h2 class="section-title">Error Analysis</h2>
-
-                <div class="chart-row">
-                    <div class="chart-container">
-                        <h2>Errors by Category</h2>
-                        <canvas id="errorCategoryChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h2>Errors by Code</h2>
-                        <canvas id="errorCodeChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="chart-row">
-                    <div class="chart-container">
-                        <h2>Errors by Category Over Time</h2>
-                        <canvas id="errorCategoryTimelineChart"></canvas>
-                    </div>
-                </div>
-
-                <h2 class="section-title" style="margin-top: 2rem;">Error Details</h2>
-                <div class="error-details-wrapper" id="errorDetailsTableWrapper">
-                    <p style="text-align: center; color: #9ca3af;">No error data available</p>
                 </div>
             </div>
 
@@ -892,9 +870,37 @@ include __DIR__ . '/../admin_header.php';
                 </div>
             </div>
 
+              <!-- Errors Tab -->
+            <div id="errors" class="tab-content">
+                <h2 class="section-title">Error Analysis</h2>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Errors by Category</h2>
+                        <canvas id="errorCategoryChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Errors by Code</h2>
+                        <canvas id="errorCodeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h2>Errors by Category Over Time</h2>
+                        <canvas id="errorCategoryTimelineChart"></canvas>
+                    </div>
+                </div>
+
+                <h2 class="section-title" style="margin-top: 2rem;">Error Details</h2>
+                <div class="error-details-wrapper" id="errorDetailsTableWrapper">
+                    <p style="text-align: center; color: #9ca3af;">No error data available</p>
+                </div>
+            </div>
+
             <!-- Crashes Tab -->
             <div id="crashes" class="tab-content">
-                <?php include __DIR__ . '/../crashes-tab.php'; ?>
+                <?php include __DIR__ . '/crashes-tab.php'; ?>
             </div>
 
         </div>

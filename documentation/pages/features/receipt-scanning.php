@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../resources/icons.php';
+require_once __DIR__ . '/../../../resources/components/feature-video.php';
 $pageTitle = 'AI Receipt Scanning';
 $pageDescription = 'Transform paper receipts into digital records instantly with AI-powered scanning in Argo Books.';
 $currentPage = 'receipt-scanning';
@@ -16,7 +17,7 @@ include __DIR__ . '/../../docs-header.php';
 
             <p>Turn any receipt into a digital record in under 5 seconds with our AI-powered scanner. It achieves 99.9% accuracy and lets you quickly make adjustments before saving.</p>
 
-            <img src="../../../resources/images/ai-receipt-scanner.webp" alt="AI Receipt Scanner" style="width: 75%; display: block; margin: 0 auto 2rem auto;">
+            <?php docs_video_embed('UuYg174V2RM', 'AI Receipt Scanner'); ?>
 
             <h2>What You Can Scan</h2>
             <p>The scanner isn't limited to paper. You can use:</p>

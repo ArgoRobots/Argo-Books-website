@@ -2,6 +2,7 @@
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
+require_once __DIR__ . '/../../resources/components/feature-video.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
 ?>
@@ -161,6 +162,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
         </div>
     </section>
 
+    <?php feature_video_section('cTQaejF6Gh0', 'Argo Books Invoicing demo'); ?>
+
     <!-- =============================================
          DETAIL SECTION 1: The Problem + Solution
          Text left, image right
@@ -171,15 +174,11 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
                     <h2>Unprofessional invoices cost you money and credibility</h2>
-                    <p>Sending invoices as Word documents or plain emails doesn't just look bad, it slows down payments. Clients lose track of loose attachments, there's no easy way for them to pay online, and you end up chasing payments manually. Argo Books gives you a complete invoicing system with professional templates, automatic calculations, and built-in payment collection, so you look polished and get paid on time.</p>
+                    <p>Sending invoices as Word documents or plain emails doesn't just look bad, it slows down payments. Clients lose track of loose attachments, there's no easy way for them to pay online, and you end up chasing payments manually. Argo Books gives you a complete invoicing system with professional templates and built-in payment collection, so you look polished and get paid on time.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Professional invoice templates with your company branding</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Automatic line-item calculations with tax, discounts, and totals</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -250,7 +249,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     <span class="section-label">Create Invoices</span>
                     <h2>Build invoices in seconds, not hours</h2>
                     <p>Select a customer, add your products or services, set quantities and prices, and Argo Books handles the rest. Subtotals, tax calculations, and totals update in real time as you type.</p>
-                    <p>Customize professional email templates, set issue and due dates, and add multiple line items. Click send, and it's done. Every invoice is automatically linked to the customer's profile.</p>
+                    <p>Click send, and it's done. Argo Books handles the rest.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -287,17 +286,18 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
                     <h3>Build your invoice</h3>
-                    <p>Select a customer and your products or services, set quantities and prices. Argo Books calculates subtotals, tax, and totals automatically.</p>
+                    <p>Select a customer and your products or services, set quantities and prices.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
                     <h3>Preview and send</h3>
-                    <p>Preview your invoice as the customer will see it. The invoice includes your branding, line-item details, and an online payment link. Send it by email with one click.</p>
+                    <p>Preview your invoice as the customer will see it. The invoice includes your branding 
+                        and an online payment link. Send it by email with one click.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
                     <h3>Get paid online</h3>
-                    <p>Your customer receives the invoice with a secure payment link. They pay by credit card, and you see the status update to "Paid" in real time. No more chasing.</p>
+                    <p>Your customer receives the invoice with a secure payment link. They pay, and you see the status update to "Paid" in real time.</p>
                 </div>
             </div>
         </div>
@@ -329,7 +329,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 <div class="feature-detail-text">
                     <span class="section-label">Professional Templates</span>
                     <h2>Invoices your clients will take seriously</h2>
-                    <p>Every invoice is rendered as a clean, professional document with your company name, customer billing details, itemized line items, and a clear total. The layout is designed to look great both on screen and when printed, with your branding front and center.</p>
+                    <p>Every invoice is rendered as a clean, professional document with your company name, customer billing details, line items, and a clear total. The layout is designed to look
+                    great with your branding front and center.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
@@ -345,7 +346,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Clear due date badge so customers know exactly when to pay</span>
+                            <span>Clear due date so customers know exactly when to pay</span>
                         </li>
                     </ul>
                 </div>
@@ -366,26 +367,8 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 <div class="feature-detail-text">
                     <span class="section-label">Online Payments</span>
                     <h2>Let customers pay with a single click</h2>
-                    <p>Every invoice includes a secure online payment link powered by Stripe, Square, or PayPal. When your customer opens the invoice email, they click the payment link and see a clean, simple payment page with the amount due, invoice details, and a credit card form. No account creation, no extra steps, just enter card details and pay.</p>
-                    <p>Payments are processed securely, and the invoice status updates to "Paid" automatically in Argo Books. You get notified when payment is received, and the transaction is recorded. No more back-and-forth about e-transfers or check deposits.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Multiple payment providers: choose Stripe, Square, or PayPal</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>No account creation required for customers, just click and pay</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Automatic status updates when payment is received</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Payment receipts sent automatically to the customer</span>
-                        </li>
-                    </ul>
+                    <p>Every invoice includes a secure online payment link powered by Stripe or Square. When your customer opens the invoice email, they click the payment link and see a clean, simple payment page with the amount due, invoice details, and a bank card form. No account creation, no extra steps, just enter card details and pay.</p>
+                    <p>Payments are processed securely, and the invoice status updates to "Paid" in Argo Books automatically. You get notified when the payment is received, and the transaction is recorded. No more back-and-forth about e-transfers or check deposits.</p>
                 </div>
                 <div class="feature-detail-visual">
                     <img src="../../resources/images/features/invoice-payment.svg" alt="Argo Books online invoice payment page showing a secure Stripe-powered credit card form with invoice details and pay button" loading="lazy">
@@ -404,20 +387,15 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                 <div class="feature-detail-text">
                     <span class="section-label">Invoice Management</span>
                     <h2>Track every invoice from draft to paid</h2>
-                    <p>The invoices dashboard gives you a complete view of every invoice you've ever sent. See all invoices in a sortable, searchable table. Summary cards at the top show your total outstanding, paid this month, overdue amounts, and invoices due this week, all at a glance.</p>
-                    <p>Filter by status to see only drafts, sent, paid, or overdue invoices. Click any invoice to view its details, resend the email, or record a manual payment.</p>
+                    <p>The invoices dashboard gives you a complete view of every invoice you've ever sent. See all invoices in a sortable, searchable table.</p>
                     <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Summary cards show outstanding, paid, overdue, and due-this-week totals</span>
-                        </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
                             <span>Search and filter by customer, date, amount, or status</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Resend invoices or record manual payments from the dashboard</span>
+                            <span>Resend invoices or record manual payments</span>
                         </li>
                     </ul>
                 </div>
@@ -542,39 +520,6 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                         Property &amp; rental management
                     </h3>
                     <p>Send rent invoices and lease-related charges to tenants. Online payment links make it easy for tenants to pay on time, and you can track payment history per property.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- =============================================
-         DETAIL SECTION 6: Privacy & Security
-         Image left, text right (reversed)
-         ============================================= -->
-    <section class="feature-detail-section" style="background: var(--gray-50);">
-        <div class="container">
-            <div class="feature-detail reversed animate-on-scroll">
-                <div class="feature-detail-text">
-                    <span class="section-label">Privacy First</span>
-                    <h2>Your invoice data stays on your computer</h2>
-                    <p>Unlike cloud-based invoicing tools that store your customer data and financial records on third-party servers, Argo Books is a desktop application. Your invoices, customer details, and payment records are stored locally on your device, not on someone else's cloud.</p>
-                    <ul class="feature-checklist">
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Desktop app: your invoice and customer data stays on your computer</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Online payments processed securely through Stripe, PayPal, and Square</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>No vendor lock-in. Your data is yours, always</span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="feature-detail-visual">
-                    <img src="../../resources/images/privacy-local-storage.svg" alt="Your data stays local: encrypted, offline-capable, no cloud" loading="lazy">
                 </div>
             </div>
         </div>

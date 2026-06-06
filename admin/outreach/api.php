@@ -195,9 +195,6 @@ switch ($action) {
     case 'reddit_get_stats':
         reddit_api_get_stats($pdo);
         break;
-    case 'reddit_pipeline_status':
-        reddit_api_pipeline_status();
-        break;
     case 'reddit_pipeline_progress':
         reddit_api_pipeline_progress();
         break;
@@ -206,9 +203,6 @@ switch ($action) {
         break;
     case 'reddit_mark_replied':
         reddit_api_mark_replied($pdo);
-        break;
-    case 'reddit_mark_not_fit':
-        reddit_api_mark_not_fit($pdo);
         break;
     case 'reddit_mark_skipped':
         reddit_api_mark_skipped($pdo);
@@ -1539,11 +1533,6 @@ function reddit_api_get_stats($pdo)
     }
 }
 
-function reddit_api_pipeline_status()
-{
-    json_response(['success' => true, 'running' => is_reddit_monitor_running()]);
-}
-
 function reddit_api_pipeline_progress()
 {
     json_response([
@@ -1663,17 +1652,6 @@ function reddit_api_mark_replied($pdo)
         json_response(['success' => false, 'message' => 'Thread not found'], 404);
     }
 
-    json_response(['success' => true]);
-}
-
-function reddit_api_mark_not_fit($pdo)
-{
-    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
-    $id = (int) ($data['id'] ?? 0);
-    if ($id <= 0) json_response(['success' => false, 'message' => 'Missing thread id'], 400);
-
-    $stmt = $pdo->prepare("UPDATE reddit_threads SET status = 'not_fit' WHERE id = ?");
-    $stmt->execute([$id]);
     json_response(['success' => true]);
 }
 

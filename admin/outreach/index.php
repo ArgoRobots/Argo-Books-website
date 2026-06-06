@@ -754,7 +754,6 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-neutral" onclick="markRedditNotFit()">Mark not fit</button>
             <button class="btn btn-neutral" onclick="markRedditSkipped()">Skip</button>
             <button class="btn btn-blue" onclick="openMarkRedditRepliedModal()">Mark replied…</button>
         </div>

@@ -101,7 +101,6 @@ function reddit_threads_tab_render($pdo)
                         <option value="replied">Replied</option>
                         <option value="reply_removed">Reply Removed</option>
                         <option value="skipped">Skipped</option>
-                        <option value="not_fit">Not Fit</option>
                         <option value="expired">Expired</option>
                     </select>
                 </div>

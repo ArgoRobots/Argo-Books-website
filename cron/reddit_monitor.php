@@ -193,7 +193,7 @@ try {
         reddit_progress_write(['message' => "AI scoring thread $processed/$totalToProcess (r/{$t['subreddit']})…"]);
 
         // AI relevance (passes $pdo so it can include the founder's recent
-        // not_fit / replied labels as few-shot examples in the prompt).
+        // accepted threads as few-shot examples in the prompt).
         $rel = reddit_ai_relevance($t, $comments, $pdo);
         $aiScore = $rel['score'];
         $aiReason = $rel['reason'];

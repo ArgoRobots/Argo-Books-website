@@ -1755,7 +1755,6 @@ function redditStatusBadge(s) {
         drafted_pending: ['badge-yellow', 'Drafted-pending'],
         replied: ['badge-blue', 'Replied'],
         skipped: ['badge-gray', 'Skipped'],
-        not_fit: ['badge-gray', 'Not fit'],
         expired: ['badge-gray', 'Expired'],
         new: ['badge-yellow', 'New'],
     };
@@ -2005,16 +2004,6 @@ function copyRedditDraft(btn) {
         document.body.removeChild(ta);
         copied();
     });
-}
-
-async function markRedditNotFit() {
-    if (!redditCurrentThread) return;
-    if (!confirm('Mark this thread as not a fit? It will be hidden from the actionable queue.')) return;
-    const data = await api('reddit_mark_not_fit', { method: 'POST', body: { id: redditCurrentThread.id } });
-    if (!data || !data.success) { notify('Failed'); return; }
-    closeModal('redditThreadModal');
-    loadRedditThreads();
-    loadRedditStats();
 }
 
 async function markRedditSkipped() {

@@ -1111,7 +1111,7 @@ CREATE TABLE IF NOT EXISTS reddit_threads (
     ai_relevance_reason VARCHAR(500) DEFAULT NULL,
     draft_body TEXT DEFAULT NULL,
     draft_generated_at DATETIME DEFAULT NULL,
-    status ENUM('new','drafted','drafted_pending','replied','skipped','not_fit','expired') NOT NULL DEFAULT 'new',
+    status ENUM('new','drafted','drafted_pending','replied','skipped','expired') NOT NULL DEFAULT 'new',
     status_updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     mentioned_product TINYINT(1) DEFAULT 0 COMMENT 'Set when marking replied; counts toward post-limit',
     reply_permalink VARCHAR(500) DEFAULT NULL,

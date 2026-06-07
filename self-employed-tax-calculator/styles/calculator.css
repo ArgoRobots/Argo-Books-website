@@ -1,0 +1,203 @@
+/* self-employed-tax-calculator/styles/calculator.css
+   Calculator-specific styling. Loads on top of invoice-generator/styles/tool.css
+   (pulled in by layout.php), so it reuses the shared chrome — site-header, the
+   "All tools" breadcrumb, .site-hero, .page-banner — and the brand CSS variables
+   from custom-colors.css. Only the calculator's form + results UI lives here. */
+
+.taxcalc-app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 20px 96px;
+}
+
+/* Two columns on desktop: inputs on the left, the live result on the right. */
+.taxcalc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 28px;
+  align-items: start;
+}
+
+/* ---------- Inputs ---------- */
+.taxcalc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 4px 20px var(--shadow-sm);
+}
+
+.taxcalc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taxcalc-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tool-text);
+}
+
+.taxcalc-field select,
+.taxcalc-money input {
+  width: 100%;
+  font: inherit;
+  color: var(--tool-text);
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  min-height: 44px;
+}
+
+.taxcalc-field select:focus,
+.taxcalc-money input:focus {
+  outline: none;
+  border-color: var(--tool-primary);
+  box-shadow: 0 0 0 3px var(--blue-100);
+}
+
+/* Money input with a leading $ affix. */
+.taxcalc-money {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.taxcalc-money-affix {
+  position: absolute;
+  left: 12px;
+  color: var(--tool-muted);
+  pointer-events: none;
+  font-weight: 600;
+}
+
+.taxcalc-money input {
+  padding-left: 26px;
+}
+
+.taxcalc-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--tool-muted);
+}
+
+.taxcalc-note {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--tool-muted);
+}
+
+/* ---------- Results ---------- */
+.taxcalc-results {
+  background: var(--tool-surface);
+  border: 1px solid var(--tool-border);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 4px 20px var(--shadow-sm);
+}
+
+.taxcalc-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  padding: 8px 0 22px;
+  border-bottom: 1px solid var(--tool-border);
+  margin-bottom: 20px;
+}
+
+.taxcalc-headline-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tool-primary);
+}
+
+.taxcalc-headline-amount {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--tool-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.taxcalc-headline-sub {
+  font-size: 14px;
+  color: var(--tool-muted);
+}
+
+.taxcalc-breakdown {
+  margin: 0;
+}
+
+.taxcalc-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 9px 0;
+}
+
+.taxcalc-breakdown-row dt {
+  color: var(--invoice-text);
+}
+
+.taxcalc-breakdown-row dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--tool-text);
+}
+
+.taxcalc-breakdown-total {
+  border-top: 1px solid var(--tool-border);
+  margin-top: 6px;
+  padding-top: 14px;
+  font-size: 18px;
+}
+
+.taxcalc-breakdown-total dt {
+  font-weight: 700;
+  color: var(--tool-text);
+}
+
+.taxcalc-breakdown-total dd {
+  font-weight: 700;
+}
+
+.taxcalc-breakdown-rate dt,
+.taxcalc-breakdown-rate dd {
+  color: var(--tool-muted);
+  font-weight: 500;
+}
+
+/* ---------- Disclaimer ---------- */
+.taxcalc-disclaimer {
+  margin: 28px auto 0;
+  max-width: 760px;
+  padding: 14px 18px;
+  background: var(--amber-50);
+  border: 1px solid var(--amber-300);
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--amber-900);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .taxcalc-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .taxcalc-headline-amount {
+    font-size: 36px;
+  }
+}

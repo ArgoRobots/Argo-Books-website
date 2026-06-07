@@ -230,6 +230,14 @@ body {
   color: var(--amber-600);
 }
 
+.feature-icon.indigo {
+  background: linear-gradient(135deg, var(--indigo-50), var(--indigo-100));
+}
+
+.feature-icon.indigo svg {
+  color: var(--indigo-500);
+}
+
 /* ========================================
    Dark Section Wrapper (Contact + Footer)
    ======================================== */

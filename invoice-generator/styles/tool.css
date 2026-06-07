@@ -956,6 +956,35 @@ body {
   flex: 0 0 auto;
 }
 
+/* Back-link to the /tools/ hub, in its own row below the header, aligned to
+   the content's max-width. */
+.tool-breadcrumb {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 20px 0;
+}
+
+.site-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--tool-muted);
+  font-size: 14px;
+  font-weight: 500;
+  flex: 0 0 auto;
+}
+
+.site-back:hover,
+.site-back:focus {
+  color: var(--tool-primary);
+}
+
+.site-back-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
 .site-brand img {
   display: block;
   height: 28px;
@@ -966,6 +995,11 @@ body {
 @media (max-width: 540px) {
   .site-header-inner {
     padding: 12px 16px;
+  }
+
+  .tool-breadcrumb {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 }
 

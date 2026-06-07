@@ -44,6 +44,14 @@ $tools = [
         'icon_class'  => 'amber',
     ],
     [
+        'name'        => 'Free Self-Employed Tax Calculator',
+        'description' => 'Estimate your self-employment taxes and how much to set aside each quarter. United States and Canada, 2026.',
+        'href'        => '../self-employed-tax-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'pie-chart',
+        'icon_class'  => 'indigo',
+    ],
+    [
         'name'        => 'Free Invoice Templates',
         'description' => 'Ready-made invoice templates in PDF, Word, Excel, Google Docs, and Google Sheets. Pick a style and start billing.',
         'href'        => '../invoice-template/',

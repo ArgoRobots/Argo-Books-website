@@ -55,5 +55,6 @@ include __DIR__ . '/../invoice-generator/_fragment.php';
 $body_content = ob_get_clean();
 
 $extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/invoice-generator/scripts/main.js"></script>';
+$tools_back = ['href' => INVGEN_BASE . '/tools/', 'label' => 'All tools'];
 
 include __DIR__ . '/../invoice-generator/layout.php';

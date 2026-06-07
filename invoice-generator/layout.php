@@ -16,6 +16,9 @@ $og_image = $og_image ?? 'https://argorobots.com/resources/images/og-default.png
 $body_content = $body_content ?? '';
 $extra_head = $extra_head ?? '';
 $extra_scripts = $extra_scripts ?? '';
+// Optional back-link to the /tools/ hub, shown top-left of the header. Opt-in:
+// set by the tool pages only, so guides / articles / niche pages are unaffected.
+$tools_back = $tools_back ?? null; // ['href' => ..., 'label' => ...]
 
 // Sitewide Organization + WebSite schema. Baked in for E-E-A-T.
 // Update logo path and sameAs URLs to match the project's real assets / social profiles.
@@ -95,6 +98,13 @@ $site_schema = [
     </a>
   </div>
 </header>
+<?php if ($tools_back): ?>
+<nav class="tool-breadcrumb" aria-label="Breadcrumb">
+  <a class="site-back" href="<?= htmlspecialchars($tools_back['href']) ?>">
+    <span class="site-back-arrow" aria-hidden="true">&larr;</span> <?= htmlspecialchars($tools_back['label']) ?>
+  </a>
+</nav>
+<?php endif; ?>
 <?= $body_content ?>
 <?= $extra_scripts ?>
 </body>

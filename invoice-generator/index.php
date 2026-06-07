@@ -41,5 +41,6 @@ $body_content = ob_get_clean();
 
 require_once __DIR__ . '/_base.php';
 $extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/invoice-generator/scripts/main.js"></script>';
+$tools_back = ['href' => INVGEN_BASE . '/tools/', 'label' => 'All tools'];
 
 include __DIR__ . '/layout.php';

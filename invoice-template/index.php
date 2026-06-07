@@ -99,5 +99,6 @@ ob_start();
 </article>
 <?php
 $body_content = ob_get_clean();
+$tools_back = ['href' => INVGEN_BASE . '/tools/', 'label' => 'All tools'];
 
 include __DIR__ . '/../invoice-generator/layout.php';

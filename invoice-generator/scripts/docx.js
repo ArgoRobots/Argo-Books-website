@@ -18,6 +18,18 @@ const BASE = (typeof window !== 'undefined' && window.INVGEN_BASE) || '';
 const DOCX_SRC = `${BASE}/invoice-generator/vendor/docx.umd.js`;
 const COUNTRIES_URL = `${BASE}/invoice-generator/data/countries.json`;
 
+// Document-type config (shared engine; invoice defaults when absent).
+const DOC = (typeof window !== 'undefined' && window.DOC_CONFIG) || {};
+const FILENAME_PREFIX = DOC.filenamePrefix || 'invoice';
+const EVENT_PREFIX = DOC.eventPrefix || 'invgen';
+// Gate the invoice-only money fields. Default true preserves invoice output.
+// A purchase order keeps Payment Terms but drops Amount Paid / Balance Due,
+// so the two are tracked independently.
+const SHOW_PAYMENT_TERMS = DOC.showPaymentTerms !== false;
+const SHOW_PAYMENT_FIELDS = DOC.showPaymentFields !== false;
+// Title-cased document noun for the Word document's <title> metadata.
+const DOC_NOUN = FILENAME_PREFIX.charAt(0).toUpperCase() + FILENAME_PREFIX.slice(1);
+
 // Letter (8.5") at default 1" margins = 6.5" content = 9360 twentieths-of-a-
 // point (DXA). We use DXA for every table and cell width because the docx
 // library's PERCENTAGE width writes OOXML pct values that Google Docs reads
@@ -183,17 +195,20 @@ function buildHeader(state, d) {
     }
   }
   leftChildren.push(new Paragraph({
-    children: [new TextRun({ text: 'From', bold: true, size: 18, color: '666666' })],
+    children: [new TextRun({ text: (state.labels && state.labels.from) || 'From', bold: true, size: 18, color: '666666' })],
     spacing: { after: 40 },
   }));
   paragraphsFromMultiline(state.from || '', { size: 20 }, d).forEach((p) => leftChildren.push(p));
 
-  // Right cell: "INVOICE" heading and number, right-aligned.
+  // Right cell: document-title heading (e.g. "INVOICE" / "ESTIMATE") and
+  // number, right-aligned. The heading follows the editable documentTitle
+  // label so a renamed title flows through to the Word output.
+  const headingText = (state.labels && state.labels.documentTitle) || DOC.documentTitle || 'INVOICE';
   const invoiceNumberText = state.invoiceNumber ? `# ${state.invoiceNumber}` : '';
   const rightChildren = [
     new Paragraph({
       children: [new TextRun({
-        text: 'INVOICE',
+        text: headingText,
         bold: true,
         size: 44,
         font: style.headingFont,
@@ -263,8 +278,12 @@ function buildPartiesAndMeta(state, d) {
     return children;
   }
 
+  // Word labels follow the editable on-screen labels so a renamed field
+  // (e.g. "Bill To" -> "Vendor" on a purchase order) carries into the export.
+  const L = state.labels || {};
+
   const partyCells = [
-    new TableCell({ width: { size: dxa(33), type: WidthType.DXA }, borders: cellBorders, children: partyStack('Bill To', state.billTo) }),
+    new TableCell({ width: { size: dxa(33), type: WidthType.DXA }, borders: cellBorders, children: partyStack(L.billTo || 'Bill To', state.billTo) }),
   ];
   // Ship To: include only when the textbox actually has content. A toggled-on
   // but empty Ship To should not print a stray label.
@@ -273,7 +292,7 @@ function buildPartiesAndMeta(state, d) {
     partyCells.push(new TableCell({
       width: { size: dxa(33), type: WidthType.DXA },
       borders: cellBorders,
-      children: partyStack('Ship To', shipToText),
+      children: partyStack(L.shipTo || 'Ship To', shipToText),
     }));
   }
 
@@ -290,10 +309,10 @@ function buildPartiesAndMeta(state, d) {
       spacing: { after: 40 },
     }));
   };
-  pushMeta('Date', state.date);
-  pushMeta('Payment Terms', state.paymentTerms);
-  pushMeta('Due Date', state.dueDate);
-  pushMeta('PO Number', state.poNumber);
+  pushMeta(L.date || 'Date', state.date);
+  if (SHOW_PAYMENT_TERMS) pushMeta(L.paymentTerms || 'Payment Terms', state.paymentTerms);
+  pushMeta(L.dueDate || DOC.dueDateLabel || 'Due Date', state.dueDate);
+  pushMeta(L.poNumber || 'PO Number', state.poNumber);
 
   const metaCellWidth = shipToText ? 34 : 67;
   partyCells.push(new TableCell({
@@ -343,13 +362,15 @@ function buildLineItemsTable(state, d) {
     });
   }
 
+  // Column headers follow the editable on-screen labels.
+  const L = state.labels || {};
   const headerRow = new TableRow({
     tableHeader: true,
     children: [
-      headerCell('Description'),
-      headerCell('Quantity', AlignmentType.RIGHT),
-      headerCell('Rate', AlignmentType.RIGHT),
-      headerCell('Amount', AlignmentType.RIGHT),
+      headerCell(L.description || 'Description'),
+      headerCell(L.quantity || 'Quantity', AlignmentType.RIGHT),
+      headerCell(L.rate || 'Rate', AlignmentType.RIGHT),
+      headerCell(L.amount || 'Amount', AlignmentType.RIGHT),
     ],
   });
 
@@ -414,20 +435,22 @@ function buildTotals(state, totals, taxLabel, d) {
     }));
   };
 
-  pushRow('Subtotal', fmt(totals.subtotal));
+  // Totals labels follow the editable on-screen labels.
+  const L = state.labels || {};
+  pushRow(L.subtotal || 'Subtotal', fmt(totals.subtotal));
   if (state.discount !== null && state.discount !== undefined) {
-    pushRow('Discount', fmt(-totals.discount));
+    pushRow(L.discount || 'Discount', fmt(-totals.discount));
   }
   if (state.shipping !== null && state.shipping !== undefined) {
-    pushRow('Shipping', fmt(totals.shipping));
+    pushRow(L.shipping || 'Shipping', fmt(totals.shipping));
   }
   pushRow(taxLabel, fmt(totals.tax));
-  pushRow('Total', fmt(totals.total), { bold: true });
+  pushRow(L.total || 'Total', fmt(totals.total), { bold: true });
 
   const amountPaid = Number(state.amountPaid) || 0;
-  if (amountPaid !== 0) {
-    pushRow('Amount Paid', fmt(amountPaid));
-    pushRow('Balance Due', fmt(totals.balanceDue), { bold: true });
+  if (SHOW_PAYMENT_FIELDS && amountPaid !== 0) {
+    pushRow(L.amountPaid || 'Amount Paid', fmt(amountPaid));
+    pushRow(L.balanceDue || 'Balance Due', fmt(totals.balanceDue), { bold: true });
   }
 
   return new Table({
@@ -491,6 +514,54 @@ function buildBottomRow(state, totals, taxLabel, d) {
   });
 }
 
+// Optional acceptance / signature block: a heading plus two ruled lines (to
+// sign and to date) with captions beneath. Returns [] when not toggled on.
+function buildSignature(state, d) {
+  if (state.signature == null) return [];
+  const { Paragraph, TextRun, Table, TableRow, TableCell, WidthType, BorderStyle } = d;
+  const L = state.labels || {};
+
+  const noBorder = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
+  const cellBorders = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+  const ruleBorder = { style: BorderStyle.SINGLE, size: 4, color: '000000' };
+
+  // A signing cell: an empty paragraph carrying a bottom border (the line to
+  // sign on), then a small caption beneath it.
+  function signCell(caption, widthPct) {
+    return new TableCell({
+      width: { size: dxa(widthPct), type: WidthType.DXA },
+      borders: cellBorders,
+      children: [
+        new Paragraph({ border: { bottom: ruleBorder }, spacing: { before: 260, after: 40 }, children: [new TextRun({ text: '' })] }),
+        new Paragraph({ children: [new TextRun({ text: caption, size: 16, color: '666666' })] }),
+      ],
+    });
+  }
+
+  const heading = new Paragraph({
+    children: [new TextRun({ text: L.signatureLabel || 'Accepted by', bold: true, size: 20 })],
+    spacing: { after: 80 },
+  });
+
+  const table = new Table({
+    width: { size: DXA_FULL, type: WidthType.DXA },
+    columnWidths: [dxa(55), dxa(10), dxa(35)],
+    borders: {
+      top: noBorder, bottom: noBorder, left: noBorder, right: noBorder,
+      insideHorizontal: noBorder, insideVertical: noBorder,
+    },
+    rows: [new TableRow({
+      children: [
+        signCell(L.signatureName || 'Signature', 55),
+        new TableCell({ width: { size: dxa(10), type: WidthType.DXA }, borders: cellBorders, children: [new Paragraph('')] }),
+        signCell(L.signatureDate || 'Date', 35),
+      ],
+    })],
+  });
+
+  return [heading, table];
+}
+
 function buildDocument(state, totals, taxLabel, d) {
   const { Document, Paragraph, TextRun, Footer, AlignmentType } = d;
 
@@ -506,9 +577,15 @@ function buildDocument(state, totals, taxLabel, d) {
     buildBottomRow(state, totals, taxLabel, d),
   ];
 
+  const signatureEls = buildSignature(state, d);
+  if (signatureEls.length) {
+    children.push(spacer(320));
+    signatureEls.forEach((el) => children.push(el));
+  }
+
   return new Document({
     creator: 'Argo Books',
-    title: state.invoiceNumber ? `Invoice ${state.invoiceNumber}` : 'Invoice',
+    title: state.invoiceNumber ? `${DOC_NOUN} ${state.invoiceNumber}` : DOC_NOUN,
     sections: [{
       properties: {},
       footers: {
@@ -531,13 +608,17 @@ export async function downloadDocx(state) {
   const countriesData = await countriesPromiseLocal;
 
   const totals = computeTotals(state);
-  const taxLabel = taxLabelForCountry(countriesData, state.country);
+  // Prefer the editable on-screen tax label (what the user sees and the PDF
+  // shows) so Word matches; fall back to the country-derived label.
+  const taxLabel = (state.labels && state.labels.tax)
+    ? state.labels.tax
+    : taxLabelForCountry(countriesData, state.country);
   const doc = buildDocument(state, totals, taxLabel, d);
 
   const blob = await d.Packer.toBlob(doc);
 
   const safeNumber = (state.invoiceNumber && String(state.invoiceNumber).trim()) || 'draft';
-  const filename = `invoice-${safeNumber}.docx`;
+  const filename = `${FILENAME_PREFIX}-${safeNumber}.docx`;
 
   const url = URL.createObjectURL(blob);
   try {
@@ -551,5 +632,5 @@ export async function downloadDocx(state) {
     // Allow the browser to start the download before revoking.
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  trackEvent('invgen_docx_downloaded', state.template || '');
+  trackEvent(`${EVENT_PREFIX}_docx_downloaded`, state.template || '');
 }

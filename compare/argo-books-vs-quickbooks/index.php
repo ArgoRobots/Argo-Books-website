@@ -167,7 +167,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                         <?= svg_icon('dollar', 30, '', 1.5) ?>
                     </div>
                     <h3>No price creep</h3>
-                    <p>QuickBooks has raised their prices twice since we launched this comparison page, and we've had to update these numbers each time. Their cheapest plan is now $<?= $qb_easystart ?> CAD/month. Argo Books has a free version with core features, and Premium is $<?= $argo_monthly ?> CAD/month.</p>
+                    <p>QuickBooks has raised their prices twice since we launched this comparison page, and we've had to update these numbers each time. They increased their prices by 70% in the last 5 years. How much will they increase it in the next 5 years?</p>
                 </div>
                 <div class="diff-card animate-on-scroll">
                     <div class="diff-icon purple">
@@ -301,7 +301,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Pricing</span>
                 <h2>Save hundreds every year</h2>
-                <p class="section-desc">QuickBooks charges $<?= $qb_easystart ?> to $<?= $qb_advanced ?> CAD/month depending on the plan, and those prices keep climbing every year (we've had to update this page twice already to keep up). Argo Books keeps it simple with predictable, affordable pricing.</p>
+                <p class="section-desc">QuickBooks charges $<?= $qb_easystart ?> to $<?= $qb_advanced ?> CAD/month depending on the plan, and those prices keep climbing every year (70% in the last 5 years!). We've had to update this page twice already to keep up. Argo Books keeps it simple with predictable, affordable pricing.</p>
             </div>
             <div class="pricing-grid">
                 <div class="pricing-col animate-on-scroll">

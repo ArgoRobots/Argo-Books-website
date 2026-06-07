@@ -25,7 +25,12 @@ $event_data = is_array($body) ? ($body['event_data'] ?? '') : '';
 
 // Allowlist of event types the tool is allowed to emit. Keep this list in
 // sync with invoice-generator/scripts/tracker.js + its callers.
+//
+// The same engine powers two tools, distinguished by an event prefix
+// (window.DOC_CONFIG.eventPrefix): the invoice generator emits 'invgen_*' and
+// the estimate generator emits 'estgen_*'. Both post to this one endpoint.
 $allowed = [
+    // --- Invoice generator (invgen_*) ---
     'invgen_pdf_downloaded',
     'invgen_docx_downloaded',
     'invgen_cta_clicked',
@@ -39,6 +44,26 @@ $allowed = [
     'invgen_template_download',     // Excel direct download / Google Docs or Sheets copy click
     // Phase E: share-link copy
     'invgen_share_link_copied',     // User clicked the toolbar "Copy share link" button
+    // --- Estimate generator (estgen_*) ---
+    'estgen_pdf_downloaded',
+    'estgen_docx_downloaded',
+    'estgen_cta_clicked',
+    'estgen_template_changed',
+    'estgen_country_changed',
+    'estgen_currency_changed',
+    'estgen_niche_default_used',
+    'estgen_logo_uploaded',
+    'estgen_share_link_copied',
+    // --- Purchase order generator (pogen_*) ---
+    'pogen_pdf_downloaded',
+    'pogen_docx_downloaded',
+    'pogen_cta_clicked',
+    'pogen_template_changed',
+    'pogen_country_changed',
+    'pogen_currency_changed',
+    'pogen_niche_default_used',
+    'pogen_logo_uploaded',
+    'pogen_share_link_copied',
 ];
 if (!in_array($event_type, $allowed, true)) {
     http_response_code(400);

@@ -1462,6 +1462,67 @@ body {
   width: 100%;
 }
 
+/* Optional acceptance / signature block. Toggled on like Ship To; the user
+   prints the document and signs above each line. Lines are plain ruled
+   borders so they print cleanly and capture into the PDF. */
+.invoice-signature {
+  margin-top: 28px;
+}
+
+.signature-block {
+  position: relative;
+}
+
+.signature-heading {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--invoice-text);
+  margin-bottom: 24px;
+}
+
+.signature-row {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.signature-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 240px;
+  min-width: 0;
+}
+
+.signature-field-date {
+  flex: 0 1 200px;
+}
+
+.signature-line {
+  display: block;
+  height: 28px;
+  border-bottom: 1px solid var(--invoice-text);
+}
+
+.signature-caption {
+  margin-top: 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--invoice-muted);
+  font-weight: 600;
+}
+
+.signature-toggle-row {
+  margin-top: 12px;
+}
+
+.signature-block > .invgen-section-remove {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 .invoice-totals {
   display: flex;
   flex-direction: column;
@@ -2171,6 +2232,7 @@ input.editable-document-title {
 .invgen-capturing .col-delete,
 .invgen-capturing .meta-label-spacer,
 .invgen-capturing .line-items-actions,
+.invgen-capturing .signature-toggle-row,
 .invgen-capturing #logo-slot {
   display: none !important;
 }

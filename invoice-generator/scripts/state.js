@@ -1,10 +1,17 @@
 // invoice-generator/scripts/state.js
 // Invoice state model + localStorage persistence.
+//
+// The engine is shared by the invoice, estimate, and purchase-order generators.
+// window.DOC_CONFIG (injected by the page) carries the document-type overrides;
+// when it is absent (the invoice standalone page and every niche page) the
+// invoice defaults apply, so behavior is unchanged.
 
-const STORAGE_KEY = 'argobooks.invoiceGenerator.draft';
+const DOC = (typeof window !== 'undefined' && window.DOC_CONFIG) || {};
+
+const STORAGE_KEY = DOC.storageKey || 'argobooks.invoiceGenerator.draft';
 
 export function emptyState() {
-  return {
+  const state = {
     template: 'classic',
     country: 'US',
     currency: 'USD',
@@ -28,18 +35,19 @@ export function emptyState() {
     notes: '',
     terms: '',
     amountPaid: 0,
+    signature: null, // null means the acceptance/signature block is hidden; {} when shown
     // Every visible piece of text on the invoice surface is user-editable.
     // The default values are the standard invoice labels; the user can
     // rename any of them (e.g. "Bill To" -> "Client", "Tax" -> "GST").
     labels: {
       businessTitle: '',
-      documentTitle: 'INVOICE',
+      documentTitle: DOC.documentTitle || 'INVOICE',
       from: 'From',
       billTo: 'Bill To',
       shipTo: 'Ship To',
       date: 'Date',
       paymentTerms: 'Payment Terms',
-      dueDate: 'Due Date',
+      dueDate: DOC.dueDateLabel || 'Due Date',
       poNumber: 'PO Number',
       description: 'Description',
       quantity: 'Quantity',
@@ -54,8 +62,20 @@ export function emptyState() {
       total: 'Total',
       amountPaid: 'Amount Paid',
       balanceDue: 'Balance Due',
+      signatureLabel: 'Accepted by',
+      signatureName: 'Signature',
+      signatureDate: 'Date',
     },
   };
+
+  // Per-document-type label overrides (e.g. "Bill To" -> "Vendor" for a PO),
+  // merged over the defaults above. Only known label keys are applied.
+  const overrides = DOC.labelOverrides || {};
+  for (const key of Object.keys(overrides)) {
+    if (key in state.labels) state.labels[key] = overrides[key];
+  }
+
+  return state;
 }
 
 function todayISO() {
@@ -70,17 +90,32 @@ function addDaysISO(iso, days) {
 
 // Priority: localStorage draft > nicheDefaults > empty state.
 // (A.18 introduces nicheDefaults; A.7 ships the parameter as a no-op-friendly default.)
+//
+// `labels` is merged one level deep, not shallow-replaced: a draft saved before
+// a new label existed (e.g. the signature captions) would otherwise clobber the
+// whole labels object and blank out the new defaults. Deep-merging backfills
+// any new default labels while preserving the user's own renames.
+function mergeOver(base, overlay) {
+  if (!overlay || typeof overlay !== 'object') return base;
+  return {
+    ...base,
+    ...overlay,
+    labels: { ...base.labels, ...(overlay.labels || {}) },
+  };
+}
+
 export function loadDraft(nicheDefaults) {
+  const base = emptyState();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...emptyState(), ...JSON.parse(raw) };
+    if (raw) return mergeOver(base, JSON.parse(raw));
   } catch (_e) {
     // fall through to defaults
   }
   if (nicheDefaults && typeof nicheDefaults === 'object') {
-    return { ...emptyState(), ...nicheDefaults };
+    return mergeOver(base, nicheDefaults);
   }
-  return emptyState();
+  return base;
 }
 
 export function saveDraft(state) {

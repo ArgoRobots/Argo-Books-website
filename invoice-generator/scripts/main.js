@@ -11,6 +11,13 @@ import { trackEvent } from './tracker.js';
 
 const BASE = (typeof window !== 'undefined' && window.INVGEN_BASE) || '';
 
+// Document-type config (shared engine; invoice defaults when absent). EVP
+// prefixes the analytics event names so the estimate tool reports under
+// estgen_*; TOOL_PATH is the canonical path for the "Copy share link" URL.
+const DOC = (typeof window !== 'undefined' && window.DOC_CONFIG) || {};
+const EVP = DOC.eventPrefix || 'invgen';
+const TOOL_PATH = DOC.toolPath || '/invoice-generator/';
+
 // ---------- tiny DOM helpers ----------
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -122,6 +129,20 @@ function hydrateFromState() {
       shippingRow.hidden = false;
       if (shippingToggleBtn) shippingToggleBtn.hidden = true;
       setFieldValue($('[data-field="shipping-value"]'), state.shipping.value);
+    }
+  }
+
+  // Signature: shown only when state.signature is not null. The block only
+  // exists on doc types that opt in (estimate, purchase order).
+  const signatureBlock = $('#signature-block');
+  const signatureToggleBtn = $('[data-action="toggle-signature"]');
+  if (signatureBlock) {
+    if (state.signature == null) {
+      signatureBlock.hidden = true;
+      if (signatureToggleBtn) signatureToggleBtn.hidden = false;
+    } else {
+      signatureBlock.hidden = false;
+      if (signatureToggleBtn) signatureToggleBtn.hidden = true;
     }
   }
 
@@ -313,13 +334,13 @@ function onAnyInput(ev) {
     state.template = value;
     applyTemplate(state.template);
     handleSaveResult(saveDraft(state));
-    trackEvent('invgen_template_changed', value);
+    trackEvent(`${EVP}_template_changed`, value);
     return;
   }
 
   if (field === 'currency') {
     applyCurrency(value);
-    trackEvent('invgen_currency_changed', value);
+    trackEvent(`${EVP}_currency_changed`, value);
     return;
   }
 
@@ -415,7 +436,7 @@ async function handleLogoFileChange(ev) {
     } else {
       handleSaveResult(result);
     }
-    trackEvent('invgen_logo_uploaded', '');
+    trackEvent(`${EVP}_logo_uploaded`, '');
   } catch (_e) {
     showToast('Could not read that image. Try a different file.');
   }
@@ -539,6 +560,17 @@ function wireToggles() {
     if (valueInput) valueInput.focus();
     rerenderAndSave();
   });
+
+  // Signature/acceptance block: present only on opt-in doc types.
+  const signatureBtn = $('[data-action="toggle-signature"]');
+  if (signatureBtn) signatureBtn.addEventListener('click', () => {
+    if (state.signature != null) return;
+    state.signature = {};
+    const block = $('#signature-block');
+    if (block) block.hidden = false;
+    signatureBtn.hidden = true;
+    handleSaveResult(saveDraft(state));
+  });
 }
 
 // "Remove" controls live inside the toggle rows themselves; we install them
@@ -584,6 +616,22 @@ function ensureSectionRemoveButtons() {
       const wrap = $('#field-shipTo-wrap');
       if (wrap) wrap.hidden = true;
       const btn = $('[data-action="toggle-shipTo"]');
+      if (btn) {
+        btn.hidden = false;
+        btn.focus();
+      }
+      handleSaveResult(saveDraft(state));
+    },
+  });
+
+  installRemoveButton({
+    rowSelector: '#signature-block',
+    label: 'Remove signature',
+    onRemove: () => {
+      state.signature = null;
+      const block = $('#signature-block');
+      if (block) block.hidden = true;
+      const btn = $('[data-action="toggle-signature"]');
       if (btn) {
         btn.hidden = false;
         btn.focus();
@@ -690,7 +738,7 @@ function wirePitchTracking() {
   document.querySelectorAll('[data-pitch-placement]').forEach((el) => {
     el.addEventListener('click', () => {
       const placement = el.getAttribute('data-pitch-placement') || '';
-      trackEvent('invgen_cta_clicked', placement);
+      trackEvent(`${EVP}_cta_clicked`, placement);
     });
   });
 }
@@ -764,7 +812,7 @@ function wireCopyShareLink() {
     button.textContent = 'Copying...';
     try {
       const { serializeShareLink } = await import(`${BASE}/invoice-generator/scripts/url-params.js`);
-      const shareUrl = serializeShareLink(`${window.location.origin}${BASE}/invoice-generator/`, state);
+      const shareUrl = serializeShareLink(`${window.location.origin}${BASE}${TOOL_PATH}`, state);
       let copied = false;
       if (navigator.clipboard && window.isSecureContext) {
         try {
@@ -785,7 +833,7 @@ function wireCopyShareLink() {
       }
       showToast(copied ? 'Share link copied to clipboard.' : 'Could not copy. The link is in your address bar.');
       if (copied) {
-        try { trackEvent('invgen_share_link_copied', ''); } catch (_e) { /* tracking is best-effort */ }
+        try { trackEvent(`${EVP}_share_link_copied`, ''); } catch (_e) { /* tracking is best-effort */ }
       }
     } catch (err) {
       console.error('Share link copy failed:', err);
@@ -820,7 +868,7 @@ async function init() {
     const slug = (typeof window !== 'undefined' && window.INVOICE_NICHE_SLUG)
       ? String(window.INVOICE_NICHE_SLUG)
       : '';
-    trackEvent('invgen_niche_default_used', slug);
+    trackEvent(`${EVP}_niche_default_used`, slug);
   }
 
   // Share-link URL parameters override the persisted draft for THIS session

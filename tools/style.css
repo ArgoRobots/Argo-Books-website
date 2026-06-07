@@ -285,10 +285,18 @@ body {
   line-height: 1.7;
 }
 
+/* Override the site-wide .btn (button.css loads after this file and forces
+   width:180px / padding:10px 0, which squeezes a longer label onto two lines).
+   This selector is more specific than .btn, so these win. */
 .contact-card .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: auto;
+  padding: 14px 28px;
+  border-radius: 12px;
+  white-space: nowrap;
 }
 
 .btn-primary {

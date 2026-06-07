@@ -15,7 +15,9 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
   gap: 28px;
-  align-items: start;
+  /* stretch: both columns grow to the height of the taller one so the form
+     and results cards are always the same size. */
+  align-items: stretch;
 }
 
 /* ---------- Inputs ---------- */
@@ -28,6 +30,9 @@
   border-radius: 14px;
   padding: 24px;
   box-shadow: 0 4px 20px var(--shadow-sm);
+  /* Fixed height that already fits the taller Canada layout (which adds the
+     province field) so the cards don't grow/shrink when the country changes. */
+  min-height: 460px;
 }
 
 .taxcalc-field {
@@ -99,6 +104,7 @@
   border-radius: 14px;
   padding: 28px;
   box-shadow: 0 4px 20px var(--shadow-sm);
+  min-height: 460px; /* match the form so both cards stay the same fixed size */
 }
 
 .taxcalc-headline {
@@ -195,6 +201,13 @@
 @media (max-width: 760px) {
   .taxcalc-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* Stacked on mobile, so the fixed height just wastes space — let them size
+     to content. */
+  .taxcalc-form,
+  .taxcalc-results {
+    min-height: 0;
   }
 
   .taxcalc-headline-amount {

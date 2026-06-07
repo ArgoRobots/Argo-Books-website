@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test invoice-generator/scripts/*.test.js self-employed-tax-calculator/scripts/*.test.js",
+    "test": "node --test invoice-generator/scripts/*.test.js self-employed-tax-calculator/scripts/*.test.js craft-pricing-calculator/scripts/*.test.js",
     "build:templates": "node invoice-generator/scripts/build-templates.js"
   },
   "devDependencies": {

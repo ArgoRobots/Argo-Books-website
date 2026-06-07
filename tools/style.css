@@ -238,6 +238,14 @@ body {
   color: var(--indigo-500);
 }
 
+.feature-icon.cyan {
+  background: linear-gradient(135deg, var(--cyan-50), var(--cyan-100));
+}
+
+.feature-icon.cyan svg {
+  color: var(--cyan-500);
+}
+
 /* ========================================
    Dark Section Wrapper (Contact + Footer)
    ======================================== */

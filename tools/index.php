@@ -52,6 +52,14 @@ $tools = [
         'icon_class'  => 'indigo',
     ],
     [
+        'name'        => 'Free Craft Pricing Calculator',
+        'description' => 'Price your handmade products to actually pay you. Add materials, labour, and markup to get a selling price, profit, and margin.',
+        'href'        => '../craft-pricing-calculator/',
+        'cta'         => 'Open the calculator',
+        'icon'        => 'shopping-bag',
+        'icon_class'  => 'cyan',
+    ],
+    [
         'name'        => 'Free Invoice Templates',
         'description' => 'Ready-made invoice templates in PDF, Word, Excel, Google Docs, and Google Sheets. Pick a style and start billing.',
         'href'        => '../invoice-template/',

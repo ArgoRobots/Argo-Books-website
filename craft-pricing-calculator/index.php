@@ -105,7 +105,7 @@ ob_start();
 
   <section class="site-hero">
     <h1 class="site-hero-title">Free Craft Pricing Calculator</h1>
-    <p class="site-hero-tagline">Stop guessing what to charge. Enter your costs and a markup to find a handmade price that actually pays you back, with your profit and margin worked out for you.</p>
+    <p class="site-hero-tagline">Stop guessing what to charge. Enter your costs and a markup to find a price that actually pays you back, with your profit and margin worked out for you.</p>
   </section>
 
   <aside class="page-banner" role="complementary">
@@ -139,7 +139,7 @@ ob_start();
           <input id="cc-markup" data-cc="markup" type="number" inputmode="decimal" min="0" step="1" placeholder="150">
           <span class="craft-money-affix craft-money-affix-right">%</span>
         </div>
-        <div class="craft-channels" role="group" aria-label="Quick markup presets by sales channel">
+        <div class="craft-channels" role="group" aria-label="Quick markup presets by where you sell">
           <?php foreach ($channels as $c): ?>
             <button type="button" class="craft-channel-btn" data-cc-preset="<?= (int)$c['preset'] ?>"><?= htmlspecialchars(strtok($c['name'], ' /')) ?> <span class="craft-channel-pct"><?= (int)$c['preset'] ?>%</span></button>
           <?php endforeach; ?>
@@ -173,9 +173,8 @@ ob_start();
 
     <section>
       <h2>How to price your handmade products (quick answer)</h2>
-      <p>Add your <strong>material cost</strong> and <strong>labour cost</strong> together to get what one item really costs you to make. Then apply a <strong>markup</strong> to set your selling price. The standard handmade formula is:</p>
-      <p class="craft-formula">Selling price = (material cost + labour cost) &times; (1 + markup %)</p>
-      <p>Most handmade sellers use a markup of <strong>100% to 200%</strong>, which leaves a profit margin of about <strong>50% to 67%</strong>. The calculator above does the maths for you and shows your profit and margin as you type.</p>
+      <p>Add your <strong>material cost</strong> and <strong>labour cost</strong> together to get what one item really costs you to make. Then apply a <strong>markup</strong> to set your selling price (see the formula below).</p>
+      <p>Most handmade sellers use a markup of <strong>100% to 200%</strong>, which leaves a profit margin of about <strong>50% to 67%</strong>. The calculator above does the work for you and shows your profit and margin as you type.</p>
     </section>
 
     <section>
@@ -183,8 +182,8 @@ ob_start();
       <h3>The three inputs</h3>
       <ul>
         <li><strong>Material cost</strong>: everything you use to make one item, including packaging and labels. Use the cost <em>per item</em>, not the price of the whole pack.</li>
-        <li><strong>Labour cost</strong>: your time. Pick an hourly rate you would be happy to earn, then multiply by how long one item takes to make.</li>
-        <li><strong>Markup</strong>: the percentage you add on top of your cost. Tap a preset for your sales channel, or type your own.</li>
+        <li><strong>Labour cost</strong>: your time, for one item. Pick an hourly rate you would be happy to earn and multiply by how long one item takes. If you work in batches, divide the batch's time by how many items it makes.</li>
+        <li><strong>Markup</strong>: the percentage you add on top of your cost. Tap a preset for where you sell, or type your own.</li>
       </ul>
       <h3>Reading the results</h3>
       <ul>
@@ -196,7 +195,7 @@ ob_start();
     </section>
 
     <section>
-      <h2>Markup and margin by sales channel</h2>
+      <h2>Markup and margin by where you sell</h2>
       <p>Where you sell changes how much to mark up. Selling direct lets you keep more; selling wholesale means leaving room for the shop to mark the item up again.</p>
       <table class="craft-table">
         <thead>
@@ -223,7 +222,7 @@ ob_start();
     </section>
 
     <section>
-      <h2>A worked example</h2>
+      <h2>A real example</h2>
       <div class="craft-example">
         <p>Say you make soap in batches. A batch of <strong>20 bars</strong> uses <strong>$40</strong> of oils, lye, fragrance, and packaging, so materials are $40 &divide; 20 = <strong>$2.00 per bar</strong>. The batch takes about an hour and you value your time at $20/hour, so labour is $20 &divide; 20 = <strong>$1.00 per bar</strong>. Dividing the batch cost across every bar gives your true per-item cost. You sell on Etsy, so you pick a <strong>150% markup</strong>.</p>
         <ul>
@@ -240,7 +239,7 @@ ob_start();
       <ol class="craft-mistakes">
         <li><strong>Not paying yourself for labour.</strong> Your time is a real cost. Leave it out and your "profit" is really just unpaid wages.</li>
         <li><strong>Using the pack price instead of the per-item cost.</strong> Divide the cost of a pack by how many items it makes.</li>
-        <li><strong>Copying a competitor's price.</strong> You do not know their costs. Price from your own numbers, then sanity-check against the market.</li>
+        <li><strong>Copying a competitor's price.</strong> You do not know their costs. Price from your own numbers, then reality-check against the market.</li>
         <li><strong>Forgetting overhead.</strong> Stall fees, online listing fees, and equipment add up. Build a little extra into your markup to cover them.</li>
       </ol>
     </section>

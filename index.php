@@ -197,6 +197,21 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         </div>
     </section>
 
+    <!-- Featured On Section -->
+    <section class="featured-on">
+        <div class="container">
+            <span class="featured-on-label">Featured on</span>
+            <div class="featured-on-logos">
+                <a href="https://topfreeaitools.com/ai/argo-books" target="_blank" rel="noopener">
+                    <img src="resources/images/featured-topfreeaitools.png" style="width: 230px; height: 54px;" width="230" height="54" alt="Featured on Top Free AI Tools" />
+                </a>
+                <a href="https://startupfa.me/s/argo-books?utm_source=argorobots.com" target="_blank" rel="noopener">
+                    <img src="resources/images/featured-startupfame.webp" style="width: 171px; height: 54px;" width="171" height="54" alt="Argo Books - Featured on Startup Fame" />
+                </a>
+            </div>
+        </div>
+    </section>
+
     <!-- Features Tabbed Section -->
     <section id="features" class="features-section">
         <div class="container">

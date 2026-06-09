@@ -900,6 +900,56 @@ a {
 }
 
 /* ========================================
+   Featured On Section
+   ======================================== */
+.featured-on {
+    padding: 48px 0;
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-border);
+}
+
+.featured-on .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+}
+
+.featured-on-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray-500);
+}
+
+.featured-on-logos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+}
+
+.featured-on-logos a {
+    display: inline-flex;
+    opacity: 0.85;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.featured-on-logos a:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.featured-on-logos img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* ========================================
    Features Tabbed Section
    ======================================== */
 .features-section {

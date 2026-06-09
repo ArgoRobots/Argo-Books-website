@@ -217,6 +217,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://dayslaunch.com', 'img' => 'https://dayslaunch.com/badages-awards.svg', 'w' => 200, 'alt' => 'Featured on Days Launch'],
                 ['href' => 'https://toolrain.com/item/argo-books', 'img' => 'toolrain.svg', 'w' => 184, 'alt' => 'Listed on ToolRain'],
                 ['href' => 'https://saasfame.com/item/argo-books', 'img' => 'https://saasfame.com/badge-light.svg', 'w' => 170, 'alt' => 'Featured on SaaSFame'],
+                ['href' => 'https://deeplaunch.io', 'img' => 'https://deeplaunch.io/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on DeepLaunch.io'],
             ];
             ?>
             <div class="featured-on-marquee">

@@ -202,19 +202,17 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         <div class="container">
             <span class="featured-on-label">Featured on</span>
             <?php
-            // Badge list rendered twice back-to-back so the marquee can loop
-            // seamlessly (the track animates by exactly -50%). To add a badge,
-            // add one entry here; both copies update automatically.
+            // Badge list rendered twice back-to-back so the marquee can loop seamlessly
             $featured_badges = [
-                ['href' => 'https://topfreeaitools.com/ai/argo-books',        'img' => 'featured-topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
-                ['href' => 'https://startupfa.me/s/argo-books?utm_source=argorobots.com', 'img' => 'featured-startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
-                ['href' => 'https://launch-list.org/product/argo-books',       'img' => 'featured-launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
-                ['href' => 'https://twelve.tools',                             'img' => 'featured-twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
-                ['href' => 'https://wired.business',                           'img' => 'featured-wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
-                ['href' => 'https://auraplusplus.com/projects/argo-books',     'img' => 'featured-auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
-                ['href' => 'https://submitmysaas.com',                         'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
+                ['href' => 'https://topfreeaitools.com', 'img' => 'featured-topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
+                ['href' => 'https://startupfa.me/s/argo-books', 'img' => 'featured-startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
+                ['href' => 'https://launch-list.org/product/argo-books', 'img' => 'featured-launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
+                ['href' => 'https://twelve.tools', 'img' => 'featured-twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
+                ['href' => 'https://wired.business', 'img' => 'featured-wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
+                ['href' => 'https://auraplusplus.com/projects/argo-books', 'img' => 'featured-auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
+                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
                 ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'featured-productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
-                ['href' => 'https://www.scrolllaunch.com/products/argo-books?utm_source=badge&utm_medium=embed&utm_campaign=argo-books&ref=scrolllaunch', 'img' => 'featured-scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
+                ['href' => 'https://www.scrolllaunch.com', 'img' => 'featured-scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
             ];
             ?>
             <div class="featured-on-marquee">

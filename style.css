@@ -905,7 +905,6 @@ a {
 .featured-on {
     padding: 48px 0;
     background: var(--white);
-    border-bottom: 1px solid var(--gray-border);
 }
 
 .featured-on .container {
@@ -924,9 +923,11 @@ a {
     color: var(--gray-500);
 }
 
-/* Marquee viewport: one row, no wrap, edges faded out */
+/* Marquee viewport: one row, no wrap, edges faded out. Vertical padding gives
+   the hover lift room so overflow:hidden doesn't clip the raised badge. */
 .featured-on-marquee {
     width: 100%;
+    padding: 6px 0;
     overflow: hidden;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
     mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);

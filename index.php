@@ -213,6 +213,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://wired.business',                           'img' => 'featured-wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
                 ['href' => 'https://auraplusplus.com/projects/argo-books',     'img' => 'featured-auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
                 ['href' => 'https://submitmysaas.com',                         'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
+                ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'featured-productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
             ];
             ?>
             <div class="featured-on-marquee">

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="48" viewBox="0 0 220 48" fill="none" role="img" aria-label="FEATURED ON ScrollLaunch">
+  <rect width="220" height="48" rx="10" fill="#0f172a"/>
+  <rect x="0.5" y="0.5" width="219" height="47" rx="9.5" stroke="rgba(255,255,255,0.08)"/>
+  <g transform="translate(12, 10) scale(0.667)">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M22.1 17.86L32 7.96L29.88 5.84L22.54 13.18V0H19.54V13.18L12.2 5.84L10.08 7.96L19.98 17.86L21.04 18.92L22.1 17.86ZM24.22 19.98L34.12 10.08L36.24 12.2L28.9 19.54H42V22.54H28.9L36.24 29.88L34.12 32L24.22 22.1L23.16 21.04L24.22 19.98ZM7.96 32L17.86 22.1L18.92 21.04L17.86 19.98L7.96 10.08L5.84 12.2L13.18 19.54H0V22.54H13.18L5.84 29.88L7.96 32ZM19.98 24.22L10.08 34.12L12.2 36.24L19.54 28.91V42H22.54V28.91L29.88 36.24L32 34.12L22.1 24.22L21.04 23.16L19.98 24.22Z" fill="#ffffff"/>
+  </g>
+  <text x="52" y="19" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="9.5" font-weight="600" letter-spacing="0.6" fill="#94a3b8">FEATURED ON</text>
+  <text x="52" y="35" font-family="system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="16" font-weight="700" fill="#ffffff">ScrollLaunch</text>
+  <!-- argo-books -->
+</svg>

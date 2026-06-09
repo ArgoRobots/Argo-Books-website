@@ -214,6 +214,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://auraplusplus.com/projects/argo-books',     'img' => 'featured-auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
                 ['href' => 'https://submitmysaas.com',                         'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
                 ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'featured-productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
+                ['href' => 'https://www.scrolllaunch.com/products/argo-books?utm_source=badge&utm_medium=embed&utm_campaign=argo-books&ref=scrolllaunch', 'img' => 'featured-scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
             ];
             ?>
             <div class="featured-on-marquee">

@@ -213,6 +213,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
                 ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'featured-productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
                 ['href' => 'https://www.scrolllaunch.com', 'img' => 'featured-scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
+                ['href' => 'https://starterbest.com', 'img' => 'featured-starterbest.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],
             ];
             ?>
             <div class="featured-on-marquee">

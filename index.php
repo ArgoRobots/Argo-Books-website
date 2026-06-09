@@ -156,7 +156,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                     <span class="hero-title-line text-gradient">or chaos</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
-                    Modern bookkeeping and operations software for small business owners. 
+                    Modern bookkeeping and accounting software for small business owners. 
                     Manage invoicing, expenses, inventory, and receipts in one clean system.
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
@@ -207,6 +207,18 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 </a>
                 <a href="https://startupfa.me/s/argo-books?utm_source=argorobots.com" target="_blank" rel="noopener">
                     <img src="resources/images/featured-startupfame.webp" style="width: 171px; height: 54px;" width="171" height="54" alt="Argo Books - Featured on Startup Fame" />
+                </a>
+                <a href="https://launch-list.org/product/argo-books" target="_blank" rel="noopener">
+                    <img src="resources/images/featured-launchlist.svg" style="width: 165px; height: 54px;" width="165" height="54" alt="Featured on Launch List" />
+                </a>
+                <a href="https://twelve.tools" target="_blank" rel="noopener">
+                    <img src="resources/images/featured-twelvetools.svg" style="width: 200px; height: 54px;" width="200" height="54" alt="Featured on Twelve Tools" />
+                </a>
+                <a href="https://wired.business" target="_blank" rel="noopener">
+                    <img src="resources/images/featured-wiredbusiness.svg" style="width: 200px; height: 54px;" width="200" height="54" alt="Featured on Wired Business" />
+                </a>
+                <a href="https://auraplusplus.com/projects/argo-books" target="_blank" rel="noopener">
+                    <img src="resources/images/featured-auraplusplus.svg" style="width: 184px; height: 54px;" width="184" height="54" alt="Featured on Aura++" />
                 </a>
             </div>
         </div>

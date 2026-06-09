@@ -204,16 +204,16 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <?php
             // Badge list rendered twice back-to-back so the marquee can loop seamlessly
             $featured_badges = [
-                ['href' => 'https://topfreeaitools.com', 'img' => 'featured-topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
-                ['href' => 'https://startupfa.me/s/argo-books', 'img' => 'featured-startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
-                ['href' => 'https://launch-list.org/product/argo-books', 'img' => 'featured-launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
-                ['href' => 'https://twelve.tools', 'img' => 'featured-twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
-                ['href' => 'https://wired.business', 'img' => 'featured-wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
-                ['href' => 'https://auraplusplus.com/projects/argo-books', 'img' => 'featured-auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
-                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
-                ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'featured-productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
-                ['href' => 'https://www.scrolllaunch.com', 'img' => 'featured-scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
-                ['href' => 'https://starterbest.com', 'img' => 'featured-starterbest.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],
+                ['href' => 'https://topfreeaitools.com', 'img' => 'topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
+                ['href' => 'https://startupfa.me/s/argo-books', 'img' => 'startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
+                ['href' => 'https://launch-list.org/product/argo-books', 'img' => 'launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
+                ['href' => 'https://twelve.tools', 'img' => 'twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
+                ['href' => 'https://wired.business', 'img' => 'wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
+                ['href' => 'https://auraplusplus.com/projects/argo-books', 'img' => 'auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
+                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
+                ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
+                ['href' => 'https://www.scrolllaunch.com', 'img' => 'scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
+                ['href' => 'https://starterbest.com', 'img' => 'https://starterbest.com/badages-awards.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],
             ];
             ?>
             <div class="featured-on-marquee">
@@ -221,7 +221,15 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                     <?php for ($pass = 0; $pass < 2; $pass++): ?>
                         <?php foreach ($featured_badges as $badge): ?>
                             <a href="<?= htmlspecialchars($badge['href']) ?>" target="_blank" rel="noopener"<?= $pass === 1 ? ' aria-hidden="true" tabindex="-1"' : '' ?>>
-                                <img src="resources/images/<?= htmlspecialchars($badge['img']) ?>" style="width: <?= (int) $badge['w'] ?>px; height: 54px;" width="<?= (int) $badge['w'] ?>" height="54" alt="<?= htmlspecialchars($badge['alt']) ?>" />
+                                <?php
+                                // Badges are self-hosted under resources/images/featured/. An absolute
+                                // URL is used only where the directory's verifier requires its own hosted
+                                // badge image to be referenced directly (e.g. Starter Best).
+                                $src = strpos($badge['img'], '://') !== false
+                                    ? $badge['img']
+                                    : 'resources/images/featured/' . $badge['img'];
+                                ?>
+                                <img src="<?= htmlspecialchars($src) ?>" style="width: <?= (int) $badge['w'] ?>px; height: 54px;" width="<?= (int) $badge['w'] ?>" height="54" alt="<?= htmlspecialchars($badge['alt']) ?>" />
                             </a>
                         <?php endforeach; ?>
                     <?php endfor; ?>

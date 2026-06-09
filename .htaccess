@@ -113,6 +113,7 @@ AddDefaultCharset UTF-8
         img-src 'self' data: \
             https://argorobots.com \
             https://dev.argorobots.com \
+            https://starterbest.com \
             https://s3-us-west-2.amazonaws.com \
             https://chart.googleapis.com \
             https://*.paypalobjects.com \

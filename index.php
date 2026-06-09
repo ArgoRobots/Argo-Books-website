@@ -218,6 +218,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://toolrain.com/item/argo-books', 'img' => 'toolrain.svg', 'w' => 184, 'alt' => 'Listed on ToolRain'],
                 ['href' => 'https://saasfame.com/item/argo-books', 'img' => 'https://saasfame.com/badge-light.svg', 'w' => 170, 'alt' => 'Featured on SaaSFame'],
                 ['href' => 'https://deeplaunch.io', 'img' => 'https://deeplaunch.io/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on DeepLaunch.io'],
+                ['href' => 'https://directoryhunt.org/', 'img' => 'https://directoryhunt.org/assets/Badges/featured.svg', 'w' => 199, 'alt' => 'Featured on DirectoryHunt.org'],
             ];
             ?>
             <div class="featured-on-marquee">

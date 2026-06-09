@@ -201,25 +201,30 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <section class="featured-on">
         <div class="container">
             <span class="featured-on-label">Featured on</span>
-            <div class="featured-on-logos">
-                <a href="https://topfreeaitools.com/ai/argo-books" target="_blank" rel="noopener">
-                    <img src="resources/images/featured-topfreeaitools.png" style="width: 230px; height: 54px;" width="230" height="54" alt="Featured on Top Free AI Tools" />
-                </a>
-                <a href="https://startupfa.me/s/argo-books?utm_source=argorobots.com" target="_blank" rel="noopener">
-                    <img src="resources/images/featured-startupfame.webp" style="width: 171px; height: 54px;" width="171" height="54" alt="Argo Books - Featured on Startup Fame" />
-                </a>
-                <a href="https://launch-list.org/product/argo-books" target="_blank" rel="noopener">
-                    <img src="resources/images/featured-launchlist.svg" style="width: 165px; height: 54px;" width="165" height="54" alt="Featured on Launch List" />
-                </a>
-                <a href="https://twelve.tools" target="_blank" rel="noopener">
-                    <img src="resources/images/featured-twelvetools.svg" style="width: 200px; height: 54px;" width="200" height="54" alt="Featured on Twelve Tools" />
-                </a>
-                <a href="https://wired.business" target="_blank" rel="noopener">
-                    <img src="resources/images/featured-wiredbusiness.svg" style="width: 200px; height: 54px;" width="200" height="54" alt="Featured on Wired Business" />
-                </a>
-                <a href="https://auraplusplus.com/projects/argo-books" target="_blank" rel="noopener">
-                    <img src="resources/images/featured-auraplusplus.svg" style="width: 184px; height: 54px;" width="184" height="54" alt="Featured on Aura++" />
-                </a>
+            <?php
+            // Badge list rendered twice back-to-back so the marquee can loop
+            // seamlessly (the track animates by exactly -50%). To add a badge,
+            // add one entry here; both copies update automatically.
+            $featured_badges = [
+                ['href' => 'https://topfreeaitools.com/ai/argo-books',        'img' => 'featured-topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
+                ['href' => 'https://startupfa.me/s/argo-books?utm_source=argorobots.com', 'img' => 'featured-startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
+                ['href' => 'https://launch-list.org/product/argo-books',       'img' => 'featured-launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
+                ['href' => 'https://twelve.tools',                             'img' => 'featured-twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
+                ['href' => 'https://wired.business',                           'img' => 'featured-wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
+                ['href' => 'https://auraplusplus.com/projects/argo-books',     'img' => 'featured-auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
+                ['href' => 'https://submitmysaas.com',                         'img' => 'featured-submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
+            ];
+            ?>
+            <div class="featured-on-marquee">
+                <div class="featured-on-track">
+                    <?php for ($pass = 0; $pass < 2; $pass++): ?>
+                        <?php foreach ($featured_badges as $badge): ?>
+                            <a href="<?= htmlspecialchars($badge['href']) ?>" target="_blank" rel="noopener"<?= $pass === 1 ? ' aria-hidden="true" tabindex="-1"' : '' ?>>
+                                <img src="resources/images/<?= htmlspecialchars($badge['img']) ?>" style="width: <?= (int) $badge['w'] ?>px; height: 54px;" width="<?= (int) $badge['w'] ?>" height="54" alt="<?= htmlspecialchars($badge['alt']) ?>" />
+                            </a>
+                        <?php endforeach; ?>
+                    <?php endfor; ?>
+                </div>
             </div>
         </div>
     </section>

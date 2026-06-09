@@ -924,29 +924,55 @@ a {
     color: var(--gray-500);
 }
 
-.featured-on-logos {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 32px;
+/* Marquee viewport: one row, no wrap, edges faded out */
+.featured-on-marquee {
+    width: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
 }
 
-.featured-on-logos a {
+/* Track holds two identical badge sets and scrolls left by exactly half its
+   width, so the second set lands where the first started: a seamless loop. */
+.featured-on-track {
+    display: flex;
+    width: max-content;
+    align-items: center;
+    animation: featured-on-scroll 45s linear infinite;
+}
+
+.featured-on:hover .featured-on-track {
+    animation-play-state: paused;
+}
+
+.featured-on-track a {
     display: inline-flex;
+    /* Per-item spacing (not flex gap) so the -50% loop point stays exact. */
+    margin-right: 48px;
     opacity: 0.85;
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.featured-on-logos a:hover {
+.featured-on-track a:hover {
     opacity: 1;
     transform: translateY(-2px);
 }
 
-.featured-on-logos img {
+.featured-on-track img {
     display: block;
-    max-width: 100%;
+    max-width: none;
     height: auto;
+}
+
+@keyframes featured-on-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .featured-on-track {
+        animation: none;
+    }
 }
 
 /* ========================================

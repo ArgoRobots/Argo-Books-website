@@ -214,6 +214,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
                 ['href' => 'https://www.scrolllaunch.com', 'img' => 'scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
                 ['href' => 'https://starterbest.com', 'img' => 'https://starterbest.com/badages-awards.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],
+                ['href' => 'https://dayslaunch.com', 'img' => 'https://dayslaunch.com/badages-awards.svg', 'w' => 200, 'alt' => 'Featured on Days Launch'],
             ];
             ?>
             <div class="featured-on-marquee">

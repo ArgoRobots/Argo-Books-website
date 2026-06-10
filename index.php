@@ -221,6 +221,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://directoryhunt.org/', 'img' => 'https://directoryhunt.org/assets/Badges/featured.svg', 'w' => 199, 'alt' => 'Featured on DirectoryHunt.org'],
                 ['href' => 'https://proofstories.io/directory/products/argo-books/', 'img' => 'https://proofstories.io/directory/badges/l/argo-books.svg', 'w' => 189, 'alt' => 'Listed on ProofStories'],
                 ['href' => 'https://dofollow.tools', 'img' => 'https://dofollow.tools/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on Dofollow.Tools'],
+                ['href' => 'https://open-launch.com/projects/argo-books', 'img' => 'https://open-launch.com/api/badge/84f80c1b-1825-496d-b98b-67919dd95a77/featured-light.svg', 'w' => 216, 'alt' => 'Featured on Open-Launch'],
             ];
             ?>
             <div class="featured-on-marquee">

@@ -145,6 +145,13 @@ function track_referral_event(string $event_type, array $opts = []): bool
         return false;
     }
 
+    // Same IP exclusion as the visit/page-view trackers: owner's own
+    // connection + crawler netblocks. allow_bot (CLI / desktop app) bypasses
+    // it too, since those legitimately post from server-side / app contexts.
+    if (!$allow_bot && is_nontracked_ip($_SERVER['REMOTE_ADDR'] ?? null)) {
+        return false;
+    }
+
     global $pdo;
     if (!$pdo) {
         return false;

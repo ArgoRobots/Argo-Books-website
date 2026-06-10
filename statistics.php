@@ -26,6 +26,11 @@ function is_likely_bot($user_agent)
         // Search / SEO crawlers
         'Googlebot', 'bingbot', 'DuckDuckBot', 'YandexBot', 'Baiduspider', 'Sogou',
         'Slurp', 'Applebot', 'AhrefsBot', 'SemrushBot', 'MJ12bot', 'DotBot', 'rogerbot',
+        // Google's non-"Googlebot" crawlers. These don't contain the substring
+        // "Googlebot", so they slipped the line above and flooded referral_visits
+        // (esp. Google-InspectionTool, which fires on Search Console URL inspection).
+        'GoogleOther', 'Google-InspectionTool', 'Storebot-Google', 'Feedfetcher-Google',
+        'APIs-Google', 'GoogleProducer',
         // AI / dataset crawlers
         'GPTBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-Web', 'anthropic-ai',
         'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Applebot-Extended',
@@ -53,6 +58,70 @@ function is_likely_bot($user_agent)
 }
 
 /**
+ * True if $ip falls inside $range. $range is either a plain address (exact
+ * match, works for IPv4 and IPv6) or an IPv4 CIDR like "66.249.64.0/19".
+ */
+function ip_in_cidr($ip, $range)
+{
+    if (strpos($range, '/') === false) {
+        return $ip === $range;
+    }
+
+    list($subnet, $bits) = explode('/', $range, 2);
+    $ip_long     = ip2long($ip);
+    $subnet_long = ip2long($subnet);
+    // ip2long returns false for non-IPv4 input; the CIDR math below is IPv4-only.
+    if ($ip_long === false || $subnet_long === false) {
+        return false;
+    }
+
+    $bits = (int)$bits;
+    if ($bits < 0 || $bits > 32) {
+        return false;
+    }
+
+    $mask = ($bits === 0) ? 0 : ((0xFFFFFFFF << (32 - $bits)) & 0xFFFFFFFF);
+    return (($ip_long & $mask) === ($subnet_long & $mask));
+}
+
+/**
+ * IPs we never record analytics for: the site owner's own connection(s) plus
+ * known crawler netblocks whose UAs can't be trusted. Keeps the owner's casual
+ * (logged-out) browsing and Google's crawler out of page-view, referral-visit,
+ * and funnel-event tables.
+ *
+ * Configure owner/internal addresses via the EXCLUDED_TRACKING_IPS env var:
+ * comma-separated, plain IPs or CIDR ranges (e.g. "64.201.195.108,203.0.113.0/24").
+ */
+function is_nontracked_ip($ip)
+{
+    if (empty($ip)) {
+        return false;
+    }
+
+    // Google's published crawler range. UA filtering catches the named bots
+    // above; this is the backstop since a spoofed UA can't fake the source IP.
+    static $ranges = ['66.249.64.0/19'];
+
+    $configured = $_ENV['EXCLUDED_TRACKING_IPS'] ?? getenv('EXCLUDED_TRACKING_IPS');
+    if (!empty($configured)) {
+        foreach (explode(',', $configured) as $entry) {
+            $entry = trim($entry);
+            if ($entry !== '') {
+                $ranges[] = $entry;
+            }
+        }
+    }
+
+    foreach ($ranges as $range) {
+        if (ip_in_cidr($ip, $range)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Track a statistical event
  *
  * @param string $event_type Type of event (download, page_view, etc.)
@@ -68,6 +137,10 @@ function track_event($event_type, $event_data = '')
 
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
     if (is_likely_bot($user_agent)) {
+        return false;
+    }
+
+    if (is_nontracked_ip($_SERVER['REMOTE_ADDR'] ?? null)) {
         return false;
     }
 
@@ -171,6 +244,10 @@ function track_referral_visit($source_code, $page_url = '')
 
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
     if (is_likely_bot($user_agent)) {
+        return false;
+    }
+
+    if (is_nontracked_ip($_SERVER['REMOTE_ADDR'] ?? null)) {
         return false;
     }
 

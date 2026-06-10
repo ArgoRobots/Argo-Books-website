@@ -6,7 +6,8 @@
  * Source resolution order:
  *   1. ?source= URL param (manual codes: sponsors, outreach campaigns, ads)
  *   2. ?utm_source= URL param mapped to a known channel
- *   3. HTTP Referer header mapped to a known channel (AI chats, social sites)
+ *   3. ?ref= URL param mapped to a known channel (Product Hunt, directories)
+ *   4. HTTP Referer header mapped to a known channel (AI chats, social sites)
  */
 
 // Staging password wall. dev-gate.php gates the dev subdomain only; it checks
@@ -135,7 +136,21 @@ if ($resolved_source === null && !empty($_GET['utm_source'])) {
     }
 }
 
-// 3. HTTP Referer header mapped to a known channel
+// 3. ?ref= param mapped to a known channel. Product Hunt and many directory
+// sites auto-append ?ref=<site>. Accepted only when it matches a known channel
+// (never as a raw source), since ref is also used for affiliate IDs and
+// self-referencing domains.
+if ($resolved_source === null && !empty($_GET['ref'])) {
+    $ref = strtolower(trim($_GET['ref']));
+    $sources = get_auto_referral_sources();
+    if (isset($sources[$ref])) {
+        $mapping = $sources[$ref];
+        ensure_auto_referral_link($mapping['code'], $mapping['name']);
+        $resolved_source = $mapping['code'];
+    }
+}
+
+// 4. HTTP Referer header mapped to a known channel
 if ($resolved_source === null && !empty($_SERVER['HTTP_REFERER'])) {
     $referer_host = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST);
     if ($referer_host) {

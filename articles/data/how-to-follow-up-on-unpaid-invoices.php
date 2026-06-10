@@ -89,7 +89,7 @@ As a reminder, the terms on the invoice include a 1.5% monthly late fee on overd
 
 Thanks,
 [Your first name]</pre>
-<p>The phrase "where it sits on your end" is doing real work. It gives the client a chance to say "it's in accounts payable for processing this Friday", which is the answer you want. Most genuine delays come unstuck at this stage, because the second email is hard to ignore and it asks a direct question. If you get a reply with a specific date, write that date on your calendar and wait. If the date passes without payment, you go straight to step 4.</p>
+<p>The phrase "where it sits on your end" is doing real work. It gives the client a chance to say "it's in accounts payable for processing this Friday", which is the answer you want. Most genuine delays come unstuck at this stage, because the second email is hard to ignore and it asks a direct question. If you get a reply with a specific date, write that date on your calendar and wait. If the date passes without payment, go straight to step 4.</p>
 HTML,
     ],
 
@@ -139,7 +139,7 @@ HTML,
       'step_name' => 'Send a final notice',
       'step_text' => 'If the late-fee invoice is also ignored, send a written final notice by email and printed letter. State the next step, give a hard deadline, and stop.',
       'html' => <<<'HTML'
-<p>If the new invoice with the late fee is also ignored, you're in the small minority of invoices that need formal handling, since most paying clients sort themselves out long before this step. Most invoices never get here. The ones that do almost always have a story behind them, usually involving the client's business being in real trouble.</p>
+<p>If the new invoice with the late fee is also ignored, you're dealing with the small minority of invoices that need formal handling, since most paying clients sort themselves out long before this step. Most invoices never get here. The ones that do almost always have a story behind them, usually involving the client's business being in real trouble.</p>
 <p>Send a final notice in writing, by email and, where possible, by printed letter to the client's business address. The printed copy matters. It shows you're treating the matter formally, and it puts the notice in front of someone other than the email inbox where the previous messages were ignored. Keep a copy of both for your records.</p>
 <p>The final notice has four parts:</p>
 <ul>

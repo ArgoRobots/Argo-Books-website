@@ -73,6 +73,116 @@
     color: var(--white);
 }
 
+/* ─── Searchable source filter (combobox) ─────────────────────────────── */
+
+.source-combobox {
+    position: relative;
+    min-width: 280px;
+}
+
+.source-combobox-input {
+    width: 100%;
+    padding: 8px 30px 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--gray-border);
+    background: var(--gray-bg-light);
+    color: var(--black);
+    font-size: 13px;
+    font-weight: 500;
+    box-sizing: border-box;
+}
+
+.source-combobox-input:focus {
+    outline: none;
+    border-color: var(--blue-500);
+    background: var(--white);
+}
+
+.source-combobox-caret {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--gray-500);
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.source-combobox-list {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 4px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    max-height: 320px;
+    overflow-y: auto;
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px var(--shadow-default);
+    display: none;
+}
+
+.source-combobox.open .source-combobox-list {
+    display: block;
+}
+
+.source-combobox-option {
+    padding: 7px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--black);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.source-combobox-option:hover,
+.source-combobox-option.highlighted {
+    background: var(--gray-bg-light);
+}
+
+.source-combobox-option.active {
+    background: var(--blue-500);
+    color: var(--white);
+    font-weight: 600;
+}
+
+[data-theme="dark"] .source-combobox-input {
+    background: var(--gray-700);
+    border-color: var(--black);
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .source-combobox-input:focus {
+    background: var(--gray-800);
+    border-color: var(--blue-500);
+}
+
+[data-theme="dark"] .source-combobox-list {
+    background: var(--gray-800);
+    border-color: var(--black);
+}
+
+[data-theme="dark"] .source-combobox-option {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .source-combobox-option:hover,
+[data-theme="dark"] .source-combobox-option.highlighted {
+    background: var(--gray-700);
+}
+
+[data-theme="dark"] .source-combobox-option.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
 /* ─── Funnel container (bars + landing-pages breakdown) ────────────────── */
 
 .funnel-container {
@@ -343,6 +453,23 @@
     padding: 0;
     min-width: 240px;
     max-width: 420px;
+}
+
+/* Two-column legend for the landing-pages chart, which now lists up to 14
+   pages. auto-fit collapses back to a single column when the row wraps under
+   the chart on narrow screens. */
+/* Multi-column (not grid) so items flow DOWN column 1, then down column 2.
+   That keeps the visitor ranking readable top-to-bottom and lands the
+   always-last "Other" entry at the bottom of the second column. */
+.landing-breakdown-list.landing-breakdown-list--two-col {
+    column-count: 2;
+    column-gap: 28px;
+    max-width: 540px;
+}
+
+.landing-breakdown-list.landing-breakdown-list--two-col li {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
 }
 
 .landing-breakdown-list li {

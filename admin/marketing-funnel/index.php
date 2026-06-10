@@ -628,8 +628,8 @@ include __DIR__ . '/../admin_header.php';
         $landing_chart_counts = [];
         if ($funnel_source_filter === '') {
             $rows = get_landing_page_breakdown($funnel_period_start_dt, current_environment());
-            $top = array_slice($rows, 0, 7);
-            $rest = array_slice($rows, 7);
+            $top = array_slice($rows, 0, 14);
+            $rest = array_slice($rows, 14);
             $other_total = array_sum(array_map(fn($r) => (int)$r['visitors'], $rest));
             foreach ($top as $r) {
                 $landing_breakdown[] = [
@@ -728,19 +728,24 @@ include __DIR__ . '/../admin_header.php';
         </div>
 
         <span class="control-label" style="margin-left:auto;">Source:</span>
-        <div class="funnel-pill-row">
-            <a href="<?php echo htmlspecialchars('index.php?' . http_build_query(['tab' => 'funnel', 'funnel_period' => $funnel_period_key])); ?>"
-               class="funnel-pill <?php echo $funnel_source_filter === '' ? 'active' : ''; ?>">All traffic</a>
-            <?php foreach ($referral_links as $rl):
-                $href = 'index.php?' . http_build_query([
-                    'tab' => 'funnel', 'funnel_period' => $funnel_period_key, 'source' => $rl['source_code']
-                ]);
-            ?>
-                <a href="<?php echo htmlspecialchars($href); ?>"
-                   class="funnel-pill <?php echo $funnel_source_filter === $rl['source_code'] ? 'active' : ''; ?>">
-                    <?php echo htmlspecialchars($rl['source_code']); ?>
-                </a>
-            <?php endforeach; ?>
+        <div class="source-combobox" id="sourceCombobox" data-period="<?php echo htmlspecialchars($funnel_period_key); ?>">
+            <input type="text" class="source-combobox-input" id="sourceComboboxInput"
+                   autocomplete="off" spellcheck="false" placeholder="Search sources&hellip;"
+                   value="<?php echo $funnel_source_filter === '' ? 'All traffic' : htmlspecialchars($funnel_source_filter); ?>"
+                   aria-label="Filter funnel by source" role="combobox" aria-expanded="false">
+            <span class="source-combobox-caret" aria-hidden="true">&#9662;</span>
+            <ul class="source-combobox-list" id="sourceComboboxList" role="listbox">
+                <li class="source-combobox-option<?php echo $funnel_source_filter === '' ? ' active' : ''; ?>"
+                    data-source="" role="option">All traffic</li>
+                <?php
+                    $sorted_links = $referral_links;
+                    usort($sorted_links, fn($a, $b) => strcmp($a['source_code'], $b['source_code']));
+                    foreach ($sorted_links as $rl):
+                ?>
+                    <li class="source-combobox-option<?php echo $funnel_source_filter === $rl['source_code'] ? ' active' : ''; ?>"
+                        data-source="<?php echo htmlspecialchars($rl['source_code']); ?>" role="option"><?php echo htmlspecialchars($rl['source_code']); ?></li>
+                <?php endforeach; ?>
+            </ul>
         </div>
     </div>
 
@@ -824,7 +829,7 @@ include __DIR__ . '/../admin_header.php';
                     <div class="landing-breakdown-chart">
                         <canvas id="landingPagesChart"></canvas>
                     </div>
-                    <ul class="landing-breakdown-list">
+                    <ul class="landing-breakdown-list landing-breakdown-list--two-col">
                         <?php $total_landings = array_sum($landing_chart_counts); ?>
                         <?php foreach ($landing_breakdown as $i => $row):
                             $pct = $total_landings > 0 ? round(($row['visitors'] / $total_landings) * 100, 1) : 0;
@@ -1482,6 +1487,81 @@ include __DIR__ . '/../admin_header.php';
         });
     });
 
+    // Searchable source filter (combobox). Type to filter the source list,
+    // click or Enter to apply; applying reloads the funnel for that source and
+    // preserves scroll the same way the pills do.
+    (function () {
+        const box = document.getElementById('sourceCombobox');
+        if (!box) return;
+        const input = document.getElementById('sourceComboboxInput');
+        const list  = document.getElementById('sourceComboboxList');
+        const period = box.getAttribute('data-period') || '30d';
+        const options = Array.from(list.querySelectorAll('.source-combobox-option'));
+        const currentLabel = input.value; // restored if the user closes without choosing
+        let highlighted = -1;
+
+        function go(source) {
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+            const params = new URLSearchParams();
+            params.set('tab', 'funnel');
+            params.set('funnel_period', period);
+            if (source) params.set('source', source);
+            window.location = 'index.php?' + params.toString();
+        }
+
+        function open()  { box.classList.add('open');  input.setAttribute('aria-expanded', 'true'); }
+        function close() {
+            box.classList.remove('open');
+            input.setAttribute('aria-expanded', 'false');
+            input.value = currentLabel;
+            highlighted = -1;
+        }
+        function visible() { return options.filter(o => o.style.display !== 'none'); }
+
+        function filter() {
+            const q = input.value.trim().toLowerCase();
+            // While the field still shows the current selection, list everything.
+            const showAll = (q === '' || q === currentLabel.toLowerCase());
+            options.forEach(o => {
+                o.style.display = (showAll || o.textContent.toLowerCase().includes(q)) ? '' : 'none';
+                o.classList.remove('highlighted');
+            });
+            highlighted = -1;
+        }
+
+        function setHighlight(i) {
+            const vis = visible();
+            vis.forEach(o => o.classList.remove('highlighted'));
+            if (!vis.length) { highlighted = -1; return; }
+            highlighted = (i + vis.length) % vis.length;
+            vis[highlighted].classList.add('highlighted');
+            vis[highlighted].scrollIntoView({ block: 'nearest' });
+        }
+
+        input.addEventListener('focus', () => { input.select(); open(); filter(); });
+        input.addEventListener('input', () => { open(); filter(); });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown')      { e.preventDefault(); open(); setHighlight(highlighted + 1); }
+            else if (e.key === 'ArrowUp')   { e.preventDefault(); setHighlight(highlighted - 1); }
+            else if (e.key === 'Enter')     {
+                e.preventDefault();
+                const vis = visible();
+                const choice = highlighted >= 0 ? vis[highlighted] : vis[0];
+                if (choice) go(choice.getAttribute('data-source'));
+            } else if (e.key === 'Escape')  { close(); input.blur(); }
+        });
+        // mousedown (not click) so it fires before the input's blur closes the list.
+        list.addEventListener('mousedown', (e) => {
+            const opt = e.target.closest('.source-combobox-option');
+            if (opt) { e.preventDefault(); go(opt.getAttribute('data-source')); }
+        });
+        box.querySelector('.source-combobox-caret').addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (box.classList.contains('open')) { close(); } else { input.focus(); }
+        });
+        document.addEventListener('click', (e) => { if (!box.contains(e.target)) close(); });
+    })();
+
     // Landing-page breakdown doughnut (only rendered on All-traffic funnel).
     (function () {
         const canvas = document.getElementById('landingPagesChart');
@@ -1492,6 +1572,8 @@ include __DIR__ . '/../admin_header.php';
         if (!labels.length) return;
 
         // Reuse the palette other admin charts use so themes stay consistent.
+        // Expanded to 14 distinct hues now that the legend shows up to 14 pages;
+        // gray is reserved for the "Other" bucket so it always reads as the catch-all.
         const palette = [
             'rgba(59, 130, 246, 0.85)',   // blue
             'rgba(139, 92, 246, 0.85)',   // purple
@@ -1500,9 +1582,16 @@ include __DIR__ . '/../admin_header.php';
             'rgba(239, 68, 68, 0.85)',    // red
             'rgba(14, 165, 233, 0.85)',   // sky
             'rgba(168, 85, 247, 0.85)',   // violet
-            'rgba(107, 114, 128, 0.85)',  // gray (Other)
+            'rgba(236, 72, 153, 0.85)',   // pink
+            'rgba(20, 184, 166, 0.85)',   // teal
+            'rgba(132, 204, 22, 0.85)',   // lime
+            'rgba(249, 115, 22, 0.85)',   // orange
+            'rgba(99, 102, 241, 0.85)',   // indigo
+            'rgba(6, 182, 212, 0.85)',    // cyan
+            'rgba(217, 70, 239, 0.85)',   // fuchsia
         ];
-        const colors = labels.map((_, i) => palette[i % palette.length]);
+        const GRAY = 'rgba(107, 114, 128, 0.85)';
+        const colors = labels.map((lbl, i) => lbl === 'Other' ? GRAY : palette[i % palette.length]);
 
         document.querySelectorAll('.landing-breakdown-list .swatch').forEach(el => {
             const idx = parseInt(el.getAttribute('data-swatch-idx'), 10);

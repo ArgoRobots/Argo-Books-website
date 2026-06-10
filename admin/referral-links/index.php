@@ -207,6 +207,33 @@ function get_referral_countries($limit = 10)
     return $data;
 }
 
+/**
+ * Map a source_code to a category from its naming-convention prefix. No DB
+ * column needed: auto-registered sources (guide-*, social-*, ai-*, ...) sort
+ * themselves into the right bucket, so the list never needs hand-filing.
+ */
+function referral_category_key($source_code)
+{
+    $code = strtolower($source_code);
+    if (strncmp($code, 'google-ads-', 11) === 0 || strncmp($code, 'ads-', 4) === 0
+        || strncmp($code, 'paid-', 5) === 0 || strncmp($code, 'bing-ads-', 9) === 0) {
+        return 'paid';
+    }
+    if (strncmp($code, 'guide-', 6) === 0 || $code === 'guides-hub') {
+        return 'website';
+    }
+    if (strncmp($code, 'social-', 7) === 0) {
+        return 'social';
+    }
+    if (strncmp($code, 'youtube-', 8) === 0) {
+        return 'youtube';
+    }
+    if (strncmp($code, 'ai-', 3) === 0) {
+        return 'ai';
+    }
+    return 'other';
+}
+
 // Get statistics
 $referral_links = get_referral_links();
 $visits_by_source = get_visits_by_source(15);
@@ -219,6 +246,34 @@ if (!in_array($period, $allowed_periods)) {
 $visits_over_time = get_visits_over_time($period, 30);
 $referral_countries = get_referral_countries();
 
+// Group-by toggle: 'source' (per-link, default) or 'category' (rolled up).
+$group_mode = (($_GET['group'] ?? 'source') === 'category') ? 'category' : 'source';
+
+$category_labels = [
+    'paid'    => 'Paid ads',
+    'website' => 'My website (guides & articles)',
+    'social'  => 'Social media',
+    'youtube' => 'YouTube',
+    'ai'      => 'AI assistants',
+    'other'   => 'Other',
+];
+$category_order = ['paid', 'website', 'social', 'youtube', 'ai', 'other'];
+
+// Bucket every referral link by category and tally per-category subtotals.
+$grouped_links = [];
+$category_visits = [];
+$category_conversions = [];
+foreach ($category_order as $k) {
+    $category_visits[$k] = 0;
+    $category_conversions[$k] = 0;
+}
+foreach ($referral_links as $link) {
+    $k = referral_category_key($link['source_code']);
+    $grouped_links[$k][] = $link;
+    $category_visits[$k] += (int)$link['total_visits'];
+    $category_conversions[$k] += (int)$link['conversions'];
+}
+
 // Prepare data for charts
 $source_labels = [];
 $source_visit_counts = [];
@@ -228,6 +283,24 @@ foreach ($visits_by_source as $item) {
     $source_labels[] = $item['source_code'];
     $source_visit_counts[] = (int)$item['visit_count'];
     $source_conversion_counts[] = (int)$item['conversions'];
+}
+
+// The three "by source" breakdown charts roll up to the 6 categories when the
+// Group-by toggle is set to category (6 clean bars instead of 40 noisy ones).
+$breakdown_noun = 'Source';
+if ($group_mode === 'category') {
+    $breakdown_noun = 'Category';
+    $source_labels = [];
+    $source_visit_counts = [];
+    $source_conversion_counts = [];
+    foreach ($category_order as $k) {
+        if (empty($grouped_links[$k])) {
+            continue;
+        }
+        $source_labels[] = $category_labels[$k];
+        $source_visit_counts[] = $category_visits[$k];
+        $source_conversion_counts[] = $category_conversions[$k];
+    }
 }
 
 // Prepare time series data
@@ -253,9 +326,10 @@ foreach ($referral_countries as $country) {
     $country_conversion_counts[] = (int)$country['conversions'];
 }
 
-// Calculate total stats
-$total_visits = array_sum($source_visit_counts);
-$total_conversions = array_sum($source_conversion_counts);
+// Calculate total stats across ALL sources (every category), so the cards read
+// the same in both group modes rather than reflecting only the charted top-N.
+$total_visits = array_sum($category_visits);
+$total_conversions = array_sum($category_conversions);
 $conversion_rate = $total_visits > 0 ? round(($total_conversions / $total_visits) * 100, 1) : 0;
 
 include __DIR__ . '/../admin_header.php';
@@ -297,6 +371,17 @@ include __DIR__ . '/../admin_header.php';
         </div>
     </div>
 
+    <!-- Group-by toggle: flips the breakdown charts + table between per-source and per-category -->
+    <div class="group-toggle">
+        <span>Group by:</span>
+        <div class="group-toggle-buttons">
+            <a href="?group=source&amp;period=<?php echo htmlspecialchars($period); ?>"
+               class="group-btn <?php echo $group_mode === 'source' ? 'active' : ''; ?>">By source</a>
+            <a href="?group=category&amp;period=<?php echo htmlspecialchars($period); ?>"
+               class="group-btn <?php echo $group_mode === 'category' ? 'active' : ''; ?>">By category</a>
+        </div>
+    </div>
+
     <!-- Period selection for time series chart -->
     <div class="period-selection">
         <span>Time Period:</span>
@@ -310,7 +395,7 @@ include __DIR__ . '/../admin_header.php';
 
             foreach ($periods as $periodKey => $periodName) {
                 $activeClass = ($period === $periodKey) ? 'active' : '';
-                echo "<a href=\"?period={$periodKey}\" class=\"period-btn {$activeClass}\">{$periodName}</a>";
+                echo "<a href=\"?period={$periodKey}&amp;group={$group_mode}\" class=\"period-btn {$activeClass}\">{$periodName}</a>";
             }
             ?>
         </div>
@@ -319,11 +404,11 @@ include __DIR__ . '/../admin_header.php';
     <!-- Charts -->
     <div class="chart-row">
         <div class="chart-container">
-            <h2>Visits by Source</h2>
+            <h2>Visits by <?php echo $breakdown_noun; ?></h2>
             <canvas id="sourceVisitsChart"></canvas>
         </div>
         <div class="chart-container">
-            <h2>Conversions by Source</h2>
+            <h2>Conversions by <?php echo $breakdown_noun; ?></h2>
             <canvas id="sourceConversionsChart"></canvas>
         </div>
     </div>
@@ -345,7 +430,7 @@ include __DIR__ . '/../admin_header.php';
             <canvas id="countriesChart"></canvas>
         </div>
         <div class="chart-container">
-            <h2>Conversion Rate by Source</h2>
+            <h2>Conversion Rate by <?php echo $breakdown_noun; ?></h2>
             <canvas id="conversionRateChart"></canvas>
         </div>
     </div>
@@ -358,7 +443,7 @@ include __DIR__ . '/../admin_header.php';
         </div>
 
         <div class="table-responsive">
-            <table data-paginate="25">
+            <table class="referral-table">
                 <thead>
                     <tr>
                         <th>Source Code</th>
@@ -372,31 +457,52 @@ include __DIR__ . '/../admin_header.php';
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <?php foreach ($referral_links as $link): ?>
-                        <?php
-                        $conv_rate = $link['total_visits'] > 0 ? round(($link['conversions'] / $link['total_visits']) * 100, 1) : 0;
-                        ?>
-                        <tr>
-                            <td><code><?php echo htmlspecialchars($link['source_code']); ?></code></td>
-                            <td><?php echo htmlspecialchars($link['name']); ?></td>
-                            <td><?php echo htmlspecialchars(substr($link['description'], 0, 50)) . (strlen($link['description']) > 50 ? '...' : ''); ?></td>
-                            <td><a href="<?php echo htmlspecialchars($link['target_url']); ?>" target="_blank" class="link-preview"><?php echo htmlspecialchars(substr($link['target_url'], 0, 30)) . (strlen($link['target_url']) > 30 ? '...' : ''); ?></a></td>
-                            <td><?php echo number_format($link['total_visits']); ?></td>
-                            <td><?php echo number_format($link['conversions']); ?></td>
-                            <td><?php echo $conv_rate; ?>%</td>
-                            <td>
-                                <span class="status-badge <?php echo $link['is_active'] ? 'status-active' : 'status-inactive'; ?>">
-                                    <?php echo $link['is_active'] ? 'Active' : 'Inactive'; ?>
-                                </span>
-                            </td>
-                            <td class="action-buttons">
-                                <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-small btn-blue" title="Edit">Edit</button>
-                                <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-small btn-red" title="Delete">Delete</button>
+                <?php foreach ($category_order as $ckey): ?>
+                    <?php
+                        $clinks = $grouped_links[$ckey] ?? [];
+                        if (empty($clinks)) {
+                            continue;
+                        }
+                        $cvisits = $category_visits[$ckey];
+                        $cconv   = $category_conversions[$ckey];
+                        $crate   = $cvisits > 0 ? round(($cconv / $cvisits) * 100, 1) : 0;
+                        // Category mode starts collapsed (just the subtotals); source mode expanded.
+                        $collapsed = ($group_mode === 'category');
+                    ?>
+                    <tbody class="category-group<?php echo $collapsed ? ' collapsed' : ''; ?>" data-cat="<?php echo htmlspecialchars($ckey); ?>">
+                        <tr class="category-header" role="button" tabindex="0" aria-expanded="<?php echo $collapsed ? 'false' : 'true'; ?>">
+                            <td colspan="9">
+                                <span class="cat-caret" aria-hidden="true">&#9656;</span>
+                                <span class="cat-name"><?php echo htmlspecialchars($category_labels[$ckey]); ?></span>
+                                <span class="cat-meta"><?php echo count($clinks); ?> source<?php echo count($clinks) === 1 ? '' : 's'; ?>
+                                    &middot; <?php echo number_format($cvisits); ?> visits
+                                    &middot; <?php echo number_format($cconv); ?> conversions
+                                    &middot; <?php echo $crate; ?>%</span>
                             </td>
                         </tr>
-                    <?php endforeach; ?>
-                </tbody>
+                        <?php foreach ($clinks as $link): ?>
+                            <?php $conv_rate = $link['total_visits'] > 0 ? round(($link['conversions'] / $link['total_visits']) * 100, 1) : 0; ?>
+                            <tr class="source-row">
+                                <td><code><?php echo htmlspecialchars($link['source_code']); ?></code></td>
+                                <td><?php echo htmlspecialchars($link['name']); ?></td>
+                                <td><?php echo htmlspecialchars(substr($link['description'], 0, 50)) . (strlen($link['description']) > 50 ? '...' : ''); ?></td>
+                                <td><a href="<?php echo htmlspecialchars($link['target_url']); ?>" target="_blank" class="link-preview"><?php echo htmlspecialchars(substr($link['target_url'], 0, 30)) . (strlen($link['target_url']) > 30 ? '...' : ''); ?></a></td>
+                                <td><?php echo number_format($link['total_visits']); ?></td>
+                                <td><?php echo number_format($link['conversions']); ?></td>
+                                <td><?php echo $conv_rate; ?>%</td>
+                                <td>
+                                    <span class="status-badge <?php echo $link['is_active'] ? 'status-active' : 'status-inactive'; ?>">
+                                        <?php echo $link['is_active'] ? 'Active' : 'Inactive'; ?>
+                                    </span>
+                                </td>
+                                <td class="action-buttons">
+                                    <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-small btn-blue" title="Edit">Edit</button>
+                                    <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-small btn-red" title="Delete">Delete</button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                <?php endforeach; ?>
             </table>
         </div>
     </div>
@@ -780,11 +886,24 @@ include __DIR__ . '/../admin_header.php';
         sessionStorage.removeItem('scrollPosition');
     }
 
-    // Save scroll position when clicking period links so the page reload
-    // doesn't jump back to the top.
-    document.querySelectorAll('a[href^="?period="]').forEach(link => {
+    // Save scroll position when clicking period or group-by links so the page
+    // reload doesn't jump back to the top.
+    document.querySelectorAll('a[href^="?period="], a[href^="?group="]').forEach(link => {
         link.addEventListener('click', function() {
             sessionStorage.setItem('scrollPosition', window.scrollY);
+        });
+    });
+
+    // Collapse / expand referral category sections in the management table.
+    document.querySelectorAll('.category-header').forEach(header => {
+        const toggle = () => {
+            const group = header.closest('.category-group');
+            const collapsed = group.classList.toggle('collapsed');
+            header.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        };
+        header.addEventListener('click', toggle);
+        header.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
         });
     });
 </script>

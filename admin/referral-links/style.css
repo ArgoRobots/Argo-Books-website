@@ -367,3 +367,125 @@ code {
     color: var(--gray-200);
 }
 
+/* ─── Group-by toggle (source vs category) ────────────────────────────── */
+
+.group-toggle {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-default);
+}
+
+.group-toggle > span {
+    font-weight: 600;
+    color: var(--black);
+}
+
+.group-toggle-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.group-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--black);
+    background: var(--gray-bg-light);
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.group-btn:hover {
+    background: var(--gray-border);
+}
+
+.group-btn.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+/* ─── Category groups in the management table ─────────────────────────── */
+
+.category-header {
+    cursor: pointer;
+    background: var(--gray-bg-light);
+}
+
+.category-header td {
+    padding: 10px 14px;
+    font-size: 13px;
+}
+
+.category-header:hover {
+    background: var(--gray-border);
+}
+
+.cat-caret {
+    display: inline-block;
+    margin-right: 8px;
+    color: var(--gray-500);
+    transition: transform 0.15s;
+}
+
+.category-group:not(.collapsed) .cat-caret {
+    transform: rotate(90deg);
+}
+
+.cat-name {
+    font-weight: 700;
+    color: var(--black);
+}
+
+.cat-meta {
+    margin-left: 10px;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
+.category-group.collapsed .source-row {
+    display: none;
+}
+
+[data-theme="dark"] .group-toggle {
+    background: var(--gray-800);
+}
+
+[data-theme="dark"] .group-toggle > span {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .group-btn {
+    background: var(--gray-700);
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .group-btn:hover {
+    background: var(--gray-600);
+}
+
+[data-theme="dark"] .group-btn.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+[data-theme="dark"] .category-header {
+    background: var(--gray-800);
+}
+
+[data-theme="dark"] .category-header:hover {
+    background: var(--gray-700);
+}
+
+[data-theme="dark"] .cat-name {
+    color: var(--gray-200);
+}
+
+[data-theme="dark"] .cat-meta {
+    color: var(--gray-400);
+}
+

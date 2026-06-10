@@ -222,6 +222,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://proofstories.io/directory/products/argo-books/', 'img' => 'https://proofstories.io/directory/badges/l/argo-books.svg', 'w' => 189, 'alt' => 'Listed on ProofStories'],
                 ['href' => 'https://dofollow.tools', 'img' => 'https://dofollow.tools/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on Dofollow.Tools'],
                 ['href' => 'https://open-launch.com/projects/argo-books', 'img' => 'https://open-launch.com/api/badge/84f80c1b-1825-496d-b98b-67919dd95a77/featured-light.svg', 'w' => 216, 'alt' => 'Featured on Open-Launch'],
+                ['href' => 'https://fazier.com/launches/argorobots.com', 'img' => 'https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light', 'w' => 229, 'alt' => 'Featured on Fazier'],
             ];
             ?>
             <div class="featured-on-marquee">

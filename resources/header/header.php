@@ -44,7 +44,7 @@
         <li><a class="whats-new" href="<?= $base ?>whats-new/">What's new</a></li>
         <li><a class="about-us" href="<?= $base ?>about-us/">About us</a></li>
         <li><a class="documentation" href="<?= $base ?>documentation/">Documentation</a></li>
-        <!-- <li><a class="community" href="<?= $base ?>community/">Community</a></li> -->
+        <li><a class="community" href="<?= $base ?>community/">Community</a></li>
         <li><a class="contact-us" href="<?= $base ?>contact-us/">Contact us</a></li>
       </ul>
     </nav>
@@ -72,7 +72,7 @@
       <li><a href="<?= $base ?>whats-new/">What's new</a></li>
       <li><a href="<?= $base ?>about-us/">About us</a></li>
       <li><a href="<?= $base ?>documentation/">Documentation</a></li>
-      <!-- <li><a href="<?= $base ?>community/">Community</a></li> -->
+      <li><a href="<?= $base ?>community/">Community</a></li>
       <li><a href="<?= $base ?>contact-us/">Contact Us</a></li>
       <li><a href="<?= $base ?>community/users/login.php" id="mobile-account-link">My Account</a></li>
     </ul>

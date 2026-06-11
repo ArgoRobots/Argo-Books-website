@@ -210,7 +210,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 ['href' => 'https://twelve.tools', 'img' => 'twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
                 ['href' => 'https://wired.business', 'img' => 'wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
                 ['href' => 'https://auraplusplus.com/projects/argo-books', 'img' => 'auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
-                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'submitmysaas.png',   'w' => 198, 'alt' => 'Featured on SubmitMySaas'],
+                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'submitmysaas-top1.png', 'w' => 237, 'alt' => 'SubmitMySaas Top 1 Daily Winner'],
                 ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
                 ['href' => 'https://www.scrolllaunch.com', 'img' => 'scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
                 ['href' => 'https://starterbest.com', 'img' => 'https://starterbest.com/badages-awards.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],

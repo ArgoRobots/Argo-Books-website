@@ -93,6 +93,12 @@ foreach (glob(__DIR__ . '/niches/data/*.php') as $file) {
     add_url($urls, $loc, $file, $urlSlug === 'generic' ? '0.9' : '0.8', 'monthly');
 }
 
+// --- Free profit analyzer tool ---
+add_url($urls, site_url('/profit-analyzer/'), __DIR__ . '/profit-analyzer/index.php', '0.9', 'monthly');
+add_url($urls, site_url('/profit-analyzer/for-accountants/'), __DIR__ . '/profit-analyzer/for-accountants/index.php', '0.7', 'monthly');
+add_url($urls, site_url('/profit-analyzer/legal/privacy.php'), __DIR__ . '/profit-analyzer/legal/privacy.php', '0.3', 'yearly');
+add_url($urls, site_url('/profit-analyzer/legal/terms.php'), __DIR__ . '/profit-analyzer/legal/terms.php', '0.3', 'yearly');
+
 // --- Invoice template library ---
 add_url($urls, site_url('/invoice-template/'), __DIR__ . '/invoice-template/index.php', '0.8', 'monthly');
 foreach (glob(__DIR__ . '/invoice-template/data/*.php') as $file) {

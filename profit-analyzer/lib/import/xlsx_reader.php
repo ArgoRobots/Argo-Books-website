@@ -275,13 +275,33 @@ function pa_xlsx_currency_styles(string $xml): array
     return $styles;
 }
 
-/** Convert an Excel date serial to a string, mirroring CellToString's formatting. */
-function pa_xlsx_serial_to_date(float $serial): string
+/**
+ * Convert a number to a plain decimal string (no scientific notation), matching
+ * ClosedXML's GetDouble().ToString(InvariantCulture). Excel often stores values
+ * like "1.2345E-2"; left as-is the amount parser would strip the "E" and mangle
+ * the number, so expand only those.
+ */
+function pa_xlsx_plain_number(string $v): string
 {
-    // Excel epoch is 1899-12-30 (accounts for the fictional 1900 leap day).
+    if (stripos($v, 'e') === false) {
+        return $v; // not scientific notation
+    }
+    $f = (float) $v;
+    if (!is_finite($f)) {
+        return $v;
+    }
+    $s = rtrim(rtrim(sprintf('%.15F', $f), '0'), '.');
+    return ($s === '' || $s === '-0') ? '0' : $s;
+}
+
+/** Convert an Excel date serial to a string, mirroring CellToString's formatting. */
+function pa_xlsx_serial_to_date(float $serial, bool $date1904 = false): string
+{
+    // 1900 system epoch is 1899-12-30 (accounts for the fictional 1900 leap day);
+    // the 1904 system (some Mac-authored files) counts days from 1904-01-01.
     $days = (int)floor($serial);
     $frac = $serial - $days;
-    $base = new DateTime('1899-12-30 00:00:00', new DateTimeZone('UTC'));
+    $base = new DateTime($date1904 ? '1904-01-01 00:00:00' : '1899-12-30 00:00:00', new DateTimeZone('UTC'));
     $base->modify("+{$days} days");
     $seconds = (int)round($frac * 86400);
     if ($seconds > 0) {
@@ -295,7 +315,7 @@ function pa_xlsx_serial_to_date(float $serial): string
  * Parse one worksheet XML into a string matrix (rows of cells, gaps filled with "").
  * @return list<list<string>>
  */
-function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyles, array $currencyStyles = [], ?array &$currencyMatrix = null): array
+function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyles, array $currencyStyles = [], ?array &$currencyMatrix = null, bool $date1904 = false): array
 {
     $rows = [];
     $curRows = [];
@@ -309,7 +329,7 @@ function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyle
     while ($reader->read()) {
         if ($reader->nodeType === XMLReader::ELEMENT && $reader->localName === 'row') {
             $rowXml = $reader->readOuterXml();
-            $parsed = pa_xlsx_parse_row($rowXml, $sharedStrings, $dateStyles, $currencyStyles);
+            $parsed = pa_xlsx_parse_row($rowXml, $sharedStrings, $dateStyles, $currencyStyles, $date1904);
             $rows[] = $parsed['cells'];
             $curRows[] = $parsed['currency'];
         }
@@ -338,7 +358,7 @@ function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyle
 }
 
 /** Parse a single <row> element's cells into a positional string array. */
-function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyles, array $currencyStyles = []): array
+function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyles, array $currencyStyles = [], bool $date1904 = false): array
 {
     $cells = [];
     $currency = [];
@@ -380,9 +400,12 @@ function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyl
             } elseif ($type === 'str') {
                 $value = $vRaw;
             } else {
-                // Number (no type). Render as a date when the style says so.
+                // Number (no type). Render as a date when the style says so, else
+                // normalize scientific notation to a plain decimal.
                 if ($vRaw !== '' && is_numeric($vRaw) && isset($dateStyles[$style])) {
-                    $value = pa_xlsx_serial_to_date((float)$vRaw);
+                    $value = pa_xlsx_serial_to_date((float)$vRaw, $date1904);
+                } elseif ($vRaw !== '' && is_numeric($vRaw)) {
+                    $value = pa_xlsx_plain_number($vRaw);
                 } else {
                     $value = $vRaw;
                 }
@@ -445,6 +468,9 @@ function pa_read_xlsx(string $path): ?array
     $sharedStrings = pa_xlsx_shared_strings($zip['xl/sharedStrings.xml'] ?? '');
     $dateStyles = pa_xlsx_date_styles($zip['xl/styles.xml'] ?? '');
     $currencyStyles = pa_xlsx_currency_styles($zip['xl/styles.xml'] ?? '');
+    // The 1904 date system (common in Mac-authored files) shifts every serial by
+    // ~4 years; honor <workbookPr date1904="1"/> so dates aren't silently wrong.
+    $date1904 = (bool) preg_match('/<workbookPr\b[^>]*\bdate1904="(?:1|true)"/i', $zip['xl/workbook.xml']);
 
     // Map rId -> worksheet target path from the workbook relationships. Attribute
     // order varies by writer (Excel emits Type, Target, Id), so read each
@@ -473,7 +499,7 @@ function pa_read_xlsx(string $path): ?array
             }
             $sheetXml = $zip[$target];
             $currencyMatrix = [];
-            $matrix = pa_xlsx_parse_sheet($sheetXml, $sharedStrings, $dateStyles, $currencyStyles, $currencyMatrix);
+            $matrix = pa_xlsx_parse_sheet($sheetXml, $sharedStrings, $dateStyles, $currencyStyles, $currencyMatrix, $date1904);
             $sheets[] = [
                 'name' => $name,
                 'matrix' => $matrix,

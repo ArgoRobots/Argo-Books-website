@@ -172,7 +172,7 @@ function pa_import_schema(?string $country = null): array
             pa_col('Payment Method', 'enum:Cash,CreditCard,DebitCard,BankTransfer,Check,PayPal,Other', 'How payment was made', false, 'paymentMethod'),
             pa_col('Reference', 'string', 'Payment reference number', false, 'referenceNumber'),
             pa_col('Notes', 'string', 'Additional notes', false, 'notes'),
-            pa_col('Currency', 'string', 'ISO currency code the amount is in (e.g., USD, EUR, GBP). Map when the sheet has a per-row currency column, OR when the amount cell itself contains a currency symbol or code. Leave unmapped if all amounts are plainly in the company currency', false, 'originalCurrency'),
+            pa_col('Currency', 'string', "ISO currency code the amount is in (e.g., USD, EUR, GBP). Map when the sheet has a per-row currency column, OR when the amount cell itself contains a currency symbol or code (e.g. '£100', '$10 CAD'): output the ISO code, or the raw symbol if the code is unclear. Leave unmapped if all amounts are plainly in the company currency", false, 'originalCurrency'),
         ],
         'Locations' => [
             pa_col('ID', 'string', 'Unique identifier (e.g., LOC-001)', true, 'id'),

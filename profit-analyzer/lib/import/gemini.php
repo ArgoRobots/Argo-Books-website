@@ -54,8 +54,104 @@ function pa_gemini_chat(
         return null;
     }
 
-    $model = PA_GEMINI_MODEL;
-    $maxTokens = max(1, min($maxTokens, 16000));
+    $ch = pa_gemini_build_handle($systemPrompt, $userPrompt, $maxTokens, $temperature, $key);
+    $response = curl_exec($ch);
+    $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+    curl_close($ch);
+
+    return pa_gemini_parse_response($response, $httpCode, $err);
+}
+
+/**
+ * Run several Gemini chats concurrently with a cap on how many are in flight at
+ * once — the website equivalent of the desktop app's parallel analysis batches
+ * (5) and Tier 2 chunks (10). Each request is an assoc array
+ * ['system'=>, 'user'=>, 'maxTokens'=>, 'temp'=>]. Returns ?string results in the
+ * SAME ORDER as $requests (null for any that failed), so callers can keep row order.
+ */
+function pa_gemini_chat_multi(array $requests, int $maxConcurrent = 5): array
+{
+    $results = array_fill(0, count($requests), null);
+    if (count($requests) === 0) {
+        return $results;
+    }
+
+    $key = pa_gemini_key();
+    if ($key === '') {
+        error_log('profit-analyzer: GEMINI_API_KEY not configured');
+        return $results;
+    }
+
+    // One request: no point spinning up curl_multi.
+    if (count($requests) === 1) {
+        $r = $requests[0];
+        $results[0] = pa_gemini_chat($r['system'] ?? '', $r['user'] ?? '', $r['maxTokens'] ?? 4000, $r['temp'] ?? 0.1);
+        return $results;
+    }
+
+    $maxConcurrent = max(1, $maxConcurrent);
+    $mh = curl_multi_init();
+    $handleIndex = []; // spl_object_id(handle) => request index
+    $next = 0;
+    $total = count($requests);
+
+    // Add the next pending request to the multi handle; false when none remain.
+    $launch = function () use (&$next, $total, $requests, $key, $mh, &$handleIndex): bool {
+        if ($next >= $total) {
+            return false;
+        }
+        $i = $next++;
+        $r = $requests[$i];
+        $ch = pa_gemini_build_handle($r['system'] ?? '', $r['user'] ?? '', $r['maxTokens'] ?? 4000, $r['temp'] ?? 0.1, $key);
+        curl_multi_add_handle($mh, $ch);
+        $handleIndex[spl_object_id($ch)] = $i;
+        return true;
+    };
+
+    // Prime the window up to the cap.
+    for ($k = 0; $k < $maxConcurrent; $k++) {
+        if (!$launch()) {
+            break;
+        }
+    }
+
+    $running = 0;
+    do {
+        curl_multi_exec($mh, $running);
+        while ($info = curl_multi_info_read($mh)) {
+            if ($info['msg'] !== CURLMSG_DONE) {
+                continue;
+            }
+            $ch = $info['handle'];
+            $id = spl_object_id($ch);
+            if (isset($handleIndex[$id])) {
+                $resp = curl_multi_getcontent($ch);
+                $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $err = curl_error($ch);
+                $results[$handleIndex[$id]] = pa_gemini_parse_response($resp, $code, $err);
+                unset($handleIndex[$id]);
+            }
+            curl_multi_remove_handle($mh, $ch);
+            curl_close($ch);
+            $launch(); // backfill so the window stays full
+        }
+        if ($running > 0) {
+            curl_multi_select($mh, 1.0); // block until activity, don't busy-spin
+        }
+    } while ($running > 0 || !empty($handleIndex));
+
+    curl_multi_close($mh);
+    return $results;
+}
+
+/** Build (but do not execute) a Gemini curl handle for one chat request. */
+function pa_gemini_build_handle(string $systemPrompt, string $userPrompt, int $maxTokens, float $temperature, string $key)
+{
+    // The C# client imposes no ceiling; a wide analysis batch (up to 40 columns
+    // across many 1-column sheets) can compute a budget above 16k. Cap at 32k so
+    // that's never silently truncated, while still guarding against runaway values.
+    $maxTokens = max(1, min($maxTokens, 32000));
     $temperature = max(0.0, min(2.0, $temperature));
 
     $payload = [
@@ -72,7 +168,7 @@ function pa_gemini_chat(
         $payload['system_instruction'] = ['parts' => [['text' => $systemPrompt]]];
     }
 
-    $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$key}";
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . PA_GEMINI_MODEL . ":generateContent?key={$key}";
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -83,14 +179,16 @@ function pa_gemini_chat(
         CURLOPT_TIMEOUT => 120,
         CURLOPT_CONNECTTIMEOUT => 10,
     ]);
+    return $ch;
+}
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch);
-    curl_close($ch);
-
-    if ($response === false) {
-        error_log('profit-analyzer Gemini cURL error: ' . $curlError);
+/** Parse a Gemini HTTP result into the model's text content, or null on failure. */
+function pa_gemini_parse_response($response, int $httpCode, string $curlError): ?string
+{
+    if ($response === false || $response === null || $response === '') {
+        if ($curlError !== '') {
+            error_log('profit-analyzer Gemini cURL error: ' . $curlError);
+        }
         return null;
     }
 

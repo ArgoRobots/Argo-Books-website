@@ -19,6 +19,11 @@ require_once __DIR__ . '/currency.php'; // pa_currency_detect for per-row curren
 const PA_MIN_TYPE_CONFIDENCE = 0.5;
 const PA_MAX_COLUMNS_PER_BATCH = 40;
 const PA_TIER2_CHUNK = 100;
+// Concurrency caps, matching the desktop app (MaxConcurrentAnalysisBatches=5,
+// MaxConcurrentChunks=10). The analysis batches and Tier 2 chunks each fan out
+// through pa_gemini_chat_multi up to these many requests in flight at once.
+const PA_MAX_CONCURRENT_ANALYSIS = 5;
+const PA_MAX_CONCURRENT_CHUNKS = 10;
 
 // ─── Prompt building (port of BuildAnalysis*Prompt / BuildTier2*Prompt) ───────
 
@@ -215,15 +220,24 @@ function pa_split_into_batches(array $sheets): array
 function pa_analyze_sheets(array $sheets, ?string $country): array
 {
     $batches = pa_split_into_batches($sheets);
-    $merged = [];
+    $system = pa_build_analysis_system_prompt();
 
+    // Build one request per batch and run up to 5 concurrently (app parity).
+    $requests = [];
     foreach ($batches as $batch) {
-        $system = pa_build_analysis_system_prompt();
-        $user = pa_build_analysis_user_prompt($batch, $country);
         $totalColumns = array_sum(array_map(fn($s) => count($s['headers']), $batch));
-        $maxTokens = max(4000, $totalColumns * 200 + count($batch) * 400);
+        $requests[] = [
+            'system' => $system,
+            'user' => pa_build_analysis_user_prompt($batch, $country),
+            'maxTokens' => max(4000, $totalColumns * 200 + count($batch) * 400),
+            'temp' => 0.1,
+        ];
+    }
 
-        $response = pa_gemini_chat($system, $user, $maxTokens, 0.1);
+    $responses = pa_gemini_chat_multi($requests, PA_MAX_CONCURRENT_ANALYSIS);
+
+    $merged = [];
+    foreach ($responses as $response) {
         if ($response === null) {
             continue;
         }
@@ -422,17 +436,28 @@ function pa_tier2_entities(array $sheet, array $analysis, ?string $country): arr
     $allRows = $sheet['dataRows'];
     $allCur = $sheet['currencyRows'] ?? [];
 
-    $entities = [];
+    // One request per 100-row chunk, run up to 10 concurrently (app parity).
+    // Results come back in request order, so entity/row order is preserved.
+    $requests = [];
     for ($i = 0; $i < count($allRows); $i += PA_TIER2_CHUNK) {
         $chunk = array_slice($allRows, $i, PA_TIER2_CHUNK);
         $curChunk = array_slice($allCur, $i, PA_TIER2_CHUNK);
-        $user = pa_build_tier2_user_prompt($headers, $chunk, $curChunk);
-        $response = pa_gemini_chat($system, $user, 16000, 0.0);
+        $requests[] = [
+            'system' => $system,
+            'user' => pa_build_tier2_user_prompt($headers, $chunk, $curChunk),
+            'maxTokens' => 16000,
+            'temp' => 0.0,
+        ];
+    }
+
+    $responses = pa_gemini_chat_multi($requests, PA_MAX_CONCURRENT_CHUNKS);
+
+    $entities = [];
+    foreach ($responses as $response) {
         if ($response === null) {
             continue;
         }
-        $parsed = pa_parse_tier2_response($response);
-        foreach ($parsed as $ent) {
+        foreach (pa_parse_tier2_response($response) as $ent) {
             $entities[] = $ent;
         }
     }

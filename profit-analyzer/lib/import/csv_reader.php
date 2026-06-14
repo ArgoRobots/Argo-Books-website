@@ -43,8 +43,18 @@ function pa_read_csv(string $path): array
     if ($content === false) {
         return [[], []];
     }
-    // Strip UTF-8 BOM.
-    if (strncmp($content, "\xEF\xBB\xBF", 3) === 0) {
+    // Decode by BOM, mirroring .NET's StreamReader(detectEncodingFromByteOrderMarks).
+    // Excel "Unicode Text" and some bank exports are UTF-16; decode them to UTF-8
+    // so the parser sees real characters instead of interleaved null bytes.
+    if (strncmp($content, "\xFF\xFE\x00\x00", 4) === 0) {        // UTF-32 LE
+        $content = mb_convert_encoding(substr($content, 4), 'UTF-8', 'UTF-32LE');
+    } elseif (strncmp($content, "\x00\x00\xFE\xFF", 4) === 0) {  // UTF-32 BE
+        $content = mb_convert_encoding(substr($content, 4), 'UTF-8', 'UTF-32BE');
+    } elseif (strncmp($content, "\xFF\xFE", 2) === 0) {          // UTF-16 LE
+        $content = mb_convert_encoding(substr($content, 2), 'UTF-8', 'UTF-16LE');
+    } elseif (strncmp($content, "\xFE\xFF", 2) === 0) {          // UTF-16 BE
+        $content = mb_convert_encoding(substr($content, 2), 'UTF-8', 'UTF-16BE');
+    } elseif (strncmp($content, "\xEF\xBB\xBF", 3) === 0) {      // UTF-8 BOM
         $content = substr($content, 3);
     }
     $content = str_replace("\r\n", "\n", $content);

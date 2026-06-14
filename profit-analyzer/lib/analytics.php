@@ -21,7 +21,6 @@ require_once __DIR__ . '/import/currency.php'; // pa_currency_symbol for currenc
 function pa_set_money_symbol(string $code): void { $GLOBALS['pa_cur_symbol'] = pa_currency_symbol($code); }
 function pa_money(float $n): string { return ($GLOBALS['pa_cur_symbol'] ?? '$') . number_format(round($n)); }
 function pa_pct(float $n, float $of): int { return $of > 0 ? (int) round($n / $of * 100) : 0; }
-function pa_month(string $date): string { return date('M', strtotime($date)); }
 
 /** Sum a numeric field over an array of rows. */
 function pa_sum(array $rows, string $field): float

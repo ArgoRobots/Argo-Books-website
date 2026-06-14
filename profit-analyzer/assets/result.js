@@ -89,7 +89,7 @@
       chart('c_purchTrend', (sve&&sve.expenses)? line(sve.expenses.cats,[{name:'Expenses',data:sve.expenses.data,color:'#ef4444',area:true}]):null);
       pieOr('c_expDist', d.expDist, true);
     },
-    products:function(){ hideCard('c_prodTrend'); }, // table is rendered separately; no trend series in the payload
+    products:function(){ renderCards('products', (A.products&&A.products.cards)||[]); },
     geographic:function(){
       var g=A.geographic||{};
       pieOr('c_cOrigin', g.origin);
@@ -98,12 +98,7 @@
       hideCard('c_compDest');
       if(has(g.map)) geoMap(g.map); else hideCard('c_geoMap');
     },
-    customers:function(){
-      var c=A.customers||{};
-      pieOr('c_topCust', c.topCustomers, true);
-      pieOr('c_payStatus', c.paymentStatus);
-      ['c_custGrowth','c_clv','c_activeInactive','c_rentalsPer'].forEach(hideCard);
-    },
+    customers:function(){ renderCards('customers', (A.customers&&A.customers.cards)||[]); },
     taxes:function(){
       var t=A.taxes||{};
       var cvp=t.collectedVsPaid;
@@ -132,6 +127,31 @@
       .catch(function(){ el.innerHTML='<div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">World map could not load.</div>'; });
   }
 
+  // ---------- generic card renderer (products / customers tabs) ----------
+  function renderCards(panelName, cards){
+    var grid=document.querySelector('.panel[data-panel="'+panelName+'"] .cgrid'); if(!grid)return;
+    grid.innerHTML='';
+    cards.forEach(function(card, idx){
+      var div=document.createElement('div');
+      div.className='chartcard'+(card.span2?' span2':'');
+      var html='<div class="ttl">'+esc(card.title)+'</div>'+(card.meta?'<div class="cmeta">'+esc(card.meta)+'</div>':'');
+      if(card.type==='table'){
+        html+='<div style="overflow:auto"><table class="dtable"><thead><tr>'
+          + card.columns.map(function(c){ return '<th>'+esc(c)+'</th>'; }).join('')
+          + '</tr></thead><tbody>'
+          + card.rows.map(function(r){ return '<tr>'+r.map(function(v){ return '<td>'+esc(v)+'</td>'; }).join('')+'</tr>'; }).join('')
+          + '</tbody></table></div>';
+        div.innerHTML=html; grid.appendChild(div);
+      } else {
+        var id='cc_'+panelName+'_'+idx;
+        html+='<div class="ec" id="'+id+'"></div>';
+        div.innerHTML=html; grid.appendChild(div);
+        if(card.type==='pie'){ init(id, pie(card.data, card.money)); }
+        else if(card.type==='bars'){ init(id, bars(card.cats, card.series)); }
+      }
+    });
+  }
+
   // ---------- KPI + table + meta rendering ----------
   function renderKpis(panelName, kpis){
     var panel=document.querySelector('.panel[data-panel="'+panelName+'"]'); if(!panel)return;
@@ -140,13 +160,6 @@
     box.innerHTML=kpis.map(function(k){
       return '<div class="kpi '+(k.cls||'')+'"><div class="lbl">'+esc(k.lbl)+'</div><div class="val">'+esc(k.val)+'</div>'
         + (k.sub?'<div class="sub '+(k.subcls||'')+'">'+esc(k.sub)+'</div>':'') + '</div>';
-    }).join('');
-  }
-  function renderProductsTable(){
-    var p=A.products; var tbody=document.querySelector('.panel[data-panel="products"] .dtable tbody'); if(!tbody)return;
-    if(!p||!has(p.table)){ return; }
-    tbody.innerHTML=p.table.map(function(r){
-      return '<tr><td>'+esc(r.name)+'</td><td class="num">'+esc(r.units)+'</td><td class="num">'+esc(r.rev)+'</td><td class="num">'+esc(r.avg)+'</td></tr>';
     }).join('');
   }
   function renderFlowStat(){
@@ -161,17 +174,26 @@
       if(badge)badge.textContent='✓ '+Number(m.rows||0).toLocaleString()+' rows analyzed';
     }
   }
+  // Multi-entity cleaned data: one tab per entity present (Sales, Expenses,
+  // Customers, Products, …), matching the downloaded spreadsheet exactly.
   function renderCleaned(){
-    var tbody=document.querySelector('.cleantable tbody'); if(!tbody||!A.cleaned)return;
-    var fmt=function(n){ return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
-    tbody.innerHTML=A.cleaned.map(function(r){
-      var inc=r.type==='income';
-      return '<tr data-type="'+esc(r.type)+'"><td class="date">'+esc(r.date)+'</td><td>'+esc(r.description)+'</td>'
-        +'<td><span class="pill cat">'+esc(r.category)+'</span></td>'
-        +'<td><span class="pill '+(inc?'inc':'exp')+'">'+(inc?'Income':'Expense')+'</span></td>'
-        +'<td class="amt'+(inc?' inc':'')+'">'+fmt(r.amount)+'</td></tr>';
-    }).join('');
-    wireCleanedFilter();
+    var sheets=A.cleanedSheets||[];
+    var tabsEl=document.getElementById('cleanTabs');
+    var head=document.getElementById('cleanHead');
+    var body=document.getElementById('cleanBody');
+    var label=document.getElementById('rowcount');
+    var wrap=document.querySelector('.cleanwrap');
+    if(!tabsEl||!head||!body){ return; }
+    if(!sheets.length){ if(wrap)wrap.style.display='none'; var st=document.querySelector('.sectitle'); if(st)st.style.display='none'; return; }
+    tabsEl.innerHTML=sheets.map(function(s,i){ return '<span class="ctab'+(i===0?' active':'')+'" data-i="'+i+'">'+esc(s.label)+'</span>'; }).join('');
+    function renderSheet(i){
+      var s=sheets[i];
+      head.innerHTML='<tr>'+s.columns.map(function(c,j){ return '<th'+(s.aligns[j]==='right'?' style="text-align:right"':'')+'>'+esc(c)+'</th>'; }).join('')+'</tr>';
+      body.innerHTML=s.rows.map(function(r){ return '<tr>'+r.map(function(v,j){ return '<td'+(s.aligns[j]==='right'?' class="num"':'')+'>'+esc(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+      if(label) label.textContent=s.rows.length+' '+s.label.toLowerCase()+' '+(s.rows.length===1?'row':'rows');
+    }
+    tabsEl.querySelectorAll('.ctab').forEach(function(t){ t.onclick=function(){ tabsEl.querySelectorAll('.ctab').forEach(function(x){x.classList.remove('active');}); t.classList.add('active'); renderSheet(+t.dataset.i); }; });
+    renderSheet(0);
   }
 
   // ---------- tabs ----------
@@ -188,18 +210,6 @@
     var present={}; (A.tabs||[]).forEach(function(t){ present[t]=true; });
     document.querySelectorAll('.tabbtn').forEach(function(b){ if(!present[b.dataset.tab]) b.style.display='none'; });
     document.querySelectorAll('.panel').forEach(function(p){ if(!present[p.dataset.panel]) p.style.display='none'; });
-  }
-
-  // ---------- cleaned-table filter ----------
-  function wireCleanedFilter(){
-    var ctabs=document.querySelectorAll('.cleanbar .ctab');
-    var rows=Array.prototype.slice.call(document.querySelectorAll('.cleantable tbody tr'));
-    var label=document.getElementById('rowcount');
-    var total=rows.length;
-    function apply(f){ var n=0; rows.forEach(function(r){ var m=(f==='all')||(r.dataset.type===f); r.style.display=m?'':'none'; if(m)n++; });
-      if(label) label.textContent=(f==='all')?(n+' of '+total+' rows shown'):(n+' '+f+' rows shown'); }
-    ctabs.forEach(function(t){ t.onclick=function(){ ctabs.forEach(function(x){x.classList.remove('active');}); t.classList.add('active'); apply(t.dataset.filter); }; });
-    apply('all');
   }
 
   // ---------- download + email (post the client-held normalized data) ----------
@@ -250,11 +260,11 @@
   function showEmptyState(){
     var tabbar=document.querySelector('.tabbar'); if(tabbar)tabbar.style.display='none';
     document.querySelectorAll('.panel').forEach(function(p){ p.style.display='none'; });
-    var wrap=document.querySelector('.wrap');
-    if(wrap){ wrap.insertAdjacentHTML('beforeend',
-      '<div class="empty-note" style="text-align:center;max-width:560px;margin:30px auto;padding:26px;border:1px solid var(--line,#e6ebf2);border-radius:16px;background:#fff">'
+    var main=document.getElementById('paMain'); if(!main)return;
+    main.insertAdjacentHTML('afterbegin',
+      '<div class="empty-note" style="text-align:center;max-width:560px;margin:10px auto 26px;padding:26px;border:1px solid var(--line,#e6ebf2);border-radius:16px;background:#fff">'
       +'<h3 style="margin:0 0 8px;font-family:Fraunces,Georgia,serif">We cleaned your file</h3>'
-      +'<p style="color:#64748b;margin:0">It didn\'t contain enough sales or expense transactions to chart, but your cleaned, organized spreadsheet is ready below.</p></div>'); }
+      +'<p style="color:#64748b;margin:0">It didn\'t contain enough sales or expense transactions to chart, but your cleaned, organized data is ready below.</p></div>');
   }
 
   function render(){
@@ -263,7 +273,6 @@
     if(!has(A.tabs)){ showEmptyState(); renderCleaned(); wireActions(); return; }
     ['dashboard','products','customers','taxes'].forEach(function(name){ if(A[name]) renderKpis(name, A[name].kpis); });
     renderFlowStat();
-    renderProductsTable();
     renderCleaned();
     document.getElementById('tabbar').addEventListener('click', function(e){ var b=e.target.closest('.tabbtn'); if(b && b.style.display!=='none') show(b.dataset.tab); });
     var first=(A.tabs&&A.tabs[0])||'dashboard';

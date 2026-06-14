@@ -10,6 +10,7 @@
 // all nine.
 
 require_once __DIR__ . '/contract.php';
+require_once __DIR__ . '/export.php'; // pa_build_workbook + pa_lookup, reused for the cleaned table
 
 function pa_money(float $n): string { return '$' . number_format(round($n)); }
 function pa_pct(float $n, float $of): int { return $of > 0 ? (int) round($n / $of * 100) : 0; }
@@ -90,10 +91,14 @@ function pa_compute_analytics(array $normalized): array
     $fees = $catTotals['Fees'] ?? 0;
     $other = max(0, $expTotal - $cogs - $ads - $fees);
 
+    // Total records analyzed across every entity, for the header badge.
+    $totalRows = 0;
+    foreach ($E as $arr) { $totalRows += count($arr); }
+
     $result = [
         'meta' => [
             'filename' => $meta['filename'] ?? 'your-spreadsheet.xlsx',
-            'rows' => count($revenue) + count($expenses),
+            'rows' => $totalRows,
             'flagged' => (int) ($meta['flagged'] ?? 0),
         ],
         'tabs' => [],
@@ -168,52 +173,90 @@ function pa_compute_analytics(array $normalized): array
         ];
     }
 
-    // ---- Products ----
-    if ($products && $revenue) {
+    // ---- Products (renders whenever products exist, with or without sales) ----
+    if ($products) {
         $result['tabs'][] = 'products';
-        $byProd = [];
-        foreach ($revenue as $r) {
-            $pid = $r['productId'] ?? null; if (!$pid) { continue; }
-            $byProd[$pid] ??= ['units' => 0, 'rev' => 0];
-            $byProd[$pid]['units'] += (float) ($r['quantity'] ?? 0);
-            $byProd[$pid]['rev'] += (float) ($r['amount'] ?? 0);
+        $catCount = []; $typeCount = [];
+        foreach ($products as $p) {
+            $cat = trim((string) ($p['categoryName'] ?? '')); if ($cat === '') { $cat = 'Uncategorized'; }
+            $catCount[$cat] = ($catCount[$cat] ?? 0) + 1;
+            $ty = trim((string) ($p['type'] ?? '')); if ($ty === '') { $ty = 'Other'; }
+            $typeCount[$ty] = ($typeCount[$ty] ?? 0) + 1;
         }
-        $rows = [];
-        $totalUnits = 0; $totalRev = 0;
-        foreach ($byProd as $pid => $d) {
-            $rows[] = ['name' => pa_product_name($products, $pid) ?? $pid, 'units' => $d['units'], 'rev' => $d['rev'], 'avg' => $d['units'] > 0 ? $d['rev'] / $d['units'] : 0];
-            $totalUnits += $d['units']; $totalRev += $d['rev'];
+        $cards = [];
+        if (count($catCount) > 1) {
+            $cards[] = ['title' => 'Products by category', 'meta' => 'Catalog breakdown', 'type' => 'pie', 'data' => pa_top_pie($catCount, 8)];
         }
-        usort($rows, fn($a, $b) => $b['rev'] <=> $a['rev']);
+        if (count($typeCount) > 1) {
+            $cards[] = ['title' => 'Products by type', 'meta' => 'Sold vs purchased vs rental', 'type' => 'pie', 'data' => pa_top_pie($typeCount, 5)];
+        }
+        if ($revenue) {
+            $revByProd = [];
+            foreach ($revenue as $r) {
+                $name = trim((string) ($r['description'] ?? '')); if ($name === '') { continue; }
+                $revByProd[$name] = ($revByProd[$name] ?? 0) + (float) ($r['amount'] ?? 0);
+            }
+            if ($revByProd) {
+                $cards[] = ['title' => 'Top products by revenue', 'meta' => 'By sales total', 'type' => 'pie', 'money' => true, 'data' => pa_top_pie($revByProd, 8)];
+            }
+        }
+        $catalog = [];
+        foreach ($products as $p) {
+            $catalog[] = [
+                (string) ($p['name'] ?? ''), (string) ($p['sku'] ?? ''),
+                (string) ($p['categoryName'] ?? ''), (string) ($p['type'] ?? ''),
+                pa_lookup($suppliers, $p['supplierId'] ?? '', 'name'),
+            ];
+        }
+        $cards[] = ['title' => 'Product catalog', 'meta' => count($products) . ' items', 'type' => 'table', 'span2' => true,
+            'columns' => ['Name', 'SKU', 'Category', 'Type', 'Supplier'], 'rows' => $catalog];
         $result['products'] = [
             'kpis' => [
-                ['lbl' => 'Product Revenue', 'val' => pa_money($totalRev), 'cls' => 'good'],
-                ['lbl' => 'Units Sold', 'val' => number_format($totalUnits), 'cls' => ''],
-                ['lbl' => 'Avg Sale Price', 'val' => '$' . number_format($totalUnits > 0 ? $totalRev / $totalUnits : 0, 2), 'cls' => ''],
-                ['lbl' => 'Products Sold', 'val' => (string) count($rows), 'cls' => ''],
+                ['lbl' => 'Products', 'val' => (string) count($products), 'cls' => 'good'],
+                ['lbl' => 'Categories', 'val' => (string) count($catCount), 'cls' => ''],
+                ['lbl' => 'Types', 'val' => (string) count($typeCount), 'cls' => ''],
             ],
-            'table' => array_map(fn($r) => [
-                'name' => $r['name'], 'units' => number_format($r['units']),
-                'rev' => pa_money($r['rev']), 'avg' => '$' . number_format($r['avg'], 2),
-            ], $rows),
+            'cards' => $cards,
         ];
     }
 
-    // ---- Customers ----
-    if ($customers && $revenue) {
+    // ---- Customers (renders whenever customers exist, with or without sales) ----
+    if ($customers) {
         $result['tabs'][] = 'customers';
-        $byCust = pa_group($revenue, fn($r) => pa_customer_name($customers, $r['customerId'] ?? '') ?? ($r['customerId'] ?? ''), 'amount');
-        $payMap = [];
-        foreach ($revenue as $r) { $s = $r['paymentStatus'] ?? 'Unknown'; $payMap[$s] = ($payMap[$s] ?? 0) + 1; }
-        $result['customers'] = [
-            'kpis' => [
-                ['lbl' => 'Total Customers', 'val' => (string) count($customers), 'cls' => ''],
-                ['lbl' => 'Active', 'val' => (string) count(array_filter($customers, fn($c) => ($c['status'] ?? '') === 'Active')), 'cls' => 'good'],
-                ['lbl' => 'Avg Customer Value', 'val' => pa_money(count($customers) > 0 ? $revTotal / count($customers) : 0), 'cls' => ''],
-            ],
-            'topCustomers' => pa_top_pie($byCust, 5),
-            'paymentStatus' => array_map(fn($k, $v) => ['name' => $k, 'value' => $v], array_keys($payMap), array_values($payMap)),
+        $countryCount = []; $statusCount = [];
+        foreach ($customers as $c) {
+            $co = trim((string) ($c['country'] ?? '')); if ($co !== '') { $countryCount[$co] = ($countryCount[$co] ?? 0) + 1; }
+            $st = trim((string) ($c['status'] ?? '')); if ($st === '') { $st = 'Unknown'; } $statusCount[$st] = ($statusCount[$st] ?? 0) + 1;
+        }
+        $cards = [];
+        if ($revenue) {
+            $byCust = pa_group($revenue, fn($r) => pa_customer_name($customers, $r['customerId'] ?? '') ?? ($r['customerId'] ?? ''), 'amount');
+            if ($byCust) { $cards[] = ['title' => 'Top customers by revenue', 'meta' => 'Highest spenders', 'type' => 'pie', 'money' => true, 'data' => pa_top_pie($byCust, 6)]; }
+            $payMap = [];
+            foreach ($revenue as $r) { $s = $r['paymentStatus'] ?? 'Unknown'; $payMap[$s] = ($payMap[$s] ?? 0) + 1; }
+            $cards[] = ['title' => 'Payment status', 'meta' => 'Paid / partial / unpaid', 'type' => 'pie', 'data' => pa_top_pie($payMap, 6)];
+        } else {
+            $byPur = [];
+            foreach ($customers as $c) { $v = (float) ($c['totalPurchases'] ?? 0); if ($v > 0) { $byPur[(string) ($c['name'] ?? '')] = $v; } }
+            if ($byPur) { $cards[] = ['title' => 'Top customers by purchases', 'meta' => 'Lifetime value', 'type' => 'pie', 'money' => true, 'data' => pa_top_pie($byPur, 6)]; }
+        }
+        if (count($countryCount) > 1) { $cards[] = ['title' => 'Customers by country', 'meta' => 'Where they are', 'type' => 'pie', 'data' => pa_top_pie($countryCount, 8)]; }
+        if (count($statusCount) > 1) { $cards[] = ['title' => 'Active vs inactive', 'meta' => 'Account status', 'type' => 'pie', 'data' => pa_top_pie($statusCount, 5)]; }
+        $list = [];
+        foreach ($customers as $c) {
+            $list[] = [(string) ($c['name'] ?? ''), (string) ($c['company'] ?? ''), (string) ($c['email'] ?? ''),
+                (string) ($c['city'] ?? ''), (string) ($c['country'] ?? ''), (string) ($c['status'] ?? '')];
+        }
+        $cards[] = ['title' => 'Customer list', 'meta' => count($customers) . ' customers', 'type' => 'table', 'span2' => true,
+            'columns' => ['Name', 'Company', 'Email', 'City', 'Country', 'Status'], 'rows' => $list];
+        $avgVal = $revenue && count($customers) > 0 ? pa_money($revTotal / count($customers)) : null;
+        $kpis = [
+            ['lbl' => 'Total Customers', 'val' => (string) count($customers), 'cls' => ''],
+            ['lbl' => 'Active', 'val' => (string) count(array_filter($customers, fn($c) => ($c['status'] ?? '') === 'Active')), 'cls' => 'good'],
+            ['lbl' => 'Countries', 'val' => (string) count($countryCount), 'cls' => ''],
         ];
+        if ($avgVal !== null) { $kpis[] = ['lbl' => 'Avg Customer Value', 'val' => $avgVal, 'cls' => '']; }
+        $result['customers'] = ['kpis' => $kpis, 'cards' => $cards];
     }
 
     // ---- Taxes ----
@@ -256,18 +299,46 @@ function pa_compute_analytics(array $normalized): array
         ];
     }
 
-    // ---- Cleaned transactions table ----
-    $cleaned = [];
-    foreach ($revenue as $r) {
-        $cleaned[] = ['date' => $r['date'] ?? '', 'description' => $r['description'] ?? '', 'category' => 'Sales income', 'type' => 'income', 'amount' => (float) ($r['amount'] ?? 0)];
-    }
-    foreach ($expenses as $r) {
-        $cleaned[] = ['date' => $r['date'] ?? '', 'description' => $r['description'] ?? '', 'category' => $r['category'] ?? 'Other', 'type' => 'expense', 'amount' => (float) ($r['amount'] ?? 0)];
-    }
-    usort($cleaned, fn($a, $b) => strcmp($a['date'], $b['date']));
-    $result['cleaned'] = $cleaned;
+    // ---- Cleaned data: one tab per entity present, matching the download ----
+    $result['cleanedSheets'] = pa_cleaned_sheets($n);
 
     return $result;
+}
+
+/**
+ * Display-ready version of the cleaned workbook: the same per-entity sheets the
+ * download produces (pa_build_workbook), but with money columns formatted and
+ * numeric columns flagged for right-alignment, so the on-page table and the
+ * .xlsx stay in lockstep.
+ */
+function pa_cleaned_sheets(array $normalized): array
+{
+    $money = ['Unit Price', 'Tax', 'Total', 'Amount', 'Subtotal', 'Paid', 'Balance'];
+    $numeric = array_merge($money, ['Quantity', 'Reorder Point']);
+    $out = [];
+    foreach (pa_build_workbook($normalized) as $label => $sheet) {
+        $headers = $sheet['headers'];
+        $aligns = array_map(fn($h) => in_array($h, $numeric, true) ? 'right' : 'left', $headers);
+        $rows = array_map(function ($r) use ($headers, $money) {
+            $cells = [];
+            foreach ($r as $i => $v) {
+                $h = $headers[$i] ?? '';
+                if (is_int($v) || is_float($v)) {
+                    if (in_array($h, $money, true)) {
+                        $cells[] = '$' . number_format((float) $v, 2);
+                    } else {
+                        // Quantity / reorder point: plain integer-ish.
+                        $cells[] = rtrim(rtrim(number_format((float) $v, 2, '.', ''), '0'), '.');
+                    }
+                } else {
+                    $cells[] = (string) $v;
+                }
+            }
+            return $cells;
+        }, $sheet['rows']);
+        $out[] = ['label' => $label, 'columns' => $headers, 'aligns' => $aligns, 'rows' => $rows];
+    }
+    return $out;
 }
 
 function pa_product_name(array $products, string $id): ?string

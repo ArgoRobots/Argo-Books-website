@@ -36,9 +36,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 
 // --- Rate limit (the limit message IS the pitch). Check only here; we record
 // AFTER a successful analysis so failed/invalid uploads (which never hit the
-// paid AI) don't burn a user's daily quota. ---
+// paid AI) don't burn a user's daily quota. Loopback (local dev) is exempt so
+// testing isn't capped — real visitors are never on 127.0.0.1. ---
 $ip = get_client_ip();
-if (is_rate_limited($ip, PA_DAILY_LIMIT, PA_WINDOW, 'profit_analyzer')) {
+$paLocal = in_array($ip, ['127.0.0.1', '::1'], true);
+if (!$paLocal && is_rate_limited($ip, PA_DAILY_LIMIT, PA_WINDOW, 'profit_analyzer')) {
     pa_fail(429, 'rate_limited',
         "You've used your free analyses for today. Want unlimited? Try Argo Books free.",
         ['cta' => '/downloads/?source=profit-analyzer-limit&utm_source=profit-analyzer&utm_medium=tool']);
@@ -78,8 +80,10 @@ try {
 // Delete the raw upload immediately after analysis (Option A: store nothing).
 @unlink($tmp);
 
-// Only successful analyses count toward the daily quota.
-record_rate_limit_attempt($ip, 'profit_analyzer', PA_WINDOW);
+// Only successful analyses count toward the daily quota (local dev exempt).
+if (!$paLocal) {
+    record_rate_limit_attempt($ip, 'profit_analyzer', PA_WINDOW);
+}
 
 // Return both the chart-ready analytics and the full NormalizedData. Under
 // Option A the server stores nothing, so the client keeps `normalized` for the

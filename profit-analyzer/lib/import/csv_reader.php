@@ -110,8 +110,15 @@ function pa_csv_parse(string $content, string $delimiter): array
                 $field .= $c;
             }
         } else {
-            if ($c === '"') {
+            if ($c === '"' && $field === '') {
+                // A quote only opens a quoted field at the START of a field.
                 $inQuotes = true;
+                $started = true;
+            } elseif ($c === '"') {
+                // A quote mid-field is a literal character (lenient, like Excel):
+                // e.g. inch marks in '3/4" pipe'. Prevents swallowing the rest of
+                // the file when a stray quote appears in an unquoted field.
+                $field .= $c;
                 $started = true;
             } elseif ($c === $delimiter) {
                 $record[] = $field;

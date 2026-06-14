@@ -141,11 +141,13 @@ function pa_xlsx_date_styles(string $xml): array
     $builtinDate = [14 => 1, 15 => 1, 16 => 1, 17 => 1, 18 => 1, 19 => 1, 20 => 1,
         21 => 1, 22 => 1, 45 => 1, 46 => 1, 47 => 1];
 
-    // Custom numFmts: numFmtId => formatCode.
+    // Custom numFmts: numFmtId => formatCode (attribute order varies by writer).
     $custom = [];
-    if (preg_match_all('/<numFmt[^>]*numFmtId="(\d+)"[^>]*formatCode="([^"]*)"/', $xml, $m, PREG_SET_ORDER)) {
-        foreach ($m as $mm) {
-            $custom[(int)$mm[1]] = html_entity_decode($mm[2], ENT_QUOTES | ENT_XML1, 'UTF-8');
+    if (preg_match_all('/<numFmt\b[^>]*>/', $xml, $m)) {
+        foreach ($m[0] as $tag) {
+            if (preg_match('/\bnumFmtId="(\d+)"/', $tag, $idm) && preg_match('/\bformatCode="([^"]*)"/', $tag, $fm)) {
+                $custom[(int)$idm[1]] = html_entity_decode($fm[1], ENT_QUOTES | ENT_XML1, 'UTF-8');
+            }
         }
     }
 
@@ -326,14 +328,17 @@ function pa_read_xlsx(string $path): ?array
     $sharedStrings = pa_xlsx_shared_strings($zip['xl/sharedStrings.xml'] ?? '');
     $dateStyles = pa_xlsx_date_styles($zip['xl/styles.xml'] ?? '');
 
-    // Map rId -> worksheet target path from the workbook relationships.
+    // Map rId -> worksheet target path from the workbook relationships. Attribute
+    // order varies by writer (Excel emits Type, Target, Id), so read each
+    // <Relationship> tag and pull Id/Target independently rather than positionally.
     $relMap = [];
     $relsXml = $zip['xl/_rels/workbook.xml.rels'] ?? '';
-    if (preg_match_all('/<Relationship[^>]*Id="([^"]+)"[^>]*Target="([^"]+)"/', $relsXml, $rm, PREG_SET_ORDER)) {
-        foreach ($rm as $r) {
-            $target = $r[2];
-            $target = preg_replace('#^/?xl/#', '', $target); // normalize to xl-relative
-            $relMap[$r[1]] = 'xl/' . ltrim($target, '/');
+    if (preg_match_all('/<Relationship\b[^>]*>/', $relsXml, $rm)) {
+        foreach ($rm[0] as $tag) {
+            if (preg_match('/\bId="([^"]+)"/', $tag, $idm) && preg_match('/\bTarget="([^"]+)"/', $tag, $tm)) {
+                $target = preg_replace('#^/?xl/#', '', $tm[1]); // normalize to xl-relative
+                $relMap[$idm[1]] = 'xl/' . ltrim($target, '/');
+            }
         }
     }
 

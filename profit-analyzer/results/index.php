@@ -71,7 +71,7 @@ $home = INVGEN_BASE . '/profit-analyzer/';
   <div class="tabbtn" data-tab="refunds">Refunds</div>
 </div></div>
 
-<div class="wrap">
+<div class="wrap" id="paMain">
 
   <!-- ============ DASHBOARD ============ -->
   <div class="panel active" data-panel="dashboard">
@@ -100,31 +100,10 @@ $home = INVGEN_BASE . '/profit-analyzer/';
     </div>
   </div>
 
-  <!-- ============ PRODUCTS ============ -->
+  <!-- ============ PRODUCTS (KPIs + cards rendered from data) ============ -->
   <div class="panel" data-panel="products">
-    <div class="kpis">
-      <div class="kpi good"><div class="lbl">Product Revenue</div><div class="val">$23,700</div></div>
-      <div class="kpi"><div class="lbl">Units Sold</div><div class="val">1,997</div></div>
-      <div class="kpi"><div class="lbl">Avg Sale Price</div><div class="val">$11.87</div></div>
-      <div class="kpi"><div class="lbl">Products Sold</div><div class="val">6</div></div>
-    </div>
-    <div class="cgrid">
-      <div class="chartcard span2">
-        <div class="ttl">Sales by Product</div><div class="cmeta">Sortable in-app · top rows shown</div>
-        <table class="dtable">
-          <thead><tr><th>Product</th><th style="text-align:right">Units</th><th style="text-align:right">Revenue</th><th style="text-align:right">Avg price</th></tr></thead>
-          <tbody>
-            <tr><td>Totes</td><td class="num">412</td><td class="num">$8,240</td><td class="num">$20.00</td></tr>
-            <tr><td>Mugs</td><td class="num">380</td><td class="num">$6,460</td><td class="num">$17.00</td></tr>
-            <tr><td>Candles</td><td class="num">295</td><td class="num">$4,720</td><td class="num">$16.00</td></tr>
-            <tr><td>Greeting cards</td><td class="num">510</td><td class="num">$2,040</td><td class="num">$4.00</td></tr>
-            <tr><td>Enamel pins</td><td class="num">160</td><td class="num">$1,280</td><td class="num">$8.00</td></tr>
-            <tr><td>Stickers</td><td class="num">240</td><td class="num">$960</td><td class="num">$4.00</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="chartcard span2"><div class="ttl">Product Revenue Trend — Totes</div><div class="cmeta">Selected product, revenue by month</div><div class="ec" id="c_prodTrend"></div></div>
-    </div>
+    <div class="kpis"></div>
+    <div class="cgrid"></div>
   </div>
 
   <!-- ============ GEOGRAPHIC ============ -->
@@ -153,22 +132,10 @@ $home = INVGEN_BASE . '/profit-analyzer/';
     </div>
   </div>
 
-  <!-- ============ CUSTOMERS ============ -->
+  <!-- ============ CUSTOMERS (KPIs + cards rendered from data) ============ -->
   <div class="panel" data-panel="customers">
-    <div class="kpis">
-      <div class="kpi"><div class="lbl">Total Customers</div><div class="val">486</div></div>
-      <div class="kpi good"><div class="lbl">New Customers</div><div class="val">63</div></div>
-      <div class="kpi"><div class="lbl">Retention Rate</div><div class="val">71%</div></div>
-      <div class="kpi"><div class="lbl">Avg Customer Value</div><div class="val">$51</div></div>
-    </div>
-    <div class="cgrid">
-      <div class="chartcard"><div class="ttl">Top Customers by Revenue</div><div class="cmeta">Highest spenders</div><div class="ec" id="c_topCust"></div></div>
-      <div class="chartcard"><div class="ttl">Customer Payment Status</div><div class="cmeta">Paid / partial / unpaid</div><div class="ec" id="c_payStatus"></div></div>
-      <div class="chartcard"><div class="ttl">Customer Growth</div><div class="cmeta">New customers by month</div><div class="ec" id="c_custGrowth"></div></div>
-      <div class="chartcard"><div class="ttl">Customer Lifetime Value</div><div class="cmeta">By month</div><div class="ec" id="c_clv"></div></div>
-      <div class="chartcard"><div class="ttl">Active vs Inactive Customers</div><div class="cmeta">Last 90 days</div><div class="ec" id="c_activeInactive"></div></div>
-      <div class="chartcard"><div class="ttl">Rentals per Customer</div><div class="cmeta">Rental count distribution</div><div class="ec" id="c_rentalsPer"></div></div>
-    </div>
+    <div class="kpis"></div>
+    <div class="cgrid"></div>
   </div>
 
   <!-- ============ TAXES ============ -->
@@ -261,29 +228,20 @@ $home = INVGEN_BASE . '/profit-analyzer/';
     </div>
   </div>
 
-  <!-- CLEANED DATA (shared, below tabs) -->
+  <!-- CLEANED DATA (one tab per entity, rendered from data) -->
   <div class="sectitle">Your data, cleaned</div>
   <div class="cleanwrap">
     <div class="cleanbar">
-      <div class="tabs">
-        <span class="ctab active" data-filter="all">Transactions</span>
-        <span class="ctab" data-filter="income">Income</span>
-        <span class="ctab" data-filter="expense">Expenses</span>
-      </div>
-      <span class="dl"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 4v12m0 0 4-4m-4 4-4-4"/><path d="M4 20h16"/></svg> Download .xlsx</span>
+      <div class="tabs" id="cleanTabs"></div>
+      <button type="button" class="dl"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 4v12m0 0 4-4m-4 4-4-4"/><path d="M4 20h16"/></svg> Download .xlsx</button>
     </div>
-    <table class="cleantable">
-      <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th style="text-align:right">Amount</th></tr></thead>
-      <tbody>
-        <tr data-type="expense"><td class="date">2024-01-05</td><td>Home Depot</td><td><span class="pill cat">Supplies</span></td><td><span class="pill exp">Expense</span></td><td class="amt">$45.20</td></tr>
-        <tr data-type="expense"><td class="date">2024-01-06</td><td>Client lunch</td><td><span class="pill cat">Meals &amp; entertainment</span></td><td><span class="pill exp">Expense</span></td><td class="amt">$82.00</td></tr>
-        <tr data-type="income"><td class="date">2024-01-07</td><td>Stripe payout</td><td><span class="pill cat">Sales income</span></td><td><span class="pill inc">Income</span></td><td class="amt inc">$980.50</td></tr>
-        <tr data-type="expense"><td class="date">2024-01-09</td><td>Fuel</td><td><span class="pill cat">Vehicle &amp; fuel</span></td><td><span class="pill exp">Expense</span></td><td class="amt">$60.00</td></tr>
-        <tr data-type="income"><td class="date">2024-01-12</td><td>Etsy deposit</td><td><span class="pill cat">Sales income</span></td><td><span class="pill inc">Income</span></td><td class="amt inc">$430.00</td></tr>
-        <tr data-type="expense"><td class="date">2024-01-14</td><td>Facebook Ads</td><td><span class="pill cat">Advertising</span></td><td><span class="pill exp">Expense</span></td><td class="amt">$210.00</td></tr>
-      </tbody>
-    </table>
-    <div class="cleanfoot"><span id="rowcount">6 of 248 rows shown</span><span><b>Download</b> the full cleaned spreadsheet above</span></div>
+    <div style="overflow:auto">
+      <table class="cleantable">
+        <thead id="cleanHead"></thead>
+        <tbody id="cleanBody"></tbody>
+      </table>
+    </div>
+    <div class="cleanfoot"><span id="rowcount"></span><span><b>Download</b> the full cleaned spreadsheet above</span></div>
   </div>
 
   <div class="email">

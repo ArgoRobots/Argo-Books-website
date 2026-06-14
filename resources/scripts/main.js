@@ -24,7 +24,7 @@ function getBasePath() {
   var sitePaths = ['/features/', '/pricing/', '/community/', '/documentation/', '/about-us/',
                    '/contact-us/', '/whats-new/', '/admin/', '/legal/', '/resources/',
                    '/error-pages/', '/older-versions/', '/downloads/', '/portal/',
-                   '/invoice/', '/api/', '/compare/', '/unsubscribe/', '/review/',
+                   '/invoice/', '/api/', '/compare/', '/unsubscribe/', '/subscribe/', '/review/',
                    '/for-landscapers/', '/for-contractors/', '/for-repair-shops/',
                    '/for-rental-businesses/', '/for-cleaning-companies/',
                    '/for-local-wholesalers/', '/for-resellers/',

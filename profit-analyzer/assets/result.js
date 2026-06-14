@@ -288,16 +288,58 @@
         }).catch(function(){}).then(function(){ btn.classList.remove('busy'); });
       });
     });
+    wireEmailModal(norm);
+  }
+
+  // ---------- email modal (confirm address + opt-in, then send) ----------
+  function wireEmailModal(norm){
     var form=document.querySelector('.email form');
-    if(form){ form.addEventListener('submit', function(e){ e.preventDefault();
-      var input=form.querySelector('input[type=email]'); var btn=form.querySelector('button');
-      var email=(input.value||'').trim(); if(!email)return;
-      btn.disabled=true; var old=btn.textContent; btn.textContent='Sending…';
-      fetch(TOOL+'email.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,normalized:norm})})
-        .then(function(r){return r.json();}).then(function(j){ btn.textContent=j&&j.ok?'Sent ✓':(j&&j.message?'Try again':'Failed'); })
-        .catch(function(){ btn.textContent='Failed'; })
-        .then(function(){ setTimeout(function(){ btn.textContent=old; btn.disabled=false; },2500); });
-    }); }
+    var modal=document.getElementById('emailModal');
+    if(!form||!modal)return;
+    var emEmail=document.getElementById('emEmail');
+    var emSub=document.getElementById('emSubscribe');
+    var emSend=document.getElementById('emSend');
+    var emMsg=document.getElementById('emMsg');
+
+    function open(){
+      var pre=(form.querySelector('input[type=email]').value||'').trim();
+      emEmail.value=pre;
+      emMsg.textContent=''; emMsg.className='pa-modal-msg';
+      emSub.checked=true;
+      emSend.disabled=false; emSend.textContent='Send';
+      modal.hidden=false;
+      setTimeout(function(){ emEmail.focus(); },0);
+    }
+    function close(){ modal.hidden=true; }
+
+    // The page's email row no longer sends directly — it opens the modal so the
+    // user can confirm their address and choose the opt-in before anything sends.
+    form.addEventListener('submit', function(e){ e.preventDefault(); open(); });
+    modal.querySelectorAll('[data-close]').forEach(function(el){ el.addEventListener('click', close); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !modal.hidden) close(); });
+
+    emSend.addEventListener('click', function(){
+      var email=(emEmail.value||'').trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        emMsg.textContent='Please enter a valid email address.'; emMsg.className='pa-modal-msg err'; return;
+      }
+      emSend.disabled=true; emSend.textContent='Sending…'; emMsg.textContent=''; emMsg.className='pa-modal-msg';
+      fetch(TOOL+'email.php',{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:email,normalized:norm,subscribe:emSub.checked})})
+        .then(function(r){return r.json();})
+        .then(function(j){
+          if(j&&j.ok){
+            emMsg.textContent=(j.message||'Sent. Check your inbox.'); emMsg.className='pa-modal-msg ok';
+            emSend.textContent='Sent ✓';
+            setTimeout(close, 2600);
+          } else {
+            emMsg.textContent=(j&&j.message)||'Could not send. Please try again.'; emMsg.className='pa-modal-msg err';
+            emSend.disabled=false; emSend.textContent='Send';
+          }
+        })
+        .catch(function(){ emMsg.textContent='Could not send. Please try again.'; emMsg.className='pa-modal-msg err';
+          emSend.disabled=false; emSend.textContent='Send'; });
+    });
   }
 
   // ---------- dark toggle ----------

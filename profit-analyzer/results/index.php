@@ -251,6 +251,27 @@ $home = INVGEN_BASE . '/profit-analyzer/';
     <form onsubmit="return false"><input type="email" placeholder="you@business.com"><button class="send">Email it</button></form>
   </div>
 
+  <!-- Email modal: confirm address + optional opt-in, then send -->
+  <div class="pa-modal" id="emailModal" hidden>
+    <div class="pa-modal-backdrop" data-close></div>
+    <div class="pa-modal-card" role="dialog" aria-modal="true" aria-labelledby="emTitle">
+      <button class="pa-modal-x" type="button" data-close aria-label="Close">&times;</button>
+      <h3 id="emTitle">Email me my results</h3>
+      <p class="pa-modal-sub">We'll send your summary plus the cleaned spreadsheet. Double-check your email below.</p>
+      <label class="pa-modal-label" for="emEmail">Your email</label>
+      <input type="email" id="emEmail" class="pa-modal-input" placeholder="you@business.com" autocomplete="email">
+      <label class="pa-modal-check">
+        <input type="checkbox" id="emSubscribe" checked>
+        <span>Email me occasional tips and product updates from Argo Books. Unsubscribe anytime.</span>
+      </label>
+      <div class="pa-modal-actions">
+        <button type="button" class="pa-modal-cancel" data-close>Cancel</button>
+        <button type="button" class="pa-modal-send" id="emSend">Send</button>
+      </div>
+      <div class="pa-modal-msg" id="emMsg" aria-live="polite"></div>
+    </div>
+  </div>
+
   <div class="bridge">
     <h2>This is a snapshot. Argo keeps it true every day.</h2>
     <p>Every chart on this page updates automatically inside Argo Books, all year, plus invoices, expenses, and tax-ready reports.</p>

@@ -90,6 +90,9 @@ $base_path = $in_subdir ? '../' : '';
                     <a href="<?php echo $base_path; ?>marketing-funnel/" class="header-link <?php echo $current_dir === 'marketing-funnel' ? 'active' : ''; ?>">
                         Funnel
                     </a>
+                    <a href="<?php echo $base_path; ?>marketing/" class="header-link <?php echo $current_dir === 'marketing' ? 'active' : ''; ?>">
+                        Marketing
+                    </a>
                     <a href="<?php echo $base_path; ?>users/" class="header-link <?php echo $current_dir === 'users' ? 'active' : ''; ?>">
                         Users
                     </a>
@@ -145,6 +148,7 @@ $base_path = $in_subdir ? '../' : '';
                     <li><a href="<?php echo $base_path; ?>website-stats/" class="<?php echo $current_dir === 'website-stats' ? 'active' : ''; ?>">Website Stats</a></li>
                     <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referrals</a></li>
                     <li><a href="<?php echo $base_path; ?>marketing-funnel/" class="<?php echo $current_dir === 'marketing-funnel' ? 'active' : ''; ?>">Funnel</a></li>
+                    <li><a href="<?php echo $base_path; ?>marketing/" class="<?php echo $current_dir === 'marketing' ? 'active' : ''; ?>">Marketing</a></li>
                     <li><a href="<?php echo $base_path; ?>users/" class="<?php echo $current_dir === 'users' ? 'active' : ''; ?>">Users</a></li>
                     <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
                     <li><a href="<?php echo $base_path; ?>outreach/" class="<?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">Outreach</a></li>

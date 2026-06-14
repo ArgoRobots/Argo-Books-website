@@ -110,6 +110,17 @@ $cronConfig = [
         ],
         'expected_interval_hours' => 36,
     ],
+    'marketing_broadcast' => [
+        'label'     => 'Marketing Broadcast Sender',
+        'frequency' => 'every 5 minutes',
+        'description' => "Delivers the email broadcasts you queue from the Marketing page. Each run sends a capped batch (up to 100) so a big list goes out over several runs without tripping rate limits, and it skips anyone who unsubscribed after the broadcast was queued.",
+        'metrics'   => [
+            'emails_sent'           => 'Emails sent',
+            'emails_failed'         => 'Emails failed',
+            'broadcasts_completed'  => 'Broadcasts completed',
+        ],
+        'expected_interval_hours' => 1,
+    ],
 ];
 
 // ─── Aggregate runs in the time range ───────────────────────────────────────

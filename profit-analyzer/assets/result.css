@@ -124,11 +124,32 @@ a{color:inherit;text-decoration:none}
 .pgbtn:disabled{opacity:.4;cursor:default}
 .pgbtn svg{width:16px;height:16px;stroke:currentColor;fill:none}
 .email{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-top:24px}
-.email .t{flex:1;min-width:220px}.email .t b{font-size:15.5px;display:block}.email .t span{font-size:13.5px;color:var(--gray-500)}
-.email form{display:flex;gap:10px}
-.email input{border:1px solid #d8e2f0;border-radius:10px;padding:11px 14px;font:500 14px "Hanken Grotesk";min-width:200px}
+.email .t{flex:1 1 240px;min-width:220px}.email .t b{font-size:15.5px;display:block}.email .t span{font-size:13.5px;color:var(--gray-500)}
+.email form{display:flex;gap:10px;flex:1 1 380px;min-width:280px}
+.email input{flex:1;border:1px solid #d8e2f0;border-radius:10px;padding:11px 14px;font:500 14px "Hanken Grotesk";min-width:230px}
 .email input:focus{outline:none;border-color:var(--blue)}
-.email .send{background:var(--ink);color:#fff;border:0;border-radius:10px;padding:11px 18px;font:600 14px "Hanken Grotesk";cursor:pointer}
+.email .send{flex:none;background:var(--ink);color:#fff;border:0;border-radius:10px;padding:11px 18px;font:600 14px "Hanken Grotesk";cursor:pointer}
+
+/* email modal (confirm address + opt-in) */
+.pa-modal[hidden]{display:none}
+.pa-modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.pa-modal-backdrop{position:absolute;inset:0;background:rgba(8,15,30,.55);backdrop-filter:blur(2px)}
+.pa-modal-card{position:relative;width:100%;max-width:440px;background:var(--card,#fff);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:26px 26px 22px;box-shadow:0 24px 60px rgba(8,15,30,.28)}
+.pa-modal-x{position:absolute;top:12px;right:14px;background:none;border:0;font-size:24px;line-height:1;color:var(--gray-500);cursor:pointer}
+.pa-modal-card h3{font-size:19px;font-weight:700;margin:2px 0 6px}
+.pa-modal-sub{font-size:13.5px;color:var(--gray-500);margin-bottom:16px}
+.pa-modal-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+.pa-modal-input{width:100%;box-sizing:border-box;border:1px solid #d8e2f0;border-radius:10px;padding:11px 14px;font:500 15px "Hanken Grotesk";background:#fff;color:#0f172a}
+.pa-modal-input:focus{outline:none;border-color:var(--blue)}
+.pa-modal-check{display:flex;gap:9px;align-items:flex-start;margin:16px 0 4px;font-size:13px;color:var(--gray-700,#475569);cursor:pointer}
+.pa-modal-check input{margin-top:2px;width:16px;height:16px;flex:none;accent-color:var(--blue)}
+.pa-modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.pa-modal-cancel{background:none;border:1px solid var(--line);color:var(--gray-700,#475569);border-radius:10px;padding:10px 16px;font:600 14px "Hanken Grotesk";cursor:pointer}
+.pa-modal-send{background:var(--blue,#2563eb);color:#fff;border:0;border-radius:10px;padding:10px 20px;font:600 14px "Hanken Grotesk";cursor:pointer}
+.pa-modal-send:disabled{opacity:.7;cursor:default}
+.pa-modal-msg{font-size:13px;margin-top:12px;min-height:1em}
+.pa-modal-msg.ok{color:#15803d}
+.pa-modal-msg.err{color:#dc2626}
 .bridge{background:radial-gradient(900px 400px at 80% 0%,#1b2d52,transparent 60%),linear-gradient(180deg,var(--navy-2),var(--navy));color:#fff;border-radius:24px;padding:48px 40px;text-align:center;margin:36px 0}
 .bridge h2{font-size:clamp(23px,3.2vw,32px);font-weight:600;margin-bottom:12px}
 .bridge p{color:#c3cee0;font-size:16px;max-width:520px;margin:0 auto 24px}
@@ -154,6 +175,9 @@ a{color:inherit;text-decoration:none}
 [data-theme="dark"] .lrow .v{color:#e8eef7}
 [data-theme="dark"] .email input{background:#0f1a30;border-color:rgba(255,255,255,.12);color:#e8eef7}
 [data-theme="dark"] .email .send{background:#e8eef7;color:#0f172a}
+[data-theme="dark"] .pa-modal-input{background:#0f1a30;border-color:rgba(255,255,255,.12);color:#e8eef7}
+[data-theme="dark"] .pa-modal-msg.ok{color:#34d399}
+[data-theme="dark"] .pa-modal-msg.err{color:#f87171}
 [data-theme="dark"] .topbar{background:rgba(10,17,32,.85);border-color:rgba(255,255,255,.08)}
 [data-theme="dark"] .tabbar{background:var(--paper);border-color:rgba(255,255,255,.08)}
 [data-theme="dark"] .kpi.good .val,[data-theme="dark"] .dtable .pos{color:#34d399}

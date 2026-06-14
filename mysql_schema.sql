@@ -837,6 +837,7 @@ CREATE TABLE IF NOT EXISTS outreach_leads (
 --   'tips_onboarding'    - how-to / getting-started nudges
 --   'promotions'         - discount codes / upsells
 --   'community_digest'   - replies / activity digest
+--   'newsletter'         - opt-in list for no-account subscribers (marketing_subscribers)
 --   'all_marketing'      - blanket suppression of all marketing contexts
 CREATE TABLE IF NOT EXISTS email_suppressions (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -858,6 +859,69 @@ CREATE TABLE IF NOT EXISTS email_marketing_log (
     related_id INT DEFAULT NULL COMMENT 'license_keys.id for review emails, etc.',
     INDEX idx_email_context (email, context),
     INDEX idx_sent_at (sent_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Inbound, opt-in marketing subscribers WITHOUT a community account (e.g. people
+-- who tick the "email me tips & updates" box on the free Profit Analyzer). Double
+-- opt-in: a row starts 'pending' and only becomes 'confirmed' after the visitor
+-- clicks the confirm link. Broadcasts go to 'confirmed' rows only. Community-user
+-- marketing still lives in community_users.email_pref_* (this table is for people
+-- with no account). The send-time gate (should_send_marketing_email) treats the
+-- 'newsletter' context as: confirmed row here AND not in email_suppressions.
+CREATE TABLE IF NOT EXISTS marketing_subscribers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) NOT NULL,
+    context VARCHAR(50) NOT NULL DEFAULT 'newsletter',
+    status ENUM('pending','confirmed','unsubscribed') NOT NULL DEFAULT 'pending',
+    source VARCHAR(50) NOT NULL DEFAULT 'profit_analyzer',
+    confirm_token VARCHAR(64) DEFAULT NULL,
+    unsubscribe_token VARCHAR(64) DEFAULT NULL,
+    ip VARCHAR(45) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    confirmed_at DATETIME DEFAULT NULL,
+    unsubscribed_at DATETIME DEFAULT NULL,
+    UNIQUE KEY unique_email_context (email, context),
+    INDEX idx_confirm_token (confirm_token),
+    INDEX idx_unsubscribe_token (unsubscribe_token),
+    INDEX idx_status_context (status, context)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Admin-composed one-off broadcasts (the "email my list" tool). One row per send.
+-- audience names which list this went to: 'newsletter' (marketing_subscribers) or a
+-- community context like 'product_updates' / 'promotions' / 'tips_onboarding'
+-- (community_users.email_pref_*). Recipients are snapshotted into
+-- marketing_broadcast_recipients at queue time; a cron drains them in batches.
+CREATE TABLE IF NOT EXISTS marketing_broadcasts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    subject VARCHAR(500) NOT NULL,
+    html_body MEDIUMTEXT NOT NULL,
+    audience VARCHAR(50) NOT NULL,
+    status ENUM('queued','sending','sent','canceled') NOT NULL DEFAULT 'queued',
+    total_recipients INT NOT NULL DEFAULT 0,
+    sent_count INT NOT NULL DEFAULT 0,
+    failed_count INT NOT NULL DEFAULT 0,
+    skipped_count INT NOT NULL DEFAULT 0,
+    created_by VARCHAR(100) DEFAULT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    started_at DATETIME DEFAULT NULL,
+    completed_at DATETIME DEFAULT NULL,
+    INDEX idx_broadcast_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-recipient rows for a broadcast. Snapshotted at queue time so the audience is
+-- frozen even if the underlying lists change mid-send. The cron picks 'pending'
+-- rows, re-checks the send-time gate (so a since-unsubscribed person is skipped),
+-- sends, then marks the row. UNIQUE(broadcast_id,email) makes re-queues idempotent.
+CREATE TABLE IF NOT EXISTS marketing_broadcast_recipients (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    broadcast_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    status ENUM('pending','sent','failed','skipped') NOT NULL DEFAULT 'pending',
+    error VARCHAR(255) DEFAULT NULL,
+    sent_at DATETIME DEFAULT NULL,
+    UNIQUE KEY unique_broadcast_email (broadcast_id, email),
+    INDEX idx_recipient_pending (broadcast_id, status),
+    FOREIGN KEY (broadcast_id) REFERENCES marketing_broadcasts(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Activity log for outreach leads

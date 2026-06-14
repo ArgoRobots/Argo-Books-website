@@ -301,3 +301,36 @@ Idempotent: each row tracks its own check count and last-checked timestamp; the 
 ### Logs
 
 A lock file (`/cron/logs/reddit_status_check.lock`) prevents overlapping runs.
+
+---
+
+## 11. Marketing Broadcast Sender
+
+**Script:** `cron/marketing_broadcast.php`
+**Schedule:** Every 5 minutes
+
+```bash
+*/5 * * * * /usr/bin/php /home/argorobots/public_html/cron/marketing_broadcast.php
+```
+
+### What It Does
+
+Drains queued broadcasts composed in the admin **Marketing** page (`marketing_broadcasts` / `marketing_broadcast_recipients`). Each run:
+
+1. Picks broadcasts in `queued` or `sending` status, oldest first, and marks them `sending`.
+2. Sends up to 100 emails per run total (the per-run cap keeps each run under Resend's rate limit and the time budget). A broadcast larger than the cap finishes over multiple runs.
+3. Re-checks every recipient against the send-time gate (`should_send_marketing_email`), so anyone who unsubscribed between queue time and send time is marked `skipped`, not emailed.
+4. Appends the one-click unsubscribe footer (subscriber token for the `newsletter` audience, community-user token for community contexts).
+5. Marks the broadcast `sent` once no `pending` recipients remain.
+
+Audience is one of: `newsletter` (no-account opt-in subscribers in `marketing_subscribers`) or a community context (`product_updates`, `tips_onboarding`, `promotions`) that maps to a `community_users.email_pref_*` column.
+
+### Manual Execution
+
+```bash
+php /home/argorobots/public_html/cron/marketing_broadcast.php
+```
+
+### Logs
+
+A lock file (`/cron/logs/marketing_broadcast.lock`) prevents overlapping runs.

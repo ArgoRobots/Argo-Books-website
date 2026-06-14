@@ -10,6 +10,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/../smtp_mailer.php';
+require_once __DIR__ . '/../email_marketing.php'; // double opt-in subscriber list
 require_once __DIR__ . '/lib/analytics.php';
 require_once __DIR__ . '/lib/export.php';
 
@@ -28,6 +29,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
 // client-held NormalizedData to build the cleaned spreadsheet from.
 $postedNormalized = null;
 $email = trim($_POST['email'] ?? '');
+$subscribe = !empty($_POST['subscribe']);
 if (($raw = file_get_contents('php://input')) !== false && $raw !== '') {
     $json = json_decode($raw, true);
     if (is_array($json)) {
@@ -36,6 +38,9 @@ if (($raw = file_get_contents('php://input')) !== false && $raw !== '') {
         }
         if (isset($json['normalized']) && is_array($json['normalized'])) {
             $postedNormalized = $json['normalized'];
+        }
+        if (array_key_exists('subscribe', $json)) {
+            $subscribe = !empty($json['subscribe']);
         }
     }
 }
@@ -90,7 +95,22 @@ try {
     pae_fail(500, "We couldn't send the email just now. Please try again.");
 }
 
-echo json_encode(['ok' => true, 'message' => 'Sent. Check your inbox.']);
+// Optional: double opt-in to the marketing list. This is independent of the
+// results email above and never blocks it. A confirmation email is sent; the
+// subscriber is only added to the broadcast list after they click confirm.
+$subscribeStatus = 'skipped';
+if ($subscribe) {
+    $subscribeStatus = create_pending_subscriber($email, 'profit_analyzer', 'newsletter', $ip);
+}
+
+$message = 'Sent. Check your inbox.';
+if ($subscribeStatus === 'sent') {
+    $message = "Sent. Check your inbox, we've also emailed a link to confirm your subscription.";
+} elseif ($subscribeStatus === 'already_confirmed') {
+    $message = "Sent. You're already subscribed, so check your inbox for your results.";
+}
+
+echo json_encode(['ok' => true, 'message' => $message, 'subscribe' => $subscribeStatus]);
 
 /** Build the results email (table-based + inline styles for email clients). */
 function pa_email_html(array $a, float $rev, float $exp, float $profit, int $margin, int $costPct, string $cta): string

@@ -199,11 +199,13 @@ $schema = json_encode([
     <div class="bridge">
       <h2>This is a one-time snapshot.<br>Argo Books keeps it true every day.</h2>
       <p>Argo Books tracks your profit automatically, all year, plus invoices, expenses, and tax-ready reports. One affordable app instead of a spreadsheet you rebuild every month.</p>
-      <a class="btn btn-primary btn-lg" href="<?= $cta ?>">Try Argo Books free →</a>
-      <label class="mini-upload" for="paFile">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg>
-        Analyze another spreadsheet - free
-      </label>
+      <div class="bridge-cta">
+        <a class="btn btn-primary btn-lg" href="<?= $cta ?>">Try Argo Books free →</a>
+        <label class="mini-upload" for="paFile">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg>
+          Analyze another spreadsheet - free
+        </label>
+      </div>
     </div>
   </div>
 </section>

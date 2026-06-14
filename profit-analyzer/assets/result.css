@@ -101,7 +101,8 @@ a{color:inherit;text-decoration:none}
 .cleanbar .tabs{display:flex;gap:6px}
 .cleanbar .ctab{font-size:13px;font-weight:600;color:var(--gray-500);padding:6px 14px;border-radius:8px;cursor:pointer}
 .cleanbar .ctab.active{background:var(--ink);color:#fff}
-.cleanbar .dl{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;background:var(--emerald-700);padding:9px 15px;border-radius:9px;cursor:pointer}
+.cleanbar .dl{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:#fff;background:var(--emerald-700);padding:9px 15px;border:0;border-radius:9px;cursor:pointer;transition:.15s}
+.cleanbar .dl:hover{background:#065f46}
 .cleanbar .dl svg{width:15px;height:15px;stroke:#fff}
 .cleantable{width:100%;border-collapse:collapse;font-size:13.5px}
 .cleantable th{background:#f7f9fc;color:var(--gray-500);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;padding:11px 16px;text-align:left;border-bottom:1px solid var(--line)}

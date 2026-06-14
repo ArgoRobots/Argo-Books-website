@@ -280,14 +280,16 @@ function pa_compute_analytics(array $normalized): array
     }
 
     // ---- Geographic (from customer + supplier countries) ----
+    // Country names are canonicalized to the world map's GeoJSON names ("USA" ->
+    // "United States") so the choropleth actually colours in.
     $destCountries = [];
     foreach ($revenue as $r) {
-        $c = pa_customer_country($customers, $r['customerId'] ?? '');
+        $c = pa_canon_country(pa_customer_country($customers, $r['customerId'] ?? ''));
         if ($c) { $destCountries[$c] = ($destCountries[$c] ?? 0) + (float) ($r['amount'] ?? 0); }
     }
     $origCountries = [];
     foreach ($expenses as $r) {
-        $c = pa_supplier_country($suppliers, $r['supplierId'] ?? '');
+        $c = pa_canon_country(pa_supplier_country($suppliers, $r['supplierId'] ?? ''));
         if ($c) { $origCountries[$c] = ($origCountries[$c] ?? 0) + (float) ($r['amount'] ?? 0); }
     }
     if ($destCountries || $origCountries) {
@@ -360,6 +362,28 @@ function pa_supplier_country(array $suppliers, string $id): ?string
 {
     foreach ($suppliers as $s) { if (($s['id'] ?? '') === $id) { return $s['country'] ?? null; } }
     return null;
+}
+
+/**
+ * Canonicalize a country name to the world-map GeoJSON's spelling so the
+ * choropleth matches. Unknown / already-canonical names pass through unchanged.
+ */
+function pa_canon_country(?string $name): string
+{
+    $n = trim((string) $name);
+    if ($n === '') { return ''; }
+    $key = trim(strtolower(preg_replace('/[.\s]+/', ' ', $n)));
+    static $alias = [
+        'usa' => 'United States', 'us' => 'United States', 'u s' => 'United States',
+        'u s a' => 'United States', 'united states of america' => 'United States', 'america' => 'United States',
+        'uk' => 'United Kingdom', 'u k' => 'United Kingdom', 'gb' => 'United Kingdom',
+        'britain' => 'United Kingdom', 'great britain' => 'United Kingdom', 'england' => 'United Kingdom',
+        'uae' => 'United Arab Emirates', 'u a e' => 'United Arab Emirates',
+        'russian federation' => 'Russia', 'czechia' => 'Czech Rep.', 'czech republic' => 'Czech Rep.',
+        'south korea' => 'Korea', 'republic of korea' => 'Korea', 'north korea' => 'Dem. Rep. Korea',
+        'holland' => 'Netherlands', 'the netherlands' => 'Netherlands',
+    ];
+    return $alias[$key] ?? $n;
 }
 
 /** Monthly net profit (revenue - expenses) series. */

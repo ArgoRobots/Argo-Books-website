@@ -273,7 +273,7 @@ $home = INVGEN_BASE . '/profit-analyzer/';
   </div>
 
   <div class="bridge">
-    <h2>This is a snapshot. Argo keeps it true every day.</h2>
+    <h2>This is a snapshot. Argo Books keeps it true every day.</h2>
     <p>Every chart on this page updates automatically inside Argo Books, all year, plus invoices, expenses, and tax-ready reports.</p>
     <a class="btn btn-primary btn-lg" href="<?= $cta ?>">Try Argo Books free →</a>
   </div>

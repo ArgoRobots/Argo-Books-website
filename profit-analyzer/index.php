@@ -197,7 +197,7 @@ $schema = json_encode([
 <section class="block">
   <div class="wrap">
     <div class="bridge">
-      <h2>This is a one-time snapshot.<br>Argo keeps it true every day.</h2>
+      <h2>This is a one-time snapshot.<br>Argo Books keeps it true every day.</h2>
       <p>Argo Books tracks your profit automatically, all year, plus invoices, expenses, and tax-ready reports. One affordable app instead of a spreadsheet you rebuild every month.</p>
       <a class="btn btn-primary btn-lg" href="<?= $cta ?>">Try Argo Books free →</a>
       <label class="mini-upload" for="paFile">

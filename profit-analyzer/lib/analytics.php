@@ -161,14 +161,13 @@ function pa_compute_analytics(array $normalized): array
                 $surv = $nextName; $survVal = $nextVal;
             }
         } else {
-            // Loss case: the waterfall would go negative (you can't keep peeling
-            // costs off a remainder that's already gone). Instead show a funding
-            // view — Revenue plus a red "Loss" stream fund Total costs, which then
-            // splits into the cost categories. Balances exactly, no negative links.
-            $loss = $expTotal - $revTotal;
-            $nodes = ['Revenue' => round($revTotal), 'Loss' => round($loss), 'Total costs' => round($expTotal)];
-            $links[] = ['Revenue', 'Total costs', round($revTotal)];
-            $links[] = ['Loss', 'Total costs', round($loss)];
+            // Loss case: revenue can't supply the cost outflow, so a balanced
+            // revenue→cost waterfall is impossible — it would need a fake inflow
+            // (a "shortfall" stream) that reads like income and flips the arrows
+            // backwards. Instead show a clean cost breakdown: Total costs fans out
+            // into its categories. Revenue, net loss, and margin live in the KPI
+            // cards and the focal stat directly above the chart.
+            $nodes = ['Total costs' => round($expTotal)];
             $cats = array_filter([
                 'Cost of goods'   => $cogs,
                 'Ads & marketing' => $ads,

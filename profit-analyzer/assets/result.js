@@ -63,7 +63,9 @@
   function sankey(flow){
     var el=document.getElementById('sankeyChart'); if(!el||charts.sankey||!flow)return;
     var c=echarts.init(el,null,{renderer:'svg'}); charts.sankey=c;
-    var VAL=flow.nodes||{}; var REV=VAL['Revenue']||1;
+    // Percentage base: revenue when present (profit view), else total costs
+    // (loss view shows a cost breakdown, so % is share of total costs).
+    var VAL=flow.nodes||{}; var REV=VAL['Revenue']||VAL['Total costs']||1;
     function f(n){return CUR+Number(n).toLocaleString('en-US');}
     var L=(flow.links||[]).map(function(a){return {source:a[0],target:a[1],value:a[2]};});
     var t=TT(), pn=dark?'#5cf0b4':'#0f766e', pv=dark?'#34d399':'#10a37f';

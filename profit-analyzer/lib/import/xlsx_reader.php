@@ -8,6 +8,8 @@
 // ClosedXML hands the desktop analysis service. Date serials are rendered the
 // same way CellToString does (yyyy-MM-dd, or with time when non-midnight).
 
+require_once __DIR__ . '/currency.php'; // pa_currency_canon for number-format currency detection
+
 /**
  * Unzip an in-memory .xlsx into a map of entry-name => uncompressed bytes.
  * Reads the zip central directory, then each local header, inflating DEFLATE
@@ -181,6 +183,98 @@ function pa_xlsx_date_styles(string $xml): array
     return $dateStyles;
 }
 
+/**
+ * Map style index -> currency token carried in the cell's NUMBER FORMAT, so a
+ * numeric 1200 displayed as "£1,200.00" is recognized as GBP even though the
+ * stored value is a bare number. This is the website equivalent of the desktop
+ * app reading ClosedXML's GetFormattedString. Returns styleIndex => token
+ * (e.g. "£", "¥", "CAD", "$"); the detector resolves the token to an ISO code.
+ */
+function pa_xlsx_currency_styles(string $xml): array
+{
+    if ($xml === '') {
+        return [];
+    }
+
+    // Builtin currency / accounting number-format ids (locale "$" in en-US).
+    $builtinCurrency = [5 => '$', 6 => '$', 7 => '$', 8 => '$', 41 => '$', 42 => '$', 43 => '$', 44 => '$'];
+
+    // Custom numFmts: numFmtId => formatCode.
+    $custom = [];
+    if (preg_match_all('/<numFmt\b[^>]*>/', $xml, $m)) {
+        foreach ($m[0] as $tag) {
+            if (preg_match('/\bnumFmtId="(\d+)"/', $tag, $idm) && preg_match('/\bformatCode="([^"]*)"/', $tag, $fm)) {
+                $custom[(int) $idm[1]] = html_entity_decode($fm[1], ENT_QUOTES | ENT_XML1, 'UTF-8');
+            }
+        }
+    }
+
+    // Extract a currency token from a format code, or '' if it isn't a currency format.
+    // When the literal is an AMBIGUOUS symbol (e.g. "¥" -> CNY/JPY), the format's
+    // decimal count is used to disambiguate (JPY has 0 decimals, CNY has 2), since
+    // the web tool has no user-resolution prompt like the desktop app. Resolving to
+    // a single candidate emits its ISO code; otherwise the raw symbol is kept.
+    $tokenFor = function (string $code): string {
+        // A format with date tokens is a date, not currency.
+        $bare = preg_replace('/"[^"]*"/', '', $code);
+        $bare = preg_replace('/\[[^\]]*\]/', '', $bare);
+        if (preg_match('/[ymdhs]/i', $bare)) {
+            return '';
+        }
+        // Decimal places in the number pattern (e.g. #,##0.00 -> 2, #,##0 -> 0).
+        $decimals = preg_match('/\.(0+)/', $bare, $dm) ? strlen($dm[1]) : 0;
+
+        $cands = [];
+        if (preg_match_all('/"([^"]*)"/', $code, $qm)) {       // "£", " CAD"
+            foreach ($qm[1] as $lit) { $cands[] = trim($lit); }
+        }
+        if (preg_match_all('/\[\$([^\]\-]+)(?:-[^\]]*)?\]/', $code, $lm)) { // [$£-809], [$USD]
+            foreach ($lm[1] as $lit) { $cands[] = trim($lit); }
+        }
+        foreach ($cands as $lit) {
+            if ($lit === '' || pa_currency_canon($lit) === null) {
+                continue;
+            }
+            $d = pa_currency_detect($lit);
+            // Ambiguous symbol: try to pin it down by matching the format's decimals.
+            if ($d['code'] === null && $d['ambiguous'] !== null) {
+                $all = pa_currency_all();
+                $matches = array_values(array_filter(
+                    $d['candidates'],
+                    fn($iso) => isset($all[$iso]) && $all[$iso][2] === $decimals
+                ));
+                if (count($matches) === 1) {
+                    return $matches[0]; // e.g. "¥" + 0 decimals -> JPY
+                }
+            }
+            return $lit;
+        }
+        return '';
+    };
+
+    // cellXfs in document order define style indices 0..n.
+    $styles = [];
+    if (preg_match('/<cellXfs[^>]*>(.*?)<\/cellXfs>/s', $xml, $block)) {
+        if (preg_match_all('/<xf[^>]*\/?>/', $block[1], $xfs)) {
+            foreach ($xfs[0] as $idx => $xf) {
+                if (!preg_match('/numFmtId="(\d+)"/', $xf, $nm)) {
+                    continue;
+                }
+                $fid = (int) $nm[1];
+                if (isset($builtinCurrency[$fid])) {
+                    $styles[$idx] = $builtinCurrency[$fid];
+                } elseif (isset($custom[$fid])) {
+                    $tok = $tokenFor($custom[$fid]);
+                    if ($tok !== '') {
+                        $styles[$idx] = $tok;
+                    }
+                }
+            }
+        }
+    }
+    return $styles;
+}
+
 /** Convert an Excel date serial to a string, mirroring CellToString's formatting. */
 function pa_xlsx_serial_to_date(float $serial): string
 {
@@ -201,11 +295,13 @@ function pa_xlsx_serial_to_date(float $serial): string
  * Parse one worksheet XML into a string matrix (rows of cells, gaps filled with "").
  * @return list<list<string>>
  */
-function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyles): array
+function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyles, array $currencyStyles = [], ?array &$currencyMatrix = null): array
 {
     $rows = [];
+    $curRows = [];
     $reader = new XMLReader();
     if (!@$reader->XML($xml)) {
+        $currencyMatrix = [];
         return [];
     }
     // NB: no $reader->next() — see pa_xlsx_shared_strings; it would skip every
@@ -213,31 +309,41 @@ function pa_xlsx_parse_sheet(string $xml, array $sharedStrings, array $dateStyle
     while ($reader->read()) {
         if ($reader->nodeType === XMLReader::ELEMENT && $reader->localName === 'row') {
             $rowXml = $reader->readOuterXml();
-            $rows[] = pa_xlsx_parse_row($rowXml, $sharedStrings, $dateStyles);
+            $parsed = pa_xlsx_parse_row($rowXml, $sharedStrings, $dateStyles, $currencyStyles);
+            $rows[] = $parsed['cells'];
+            $curRows[] = $parsed['currency'];
         }
     }
     $reader->close();
 
-    // Normalize every row to the widest column count.
+    // Normalize every row (and its currency row) to the widest column count.
     $maxCols = 0;
     foreach ($rows as $r) {
         $maxCols = max($maxCols, count($r));
     }
-    foreach ($rows as &$r) {
+    foreach ($rows as $i => &$r) {
         while (count($r) < $maxCols) {
             $r[] = '';
         }
+        $cr = $curRows[$i];
+        while (count($cr) < $maxCols) {
+            $cr[] = '';
+        }
+        $curRows[$i] = $cr;
     }
     unset($r);
+
+    $currencyMatrix = $curRows;
     return $rows;
 }
 
 /** Parse a single <row> element's cells into a positional string array. */
-function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyles): array
+function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyles, array $currencyStyles = []): array
 {
     $cells = [];
+    $currency = [];
     if (!preg_match_all('/<c\b([^>]*)(?:\/>|>(.*?)<\/c>)/s', $rowXml, $matches, PREG_SET_ORDER)) {
-        return [];
+        return ['cells' => [], 'currency' => []];
     }
     $autoCol = 0;
     foreach ($matches as $cell) {
@@ -256,6 +362,7 @@ function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyl
         $style = preg_match('/s="(\d+)"/', $attrs, $sm) ? (int)$sm[1] : -1;
 
         $value = '';
+        $vRaw = '';
         if ($type === 'inlineStr') {
             if (preg_match_all('/<(?:[a-zA-Z0-9]+:)?t[^>]*>(.*?)<\/(?:[a-zA-Z0-9]+:)?t>/s', $inner, $im)) {
                 foreach ($im[1] as $frag) {
@@ -282,13 +389,23 @@ function pa_xlsx_parse_row(string $rowXml, array $sharedStrings, array $dateStyl
             }
         }
 
+        // Currency carried in the cell's number format (only for numeric cells
+        // that weren't rendered as a date). Empty string when none.
+        $token = '';
+        if (($type === '' || $type === 'n') && $vRaw !== '' && is_numeric($vRaw)
+            && !isset($dateStyles[$style]) && isset($currencyStyles[$style])) {
+            $token = $currencyStyles[$style];
+        }
+
         // Place at the right column, filling gaps with "".
         while (count($cells) < $col) {
             $cells[] = '';
+            $currency[] = '';
         }
         $cells[$col] = $value;
+        $currency[$col] = $token;
     }
-    return $cells;
+    return ['cells' => $cells, 'currency' => $currency];
 }
 
 /** Extract merged-range rectangles (1-based, like the layout gate expects). */
@@ -327,6 +444,7 @@ function pa_read_xlsx(string $path): ?array
 
     $sharedStrings = pa_xlsx_shared_strings($zip['xl/sharedStrings.xml'] ?? '');
     $dateStyles = pa_xlsx_date_styles($zip['xl/styles.xml'] ?? '');
+    $currencyStyles = pa_xlsx_currency_styles($zip['xl/styles.xml'] ?? '');
 
     // Map rId -> worksheet target path from the workbook relationships. Attribute
     // order varies by writer (Excel emits Type, Target, Id), so read each
@@ -354,9 +472,12 @@ function pa_read_xlsx(string $path): ?array
                 continue;
             }
             $sheetXml = $zip[$target];
+            $currencyMatrix = [];
+            $matrix = pa_xlsx_parse_sheet($sheetXml, $sharedStrings, $dateStyles, $currencyStyles, $currencyMatrix);
             $sheets[] = [
                 'name' => $name,
-                'matrix' => pa_xlsx_parse_sheet($sheetXml, $sharedStrings, $dateStyles),
+                'matrix' => $matrix,
+                'fmtCurrency' => $currencyMatrix,
                 'merges' => pa_xlsx_merged_ranges($sheetXml),
             ];
         }

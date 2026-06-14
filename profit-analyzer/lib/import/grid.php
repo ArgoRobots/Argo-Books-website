@@ -114,8 +114,40 @@ function pa_sample_rows(array $dataRows): array
     return $out;
 }
 
+/**
+ * Data rows plus, in lockstep, the per-cell currency tokens carried in the cell
+ * number formats. Emptiness is decided on the VALUE row (identical to
+ * pa_grid_data_rows) so the two stay aligned. Returns ['rows'=>, 'currencies'=>].
+ */
+function pa_grid_data_rows_with_currency(array $matrix, array $fmtMatrix, int $headerRow, int $colCount): array
+{
+    $rows = [];
+    $currencies = [];
+    $total = count($matrix);
+    for ($r = $headerRow + 1; $r < $total; $r++) {
+        $src = $matrix[$r];
+        $fsrc = $fmtMatrix[$r] ?? [];
+        $rowData = [];
+        $curData = [];
+        $isEmpty = true;
+        for ($col = 0; $col < $colCount; $col++) {
+            $val = isset($src[$col]) ? (string) $src[$col] : '';
+            if (trim($val) !== '') {
+                $isEmpty = false;
+            }
+            $rowData[] = $val;
+            $curData[] = isset($fsrc[$col]) ? (string) $fsrc[$col] : '';
+        }
+        if (!$isEmpty) {
+            $rows[] = $rowData;
+            $currencies[] = $curData;
+        }
+    }
+    return ['rows' => $rows, 'currencies' => $currencies];
+}
+
 /** Build a sheet struct from a raw xlsx matrix (applies header detection). */
-function pa_sheet_from_matrix(string $name, array $matrix, array $merges = []): ?array
+function pa_sheet_from_matrix(string $name, array $matrix, array $merges = [], array $fmtMatrix = []): ?array
 {
     if (count($matrix) === 0) {
         return null;
@@ -125,11 +157,19 @@ function pa_sheet_from_matrix(string $name, array $matrix, array $merges = []): 
     if (count($headers) === 0) {
         return null;
     }
-    $dataRows = pa_grid_data_rows($matrix, $headerRow, count($headers));
+    if ($fmtMatrix) {
+        $both = pa_grid_data_rows_with_currency($matrix, $fmtMatrix, $headerRow, count($headers));
+        $dataRows = $both['rows'];
+        $currencyRows = $both['currencies'];
+    } else {
+        $dataRows = pa_grid_data_rows($matrix, $headerRow, count($headers));
+        $currencyRows = [];
+    }
     return [
         'name' => $name,
         'headers' => $headers,
         'dataRows' => $dataRows,
+        'currencyRows' => $currencyRows,
         'sampleRows' => pa_sample_rows($dataRows),
         'totalRows' => count($dataRows),
         'matrix' => $matrix,
@@ -147,6 +187,7 @@ function pa_sheet_from_csv(string $name, array $headers, array $dataRows): ?arra
         'name' => $name,
         'headers' => $headers,
         'dataRows' => $dataRows,
+        'currencyRows' => [], // CSV carries no cell formats; currency comes from text/columns
         'sampleRows' => pa_sample_rows($dataRows),
         'totalRows' => count($dataRows),
         'matrix' => array_merge([$headers], $dataRows),

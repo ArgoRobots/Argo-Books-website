@@ -71,14 +71,23 @@ function pa_read_file_to_sheets(string $path, string $ext, string $filename): ar
         return [];
     }
     foreach ($raw as $rawSheet) {
-        $matrix = $rawSheet['matrix'];
+        $origMatrix = $rawSheet['matrix'];
+        $matrix = $origMatrix;
         $merges = $rawSheet['merges'];
         // Rewrite messy layouts to a clean header+rows matrix (no-op for clean sheets).
         [$matrix, $merges] = pa_layout_normalize_matrix($matrix, $merges);
+
+        // The per-cell currency map is aligned to the ORIGINAL matrix. Only carry it
+        // when layout normalization was a true no-op; a rewritten matrix would desync.
+        $fmtCurrency = ($matrix === $origMatrix) ? ($rawSheet['fmtCurrency'] ?? []) : [];
+
         if (count($matrix) > PA_MAX_ROWS_PER_SHEET + 1) {
             $matrix = array_slice($matrix, 0, PA_MAX_ROWS_PER_SHEET + 1);
+            if ($fmtCurrency) {
+                $fmtCurrency = array_slice($fmtCurrency, 0, PA_MAX_ROWS_PER_SHEET + 1);
+            }
         }
-        $sheet = pa_sheet_from_matrix($rawSheet['name'], $matrix, $merges);
+        $sheet = pa_sheet_from_matrix($rawSheet['name'], $matrix, $merges, $fmtCurrency);
         if ($sheet !== null) {
             $sheets[] = $sheet;
         }

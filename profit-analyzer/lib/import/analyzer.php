@@ -14,6 +14,7 @@
 require_once __DIR__ . '/gemini.php';
 require_once __DIR__ . '/schema.php';
 require_once __DIR__ . '/profiler.php';
+require_once __DIR__ . '/currency.php'; // pa_currency_detect for per-row currency (Tier 1)
 
 const PA_MIN_TYPE_CONFIDENCE = 0.5;
 const PA_MAX_COLUMNS_PER_BATCH = 40;
@@ -158,15 +159,24 @@ function pa_build_tier2_system_prompt(string $entityType, array $schema): string
 }
 
 /** Port of BuildTier2UserPrompt. */
-function pa_build_tier2_user_prompt(array $headers, array $rows): string
+function pa_build_tier2_user_prompt(array $headers, array $rows, array $currencyRows = []): string
 {
     $sb = "Convert these rows:\n\n";
     $sb .= '| ' . implode(' | ', $headers) . " |\n";
     $sb .= '| ' . implode(' | ', array_fill(0, count($headers), '---')) . " |\n";
-    foreach ($rows as $row) {
+    foreach ($rows as $rowIdx => $row) {
         $cells = $row;
         while (count($cells) < count($headers)) {
             $cells[] = '';
+        }
+        // Surface currency carried in the cell number format (e.g. show 1200 as
+        // "£1200") so the model emits originalCurrency for these rows.
+        $curRow = $currencyRows[$rowIdx] ?? [];
+        foreach ($cells as $c => $v) {
+            $tok = $curRow[$c] ?? '';
+            if ($tok !== '' && trim((string) $v) !== '') {
+                $cells[$c] = $tok . $v;
+            }
         }
         $escaped = array_map(fn($c) => str_replace('|', '\\|', (string)$c), $cells);
         $sb .= '| ' . implode(' | ', $escaped) . " |\n";
@@ -320,9 +330,21 @@ function pa_tier1_entities(array $sheet, array $analysis, ?string $country): arr
         }
     }
 
+    // Amount columns to inspect for in-cell currency (mirrors CurrencyImportPreparer's
+    // MoneyTargets). Currency lives in the cell number format, surfaced as a token in
+    // $sheet['currencyRows']; falls back to the cell text (for CSV / symbols typed inline).
+    $moneyTargets = ['total', 'amount', 'unit price', 'subtotal'];
+    $amountCols = [];
+    foreach ($headers as $i => $h) {
+        if (in_array(strtolower((string)$h), $moneyTargets, true)) {
+            $amountCols[] = $i;
+        }
+    }
+    $currencyRows = $sheet['currencyRows'] ?? [];
+
     $entities = [];
     $rowNum = 0;
-    foreach ($sheet['dataRows'] as $row) {
+    foreach ($sheet['dataRows'] as $rowIdx => $row) {
         $rowNum++;
         $entity = [];
         foreach ($schema as $col) {
@@ -347,9 +369,43 @@ function pa_tier1_entities(array $sheet, array $analysis, ?string $country): arr
         if (count($entity) <= 1) {
             continue;
         }
+        // Per-row currency from the amount cells, unless the sheet already mapped a
+        // Currency column onto the row (then trust that).
+        if (empty($entity['originalCurrency']) && $amountCols) {
+            $cur = pa_detect_row_currency($row, $currencyRows[$rowIdx] ?? [], $amountCols);
+            if ($cur !== null) {
+                $entity['originalCurrency'] = $cur;
+            }
+        }
         $entities[] = $entity;
     }
     return $entities;
+}
+
+/**
+ * Resolve one row's currency from its amount cells, like CurrencyImportPreparer:
+ * the first amount cell with an explicit code or unambiguous symbol wins; failing
+ * that, the first ambiguous symbol resolves to its priority default (no user prompt
+ * on the web). Prefers the number-format token, falling back to the cell text.
+ */
+function pa_detect_row_currency(array $row, array $currencyRow, array $amountCols): ?string
+{
+    $pending = null;
+    foreach ($amountCols as $col) {
+        $token = $currencyRow[$col] ?? '';
+        $probe = $token !== '' ? $token : (string) ($row[$col] ?? '');
+        if (trim($probe) === '') {
+            continue;
+        }
+        $d = pa_currency_detect($probe);
+        if ($d['code'] !== null) {
+            return $d['code'];
+        }
+        if ($d['ambiguous'] !== null && $pending === null && $d['candidates']) {
+            $pending = $d['candidates'][0];
+        }
+    }
+    return $pending;
 }
 
 // ─── Tier 2 (port of ProcessChunkAsync / ParseTier2Response) ──────────────────
@@ -364,11 +420,13 @@ function pa_tier2_entities(array $sheet, array $analysis, ?string $country): arr
     $system = pa_build_tier2_system_prompt($analysis['detectedType'], $schema);
     $headers = $sheet['headers'];
     $allRows = $sheet['dataRows'];
+    $allCur = $sheet['currencyRows'] ?? [];
 
     $entities = [];
     for ($i = 0; $i < count($allRows); $i += PA_TIER2_CHUNK) {
         $chunk = array_slice($allRows, $i, PA_TIER2_CHUNK);
-        $user = pa_build_tier2_user_prompt($headers, $chunk);
+        $curChunk = array_slice($allCur, $i, PA_TIER2_CHUNK);
+        $user = pa_build_tier2_user_prompt($headers, $chunk, $curChunk);
         $response = pa_gemini_chat($system, $user, 16000, 0.0);
         if ($response === null) {
             continue;

@@ -21,65 +21,250 @@
 // Past the cap, the most recent successfully-fetched rate set is reused.
 const PA_FX_MAX_LIVE_FETCHES = 40;
 
-/** Symbols that map unambiguously to one ISO code (used to read captured tokens). */
-function pa_currency_symbol_map(): array
+// ── CurrencyInfo: port of ArgoBooks.Core/Models/Common/CurrencyInfo.cs ─────────
+// The same 29-currency table the desktop app uses, so symbol/code resolution and
+// ambiguity match the app exactly.
+
+/** code => [symbol, name, decimals]. Mirrors CurrencyInfo.All. */
+function pa_currency_all(): array
 {
-    return [
-        '$' => 'USD', '€' => 'EUR', '£' => 'GBP', '¥' => 'JPY', '₹' => 'INR',
-        '₩' => 'KRW', '₽' => 'RUB', '₺' => 'TRY', '₪' => 'ILS', '฿' => 'THB',
-        'R$' => 'BRL', 'C$' => 'CAD', 'A$' => 'AUD', 'NZ$' => 'NZD', 'HK$' => 'HKD',
-        'CHF' => 'CHF', 'zł' => 'PLN',
+    static $all = [
+        'ALL' => ['L', 'Albanian Lek', 2],     'AUD' => ['$', 'Australian Dollar', 2],
+        'BAM' => ['KM', 'Bosnia-Herzegovina Mark', 2], 'BGN' => ['лв', 'Bulgarian Lev', 2],
+        'BRL' => ['R$', 'Brazilian Real', 2],   'BYN' => ['Br', 'Belarusian Ruble', 2],
+        'CAD' => ['$', 'Canadian Dollar', 2],   'CHF' => ['CHF', 'Swiss Franc', 2],
+        'CNY' => ['¥', 'Chinese Yuan', 2],      'CZK' => ['Kč', 'Czech Koruna', 2],
+        'DKK' => ['kr', 'Danish Krone', 2],     'EUR' => ['€', 'Euro', 2],
+        'GBP' => ['£', 'British Pound', 2],     'HUF' => ['Ft', 'Hungarian Forint', 0],
+        'INR' => ['₹', 'Indian Rupee', 2],      'ISK' => ['kr', 'Icelandic Króna', 0],
+        'JPY' => ['¥', 'Japanese Yen', 0],      'KRW' => ['₩', 'South Korean Won', 0],
+        'MKD' => ['ден', 'Macedonian Denar', 2],'NOK' => ['kr', 'Norwegian Krone', 2],
+        'PLN' => ['zł', 'Polish Zloty', 2],     'RON' => ['lei', 'Romanian Leu', 2],
+        'RSD' => ['дин', 'Serbian Dinar', 2],   'RUB' => ['₽', 'Russian Ruble', 2],
+        'SEK' => ['kr', 'Swedish Krona', 2],    'TRY' => ['₺', 'Turkish Lira', 2],
+        'TWD' => ['NT$', 'Taiwan Dollar', 2],   'UAH' => ['₴', 'Ukrainian Hryvnia', 2],
+        'USD' => ['$', 'US Dollar', 2],
     ];
+    return $all;
 }
 
-/** ISO code -> the symbol used when displaying amounts in that currency. */
+/** Common currencies shown first; used to order ambiguous-symbol candidates. */
+function pa_currency_priority_codes(): array
+{
+    return ['USD', 'EUR', 'CAD', 'AUD', 'GBP'];
+}
+
+/**
+ * symbol => priority-ordered list of ISO codes that use it (e.g. "$" => [USD,CAD,AUD],
+ * "¥" => [CNY,JPY], "kr" => [DKK,ISK,NOK,SEK]). Mirrors CurrencyInfo.CodesBySymbol.
+ */
+function pa_currency_codes_by_symbol(): array
+{
+    static $map = null;
+    if ($map !== null) {
+        return $map;
+    }
+    $priority = array_flip(pa_currency_priority_codes());
+    $groups = [];
+    foreach (pa_currency_all() as $code => [$symbol]) {
+        $groups[$symbol][] = $code;
+    }
+    foreach ($groups as $symbol => $codes) {
+        usort($codes, function ($a, $b) use ($priority) {
+            $ra = $priority[$a] ?? PHP_INT_MAX;
+            $rb = $priority[$b] ?? PHP_INT_MAX;
+            return $ra === $rb ? strcmp($a, $b) : $ra - $rb;
+        });
+        $groups[$symbol] = $codes;
+    }
+    $map = $groups;
+    return $map;
+}
+
+/** Every ISO code that uses a symbol (priority-ordered), or [] if unknown. */
+function pa_currency_candidates_for_symbol(string $symbol): array
+{
+    return pa_currency_codes_by_symbol()[$symbol] ?? [];
+}
+
+/** ISO code -> display symbol (mirrors CurrencyInfo). Multi-char symbols get a space. */
 function pa_currency_symbol(string $code): string
 {
     $code = strtoupper(trim($code));
-    static $m = [
-        'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'JPY' => '¥', 'CNY' => '¥',
-        'INR' => '₹', 'KRW' => '₩', 'BRL' => 'R$', 'CAD' => '$', 'AUD' => '$',
-        'NZD' => '$', 'MXN' => '$', 'HKD' => '$', 'SGD' => '$', 'ZAR' => 'R',
-        'RUB' => '₽', 'TRY' => '₺', 'ILS' => '₪', 'THB' => '฿',
-        'CHF' => 'CHF ', 'SEK' => 'kr ', 'NOK' => 'kr ', 'DKK' => 'kr ', 'PLN' => 'zł ',
-    ];
-    if (isset($m[$code])) {
-        return $m[$code];
+    $all = pa_currency_all();
+    if (isset($all[$code])) {
+        $sym = $all[$code][0];
+        // Glyph symbols ($, €, £, ¥, …) sit flush; alpha symbols (CHF, kr, zł) get a space.
+        return preg_match('/[^\p{L}]/u', $sym) ? $sym : $sym . ' ';
     }
-    // Unknown but plausible code: prefix the code itself (e.g. "AED 1,200").
     return $code !== '' ? $code . ' ' : '$';
 }
 
 /**
- * Normalize a captured currency token (a symbol like "£" or a code like "gbp")
- * to an ISO-4217 code, or null if blank/unrecognized. Ambiguous "$" -> USD.
+ * Port of CurrencyCellDetector.Detect: read currency + amount from a cell string
+ * (e.g. "$10 CAD", "£100", "95,000 CAD", "1,234.56"). Precedence: an explicit ISO
+ * code wins; then an unambiguous symbol; then an ambiguous symbol (reported with
+ * its candidates); otherwise no currency.
+ *
+ * @return array{amount:float, code:?string, ambiguous:?string, candidates:string[]}
+ */
+function pa_currency_detect(?string $cell): array
+{
+    $none = ['amount' => 0.0, 'code' => null, 'ambiguous' => null, 'candidates' => []];
+    if ($cell === null || trim($cell) === '') {
+        return $none;
+    }
+    $raw = trim($cell);
+    $amount = pa_currency_parse_amount($raw);
+
+    // 1. Explicit ISO code: a 3-letter alphabetic token that is a known code.
+    $explicit = null;
+    $conflict = false;
+    foreach (pa_currency_alpha_tokens($raw) as $token) {
+        $up = strtoupper($token);
+        if (strlen($token) === 3 && isset(pa_currency_all()[$up])) {
+            if ($explicit === null) {
+                $explicit = $up;
+            } elseif ($explicit !== $up) {
+                $conflict = true;
+            }
+        }
+    }
+    if ($explicit !== null && !$conflict) {
+        return ['amount' => $amount, 'code' => $explicit, 'ambiguous' => null, 'candidates' => []];
+    }
+
+    // 2. Symbol: prefer a glyph symbol (longest-first), else an alphabetic symbol token.
+    $symbol = pa_currency_find_glyph($raw) ?? pa_currency_find_alpha_symbol($raw);
+    if ($symbol !== null) {
+        $codes = pa_currency_candidates_for_symbol($symbol);
+        if (count($codes) === 1) {
+            return ['amount' => $amount, 'code' => $codes[0], 'ambiguous' => null, 'candidates' => []];
+        }
+        if (count($codes) > 1) {
+            return ['amount' => $amount, 'code' => null, 'ambiguous' => $symbol, 'candidates' => $codes];
+        }
+    }
+
+    // 3. No currency marker.
+    return ['amount' => $amount, 'code' => null, 'ambiguous' => null, 'candidates' => []];
+}
+
+/**
+ * Resolve a currency token or cell to a single ISO code, picking the priority
+ * default for an ambiguous symbol (the web tool has no user-resolution dialog
+ * like the desktop app, so it takes the most common candidate). Null if none.
  */
 function pa_currency_canon(?string $raw): ?string
 {
-    if ($raw === null) {
-        return null;
+    $d = pa_currency_detect($raw);
+    if ($d['code'] !== null) {
+        return $d['code'];
     }
-    $s = trim($raw);
-    if ($s === '') {
-        return null;
+    if ($d['ambiguous'] !== null && $d['candidates']) {
+        return $d['candidates'][0]; // priority default, e.g. "$" -> USD
     }
+    return null;
+}
 
-    $u = strtoupper($s);
-    if (preg_match('/^[A-Z]{3}$/', $u)) {
-        return $u; // already an ISO code
+/** Port of CurrencyCellDetector.ParseAmount: strip currency tokens, parens=negative. */
+function pa_currency_parse_amount(?string $s): float
+{
+    if ($s === null || trim($s) === '') {
+        return 0.0;
     }
+    $cleaned = trim($s);
+    foreach (pa_currency_strip_tokens() as $token) {
+        $cleaned = str_ireplace($token, '', $cleaned);
+    }
+    $cleaned = trim($cleaned);
+    if ($cleaned !== '' && $cleaned[0] === '(' && substr($cleaned, -1) === ')') {
+        $cleaned = '-' . substr($cleaned, 1, -1);
+    }
+    // Normalize thousands/decimal separators, then parse.
+    $cleaned = str_replace(' ', '', $cleaned);
+    if (strpos($cleaned, ',') !== false && strpos($cleaned, '.') !== false) {
+        $cleaned = str_replace(',', '', $cleaned);
+    } elseif (preg_match('/,\d{1,2}$/', $cleaned) && substr_count($cleaned, ',') === 1) {
+        $cleaned = str_replace(',', '.', $cleaned);
+    } else {
+        $cleaned = str_replace(',', '', $cleaned);
+    }
+    return is_numeric($cleaned) ? (float) $cleaned : 0.0;
+}
 
-    $map = pa_currency_symbol_map();
-    if (isset($map[$s])) {
-        return $map[$s];
+/** Maximal runs of letters in a string (currency-code candidates). */
+function pa_currency_alpha_tokens(string $s): array
+{
+    return preg_match_all('/\p{L}+/u', $s, $m) ? $m[0] : [];
+}
+
+/** Glyph symbols (contain a non-letter char, e.g. "$", "R$"), longest first. */
+function pa_currency_glyph_symbols(): array
+{
+    static $syms = null;
+    if ($syms !== null) {
+        return $syms;
     }
-    if (isset($map[$u])) {
-        return $map[$u];
+    $syms = [];
+    foreach (array_keys(pa_currency_codes_by_symbol()) as $sym) {
+        if (preg_match('/[^\p{L}]/u', $sym)) {
+            $syms[] = $sym;
+        }
     }
-    // Token contains a known glyph somewhere (e.g. "£100" slipped through).
-    foreach ($map as $sym => $code) {
-        if (mb_strpos($s, $sym) !== false) {
-            return $code;
+    usort($syms, fn($a, $b) => mb_strlen($b) - mb_strlen($a));
+    return $syms;
+}
+
+/** Alphabetic-only symbols (e.g. "kr", "CHF", "lei"), keyed lowercase. */
+function pa_currency_alpha_symbols(): array
+{
+    static $syms = null;
+    if ($syms !== null) {
+        return $syms;
+    }
+    $syms = [];
+    foreach (array_keys(pa_currency_codes_by_symbol()) as $sym) {
+        if (!preg_match('/[^\p{L}]/u', $sym)) {
+            $syms[mb_strtolower($sym)] = $sym;
+        }
+    }
+    return $syms;
+}
+
+/** All currency tokens to strip when isolating the number (symbols + codes), longest first. */
+function pa_currency_strip_tokens(): array
+{
+    static $tokens = null;
+    if ($tokens !== null) {
+        return $tokens;
+    }
+    $tokens = array_unique(array_merge(
+        array_keys(pa_currency_codes_by_symbol()),
+        array_keys(pa_currency_all())
+    ));
+    usort($tokens, fn($a, $b) => mb_strlen($b) - mb_strlen($a));
+    $tokens = array_values($tokens);
+    return $tokens;
+}
+
+function pa_currency_find_glyph(string $raw): ?string
+{
+    foreach (pa_currency_glyph_symbols() as $sym) {
+        if (mb_strpos($raw, $sym) !== false) {
+            return $sym;
+        }
+    }
+    return null;
+}
+
+function pa_currency_find_alpha_symbol(string $raw): ?string
+{
+    $alpha = pa_currency_alpha_symbols();
+    foreach (pa_currency_alpha_tokens($raw) as $token) {
+        $key = mb_strtolower($token);
+        if (isset($alpha[$key])) {
+            return $alpha[$key];
         }
     }
     return null;

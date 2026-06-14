@@ -1,12 +1,16 @@
-/* Profit Analyzer result page — full analytics, lazy-loaded per tab, dark-mode
-   toggle. Sample data for now; the real build feeds NormalizedData here.
+/* Profit Analyzer result page — renders the live analytics payload.
+   Data comes from window.PA_ANALYTICS (an upload, handed over via sessionStorage)
+   or, when absent, the bundled sample. Charts/cards/tabs with no data are hidden,
+   so a real upload shows only the dimensions its spreadsheet supports.
    ECharts is loaded separately. window.PA_ASSETS = base path for self-hosted assets. */
 (function(){
   var ASSETS = window.PA_ASSETS || '';
+  var TOOL = window.PA_TOOL || '';
   var PALETTE = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#64748b','#14b8a6','#f97316'];
-  var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   var charts = {};
   var dark = false, curTab = 'dashboard';
+  var A = null; // the analytics payload
+
   function TT(){ return dark
     ? {axis:'#8a97ab',split:'rgba(255,255,255,.08)',axisLine:'rgba(255,255,255,.13)',tipBg:'#111c33',tipBorder:'rgba(255,255,255,.12)',tipText:'#e2e8f0',sankN:'#cbd5e1',sankV:'#8a97ab'}
     : {axis:'#94a3b8',split:'#f1f5f9',axisLine:'#e2e8f0',tipBg:'#ffffff',tipBorder:'#e6ebf2',tipText:'#0f172a',sankN:'#475569',sankV:'#9aa6b6'}; }
@@ -16,6 +20,7 @@
   function axisX(cats){ var t=TT(); return {type:'category',data:cats,boundaryGap:true,axisLine:{lineStyle:{color:t.axisLine}},axisTick:{show:false},axisLabel:{color:t.axis,fontSize:11}}; }
   function axisY(){ var t=TT(); return {type:'value',splitLine:{lineStyle:{color:t.split}},axisLine:{show:false},axisLabel:{color:t.axis,fontSize:11}}; }
   function fade(hex){ return new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:hex+'33'},{offset:1,color:hex+'00'}]); }
+  function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
 
   function line(cats, series){
     return base({ tooltip:tip({trigger:'axis'}), legend: series.length>1?{top:0,icon:'roundRect',itemWidth:11,itemHeight:11,textStyle:{color:TT().axis,fontSize:12}}:undefined,
@@ -36,16 +41,32 @@
         data:data.map(function(d,i){ return {name:d.name,value:d.value,itemStyle:{color:PALETTE[i%PALETTE.length]}}; })}] });
   }
 
-  // ---------- Sankey (dashboard) ----------
-  function sankey(){
-    var el=document.getElementById('sankeyChart'); if(!el||charts.sankey)return;
+  // hide the card wrapping a chart id (when there's no data for it)
+  function hideCard(id){ var d=document.getElementById(id); if(d){ var c=d.closest('.chartcard,.listcard'); if(c)c.style.display='none'; } }
+  function chart(id, opt){ if(opt){ init(id,opt); } else { hideCard(id); } }
+  // pie helper that hides the card when the dataset is empty
+  function pieOr(id, data, money){ chart(id, (data&&data.length)? pie(data,money):null); }
+  function has(arr){ return arr && arr.length; }
+
+  // ---------- Sankey (dashboard money-flow) ----------
+  function sankeyColor(name){
+    var n=name.toLowerCase();
+    if(n==='revenue') return '#6f8fb3';
+    if(n==='profit') return '#1f9d6b';
+    if(/cost|ads|advert|fee|other|shipping|expense/.test(n)) return '#d76b66'; // leaks (red)
+    return '#6fae93'; // surviving stages (green)
+  }
+  function sankey(flow){
+    var el=document.getElementById('sankeyChart'); if(!el||charts.sankey||!flow)return;
     var c=echarts.init(el,null,{renderer:'svg'}); charts.sankey=c;
-    var REV=24800; function f(n){return '$'+n.toLocaleString('en-US');}
-    var VAL={'Revenue':24800,'Cost of goods':13400,'Gross profit':11400,'Ads & marketing':4460,'After ads':6940,'Fees':2230,'Profit':4710};
-    var L=[['Revenue','Cost of goods',13400],['Revenue','Gross profit',11400],['Gross profit','Ads & marketing',4460],['Gross profit','After ads',6940],['After ads','Fees',2230],['After ads','Profit',4710]].map(function(a){return {source:a[0],target:a[1],value:a[2]};});
-    var C={'Revenue':'#6f8fb3','Cost of goods':'#d76b66','Gross profit':'#6fae93','Ads & marketing':'#e3938c','After ads':'#46a37e','Fees':'#c9544f','Profit':'#1f9d6b'};
+    var VAL=flow.nodes||{}; var REV=VAL['Revenue']||1;
+    function f(n){return '$'+Number(n).toLocaleString('en-US');}
+    var L=(flow.links||[]).map(function(a){return {source:a[0],target:a[1],value:a[2]};});
     var t=TT(), pn=dark?'#5cf0b4':'#0f766e', pv=dark?'#34d399':'#10a37f';
-    var nodes=Object.keys(VAL).map(function(n){ var o={name:n,value:VAL[n],itemStyle:{color:C[n],borderWidth:0,borderRadius:6}}; if(n==='Revenue')o.label={position:'left'}; if(n==='Profit')o.label={position:'right',rich:{n:{color:pn,fontSize:12.5,fontWeight:700,lineHeight:17},v:{color:pv,fontSize:12,fontWeight:700,lineHeight:15}}}; return o; });
+    var nodes=Object.keys(VAL).map(function(n){ var o={name:n,value:VAL[n],itemStyle:{color:sankeyColor(n),borderWidth:0,borderRadius:6}};
+      if(n==='Revenue')o.label={position:'left'};
+      if(n==='Profit')o.label={position:'right',rich:{n:{color:pn,fontSize:12.5,fontWeight:700,lineHeight:17},v:{color:pv,fontSize:12,fontWeight:700,lineHeight:15}}};
+      return o; });
     c.setOption({backgroundColor:'transparent',animationDuration:1100,
       tooltip:tip({trigger:'item',confine:true,padding:[9,13],extraCssText:'box-shadow:0 12px 30px -10px rgba(16,24,40,.22);border-radius:10px',
         formatter:function(p){ if(p.dataType==='node')return '<b>'+p.name+'</b><br><span style="opacity:.7">'+f(p.value)+' · '+Math.round(p.value/REV*100)+'%</span>'; return '<span style="opacity:.7">'+p.data.source+' → '+p.data.target+'</span><br><b>'+f(p.value)+'</b>'; }}),
@@ -55,83 +76,102 @@
         data:nodes,links:L}]});
   }
 
-  // ---------- per-tab builders ----------
-  var built={};
+  // ---------- per-tab chart builders (read from A) ----------
   var builders = {
     dashboard:function(){
-      sankey();
-      init('c_profitTrend', line(M.slice(0,6),[{name:'Profit',data:[420,560,510,680,720,860],color:'#10b981',area:true}]));
-      init('c_salesVsExp', bars(M.slice(0,6),[{name:'Sales',data:[3.6,3.9,3.7,4.2,4.4,5.0].map(function(x){return x*1000;}),color:'#3b82f6'},{name:'Expenses',data:[3.0,3.1,3.2,3.3,3.4,3.6].map(function(x){return x*1000;}),color:'#ef4444'}]));
-      init('c_salesTrend', line(M.slice(0,6),[{name:'Revenue',data:[3600,3900,3700,4200,4400,5000],color:'#3b82f6',area:true}]));
-      init('c_revDist', pie([{name:'Totes',value:8240},{name:'Mugs',value:6460},{name:'Candles',value:4720},{name:'Cards',value:2040},{name:'Pins',value:1280},{name:'Stickers',value:960}],true));
-      init('c_purchTrend', line(M.slice(0,6),[{name:'Expenses',data:[3000,3100,3200,3300,3400,3600],color:'#ef4444',area:true}]));
-      init('c_expDist', pie([{name:'Cost of goods',value:13400},{name:'Ads',value:4460},{name:'Fees',value:2230},{name:'Shipping',value:1200},{name:'Other',value:800}],true));
+      var d=A.dashboard||{};
+      sankey(d.flow);
+      chart('c_profitTrend', d.profitTrend? line(d.profitTrend.cats,[{name:'Profit',data:d.profitTrend.data,color:'#10b981',area:true}]):null);
+      var sve=d.salesVsExp;
+      chart('c_salesVsExp', sve? bars(sve.revenue.cats,[{name:'Sales',data:sve.revenue.data,color:'#3b82f6'},{name:'Expenses',data:sve.expenses.data,color:'#ef4444'}]):null);
+      chart('c_salesTrend', (sve&&sve.revenue)? line(sve.revenue.cats,[{name:'Revenue',data:sve.revenue.data,color:'#3b82f6',area:true}]):null);
+      pieOr('c_revDist', d.revByProduct, true);
+      chart('c_purchTrend', (sve&&sve.expenses)? line(sve.expenses.cats,[{name:'Expenses',data:sve.expenses.data,color:'#ef4444',area:true}]):null);
+      pieOr('c_expDist', d.expDist, true);
     },
-    products:function(){ init('c_prodTrend', line(M.slice(0,6),[{name:'Revenue',data:[1180,1260,1240,1360,1420,1780],color:'#3b82f6',area:true}])); },
+    products:function(){ hideCard('c_prodTrend'); }, // table is rendered separately; no trend series in the payload
     geographic:function(){
-      init('c_cOrigin', pie([{name:'China',value:46},{name:'Canada',value:22},{name:'USA',value:18},{name:'Vietnam',value:9},{name:'Other',value:5}]));
-      init('c_compOrigin', pie([{name:'Pak Supplies',value:38},{name:'Northwind',value:27},{name:'Acme Co.',value:20},{name:'Other',value:15}]));
-      init('c_cDest', pie([{name:'USA',value:52},{name:'Canada',value:28},{name:'UK',value:11},{name:'Australia',value:9}]));
-      init('c_compDest', pie([{name:'Riverside Co.',value:31},{name:'Maple Retail',value:24},{name:'Bianchi Ltd',value:18},{name:'Other',value:27}]));
-      geoMap();
-    },
-    performance:function(){
-      init('c_avgTxn', bars(M.slice(0,6),[{name:'Avg value',data:[17.2,18.1,18.6,19.0,19.4,20.1],color:'#3b82f6'}]));
-      init('c_totalTxn', bars(M.slice(0,6),[{name:'Transactions',data:[180,196,205,214,228,240],color:'#8b5cf6'}]));
-      init('c_shipping', line(M.slice(0,6),[{name:'Avg shipping',data:[5.2,5.0,4.9,4.8,4.85,4.7],color:'#06b6d4',area:true}]));
+      var g=A.geographic||{};
+      pieOr('c_cOrigin', g.origin);
+      hideCard('c_compOrigin');
+      pieOr('c_cDest', g.destination);
+      hideCard('c_compDest');
+      if(has(g.map)) geoMap(g.map); else hideCard('c_geoMap');
     },
     customers:function(){
-      init('c_topCust', pie([{name:'Riverside Co.',value:2100},{name:'Maple Retail',value:1640},{name:'A. Whitfield',value:1180},{name:'J. Okafor',value:920},{name:'Other',value:3200}],true));
-      init('c_payStatus', pie([{name:'Paid',value:74},{name:'Partial',value:14},{name:'Unpaid',value:12}]));
-      init('c_custGrowth', line(M.slice(0,6),[{name:'New customers',data:[8,11,9,13,12,15],color:'#10b981',area:true}]));
-      init('c_clv', bars(M.slice(0,6),[{name:'CLV',data:[42,45,47,49,50,53],color:'#3b82f6'}]));
-      init('c_activeInactive', pie([{name:'Active',value:71},{name:'Inactive',value:29}]));
-      init('c_rentalsPer', bars(['0','1','2','3','4+'],[{name:'Customers',data:[310,92,46,24,14],color:'#14b8a6'}]));
+      var c=A.customers||{};
+      pieOr('c_topCust', c.topCustomers, true);
+      pieOr('c_payStatus', c.paymentStatus);
+      ['c_custGrowth','c_clv','c_activeInactive','c_rentalsPer'].forEach(hideCard);
     },
     taxes:function(){
-      init('c_taxVsPaid', bars(M.slice(0,6),[{name:'Collected',data:[480,520,500,560,580,584],color:'#10b981'},{name:'Paid',data:[260,280,290,300,300,312],color:'#ef4444'}]));
-      init('c_taxRate', bars(['0%','5%','8%','13%','15%'],[{name:'Transactions',data:[120,340,210,470,144],color:'#8b5cf6'}]));
-      init('c_taxLiab', line(M.slice(0,6),[{name:'Net liability',data:[220,240,210,260,280,272],color:'#3b82f6',area:true}]));
-      init('c_taxCat', pie([{name:'Sales',value:58},{name:'Supplies',value:20},{name:'Shipping',value:12},{name:'Other',value:10}]));
-      init('c_taxProd', pie([{name:'Totes',value:34},{name:'Mugs',value:26},{name:'Candles',value:20},{name:'Other',value:20}]));
-      init('c_expRevTax', bars(M.slice(0,6),[{name:'Revenue tax',data:[480,520,500,560,580,584],color:'#3b82f6'},{name:'Expense tax',data:[260,280,290,300,300,312],color:'#f59e0b'}]));
-    },
-    returns:function(){
-      init('c_retTime', bars(M.slice(0,6),[{name:'Returns',data:[5,7,6,8,6,6],color:'#f59e0b'}]));
-      init('c_retReasons', pie([{name:'Damaged',value:37},{name:'Wrong item',value:24},{name:'Changed mind',value:21},{name:'Late',value:18}]));
-      init('c_retImpact', bars(M.slice(0,6),[{name:'$ impact',data:[160,220,180,240,170,150],color:'#ef4444'}]));
-      init('c_retCat', pie([{name:'Stationery',value:42},{name:'Drinkware',value:30},{name:'Apparel',value:18},{name:'Other',value:10}]));
-      init('c_retProd', pie([{name:'Stickers',value:34},{name:'Pins',value:30},{name:'Mugs',value:20},{name:'Other',value:16}]));
-      init('c_retPurchSale', bars(M.slice(0,6),[{name:'Sale returns',data:[120,160,130,170,120,110],color:'#3b82f6'},{name:'Purchase returns',data:[40,60,50,70,50,40],color:'#f59e0b'}]));
-    },
-    losses:function(){
-      init('c_lossTime', bars(M.slice(0,6),[{name:'$ losses',data:[240,300,210,280,330,280],color:'#ef4444'}]));
-      init('c_lossReasons', pie([{name:'Damaged',value:44},{name:'Spoilage',value:26},{name:'Theft',value:18},{name:'Misc',value:12}]));
-      init('c_lossImpact', line(M.slice(0,6),[{name:'$ impact',data:[240,300,210,280,330,280],color:'#f59e0b',area:true}]));
-      init('c_lossCat', pie([{name:'Drinkware',value:38},{name:'Candles',value:28},{name:'Stationery',value:22},{name:'Other',value:12}]));
-      init('c_lossProd', pie([{name:'Candles',value:40},{name:'Mugs',value:30},{name:'Totes',value:18},{name:'Other',value:12}]));
-      init('c_lossPurchSale', bars(M.slice(0,6),[{name:'Sale losses',data:[140,180,120,160,200,170],color:'#3b82f6'},{name:'Purchase losses',data:[100,120,90,120,130,110],color:'#f59e0b'}]));
-    },
-    refunds:function(){ init('c_refundMonth', bars(M,[{name:'Refunds',data:[90,120,80,140,110,150,130,160,120,180,140,170],color:'#ef4444'}])); }
+      var t=A.taxes||{};
+      var cvp=t.collectedVsPaid;
+      chart('c_taxVsPaid', cvp? bars(cvp.collected.cats,[{name:'Collected',data:cvp.collected.data,color:'#10b981'},{name:'Paid',data:cvp.paid.data,color:'#ef4444'}]):null);
+      pieOr('c_taxCat', t.byCategory);
+      ['c_taxRate','c_taxLiab','c_taxProd','c_expRevTax'].forEach(hideCard);
+    }
   };
 
   // ---------- world map ----------
   var mapReady=false, mapPending=false;
-  function geoMap(){
+  function geoMap(mapData){
     var el=document.getElementById('c_geoMap'); if(!el||charts.geoMap)return;
+    var maxv=mapData.reduce(function(m,d){return Math.max(m,d.value);},0)||1;
     function draw(){
       var c=echarts.init(el,null,{renderer:'svg'}); charts.geoMap=c; var t=TT();
-      c.setOption(base({ tooltip:tip({trigger:'item',formatter:function(p){return p.name+(p.value?': $'+p.value.toLocaleString():': —');}}),
-        visualMap:{left:14,bottom:14,min:0,max:9000,calculable:true,inRange:{color:dark?['#1e3356','#2f6fd0','#7db4ff']:['#dbeafe','#60a5fa','#1e40af']},text:['High','Low'],textStyle:{color:t.axis}},
+      c.setOption(base({ tooltip:tip({trigger:'item',formatter:function(p){return p.name+(p.value?': $'+Number(p.value).toLocaleString():': —');}}),
+        visualMap:{left:14,bottom:14,min:0,max:maxv,calculable:true,inRange:{color:dark?['#1e3356','#2f6fd0','#7db4ff']:['#dbeafe','#60a5fa','#1e40af']},text:['High','Low'],textStyle:{color:t.axis}},
         series:[{type:'map',map:'world',roam:false,itemStyle:{areaColor:dark?'#16223c':'#eef2f7',borderColor:dark?'rgba(255,255,255,.10)':'#dbe2ec'},emphasis:{itemStyle:{areaColor:'#10b981'},label:{show:false}},
-          data:[{name:'United States',value:8600},{name:'Canada',value:5200},{name:'United Kingdom',value:2100},{name:'Australia',value:1700},{name:'Germany',value:900}]}] }));
+          data:mapData}] }));
     }
     if(mapReady){ draw(); return; }
     if(mapPending)return; mapPending=true;
-    fetch(ASSETS + 'world.json')
-      .then(function(r){return r.json();})
+    fetch(ASSETS + 'world.json').then(function(r){return r.json();})
       .then(function(geo){ echarts.registerMap('world',geo); mapReady=true; draw(); })
       .catch(function(){ el.innerHTML='<div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">World map could not load.</div>'; });
+  }
+
+  // ---------- KPI + table + meta rendering ----------
+  function renderKpis(panelName, kpis){
+    var panel=document.querySelector('.panel[data-panel="'+panelName+'"]'); if(!panel)return;
+    var box=panel.querySelector('.kpis'); if(!box)return;
+    if(!has(kpis)){ box.style.display='none'; return; }
+    box.innerHTML=kpis.map(function(k){
+      return '<div class="kpi '+(k.cls||'')+'"><div class="lbl">'+esc(k.lbl)+'</div><div class="val">'+esc(k.val)+'</div>'
+        + (k.sub?'<div class="sub '+(k.subcls||'')+'">'+esc(k.sub)+'</div>':'') + '</div>';
+    }).join('');
+  }
+  function renderProductsTable(){
+    var p=A.products; var tbody=document.querySelector('.panel[data-panel="products"] .dtable tbody'); if(!tbody)return;
+    if(!p||!has(p.table)){ return; }
+    tbody.innerHTML=p.table.map(function(r){
+      return '<tr><td>'+esc(r.name)+'</td><td class="num">'+esc(r.units)+'</td><td class="num">'+esc(r.rev)+'</td><td class="num">'+esc(r.avg)+'</td></tr>';
+    }).join('');
+  }
+  function renderFlowStat(){
+    var d=A.dashboard; if(!d||!d.flow)return;
+    var stat=document.querySelector('.keptstat b'); if(stat)stat.textContent=(d.flow.kept||0)+'%';
+  }
+  function renderMeta(){
+    var m=A.meta||{};
+    var fileEl=document.querySelector('.rhead .file'); if(fileEl){
+      var badge=fileEl.querySelector('.badge'); var name=esc(m.filename||'your-spreadsheet.xlsx');
+      fileEl.childNodes.forEach&&fileEl.childNodes.forEach(function(n){ if(n.nodeType===3)n.textContent=' '+m.filename+' '; });
+      if(badge)badge.textContent='✓ '+Number(m.rows||0).toLocaleString()+' rows analyzed';
+    }
+  }
+  function renderCleaned(){
+    var tbody=document.querySelector('.cleantable tbody'); if(!tbody||!A.cleaned)return;
+    var fmt=function(n){ return '$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+    tbody.innerHTML=A.cleaned.map(function(r){
+      var inc=r.type==='income';
+      return '<tr data-type="'+esc(r.type)+'"><td class="date">'+esc(r.date)+'</td><td>'+esc(r.description)+'</td>'
+        +'<td><span class="pill cat">'+esc(r.category)+'</span></td>'
+        +'<td><span class="pill '+(inc?'inc':'exp')+'">'+(inc?'Income':'Expense')+'</span></td>'
+        +'<td class="amt'+(inc?' inc':'')+'">'+fmt(r.amount)+'</td></tr>';
+    }).join('');
+    wireCleanedFilter();
   }
 
   // ---------- tabs ----------
@@ -142,31 +182,105 @@
     if(builders[name] && !built[name]){ built[name]=true; builders[name](); }
     Object.keys(charts).forEach(function(k){ charts[k].resize(); });
   }
-  document.getElementById('tabbar').addEventListener('click', function(e){ var b=e.target.closest('.tabbtn'); if(b) show(b.dataset.tab); });
-  show('dashboard');
+  var built={};
 
-  // dark-theme toggle: flip the attribute and re-render the active tab's charts
-  var tbtn=document.getElementById('themeToggle');
-  if(tbtn){ tbtn.addEventListener('click', function(){
-    dark=!dark;
-    document.documentElement.setAttribute('data-theme', dark?'dark':'light');
-    tbtn.setAttribute('aria-pressed', dark);
-    Object.keys(charts).forEach(function(k){ charts[k].dispose(); delete charts[k]; });
-    Object.keys(built).forEach(function(k){ delete built[k]; });
-    built[curTab]=true; builders[curTab]();
-    Object.keys(charts).forEach(function(k){ charts[k].resize(); });
-  }); }
+  function hideAbsentTabs(){
+    var present={}; (A.tabs||[]).forEach(function(t){ present[t]=true; });
+    document.querySelectorAll('.tabbtn').forEach(function(b){ if(!present[b.dataset.tab]) b.style.display='none'; });
+    document.querySelectorAll('.panel').forEach(function(p){ if(!present[p.dataset.panel]) p.style.display='none'; });
+  }
 
-  // ---------- cleaned-table tabs ----------
-  var ctabs=document.querySelectorAll('.cleanbar .ctab');
-  var rows=Array.prototype.slice.call(document.querySelectorAll('.cleantable tbody tr'));
-  var label=document.getElementById('rowcount');
-  ctabs.forEach(function(t){ t.addEventListener('click', function(){
-    ctabs.forEach(function(x){x.classList.remove('active');}); t.classList.add('active');
-    var f=t.dataset.filter, n=0;
-    rows.forEach(function(r){ var m=(f==='all')||(r.dataset.type===f); r.style.display=m?'':'none'; if(m)n++; });
-    if(label) label.textContent=(f==='all')?(n+' of 248 rows shown'):(n+' '+f+' rows shown');
-  }); });
+  // ---------- cleaned-table filter ----------
+  function wireCleanedFilter(){
+    var ctabs=document.querySelectorAll('.cleanbar .ctab');
+    var rows=Array.prototype.slice.call(document.querySelectorAll('.cleantable tbody tr'));
+    var label=document.getElementById('rowcount');
+    var total=rows.length;
+    function apply(f){ var n=0; rows.forEach(function(r){ var m=(f==='all')||(r.dataset.type===f); r.style.display=m?'':'none'; if(m)n++; });
+      if(label) label.textContent=(f==='all')?(n+' of '+total+' rows shown'):(n+' '+f+' rows shown'); }
+    ctabs.forEach(function(t){ t.onclick=function(){ ctabs.forEach(function(x){x.classList.remove('active');}); t.classList.add('active'); apply(t.dataset.filter); }; });
+    apply('all');
+  }
 
-  window.addEventListener('resize', function(){ Object.keys(charts).forEach(function(k){ charts[k].resize(); }); });
+  // ---------- download + email (post the client-held normalized data) ----------
+  function wireActions(){
+    var norm=window.PA_NORMALIZED || null;
+    function postBlob(url){
+      return fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({normalized:norm})});
+    }
+    document.querySelectorAll('.btn-download, .cleanbar .dl').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(!norm){ return; }
+        btn.classList.add('busy');
+        postBlob(TOOL+'download.php').then(function(r){ return r.blob(); }).then(function(blob){
+          var url=URL.createObjectURL(blob); var a=document.createElement('a');
+          a.href=url; a.download='cleaned-'+(new Date().toISOString().slice(0,10))+'.xlsx';
+          document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+        }).catch(function(){}).then(function(){ btn.classList.remove('busy'); });
+      });
+    });
+    var form=document.querySelector('.email form');
+    if(form){ form.addEventListener('submit', function(e){ e.preventDefault();
+      var input=form.querySelector('input[type=email]'); var btn=form.querySelector('button');
+      var email=(input.value||'').trim(); if(!email)return;
+      btn.disabled=true; var old=btn.textContent; btn.textContent='Sending…';
+      fetch(TOOL+'email.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,normalized:norm})})
+        .then(function(r){return r.json();}).then(function(j){ btn.textContent=j&&j.ok?'Sent ✓':(j&&j.message?'Try again':'Failed'); })
+        .catch(function(){ btn.textContent='Failed'; })
+        .then(function(){ setTimeout(function(){ btn.textContent=old; btn.disabled=false; },2500); });
+    }); }
+  }
+
+  // ---------- dark toggle ----------
+  function wireTheme(){
+    var tbtn=document.getElementById('themeToggle'); if(!tbtn)return;
+    tbtn.addEventListener('click', function(){
+      dark=!dark;
+      document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+      tbtn.setAttribute('aria-pressed', dark);
+      Object.keys(charts).forEach(function(k){ charts[k].dispose(); delete charts[k]; });
+      Object.keys(built).forEach(function(k){ delete built[k]; });
+      mapReady=mapReady; // keep registered map
+      built[curTab]=true; builders[curTab] && builders[curTab]();
+      Object.keys(charts).forEach(function(k){ charts[k].resize(); });
+    });
+  }
+
+  // ---------- boot ----------
+  function showEmptyState(){
+    var tabbar=document.querySelector('.tabbar'); if(tabbar)tabbar.style.display='none';
+    document.querySelectorAll('.panel').forEach(function(p){ p.style.display='none'; });
+    var wrap=document.querySelector('.wrap');
+    if(wrap){ wrap.insertAdjacentHTML('beforeend',
+      '<div class="empty-note" style="text-align:center;max-width:560px;margin:30px auto;padding:26px;border:1px solid var(--line,#e6ebf2);border-radius:16px;background:#fff">'
+      +'<h3 style="margin:0 0 8px;font-family:Fraunces,Georgia,serif">We cleaned your file</h3>'
+      +'<p style="color:#64748b;margin:0">It didn\'t contain enough sales or expense transactions to chart, but your cleaned, organized spreadsheet is ready below.</p></div>'); }
+  }
+
+  function render(){
+    renderMeta();
+    hideAbsentTabs();
+    if(!has(A.tabs)){ showEmptyState(); renderCleaned(); wireActions(); return; }
+    ['dashboard','products','customers','taxes'].forEach(function(name){ if(A[name]) renderKpis(name, A[name].kpis); });
+    renderFlowStat();
+    renderProductsTable();
+    renderCleaned();
+    document.getElementById('tabbar').addEventListener('click', function(e){ var b=e.target.closest('.tabbtn'); if(b && b.style.display!=='none') show(b.dataset.tab); });
+    var first=(A.tabs&&A.tabs[0])||'dashboard';
+    show(first);
+    wireTheme();
+    wireActions();
+    window.addEventListener('resize', function(){ Object.keys(charts).forEach(function(k){ charts[k].resize(); }); });
+  }
+
+  function boot(data){ A=data||{}; if(!A.tabs)A.tabs=[]; render(); }
+
+  if(window.PA_ANALYTICS){ boot(window.PA_ANALYTICS); }
+  else {
+    fetch(ASSETS+'sample-analytics.json').then(function(r){return r.json();})
+      .then(function(d){ if(!window.PA_NORMALIZED){ // also load sample normalized so download/email work in the demo
+          return fetch(ASSETS+'sample-normalized.json').then(function(r){return r.json();}).then(function(n){ window.PA_NORMALIZED=n; boot(d); }).catch(function(){ boot(d); });
+        } boot(d); })
+      .catch(function(){ document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<p style="padding:20px;color:#ef4444">Could not load results. Please try uploading again.</p>'); });
+  }
 })();

@@ -24,10 +24,20 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     pae_fail(405, 'Use POST.');
 }
 
+// Read the JSON body once: it carries both the email and (Option A) the
+// client-held NormalizedData to build the cleaned spreadsheet from.
+$postedNormalized = null;
 $email = trim($_POST['email'] ?? '');
-if ($email === '' && ($raw = file_get_contents('php://input'))) {
+if (($raw = file_get_contents('php://input')) !== false && $raw !== '') {
     $json = json_decode($raw, true);
-    $email = trim($json['email'] ?? '');
+    if (is_array($json)) {
+        if ($email === '') {
+            $email = trim($json['email'] ?? '');
+        }
+        if (isset($json['normalized']) && is_array($json['normalized'])) {
+            $postedNormalized = $json['normalized'];
+        }
+    }
 }
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     pae_fail(400, 'Please enter a valid email address.');
@@ -39,8 +49,9 @@ if (check_and_record_rate_limit($ip, 5, 3600, 'profit_analyzer_email')) {
     pae_fail(429, 'Too many emails from this address right now. Please try again later.');
 }
 
-// DEFERRED: real flow emails the just-analyzed session data; stub uses the sample.
-$normalized = pa_load_fixture('maple-goods');
+// Use the client-held analyzed data when present; otherwise the sample fixture
+// (e.g. someone emailing themselves the sample-data demo).
+$normalized = $postedNormalized !== null ? pa_normalize($postedNormalized) : pa_load_fixture('maple-goods');
 $analytics = pa_compute_analytics($normalized);
 
 $revenue = pa_sum($normalized['entities']['revenue'], 'amount');

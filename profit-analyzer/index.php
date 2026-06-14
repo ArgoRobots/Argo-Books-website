@@ -71,13 +71,15 @@ $schema = json_encode([
     <h1 class="rise d2">See exactly where your<br>business is <em>losing money</em>.</h1>
     <p class="sub rise d3">Upload your spreadsheet and get a clear, honest picture of your numbers in about 60 seconds. Free.</p>
 
-    <a class="upload rise d4" href="<?= $results ?>">
+    <input type="file" id="paFile" accept=".xlsx,.csv" hidden>
+    <label class="upload rise d4" for="paFile" id="paDrop">
       <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg></div>
       <div class="big">Drop your spreadsheet here</div>
       <div class="small">.xlsx or .csv · any spreadsheet or export</div>
       <span class="pick">Choose file</span>
-    </a>
+    </label>
     <div class="or-sample rise d4">or <a href="<?= $results ?>">try it with sample data →</a></div>
+    <div class="upload-err rise" id="paError" role="alert" hidden></div>
 
     <div class="trust-line rise d5">
       <span><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Encrypted</span>
@@ -198,10 +200,10 @@ $schema = json_encode([
       <h2>This is a one-time snapshot.<br>Argo keeps it true every day.</h2>
       <p>Argo Books tracks your profit automatically, all year, plus invoices, expenses, and tax-ready reports. One affordable app instead of a spreadsheet you rebuild every month.</p>
       <a class="btn btn-primary btn-lg" href="<?= $cta ?>">Try Argo Books free →</a>
-      <a class="mini-upload" href="<?= $results ?>">
+      <label class="mini-upload" for="paFile">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg>
         Analyze another spreadsheet — free
-      </a>
+      </label>
     </div>
   </div>
 </section>
@@ -211,7 +213,21 @@ $schema = json_encode([
   © <?= date('Y') ?> Argo Books · Built for small businesses
 </footer>
 
+<!-- Analysis loading overlay -->
+<div class="pa-overlay" id="paOverlay" hidden>
+  <div class="pa-overlay-card">
+    <div class="pa-spinner"></div>
+    <div class="pa-overlay-title">Reading your spreadsheet…</div>
+    <div class="pa-overlay-sub" id="paOverlaySub">Detecting columns and cleaning your data. This takes about a minute.</div>
+  </div>
+</div>
+
+<script>
+  window.PA_TOOL = <?= json_encode(INVGEN_BASE . '/profit-analyzer/', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+  window.PA_RESULTS = <?= json_encode($results, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
 <script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/echarts.min.js"></script>
 <script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/owner-sample.js"></script>
+<script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/upload.js"></script>
 </body>
 </html>

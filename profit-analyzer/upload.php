@@ -4,15 +4,19 @@
 // Upload endpoint for the Profit Analyzer. Validates the file, enforces the
 // per-IP rate limit, runs the analysis, and returns the computed result.
 //
-// The analysis step (file -> NormalizedData) is the ONLY piece deferred until
-// the desktop importer stabilizes; here it is a stub returning sample data so
-// the whole pipeline (upload -> validate -> rate-limit -> analytics -> delete)
-// runs end to end. Swap pa_analyze() for the real port when it lands.
+// The analysis step (file -> NormalizedData) is a PHP port of the desktop
+// importer's analysis, living in lib/import/. pa_analyze() (pipeline.php) reads
+// the file, runs the Gemini-backed sheet-type + column-mapping analysis, and
+// returns the NormalizedData contract that the analytics engine consumes.
 
 header('Content-Type: application/json; charset=utf-8');
 
+// The analysis makes several sequential Gemini calls; give it room.
+@set_time_limit(300);
+
 require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/lib/analytics.php';
+require_once __DIR__ . '/lib/import/pipeline.php';
 
 const PA_MAX_BYTES = 5 * 1024 * 1024;       // 5 MB
 const PA_DAILY_LIMIT = 5;                    // analyses per IP per day
@@ -63,10 +67,11 @@ if (!$tmp || !move_uploaded_file($file['tmp_name'], $tmp)) {
 }
 
 try {
-    $normalized = pa_analyze($tmp, $ext);          // DEFERRED step (stub for now)
+    $normalized = pa_analyze($tmp, $ext, $file['name'] ?? '');
     $analytics = pa_compute_analytics($normalized);
 } catch (Throwable $e) {
     @unlink($tmp);
+    error_log('profit-analyzer analysis failed: ' . $e->getMessage());
     pa_fail(422, 'unreadable', "We couldn't make sense of that spreadsheet. Try a cleaner export.");
 }
 
@@ -76,19 +81,8 @@ try {
 // Only successful analyses count toward the daily quota.
 record_rate_limit_attempt($ip, 'profit_analyzer', PA_WINDOW);
 
-echo json_encode(['ok' => true, 'analytics' => $analytics]);
-
-/**
- * DEFERRED: turn an uploaded spreadsheet into NormalizedData. Real implementation
- * (PHP port of the desktop importer's analysis: PhpSpreadsheet read + Gemini via
- * api/ai/completions.php + column mapping + Tier-2) replaces this stub body. The
- * contract it must return is documented in lib/contract.php.
- */
-function pa_analyze(string $path, string $ext): array
-{
-    $sample = pa_load_fixture('maple-goods');
-    if ($sample === null) {
-        throw new RuntimeException('analysis unavailable');
-    }
-    return $sample;
-}
+// Return both the chart-ready analytics and the full NormalizedData. Under
+// Option A the server stores nothing, so the client keeps `normalized` for the
+// session and posts it back to download.php / email.php to build the cleaned
+// spreadsheet on demand.
+echo json_encode(['ok' => true, 'analytics' => $analytics, 'normalized' => $normalized]);

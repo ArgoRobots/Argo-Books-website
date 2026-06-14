@@ -303,7 +303,20 @@ $home = INVGEN_BASE . '/profit-analyzer/';
   © <?= date('Y') ?> Argo Books
 </footer>
 
-<script>window.PA_ASSETS = <?= json_encode(INVGEN_BASE . '/profit-analyzer/assets/', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;</script>
+<script>
+  window.PA_ASSETS = <?= json_encode(INVGEN_BASE . '/profit-analyzer/assets/', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+  window.PA_TOOL = <?= json_encode(INVGEN_BASE . '/profit-analyzer/', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+  // An upload hands its result over via sessionStorage (Option A: nothing is
+  // stored server-side). When absent, result.js falls back to the bundled sample.
+  try {
+    var raw = sessionStorage.getItem('pa_result');
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      window.PA_ANALYTICS = parsed.analytics || null;
+      window.PA_NORMALIZED = parsed.normalized || null;
+    }
+  } catch (e) {}
+</script>
 <script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/echarts.min.js"></script>
 <script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/result.js"></script>
 </body>

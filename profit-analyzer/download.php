@@ -2,13 +2,24 @@
 // profit-analyzer/download.php
 //
 // Streams the cleaned, multi-sheet .xlsx for the "Download organized
-// spreadsheet" button. Under Option A (store nothing) the download is
-// generated in-session from the just-analyzed data; here it is generated from
-// the sample fixture as a stub until the real upload->analysis flow is wired.
+// spreadsheet" button. Under Option A (store nothing) the client holds the
+// analyzed NormalizedData for the session and POSTs it here to build the file
+// on demand. With no posted data (e.g. the sample-data demo) it falls back to
+// the sample fixture.
 
 require_once __DIR__ . '/lib/export.php';
 
-$normalized = pa_load_fixture('maple-goods');
+$normalized = null;
+$raw = file_get_contents('php://input');
+if ($raw !== false && $raw !== '') {
+    $body = json_decode($raw, true);
+    if (is_array($body) && isset($body['normalized']) && is_array($body['normalized'])) {
+        $normalized = pa_normalize($body['normalized']);
+    }
+}
+if ($normalized === null) {
+    $normalized = pa_load_fixture('maple-goods');
+}
 if ($normalized === null) {
     http_response_code(500);
     header('Content-Type: text/plain');

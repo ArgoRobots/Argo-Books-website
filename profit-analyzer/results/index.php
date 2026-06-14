@@ -241,7 +241,7 @@ $home = INVGEN_BASE . '/profit-analyzer/';
         <tbody id="cleanBody"></tbody>
       </table>
     </div>
-    <div class="cleanfoot"><span id="rowcount"></span><span><b>Download</b> the full cleaned spreadsheet above</span></div>
+    <div class="pgfoot" id="cleanFoot"></div>
   </div>
 
   <div class="email">

@@ -127,6 +127,49 @@
       .catch(function(){ el.innerHTML='<div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">World map could not load.</div>'; });
   }
 
+  // ---------- pagination (matches the Argo Books app's table footer) ----------
+  var CHEV_L='<svg viewBox="0 0 24 24" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>';
+  var CHEV_R='<svg viewBox="0 0 24 24" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+  function pageWindow(cur, total){ // sliding window of up to 5 numbers
+    var start=Math.max(1, cur-2), end=Math.min(total, start+4); start=Math.max(1, end-4);
+    var a=[]; for(var i=start;i<=end;i++)a.push(i); return a;
+  }
+  function pagerText(total, page, size, totalPages, noun){
+    if(total===0) return '0 '+noun.plural;
+    if(totalPages<=1) return total===1 ? ('1 '+noun.singular) : (total+' '+noun.plural);
+    var s=(page-1)*size+1, e=Math.min(page*size, total);
+    return s+'-'+e+' of '+total+' '+noun.plural;
+  }
+  // rows: full array; foot: footer element; renderRows(pageRows): fills the body.
+  function buildPager(rows, foot, renderRows, noun){
+    var state={size:10, page:1};
+    function totalPages(){ return Math.max(1, Math.ceil(rows.length/state.size)); }
+    function draw(){
+      var tp=totalPages(); if(state.page>tp) state.page=tp;
+      var start=(state.page-1)*state.size;
+      renderRows(rows.slice(start, start+state.size));
+      var right='';
+      if(tp>1){
+        var nums=pageWindow(state.page,tp).map(function(p){ return '<button class="pgbtn'+(p===state.page?' active':'')+'" data-p="'+p+'">'+p+'</button>'; }).join('');
+        right='<div class="pgpages"><button class="pgbtn" data-act="prev"'+(state.page===1?' disabled':'')+'>'+CHEV_L+'</button>'+nums
+          +'<button class="pgbtn" data-act="next"'+(state.page===tp?' disabled':'')+'>'+CHEV_R+'</button></div>';
+      }
+      foot.innerHTML='<div class="pgleft"><span>'+esc(pagerText(rows.length,state.page,state.size,tp,noun))+'</span>'
+        +'<span class="pgsep">|</span><span>Rows per page:</span>'
+        +'<select class="pgsize">'+[10,25,50,100].map(function(s){ return '<option'+(s===state.size?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></div>'+right;
+      foot.querySelector('.pgsize').onchange=function(){ state.size=parseInt(this.value,10); state.page=1; draw(); };
+      foot.querySelectorAll('.pgpages .pgbtn').forEach(function(b){ b.onclick=function(){
+        var act=b.dataset.act;
+        if(act==='prev'){ if(state.page>1) state.page--; }
+        else if(act==='next'){ if(state.page<totalPages()) state.page++; }
+        else { state.page=parseInt(b.dataset.p,10); }
+        draw();
+      }; });
+    }
+    draw();
+  }
+  function nounFor(label){ var p=String(label||'rows').toLowerCase(); return {plural:p, singular:p.replace(/s$/,'')}; }
+
   // ---------- generic card renderer (products / customers tabs) ----------
   function renderCards(panelName, cards){
     var grid=document.querySelector('.panel[data-panel="'+panelName+'"] .cgrid'); if(!grid)return;
@@ -136,12 +179,17 @@
       div.className='chartcard'+(card.span2?' span2':'');
       var html='<div class="ttl">'+esc(card.title)+'</div>'+(card.meta?'<div class="cmeta">'+esc(card.meta)+'</div>':'');
       if(card.type==='table'){
+        var bid='cb_'+panelName+'_'+idx, fid='cf_'+panelName+'_'+idx;
         html+='<div style="overflow:auto"><table class="dtable"><thead><tr>'
           + card.columns.map(function(c){ return '<th>'+esc(c)+'</th>'; }).join('')
-          + '</tr></thead><tbody>'
-          + card.rows.map(function(r){ return '<tr>'+r.map(function(v){ return '<td>'+esc(v)+'</td>'; }).join('')+'</tr>'; }).join('')
-          + '</tbody></table></div>';
+          + '</tr></thead><tbody id="'+bid+'"></tbody></table></div>'
+          + '<div class="pgfoot" id="'+fid+'"></div>';
         div.innerHTML=html; grid.appendChild(div);
+        var bodyEl=document.getElementById(bid);
+        var noun=card.noun ? {plural:card.noun+'s', singular:card.noun} : nounFor('rows');
+        buildPager(card.rows, document.getElementById(fid), function(pageRows){
+          bodyEl.innerHTML=pageRows.map(function(r){ return '<tr>'+r.map(function(v){ return '<td>'+esc(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+        }, noun);
       } else {
         var id='cc_'+panelName+'_'+idx;
         html+='<div class="ec" id="'+id+'"></div>';
@@ -181,7 +229,7 @@
     var tabsEl=document.getElementById('cleanTabs');
     var head=document.getElementById('cleanHead');
     var body=document.getElementById('cleanBody');
-    var label=document.getElementById('rowcount');
+    var foot=document.getElementById('cleanFoot');
     var wrap=document.querySelector('.cleanwrap');
     if(!tabsEl||!head||!body){ return; }
     if(!sheets.length){ if(wrap)wrap.style.display='none'; var st=document.querySelector('.sectitle'); if(st)st.style.display='none'; return; }
@@ -189,8 +237,9 @@
     function renderSheet(i){
       var s=sheets[i];
       head.innerHTML='<tr>'+s.columns.map(function(c,j){ return '<th'+(s.aligns[j]==='right'?' style="text-align:right"':'')+'>'+esc(c)+'</th>'; }).join('')+'</tr>';
-      body.innerHTML=s.rows.map(function(r){ return '<tr>'+r.map(function(v,j){ return '<td'+(s.aligns[j]==='right'?' class="num"':'')+'>'+esc(v)+'</td>'; }).join('')+'</tr>'; }).join('');
-      if(label) label.textContent=s.rows.length+' '+s.label.toLowerCase()+' '+(s.rows.length===1?'row':'rows');
+      buildPager(s.rows, foot, function(pageRows){
+        body.innerHTML=pageRows.map(function(r){ return '<tr>'+r.map(function(v,j){ return '<td'+(s.aligns[j]==='right'?' class="num"':'')+'>'+esc(v)+'</td>'; }).join('')+'</tr>'; }).join('');
+      }, nounFor(s.label));
     }
     tabsEl.querySelectorAll('.ctab').forEach(function(t){ t.onclick=function(){ tabsEl.querySelectorAll('.ctab').forEach(function(x){x.classList.remove('active');}); t.classList.add('active'); renderSheet(+t.dataset.i); }; });
     renderSheet(0);

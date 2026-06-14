@@ -208,7 +208,7 @@ function pa_compute_analytics(array $normalized): array
                 pa_lookup($suppliers, $p['supplierId'] ?? '', 'name'),
             ];
         }
-        $cards[] = ['title' => 'Product catalog', 'meta' => count($products) . ' items', 'type' => 'table', 'span2' => true,
+        $cards[] = ['title' => 'Product catalog', 'meta' => count($products) . ' items', 'type' => 'table', 'span2' => true, 'noun' => 'product',
             'columns' => ['Name', 'SKU', 'Category', 'Type', 'Supplier'], 'rows' => $catalog];
         $result['products'] = [
             'kpis' => [
@@ -247,7 +247,7 @@ function pa_compute_analytics(array $normalized): array
             $list[] = [(string) ($c['name'] ?? ''), (string) ($c['company'] ?? ''), (string) ($c['email'] ?? ''),
                 (string) ($c['city'] ?? ''), (string) ($c['country'] ?? ''), (string) ($c['status'] ?? '')];
         }
-        $cards[] = ['title' => 'Customer list', 'meta' => count($customers) . ' customers', 'type' => 'table', 'span2' => true,
+        $cards[] = ['title' => 'Customer list', 'meta' => count($customers) . ' customers', 'type' => 'table', 'span2' => true, 'noun' => 'customer',
             'columns' => ['Name', 'Company', 'Email', 'City', 'Country', 'Status'], 'rows' => $list];
         $avgVal = $revenue && count($customers) > 0 ? pa_money($revTotal / count($customers)) : null;
         $kpis = [

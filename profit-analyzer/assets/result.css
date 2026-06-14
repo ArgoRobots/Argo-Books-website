@@ -111,6 +111,17 @@ a{color:inherit;text-decoration:none}
 .pill{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
 .pill.cat{background:#eef2ff;color:#4338ca}.pill.exp{background:#fef2f2;color:#b91c1c}.pill.inc{background:#ecfdf5;color:#047857}
 .cleanfoot{display:flex;justify-content:space-between;padding:13px 18px;background:#fbfdff;border-top:1px solid var(--line);font-size:13px;color:var(--gray-500)}
+/* Pagination footer (matches the Argo Books app's table pagination) */
+.pgfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:11px 18px;border-top:1px solid var(--line)}
+.pgleft{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--gray-500)}
+.pgsep{color:var(--gray-400)}
+.pgsize{font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:4px;padding:4px 8px;min-height:28px;cursor:pointer;font-family:inherit}
+.pgpages{display:flex;align-items:center;gap:4px}
+.pgbtn{width:32px;height:32px;border:0;background:transparent;border-radius:6px;font:500 13px "Hanken Grotesk";color:var(--gray-500);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .12s}
+.pgbtn:hover:not(:disabled):not(.active){background:rgba(100,116,139,.14)}
+.pgbtn.active{background:var(--blue-600);color:#fff}
+.pgbtn:disabled{opacity:.4;cursor:default}
+.pgbtn svg{width:16px;height:16px;stroke:currentColor;fill:none}
 .email{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px 24px;margin-top:24px}
 .email .t{flex:1;min-width:220px}.email .t b{font-size:15.5px;display:block}.email .t span{font-size:13.5px;color:var(--gray-500)}
 .email form{display:flex;gap:10px}

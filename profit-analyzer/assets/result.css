@@ -76,6 +76,7 @@ a{color:inherit;text-decoration:none}
 .keptstat{text-align:right;flex:0 0 auto;line-height:1.05}
 .keptstat b{font-family:"Fraunces",serif;font-size:32px;font-weight:600;color:#10a37f;display:block}
 .keptstat span{font-size:11px;color:var(--gray-400);font-weight:600;text-transform:uppercase;letter-spacing:.07em}
+.keptstat.neg b{color:var(--red)}
 
 /* tables */
 .dtable{width:100%;border-collapse:collapse;font-size:13px}
@@ -158,6 +159,7 @@ a{color:inherit;text-decoration:none}
 [data-theme="dark"] .kpi.good .val,[data-theme="dark"] .dtable .pos{color:#34d399}
 [data-theme="dark"] .kpi.bad .val,[data-theme="dark"] .dtable .neg{color:#f87171}
 [data-theme="dark"] .rhead h1 em,[data-theme="dark"] .keptstat b,[data-theme="dark"] .cleantable td.amt.inc{color:#34d399}
+[data-theme="dark"] .keptstat.neg b{color:#f87171}
 [data-theme="dark"] .themetoggle{border-color:rgba(255,255,255,.14);color:#cbd5e1}
 [data-theme="dark"] .themetoggle:hover{background:rgba(255,255,255,.06)}
 [data-theme="dark"] .themetoggle .ic-moon{display:none}

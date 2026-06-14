@@ -52,7 +52,9 @@
   function sankeyColor(name){
     var n=name.toLowerCase();
     if(n==='revenue') return '#6f8fb3';
+    if(n==='total costs'||n==='total spent') return '#8aa0b8'; // neutral funding node
     if(n==='profit') return '#1f9d6b';
+    if(n==='loss'||n==='shortfall') return '#c9544f'; // the red shortfall stream
     if(/cost|ads|advert|fee|other|shipping|expense/.test(n)) return '#d76b66'; // leaks (red)
     return '#6fae93'; // surviving stages (green)
   }
@@ -212,7 +214,14 @@
   }
   function renderFlowStat(){
     var d=A.dashboard; if(!d||!d.flow)return;
-    var stat=document.querySelector('.keptstat b'); if(stat)stat.textContent=(d.flow.kept||0)+'%';
+    var kept=d.flow.kept||0;
+    var stat=document.querySelector('.keptstat b'); if(stat)stat.textContent=kept+'%';
+    var ks=document.querySelector('.keptstat');
+    if(ks){
+      var neg=kept<0;
+      ks.classList.toggle('neg', neg);
+      var span=ks.querySelector('span'); if(span) span.textContent = neg ? 'lost to costs' : 'kept as profit';
+    }
   }
   function renderMeta(){
     var m=A.meta||{};

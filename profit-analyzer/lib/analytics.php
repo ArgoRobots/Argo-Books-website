@@ -125,27 +125,49 @@ function pa_compute_analytics(array $normalized): array
     if ($revTotal > 0 || $expTotal > 0) {
         $result['tabs'][] = 'dashboard';
 
-        // staged money-flow (Profit = revenue - all expenses, always correct)
-        $nodes = ['Revenue' => round($revTotal)];
-        $links = [];
-        $surv = 'Revenue'; $survVal = $revTotal;
-        $stages = [
-            ['leak' => 'Cost of goods',    'val' => $cogs,  'next' => 'Gross profit'],
-            ['leak' => 'Ads & marketing',  'val' => $ads,   'next' => 'After ads'],
-            ['leak' => 'Fees',             'val' => $fees,  'next' => 'After fees'],
-            ['leak' => 'Other costs',      'val' => $other, 'next' => 'Profit'],
-        ];
-        // drop zero leaks, and make the last surviving stage land on "Profit"
-        $stages = array_values(array_filter($stages, fn($s) => $s['val'] > 0));
-        foreach ($stages as $i => $s) {
-            $isLast = ($i === count($stages) - 1);
-            $nextName = $isLast ? 'Profit' : $s['next'];
-            $nextVal = $survVal - $s['val'];
-            $nodes[$s['leak']] = round($s['val']);
-            $nodes[$nextName] = round($nextVal);
-            $links[] = [$surv, $s['leak'], round($s['val'])];
-            $links[] = [$surv, $nextName, round($nextVal)];
-            $surv = $nextName; $survVal = $nextVal;
+        $nodes = []; $links = [];
+        if ($netProfit >= 0) {
+            // Profit case: a waterfall — revenue peels off each cost, the remainder
+            // survives to the next stage, and the final remainder is Profit. Safe
+            // because every intermediate remainder stays >= profit >= 0.
+            $nodes = ['Revenue' => round($revTotal)];
+            $surv = 'Revenue'; $survVal = $revTotal;
+            $stages = [
+                ['leak' => 'Cost of goods',    'val' => $cogs,  'next' => 'Gross profit'],
+                ['leak' => 'Ads & marketing',  'val' => $ads,   'next' => 'After ads'],
+                ['leak' => 'Fees',             'val' => $fees,  'next' => 'After fees'],
+                ['leak' => 'Other costs',      'val' => $other, 'next' => 'Profit'],
+            ];
+            $stages = array_values(array_filter($stages, fn($s) => $s['val'] > 0));
+            foreach ($stages as $i => $s) {
+                $isLast = ($i === count($stages) - 1);
+                $nextName = $isLast ? 'Profit' : $s['next'];
+                $nextVal = $survVal - $s['val'];
+                $nodes[$s['leak']] = round($s['val']);
+                $nodes[$nextName] = round($nextVal);
+                $links[] = [$surv, $s['leak'], round($s['val'])];
+                $links[] = [$surv, $nextName, round($nextVal)];
+                $surv = $nextName; $survVal = $nextVal;
+            }
+        } else {
+            // Loss case: the waterfall would go negative (you can't keep peeling
+            // costs off a remainder that's already gone). Instead show a funding
+            // view — Revenue plus a red "Loss" stream fund Total costs, which then
+            // splits into the cost categories. Balances exactly, no negative links.
+            $loss = $expTotal - $revTotal;
+            $nodes = ['Revenue' => round($revTotal), 'Loss' => round($loss), 'Total costs' => round($expTotal)];
+            $links[] = ['Revenue', 'Total costs', round($revTotal)];
+            $links[] = ['Loss', 'Total costs', round($loss)];
+            $cats = array_filter([
+                'Cost of goods'   => $cogs,
+                'Ads & marketing' => $ads,
+                'Fees'            => $fees,
+                'Other costs'     => $other,
+            ], fn($v) => $v > 0);
+            foreach ($cats as $name => $val) {
+                $nodes[$name] = round($val);
+                $links[] = ['Total costs', $name, round($val)];
+            }
         }
 
         $revByProductMap = [];

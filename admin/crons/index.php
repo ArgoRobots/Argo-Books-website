@@ -170,7 +170,15 @@ function relative_time_ago($datetime) {
 function cron_status_pill($latest, $expectedIntervalHours) {
     if (!$latest) return ['class' => 'status-stale', 'label' => 'No runs'];
     if ($latest['status'] === 'error') return ['class' => 'status-error', 'label' => 'Error'];
-    if ($latest['status'] === 'running') return ['class' => 'status-running', 'label' => 'Running'];
+    if ($latest['status'] === 'running') {
+        // A row stuck in 'running' well past when the run should have finished is
+        // an orphan (process died before recording a result), not a live run.
+        $runHours = (time() - strtotime($latest['started_at'])) / 3600;
+        if ($runHours > max($expectedIntervalHours, 1)) {
+            return ['class' => 'status-error', 'label' => 'Stalled'];
+        }
+        return ['class' => 'status-running', 'label' => 'Running'];
+    }
     $ageHours = (time() - strtotime($latest['started_at'])) / 3600;
     if ($ageHours > $expectedIntervalHours * 2) return ['class' => 'status-stale', 'label' => 'Stale'];
     return ['class' => 'status-ok', 'label' => 'OK'];

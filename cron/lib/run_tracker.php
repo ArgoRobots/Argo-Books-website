@@ -36,7 +36,27 @@ function cron_run_start(PDO $pdo, string $cronName): int
     try {
         $stmt = $pdo->prepare("INSERT INTO cron_runs (cron_name, started_at, status) VALUES (?, NOW(), 'running')");
         $stmt->execute([$cronName]);
-        return (int) $pdo->lastInsertId();
+        $runId = (int) $pdo->lastInsertId();
+
+        // Safety net: if the process dies before cron_run_finish() runs (fatal
+        // Error, timeout, OOM, or an early return that forgets to finish), mark
+        // the orphaned row as errored at shutdown so it doesn't sit as 'running'
+        // forever and show a permanent "Running" pill. No-op once finished, since
+        // the WHERE clause only matches rows still in 'running'.
+        register_shutdown_function(static function () use ($pdo, $runId) {
+            try {
+                $stmt = $pdo->prepare(
+                    "UPDATE cron_runs SET status = 'error', completed_at = NOW(),
+                        error_message = COALESCE(error_message, 'process exited without finishing')
+                     WHERE id = ? AND status = 'running'"
+                );
+                $stmt->execute([$runId]);
+            } catch (Throwable $e) {
+                // Shutdown context: nothing useful to do, swallow.
+            }
+        });
+
+        return $runId;
     } catch (Throwable $e) {
         error_log("cron_run_start failed for '$cronName': " . $e->getMessage());
         return 0;

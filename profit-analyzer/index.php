@@ -78,7 +78,7 @@ $schema = json_encode([
       <div class="small">.xlsx or .csv · any spreadsheet or export</div>
       <span class="pick">Choose file</span>
     </label>
-    <div class="or-sample rise d4">or <a href="<?= $results ?>">try it with sample data →</a></div>
+    <div class="or-sample rise d4">or <a href="<?= $results ?>?sample=1">try it with sample data →</a></div>
     <div class="upload-err rise" id="paError" role="alert" hidden></div>
 
     <div class="trust-line rise d5">

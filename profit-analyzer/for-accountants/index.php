@@ -64,7 +64,7 @@ $schema = json_encode([
     <h1 class="rise d2">Turn a client's<br><em style="white-space:nowrap">messy spreadsheet</em><br>into clean, structured books.</h1>
     <p class="sub rise d3">Drop in the disorganized file your client sent. Get back a tidy, categorized, ready-to-work spreadsheet in about 60 seconds. Free.</p>
 
-    <a class="upload rise d4" href="<?= $results ?>">
+    <a class="upload rise d4" href="<?= $results ?>?sample=1">
       <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg></div>
       <div class="big">Drop your client's spreadsheet here</div>
       <div class="small">.xlsx or .csv · however messy it is</div>

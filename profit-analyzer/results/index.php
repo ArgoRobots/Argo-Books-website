@@ -289,14 +289,19 @@ $home = INVGEN_BASE . '/profit-analyzer/';
   window.PA_TOOL = <?= json_encode(INVGEN_BASE . '/profit-analyzer/', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
   // An upload hands its result over via sessionStorage (Option A: nothing is
   // stored server-side). When absent, result.js falls back to the bundled sample.
-  try {
-    var raw = sessionStorage.getItem('pa_result');
-    if (raw) {
-      var parsed = JSON.parse(raw);
-      window.PA_ANALYTICS = parsed.analytics || null;
-      window.PA_NORMALIZED = parsed.normalized || null;
-    }
-  } catch (e) {}
+  // The "try with sample data" link adds ?sample=1, which forces the bundled
+  // sample even when a previous upload is still sitting in sessionStorage.
+  var paSample = /[?&]sample=1(?:&|$)/.test(location.search);
+  if (!paSample) {
+    try {
+      var raw = sessionStorage.getItem('pa_result');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        window.PA_ANALYTICS = parsed.analytics || null;
+        window.PA_NORMALIZED = parsed.normalized || null;
+      }
+    } catch (e) {}
+  }
 </script>
 <script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/echarts.min.js"></script>
 <script src="<?= INVGEN_BASE ?>/profit-analyzer/assets/result.js"></script>

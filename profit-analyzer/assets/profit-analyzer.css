@@ -187,3 +187,6 @@ footer a{color:inherit;text-decoration:underline}
 @keyframes pa-spin{to{transform:rotate(360deg)}}
 .pa-overlay-title{font-family:"Fraunces",Georgia,serif;font-size:21px;font-weight:600;color:#f1f5f9;margin-bottom:8px}
 .pa-overlay-sub{font-size:14px;color:#94a3b8;line-height:1.5;min-height:42px}
+.pa-cancel{margin-top:18px;background:transparent;border:1px solid rgba(255,255,255,.18);color:#cbd5e1;
+  font:600 13.5px "Hanken Grotesk";padding:9px 22px;border-radius:10px;cursor:pointer;transition:.15s}
+.pa-cancel:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.3)}

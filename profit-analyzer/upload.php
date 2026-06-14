@@ -11,8 +11,12 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-// The analysis makes several sequential Gemini calls; give it room.
+// The analysis makes several sequential Gemini calls; give it room. Keep running
+// even if the client disconnects (e.g. the user hits Cancel) so the analysis
+// completes and still records the daily usage — Cancel must not be a way to dodge
+// the rate limit.
 @set_time_limit(300);
+ignore_user_abort(true);
 
 require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/lib/analytics.php';

@@ -202,7 +202,7 @@ $schema = json_encode([
       <a class="btn btn-primary btn-lg" href="<?= $cta ?>">Try Argo Books free →</a>
       <label class="mini-upload" for="paFile">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M5 18v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1"/></svg>
-        Analyze another spreadsheet — free
+        Analyze another spreadsheet - free
       </label>
     </div>
   </div>
@@ -219,6 +219,7 @@ $schema = json_encode([
     <div class="pa-spinner"></div>
     <div class="pa-overlay-title">Reading your spreadsheet…</div>
     <div class="pa-overlay-sub" id="paOverlaySub">Detecting columns and cleaning your data. This takes about a minute.</div>
+    <button type="button" class="pa-cancel" id="paCancel">Cancel</button>
   </div>
 </div>
 

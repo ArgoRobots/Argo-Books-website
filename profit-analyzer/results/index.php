@@ -31,6 +31,8 @@ $home = INVGEN_BASE . '/profit-analyzer/';
 <meta property="og:site_name" content="Argo Books">
 <link rel="stylesheet" href="<?= INVGEN_BASE ?>/profit-analyzer/assets/fonts.css">
 <link rel="stylesheet" href="<?= INVGEN_BASE ?>/profit-analyzer/assets/result.css">
+<script>/* Apply the saved theme before paint so it persists across uploads (no flash). */
+(function(){try{if(localStorage.getItem('pa_theme')==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 </head>
 <body>
 

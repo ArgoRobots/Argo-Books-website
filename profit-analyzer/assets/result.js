@@ -8,7 +8,8 @@
   var TOOL = window.PA_TOOL || '';
   var PALETTE = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#64748b','#14b8a6','#f97316'];
   var charts = {};
-  var dark = false, curTab = 'dashboard';
+  // Initial theme comes from the attribute set by the head script (persisted choice).
+  var dark = (document.documentElement.getAttribute('data-theme') === 'dark'), curTab = 'dashboard';
   var A = null; // the analytics payload
 
   function TT(){ return dark
@@ -302,10 +303,12 @@
   // ---------- dark toggle ----------
   function wireTheme(){
     var tbtn=document.getElementById('themeToggle'); if(!tbtn)return;
+    tbtn.setAttribute('aria-pressed', dark); // reflect the restored theme
     tbtn.addEventListener('click', function(){
       dark=!dark;
       document.documentElement.setAttribute('data-theme', dark?'dark':'light');
       tbtn.setAttribute('aria-pressed', dark);
+      try{ localStorage.setItem('pa_theme', dark?'dark':'light'); }catch(e){} // persist across uploads
       Object.keys(charts).forEach(function(k){ charts[k].dispose(); delete charts[k]; });
       Object.keys(built).forEach(function(k){ delete built[k]; });
       mapReady=mapReady; // keep registered map

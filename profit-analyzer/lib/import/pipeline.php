@@ -18,6 +18,7 @@ require_once __DIR__ . '/grid.php';
 require_once __DIR__ . '/analyzer.php';
 require_once __DIR__ . '/layout.php';
 require_once __DIR__ . '/categorize.php';
+require_once __DIR__ . '/currency.php';
 require_once __DIR__ . '/../contract.php';
 
 const PA_MAX_ROWS_PER_SHEET = 5000;
@@ -162,6 +163,7 @@ function pa_bridge_to_contract(array $results, string $filename): array
                 'taxAmount' => (float)($e['taxAmount'] ?? 0),
                 'total' => isset($e['total']) ? (float)$e['total'] : $amount + (float)($e['taxAmount'] ?? 0),
                 'paymentStatus' => $e['paymentStatus'] ?? 'Paid',
+                'originalCurrency' => $e['originalCurrency'] ?? '',
             ];
         }, $byKey['revenue']);
     }
@@ -180,6 +182,7 @@ function pa_bridge_to_contract(array $results, string $filename): array
                 'taxAmount' => (float)($e['taxAmount'] ?? 0),
                 'total' => isset($e['total']) ? (float)$e['total'] : $amount + (float)($e['taxAmount'] ?? 0),
                 'paymentMethod' => $e['paymentMethod'] ?? '',
+                'originalCurrency' => $e['originalCurrency'] ?? '',
             ];
         }, $byKey['expenses']);
         $entities['expenses'] = pa_categorize_expenses($entities['expenses']);
@@ -233,6 +236,7 @@ function pa_bridge_to_contract(array $results, string $filename): array
             'amountPaid' => (float)($e['amountPaid'] ?? 0),
             'balance' => (float)($e['balance'] ?? 0),
             'status' => $e['status'] ?? '',
+            'originalCurrency' => $e['originalCurrency'] ?? '',
         ], $byKey['invoices']);
     }
 
@@ -259,6 +263,7 @@ function pa_bridge_to_contract(array $results, string $filename): array
                 'taxAmount' => (float)($inv['taxAmount'] ?? 0),
                 'total' => (float)($inv['total'] ?? ($amount + (float)($inv['taxAmount'] ?? 0))),
                 'paymentStatus' => $status === 'Paid' ? 'Paid' : ($status ?: 'Unpaid'),
+                'originalCurrency' => $inv['originalCurrency'] ?? '',
             ];
         }, $entities['invoices']);
     }
@@ -271,14 +276,19 @@ function pa_bridge_to_contract(array $results, string $filename): array
         }
     }
 
+    // Detect the dominant currency and convert every monetary field into it
+    // (historical per-row rates). Runs after invoice->revenue synthesis so the
+    // synthesized rows are converted too. Returns the ISO code for meta/labeling.
+    $currency = pa_apply_currency($entities);
+
     return [
-        'meta' => pa_build_meta($entities, $filename),
+        'meta' => pa_build_meta($entities, $filename, $currency),
         'entities' => $entities,
     ];
 }
 
 /** Build meta: filename, detected currency, and the date range covered. */
-function pa_build_meta(array $entities, string $filename): array
+function pa_build_meta(array $entities, string $filename, string $currency = 'USD'): array
 {
     $dates = [];
     foreach (['revenue', 'expenses'] as $k) {
@@ -297,7 +307,7 @@ function pa_build_meta(array $entities, string $filename): array
 
     return [
         'filename' => $filename !== '' ? $filename : 'your-spreadsheet.xlsx',
-        'currency' => 'USD',
+        'currency' => $currency !== '' ? $currency : 'USD',
         'period' => $period,
         'flagged' => 0,
     ];

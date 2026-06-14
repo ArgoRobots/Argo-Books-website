@@ -11,6 +11,7 @@
   // Initial theme comes from the attribute set by the head script (persisted choice).
   var dark = (document.documentElement.getAttribute('data-theme') === 'dark'), curTab = 'dashboard';
   var A = null; // the analytics payload
+  var CUR = '$'; // currency symbol for this dataset (set in boot from meta)
 
   function TT(){ return dark
     ? {axis:'#8a97ab',split:'rgba(255,255,255,.08)',axisLine:'rgba(255,255,255,.13)',tipBg:'#111c33',tipBorder:'rgba(255,255,255,.12)',tipText:'#e2e8f0',sankN:'#cbd5e1',sankV:'#8a97ab'}
@@ -35,7 +36,7 @@
       series:series.map(function(s){ return {name:s.name,type:'bar',stack:opt.stack?'t':null,data:s.data,barMaxWidth:opt.thin?16:26,itemStyle:{color:s.color,borderRadius:opt.stack?0:[4,4,0,0]}}; }) });
   }
   function pie(data, money){
-    return base({ tooltip:tip({trigger:'item',formatter: money?'{b}: ${c} ({d}%)':'{b}: {c} ({d}%)'}),
+    return base({ tooltip:tip({trigger:'item',formatter: money?('{b}: '+CUR+'{c} ({d}%)'):'{b}: {c} ({d}%)'}),
       legend:{type:'scroll',orient:'vertical',right:6,top:'middle',icon:'circle',itemWidth:10,itemHeight:10,textStyle:{color:TT().axis,fontSize:12}},
       series:[{type:'pie',radius:['46%','72%'],center:['36%','52%'],avoidLabelOverlap:true,label:{show:false},
         itemStyle:{borderColor:'#fff',borderWidth:2,borderRadius:4},
@@ -63,7 +64,7 @@
     var el=document.getElementById('sankeyChart'); if(!el||charts.sankey||!flow)return;
     var c=echarts.init(el,null,{renderer:'svg'}); charts.sankey=c;
     var VAL=flow.nodes||{}; var REV=VAL['Revenue']||1;
-    function f(n){return '$'+Number(n).toLocaleString('en-US');}
+    function f(n){return CUR+Number(n).toLocaleString('en-US');}
     var L=(flow.links||[]).map(function(a){return {source:a[0],target:a[1],value:a[2]};});
     var t=TT(), pn=dark?'#5cf0b4':'#0f766e', pv=dark?'#34d399':'#10a37f';
     var nodes=Object.keys(VAL).map(function(n){ var o={name:n,value:VAL[n],itemStyle:{color:sankeyColor(n),borderWidth:0,borderRadius:6}};
@@ -118,7 +119,7 @@
     var maxv=mapData.reduce(function(m,d){return Math.max(m,d.value);},0)||1;
     function draw(){
       var c=echarts.init(el,null,{renderer:'svg'}); charts.geoMap=c; var t=TT();
-      c.setOption(base({ tooltip:tip({trigger:'item',formatter:function(p){return p.name+(p.value?': $'+Number(p.value).toLocaleString():': —');}}),
+      c.setOption(base({ tooltip:tip({trigger:'item',formatter:function(p){return p.name+(p.value?': '+CUR+Number(p.value).toLocaleString():': —');}}),
         visualMap:{left:14,bottom:14,min:0,max:maxv,calculable:true,inRange:{color:dark?['#1e3356','#2f6fd0','#7db4ff']:['#dbeafe','#60a5fa','#1e40af']},text:['High','Low'],textStyle:{color:t.axis}},
         series:[{type:'map',map:'world',roam:false,itemStyle:{areaColor:dark?'#16223c':'#eef2f7',borderColor:dark?'rgba(255,255,255,.10)':'#dbe2ec'},emphasis:{itemStyle:{areaColor:'#10b981'},label:{show:false}},
           data:mapData}] }));
@@ -385,7 +386,7 @@
     window.addEventListener('resize', function(){ Object.keys(charts).forEach(function(k){ charts[k].resize(); }); });
   }
 
-  function boot(data){ A=data||{}; if(!A.tabs)A.tabs=[]; render(); }
+  function boot(data){ A=data||{}; if(!A.tabs)A.tabs=[]; CUR=(A.meta&&A.meta.currencySymbol)||'$'; render(); }
 
   if(window.PA_ANALYTICS){ boot(window.PA_ANALYTICS); }
   else {

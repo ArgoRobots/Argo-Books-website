@@ -118,7 +118,8 @@ function pa_email_html(array $a, float $rev, float $exp, float $profit, int $mar
     $file = htmlspecialchars($a['meta']['filename'] ?? 'your spreadsheet');
     $hTitle = $a['headline']['title'] ?? '';
     $hDetail = $a['headline']['detail'] ?? '';
-    $m = fn($n) => '$' . number_format(round($n));
+    $sym = $a['meta']['currencySymbol'] ?? pa_currency_symbol($a['meta']['currency'] ?? 'USD');
+    $m = fn($n) => $sym . number_format(round($n));
 
     $stat = fn($label, $val, $color) =>
         '<td align="center" style="padding:12px 8px;border:1px solid #e6ebf2;">'

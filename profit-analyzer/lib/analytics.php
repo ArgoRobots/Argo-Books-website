@@ -11,8 +11,15 @@
 
 require_once __DIR__ . '/contract.php';
 require_once __DIR__ . '/export.php'; // pa_build_workbook + pa_lookup, reused for the cleaned table
+require_once __DIR__ . '/import/currency.php'; // pa_currency_symbol for currency-aware formatting
 
-function pa_money(float $n): string { return '$' . number_format(round($n)); }
+/**
+ * Currency symbol used by pa_money() and the cleaned-table money cells. Set once
+ * per compute from the normalized meta, so all server-rendered amounts carry the
+ * dominant currency's symbol instead of a hardcoded "$".
+ */
+function pa_set_money_symbol(string $code): void { $GLOBALS['pa_cur_symbol'] = pa_currency_symbol($code); }
+function pa_money(float $n): string { return ($GLOBALS['pa_cur_symbol'] ?? '$') . number_format(round($n)); }
 function pa_pct(float $n, float $of): int { return $of > 0 ? (int) round($n / $of * 100) : 0; }
 function pa_month(string $date): string { return date('M', strtotime($date)); }
 
@@ -72,6 +79,8 @@ function pa_compute_analytics(array $normalized): array
     $n = pa_normalize($normalized);
     $E = $n['entities'];
     $meta = $n['meta'];
+    $currency = $meta['currency'] ?? 'USD';
+    pa_set_money_symbol($currency); // all pa_money() output below uses this currency's symbol
 
     $revenue   = $E['revenue'];
     $expenses  = $E['expenses'];
@@ -100,6 +109,8 @@ function pa_compute_analytics(array $normalized): array
             'filename' => $meta['filename'] ?? 'your-spreadsheet.xlsx',
             'rows' => $totalRows,
             'flagged' => (int) ($meta['flagged'] ?? 0),
+            'currency' => $currency,
+            'currencySymbol' => pa_currency_symbol($currency),
         ],
         'tabs' => [],
         'headline' => null,
@@ -349,7 +360,7 @@ function pa_cleaned_sheets(array $normalized): array
                 $h = $headers[$i] ?? '';
                 if (is_int($v) || is_float($v)) {
                     if (in_array($h, $money, true)) {
-                        $cells[] = '$' . number_format((float) $v, 2);
+                        $cells[] = ($GLOBALS['pa_cur_symbol'] ?? '$') . number_format((float) $v, 2);
                     } else {
                         // Quantity / reorder point: plain integer-ish.
                         $cells[] = rtrim(rtrim(number_format((float) $v, 2, '.', ''), '0'), '.');

@@ -1,13 +1,13 @@
 <?php
 /**
- * Outreach Reply Detection Cron
+ * reply_checker.php
  *
  * Polls the contact mailbox via IMAP, matches incoming emails against
  * outreach leads in 'contacted' status, and auto-promotes matched leads
  * to 'replied'. Admins can then manually classify as interested/not_interested.
  *
- * RECOMMENDED SCHEDULE: Hourly
- *   0 * * * * /usr/local/bin/php /path/to/cron/reply_checker.php
+ * Schedule: hourly.
+ *   0 * * * * /usr/bin/php /home/argorobots/public_html/cron/reply_checker.php
  *
  * Requires:
  *   - PHP imap extension enabled (cPanel → Select PHP Version → Extensions)

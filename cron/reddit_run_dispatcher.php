@@ -12,16 +12,13 @@ declare(strict_types=1);
  * So the button just records reddit_settings.manual_run_requested_at; this cron
  * polls for that flag and runs reddit_monitor via CLI, which has no such limit.
  *
- * Schedule: every 2 minutes (see crontab line below / read-me/Cron jobs.md).
- *
  * Lightweight by design: when no run is requested it does a single SELECT and
  * exits, so a tight schedule is cheap. It does not write to cron_runs;
  * reddit_monitor tracks its own run when the dispatcher fires it.
+ *
+ * Schedule: every 2 minutes.
+ *   *\/2 * * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_run_dispatcher.php
  */
-
-// Crontab line (kept out of the block comment above because the "*/2" cron
-// syntax would close it early):
-//   */2 * * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_run_dispatcher.php
 
 // CLI / cron only.
 if (php_sapi_name() !== 'cli' && !empty($_SERVER['REMOTE_ADDR'])) {

@@ -5,28 +5,22 @@ declare(strict_types=1);
  * indexnow_submit.php
  *
  * Pings IndexNow (Bing, Yandex, DuckDuckGo, Seznam, Naver, ...) with the pages
- * whose source files changed since the last successful run, so freshly
- * deployed or edited pages get recrawled quickly without manual submission.
- * Google does NOT participate in IndexNow, so this does nothing for Google;
- * keep using Search Console there.
+ * whose source files changed since the last successful run, so freshly deployed
+ * or edited pages get recrawled quickly without manual submission. The URL list
+ * and each page's mtime come from sitemap_build_urls() (the same source the XML
+ * sitemap uses). State (epoch of last successful submit) lives in
+ * cron/logs/indexnow_last_submit; the first run with no watermark submits every
+ * URL once as a bootstrap unless --baseline is passed. Google does NOT
+ * participate in IndexNow; keep using Search Console there.
  *
- * The URL list and each page's modification time come from sitemap_build_urls()
- * (the same source the XML sitemap uses), so a new page is announced
- * automatically. "Changed" is decided by file mtime, which on the server
- * reflects the last deploy that touched the file.
- *
- * Schedule: daily.
- *   0 5 * * * php /home/argorobots/public_html/cron/indexnow_submit.php
+ * Schedule: daily at 5:00 AM.
+ *   0 5 * * * /usr/bin/php /home/argorobots/public_html/cron/indexnow_submit.php
  *
  * Flags:
  *   --all        Submit every URL regardless of mtime (force a full re-ping).
- *   --dry-run    Log what would be submitted without calling IndexNow.
  *   --baseline   Record "now" as the watermark without submitting anything
  *                (use once if you do NOT want the first run to ping every URL).
- *
- * State: the epoch of the last successful submit is stored in
- * cron/logs/indexnow_last_submit. On the very first run (no watermark) every
- * URL is submitted once as a bootstrap, unless --baseline is passed.
+ *   --dry-run    Log what would be submitted without calling IndexNow.
  */
 
 // CLI / cron only.

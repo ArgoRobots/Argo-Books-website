@@ -1,25 +1,22 @@
 <?php
 /**
- * Fully Automated Outreach Pipeline Cron
+ * outreach_pipeline.php
  *
- * Runs the complete outreach pipeline automatically:
- *   1. Pick the next target city from the expansion list
- *   2. Discover businesses via Google Places
- *   3. Import them (skip duplicates)
- *   4. Generate AI email drafts for leads without one
- *   5. Auto-approve drafts
- *   6. Send approved emails (up to daily limit)
+ * Runs the complete outreach pipeline automatically: picks the next target city
+ * from the expansion list, discovers businesses via Google Places, imports them
+ * (skipping duplicates), generates AI email drafts for leads without one,
+ * auto-approves drafts, and sends approved emails up to the daily limit. Full
+ * detail in read-me/Cron jobs.md.
  *
- * RECOMMENDED SCHEDULE: Daily at 8:00 AM (before the send window)
- *   0 8 * * * /usr/bin/php /path/to/outreach_pipeline.php
+ * Schedule: daily at 8:00 AM.
+ *   0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/outreach_pipeline.php
  *
- * Manual execution:
- *   php outreach_pipeline.php
- *   php outreach_pipeline.php --discover-only   # Only run discovery + import (Google Places + Shopify)
- *   php outreach_pipeline.php --shopify-only    # Only run Shopify discovery
- *   php outreach_pipeline.php --draft-only      # Only run draft generation
- *   php outreach_pipeline.php --send-only       # Only run send (same as outreach_email.php)
- *   php outreach_pipeline.php --dry-run         # Log what would happen without doing it
+ * Flags:
+ *   --discover-only   Only run discovery + import (Google Places + Shopify)
+ *   --shopify-only    Only run Shopify discovery
+ *   --draft-only      Only run draft generation
+ *   --send-only       Only run send (same as outreach_email.php)
+ *   --dry-run         Log what would happen without doing it
  */
 
 set_time_limit(600); // 10 minutes max for full pipeline

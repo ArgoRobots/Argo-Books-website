@@ -1,15 +1,16 @@
 <?php
 /**
- * Reddit posted-reply status checker.
+ * reddit_status_check.php
  *
- * Runs every 2 hours. For each thread with status='replied', re-checks the
- * posted comment via Reddit API on a staggered schedule (30min / 2h / 6h /
- * 24h / 72h after posting), classifies reply_status, captures engagement
- * (upvotes + replies), then rolls up per-subreddit removal stats and
- * applies the auto-disable rule.
+ * For each thread with status='replied', re-checks the posted comment via
+ * Reddit API on a staggered schedule (30min / 2h / 6h / 24h / 72h after
+ * posting), classifies reply_status, captures engagement (upvotes + replies),
+ * then rolls up per-subreddit removal stats and applies the auto-disable rule.
+ * Idempotent: each row tracks its own check_count + last_checked_at so we never
+ * over-check.
  *
- * Idempotent: safe to run on any schedule. Each row tracks its own
- * check_count + last_checked_at so we never over-check.
+ * Schedule: every 2 hours.
+ *   0 *\/2 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_status_check.php
  */
 
 set_time_limit(600);

@@ -1,24 +1,17 @@
 <?php
 /**
- * Reddit discovery cron.
+ * reddit_monitor.php
  *
- * Runs daily at 8am (and manually via admin "Run discovery now").
+ * Reddit discovery pipeline: pulls the last 24h from each watchlist subreddit and
+ * runs keyword searches, dedups by reddit_id, scores threads (rules-based then AI
+ * relevance), pre-generates drafts for strong matches, auto-expires stale threads
+ * older than 3 days, and updates reddit_settings diagnostics. Full detail in
+ * read-me/Cron jobs.md.
  *
- * Pipeline:
- *   1. Pull last 24h from each enabled watchlist subreddit
- *   2. Run global Reddit search for each enabled keyword (t=day)
- *   3. Dedup by reddit_id (a thread hitting both sources gets discovery_source=both)
- *   4. Score each new thread (rules-based 0-100)
- *   5. Threads scoring < rules_score_floor → status='skipped'
- *   6. For passing threads: fetch top comments, run AI relevance check
- *   7. Threads with ai_relevance < ai_relevance_floor → status='skipped'
- *   8. Threads with ai_relevance ≥ 8 → pre-generate draft, status='drafted'
- *   9. Threads with ai_relevance 6-7 → status='drafted_pending' (on-demand draft)
- *  10. Auto-expire `new`, `drafted`, and `drafted_pending` threads older than 3 days
- *      (including `new` catches AI-failure retries that never got reprocessed)
- *  11. Update reddit_settings diagnostics
+ * Schedule: daily at 8:00 AM.
+ *   0 8 * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_monitor.php
  *
- * Manual flags:
+ * Flags:
  *   --dry-run    Log what would happen without writing drafts or status changes
  *   --verbose    Print each step's progress to stdout
  */

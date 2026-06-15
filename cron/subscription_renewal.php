@@ -1,28 +1,13 @@
 <?php
 /**
- * Premium Subscription Renewal Cron Job
+ * subscription_renewal.php
  *
- * This script should be run daily via cron to check for and process subscription renewals.
+ * Charges Premium subscriptions due within 24h (credit first, then Stripe/Square
+ * for the balance), emails receipts and decline notices, suspends after 3 failed
+ * attempts, and expires non-auto-renew subs. Full detail in read-me/Cron jobs.md.
  *
- * RECOMMENDED SCHEDULE: Daily at 3:00 PM
- *
- * Example cron entry:
- *
- *   0 15 * * * /usr/bin/php /path/to/subscription_renewal.php
- *
- * The script will:
- *   1. Find active subscriptions due for renewal within 24 hours
- *   2. Process credit-based renewals first (no charge)
- *   3. Charge payment methods (Stripe/Square) for remaining balance
- *   4. Send email receipts for successful renewals
- *   5. Send failure notifications for failed payments
- *   6. Suspend subscriptions after 3 consecutive failures
- *   7. Mark non-auto-renew subscriptions as expired
- *
- * Manual execution:
- *   php subscription_renewal.php
- *
- * Logs are stored in: /cron/logs/subscription_renewal_YYYY-MM-DD.log
+ * Schedule: daily at 3:00 PM.
+ *   0 15 * * * /usr/bin/php /home/argorobots/public_html/cron/subscription_renewal.php
  */
 
 // Prevent timeout for long-running process

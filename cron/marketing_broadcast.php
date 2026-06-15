@@ -1,6 +1,6 @@
 <?php
 /**
- * Marketing Broadcast Sender Cron
+ * marketing_broadcast.php
  *
  * Drains queued admin-composed broadcasts (marketing_broadcasts) by sending a
  * capped batch of pending recipients per run. Resumable and rate-limit friendly:
@@ -9,11 +9,8 @@
  * (should_send_marketing_email) so anyone who unsubscribed after the broadcast was
  * queued is skipped, not emailed.
  *
- * RECOMMENDED SCHEDULE: every 5 minutes
- *   (cron expression: every fifth minute) /usr/bin/php /path/to/cron/marketing_broadcast.php
- *
- * Manual execution:
- *   php marketing_broadcast.php
+ * Schedule: every 5 minutes.
+ *   *\/5 * * * * /usr/bin/php /home/argorobots/public_html/cron/marketing_broadcast.php
  */
 
 set_time_limit(300);

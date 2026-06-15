@@ -352,7 +352,7 @@ Pings IndexNow with the pages whose source files changed since the last successf
 
 1. Builds the full URL list from `sitemap_build_urls()` in `sitemap_urls.php` (the same source the XML sitemap uses, so new pages are picked up automatically).
 2. Selects URLs whose source file modification time is newer than the stored watermark (`/cron/logs/indexnow_last_submit`). On the server, file mtime reflects the last deploy that touched the file.
-3. POSTs them to `https://api.indexnow.com/indexnow` via the helper in `indexnow.php`.
+3. POSTs them to `https://api.indexnow.org/indexnow` via the helper in `indexnow.php`.
 4. Advances the watermark only on full success, so a transient failure retries the same URLs next run.
 
 The first run has no watermark, so it submits every URL once as a bootstrap. Run with `--baseline` first if you would rather start clean and only announce future changes.
@@ -380,3 +380,39 @@ php indexnow_submit.php --dry-run   # Log what would be submitted; send nothing
 `/cron/logs/indexnow_submit_YYYY-MM-DD.log`
 
 A lock file (`/cron/logs/indexnow_submit.lock`) prevents overlapping runs.
+
+---
+
+## 13. Reddit Run Dispatcher
+
+**Script:** `cron/reddit_run_dispatcher.php`
+**Schedule:** Every 2 minutes
+
+```bash
+*/2 * * * * /usr/bin/php /home/argorobots/public_html/cron/reddit_run_dispatcher.php
+```
+
+### What It Does
+
+Bridges the admin **"Run discovery now"** button to a real CLI run of `reddit_monitor.php`.
+
+The production host disables `exec` / `shell_exec` / `proc_open`, so the admin button cannot spawn a background process, and running discovery inline in the web request is killed by PHP-FPM's `request_terminate_timeout` (~30s) long before it finishes. So the button only records a request (`reddit_settings.manual_run_requested_at = NOW()`); this cron polls for that flag and runs discovery via CLI, which has no time limit.
+
+1. Reads `reddit_settings.manual_run_requested_at`. If unset, exits immediately (one cheap SELECT).
+2. Claims the request by clearing the flag, so a second tick can't double-fire it.
+3. Ignores requests older than 15 minutes (a stale click can't trigger a surprise run later).
+4. Runs `reddit_monitor.php` via CLI with `REDDIT_FORCE_RUN` defined, which makes discovery run even when the master enable toggle is off (a manual request is an explicit override).
+
+This cron does not write to `cron_runs`; `reddit_monitor` records its own run when fired. Discovery starts within ~2 minutes of clicking the button; progress shows in the Reddit threads tab as usual.
+
+### Setup (one time)
+
+Add the column the button writes to (run in HeidiSQL):
+
+```sql
+ALTER TABLE reddit_settings
+  ADD COLUMN manual_run_requested_at DATETIME DEFAULT NULL
+  COMMENT 'Set by the admin "Run discovery now" button; reddit_run_dispatcher cron claims it and runs discovery via CLI.';
+```
+
+Then add the crontab line above on the server.

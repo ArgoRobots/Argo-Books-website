@@ -1544,59 +1544,26 @@ function reddit_api_pipeline_progress()
 
 function reddit_api_run_now($pdo)
 {
-    // Shared-hosting friendly: many hosts disable exec/shell_exec/proc_open via
-    // disable_functions. Instead of spawning a subprocess, we send the HTTP
-    // response immediately, detach from the client, then run the cron inline
-    // in this same PHP process. $pdo is brought in as a parameter so it stays
-    // in scope when we `require` the cron from inside this function (PHP
-    // doesn't auto-import globals into function scope for included files).
-    $cronPath = realpath(__DIR__ . '/../../cron/reddit_monitor.php');
-    if (!$cronPath) {
-        json_response(['success' => false, 'message' => 'Cron script not found'], 500);
-    }
+    // This host disables exec/shell_exec/proc_open, so we can't spawn a CLI
+    // subprocess, and running the full discovery inline in this web request is
+    // hard-killed by PHP-FPM's request_terminate_timeout (~30s) long before it
+    // finishes. Instead we record a run request; the reddit_run_dispatcher cron
+    // (every 2 min) claims it and runs discovery via CLI, which has no such time
+    // limit. A manual request runs even when the master enable toggle is off.
+    $pdo->prepare("UPDATE reddit_settings SET manual_run_requested_at = NOW() WHERE id = 1")->execute();
 
-    // Let the work run as long as it needs and survive client disconnect.
-    @set_time_limit(600);
-    @ignore_user_abort(true);
+    // Show "queued" in the progress UI the Reddit threads tab polls, so the
+    // admin sees immediate feedback before the dispatcher picks it up.
+    reddit_progress_reset([
+        'message'    => 'Queued — discovery will start within ~2 minutes…',
+        'started_at' => date('Y-m-d H:i:s'),
+    ]);
 
-    // Send the JSON response now so the admin UI doesn't hang while the cron runs.
-    http_response_code(200);
-    header('Content-Type: application/json');
-    echo json_encode(['success' => true, 'message' => 'Reddit discovery started. Refresh in a minute or two to see new threads.']);
-
-    // Release the session lock BEFORE running the inline cron. PHP's default
-    // file-based session handler holds an exclusive lock on the session file
-    // for the duration of the request, so without this close, page reloads and
-    // the JS progress polling block for the full multi-minute cron runtime.
-    if (function_exists('session_write_close')) {
-        @session_write_close();
-    }
-
-    // Detach from the client. fastcgi_finish_request is PHP-FPM only; fall back
-    // to flushing buffers on other SAPIs (work continues either way thanks to
-    // ignore_user_abort).
-    if (function_exists('fastcgi_finish_request')) {
-        fastcgi_finish_request();
-    } else {
-        while (function_exists('ob_get_level') && ob_get_level() > 0) {
-            @ob_end_flush();
-        }
-        @flush();
-    }
-
-    outreach_log('Reddit monitor triggered manually from admin (inline)');
-
-    // Bypass the cron's CLI-only guard and run the pipeline inline. After the
-    // cron file finishes, control returns here and PHP exits normally.
-    if (!defined('REDDIT_MONITOR_INLINE')) {
-        define('REDDIT_MONITOR_INLINE', true);
-    }
-    try {
-        require $cronPath;
-    } catch (Throwable $e) {
-        outreach_log('Inline Reddit monitor crashed: ' . $e->getMessage());
-    }
-    exit;
+    outreach_log('Reddit discovery run requested from admin (queued for dispatcher)');
+    json_response([
+        'success' => true,
+        'message' => 'Discovery queued. It starts within a couple of minutes — watch this tab for progress.',
+    ]);
 }
 
 function reddit_api_mark_replied($pdo)

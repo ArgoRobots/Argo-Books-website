@@ -1237,7 +1237,8 @@ CREATE TABLE IF NOT EXISTS reddit_settings (
     daily_post_limit TINYINT NOT NULL DEFAULT 3,
     weekly_post_limit TINYINT NOT NULL DEFAULT 12,
     auto_disable_removal_rate TINYINT NOT NULL DEFAULT 60,
-    auto_disable_min_replies TINYINT NOT NULL DEFAULT 3
+    auto_disable_min_replies TINYINT NOT NULL DEFAULT 3,
+    manual_run_requested_at DATETIME DEFAULT NULL COMMENT 'Set by the admin "Run discovery now" button; reddit_run_dispatcher cron claims it and runs discovery via CLI (host disables exec/proc_open).'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Seed the singleton row and a starter watchlist + keyword pool. Idempotent

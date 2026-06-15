@@ -80,7 +80,11 @@ reddit_progress_reset([
     'started_at' => $startedAt,
 ]);
 
-$runId = cron_run_start($pdo, 'reddit_monitor');
+// Only track scheduled CLI cron runs. A manual "Run discovery now" from admin
+// runs inline in a PHP-FPM worker the host hard-kills at ~30s
+// (request_terminate_timeout, which set_time_limit can't override), so tracking
+// it would post a misleading ERROR to the cron dashboard for the real cron.
+$runId = defined('REDDIT_MONITOR_INLINE') ? 0 : cron_run_start($pdo, 'reddit_monitor');
 
 try {
     // Ensure singleton row + read floors
@@ -93,8 +97,12 @@ try {
     // pre-migration schema (no `enabled` column yet) is treated as enabled
     // rather than crashing.
     try {
+        // A manual run (admin "Run discovery now", dispatched via REDDIT_FORCE_RUN,
+        // or the legacy inline path) is an explicit override and runs even when
+        // the master enable toggle is off.
+        $manualRun = defined('REDDIT_MONITOR_INLINE') || defined('REDDIT_FORCE_RUN');
         $enabledRow = $pdo->query("SELECT enabled FROM reddit_settings WHERE id = 1")->fetch();
-        if (!defined('REDDIT_MONITOR_INLINE') && $enabledRow && (int) $enabledRow['enabled'] === 0) {
+        if (!$manualRun && $enabledRow && (int) $enabledRow['enabled'] === 0) {
             reddit_log('Reddit discovery is DISABLED via admin Settings (reddit_settings.enabled = 0). Exiting without running.');
             reddit_progress_write([
                 'message' => 'Reddit discovery is disabled in Settings. Re-enable to run.',

@@ -553,14 +553,15 @@ a {
 
 .hero-app-title {
     font-family: "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 4.5rem;
+    font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 24px;
     letter-spacing: -0.03em;
-    background: linear-gradient(135deg, var(--blue-400) 0%, var(--purple-400) 50%, var(--pink-400) 100%);
+    background: white;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.45));
 }
 
 .hero-title {

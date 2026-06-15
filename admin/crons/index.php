@@ -121,6 +121,36 @@ $cronConfig = [
         ],
         'expected_interval_hours' => 1,
     ],
+    'reddit_monitor' => [
+        'label'     => 'Reddit Discovery',
+        'frequency' => 'daily',
+        'description' => "Pulls fresh Reddit threads from the watchlist subreddits and keyword searches, scores them for relevance with AI, and pre-writes a reply draft for the strongest matches. It never posts anything: drafts are reviewed and posted by hand.",
+        'metrics'   => [
+            'threads_found'    => 'Threads found',
+            'drafts_generated' => 'Drafts generated',
+        ],
+        'expected_interval_hours' => 36,
+    ],
+    'reddit_status_check' => [
+        'label'     => 'Reddit Status Check',
+        'frequency' => 'every 2 hours',
+        'description' => "Re-checks Reddit comments we've replied to, on a staggered schedule, to see if they're still live, removed, or shadowbanned. Tracks upvotes and replies, and auto-drops any subreddit with a high removal rate from the watchlist.",
+        'metrics'   => [
+            'replies_checked' => 'Replies checked',
+            'replies_removed' => 'Replies removed',
+        ],
+        'expected_interval_hours' => 4,
+    ],
+    'indexnow_submit' => [
+        'label'     => 'IndexNow Submit',
+        'frequency' => 'daily',
+        'description' => "Tells Bing, Yandex, DuckDuckGo and other IndexNow search engines about pages that changed since the last run, so they get recrawled quickly without manual submission. Does not affect Google, which doesn't use IndexNow.",
+        'metrics'   => [
+            'changed_urls' => 'Pages changed',
+            'submitted_ok' => 'Pages submitted',
+        ],
+        'expected_interval_hours' => 48,
+    ],
 ];
 
 // ─── Aggregate runs in the time range ───────────────────────────────────────

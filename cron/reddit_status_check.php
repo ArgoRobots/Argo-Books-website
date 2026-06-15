@@ -26,6 +26,7 @@ $dotenv->load();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/lib/outreach_helpers.php';
 require_once __DIR__ . '/lib/reddit_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // ─── Lock file ───
 
@@ -43,7 +44,10 @@ const CHECK_OFFSETS_SEC = [1800, 7200, 21600, 86400, 259200];
 
 $startedAt = date('Y-m-d H:i:s');
 $updated = 0;
+$removedCount = 0;
 $lastError = null;
+
+$runId = cron_run_start($pdo, 'reddit_status_check');
 
 try {
     // Find candidates: replied, comment id known, check_count < 5
@@ -93,6 +97,9 @@ try {
             $row['id'],
         ]);
         $updated++;
+        if (in_array($status, ['removed', 'removed_or_shadowbanned'], true)) {
+            $removedCount++;
+        }
     }
 
     // ─── Roll up per-subreddit removal rates ───
@@ -149,10 +156,16 @@ try {
     $upd = $pdo->prepare("UPDATE reddit_settings SET last_status_check_at = ? WHERE id = 1");
     $upd->execute([$startedAt]);
 
+    cron_metric_set('replies_checked', $updated);
+    cron_metric_set('replies_removed', $removedCount);
+    cron_run_finish($pdo, $runId, 'ok');
     echo "Reddit status check complete: $updated reply rows updated, " . count($rollup) . " subreddits rolled up.\n";
 } catch (Throwable $e) {
     $lastError = $e->getMessage();
     reddit_log("Status check crashed: $lastError");
+    cron_metric_set('replies_checked', $updated);
+    cron_metric_set('replies_removed', $removedCount);
+    cron_run_finish($pdo, $runId, 'error', $lastError);
     echo "Reddit status check FAILED: $lastError\n";
     exit(1);
 } finally {

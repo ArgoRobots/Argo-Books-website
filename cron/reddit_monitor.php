@@ -43,6 +43,7 @@ if (!defined('REDDIT_MONITOR_INLINE')) {
 }
 require_once __DIR__ . '/lib/outreach_helpers.php';
 require_once __DIR__ . '/lib/reddit_helpers.php';
+require_once __DIR__ . '/lib/run_tracker.php';
 
 // ─── Lock file ───
 
@@ -79,6 +80,8 @@ reddit_progress_reset([
     'started_at' => $startedAt,
 ]);
 
+$runId = cron_run_start($pdo, 'reddit_monitor');
+
 try {
     // Ensure singleton row + read floors
     $pdo->exec("INSERT IGNORE INTO reddit_settings (id) VALUES (1)");
@@ -97,6 +100,8 @@ try {
                 'message' => 'Reddit discovery is disabled in Settings. Re-enable to run.',
                 'completed' => true,
             ]);
+            cron_metric_set('status', 'disabled');
+            cron_run_finish($pdo, $runId, 'ok');
             echo "Reddit discovery disabled in admin Settings. Exiting.\n";
             exit(0);
         }
@@ -287,6 +292,9 @@ try {
         'found' => $threadsFound,
         'drafted' => $threadsDrafted,
     ]);
+    cron_metric_set('threads_found', $threadsFound);
+    cron_metric_set('drafts_generated', $threadsDrafted);
+    cron_run_finish($pdo, $runId, 'ok');
     echo "Reddit monitor complete: $threadsFound threads found, $threadsDrafted pre-drafted.\n";
 } catch (Throwable $e) {
     $lastError = $e->getMessage();
@@ -300,6 +308,9 @@ try {
         $upd = $pdo->prepare("UPDATE reddit_settings SET last_run_at = ?, last_run_error = ? WHERE id = 1");
         $upd->execute([$startedAt, $lastError]);
     }
+    cron_metric_set('threads_found', $threadsFound);
+    cron_metric_set('drafts_generated', $threadsDrafted);
+    cron_run_finish($pdo, $runId, 'error', $lastError);
     echo "Reddit monitor FAILED: $lastError\n";
     exit(1);
 } finally {

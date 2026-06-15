@@ -29,7 +29,7 @@ $rangeInterval = $rangeMap[$range]['interval'];
 $cronConfig = [
     'outreach_pipeline' => [
         'label'     => 'Outreach Pipeline',
-        'frequency' => 'every hour',
+        'frequency' => 'daily',
         'description' => 'Finds small Canadian businesses (via Google Places and Shopify), writes them a personalized intro email with AI, sends it, schedules follow-ups, and runs A/B tests on the wording. This is the main engine that finds and contacts new leads.',
         'metrics'   => [
             'leads_discovered'          => 'Leads discovered',
@@ -40,7 +40,7 @@ $cronConfig = [
             'ab_tests_promoted'         => 'A/B tests promoted',
             'shopify_rejected'          => 'Shopify stores rejected',
         ],
-        'expected_interval_hours' => 2,
+        'expected_interval_hours' => 48,
     ],
     'subscription_renewal' => [
         'label'     => 'Subscription Renewal',

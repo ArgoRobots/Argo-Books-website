@@ -135,7 +135,8 @@ include __DIR__ . '/../admin_header.php';
 
 <style>
 .mkt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
-.mkt-compose{display:flex;flex-direction:column;gap:14px;max-width:760px}
+.mkt-section-head{text-align:center}
+.mkt-compose{display:flex;flex-direction:column;gap:14px;max-width:760px;margin:0 auto}
 .mkt-field label{display:block;font-weight:600;margin-bottom:6px;font-size:14px}
 .mkt-field input[type=text],.mkt-field input[type=email],.mkt-field select,.mkt-field textarea{
   width:100%;padding:10px 12px;border:1px solid var(--border-color,#d8e2f0);border-radius:8px;
@@ -150,6 +151,20 @@ include __DIR__ . '/../admin_header.php';
 .mkt-badge.sending{background:#dbeafe;color:#1e40af}
 .mkt-badge.sent{background:#dcfce7;color:#166534}
 .mkt-badge.canceled{background:#f3f4f6;color:#6b7280}
+
+/* Dark theme. The base input rule hardcodes a light background and the shared
+   .btn-gray / .mkt-hint colors have no dark variant, so override them here to
+   match the global dark input + label styling in common-style.css. */
+[data-theme="dark"] .mkt-field input[type=text],
+[data-theme="dark"] .mkt-field input[type=email],
+[data-theme="dark"] .mkt-field select,
+[data-theme="dark"] .mkt-field textarea{
+  background:var(--gray-700);border-color:var(--black);color:var(--gray-200)}
+[data-theme="dark"] .mkt-field input::placeholder,
+[data-theme="dark"] .mkt-field textarea::placeholder{color:var(--gray-500)}
+[data-theme="dark"] .mkt-hint{color:var(--gray-400)}
+[data-theme="dark"] .btn-gray{background-color:var(--gray-700);color:var(--gray-200);border-color:var(--black)}
+[data-theme="dark"] .btn-gray:hover{background-color:var(--gray-600);color:var(--gray-100)}
 </style>
 
 <?php if ($flash): ?>
@@ -171,8 +186,8 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
-<h2>Compose a broadcast</h2>
-<p class="mkt-hint" style="margin-bottom:16px;max-width:760px">
+<h2 class="mkt-section-head">Compose a broadcast</h2>
+<p class="mkt-hint" style="margin:0 auto 16px;max-width:760px;text-align:center">
     The body accepts HTML and is wrapped in the standard Argo email template. An unsubscribe
     footer is appended automatically. Always send yourself a test first. Queuing hands the send
     to the cron, which delivers in batches and skips anyone who has since unsubscribed.
@@ -213,7 +228,7 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </form>
 
-<h2 style="margin-top:36px">Recent broadcasts</h2>
+<h2 class="mkt-section-head" style="margin-top:36px">Recent broadcasts</h2>
 <?php if (!$recent): ?>
     <p class="empty-state">No broadcasts yet.</p>
 <?php else: ?>

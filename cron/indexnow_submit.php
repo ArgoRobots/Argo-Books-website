@@ -42,7 +42,9 @@ require_once __DIR__ . '/lib/run_tracker.php';
 
 global $pdo;
 
-$args      = array_slice($argv, 1);
+// $argv is undefined when the host runs cron PHP with register_argc_argv off,
+// so default to an empty list rather than fataling before we can even log.
+$args      = array_slice($argv ?? [], 1);
 $forceAll  = in_array('--all', $args, true);
 $dryRun    = in_array('--dry-run', $args, true);
 $baseline  = in_array('--baseline', $args, true);

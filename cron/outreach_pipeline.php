@@ -195,6 +195,10 @@ try {
     $outreachEnabled = getState($pdo, 'outreach_enabled', '1');
     if ($outreachEnabled !== '1') {
         logPipeline('Outreach is DISABLED via admin Settings (outreach_enabled != "1"). Pipeline exiting without running any steps.');
+        // Finish cleanly: this is a normal no-op, not a crash. Without this the
+        // run row would stay 'running' and the admin Crons pill would read
+        // "Running" forever while outreach is toggled off.
+        cron_run_finish($pdo, $cronRunId, 'ok');
         return;
     }
 
@@ -260,7 +264,10 @@ try {
     logPipeline('=== Outreach Pipeline Complete ===');
     cron_run_finish($pdo, $cronRunId, 'ok');
 
-} catch (Exception $e) {
+} catch (Throwable $e) {
+    // Throwable, not Exception: also catch PHP Errors (TypeError, OOM-adjacent
+    // fatals) so a non-Exception failure still records 'error' instead of
+    // leaving the run row orphaned as 'running'.
     logPipeline("Pipeline fatal error: " . $e->getMessage(), 'ERROR');
     cron_run_finish($pdo, $cronRunId, 'error', $e->getMessage());
     exit(1);

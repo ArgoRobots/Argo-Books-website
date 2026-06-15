@@ -10,6 +10,7 @@ $category_label = '';
 
 $tokenUser = isset($_GET['u']) ? trim($_GET['u']) : '';
 $tokenLicense = isset($_GET['l']) ? trim($_GET['l']) : '';
+$tokenSubscriber = isset($_GET['s']) ? trim($_GET['s']) : '';
 $rawContext = isset($_GET['c']) ? trim($_GET['c']) : 'all';
 $isUndo = isset($_GET['undo']) && $_GET['undo'] === '1';
 
@@ -104,6 +105,34 @@ try {
                     }
                 }
                 $state = $alreadySuppressed ? 'already_unsubscribed' : 'unsubscribed';
+            }
+        }
+    } elseif ($tokenSubscriber !== '' && preg_match('/^[a-f0-9]{24,128}$/', $tokenSubscriber)) {
+        // No-account subscriber flow (marketing_subscribers, e.g. Profit Analyzer opt-ins)
+        $category_label = 'tips & product updates';
+
+        $stmt = $pdo->prepare('SELECT id, email, context, status FROM marketing_subscribers WHERE unsubscribe_token = ? LIMIT 1');
+        $stmt->execute([$tokenSubscriber]);
+        $sub = $stmt->fetch();
+
+        if ($sub) {
+            $email = strtolower(trim($sub['email']));
+            $resubscribeUrl = '/unsubscribe/marketing.php?s=' . urlencode($tokenSubscriber);
+
+            if ($isUndo) {
+                // Re-subscribe: they're actively clicking "undo" here, which is itself
+                // a fresh opt-in, so confirm directly rather than re-sending a confirm email.
+                $upd = $pdo->prepare("UPDATE marketing_subscribers SET status = 'confirmed', confirmed_at = NOW(), unsubscribed_at = NULL WHERE id = ?");
+                $upd->execute([$sub['id']]);
+
+                $del = $pdo->prepare('DELETE FROM email_suppressions WHERE email = ? AND context IN (?, ?)');
+                $del->execute([$email, $sub['context'], 'all_marketing']);
+
+                $state = 'resubscribed';
+            } else {
+                $already = ($sub['status'] === 'unsubscribed');
+                unsubscribe_subscriber_by_token($tokenSubscriber);
+                $state = $already ? 'already_unsubscribed' : 'unsubscribed';
             }
         }
     }

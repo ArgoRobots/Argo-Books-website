@@ -110,6 +110,17 @@ $cronConfig = [
         ],
         'expected_interval_hours' => 36,
     ],
+    'marketing_broadcast' => [
+        'label'     => 'Marketing Broadcast Sender',
+        'frequency' => 'every 5 minutes',
+        'description' => "Delivers the email broadcasts you queue from the Marketing page. Each run sends a capped batch (up to 100) so a big list goes out over several runs without tripping rate limits, and it skips anyone who unsubscribed after the broadcast was queued.",
+        'metrics'   => [
+            'emails_sent'           => 'Emails sent',
+            'emails_failed'         => 'Emails failed',
+            'broadcasts_completed'  => 'Broadcasts completed',
+        ],
+        'expected_interval_hours' => 1,
+    ],
 ];
 
 // ─── Aggregate runs in the time range ───────────────────────────────────────
@@ -159,7 +170,15 @@ function relative_time_ago($datetime) {
 function cron_status_pill($latest, $expectedIntervalHours) {
     if (!$latest) return ['class' => 'status-stale', 'label' => 'No runs'];
     if ($latest['status'] === 'error') return ['class' => 'status-error', 'label' => 'Error'];
-    if ($latest['status'] === 'running') return ['class' => 'status-running', 'label' => 'Running'];
+    if ($latest['status'] === 'running') {
+        // A row stuck in 'running' well past when the run should have finished is
+        // an orphan (process died before recording a result), not a live run.
+        $runHours = (time() - strtotime($latest['started_at'])) / 3600;
+        if ($runHours > max($expectedIntervalHours, 1)) {
+            return ['class' => 'status-error', 'label' => 'Stalled'];
+        }
+        return ['class' => 'status-running', 'label' => 'Running'];
+    }
     $ageHours = (time() - strtotime($latest['started_at'])) / 3600;
     if ($ageHours > $expectedIntervalHours * 2) return ['class' => 'status-stale', 'label' => 'Stale'];
     return ['class' => 'status-ok', 'label' => 'OK'];

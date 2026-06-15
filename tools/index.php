@@ -20,6 +20,14 @@ if (PHP_SAPI !== 'cli') {
 // svg_icon() set and the about-us feature-icon color variants.
 $tools = [
     [
+        'name'        => 'Free Profit Analyzer',
+        'description' => 'Upload a spreadsheet and instantly see where your business is losing money: fees, unprofitable products, and your true margin. No signup.',
+        'href'        => '../profit-analyzer/',
+        'cta'         => 'Open the analyzer',
+        'icon'        => 'analytics',
+        'icon_class'  => 'green',
+    ],
+    [
         'name'        => 'Free Invoice Generator',
         'description' => 'Create and download a professional invoice in seconds. No signup, no watermark. Export to PDF or Word.',
         'href'        => '../invoice-generator/',

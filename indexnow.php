@@ -17,7 +17,11 @@
 
 require_once __DIR__ . '/env_helper.php';
 
-const INDEXNOW_ENDPOINT = 'https://api.indexnow.com/indexnow';
+// Official neutral IndexNow endpoint (operated by the IndexNow initiative,
+// founded by Microsoft Bing + Yandex). Submitting here propagates to every
+// participating engine. Microsoft's own https://www.bing.com/indexnow is an
+// equivalent drop-in if you'd rather POST directly to Bing.
+const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/indexnow';
 
 /** The IndexNow key (also the key-file name). */
 function indexnow_key(): string

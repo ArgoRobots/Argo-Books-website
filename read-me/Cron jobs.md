@@ -334,3 +334,49 @@ php /home/argorobots/public_html/cron/marketing_broadcast.php
 ### Logs
 
 A lock file (`/cron/logs/marketing_broadcast.lock`) prevents overlapping runs.
+
+---
+
+## 12. IndexNow Submit
+
+**Script:** `cron/indexnow_submit.php`
+**Schedule:** Daily at 5:00 AM
+
+```bash
+0 5 * * * /usr/bin/php /home/argorobots/public_html/cron/indexnow_submit.php
+```
+
+### What It Does
+
+Pings IndexNow with the pages whose source files changed since the last successful run, so freshly deployed or edited pages get recrawled quickly without manual submission. IndexNow notifies Bing, Yandex, DuckDuckGo, Seznam, and Naver in one call.
+
+1. Builds the full URL list from `sitemap_build_urls()` in `sitemap_urls.php` (the same source the XML sitemap uses, so new pages are picked up automatically).
+2. Selects URLs whose source file modification time is newer than the stored watermark (`/cron/logs/indexnow_last_submit`). On the server, file mtime reflects the last deploy that touched the file.
+3. POSTs them to `https://api.indexnow.com/indexnow` via the helper in `indexnow.php`.
+4. Advances the watermark only on full success, so a transient failure retries the same URLs next run.
+
+The first run has no watermark, so it submits every URL once as a bootstrap. Run with `--baseline` first if you would rather start clean and only announce future changes.
+
+Google does NOT participate in IndexNow, so this cron does nothing for Google. Keep using Search Console for Google.
+
+### Setup (one time)
+
+1. The ownership key file `77469e7877e34a30ab5fab27e275650e.txt` lives at the site root and deploys with the rest of the repo. Confirm it is reachable at `https://argorobots.com/77469e7877e34a30ab5fab27e275650e.txt` after the first deploy.
+2. Add the crontab line above on the server.
+
+The key can be rotated by generating a new one in Bing Webmaster Tools, replacing the root `.txt` file, and setting `INDEXNOW_KEY` in `.env`.
+
+### CLI Flags
+
+```bash
+php indexnow_submit.php             # Submit URLs changed since last run
+php indexnow_submit.php --all       # Force-submit every URL
+php indexnow_submit.php --baseline  # Record the watermark without submitting
+php indexnow_submit.php --dry-run   # Log what would be submitted; send nothing
+```
+
+### Logs
+
+`/cron/logs/indexnow_submit_YYYY-MM-DD.log`
+
+A lock file (`/cron/logs/indexnow_submit.lock`) prevents overlapping runs.

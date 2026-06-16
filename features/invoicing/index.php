@@ -5,6 +5,7 @@ require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../resources/components/feature-video.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+$argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limit'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +96,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     "name": "How many invoices can I send per month?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Free plan includes 25 invoices per month, which is plenty for most small businesses and freelancers getting started. If you need unlimited invoicing, the Premium plan removes all limits so you can send as many invoices as your business requires."
+                        "text": "The Free plan includes <?= $argo_free_invoice_limit ?> invoices per month, which is plenty for most small businesses and freelancers getting started. If you need unlimited invoicing, the Premium plan removes all limits so you can send as many invoices as your business requires."
                     }
                 }
             ]

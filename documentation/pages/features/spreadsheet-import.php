@@ -1,5 +1,7 @@
 <?php
+require_once __DIR__ . '/../../../config/pricing.php';
 require_once __DIR__ . '/../../../resources/icons.php';
+$pricing = get_pricing_config();
 $pageTitle = 'AI Spreadsheet Import';
 $pageDescription = 'Import data from any Excel or CSV spreadsheet into Argo Books. AI automatically detects your data types and maps columns, with no reformatting needed.';
 $currentPage = 'spreadsheet-import';
@@ -81,7 +83,7 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <h2>Usage Limits</h2>
-            <p>Every user gets 100 AI-powered imports per month. Each file you import (regardless of the number of sheets) counts as one import.</p>
+            <p>Every user gets <?= (int) $pricing['ai_import_monthly_limit'] ?> AI-powered imports per month. Each file you import (regardless of the number of sheets) counts as one import.</p>
 
             <div class="page-navigation">
                 <a href="receipt-scanning.php" class="nav-button prev">

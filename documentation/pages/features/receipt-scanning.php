@@ -1,6 +1,8 @@
 <?php
+require_once __DIR__ . '/../../../config/pricing.php';
 require_once __DIR__ . '/../../../resources/icons.php';
 require_once __DIR__ . '/../../../resources/components/feature-video.php';
+$pricing = get_pricing_config();
 $pageTitle = 'AI Receipt Scanning';
 $pageDescription = 'Transform paper receipts into digital records instantly with AI-powered scanning in Argo Books.';
 $currentPage = 'receipt-scanning';
@@ -11,7 +13,7 @@ include __DIR__ . '/../../docs-header.php';
 
         <div class="docs-content">
             <div class="info-box">
-                <p><strong>Plan limits:</strong> The Free plan includes 5 AI receipt scans per month. Premium includes 500 per month.
+                <p><strong>Plan limits:</strong> The Free plan includes <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month. Premium includes <?= (int) $pricing['receipt_scan_monthly_limit'] ?> per month.
                 <a href="../getting-started/version-comparison.php" class="link">Compare versions</a></p>
             </div>
 

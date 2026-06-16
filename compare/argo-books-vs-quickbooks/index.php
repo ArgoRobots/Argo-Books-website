@@ -73,7 +73,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. QuickBooks does not offer a free plan; pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. QuickBooks does not offer a free plan; pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial."
                     }
                 },
                 {
@@ -417,7 +417,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>QuickBooks does not offer a free plan. Pricing starts at $<?= $qb_easystart ?> CAD/month after a limited trial.</p>
                         </div>
                     </div>

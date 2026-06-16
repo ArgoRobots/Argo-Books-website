@@ -72,7 +72,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month."
                     }
                 },
                 {
@@ -401,7 +401,7 @@ $odoo_custom   = competitor_price('odoo', 'custom');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Odoo's free plan is limited to a single app, and adding a second module starts at $<?= $odoo_standard ?> CAD/user/month.</p>
                         </div>
                     </div>

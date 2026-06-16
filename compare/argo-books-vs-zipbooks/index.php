@@ -72,7 +72,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. ZipBooks also has a free tier, but it's more limited in features, with no AI capabilities, no inventory management, and no offline access."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. ZipBooks also has a free tier, but it's more limited in features, with no AI capabilities, no inventory management, and no offline access."
                     }
                 },
                 {
@@ -395,7 +395,7 @@ $zb_sophisticated   = competitor_price('zipbooks', 'sophisticated');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>ZipBooks also has a free tier, but it's more limited: no AI capabilities, no inventory management, and no offline access.</p>
                         </div>
                     </div>

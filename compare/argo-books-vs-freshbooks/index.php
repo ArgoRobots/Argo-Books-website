@@ -74,7 +74,7 @@ $fb_premium   = competitor_price('freshbooks', 'premium');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $<?= $fb_lite ?> CAD/month."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $<?= $fb_lite ?> CAD/month."
                     }
                 },
                 {
@@ -409,7 +409,7 @@ $fb_premium   = competitor_price('freshbooks', 'premium');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>FreshBooks only offers a 30-day free trial before requiring a paid plan starting at $<?= $fb_lite ?> CAD/month.</p>
                         </div>
                     </div>

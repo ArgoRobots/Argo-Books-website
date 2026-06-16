@@ -73,7 +73,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro)."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro)."
                     }
                 },
                 {
@@ -401,7 +401,7 @@ $wave_receipt_yr  = competitor_price('wave', 'receipt_addon', 'yearly');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Wave also offers a free Starter plan, but features like auto bank import require the Pro plan at $<?= $wave_pro ?> CAD/month, and receipt scanning costs another $<?= $wave_receipt_mo ?>/month or $<?= $wave_receipt_yr ?>/year on the free Starter plan (it's included on Pro).</p>
                         </div>
                     </div>

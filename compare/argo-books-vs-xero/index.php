@@ -73,7 +73,7 @@ $xero_premium  = competitor_price('xero', 'premium');
                     "name": "Is Argo Books really free?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning. Xero does not offer a free plan; pricing starts at $<?= $xero_starter ?> CAD/month after a 30-day trial."
+                        "text": "Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning. Xero does not offer a free plan; pricing starts at $<?= $xero_starter ?> CAD/month after a 30-day trial."
                     }
                 },
                 {
@@ -414,7 +414,7 @@ $xero_premium  = competitor_price('xero', 'premium');
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, 25 invoices per month, and AI receipt scanning.</p>
+                            <p>Yes. Argo Books has a free tier you can use forever, with no credit card, no trial period, and no strings attached. The Free plan includes all core features, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, and AI receipt scanning.</p>
                             <p>Xero does not offer a free plan. Pricing starts at $<?= $xero_starter ?> CAD/month after a 30-day trial.</p>
                         </div>
                     </div>

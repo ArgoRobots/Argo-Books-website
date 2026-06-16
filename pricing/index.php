@@ -58,7 +58,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "How does the Free plan work?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month. You can use it for as long as you like."
+                        "text": "Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month. You can use it for as long as you like."
                     }
                 },
                 {
@@ -66,7 +66,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     "name": "What does Premium unlock?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
+                        "text": "Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support. Premium is available at $<?php echo number_format($monthlyPrice, 0); ?> CAD/month or $<?php echo number_format($yearlyPrice, 0); ?> CAD/year. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year."
                     }
                 },
                 {
@@ -193,7 +193,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     <h2>Scan receipts in seconds, not minutes</h2>
                     <p>Point your camera at any receipt and Argo Books extracts the supplier, date, and total automatically, with no typing required. Receipts are categorized and attached to your expense records instantly.</p>
                     <ul class="feature-checklist">
-                        <li><?= svg_icon('check', 20) ?><span>500 receipt scans per month</span></li>
+                        <li><?= svg_icon('check', 20) ?><span><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipt scans per month</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Auto-categorized by expense type</span></li>
                         <li><?= svg_icon('check', 20) ?><span>Attached directly to your transaction records</span></li>
                     </ul>
@@ -326,7 +326,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                         <?= svg_icon('trending-up', 22) ?>
                     </div>
                     <h3>Higher AI Limits</h3>
-                    <p>500 receipt scans and expanded AI headroom each month, built to keep up as your business grows.</p>
+                    <p><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipt scans and expanded AI headroom each month, built to keep up as your business grows.</p>
                 </div>
             </div>
         </div>
@@ -364,7 +364,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, 25 invoices per month, 5 AI receipt scans per month, and 100 AI spreadsheet imports per month.</p>
+                            <p>Argo Books is free to download and use. No credit card, no trial period, no strings attached. The Free plan includes all core features: unlimited products, unlimited transactions, real-time analytics, receipt management, <?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices per month, <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> AI receipt scans per month, and <?= (int) $pricing['ai_import_monthly_limit'] ?> AI spreadsheet imports per month.</p>
                             <p>You can use it for as long as you like. When your business needs more, upgrading to Premium takes just a few clicks.</p>
                         </div>
                     </div>
@@ -379,7 +379,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, 500 AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support.</p>
+                            <p>Premium removes all limits and adds powerful tools to help your business scale. You get unlimited invoicing, <?= (int) $pricing['receipt_scan_monthly_limit'] ?> AI receipt scans per month, predictive analytics that forecast trends in your data, biometric login security via Windows Hello, and priority customer support.</p>
                             <p>Premium is available at <strong>$<?php echo number_format($monthlyPrice, 0); ?> CAD/month</strong> or <strong>$<?php echo number_format($yearlyPrice, 0); ?> CAD/year</strong>. The annual plan saves you $<?php echo number_format($yearlySavings, 0); ?> per year.</p>
                         </div>
                     </div>

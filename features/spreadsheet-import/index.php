@@ -4,6 +4,7 @@ require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+$argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -94,7 +95,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     "name": "How many records can I import per month?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Free plan includes 100 spreadsheet imports per month, which is plenty for getting started or migrating in batches. Premium users have no limit. Each file counts as one import, no matter how many rows it contains."
+                        "text": "The Free plan includes <?= $argo_import_limit ?> spreadsheet imports per month, which is plenty for getting started or migrating in batches. Premium users have no limit. Each file counts as one import, no matter how many rows it contains."
                     }
                 }
             ]

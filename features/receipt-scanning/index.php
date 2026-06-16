@@ -5,6 +5,8 @@ require_once __DIR__ . '/../../resources/icons.php';
 require_once __DIR__ . '/../../resources/components/feature-video.php';
 require_once __DIR__ . '/../../config/pricing.php';
 $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
+$argo_free_scan_limit = (int) get_pricing_config()['free_receipt_scan_monthly_limit'];
+$argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -95,7 +97,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
                     "name": "How many receipts can I scan per month?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Free plan includes 5 AI receipt scans per month: enough to get started and see how it works. Premium users get 500 scans per month, which is more than enough for even the busiest small businesses. If you regularly collect receipts, Premium pays for itself in time saved."
+                        "text": "The Free plan includes <?= $argo_free_scan_limit ?> AI receipt scans per month: enough to get started and see how it works. Premium users get <?= $argo_scan_limit ?> scans per month, which is more than enough for even the busiest small businesses. If you regularly collect receipts, Premium pays for itself in time saved."
                     }
                 }
             ]

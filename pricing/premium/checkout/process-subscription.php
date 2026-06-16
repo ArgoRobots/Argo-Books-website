@@ -864,6 +864,72 @@ try {
             error_log("Failed to send Premium subscription email: " . $e->getMessage());
         }
 
+        // PayPal price-drift guard. PayPal bills the plan's baked-in price, not
+        // the amount we compute here, so a stale plan (e.g. created before a
+        // price change and never regenerated) silently charges the wrong amount
+        // while the receipt shows ours. Compare what PayPal will actually bill
+        // against what we recorded and alert if they differ, so we catch it
+        // before a customer does. Best-effort: never let it break checkout.
+        if ($paypalSubscriptionId) {
+            try {
+                require_once __DIR__ . '/../../../paypal-helper.php';
+                $paypalBilled = getPayPalSubscriptionBilledAmount($paypalSubscriptionId);
+                if ($paypalBilled !== null && abs($paypalBilled - (float) $amount) > 0.01) {
+                    $expectedStr = number_format((float) $amount, 2);
+                    $billedStr   = number_format($paypalBilled, 2);
+                    error_log(
+                        "CRITICAL: PayPal price mismatch. subscription_id=$subscriptionId, "
+                        . "paypal_subscription_id=$paypalSubscriptionId, expected=$expectedStr $currency, "
+                        . "paypal_will_bill=$billedStr $currency. Regenerate the PayPal plans "
+                        . "(setup-paypal-plans.php) and update the plan IDs in .env."
+                    );
+
+                    $envLabel = htmlspecialchars(current_environment());
+                    $subSafe  = htmlspecialchars($subscriptionId);
+                    $paypalSafe = htmlspecialchars($paypalSubscriptionId);
+                    $emailSafe = htmlspecialchars($email);
+                    $curSafe   = htmlspecialchars($currency);
+                    $expSafe   = htmlspecialchars($expectedStr);
+                    $billSafe  = htmlspecialchars($billedStr);
+                    $alertBody = <<<HTML
+                        <p><strong>A PayPal subscription was charged a different amount than the receipt shows.</strong> This means the live PayPal plan price has drifted from the configured price. Regenerate the plans and update the plan IDs in <code>.env</code>.</p>
+
+                        <h3 style="margin-top:24px;">Subscription</h3>
+                        <ul>
+                            <li><strong>Subscription ID:</strong> $subSafe</li>
+                            <li><strong>PayPal subscription ID:</strong> $paypalSafe</li>
+                            <li><strong>Customer email:</strong> $emailSafe</li>
+                            <li><strong>Environment:</strong> $envLabel</li>
+                        </ul>
+
+                        <h3 style="margin-top:24px;">Amounts</h3>
+                        <ul>
+                            <li><strong>Receipt / expected:</strong> \$$expSafe $curSafe</li>
+                            <li><strong>PayPal will actually bill:</strong> \$$billSafe $curSafe</li>
+                        </ul>
+
+                        <h3 style="margin-top:24px;">Fix</h3>
+                        <ol>
+                            <li>Run <code>php setup-paypal-plans.php</code> in the affected environment.</li>
+                            <li>Paste the new plan IDs into <code>.env</code> (<code>PAYPAL_*_MONTHLY_PLAN_ID</code> / <code>PAYPAL_*_YEARLY_PLAN_ID</code>).</li>
+                            <li>Existing subscribers keep their current price; only new checkouts use the new plans.</li>
+                        </ol>
+                        HTML;
+                    send_styled_email(
+                        'contact@argorobots.com',
+                        "[Argo Books] PayPal price mismatch: $subscriptionId",
+                        $alertBody,
+                        'purple',
+                        null,
+                        null,
+                        $email
+                    );
+                }
+            } catch (Exception $e) {
+                error_log("PayPal price-drift guard failed: " . $e->getMessage());
+            }
+        }
+
         echo json_encode([
             'success' => true,
             'subscription_id' => $subscriptionId,

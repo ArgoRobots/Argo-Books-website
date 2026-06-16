@@ -494,6 +494,18 @@ include __DIR__ . '/../admin_header.php';
     color: #6ee7b7;
     border-color: #065f46;
 }
+/* Payment provider label. Light theme reads fine as plain brand-colored text;
+   in dark theme the dark brand colors (esp. PayPal navy #003087) disappear, so
+   sit them on a white chip for contrast. */
+.provider-chip {
+    font-weight: 600;
+}
+[data-theme="dark"] .provider-chip {
+    display: inline-block;
+    background: #ffffff;
+    padding: 1px 8px;
+    border-radius: 4px;
+}
 </style>
 
 <script>
@@ -610,7 +622,7 @@ include __DIR__ . '/../admin_header.php';
                                             $providerName = $providerNames[$method] ?? ucfirst($sub['payment_method'] ?? 'N/A');
                                             $providerColor = $providerColors[$method] ?? '#6b7280';
                                             ?>
-                                            <span style="color: <?php echo $providerColor; ?>; font-weight: 600;"><?php echo $providerName; ?></span>
+                                            <span class="provider-chip" style="color: <?php echo $providerColor; ?>;"><?php echo $providerName; ?></span>
                                         </td>
                                         <td>
                                             <span class="badge badge-<?php echo $sub['status']; ?>">

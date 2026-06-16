@@ -1,0 +1,195 @@
+/* Affiliate dashboard + application page. Mirrors the community account
+   subpages: card on a tinted page, tokens from custom-colors.css so dark mode
+   comes for free. */
+
+.affiliate-main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 100px 20px 60px;
+}
+
+.affiliate-banner {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.affiliate-banner-success {
+    background: var(--emerald-50, #ecfdf5);
+    color: var(--emerald-700, #047857);
+    border: 1px solid var(--emerald-200, #a7f3d0);
+}
+
+.affiliate-banner-error {
+    background: var(--red-50, #fef2f2);
+    color: var(--red-700, #b91c1c);
+    border: 1px solid var(--red-200, #fecaca);
+}
+
+.affiliate-card {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 16px;
+    padding: 32px 40px;
+    box-shadow: 0 4px 16px var(--shadow-default);
+    margin-bottom: 24px;
+}
+
+.affiliate-card h1 {
+    margin: 0 0 12px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+    line-height: 1.2;
+}
+
+.affiliate-lead {
+    color: var(--gray-700, #374151);
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 0 20px;
+}
+
+.affiliate-perks {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+}
+
+.affiliate-perks li {
+    position: relative;
+    padding-left: 28px;
+    margin-bottom: 10px;
+    color: var(--gray-700, #374151);
+    font-size: 15px;
+}
+
+.affiliate-perks li::before {
+    content: "\2713";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--success-green, #10b981);
+    font-weight: 700;
+}
+
+/* Application form */
+.affiliate-field {
+    margin-bottom: 20px;
+}
+
+.affiliate-field label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--gray-900, #111827);
+    margin-bottom: 6px;
+}
+
+.affiliate-field input,
+.affiliate-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: inherit;
+    background: var(--white);
+    color: var(--gray-900, #111827);
+}
+
+.affiliate-field input:focus,
+.affiliate-field textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px var(--blue-alpha-20, rgba(59, 130, 246, 0.2));
+}
+
+.affiliate-field small {
+    display: block;
+    margin-top: 4px;
+    color: var(--gray-600, #6b7280);
+    font-size: 13px;
+}
+
+.affiliate-submit {
+    margin-top: 8px;
+}
+
+/* Approved dashboard */
+.affiliate-link-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.affiliate-link-row input {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 14px;
+    background: var(--gray-50, #f9fafb);
+    color: var(--gray-900, #111827);
+}
+
+.affiliate-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.affiliate-stat {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 2px 8px var(--shadow-default);
+}
+
+.affiliate-stat-label {
+    font-size: 13px;
+    color: var(--gray-600, #6b7280);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.affiliate-stat-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+}
+
+.affiliate-stat-highlight .affiliate-stat-value {
+    color: var(--success-green, #10b981);
+}
+
+.affiliate-stat-owed .affiliate-stat-value {
+    color: var(--amber-600, #d97706);
+}
+
+.affiliate-fineprint p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-600, #6b7280);
+    line-height: 1.6;
+}
+
+.affiliate-status p {
+    color: var(--gray-700, #374151);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+    .affiliate-card { padding: 24px 20px; }
+    .affiliate-stats-grid { grid-template-columns: repeat(2, 1fr); }
+}

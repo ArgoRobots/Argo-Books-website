@@ -1,0 +1,98 @@
+/* Public affiliate-program landing page. */
+
+.aff-hero {
+    position: relative;
+    box-sizing: border-box;
+    /* Fill the viewport so the dark hero flows straight into the dark footer
+       instead of leaving an awkward band. Content is vertically centered. */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 140px 20px 80px;
+    text-align: center;
+    /* Colored backdrop so the site's transparent white header (white logo +
+       white nav) stays legible at the top of the page, like every other
+       marketing hero. */
+    background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
+    color: var(--white);
+    overflow: hidden;
+}
+
+.aff-hero .container {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.aff-hero h1 {
+    font-size: 48px;
+    line-height: 1.1;
+    font-weight: 800;
+    color: var(--white);
+    margin: 0 0 20px;
+}
+
+.aff-subtitle {
+    font-size: 19px;
+    color: var(--white-alpha-80, rgba(255, 255, 255, 0.8));
+    line-height: 1.6;
+    margin: 0 auto 40px;
+    max-width: 560px;
+}
+
+.aff-offer {
+    background: var(--white);
+    border: 1px solid var(--gray-border);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 420px;
+    margin: 0 auto;
+    box-shadow: 0 8px 30px var(--shadow-default);
+    text-align: left;
+}
+
+.aff-offer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+}
+
+.aff-offer-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 16px;
+    color: var(--gray-800, #1f2937);
+}
+
+.aff-offer-list li svg {
+    flex-shrink: 0;
+    color: var(--success-green, #10b981);
+}
+
+/* Higher specificity than .btn (in button.css, which loads after this file)
+   so width/centering actually win. Auto width + auto margins center it. */
+.aff-offer .aff-cta {
+    display: flex;
+    width: auto;
+    margin: 4px auto 0;
+    gap: 8px;
+    padding: 14px 28px;
+    font-size: 16px;
+    max-height: none;
+}
+
+.aff-cta-note {
+    margin: 14px 0 0;
+    font-size: 13px;
+    color: var(--gray-500, #9ca3af);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .aff-hero { padding: 120px 20px 60px; }
+    .aff-hero h1 { font-size: 36px; }
+}

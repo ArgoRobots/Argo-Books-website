@@ -55,6 +55,7 @@
       <li><a href="<?= $base ?>contact-us/">Contact Us</a></li>
       <li><a href="<?= $base ?>guides/">Guides</a></li>
       <li><a href="<?= $base ?>tools/">Tools</a></li>
+      <li><a href="<?= $base ?>affiliates/">Affiliate Program</a></li>
       <li><a href="<?= $base ?>review/">Leave a Review</a></li>
     </ul>
   </div>

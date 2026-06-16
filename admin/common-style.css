@@ -272,6 +272,89 @@ body.menu-open::after {
   background: var(--blue-e6f3ff);
 }
 
+/* Grouped nav dropdowns */
+.nav-group {
+  position: relative;
+}
+
+.nav-group-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.nav-caret {
+  font-size: 0.7em;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.nav-group:hover .nav-caret {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: var(--white);
+  border: 1px solid var(--neutral-e0e0e0, #e0e0e0);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  z-index: 1000;
+}
+
+/* Hover bridge so the menu doesn't close in the gap between toggle and dropdown */
+.nav-dropdown::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  height: 6px;
+}
+
+.nav-group:hover .nav-dropdown,
+.nav-group:focus-within .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-dropdown-link {
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  color: var(--black);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.nav-dropdown-link:hover {
+  color: var(--dark-gray);
+  background: var(--neutral-f0f0f0);
+}
+
+.nav-dropdown-link.active {
+  color: var(--blue-link);
+  background: var(--blue-e6f3ff);
+}
+
 .desktop-actions {
   display: flex;
   align-items: center;
@@ -1116,6 +1199,26 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .header-link.active {
+  color: var(--blue-400);
+  background: var(--blue-alpha-15);
+}
+
+[data-theme="dark"] .nav-dropdown {
+  background: var(--gray-800);
+  border-color: var(--gray-700);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .nav-dropdown-link {
+  color: var(--gray-400);
+}
+
+[data-theme="dark"] .nav-dropdown-link:hover {
+  color: var(--gray-200);
+  background: var(--gray-700);
+}
+
+[data-theme="dark"] .nav-dropdown-link.active {
   color: var(--blue-400);
   background: var(--blue-alpha-15);
 }

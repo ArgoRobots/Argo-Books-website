@@ -306,6 +306,7 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     email VARCHAR(100) DEFAULT NULL,
     billing_cycle ENUM('monthly', 'yearly') NOT NULL DEFAULT 'monthly',
     amount DECIMAL(10,2) NOT NULL,
+    signup_base_price DECIMAL(10,2) DEFAULT NULL COMMENT 'Base price (pre-processing-fee) locked at signup/cycle-switch. Renewals charge this so raising the env price never re-prices existing customers. NULL falls back to the current env price.',
     currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,

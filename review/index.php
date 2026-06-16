@@ -179,7 +179,7 @@
                                 <div class="review-info-card-role">Owner, Retail, 2-10 employees</div>
                             </div>
                         </div>
-                        <p class="review-info-card-disclaimer">Illustrative example. Reviews on Capterra display first name, role, industry, and company size.</p>
+                        <p class="review-info-card-disclaimer">Illustrative example. Reviews display first name, role, industry, and company size.</p>
                     </div>
                 </div>
             </div>

@@ -288,8 +288,10 @@ body.menu-open::after {
 }
 
 .nav-caret {
-  font-size: 0.7em;
+  font-size: 1.3em;
   line-height: 1;
+  margin-left: 1px;
+  opacity: 0.85;
   transition: transform 0.2s ease;
 }
 

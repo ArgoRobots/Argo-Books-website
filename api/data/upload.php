@@ -29,6 +29,13 @@ define('MAX_UPLOADS_PER_HOUR_FREE', 6);
 // shared NATs (a household, a small office) but low enough to block abuse.
 define('MAX_UPLOADS_PER_HOUR_FREE_PER_IP', 60);
 define('MAX_FILENAME_LENGTH', 255);
+// Internal/developer identities whose telemetry must never be stored, so the
+// founder's own testing doesn't pollute production stats and error counts. The
+// upload still returns success so the client marks its events uploaded and stops
+// retrying. Add free-tier test installs here as 'device:<hash>' if needed.
+define('TELEMETRY_EXCLUDED_AUTH_IDS', [
+    'subscription:PREM-DZIL-BS8F-XE91-PYSC', // founder's premium install
+]);
 
 /**
  * Atomic check-and-bump on a single rate-limit bucket. Held under an exclusive
@@ -246,6 +253,21 @@ try {
 
     $tier = $auth['tier'];
     $authId = $auth['authId'];
+
+    // Drop telemetry from excluded internal/developer identities before doing any
+    // work, so the founder's own testing never lands in production stats. Returns
+    // a normal success so the client treats the batch as uploaded and stops
+    // retrying it.
+    if (in_array($authId, TELEMETRY_EXCLUDED_AUTH_IDS, true)) {
+        echo json_encode([
+            'status' => 'success',
+            'file' => 'excluded',
+            'bytes' => 0,
+            'timestamp' => date('Y-m-d H:i:s'),
+        ]);
+        exit;
+    }
+
     $maxFileSize = $tier === 'premium' ? MAX_FILE_SIZE_PREMIUM : MAX_FILE_SIZE_FREE;
     $maxPerHour = $tier === 'premium' ? MAX_UPLOADS_PER_HOUR_PREMIUM : MAX_UPLOADS_PER_HOUR_FREE;
     // Free tier also gets a coarse per-IP cap so device-ID rotation can't bypass the per-device limit.

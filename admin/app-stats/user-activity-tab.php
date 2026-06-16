@@ -179,7 +179,9 @@ uasort($ua_users, function ($a, $b) {
 });
 
 if (!function_exists('ua_fmt')) {
-    function ua_fmt($ts) { return $ts ? date('Y-m-d H:i', $ts) : '—'; }
+    // gmdate() renders in UTC regardless of the server's timezone, so the "UTC"
+    // label is always accurate. Telemetry timestamps arrive as UTC (Z-suffixed).
+    function ua_fmt($ts) { return $ts ? gmdate('Y-m-d H:i', $ts) . ' UTC' : '—'; }
 }
 if (!function_exists('ua_kv')) {
     function ua_kv($arr) {
@@ -272,7 +274,7 @@ if (!function_exists('ua_kv')) {
             <div class="ua-timeline">
                 <?php foreach ($timeline as $t): ?>
                     <div class="ua-evt <?= $t['type'] ?>">
-                        <span class="ua-evt-ts"><?= $t['ts'] ? date('Y-m-d H:i:s', $t['ts']) : '—' ?></span>
+                        <span class="ua-evt-ts"><?= $t['ts'] ? gmdate('Y-m-d H:i:s', $t['ts']) . ' UTC' : '—' ?></span>
                         <span class="ua-evt-text"><?= htmlspecialchars($t['text']) ?></span>
                     </div>
                 <?php endforeach; ?>

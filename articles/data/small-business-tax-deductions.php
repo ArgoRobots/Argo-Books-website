@@ -129,7 +129,7 @@ HTML,
     ],
     [
       'q' => 'What is the difference between an expense and an asset for tax?',
-      'a' => 'An expense is a cost used up in the short term, like fuel, supplies, or a subscription, and you generally claim the full amount in the year you spend it. An asset is something durable that keeps providing value, like a vehicle or major equipment, and larger assets are often claimed gradually over their useful life through depreciation or capital allowances rather than all at once. The value threshold where a purchase becomes an asset, and the rules for writing off smaller ones immediately, vary by country. You do not have to get this right yourself; keep the receipt and the purchase date, and let your accountant apply the correct treatment.',
+      'a' => 'An expense is a cost used up in the short term, like fuel, supplies, or a subscription, and you generally claim the full amount in the year you spend it. An asset is something durable that keeps providing value, like a vehicle or major equipment, and larger assets are often claimed gradually over their useful life through depreciation or capital allowances rather than all at once. The value threshold where a purchase becomes an asset, and the rules for writing off smaller ones immediately, vary by country. You don\'t have to get this right yourself; keep the receipt and the purchase date, and let your accountant apply the correct treatment.',
     ],
     [
       'q' => 'Can I claim my home office and car if I use them for personal life too?',

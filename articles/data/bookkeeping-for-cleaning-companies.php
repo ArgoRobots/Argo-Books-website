@@ -138,7 +138,7 @@ HTML,
     ],
     [
       'q' => 'Is this guide trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits in this guide do not depend on our tool. Separating your accounts, capturing supply receipts as you go, logging mileage, tracking recurring invoices, and recording what you pay your cleaners all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you keep clean books and claim every deduction than buy software you do not need.',
+      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits in this guide don\'t depend on our tool. Separating your accounts, capturing supply receipts as you go, logging mileage, tracking recurring invoices, and recording what you pay your cleaners all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you keep clean books and claim every deduction than buy software you don\'t need.',
     ],
   ],
 

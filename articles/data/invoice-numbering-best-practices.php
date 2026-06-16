@@ -85,7 +85,7 @@ HTML,
       'h2' => 'Step 3: Never reuse a number',
       'anchor' => 'never-reuse',
       'step_name' => 'Never reuse a number',
-      'step_text' => 'Each invoice number must be unique forever. If you void an invoice, mark it voided and move on to the next number. Do not reissue the old number to a different invoice.',
+      'step_text' => 'Each invoice number must be unique forever. If you void an invoice, mark it voided and move on to the next number. Don\'t reissue the old number to a different invoice.',
       'html' => <<<'HTML'
 <p>This is the one hard rule. Every invoice number you ever issue points to exactly one invoice, forever. Once you've used 1024, it's taken. Even if you void that invoice five minutes later, you don't reuse 1024 for the next one. The next invoice is 1025.</p>
 <p>Why this matters in practice:</p>
@@ -109,7 +109,7 @@ HTML,
       'h2' => 'Step 4: Keep them sequential',
       'anchor' => 'keep-them-sequential',
       'step_name' => 'Keep them sequential',
-      'step_text' => 'Run your numbers in order with no gaps. If you void 1024, mark it voided in your records but do not skip from 1023 to 1025 with nothing in between. Auditors will ask about gaps.',
+      'step_text' => 'Run your numbers in order with no gaps. If you void 1024, mark it voided in your records but don\'t skip from 1023 to 1025 with nothing in between. Auditors will ask about gaps.',
       'html' => <<<'HTML'
 <p>Step 3 says never reuse a number. Step 4 says the flip side: don't skip numbers either. The sequence should run 1001, 1002, 1003, 1004, with every number accounted for.</p>
 <p>This matters mainly for tax purposes. In the UK, Australia, Canada, the EU, and most other countries with a VAT or GST system, your invoice register is expected to be a continuous run of numbers. A gap between 1023 and 1025 with no 1024 anywhere raises the question: was there a sale you forgot to record? In the US, the federal rules are looser, but state sales-tax audits and most accountants still want a clean continuous list.</p>

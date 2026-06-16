@@ -133,7 +133,7 @@ HTML,
     ],
     [
       'q' => 'What expense categories should a small business track?',
-      'a' => 'Start with a handful that match how you actually spend: materials and supplies, vehicle and travel, tools and equipment, software and subscriptions, insurance and professional fees, and meals separately because their tax treatment often differs. You do not need an accountant\'s full chart of accounts to begin. The goal is that every expense lands in a bucket that means something at tax time. If you carry stock, keep inventory purchases out of general expenses, since they affect cost of goods sold rather than being a plain deductible cost. Your accountant can refine the categories later, but these cover most small businesses well enough to start today.',
+      'a' => 'Start with a handful that match how you actually spend: materials and supplies, vehicle and travel, tools and equipment, software and subscriptions, insurance and professional fees, and meals separately because their tax treatment often differs. You don\'t need an accountant\'s full chart of accounts to begin. The goal is that every expense lands in a bucket that means something at tax time. If you carry stock, keep inventory purchases out of general expenses, since they affect cost of goods sold rather than being a plain deductible cost. Your accountant can refine the categories later, but these cover most small businesses well enough to start today.',
     ],
     [
       'q' => 'How do I track cash expenses with no card record?',
@@ -145,7 +145,7 @@ HTML,
     ],
     [
       'q' => 'Is this article just trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and yes this is the Argo Books site, so read it with that in mind. But the system in this guide does not depend on our tool. Separating your accounts, capturing receipts as they happen, categorizing them, and checking against the bank monthly are habits that work with a phone and a free app, a competitor\'s software, or even the spreadsheet we are talking you out of. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you claim every deduction you are owed than buy software you do not need.',
+      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and yes this is the Argo Books site, so read it with that in mind. But the system in this guide does not depend on our tool. Separating your accounts, capturing receipts as they happen, categorizing them, and checking against the bank monthly are habits that work with a phone and a free app, a competitor\'s software, or even the spreadsheet we are talking you out of. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you claim every deduction you are owed than buy software you don\'t need.',
     ],
   ],
 

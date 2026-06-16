@@ -124,7 +124,7 @@ HTML,
     ],
     [
       'q' => 'Can I run a real business on free accounting software?',
-      'a' => 'Yes, many do for years. The limit is not the size of the business so much as its shape. A sole operator or small team that sends invoices, tracks expenses, and does not run payroll can run on a free tier indefinitely. Free stops being enough when you need built-in payroll, hit the plan caps, want automation like recurring billing and reminders, or your tax situation turns complex with multiple currencies or entities. If you need those, you are choosing between paid tools. If you do not, a free tier genuinely runs the business and the saving is real money.',
+      'a' => 'Yes, many do for years. The limit is not the size of the business so much as its shape. A sole operator or small team that sends invoices, tracks expenses, and does not run payroll can run on a free tier indefinitely. Free stops being enough when you need built-in payroll, hit the plan caps, want automation like recurring billing and reminders, or your tax situation turns complex with multiple currencies or entities. If you need those, you are choosing between paid tools. If you don\'t, a free tier genuinely runs the business and the saving is real money.',
     ],
     [
       'q' => 'What is the difference between free and open-source accounting software?',
@@ -136,7 +136,7 @@ HTML,
     ],
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears third, not first, every competitor is described with real strengths, and a plain spreadsheet is named as a legitimate free option too. The article also says clearly that the right move for many people is to stay on whatever free tool is already working. If your answer turns out to be Wave, GnuCash, or a spreadsheet, that is a real answer, and we would rather you use it than sign up for something you do not need.',
+      'a' => 'Partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears third, not first, every competitor is described with real strengths, and a plain spreadsheet is named as a legitimate free option too. The article also says clearly that the right move for many people is to stay on whatever free tool is already working. If your answer turns out to be Wave, GnuCash, or a spreadsheet, that is a real answer, and we would rather you use it than sign up for something you don\'t need.',
     ],
   ],
 

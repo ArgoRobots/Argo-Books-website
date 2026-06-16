@@ -133,7 +133,7 @@ HTML,
     ],
     [
       'q' => 'Do I need to track each job separately?',
-      'a' => 'It is worth it, because landscaping jobs vary so much in margin. Job costing means tagging each cost, materials, crew hours, fuel, equipment, and each payment to a specific job, so you can see what that job actually earned after everything. Do it across a season and you learn which kinds of work genuinely pay and which just feel busy, which changes how you quote and what work you chase. You do not need special software to start; a job name on every receipt and a simple per-job tally works. The hard part is capturing material and fuel receipts at the moment of purchase and tagging the job then, because they cannot be split back from memory later.',
+      'a' => 'It is worth it, because landscaping jobs vary so much in margin. Job costing means tagging each cost, materials, crew hours, fuel, equipment, and each payment to a specific job, so you can see what that job actually earned after everything. Do it across a season and you learn which kinds of work genuinely pay and which just feel busy, which changes how you quote and what work you chase. You don\'t need special software to start; a job name on every receipt and a simple per-job tally works. The hard part is capturing material and fuel receipts at the moment of purchase and tagging the job then, because they cannot be split back from memory later.',
     ],
     [
       'q' => 'Are my crew employees or subcontractors?',
@@ -141,7 +141,7 @@ HTML,
     ],
     [
       'q' => 'Is this guide trying to sell me Argo Books?',
-      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits here do not depend on our tool. Separating your accounts, tracking costs by job, setting aside money for the off-season and for tax, logging mileage, and keeping crew records all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you ride the seasons with clean books and claim every deduction than buy software you do not need.',
+      'a' => 'Argo Books is mentioned once, in a callout you can ignore, and this is the Argo Books site, so read it knowing that. But the habits here don\'t depend on our tool. Separating your accounts, tracking costs by job, setting aside money for the off-season and for tax, logging mileage, and keeping crew records all work with a spreadsheet, a notebook, and a phone camera. If you take only the habits and never look at Argo Books, the guide did its job. We would rather you ride the seasons with clean books and claim every deduction than buy software you don\'t need.',
     ],
   ],
 

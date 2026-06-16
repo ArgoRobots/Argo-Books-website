@@ -126,7 +126,7 @@ HTML,
 <p>Sending the invoice isn't the last step, getting paid is. A bit of tracking turns "I think they paid that one" into a clear picture:</p>
 <ul>
 <li><strong>Note the due date somewhere you'll see it.</strong> A calendar reminder, a spreadsheet column, or the status field in free-tier software. The point is to know when something has gone past due without having to remember.</li>
-<li><strong>Mark it paid when the money lands.</strong> Check it off so you're not chasing an invoice that's already settled, which can lean to an awkward situation.</li>
+<li><strong>Mark it paid when the money lands.</strong> Check it off so you're not chasing an invoice that's already settled, which can lead to an awkward situation.</li>
 <li><strong>Send one polite reminder if it's late.</strong> A short, friendly note a few days after the due date unsticks most late payments. People forget; they're rarely refusing. You don't have to be apologetic about it, it's owed.</li>
 <li><strong>Keep the PDF.</strong> File the sent invoice in a folder by client or by year. It's your record at tax time and your proof if a client ever queries what they paid for.</li>
 </ul>
@@ -170,7 +170,7 @@ HTML,
     ],
     [
       'q' => 'Is this article just trying to sell me Argo Books?',
-      'a' => 'The free invoice generator mentioned here is made by Argo Books, and this is the Argo Books site, so read it knowing that. But the generator genuinely needs no signup and adds no watermark, and every step in this guide works just as well with a template or a competitor\'s free tool. The advice does not depend on using our tool. If you follow the steps with a Word template and an e-transfer, you have sent a professional invoice for free, and that is a complete answer. We would rather you do that than pay for something you do not need.',
+      'a' => 'The free invoice generator mentioned here is made by Argo Books, and this is the Argo Books site, so read it knowing that. But the generator genuinely needs no signup and adds no watermark, and every step in this guide works just as well with a template or a competitor\'s free tool. The advice does not depend on using our tool. If you follow the steps with a Word template and an e-transfer, you have sent a professional invoice for free, and that is a complete answer. We would rather you do that than pay for something you don\'t need.',
     ],
   ],
 

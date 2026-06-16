@@ -126,7 +126,7 @@ HTML,
     ],
     [
       'q' => 'How often should I do my bookkeeping?',
-      'a' => 'Capture continuously and review monthly. Income and expense receipts need to be recorded as they happen, because a receipt you do not capture now is usually lost, and a payment you do not log is easy to forget. Then once a month, sit down for under an hour to check your records against the bank, see which invoices are unpaid, and set tax money aside. That rhythm, constant capture plus a monthly check, keeps the books current with very little effort. The alternative, leaving it all for year-end, turns a small ongoing habit into a stressful two-week project and usually means lost receipts and missed deductions.',
+      'a' => 'Capture continuously and review monthly. Income and expense receipts need to be recorded as they happen, because a receipt you don\'t capture now is usually lost, and a payment you don\'t log is easy to forget. Then once a month, sit down for under an hour to check your records against the bank, see which invoices are unpaid, and set tax money aside. That rhythm, constant capture plus a monthly check, keeps the books current with very little effort. The alternative, leaving it all for year-end, turns a small ongoing habit into a stressful two-week project and usually means lost receipts and missed deductions.',
     ],
     [
       'q' => 'Is this article tax advice?',

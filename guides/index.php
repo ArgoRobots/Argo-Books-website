@@ -28,6 +28,7 @@ $category_labels = [
     'invoicing'         => 'Invoicing',
     'receipts-expenses' => 'Receipts & Expenses',
     'bookkeeping'       => 'Bookkeeping',
+    'spreadsheets'      => 'Spreadsheets & Importing',
     'choosing-software' => 'Choosing Software',
 ];
 

@@ -136,7 +136,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Yes, partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the alternatives listed. We tried to keep it honest: Argo Books appears last in the list, not first, every competitor is described with real strengths, and the article says plainly that some people shopping for an alternative should stay on QuickBooks. If the right answer for you is Wave, Xero, or even staying put, that is the answer, and we would rather tell you that than sell you a switch you do not need.',
+      'a' => 'Yes, partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the alternatives listed. We tried to keep it honest: Argo Books appears last in the list, not first, every competitor is described with real strengths, and the article says plainly that some people shopping for an alternative should stay on QuickBooks. If the right answer for you is Wave, Xero, or even staying put, that is the answer, and we would rather tell you that than sell you a switch you don\'t need.',
     ],
     [
       'q' => 'Will my accountant accept a QuickBooks alternative?',
@@ -148,7 +148,7 @@ HTML,
     ],
     [
       'q' => 'Is a free QuickBooks alternative actually good enough?',
-      'a' => 'For many small businesses, yes. Wave and Argo Books both have free tiers that handle invoicing and basic bookkeeping with no time limit, and plenty of sole proprietors and small service businesses run on them for years. Free stops being enough when you need built-in payroll, heavy inventory, complex multi-entity reporting, or a large team in the books at once. If you need those, you are comparing paid tools, not free ones. If you do not, a free tier can genuinely replace a paid QuickBooks plan and the saving is real.',
+      'a' => 'For many small businesses, yes. Wave and Argo Books both have free tiers that handle invoicing and basic bookkeeping with no time limit, and plenty of sole proprietors and small service businesses run on them for years. Free stops being enough when you need built-in payroll, heavy inventory, complex multi-entity reporting, or a large team in the books at once. If you need those, you are comparing paid tools, not free ones. If you don\'t, a free tier can genuinely replace a paid QuickBooks plan and the saving is real.',
     ],
     [
       'q' => 'Which alternative is closest to QuickBooks itself?',

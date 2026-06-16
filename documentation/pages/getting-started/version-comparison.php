@@ -117,13 +117,13 @@ include __DIR__ . '/../../docs-header.php';
                         </tr>
                         <tr>
                             <td>Invoices & Payments</td>
-                            <td>5 invoices / month</td>
+                            <td><?= (int) $pricing['free_invoice_monthly_limit'] ?> invoices / month</td>
                             <td>Unlimited</td>
                         </tr>
                         <tr>
                             <td>AI Receipt Scanning</td>
-                            <td>—</td>
-                            <td>(500 receipts / month)</td>
+                            <td><?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipts / month</td>
+                            <td><?= (int) $pricing['receipt_scan_monthly_limit'] ?> receipts / month</td>
                         </tr>
                         <tr>
                             <td>Predictive Analytics</td>

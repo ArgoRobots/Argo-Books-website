@@ -781,6 +781,27 @@ try {
             current_environment()
         ]);
 
+        // Create the redeemable license-key row so the desktop app can activate
+        // this paid subscription. The customer's "license key" IS the
+        // subscription_id (that's what the receipt email shows). The desktop
+        // redeem endpoint only looks in premium_subscription_keys, so without
+        // this row a paid key is rejected as invalid. redeemed_at is preset and
+        // device_id is NULL so the first redemption routes through
+        // _handle_re_redemption(), which binds the device to the existing
+        // subscription instead of creating a duplicate one.
+        $stmt = $pdo->prepare("
+            INSERT INTO premium_subscription_keys (
+                subscription_key, email, duration_months,
+                redeemed_at, device_id, subscription_id, notes
+            ) VALUES (?, ?, ?, NOW(), NULL, ?, 'Auto-created for paid subscription')
+        ");
+        $stmt->execute([
+            $subscriptionId,
+            $email,
+            ($billing === 'yearly') ? 12 : 1,
+            $subscriptionId
+        ]);
+
         $pdo->commit();
 
         // Mark referral visit as converted if this purchase came from a referral source.

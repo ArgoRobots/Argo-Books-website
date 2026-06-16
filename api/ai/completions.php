@@ -244,11 +244,10 @@ if (!empty($uploadedFileName)) {
     curl_exec($ch);
 }
 
-// Extract content from Gemini response
-$content = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? null;
-if ($content === null) {
-    send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
-}
+// Extract content + finish reason from the Gemini response.
+$candidate = $responseData['candidates'][0] ?? [];
+$content = $candidate['content']['parts'][0]['text'] ?? null;
+$finishReason = $candidate['finishReason'] ?? null;
 
 $usage = null;
 if (isset($responseData['usageMetadata'])) {
@@ -259,10 +258,35 @@ if (isset($responseData['usageMetadata'])) {
     ];
 }
 
+// Diagnostic: a finishReason other than STOP (most often MAX_TOKENS) means the
+// model stopped before completing, typically leaving truncated or empty JSON,
+// which is the likely cause of downstream "JsonReaderException" parse failures.
+// gemini-2.5-flash spends hidden "thinking" tokens out of maxOutputTokens, so a
+// small token budget can be exhausted before the JSON answer is written. Logged
+// only (response behaviour is unchanged) so truncation shows up in the PHP
+// error log. Grep the error log for "[gemini]" to find these.
+if ($finishReason !== null && $finishReason !== 'STOP') {
+    error_log(sprintf(
+        '[gemini] non-STOP finishReason=%s model=%s maxOutputTokens=%d tokens(prompt/out/total)=%d/%d/%d content=%s',
+        $finishReason,
+        $model,
+        $maxTokens,
+        $usage['prompt_tokens'] ?? 0,
+        $usage['completion_tokens'] ?? 0,
+        $usage['total_tokens'] ?? 0,
+        $content === null ? 'null' : strlen($content) . ' chars'
+    ));
+}
+
+if ($content === null) {
+    send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
+}
+
 send_json_response(200, [
     'success' => true,
     'content' => $content,
     'model' => $model,
     'usage' => $usage,
+    'finishReason' => $finishReason,
     'timestamp' => date('c'),
 ]);

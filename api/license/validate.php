@@ -4,6 +4,7 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../license_functions.php';
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../portal/portal-helper.php';
 
 // Initialize response array
 $response = [
@@ -14,6 +15,15 @@ $response = [
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Rate limit per IP. Generous, since the app validates on launch, but still
+    // caps abusive enumeration.
+    $client_ip = get_client_ip();
+    if (is_rate_limited($client_ip, 60, 600, 'license_validate')) {
+        echo json_encode(['success' => false, 'status' => 'rate_limited', 'message' => 'Too many requests. Please try again shortly.']);
+        exit;
+    }
+    record_rate_limit_attempt($client_ip, 'license_validate');
+
     // Get the request data
     $data = json_decode(file_get_contents('php://input'), true);
 

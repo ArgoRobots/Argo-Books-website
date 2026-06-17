@@ -564,7 +564,11 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
 
         // Create payment request with customer_id
         $paymentData = [
-            'idempotency_key' => bin2hex(random_bytes(16)),
+            // Deterministic per (subscription, month) so a retry after a lost
+            // response reuses the key and Square dedups the charge instead of
+            // billing the card twice. A random key would let a lost-response
+            // retry double-charge.
+            'idempotency_key' => hash('sha256', 'sqrenew_' . $subscriptionId . '_' . date('Y-m')),
             'source_id' => $cardId,
             'customer_id' => $customerId,
             'amount_money' => [

@@ -437,21 +437,34 @@ function handlePaymentCompleted($resource) {
     $cycleSwitchFirstBill = !empty($subscription['last_cycle_change_at'])
         && $secsUntilEnd > (0.7 * $cycleSecs);
 
-    // Log the payment
-    $stmt = $pdo->prepare("
-        INSERT INTO premium_subscription_payments (
-            subscription_id, amount, currency, payment_method,
-            transaction_id, status, payment_type, environment, created_at
-        ) VALUES (?, ?, ?, 'paypal', ?, 'completed', ?, ?, NOW())
-    ");
-    $stmt->execute([
-        $subscription['subscription_id'],
-        $amount,
-        $currency,
-        $transactionId,
-        $paymentType,
-        current_environment()
-    ]);
+    // Log the payment. The UNIQUE index on transaction_id is the real guard
+    // against a concurrent duplicate webhook delivery: if another process
+    // inserted this transaction between the earlier check and here, the insert
+    // throws a duplicate-key error and we bail out without extending end_date a
+    // second time. (Pre-migration, with no unique index, this simply never
+    // throws and behaviour is unchanged.)
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO premium_subscription_payments (
+                subscription_id, amount, currency, payment_method,
+                transaction_id, status, payment_type, environment, created_at
+            ) VALUES (?, ?, ?, 'paypal', ?, 'completed', ?, ?, NOW())
+        ");
+        $stmt->execute([
+            $subscription['subscription_id'],
+            $amount,
+            $currency,
+            $transactionId,
+            $paymentType,
+            current_environment()
+        ]);
+    } catch (PDOException $e) {
+        if ($e->getCode() === '23000') {
+            logPayPalWebhookEvent('PAYMENT.SALE.COMPLETED', $resource, 'duplicate_transaction_race');
+            return;
+        }
+        throw $e;
+    }
 
     // Fire funnel event for this payment. Webhook has no session/cookie,
     // so resolve attribution from the original premium_signup event.
@@ -570,6 +583,17 @@ function handlePaymentRefunded($resource) {
 
     if (empty($saleId)) {
         return;
+    }
+
+    // Dedupe: a duplicate REFUNDED webhook delivery would otherwise insert a
+    // second negative row and double-count the refund in reports.
+    if (!empty($refundId)) {
+        $dupe = $pdo->prepare("SELECT id FROM premium_subscription_payments WHERE transaction_id = ? LIMIT 1");
+        $dupe->execute([$refundId]);
+        if ($dupe->fetch()) {
+            logPayPalWebhookEvent('PAYMENT.SALE.REFUNDED', $resource, 'duplicate_refund_skipped');
+            return;
+        }
     }
 
     // Find the original payment

@@ -351,7 +351,11 @@ CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     INDEX idx_status (status),
     INDEX idx_created_at (created_at),
     INDEX idx_payment_type (payment_type),
-    INDEX idx_env_status_created (environment, status, created_at)
+    INDEX idx_env_status_created (environment, status, created_at),
+    -- Prevents a concurrent duplicate gateway/webhook delivery from recording
+    -- the same transaction twice (and double-extending end_date). NULLs allowed
+    -- (failed/credit rows use NULL), and MySQL permits multiple NULLs.
+    UNIQUE KEY uq_transaction_id (transaction_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Premium Subscription Keys table (free/promo keys)

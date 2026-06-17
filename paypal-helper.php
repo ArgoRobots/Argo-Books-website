@@ -54,6 +54,8 @@ function getPayPalAccessToken() {
         CURLOPT_USERPWD => "$clientId:$clientSecret",
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     $response = curl_exec($ch);
@@ -125,6 +127,8 @@ function verifyPayPalWebhookSignature($headers, $body, $webhookId) {
         ],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     $response = curl_exec($ch);
@@ -185,6 +189,8 @@ function cancelPayPalSubscription($subscriptionId, $reason = 'Cancelled by user'
         ],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     $response = curl_exec($ch);
@@ -230,6 +236,8 @@ function activatePayPalSubscription($subscriptionId, $reason = 'Reactivated by u
         ],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
 
     curl_exec($ch);
@@ -277,9 +285,10 @@ function refundPayPalSale($saleId, $amount, $currency, $description = 'Cycle swi
         'description' => $description,
     ]);
 
-    // PayPal-Request-Id: deterministic per (sale, day) so an accidental
-    // retry inside a 24h window reuses the key and PayPal dedups.
-    $requestId = hash('sha256', 'refund_' . $saleId . '_' . date('Y-m-d'));
+    // PayPal-Request-Id: deterministic per sale (no date component) so any
+    // retry — even days later — reuses the key and PayPal dedups the refund
+    // indefinitely, preventing an accidental double refund.
+    $requestId = hash('sha256', 'refund_' . $saleId);
 
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -380,6 +389,8 @@ function getPayPalSubscriptionBilledAmount($subscriptionId) {
         CURLOPT_HTTPHEADER => $headers,
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -407,6 +418,8 @@ function getPayPalSubscriptionBilledAmount($subscriptionId) {
         CURLOPT_HTTPHEADER => $headers,
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_TIMEOUT        => 15,
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

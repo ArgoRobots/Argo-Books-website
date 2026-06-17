@@ -65,14 +65,31 @@ function validateAndGetTier($pdo, $license_key, $device_id) {
     if (!empty($license_key)) {
         // Check if it's a Premium key (starts with PREM-)
         if (strpos($license_key, 'PREM-') === 0) {
-            // Check premium_subscription_keys table (unredeemed promo keys)
-            $stmt = $pdo->prepare("SELECT id FROM premium_subscription_keys WHERE subscription_key = ?");
+            // Require the key to be redeemed AND linked to an active, unexpired
+            // subscription before granting premium tier (mirrors receipt/invoice
+            // usage). An unredeemed promo code must not count as premium.
+            $stmt = $pdo->prepare("
+                SELECT subscription_id, redeemed_at
+                FROM premium_subscription_keys
+                WHERE subscription_key = ?
+            ");
             $stmt->execute([$license_key]);
-            if ($stmt->fetch()) {
-                return ['tier' => 'premium', 'limit' => $limit, 'identifier' => $license_key];
+            $premiumKey = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($premiumKey && $premiumKey['redeemed_at'] !== null) {
+                $stmt = $pdo->prepare("
+                    SELECT id FROM premium_subscriptions
+                    WHERE subscription_id = ?
+                    AND status IN ('active', 'cancelled')
+                    AND end_date > NOW()
+                ");
+                $stmt->execute([$premiumKey['subscription_id']]);
+                if ($stmt->fetch()) {
+                    return ['tier' => 'premium', 'limit' => $limit, 'identifier' => $license_key];
+                }
             }
 
-            // Check premium_subscriptions table for active subscriptions
+            // Fallback: subscription_id may have been used directly as the license key
             $stmt = $pdo->prepare("
                 SELECT id FROM premium_subscriptions
                 WHERE subscription_id = ?

@@ -1181,6 +1181,35 @@ function send_free_credit_email($email, $creditAmount, $note = '', $subscription
 }
 
 /**
+ * Notify the subscriber that a new device was just activated on their Premium
+ * subscription. Doubles as a security signal: if they don't recognize it, they
+ * can remove it from the management page.
+ *
+ * @param string $email     Subscriber email
+ * @param string $manageUrl Link to the device-management page
+ * @return bool Success status
+ */
+function send_new_device_activated_email($email, $manageUrl)
+{
+    $site_url = site_url();
+    $body = <<<HTML
+        <h1>New device activated</h1>
+        <p>A new device was just activated on your Argo Premium subscription.</p>
+        <p>If this was you, you're all set — no action needed.</p>
+        <div class="info-box info-box-warning">
+            <p><strong>Don't recognize it?</strong> You can review and remove devices on your subscription page:</p>
+            <p><a href="{$manageUrl}">Manage your devices</a></p>
+        </div>
+        <div class="receipt-footer">
+            <p>Thank you for using Argo Books!</p>
+            <p><a href="{$site_url}">argorobots.com</a></p>
+        </div>
+        HTML;
+
+    return send_styled_email($email, 'New device activated - Argo Premium', $body, 'purple');
+}
+
+/**
  * Build a short plain-text excerpt from HTML/markdown content for use in
  * notification emails. Strips tags, decodes entities, collapses whitespace,
  * and truncates with an ellipsis.

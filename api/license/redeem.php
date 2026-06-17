@@ -28,6 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $premium_key = trim($data['premium_key'] ?? '');
     $device_id = trim($data['device_id'] ?? '');
+    $device_label = isset($data['device_label']) ? substr(trim((string) $data['device_label']), 0, 100) : null;
 
     if (empty($premium_key)) {
         $response = [
@@ -42,7 +43,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'message' => 'Device ID is required.'
         ];
     } else {
-        $response = redeem_premium_key($premium_key, $device_id);
+        $response = redeem_premium_key($premium_key, $device_id, $device_label);
+    }
+}
+
+// Best-effort: notify the subscriber when a brand-new device is activated.
+// Never let email failure affect the activation result.
+if (!empty($response['success']) && !empty($response['new_device']) && !empty($response['subscription_id'])) {
+    try {
+        require_once __DIR__ . '/../../email_sender.php';
+        $stmt = $pdo->prepare("SELECT email FROM premium_subscriptions WHERE subscription_id = ?");
+        $stmt->execute([$response['subscription_id']]);
+        $subEmail = $stmt->fetchColumn();
+        if (!empty($subEmail)) {
+            send_new_device_activated_email($subEmail, site_url() . '/community/users/subscription.php');
+        }
+    } catch (\Throwable $e) {
+        error_log('New-device activation email failed: ' . $e->getMessage());
     }
 }
 

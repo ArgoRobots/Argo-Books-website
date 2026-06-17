@@ -41,6 +41,7 @@ function get_premium_subscriptions($search_filter = '')
                     FROM premium_subscription_payments p
                     WHERE p.subscription_id = s.subscription_id
                       AND p.status = 'completed'
+                      AND p.amount > 0
                     ORDER BY p.created_at DESC
                     LIMIT 1
                 ) AS last_paid_amount

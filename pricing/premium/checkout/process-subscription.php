@@ -375,8 +375,12 @@ try {
         // Update existing subscription with new payment method and billing cycle
         $subscriptionId = $existingSubscription['subscription_id'];
 
-        // Calculate new amount based on billing cycle (from centralized config)
+        // Calculate new amount based on billing cycle (from centralized config).
+        // $newAmount is the base price (used for signup_base_price / grandfathering);
+        // $newAmountCharged includes the processing fee and is what goes in the
+        // amount column, keeping it consistent with the new-signup path.
         $newAmount = ($billing === 'yearly') ? $pricingConfig['premium_yearly_price'] : $pricingConfig['premium_monthly_price'];
+        $newAmountCharged = $newAmount + calculate_processing_fee($newAmount);
 
         // Determine the new end date:
         // - If subscription still valid (end_date > now) AND not charged: keep existing end_date
@@ -546,7 +550,7 @@ try {
                 $stripeCustomerId,
                 $transactionId,
                 $billing,
-                $newAmount,
+                $newAmountCharged,
                 // Cycle switch is a deliberate plan change, so re-lock to the
                 // current price for the new cycle (not the old grandfathered one).
                 $newAmount,
@@ -602,7 +606,7 @@ try {
                 $stripeCustomerId,
                 $transactionId,
                 $billing,
-                $newAmount,
+                $newAmountCharged,
                 // Re-lock to the current price for the new cycle.
                 $newAmount,
                 $newEndDate,

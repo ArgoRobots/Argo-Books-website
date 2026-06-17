@@ -16,6 +16,7 @@
  *   FREE_RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for free tier (default: 5)
  *   AI_IMPORT_MONTHLY_LIMIT          - Monthly AI import limit for all users (default: 100)
  *   FREE_INVOICE_MONTHLY_LIMIT       - Monthly invoice send limit for free tier (default: 25)
+ *   PREMIUM_MAX_DEVICES              - Max simultaneous devices per subscription (default: 3)
  */
 
 /**
@@ -46,6 +47,7 @@ function get_pricing_config() {
         'free_receipt_scan_monthly_limit' => _pricing_parse_int_env('FREE_RECEIPT_SCAN_MONTHLY_LIMIT', 5),
         'ai_import_monthly_limit'         => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 100),
         'free_invoice_monthly_limit'      => _pricing_parse_int_env('FREE_INVOICE_MONTHLY_LIMIT', 25),
+        'max_devices'                     => _pricing_parse_int_env('PREMIUM_MAX_DEVICES', 3),
         'currency'              => 'CAD',
     ];
 

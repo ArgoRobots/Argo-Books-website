@@ -374,6 +374,21 @@ CREATE TABLE IF NOT EXISTS premium_subscription_keys (
     INDEX idx_redeemed (redeemed_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Devices registered against a premium subscription. Replaces the single
+-- premium_subscription_keys.device_id binding so a subscription can run on up
+-- to PREMIUM_MAX_DEVICES machines at once. One row per (subscription, device).
+CREATE TABLE IF NOT EXISTS premium_subscription_devices (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    subscription_id VARCHAR(50) NOT NULL,
+    device_id VARCHAR(255) NOT NULL COMMENT 'Hashed machine identifier from the desktop app',
+    device_label VARCHAR(100) DEFAULT NULL COMMENT 'Optional human label (e.g. OS/platform) for the management UI',
+    activated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_seen_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_sub_device (subscription_id, device_id),
+    INDEX idx_subscription_id (subscription_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Add indexes for license_keys table
 CREATE INDEX idx_license_keys_transaction_id ON license_keys(transaction_id);
 CREATE INDEX idx_license_keys_email ON license_keys(email);

@@ -57,11 +57,12 @@ if ($premium_subscription) {
 
 // Get devices for the subscription
 $subscription_devices = [];
+$max_devices = 0;
 if ($premium_subscription) {
     require_once __DIR__ . '/../../license_functions.php';
     $subscription_devices = get_subscription_devices($premium_subscription['subscription_id']);
+    $max_devices = (int) $pricing['max_devices'];
 }
-$max_devices = (int) $pricing['max_devices'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -317,7 +318,7 @@ $max_devices = (int) $pricing['max_devices'];
                 fetch('remove-device.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'csrf_token=<?php echo $_SESSION['csrf_token']; ?>&device_id=' + encodeURIComponent(deviceId)
+                    body: 'csrf_token=' + encodeURIComponent(<?php echo json_encode($_SESSION['csrf_token']); ?>) + '&device_id=' + encodeURIComponent(deviceId)
                 })
                 .then(function (r) { return r.json(); })
                 .then(function (res) {

@@ -39,3 +39,4 @@ if (!$subscription) {
 
 $removed = remove_subscription_device($subscription['subscription_id'], $device_id);
 echo json_encode(['success' => $removed, 'error' => $removed ? null : 'Device not found']);
+exit;

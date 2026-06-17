@@ -564,12 +564,18 @@ function validate_license($key, $device_id) {
             ];
         }
 
-        // Check device_id matches
-        if ($premium_key['device_id'] !== $device_id) {
+        // Device must be one of the subscription's registered devices.
+        // (Fall back to the legacy single device_id for rows that predate the
+        // devices table and weren't backfilled.)
+        $subId = $premium_key['subscription_id'];
+        $deviceOk = ($subId !== null && is_device_registered($subId, $device_id))
+            || ($premium_key['device_id'] === $device_id);
+
+        if (!$deviceOk) {
             return [
                 'success' => false,
                 'status' => 'wrong_device',
-                'message' => 'This license key is active on a different device.'
+                'message' => 'This device is not activated for this license.'
             ];
         }
 
@@ -608,6 +614,10 @@ function validate_license($key, $device_id) {
         }
 
         // Key is valid, device matches, subscription active
+        if ($subId !== null) {
+            touch_subscription_device($subId, $device_id);
+        }
+
         return [
             'success' => true,
             'status' => 'valid',

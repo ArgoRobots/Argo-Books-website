@@ -70,4 +70,34 @@ final class ValidateLicenseTest extends DatabaseTestCase
         $this->assertFalse($result['success']);
         $this->assertSame('invalid_key', $result['status']);
     }
+
+    public function test_valid_when_device_in_set_even_if_not_primary(): void
+    {
+        $subId = 'PREM-TEST-MULT-DEV1-AAAA';
+        $this->seedSubscription($subId, (new \DateTime('+90 days'))->format('Y-m-d H:i:s'));
+        // Primary device on the key is 'device-primary', but 'device-second'
+        // is also a registered device in the new table.
+        $key = $this->seedRedeemedKey('device-primary', $subId);
+        $this->pdo->prepare(
+            'INSERT INTO premium_subscription_devices (subscription_id, device_id) VALUES (?, ?), (?, ?)'
+        )->execute([$subId, 'device-primary', $subId, 'device-second']);
+
+        $result = validate_license($key, 'device-second');
+        $this->assertTrue($result['success']);
+        $this->assertSame('valid', $result['status']);
+    }
+
+    public function test_wrong_device_when_not_in_set(): void
+    {
+        $subId = 'PREM-TEST-MULT-DEV2-BBBB';
+        $this->seedSubscription($subId, (new \DateTime('+90 days'))->format('Y-m-d H:i:s'));
+        $key = $this->seedRedeemedKey('device-primary', $subId);
+        $this->pdo->prepare(
+            'INSERT INTO premium_subscription_devices (subscription_id, device_id) VALUES (?, ?)'
+        )->execute([$subId, 'device-primary']);
+
+        $result = validate_license($key, 'device-unknown');
+        $this->assertFalse($result['success']);
+        $this->assertSame('wrong_device', $result['status']);
+    }
 }

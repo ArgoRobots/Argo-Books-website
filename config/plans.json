@@ -14,6 +14,7 @@
             {"label": "Unlimited invoices & payments"},
             {"label": "AI receipt scanning", "detail": "{receipt_scan_monthly_limit}/month"},
             {"label": "Predictive analytics"},
+            {"label": "Use on up to {premium_max_devices} devices"},
             {"label": "Biometric login security"},
             {"label": "Priority support"}
         ]

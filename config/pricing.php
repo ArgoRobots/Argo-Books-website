@@ -123,6 +123,7 @@ function get_plan_features() {
         '{free_receipt_scan_monthly_limit}' => (string) $cfg['free_receipt_scan_monthly_limit'],
         '{ai_import_monthly_limit}'         => (string) $cfg['ai_import_monthly_limit'],
         '{receipt_scan_monthly_limit}'      => (string) $cfg['receipt_scan_monthly_limit'],
+        '{premium_max_devices}'             => (string) $cfg['max_devices'],
     ]);
     $plans = json_decode($json, true);
     return $plans;

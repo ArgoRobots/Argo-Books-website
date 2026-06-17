@@ -1195,7 +1195,7 @@ function send_new_device_activated_email($email, $manageUrl)
     $body = <<<HTML
         <h1>New device activated</h1>
         <p>A new device was just activated on your Argo Premium subscription.</p>
-        <p>If this was you, you're all set — no action needed.</p>
+        <p>If this was you, you're all set. No action needed.</p>
         <div class="info-box info-box-warning">
             <p><strong>Don't recognize it?</strong> You can review and remove devices on your subscription page:</p>
             <p><a href="{$manageUrl}">Manage your devices</a></p>

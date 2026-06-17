@@ -44,22 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ];
     } else {
         $response = redeem_premium_key($premium_key, $device_id, $device_label);
-    }
-}
 
-// Best-effort: notify the subscriber when a brand-new device is activated.
-// Never let email failure affect the activation result.
-if (!empty($response['success']) && !empty($response['new_device']) && !empty($response['subscription_id'])) {
-    try {
-        require_once __DIR__ . '/../../email_sender.php';
-        $stmt = $pdo->prepare("SELECT email FROM premium_subscriptions WHERE subscription_id = ?");
-        $stmt->execute([$response['subscription_id']]);
-        $subEmail = $stmt->fetchColumn();
-        if (!empty($subEmail)) {
-            send_new_device_activated_email($subEmail, site_url() . '/community/users/subscription.php');
+        // Best-effort: notify the subscriber when a brand-new device is activated.
+        // Never let email failure affect the activation result.
+        if (!empty($response['success']) && !empty($response['new_device']) && !empty($response['subscription_id'])) {
+            try {
+                require_once __DIR__ . '/../../email_sender.php';
+                $stmt = $pdo->prepare("SELECT email FROM premium_subscriptions WHERE subscription_id = ?");
+                $stmt->execute([$response['subscription_id']]);
+                $subEmail = $stmt->fetchColumn();
+                if (!empty($subEmail)) {
+                    send_new_device_activated_email($subEmail, site_url() . '/community/users/subscription.php');
+                }
+            } catch (\Throwable $e) {
+                error_log('New-device activation email failed: ' . $e->getMessage());
+            }
         }
-    } catch (\Throwable $e) {
-        error_log('New-device activation email failed: ' . $e->getMessage());
     }
 }
 

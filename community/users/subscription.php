@@ -54,6 +54,14 @@ if ($premium_subscription) {
         // Silently fail - payment history not critical
     }
 }
+
+// Get devices for the subscription
+$subscription_devices = [];
+if ($premium_subscription) {
+    require_once __DIR__ . '/../../license_functions.php';
+    $subscription_devices = get_subscription_devices($premium_subscription['subscription_id']);
+}
+$max_devices = (int) $pricing['max_devices'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -277,6 +285,50 @@ if ($premium_subscription) {
                 </div>
             <?php endif; ?>
         </div>
+
+        <!-- Devices Section -->
+        <?php if ($premium_subscription): ?>
+        <div class="subscription-section">
+            <div class="devices-card">
+                <h2>Your devices <span class="devices-count"><?php echo count($subscription_devices); ?> / <?php echo $max_devices; ?></span></h2>
+                <p class="devices-help">Argo Premium can run on up to <?php echo $max_devices; ?> devices. Remove one to free a slot for a new computer.</p>
+                <?php if (empty($subscription_devices)): ?>
+                    <p class="devices-empty">No devices activated yet.</p>
+                <?php else: ?>
+                <ul class="device-list">
+                    <?php foreach ($subscription_devices as $d): ?>
+                    <li class="device-row" data-device-id="<?php echo htmlspecialchars($d['device_id']); ?>">
+                        <span class="device-label"><?php echo htmlspecialchars($d['device_label'] ?: 'Device'); ?></span>
+                        <span class="device-seen">Last used <?php echo htmlspecialchars(date('M j, Y', strtotime($d['last_seen_at']))); ?></span>
+                        <button type="button" class="btn-remove-device">Remove</button>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php endif; ?>
+            </div>
+        </div>
+        <script>
+        document.querySelectorAll('.btn-remove-device').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = btn.closest('.device-row');
+                var deviceId = row.getAttribute('data-device-id');
+                if (!confirm('Remove this device? It will lose Premium access until reactivated.')) return;
+                btn.disabled = true;
+                fetch('remove-device.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'csrf_token=<?php echo $_SESSION['csrf_token']; ?>&device_id=' + encodeURIComponent(deviceId)
+                })
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res.success) { row.remove(); }
+                    else { alert(res.error || 'Could not remove device.'); btn.disabled = false; }
+                })
+                .catch(function () { alert('Network error.'); btn.disabled = false; });
+            });
+        });
+        </script>
+        <?php endif; ?>
 
         <!-- Payment History Section -->
         <div class="subscription-section">

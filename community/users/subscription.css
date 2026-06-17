@@ -751,6 +751,17 @@
     }
 }
 
+/* Devices Card */
+.devices-card { margin-top: 24px; padding: 20px; border-radius: 8px; background: var(--card-bg, #fff); }
+.devices-count { font-weight: 600; color: var(--text-muted, #64748b); }
+.devices-help { color: var(--text-muted, #64748b); font-size: 14px; }
+.devices-empty { color: var(--text-muted, #64748b); font-size: 14px; }
+.device-list { list-style: none; padding: 0; margin: 12px 0 0; }
+.device-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border, #e2e8f0); }
+.device-row .device-label { font-weight: 600; }
+.device-row .device-seen { color: var(--text-muted, #64748b); font-size: 13px; margin-left: auto; }
+.btn-remove-device { padding: 4px 12px; border-radius: 4px; cursor: pointer; }
+
 /* Modal responsive */
 @media (max-width: 576px) {
     .modal-container {

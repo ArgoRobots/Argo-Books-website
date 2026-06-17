@@ -41,7 +41,11 @@ if (!$input) {
 
 // Extract common fields
 $email = $input['email'] ?? $input['payer_email'] ?? '';
-$currency = $input['currency'] ?? 'CAD';
+// Only CAD is supported. Never trust a client-supplied currency: it is stored
+// on the subscription and used for PayPal refund currency, so a bad value
+// corrupts records and breaks refunds. The actual gateway charge is already
+// hardcoded to CAD.
+$currency = 'CAD';
 $billing = $input['billing'] ?? 'monthly';
 $paymentMethod = $input['payment_method'] ?? 'unknown';
 // Use session user_id as authoritative source (POST user_id is untrusted)
@@ -63,25 +67,46 @@ $amount = $baseCharge + $processingFee;
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';
 
-if (empty($email) || $userId <= 0 || $amount <= 0) {
+if ($userId <= 0 || $amount <= 0) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing required fields or invalid user']);
     exit();
 }
 
-// Verify user exists
+// Verify the user exists and use their ACCOUNT email (never trust a
+// client-supplied email) for the subscription record and receipt.
 try {
-    $stmt = $pdo->prepare("SELECT id FROM community_users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, email FROM community_users WHERE id = ?");
     $stmt->execute([$userId]);
-    if (!$stmt->fetch()) {
+    $userRow = $stmt->fetch();
+    if (!$userRow) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid user']);
         exit();
     }
+    $email = $userRow['email'];
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database error']);
     exit();
+}
+
+// Serialize concurrent checkout requests for the same user so a double-submit
+// can't create two subscriptions: the existing-subscription check and the
+// INSERT below are not otherwise atomic. The lock auto-releases when the
+// request (DB connection) ends.
+try {
+    $lockStmt = $pdo->prepare("SELECT GET_LOCK(?, 10)");
+    $lockStmt->execute(["premium_checkout_$userId"]);
+    $lockResult = $lockStmt->fetchColumn();
+    if ($lockResult === '0' || $lockResult === 0) {
+        http_response_code(409);
+        echo json_encode(['success' => false, 'error' => 'Another checkout is already in progress. Please wait a moment and try again.']);
+        exit();
+    }
+} catch (PDOException $e) {
+    // Best-effort: if advisory locking is unavailable, proceed rather than block checkout.
+    error_log("Checkout GET_LOCK failed for user $userId: " . $e->getMessage());
 }
 
 // Check if user is updating payment method for existing subscription
@@ -164,9 +189,15 @@ try {
                 $transactionId = $paypalSubscriptionId;
                 $paymentToken = $paypalSubscriptionId; // Store subscription ID as token
             } else {
-                // One-time PayPal payment (fallback)
-                $transactionId = $input['orderID'] ?? '';
-                $paymentToken = null;
+                // One-time PayPal payments are NOT supported here. This endpoint
+                // only creates recurring subscriptions, and there is no
+                // server-side capture verification for a one-off order id, so
+                // trusting a client-supplied orderID would let a logged-in user
+                // create a paid subscription without actually paying. Reject it.
+                $pdo->rollBack();
+                error_log("Rejected unsupported one-time PayPal payment. user_id=$userId");
+                echo json_encode(['success' => false, 'error' => 'Unsupported PayPal payment type']);
+                exit();
             }
             break;
 

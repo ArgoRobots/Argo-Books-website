@@ -96,7 +96,7 @@ function recently_renewed(PDO $pdo, string $subscriptionId): bool
         "SELECT 1 FROM premium_subscription_payments
          WHERE subscription_id = ?
            AND status = 'completed'
-           AND payment_type = 'renewal'
+           AND payment_type IN ('renewal', 'credit')
            AND created_at > DATE_SUB(NOW(), INTERVAL 23 HOUR)
          LIMIT 1"
     );

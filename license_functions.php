@@ -181,7 +181,7 @@ function validate_premium_key($key) {
  * @param string $device_id The hashed machine identifier of the redeeming device
  * @return array Response array with redemption result
  */
-function redeem_premium_key($key, $device_id) {
+function redeem_premium_key($key, $device_id, $label = null) {
     global $pdo;
 
     // First validate the key
@@ -197,7 +197,7 @@ function redeem_premium_key($key, $device_id) {
 
     // Key already redeemed: handle re-redemption (device transfer)
     if ($validation['status'] === 'redeemed') {
-        return _handle_re_redemption($key, $device_id, $validation['subscription_id']);
+        return _handle_re_redemption($key, $device_id, $validation['subscription_id'], $label);
     }
 
     // First-time redemption
@@ -244,7 +244,8 @@ function redeem_premium_key($key, $device_id) {
             current_environment()
         ]);
 
-        // Mark the key as redeemed with device_id
+        // Mark the key as redeemed with device_id (kept for backward compat /
+        // "primary device"; the devices table is the source of truth now).
         $stmt = $pdo->prepare("
             UPDATE premium_subscription_keys
             SET redeemed_at = NOW(),
@@ -253,6 +254,9 @@ function redeem_premium_key($key, $device_id) {
             WHERE subscription_key = ?
         ");
         $stmt->execute([$device_id, $subscriptionId, $key]);
+
+        // Register the redeeming device against the new subscription.
+        register_subscription_device($subscriptionId, $device_id, $label);
 
         $pdo->commit();
 
@@ -288,7 +292,8 @@ function redeem_premium_key($key, $device_id) {
             'message' => 'License activated successfully!',
             'subscription_id' => $subscriptionId,
             'end_date' => $endDate,
-            'duration_months' => $duration_months
+            'duration_months' => $duration_months,
+            'new_device' => true,
         ];
 
     } catch (PDOException $e) {
@@ -313,7 +318,7 @@ function redeem_premium_key($key, $device_id) {
  * @param string $subscription_id The subscription ID linked to this key
  * @return array Response array
  */
-function _handle_re_redemption($key, $device_id, $subscription_id) {
+function _handle_re_redemption($key, $device_id, $subscription_id, $label = null) {
     global $pdo;
 
     try {
@@ -332,7 +337,7 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
         if (!$subscription) {
             // Linked subscription is missing (deleted or never created).
             // Recreate the subscription from the key's metadata.
-            return _recreate_subscription_for_key($key, $device_id);
+            return _recreate_subscription_for_key($key, $device_id, $label);
         }
 
         // Check if subscription has expired
@@ -352,11 +357,27 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
             ];
         }
 
-        // Subscription is still active. Transfer to new device
+        // Subscription is active. Register THIS device if it's new and there's
+        // room; never silently evict another device.
+        $subId = $subscription['subscription_id'];
+        $alreadyHasDevice = is_device_registered($subId, $device_id);
+
+        if (!$alreadyHasDevice && count_subscription_devices($subId) >= get_max_devices()) {
+            return [
+                'success'     => false,
+                'status'      => 'device_limit_reached',
+                'message'     => 'This license is already active on the maximum number of devices. Remove a device from your account at ' . site_url() . '/community/users/subscription.php to free up a slot.',
+                'devices'     => get_subscription_devices($subId),
+                'max_devices' => get_max_devices(),
+            ];
+        }
+
+        register_subscription_device($subId, $device_id, $label);
+
+        // Keep premium_subscription_keys.device_id pointing at the most recent
+        // device for backward compatibility with older app builds.
         $stmt = $pdo->prepare("
-            UPDATE premium_subscription_keys
-            SET device_id = ?
-            WHERE subscription_key = ?
+            UPDATE premium_subscription_keys SET device_id = ? WHERE subscription_key = ?
         ");
         $stmt->execute([$device_id, $key]);
 
@@ -365,8 +386,11 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
             'type' => 'premium',
             'status' => 'active',
             'message' => 'License activated successfully!',
-            'subscription_id' => $subscription['subscription_id'],
+            'subscription_id' => $subId,
             'end_date' => $subscription['end_date'],
+            // True only when a brand-new device was added (drives the "new device
+            // activated" email in Task 5). Re-activating an existing device is false.
+            'new_device' => !$alreadyHasDevice,
         ];
 
     } catch (PDOException $e) {
@@ -388,7 +412,7 @@ function _handle_re_redemption($key, $device_id, $subscription_id) {
  * @param string $device_id The device's hashed machine identifier
  * @return array Response array with redemption result
  */
-function _recreate_subscription_for_key($key, $device_id) {
+function _recreate_subscription_for_key($key, $device_id, $label = null) {
     global $pdo;
 
     try {
@@ -471,6 +495,8 @@ function _recreate_subscription_for_key($key, $device_id) {
         ");
         $stmt->execute([$device_id, $newSubscriptionId, $key]);
 
+        register_subscription_device($newSubscriptionId, $device_id, $label);
+
         $pdo->commit();
 
         error_log("Recreated missing subscription for key $key: new subscription_id = $newSubscriptionId");
@@ -482,7 +508,8 @@ function _recreate_subscription_for_key($key, $device_id) {
             'message' => 'License activated successfully!',
             'subscription_id' => $newSubscriptionId,
             'end_date' => $endDate,
-            'duration_months' => $duration_months
+            'duration_months' => $duration_months,
+            'new_device' => true,
         ];
 
     } catch (PDOException $e) {

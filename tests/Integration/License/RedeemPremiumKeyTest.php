@@ -123,4 +123,66 @@ final class RedeemPremiumKeyTest extends IntegrationTestCase
         $stmt->execute([$result['subscription_id']]);
         $this->assertSame('active', $stmt->fetch()['status']);
     }
+
+    protected function tearDown(): void
+    {
+        $this->pdo->exec("DELETE FROM premium_subscription_devices WHERE subscription_id LIKE 'PREM-%'");
+        parent::tearDown();
+    }
+
+    public function test_first_redemption_registers_the_device(): void
+    {
+        $key = $this->seedPremiumKey(12);
+        $result = redeem_premium_key($key, 'dev-1');
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('active', $result['status']);
+        $this->trackSubscription($result['subscription_id']);
+
+        $this->assertTrue(is_device_registered($result['subscription_id'], 'dev-1'));
+        $this->assertSame(1, count_subscription_devices($result['subscription_id']));
+    }
+
+    public function test_additional_device_registers_when_under_limit(): void
+    {
+        if (get_max_devices() < 2) {
+            $this->markTestSkipped('Device limit < 2; multi-device add not testable.');
+        }
+        $key = $this->seedPremiumKey(12);
+        $first = redeem_premium_key($key, 'dev-1');
+        $this->trackSubscription($first['subscription_id']);
+
+        $second = redeem_premium_key($key, 'dev-2');
+        $this->assertTrue($second['success']);
+        $this->assertSame(2, count_subscription_devices($first['subscription_id']));
+    }
+
+    public function test_device_over_limit_is_rejected_with_device_limit_reached(): void
+    {
+        // Limit-agnostic: fill exactly the limit, then one more must be rejected.
+        $max = get_max_devices();
+        $key = $this->seedPremiumKey(12);
+        $first = redeem_premium_key($key, 'dev-1');
+        $this->trackSubscription($first['subscription_id']);
+        for ($i = 2; $i <= $max; $i++) {
+            redeem_premium_key($key, 'dev-' . $i);
+        }
+
+        $over = redeem_premium_key($key, 'dev-' . ($max + 1));
+        $this->assertFalse($over['success']);
+        $this->assertSame('device_limit_reached', $over['status']);
+        $this->assertCount($max, $over['devices']);
+        $this->assertFalse(is_device_registered($first['subscription_id'], 'dev-' . ($max + 1)));
+    }
+
+    public function test_reusing_same_device_does_not_consume_a_new_slot(): void
+    {
+        $key = $this->seedPremiumKey(12);
+        $first = redeem_premium_key($key, 'dev-1');
+        $this->trackSubscription($first['subscription_id']);
+        $again = redeem_premium_key($key, 'dev-1');
+
+        $this->assertTrue($again['success']);
+        $this->assertSame(1, count_subscription_devices($first['subscription_id']));
+    }
 }

@@ -1,6 +1,94 @@
 <?php
 require_once __DIR__ . '/db_connect.php';
 require_once __DIR__ . '/track_referral_event.php';
+require_once __DIR__ . '/config/pricing.php';
+
+/**
+ * Maximum number of devices a single subscription may run on simultaneously.
+ */
+function get_max_devices(): int
+{
+    return (int) get_pricing_config()['max_devices'];
+}
+
+/** Count devices currently registered to a subscription. */
+function count_subscription_devices(string $subscriptionId): int
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'SELECT COUNT(*) FROM premium_subscription_devices WHERE subscription_id = ?'
+    );
+    $stmt->execute([$subscriptionId]);
+    return (int) $stmt->fetchColumn();
+}
+
+/** True if this device is already registered to the subscription. */
+function is_device_registered(string $subscriptionId, string $deviceId): bool
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'SELECT 1 FROM premium_subscription_devices
+         WHERE subscription_id = ? AND device_id = ? LIMIT 1'
+    );
+    $stmt->execute([$subscriptionId, $deviceId]);
+    return $stmt->fetch() !== false;
+}
+
+/**
+ * Register a device against a subscription, or refresh last_seen_at/label if it
+ * already exists. Caller is responsible for enforcing the device limit BEFORE
+ * calling this for a brand-new device.
+ */
+function register_subscription_device(string $subscriptionId, string $deviceId, ?string $label = null): void
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'INSERT INTO premium_subscription_devices
+            (subscription_id, device_id, device_label, activated_at, last_seen_at, created_at)
+         VALUES (?, ?, ?, NOW(), NOW(), NOW())
+         ON DUPLICATE KEY UPDATE
+            last_seen_at = NOW(),
+            device_label = COALESCE(VALUES(device_label), device_label)'
+    );
+    $stmt->execute([$subscriptionId, $deviceId, $label]);
+}
+
+/** Update only last_seen_at for an already-registered device. */
+function touch_subscription_device(string $subscriptionId, string $deviceId): void
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'UPDATE premium_subscription_devices SET last_seen_at = NOW()
+         WHERE subscription_id = ? AND device_id = ?'
+    );
+    $stmt->execute([$subscriptionId, $deviceId]);
+}
+
+/** All devices for a subscription, most-recently-seen first. */
+function get_subscription_devices(string $subscriptionId): array
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'SELECT device_id, device_label, activated_at, last_seen_at
+         FROM premium_subscription_devices
+         WHERE subscription_id = ?
+         ORDER BY last_seen_at DESC'
+    );
+    $stmt->execute([$subscriptionId]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/** Remove one device. Returns true if a row was actually deleted. */
+function remove_subscription_device(string $subscriptionId, string $deviceId): bool
+{
+    global $pdo;
+    $stmt = $pdo->prepare(
+        'DELETE FROM premium_subscription_devices
+         WHERE subscription_id = ? AND device_id = ?'
+    );
+    $stmt->execute([$subscriptionId, $deviceId]);
+    return $stmt->rowCount() > 0;
+}
 
 /**
  * Generate a random license key

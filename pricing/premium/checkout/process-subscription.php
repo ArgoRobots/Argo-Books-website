@@ -375,8 +375,12 @@ try {
         // Update existing subscription with new payment method and billing cycle
         $subscriptionId = $existingSubscription['subscription_id'];
 
-        // Calculate new amount based on billing cycle (from centralized config)
+        // Calculate new amount based on billing cycle (from centralized config).
+        // $newAmount is the base price (used for signup_base_price / grandfathering);
+        // $newAmountCharged includes the processing fee and is what goes in the
+        // amount column, keeping it consistent with the new-signup path.
         $newAmount = ($billing === 'yearly') ? $pricingConfig['premium_yearly_price'] : $pricingConfig['premium_monthly_price'];
+        $newAmountCharged = $newAmount + calculate_processing_fee($newAmount);
 
         // Determine the new end date:
         // - If subscription still valid (end_date > now) AND not charged: keep existing end_date
@@ -529,6 +533,7 @@ try {
                     transaction_id = ?,
                     billing_cycle = ?,
                     amount = ?,
+                    signup_base_price = ?,
                     end_date = ?,
                     paypal_subscription_id = ?,
                     previous_paypal_subscription_id = ?,
@@ -545,6 +550,9 @@ try {
                 $stripeCustomerId,
                 $transactionId,
                 $billing,
+                $newAmountCharged,
+                // Cycle switch is a deliberate plan change, so re-lock to the
+                // current price for the new cycle (not the old grandfathered one).
                 $newAmount,
                 $newEndDate,
                 $paypalSubscriptionId,
@@ -584,6 +592,7 @@ try {
                     transaction_id = ?,
                     billing_cycle = ?,
                     amount = ?,
+                    signup_base_price = ?,
                     end_date = ?,
                     status = 'active',
                     auto_renew = 1,
@@ -597,6 +606,8 @@ try {
                 $stripeCustomerId,
                 $transactionId,
                 $billing,
+                $newAmountCharged,
+                // Re-lock to the current price for the new cycle.
                 $newAmount,
                 $newEndDate,
                 $subscriptionId
@@ -702,6 +713,23 @@ try {
             }
         }
 
+        // If this cycle switch raised the customer's effective rate (e.g. they
+        // had an older, lower locked-in price), say so plainly so a higher
+        // charge isn't a surprise. Compare monthly-equivalent rates, and only
+        // when we have a recorded old locked price to compare against.
+        $priceIncreaseNote = '';
+        $oldLockedBase = $existingSubscription['signup_base_price'] ?? null;
+        if ($oldLockedBase !== null && (float) $oldLockedBase > 0) {
+            $oldMonthly = ($existingSubscription['billing_cycle'] === 'yearly')
+                ? (float) $oldLockedBase / 12
+                : (float) $oldLockedBase;
+            $newMonthly = ($billing === 'yearly') ? (float) $newAmount / 12 : (float) $newAmount;
+            if ($newMonthly > $oldMonthly + 0.01) {
+                $newRateStr = '$' . number_format((float) $newAmount, 2) . '/' . ($billing === 'yearly' ? 'year' : 'month');
+                $priceIncreaseNote = " Note: changing your plan moves you to our current rate ($newRateStr). Your previous price was locked in when you first subscribed, and switching plans applies today's pricing.";
+            }
+        }
+
         // Build appropriate success message
         $formattedEndDate = date('F j, Y', strtotime($newEndDate));
         if ($isPayPalCycleSwitch) {
@@ -711,6 +739,7 @@ try {
         } else {
             $chargeMessage = "Payment successful! Your subscription is now active until $formattedEndDate.";
         }
+        $chargeMessage .= $priceIncreaseNote;
 
         $responseData = [
             'success' => true,
@@ -727,11 +756,11 @@ try {
         // Create new subscription
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscriptions (
-                subscription_id, user_id, email, billing_cycle, amount, currency,
+                subscription_id, user_id, email, billing_cycle, amount, signup_base_price, currency,
                 start_date, end_date, status, payment_method, transaction_id,
                 payment_token, stripe_customer_id, auto_renew, environment, created_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, 'active', ?, ?,
                 ?, ?, 1, ?, NOW()
             )
@@ -743,6 +772,9 @@ try {
             $email,
             $billing,
             $amount,
+            // Lock the base price (pre-fee) at signup so future renewals charge
+            // this rate even if the env price changes later. Grandfathering.
+            $baseCharge,
             $currency,
             $startDate,
             $endDate,

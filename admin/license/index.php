@@ -35,7 +35,16 @@ function get_premium_subscriptions($search_filter = '')
 
     try {
         $query = "
-            SELECT s.*, u.username
+            SELECT s.*, u.username,
+                (
+                    SELECT p.amount
+                    FROM premium_subscription_payments p
+                    WHERE p.subscription_id = s.subscription_id
+                      AND p.status = 'completed'
+                      AND p.amount > 0
+                    ORDER BY p.created_at DESC
+                    LIMIT 1
+                ) AS last_paid_amount
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
             WHERE s.payment_method != 'free_key'
@@ -613,7 +622,13 @@ include __DIR__ . '/../admin_header.php';
                                         <td class="key-field"><?php echo htmlspecialchars($sub['subscription_id']); ?></td>
                                         <td><?php echo htmlspecialchars($sub['username'] ?? 'N/A'); ?></td>
                                         <td><?php echo htmlspecialchars($sub['email']); ?></td>
-                                        <td><?php echo ucfirst($sub['billing_cycle']); ?> - $<?php echo number_format($sub['amount'], 2); ?></td>
+                                        <?php
+                                            // Show what the customer is actually billed (most recent completed
+                                            // payment), not the env-computed snapshot in s.amount, which can
+                                            // differ (e.g. a PayPal plan priced below the configured amount).
+                                            $billedAmount = $sub['last_paid_amount'] ?? $sub['amount'];
+                                        ?>
+                                        <td><?php echo ucfirst($sub['billing_cycle']); ?> - $<?php echo number_format((float) $billedAmount, 2); ?></td>
                                         <td>
                                             <?php
                                             $providerNames = ['paypal' => 'PayPal', 'stripe' => 'Stripe', 'square' => 'Square'];

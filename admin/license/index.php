@@ -44,7 +44,11 @@ function get_premium_subscriptions($search_filter = '')
                       AND p.amount > 0
                     ORDER BY p.created_at DESC
                     LIMIT 1
-                ) AS last_paid_amount
+                ) AS last_paid_amount,
+                (
+                    SELECT COUNT(*) FROM premium_subscription_devices d
+                    WHERE d.subscription_id = s.subscription_id
+                ) AS device_count
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
             WHERE s.payment_method != 'free_key'
@@ -199,6 +203,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_usage'])) {
         error_log("Usage reset error: " . $e->getMessage());
         echo json_encode(['success' => false, 'error' => 'Database error']);
     }
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_remove_device'])) {
+    header('Content-Type: application/json');
+    if (!verify_csrf_token()) {
+        echo json_encode(['success' => false, 'error' => 'Invalid request']);
+        exit;
+    }
+    $subId = trim($_POST['subscription_id'] ?? '');
+    $deviceId = trim($_POST['device_id'] ?? '');
+    if ($subId === '' || $deviceId === '') {
+        echo json_encode(['success' => false, 'error' => 'Missing parameters']);
+        exit;
+    }
+    require_once __DIR__ . '/../../license_functions.php';
+    $ok = remove_subscription_device($subId, $deviceId);
+    echo json_encode(['success' => $ok]);
     exit;
 }
 
@@ -607,6 +629,7 @@ include __DIR__ . '/../admin_header.php';
                                     <th>End Date</th>
                                     <th>Receipt Scans</th>
                                     <th>AI Imports</th>
+                                    <th>Devices</th>
                                     <th>Credit</th>
                                 </tr>
                             </thead>
@@ -653,6 +676,7 @@ include __DIR__ . '/../admin_header.php';
                                         ?>
                                         <td><span class="usage-count <?php echo $scans >= $receipt_limit ? 'usage-maxed' : ''; ?>"><?php echo $scans; ?> / <?php echo $receipt_limit; ?></span></td>
                                         <td><span class="usage-count <?php echo $imports >= $ai_import_limit ? 'usage-maxed' : ''; ?>"><?php echo $imports; ?> / <?php echo $ai_import_limit; ?></span></td>
+                                        <td><?php echo (int) ($sub['device_count'] ?? 0); ?> / <?php echo (int) get_pricing_config()['max_devices']; ?></td>
                                         <td>$<?php echo number_format($sub['credit_balance'] ?? 0, 2); ?></td>
                                     </tr>
                                 <?php endforeach; ?>

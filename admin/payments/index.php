@@ -526,7 +526,7 @@ include __DIR__ . '/../admin_header.php';
                 <h2>Recent Payments</h2>
             </div>
             <?php if (empty($recent_payments)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No payments recorded yet</p>
+                <p style="text-align: center; color: var(--black); padding: 2rem;">No payments recorded yet</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table>
@@ -608,7 +608,7 @@ include __DIR__ . '/../admin_header.php';
                 <span class="result-count"><?php echo count($transactions); ?> results</span>
             </div>
             <?php if (empty($transactions)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No transactions found</p>
+                <p style="text-align: center; color: var(--black); padding: 2rem;">No transactions found</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -664,7 +664,7 @@ include __DIR__ . '/../admin_header.php';
                 <span class="result-count"><?php echo count($companies); ?> companies</span>
             </div>
             <?php if (empty($companies)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No companies registered yet</p>
+                <p style="text-align: center; color: var(--black); padding: 2rem;">No companies registered yet</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table>
@@ -800,7 +800,7 @@ include __DIR__ . '/../admin_header.php';
                                                             if (!empty($company['locked'])) {
                                                                 echo '<strong style="color:#dc2626;">Locked</strong>';
                                                                 if (!empty($company['locked_at'])) echo ' on ' . date('M j', strtotime($company['locked_at']));
-                                                                if (!empty($company['lock_reason'])) echo '<br><small style="color:#6b7280;">' . htmlspecialchars($company['lock_reason']) . '</small>';
+                                                                if (!empty($company['lock_reason'])) echo '<br><small style="color:var(--black);">' . htmlspecialchars($company['lock_reason']) . '</small>';
                                                             } else {
                                                                 echo 'Active';
                                                             }
@@ -848,7 +848,7 @@ include __DIR__ . '/../admin_header.php';
                                                             <td><?php echo date('M j, Y g:i A', strtotime($ec['created_at'])); ?></td>
                                                             <td>
                                                                 <?php echo htmlspecialchars($ec['old_email']); ?>
-                                                                <span style="color:#6b7280;"> → </span>
+                                                                <span style="color:var(--black);"> → </span>
                                                                 <?php echo htmlspecialchars($ec['new_email']); ?>
                                                             </td>
                                                             <td>
@@ -931,7 +931,7 @@ include __DIR__ . '/../admin_header.php';
                 <span class="result-count"><?php echo count($invoices); ?> results</span>
             </div>
             <?php if (empty($invoices)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No invoices found</p>
+                <p style="text-align: center; color: var(--black); padding: 2rem;">No invoices found</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -1074,10 +1074,10 @@ include __DIR__ . '/../admin_header.php';
         <div class="table-container">
             <div class="table-header">
                 <h2>Refund Requests</h2>
-                <span class="subtext" style="color:#6b7280;font-size:.85rem;">In-flight orchestration. Completed refunds appear in "Refunded Payments" below.</span>
+                <span class="subtext" style="color:var(--black);font-size:.85rem;">In-flight orchestration. Completed refunds appear in "Refunded Payments" below.</span>
             </div>
             <?php if (empty($inflight_refunds)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 1.5rem;">No in-flight refund requests.</p>
+                <p style="text-align: center; color: var(--black); padding: 1.5rem;">No in-flight refund requests.</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -1122,7 +1122,7 @@ include __DIR__ . '/../admin_header.php';
                                             </form>
                                         <?php endif; ?>
                                         <?php if ($r['state_reason']): ?>
-                                            <small style="color:#6b7280;display:block;margin-top:2px;"><?php echo htmlspecialchars(substr($r['state_reason'], 0, 80)); ?></small>
+                                            <small style="color:var(--black);display:block;margin-top:2px;"><?php echo htmlspecialchars(substr($r['state_reason'], 0, 80)); ?></small>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -1139,7 +1139,7 @@ include __DIR__ . '/../admin_header.php';
                 <h2>Failed Payments</h2>
             </div>
             <?php if (empty($failed_payments)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No failed payments</p>
+                <p style="text-align: center; color: var(--black); padding: 2rem;">No failed payments</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -1176,7 +1176,7 @@ include __DIR__ . '/../admin_header.php';
                 <h2>Refunded Payments</h2>
             </div>
             <?php if (empty($refunded_payments)): ?>
-                <p style="text-align: center; color: #6b7280; padding: 2rem;">No refunded payments</p>
+                <p style="text-align: center; color: var(--black); padding: 2rem;">No refunded payments</p>
             <?php else: ?>
                 <div class="table-responsive">
                     <table data-paginate="25">

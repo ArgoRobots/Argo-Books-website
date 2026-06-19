@@ -271,7 +271,7 @@
 
 .provider-badge.disconnected {
     background-color: var(--gray-bg-light);
-    color: var(--gray-placeholder);
+    color: var(--black);
 }
 
 /* ============================================================
@@ -293,7 +293,7 @@
 .expand-arrow {
     display: inline-block;
     transition: transform 0.2s ease;
-    color: var(--gray-placeholder);
+    color: var(--black);
     font-size: 0.875rem;
 }
 

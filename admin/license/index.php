@@ -470,7 +470,7 @@ include __DIR__ . '/../admin_header.php';
     padding: 2px 8px;
     font-size: 12px;
     font-weight: 500;
-    color: #6b7280;
+    color: var(--black);
     background: #f3f4f6;
     border: 1px solid #d1d5db;
     border-radius: 4px;
@@ -482,7 +482,7 @@ include __DIR__ . '/../admin_header.php';
 }
 .btn-copy:hover {
     background: #e5e7eb;
-    color: #374151;
+    color: var(--black);
 }
 .btn-copy.copied {
     background: #d1fae5;
@@ -491,12 +491,12 @@ include __DIR__ . '/../admin_header.php';
 }
 [data-theme="dark"] .btn-copy {
     background: #1e293b;
-    color: #94a3b8;
+    color: var(--white);
     border-color: #334155;
 }
 [data-theme="dark"] .btn-copy:hover {
     background: #334155;
-    color: #e2e8f0;
+    color: var(--white);
 }
 [data-theme="dark"] .btn-copy.copied {
     background: #064e3b;
@@ -737,7 +737,7 @@ include __DIR__ . '/../admin_header.php';
                     <div class="form-group">
                         <label for="notes">Notes (optional)</label>
                         <input type="text" id="notes" name="notes" placeholder="e.g., Giveaway winner">
-                         <p style="position: absolute; margin: 5px 0 20px; color: var(--gray-500);">This will also appear in the recipient's email.</p>
+                         <p style="position: absolute; margin: 5px 0 20px; color: var(--black);">This will also appear in the recipient's email.</p>
                     </div>
                     <div class="form-group">
                         <button type="submit" name="generate_sub_key" class="btn btn-purple" style="margin-top: 24px;">Generate Key</button>
@@ -805,7 +805,7 @@ include __DIR__ . '/../admin_header.php';
                                             <button type="button" class="btn-copy" onclick="copyToClipboard('<?php echo htmlspecialchars($key['subscription_key'], ENT_QUOTES); ?>', this)" title="Copy key">Copy</button>
                                         </td>
                                         <td><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
-                                        <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:#9ca3af;">Any user</span>'; ?></td>
+                                        <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:var(--black);">Any user</span>'; ?></td>
                                         <td>
                                             <?php if ($key['redeemed_at']): ?>
                                                 <span class="badge badge-redeemed">Redeemed</span>

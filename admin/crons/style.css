@@ -22,7 +22,7 @@
     padding: 6px 14px;
     border-radius: 6px;
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--black);
     text-decoration: none;
     transition: background 0.15s ease, color 0.15s ease;
 }
@@ -37,7 +37,7 @@
 }
 
 [data-theme="dark"] .range-btn {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .range-btn:hover {
@@ -55,12 +55,12 @@
     border: 1px dashed var(--gray-300);
     border-radius: 8px;
     text-align: center;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 [data-theme="dark"] .empty-state {
     border-color: var(--gray-700);
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 .cron-cards {
@@ -122,7 +122,7 @@
     height: 18px;
     border-radius: 999px;
     background: var(--gray-200);
-    color: var(--gray-700);
+    color: var(--black);
     font-family: 'Times New Roman', serif;
     font-style: italic;
     font-size: 12px;
@@ -139,7 +139,7 @@
 
 [data-theme="dark"] .cron-info-icon {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .cron-info:hover .cron-info-icon,
@@ -203,11 +203,11 @@
     flex-wrap: wrap;
     gap: 12px;
     font-size: 12px;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 [data-theme="dark"] .cron-meta {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 
@@ -236,14 +236,14 @@
     padding: 12px;
     background: var(--gray-100, #f9fafb);
     border-radius: 6px;
-    color: var(--gray-600);
+    color: var(--black);
     font-size: 13px;
     text-align: center;
 }
 
 [data-theme="dark"] .cron-empty {
     background: var(--gray-900);
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 .cron-metrics {
@@ -270,12 +270,12 @@
 
 .metric-label {
     font-size: 12px;
-    color: var(--gray-600);
+    color: var(--black);
     margin-top: 4px;
 }
 
 [data-theme="dark"] .metric-label {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 .cron-detail {
@@ -291,11 +291,11 @@
 .cron-detail summary {
     cursor: pointer;
     font-size: 13px;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 [data-theme="dark"] .cron-detail summary {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 .cron-detail summary:hover {
@@ -335,7 +335,7 @@
 }
 
 .cron-metric-table td.k {
-    color: var(--gray-600);
+    color: var(--black);
     width: 40%;
 }
 
@@ -346,5 +346,5 @@
 }
 
 [data-theme="dark"] .cron-metric-table td.k {
-    color: var(--gray-400);
+    color: var(--white);
 }

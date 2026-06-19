@@ -36,7 +36,7 @@
 
 .stat-card .subtext {
     font-size: 14px;
-    color: var(--gray-placeholder);
+    color: var(--black);
 }
 
 .period-selection {
@@ -281,7 +281,7 @@ code {
 }
 
 .modal-close {
-    color: var(--gray-placeholder);
+    color: var(--black);
     float: right;
     font-size: 32px;
     font-weight: bold;
@@ -364,7 +364,7 @@ code {
 
 [data-theme="dark"] .chart-container h2,
 [data-theme="dark"] .table-header-actions h2 {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 /* ─── Group-by toggle (source vs category) ────────────────────────────── */
@@ -428,7 +428,7 @@ code {
 .cat-caret {
     display: inline-block;
     margin-right: 8px;
-    color: var(--gray-500);
+    color: var(--black);
     transition: transform 0.15s;
 }
 
@@ -443,7 +443,7 @@ code {
 
 .cat-meta {
     margin-left: 10px;
-    color: var(--gray-500);
+    color: var(--black);
     font-weight: 500;
 }
 
@@ -456,12 +456,12 @@ code {
 }
 
 [data-theme="dark"] .group-toggle > span {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .group-btn {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .group-btn:hover {
@@ -482,10 +482,10 @@ code {
 }
 
 [data-theme="dark"] .cat-name {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .cat-meta {
-    color: var(--gray-400);
+    color: var(--white);
 }
 

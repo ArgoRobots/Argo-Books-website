@@ -239,7 +239,7 @@ body.menu-open::after {
 .header-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: var(--black);
 }
 
 /* Desktop Navigation */
@@ -263,7 +263,7 @@ body.menu-open::after {
 }
 
 .header-link:hover {
-  color: var(--dark-gray);
+  color: var(--black);
   background: var(--neutral-f0f0f0);
 }
 
@@ -348,7 +348,7 @@ body.menu-open::after {
 }
 
 .nav-dropdown-link:hover {
-  color: var(--dark-gray);
+  color: var(--black);
   background: var(--neutral-f0f0f0);
 }
 
@@ -429,7 +429,7 @@ body.menu-open::after {
 .page-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: var(--black);
   margin: 0 0 0.5rem 0;
 }
 
@@ -638,7 +638,7 @@ tbody tr:hover {
 }
 
 .stat-card .subtext {
-  color: var(--gray-placeholder);
+  color: var(--black);
   font-size: 0.75rem;
   margin-top: 0.25rem;
   line-height: 1.2;
@@ -1001,7 +1001,7 @@ tbody tr:hover {
   padding: 1rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: var(--gray-600);
+  color: var(--black);
   font-size: 0.875rem;
   font-weight: 500;
 }
@@ -1265,13 +1265,13 @@ tbody tr:hover {
    ============================================================ */
 [data-theme="dark"] .theme-toggle {
   border-color: var(--black);
-  color: var(--gray-input-border);
+  color: var(--white);
 }
 
 [data-theme="dark"] .theme-toggle:hover {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--whiteBackground);
+  color: var(--white);
 }
 
 [data-theme="dark"] .theme-toggle .icon-moon {
@@ -1294,7 +1294,7 @@ tbody tr:hover {
 
 [data-theme="dark"] body {
   background: var(--neutral-111827);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Header */
@@ -1305,15 +1305,15 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .header-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .header-link {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .header-link:hover {
-  color: var(--gray-200);
+  color: var(--white);
   background: var(--gray-700);
 }
 
@@ -1329,11 +1329,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .nav-dropdown-link {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .nav-dropdown-link:hover {
-  color: var(--gray-200);
+  color: var(--white);
   background: var(--gray-700);
 }
 
@@ -1343,7 +1343,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .user-name {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .menu-icon .nav-icon,
@@ -1359,13 +1359,13 @@ tbody tr:hover {
 /* Dark theme - Home button */
 [data-theme="dark"] .btn-home {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
   border-color: var(--gray-600);
 }
 
 [data-theme="dark"] .btn-home:hover {
   background: var(--slate-3f4f63);
-  color: var(--gray-200);
+  color: var(--white);
   border-color: var(--gray-500);
 }
 
@@ -1383,7 +1383,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .hamburger-nav-menu ul li a {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .hamburger-nav-menu ul li a:hover {
@@ -1405,11 +1405,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .page-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .page-description {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Typography */
@@ -1418,11 +1418,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] h2 {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] h3 {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 /* Dark theme - Tables */
@@ -1434,13 +1434,13 @@ tbody tr:hover {
 
 [data-theme="dark"] th {
   background-color: var(--gray-800);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] th,
 [data-theme="dark"] td {
   border-bottom-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] tbody tr:hover {
@@ -1455,7 +1455,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .stat-card h3 {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .stat-card .stat-value,
@@ -1464,7 +1464,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .stat-card .subtext {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 /* Dark theme - Charts */
@@ -1475,7 +1475,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .chart-no-data {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Forms & Inputs */
@@ -1487,12 +1487,12 @@ tbody tr:hover {
 [data-theme="dark"] textarea {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] input[type="password"]::-ms-reveal {
@@ -1500,7 +1500,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] label {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 /* Dark theme - Badges */
@@ -1521,7 +1521,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .badge-user {
   background-color: var(--gray-alpha-30);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .badge-banned {
@@ -1531,7 +1531,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .badge-active {
   background-color: var(--gray-alpha-20);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Alerts */
@@ -1556,12 +1556,12 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .period-selection span {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 [data-theme="dark"] .period-btn {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .period-btn:hover {
@@ -1570,7 +1570,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .period-btn.active {
   background: var(--gray-600);
-  color: var(--gray-100);
+  color: var(--white);
   border-color: var(--black);
 }
 
@@ -1578,14 +1578,14 @@ tbody tr:hover {
 [data-theme="dark"] .range-select select,
 [data-theme="dark"] .range-custom input[type="date"] {
   background: var(--gray-800);
-  color: var(--gray-100);
+  color: var(--white);
   border-color: var(--gray-700);
   box-shadow: 0 1px 3px var(--overlay-light);
 }
 
 [data-theme="dark"] .range-label,
 [data-theme="dark"] .range-display {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .range-custom input[type="date"] {
@@ -1606,40 +1606,40 @@ tbody tr:hover {
 [data-theme="dark"] .secret-key {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .verification-heading {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .verification-code,
 [data-theme="dark"] .verification-input {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Data info / No data */
 [data-theme="dark"] .data-info {
   background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
   border-color: var(--gray-600);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .no-data {
-  color: var(--gray-400);
+  color: var(--white);
   background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-800) 100%);
   border-color: var(--gray-600);
 }
 
 [data-theme="dark"] .no-data h3 {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .no-data code {
   background: var(--gray-700);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Scrollbar */
@@ -1668,11 +1668,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .env-toggle-btn {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .env-toggle-btn:hover {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .env-toggle-btn.active {
@@ -1685,11 +1685,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .section-tab {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .section-tab:hover {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Payment status badges */
@@ -1715,7 +1715,7 @@ tbody tr:hover {
 [data-theme="dark"] .badge-invoice-draft,
 [data-theme="dark"] .badge-invoice-cancelled {
   background: var(--gray-alpha-20);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .badge-invoice-sent {
@@ -1764,16 +1764,16 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .detail-section-title {
-  color: var(--gray-300);
+  color: var(--white);
   border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .detail-label {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .detail-value {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .provider-card {
@@ -1791,11 +1791,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .provider-card-name {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .provider-card-status {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .expandable-row:hover {
@@ -1813,24 +1813,24 @@ tbody tr:hover {
 
 [data-theme="dark"] .provider-badge.disconnected {
   background-color: var(--gray-alpha-20);
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 /* Dark theme - Result count */
 [data-theme="dark"] .result-count {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Btn outline */
 [data-theme="dark"] .btn-outline {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
   border-color: var(--black);
 }
 
 [data-theme="dark"] .btn-outline:hover {
   background: var(--gray-600);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Badge method */
@@ -1841,11 +1841,11 @@ tbody tr:hover {
 
 /* Dark theme - License page */
 [data-theme="dark"] .form-group label {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 [data-theme="dark"] .form-group small {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .form-group input,
@@ -1853,7 +1853,7 @@ tbody tr:hover {
 [data-theme="dark"] .form-group textarea {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .key-display {
@@ -1883,20 +1883,20 @@ tbody tr:hover {
 
 [data-theme="dark"] .badge-expired {
   background: var(--gray-alpha-20);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .usage-count {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .usage-na {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .btn-secondary {
   background: var(--gray-700);
-  color: var(--gray-200);
+  color: var(--white);
   border-color: var(--black);
 }
 
@@ -1914,24 +1914,24 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .modal-header h3 {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-close {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-close:hover {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-body p {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-note {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-footer {
@@ -1940,7 +1940,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] #modalTitle {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Referral links page */
@@ -1949,7 +1949,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] table td {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] table tbody tr:hover {
@@ -1982,20 +1982,20 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .report-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .report-id {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .report-meta-row {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .content-preview {
   background: var(--gray-800);
-  color: var(--gray-400);
+  color: var(--white);
   border-left-color: var(--gray-600);
 }
 
@@ -2009,22 +2009,22 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .status-badge-label {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .status-badge-count {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Filter groups */
 [data-theme="dark"] .filter-group select {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .filter-group label {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 
@@ -2039,23 +2039,23 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .card-header h2 {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .search-input {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .clear-button {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .clear-button:hover {
   background: var(--gray-600);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Bulk actions (users) */
@@ -2065,7 +2065,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .selection-info {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Dashboard chart cards */
@@ -2076,12 +2076,12 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .chart-card-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Search results */
 [data-theme="dark"] .search-results {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Checkboxes */
@@ -2100,7 +2100,7 @@ tbody tr:hover {
 
 /* Dark theme - Dashboard hero */
 [data-theme="dark"] .hero-section h1 {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Env toggle production/sandbox */
@@ -2119,12 +2119,12 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .bulk-actions-container .selection-info {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - App stats inline styles */
 [data-theme="dark"] .section-title {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .error-details-table {
@@ -2134,12 +2134,12 @@ tbody tr:hover {
 
 [data-theme="dark"] .error-details-table th {
   background: var(--gray-800);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .error-details-table td {
   border-bottom-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .error-details-table tr:hover {
@@ -2151,7 +2151,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .error-details-table td.error-source {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* ─── Pagination Controls ─── */
@@ -2194,7 +2194,7 @@ tbody tr:hover {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--dark-gray, #374151);
+  color: var(--black);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -2228,13 +2228,13 @@ tbody tr:hover {
   justify-content: center;
   min-width: 32px;
   height: 36px;
-  color: var(--gray-500);
+  color: var(--black);
   font-size: 0.9rem;
 }
 
 [data-theme="dark"] .pg-arrow,
 [data-theme="dark"] .pg-num {
-  color: var(--gray-300, #d1d5db);
+  color: var(--white);
 }
 
 [data-theme="dark"] .pg-arrow:hover:not(:disabled),
@@ -2306,11 +2306,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .section-tab {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .section-tab:hover {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .section-tab.active {

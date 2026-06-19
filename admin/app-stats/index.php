@@ -338,7 +338,7 @@ include __DIR__ . '/../admin_header.php';
 .stat-card h3 {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--black);
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -347,13 +347,13 @@ include __DIR__ . '/../admin_header.php';
 .stat-card .value {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--black);
     margin: 0.5rem 0;
 }
 
 .stat-card .subtext {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--black);
     margin: 0;
 }
 
@@ -364,7 +364,7 @@ include __DIR__ . '/../admin_header.php';
 .section-title {
     text-align: center;
     margin-bottom: 1.5rem;
-    color: #374151;
+    color: var(--black);
     font-size: 1.5rem;
     font-weight: 600;
 }
@@ -405,7 +405,7 @@ include __DIR__ . '/../admin_header.php';
 .error-details-table th {
     background: #f9fafb;
     font-weight: 600;
-    color: #374151;
+    color: var(--black);
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
@@ -426,7 +426,7 @@ include __DIR__ . '/../admin_header.php';
 .error-details-table td.error-source {
     font-family: monospace;
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--black);
 }
 
 .error-details-wrapper {
@@ -473,12 +473,12 @@ include __DIR__ . '/../admin_header.php';
 }
 
 [data-theme="dark"] .tier-filter-label {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .tier-pill {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .tier-pill:hover {
@@ -543,23 +543,6 @@ include __DIR__ . '/../admin_header.php';
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <div class="data-info">
-            <strong>Data Summary:</strong>
-            <?= $fileInfo['processed_files'] ?> files processed
-            (<?= $fileInfo['total_files'] ?> total files)
-            <?php if ($fileInfo['failed_files'] > 0): ?>
-                | <?= $fileInfo['failed_files'] ?> files failed to process
-            <?php endif; ?>
-            <?php if ($tierFilter !== 'all'): ?>
-                | <strong>Filter:</strong> <?= htmlspecialchars(ucfirst($tierFilter)) ?> tier only
-            <?php endif; ?>
-            <br>
-            <strong>Latest Data:</strong> <?= date('M j, Y g:i A', $fileInfo['latest_modified']) ?>
-            <?php if ($fileInfo['oldest_file'] !== $fileInfo['latest_file']): ?>
-                | <strong>Oldest Data:</strong> <?= date('M j, Y g:i A', $fileInfo['oldest_modified']) ?>
-            <?php endif; ?>
-        </div>
-
         <div class="tabs-container">
             <div class="section-tabs">
                 <button class="section-tab active" data-tab="active-users">Active Users</button>
@@ -604,12 +587,12 @@ include __DIR__ . '/../admin_header.php';
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Free Users (MAU)</h3>
+                        <h3>Free Users (Monthly Active Users)</h3>
                         <div class="value"><?= number_format($aggregatedData['tierStats']['free']['mauUsers']) ?></div>
                         <p class="subtext"><?= number_format($aggregatedData['tierStats']['free']['totalUsers']) ?> total · last 30 days</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Premium Users (MAU)</h3>
+                        <h3>Premium Users (Monthly Active Users)</h3>
                         <div class="value"><?= number_format($aggregatedData['tierStats']['premium']['mauUsers']) ?></div>
                         <p class="subtext"><?= number_format($aggregatedData['tierStats']['premium']['totalUsers']) ?> total · last 30 days</p>
                     </div>
@@ -894,7 +877,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <h2 class="section-title" style="margin-top: 2rem;">Error Details</h2>
                 <div class="error-details-wrapper" id="errorDetailsTableWrapper">
-                    <p style="text-align: center; color: #9ca3af;">No error data available</p>
+                    <p style="text-align: center; color: var(--black);">No error data available</p>
                 </div>
             </div>
 

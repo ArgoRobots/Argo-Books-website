@@ -56,12 +56,12 @@
 }
 
 [data-theme="dark"] .funnel-controls .control-label {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .funnel-pill {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .funnel-pill:hover {
@@ -104,7 +104,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 11px;
-    color: var(--gray-500);
+    color: var(--black);
     pointer-events: auto;
     cursor: pointer;
 }
@@ -156,7 +156,7 @@
 [data-theme="dark"] .source-combobox-input {
     background: var(--gray-700);
     border-color: var(--black);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .source-combobox-input:focus {
@@ -170,7 +170,7 @@
 }
 
 [data-theme="dark"] .source-combobox-option {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .source-combobox-option:hover,
@@ -218,7 +218,7 @@
 }
 
 [data-theme="dark"] .funnel-container h2 {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .funnel-container h2 .source-tag {
@@ -246,7 +246,7 @@
 }
 
 [data-theme="dark"] .funnel-label {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 .funnel-bar-wrap {
@@ -285,7 +285,7 @@
 }
 
 [data-theme="dark"] .funnel-count {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 .funnel-dropoff {
@@ -294,12 +294,12 @@
     gap: 12px;
     padding: 6px 0 6px 220px;
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .funnel-dropoff .kept { color: var(--emerald-600); font-weight: 600; }
-.funnel-dropoff .lost { color: var(--gray-400); }
-.funnel-dropoff .sep  { color: var(--gray-300); }
+.funnel-dropoff .lost { color: var(--black); }
+.funnel-dropoff .sep  { color: var(--black); }
 
 .funnel-dropoff.biggest { color: var(--red-600); }
 .funnel-dropoff.biggest .kept { color: var(--red-600); }
@@ -309,9 +309,9 @@
     color: var(--red-600);
 }
 
-[data-theme="dark"] .funnel-dropoff       { color: var(--gray-500); }
+[data-theme="dark"] .funnel-dropoff       { color: var(--white); }
 [data-theme="dark"] .funnel-dropoff .kept { color: var(--emerald-400); }
-[data-theme="dark"] .funnel-dropoff .lost { color: var(--gray-500); }
+[data-theme="dark"] .funnel-dropoff .lost { color: var(--white); }
 [data-theme="dark"] .funnel-dropoff.biggest { color: var(--red-400); }
 [data-theme="dark"] .funnel-dropoff.biggest .kept { color: var(--red-400); }
 [data-theme="dark"] .funnel-dropoff.biggest::before { color: var(--red-400); }
@@ -330,7 +330,7 @@
 
 .stat-card.hero .suffix {
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--black);
     margin-left: 8px;
     font-weight: 500;
 }
@@ -367,7 +367,7 @@
 [data-theme="dark"] .stat-card.ratio-profitable .value { color: var(--emerald-400); }
 [data-theme="dark"] .stat-card.ratio-organic .value    { color: var(--emerald-400); }
 
-[data-theme="dark"] .stat-card.hero .suffix { color: var(--gray-400); }
+[data-theme="dark"] .stat-card.hero .suffix { color: var(--white); }
 
 /* ─── Comparison table ─────────────────────────────────────────────────── */
 
@@ -400,7 +400,7 @@
 .empty-state {
     text-align: center;
     padding: 48px 24px;
-    color: var(--gray-500);
+    color: var(--black);
 }
 
 .empty-state p {
@@ -424,11 +424,11 @@
     margin: 0 0 16px 0;
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-600);
+    color: var(--black);
 }
 
 [data-theme="dark"] .landing-breakdown h3 {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 .landing-breakdown-body {
@@ -490,12 +490,12 @@
 
 .landing-breakdown-list .pct {
     font-variant-numeric: tabular-nums;
-    color: var(--gray-700);
+    color: var(--black);
     font-weight: 600;
 }
 
 [data-theme="dark"] .landing-breakdown-list .pct {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 /* ─── Modal (ad-spend create/edit) ─────────────────────────────────────── */
@@ -522,7 +522,7 @@
 }
 
 .modal-close {
-    color: var(--gray-placeholder);
+    color: var(--black);
     float: right;
     font-size: 32px;
     font-weight: bold;
@@ -541,7 +541,7 @@
 }
 
 [data-theme="dark"] #spendModalTitle {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 /* The month picker and textarea aren't covered by the shared input sizing
@@ -588,13 +588,13 @@
    button renders light-on-dark without this. */
 [data-theme="dark"] #spendModal .btn-gray {
     background-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
     border-color: var(--black);
 }
 
 [data-theme="dark"] #spendModal .btn-gray:hover {
     background-color: var(--gray-600);
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 /* ─── Mobile responsive ────────────────────────────────────────────────── */
@@ -643,13 +643,13 @@
 .survey-other-details summary {
     cursor: pointer;
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--black);
     user-select: none;
     margin-bottom: 8px;
 }
 
 [data-theme="dark"] .survey-other-details summary {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 .survey-other-list {
@@ -680,10 +680,10 @@
 
 .survey-other-list .count {
     font-variant-numeric: tabular-nums;
-    color: var(--gray-600);
+    color: var(--black);
     flex-shrink: 0;
 }
 
 [data-theme="dark"] .survey-other-list .count {
-    color: var(--gray-400);
+    color: var(--white);
 }

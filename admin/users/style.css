@@ -11,7 +11,7 @@
 .stat-card h3 {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: var(--black);
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -20,7 +20,7 @@
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--gray-800);
+  color: var(--black);
   line-height: 1;
 }
 
@@ -46,7 +46,7 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--gray-800);
+  color: var(--black);
 }
 
 /* Search Form */
@@ -107,7 +107,7 @@
 .clear-button {
   padding: 0.5rem 1rem;
   background: var(--gray-100);
-  color: var(--gray-500);
+  color: var(--black);
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.875rem;
@@ -121,7 +121,7 @@
 
 .clear-button:hover {
   background: var(--gray-border);
-  color: var(--gray-700);
+  color: var(--black);
 }
 
 /* Filter Groups (inline with search) */
@@ -134,7 +134,7 @@
 .filter-group label {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--gray-500);
+  color: var(--black);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -163,7 +163,7 @@
 [data-theme="dark"] .filter-group input[type="date"] {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .filter-group input[type="date"]::-webkit-calendar-picker-indicator {
@@ -209,7 +209,7 @@
 
 .selection-info {
   font-size: 0.875rem;
-  color: var(--gray-500);
+  color: var(--black);
   font-weight: 500;
 }
 
@@ -269,7 +269,7 @@
 .no-results {
   padding: 3rem 2rem;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--black);
 }
 
 .no-results svg {

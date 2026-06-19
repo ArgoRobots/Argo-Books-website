@@ -13,116 +13,199 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 $page_title = "Website Statistics";
 $page_description = "View comprehensive analytics, user statistics, and performance metrics";
 
-/**
- * Get SQL period formatting based on period type
- * @param string $period Period type (day, week, month, year)
- * @return array [sql_period, display_format]
- */
-function get_period_formatting($period)
+// ---------------------------------------------------------------------------
+// Date range + automatic bucketing.
+//
+// Mirrors the desktop app (ArgoBooks): a single date-range selection drives
+// everything, and the chart bucket (day / week / month) is derived from the
+// range length rather than chosen manually.
+//   - range  < 90 days  -> daily buckets
+//   - range  < 365 days -> weekly buckets (Sunday-start)
+//   - range >= 365 days -> monthly buckets
+// See ReportChartDataService.GetTimeBucket and ChartSettingsService in the
+// Avalonia repo.
+// ---------------------------------------------------------------------------
+
+/** Preset display names, in dropdown order (matches DateRangePreset.GetStandardOptions()). */
+function date_range_presets()
 {
-    $formats = [
-        'day' => ['DATE(created_at)', 'DATE(created_at)'],
-        'week' => ['YEARWEEK(created_at)', 'CONCAT("Week ", WEEK(created_at), ", ", YEAR(created_at))'],
-        'month' => ['DATE_FORMAT(created_at, "%Y-%m")', 'DATE_FORMAT(created_at, "%b %Y")'],
-        'year' => ['YEAR(created_at)', 'YEAR(created_at)']
+    return [
+        'This Month', 'Last Month', 'Last 30 Days', 'Last 100 Days', 'Last 365 Days',
+        'This Quarter', 'Last Quarter', 'This Year', 'Last Year', 'All Time', 'Custom Range',
     ];
-    return $formats[$period] ?? $formats['month'];
 }
 
 /**
- * Generic function to get statistics by period from any table
- * @param string $table Table name
- * @param string $period Period type
- * @param int $limit Number of results
- * @param string $where_clause Optional WHERE clause (without WHERE keyword)
- * @return array Statistics data
+ * Resolve a preset (plus optional custom start/end) to concrete [start, end]
+ * DateTime bounds. Mirrors ChartSettingsService.UpdateDateRangeFromSelection():
+ * the end is always end-of-day so rows saved later in the day aren't filtered out.
  */
-function get_stats_by_period($table, $period = 'month', $limit = 12, $where_clause = '')
+function resolve_date_range($preset, $custom_start = null, $custom_end = null)
 {
     global $pdo;
-    list($sql_period, $display_format) = get_period_formatting($period);
 
-    $where = $where_clause ? "WHERE $where_clause" : '';
-    $query = "
-        SELECT
-            $sql_period as period,
-            $display_format as display_period,
-            COUNT(*) as count
-        FROM $table
-        $where
-        GROUP BY period, display_period
-        ORDER BY period DESC
-        LIMIT ?";
+    $now   = new DateTime('now');
+    $today = (new DateTime('now'))->setTime(0, 0, 0);
+    $year  = (int)$now->format('Y');
 
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([$limit]);
+    // Defaults (used as-is for "Custom Range" with missing/invalid input).
+    $start = clone $today;
+    $end   = (new DateTime('now'))->setTime(23, 59, 59);
 
-    $data = [];
-    while ($row = $stmt->fetch()) {
-        $data[] = $row;
+    switch ($preset) {
+        case 'This Month':
+            $start = (new DateTime('first day of this month'))->setTime(0, 0, 0);
+            break;
+
+        case 'Last Month':
+            $start = (new DateTime('first day of last month'))->setTime(0, 0, 0);
+            $end   = (new DateTime('last day of last month'))->setTime(23, 59, 59);
+            break;
+
+        case 'Last 30 Days':
+            $start = (clone $today)->modify('-29 days');
+            break;
+
+        case 'Last 100 Days':
+            $start = (clone $today)->modify('-99 days');
+            break;
+
+        case 'Last 365 Days':
+            $start = (clone $today)->modify('-364 days');
+            break;
+
+        case 'This Quarter':
+            $qm = intdiv((int)$now->format('n') - 1, 3) * 3 + 1;
+            $start = (new DateTime())->setDate($year, $qm, 1)->setTime(0, 0, 0);
+            break;
+
+        case 'Last Quarter':
+            $qm = intdiv((int)$now->format('n') - 1, 3) * 3 + 1;
+            $this_q_start = (new DateTime())->setDate($year, $qm, 1)->setTime(0, 0, 0);
+            $last_q_end   = (clone $this_q_start)->modify('-1 day')->setTime(23, 59, 59);
+            $lqm = intdiv((int)$last_q_end->format('n') - 1, 3) * 3 + 1;
+            $start = (new DateTime())->setDate((int)$last_q_end->format('Y'), $lqm, 1)->setTime(0, 0, 0);
+            $end   = $last_q_end;
+            break;
+
+        case 'This Year':
+            $start = (new DateTime())->setDate($year, 1, 1)->setTime(0, 0, 0);
+            break;
+
+        case 'Last Year':
+            $start = (new DateTime())->setDate($year - 1, 1, 1)->setTime(0, 0, 0);
+            $end   = (new DateTime())->setDate($year - 1, 12, 31)->setTime(23, 59, 59);
+            break;
+
+        case 'All Time':
+            $row = $pdo->query("
+                SELECT LEAST(
+                    COALESCE((SELECT MIN(created_at) FROM statistics), NOW()),
+                    COALESCE((SELECT MIN(created_at) FROM community_users), NOW())
+                ) AS earliest")->fetch();
+            $start = (!empty($row['earliest']))
+                ? (new DateTime($row['earliest']))->setTime(0, 0, 0)
+                : clone $today;
+            break;
+
+        case 'Custom Range':
+            $s = $custom_start ? DateTime::createFromFormat('Y-m-d', $custom_start) : false;
+            $e = $custom_end ? DateTime::createFromFormat('Y-m-d', $custom_end) : false;
+            if ($s && $e) {
+                if ($s > $e) {
+                    $tmp = $s;
+                    $s = $e;
+                    $e = $tmp;
+                }
+                $start = $s->setTime(0, 0, 0);
+                $end   = $e->setTime(23, 59, 59);
+            }
+            break;
     }
 
-    return $data;
+    return ['start' => $start, 'end' => $end];
 }
 
-// Function to get download statistics by period (all platforms combined)
-function get_downloads_by_period($period = 'month', $limit = 12)
+/** Choose the bucket granularity from the range length (mirrors GetTimeBucket). */
+function pick_time_bucket(DateTime $start, DateTime $end)
 {
-    return get_stats_by_period('statistics', $period, $limit, "event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')");
+    $days = ($end->getTimestamp() - $start->getTimestamp()) / 86400;
+    if ($days < 90)  return 'day';
+    if ($days < 365) return 'week';
+    return 'month';
 }
 
-// Function to get user registrations by period
-function get_registrations_by_period($period = 'month', $limit = 12)
+/** SQL expression returning the canonical bucket key (a DATE string) for a row. */
+function bucket_key_sql($bucket, $col = 'created_at')
 {
-    return get_stats_by_period('community_users', $period, $limit);
-}
-
-// Function to get page view statistics
-function get_page_views_by_period($period = 'month', $limit = 12)
-{
-    global $pdo;
-
-    $sql_period = '';
-    $display_format = '';
-    switch ($period) {
-        case 'day':
-            $sql_period = 'DATE(created_at)';
-            $display_format = 'DATE(created_at)';
-            break;
-        case 'week':
-            $sql_period = 'YEARWEEK(created_at)';
-            $display_format = 'CONCAT("Week ", WEEK(created_at), ", ", YEAR(created_at))';
-            break;
+    switch ($bucket) {
+        case 'week':  // Sunday-start week (DAYOFWEEK: 1=Sun..7=Sat)
+            return "DATE_SUB(DATE($col), INTERVAL (DAYOFWEEK($col) - 1) DAY)";
         case 'month':
-            $sql_period = 'DATE_FORMAT(created_at, "%Y-%m")';
-            $display_format = 'DATE_FORMAT(created_at, "%b %Y")';
-            break;
-        case 'year':
-            $sql_period = 'YEAR(created_at)';
-            $display_format = 'YEAR(created_at)';
-            break;
+            return "DATE_FORMAT($col, '%Y-%m-01')";
+        case 'day':
+        default:
+            return "DATE($col)";
     }
+}
 
-    $query = "
-        SELECT
-            $sql_period as period,
-            $display_format as display_period,
-            COUNT(*) as count
-        FROM statistics
-        WHERE event_type = 'page_view'
-        GROUP BY period, display_period
-        ORDER BY period DESC
-        LIMIT ?";
+/** Snap a DateTime down to the start of its bucket. */
+function bucket_floor(DateTime $d, $bucket)
+{
+    $f = (clone $d)->setTime(0, 0, 0);
+    if ($bucket === 'week') {
+        $f->modify('-' . (int)$f->format('w') . ' days'); // w: 0=Sun..6=Sat
+    } elseif ($bucket === 'month') {
+        $f->modify('first day of this month');
+    }
+    return $f;
+}
 
-    $stmt = $pdo->prepare($query);
-    $stmt->execute([$limit]);
+/** Ordered list of bucket keys ('Y-m-d') spanning [start, end]. */
+function generate_buckets(DateTime $start, DateTime $end, $bucket)
+{
+    $cursor = bucket_floor($start, $bucket);
+    $last   = bucket_floor($end, $bucket);
+    $step   = $bucket === 'day' ? '+1 day' : ($bucket === 'week' ? '+7 days' : '+1 month');
 
-    $data = [];
+    $keys = [];
+    $guard = 0;
+    while ($cursor <= $last && $guard++ < 5000) {
+        $keys[] = $cursor->format('Y-m-d');
+        $cursor = (clone $cursor)->modify($step);
+    }
+    return $keys;
+}
+
+/** Human label for a bucket key (mirrors GetBucketLabel). */
+function bucket_label($key, $bucket)
+{
+    $d = DateTime::createFromFormat('Y-m-d', $key);
+    if (!$d) return $key;
+    return $bucket === 'month' ? $d->format('M Y') : $d->format('M d');
+}
+
+/** COUNT(*) per bucket over a date range, as [bucket_key => count]. */
+function counts_by_bucket($table, DateTime $start, DateTime $end, $bucket, $where_extra = '')
+{
+    global $pdo;
+    $key   = bucket_key_sql($bucket);
+    $where = "created_at BETWEEN :start AND :end" . ($where_extra ? " AND $where_extra" : '');
+    $sql   = "SELECT $key AS bkey, COUNT(*) AS count
+              FROM $table
+              WHERE $where
+              GROUP BY bkey";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':start' => $start->format('Y-m-d H:i:s'),
+        ':end'   => $end->format('Y-m-d H:i:s'),
+    ]);
+
+    $map = [];
     while ($row = $stmt->fetch()) {
-        $data[] = $row;
+        $map[$row['bkey']] = (int)$row['count'];
     }
-
-    return $data;
+    return $map;
 }
 
 /**
@@ -161,24 +244,39 @@ function bounce_sessions_cte()
                 user_agent,
                 session_id,
                 MIN(created_at) AS session_start,
+                MAX(created_at) AS session_end,
                 COUNT(*) AS pageview_count
             FROM session_marks
             GROUP BY ip_address, user_agent, session_id
         )";
 }
 
-function get_bounce_rate_overall()
+function get_bounce_rate_overall(DateTime $start = null, DateTime $end = null)
 {
     global $pdo;
     $cte = bounce_sessions_cte();
+
+    $where  = '';
+    $params = [];
+    if ($start && $end) {
+        $where  = "WHERE session_start BETWEEN :start AND :end";
+        $params = [
+            ':start' => $start->format('Y-m-d H:i:s'),
+            ':end'   => $end->format('Y-m-d H:i:s'),
+        ];
+    }
+
     $query = "
         $cte
         SELECT
             COUNT(*) AS total_sessions,
             SUM(CASE WHEN pageview_count = 1 THEN 1 ELSE 0 END) AS bounced_sessions
-        FROM sessions";
+        FROM sessions
+        $where";
 
-    $row = $pdo->query($query)->fetch();
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    $row = $stmt->fetch();
     $total = (int)($row['total_sessions'] ?? 0);
     $bounced = (int)($row['bounced_sessions'] ?? 0);
 
@@ -189,41 +287,90 @@ function get_bounce_rate_overall()
     ];
 }
 
-function get_bounce_rate_by_period($period = 'month', $limit = 12)
+/**
+ * Headline visitor metrics for the stat cards, scoped to [start, end] except
+ * "live", which is always the last 5 minutes:
+ *  - live visitors: distinct (ip, user_agent) with a page view in the last 5 minutes
+ *  - unique visitors and total page views: page_view events in range
+ *  - average session length in seconds (bounce sessions count as 0)
+ */
+function get_visitor_overview(DateTime $start, DateTime $end)
 {
     global $pdo;
 
-    // Period expressions parallel to get_period_formatting() but bound to session_start
-    $period_exprs = [
-        'day'   => ['DATE(session_start)', 'DATE(session_start)'],
-        'week'  => ['YEARWEEK(session_start)', 'CONCAT("Week ", WEEK(session_start), ", ", YEAR(session_start))'],
-        'month' => ['DATE_FORMAT(session_start, "%Y-%m")', 'DATE_FORMAT(session_start, "%b %Y")'],
-        'year'  => ['YEAR(session_start)', 'YEAR(session_start)'],
+    $params = [
+        ':start' => $start->format('Y-m-d H:i:s'),
+        ':end'   => $end->format('Y-m-d H:i:s'),
     ];
-    list($sql_period, $display_format) = $period_exprs[$period] ?? $period_exprs['month'];
+
+    $live = (int) $pdo->query("
+        SELECT COUNT(DISTINCT ip_address, user_agent) AS c
+        FROM statistics
+        WHERE event_type = 'page_view'
+          AND ip_address IS NOT NULL
+          AND created_at >= NOW() - INTERVAL 5 MINUTE
+    ")->fetch()['c'];
+
+    $totals_stmt = $pdo->prepare("
+        SELECT
+            COUNT(DISTINCT ip_address) AS unique_visitors,
+            COUNT(*) AS total_pageviews
+        FROM statistics
+        WHERE event_type = 'page_view'
+          AND created_at BETWEEN :start AND :end
+    ");
+    $totals_stmt->execute($params);
+    $totals = $totals_stmt->fetch();
 
     $cte = bounce_sessions_cte();
+    $avg_stmt = $pdo->prepare("
+        $cte
+        SELECT AVG(TIMESTAMPDIFF(SECOND, session_start, session_end)) AS avg_seconds
+        FROM sessions
+        WHERE session_start BETWEEN :start AND :end
+    ");
+    $avg_stmt->execute($params);
+    $avg = $avg_stmt->fetch();
+
+    return [
+        'live'             => $live,
+        'unique_visitors'  => (int) ($totals['unique_visitors'] ?? 0),
+        'total_pageviews'  => (int) ($totals['total_pageviews'] ?? 0),
+        'avg_session_secs' => (int) round((float) ($avg['avg_seconds'] ?? 0)),
+    ];
+}
+
+/** Bounce rate + session count per bucket over a date range, as [bucket_key => [...]]. */
+function bounce_by_bucket(DateTime $start, DateTime $end, $bucket)
+{
+    global $pdo;
+    $cte = bounce_sessions_cte();
+    $key = bucket_key_sql($bucket, 'session_start');
+
     $query = "
         $cte
         SELECT
-            $sql_period AS period,
-            $display_format AS display_period,
+            $key AS bkey,
             COUNT(*) AS total_sessions,
-            SUM(CASE WHEN pageview_count = 1 THEN 1 ELSE 0 END) AS bounced_sessions,
             ROUND(SUM(CASE WHEN pageview_count = 1 THEN 1 ELSE 0 END) / COUNT(*) * 100, 1) AS bounce_rate
         FROM sessions
-        GROUP BY period, display_period
-        ORDER BY period DESC
-        LIMIT ?";
+        WHERE session_start BETWEEN :start AND :end
+        GROUP BY bkey";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute([$limit]);
+    $stmt->execute([
+        ':start' => $start->format('Y-m-d H:i:s'),
+        ':end'   => $end->format('Y-m-d H:i:s'),
+    ]);
 
-    $data = [];
+    $map = [];
     while ($row = $stmt->fetch()) {
-        $data[] = $row;
+        $map[$row['bkey']] = [
+            'rate'     => (float)$row['bounce_rate'],
+            'sessions' => (int)$row['total_sessions'],
+        ];
     }
-    return $data;
+    return $map;
 }
 
 // Function to get community post views
@@ -396,98 +543,67 @@ function get_most_active_users($limit = 5)
     return $data;
 }
 
-// Get statistics by period (default to month)
-$period = isset($_GET['period']) ? $_GET['period'] : 'month';
-$allowed_periods = ['day', 'week', 'month', 'year'];
-if (!in_array($period, $allowed_periods)) {
-    $period = 'month';
+// ---- Resolve the selected date range and derive the chart bucket ----
+$presets = date_range_presets();
+$selected_range = isset($_GET['range']) ? $_GET['range'] : 'Last 30 Days';
+if (!in_array($selected_range, $presets, true)) {
+    $selected_range = 'Last 30 Days';
 }
+$custom_start_raw = isset($_GET['start']) ? $_GET['start'] : null;
+$custom_end_raw   = isset($_GET['end']) ? $_GET['end'] : null;
 
-$downloads = get_downloads_by_period($period);
-$registrations = get_registrations_by_period($period);
-$page_views = get_page_views_by_period($period);
-$post_views = get_community_post_views();
-$post_types = get_community_post_types();
-$user_countries = get_user_countries();
-$downloads_by_country = get_downloads_by_country();
-$user_agents = get_user_agents();
-$conversion_data = get_conversion_data();
-$active_users = get_most_active_users();
-$bounce_overall = get_bounce_rate_overall();
-$bounce_by_period = array_reverse(get_bounce_rate_by_period($period));
+$range       = resolve_date_range($selected_range, $custom_start_raw, $custom_end_raw);
+$range_start = $range['start'];
+$range_end   = $range['end'];
+$bucket      = pick_time_bucket($range_start, $range_end);
 
-// Prepare data for charts
-$chart_labels = [];
-$downloads_data = [];
-$registrations_data = [];
-$page_views_data = [];
+// Continuous bucket axis across the whole range, so empty buckets still render.
+$bucket_keys  = generate_buckets($range_start, $range_end, $bucket);
+$chart_labels = array_map(function ($k) use ($bucket) {
+    return bucket_label($k, $bucket);
+}, $bucket_keys);
 
-// Reverse arrays to show chronological order
-$downloads = array_reverse($downloads);
-$registrations = array_reverse($registrations);
-$page_views = array_reverse($page_views);
+// Per-dataset counts, keyed by bucket, then aligned to the axis.
+$downloads_map = counts_by_bucket('statistics', $range_start, $range_end, $bucket,
+    "event_type IN ('download_win', 'download_mac', 'download_linux', 'download_avalonia')");
+$registrations_map = counts_by_bucket('community_users', $range_start, $range_end, $bucket);
+$page_views_map    = counts_by_bucket('statistics', $range_start, $range_end, $bucket, "event_type = 'page_view'");
+$bounce_map        = bounce_by_bucket($range_start, $range_end, $bucket);
 
-foreach ($downloads as $item) {
-    $chart_labels[] = isset($item['display_period']) ? $item['display_period'] : $item['period'];
-    $downloads_data[] = $item['count'];
-}
-
-$reg_data = [];
-foreach ($registrations as $item) {
-    $period_key = $item['period'];
-    $reg_data[$period_key] = $item['count'];
-}
-
-// Align registration data with download periods
-foreach ($downloads as $index => $item) {
-    $period_key = $item['period'];
-    $registrations_data[] = isset($reg_data[$period_key]) ? $reg_data[$period_key] : 0;
-}
-
-// Align page view data with download periods
-$view_data = [];
-foreach ($page_views as $item) {
-    $period_key = $item['period'];
-    $view_data[$period_key] = $item['count'];
-}
-
-foreach ($downloads as $index => $item) {
-    $period_key = $item['period'];
-    $page_views_data[] = isset($view_data[$period_key]) ? $view_data[$period_key] : 0;
-}
-
-// Align bounce rate data with download periods (null where no sessions in that period
-// so the line chart shows a gap instead of a misleading 0%)
-$bounce_lookup = [];
-foreach ($bounce_by_period as $item) {
-    $bounce_lookup[$item['period']] = [
-        'rate' => (float)$item['bounce_rate'],
-        'sessions' => (int)$item['total_sessions'],
-    ];
-}
-
-$bounce_rate_data = [];
+$downloads_data       = [];
+$registrations_data   = [];
+$page_views_data      = [];
+$bounce_rate_data     = [];
 $bounce_sessions_data = [];
-foreach ($downloads as $item) {
-    $period_key = $item['period'];
-    if (isset($bounce_lookup[$period_key])) {
-        $bounce_rate_data[] = $bounce_lookup[$period_key]['rate'];
-        $bounce_sessions_data[] = $bounce_lookup[$period_key]['sessions'];
+foreach ($bucket_keys as $k) {
+    $downloads_data[]     = $downloads_map[$k] ?? 0;
+    $registrations_data[] = $registrations_map[$k] ?? 0;
+    $page_views_data[]    = $page_views_map[$k] ?? 0;
+    // Null bounce where no sessions in that bucket so the line shows a gap, not a misleading 0%.
+    if (isset($bounce_map[$k])) {
+        $bounce_rate_data[]     = $bounce_map[$k]['rate'];
+        $bounce_sessions_data[] = $bounce_map[$k]['sessions'];
     } else {
-        $bounce_rate_data[] = null;
+        $bounce_rate_data[]     = null;
         $bounce_sessions_data[] = 0;
     }
 }
 
-// Calculate growth rate
-$latest_growth = 0;
-if (count($downloads_data) >= 2) {
-    $latest = end($downloads_data);
-    $previous = prev($downloads_data);
-    if ($previous > 0) {
-        $latest_growth = round((($latest - $previous) / $previous) * 100, 1);
-    }
-}
+// Non-time-series datasets (unaffected by the date range).
+$post_views          = get_community_post_views();
+$post_types          = get_community_post_types();
+$user_countries      = get_user_countries();
+$downloads_by_country = get_downloads_by_country();
+$user_agents         = get_user_agents();
+$conversion_data     = get_conversion_data();
+$active_users        = get_most_active_users();
+
+// Range-scoped headline metrics for the stat cards.
+$bounce_overall   = get_bounce_rate_overall($range_start, $range_end);
+$visitor_overview = get_visitor_overview($range_start, $range_end);
+
+// Pretty range string for the toolbar pill (e.g. "Sep 14, 2025 – Oct 14, 2025").
+$range_display = $range_start->format('M j, Y') . ' – ' . $range_end->format('M j, Y');
 
 // Format post views numbers
 $total_post_views = isset($post_views['total_views']) ? number_format($post_views['total_views']) : 0;
@@ -555,31 +671,40 @@ include __DIR__ . '/../admin_header.php';
 ?>
 
 <div class="container">
+    <!-- Date range controls (the chart bucket is derived automatically from the range) -->
+    <div class="stats-toolbar">
+        <form method="get" id="rangeForm" class="range-controls">
+            <div class="range-picker">
+                <div class="range-top">
+                    <span class="range-label">Date Range:</span>
+                    <div class="range-select">
+                        <select name="range" id="rangePreset" onchange="onRangeChange()">
+                            <?php foreach ($presets as $preset_option): ?>
+                                <option value="<?php echo htmlspecialchars($preset_option); ?>"
+                                    <?php echo $preset_option === $selected_range ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($preset_option); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="range-display" title="Grouped by <?php echo htmlspecialchars($bucket); ?>">
+                    <?php echo htmlspecialchars($range_display); ?>
+                </div>
+            </div>
+
+            <div class="range-custom" id="rangeCustom" style="display: <?php echo $selected_range === 'Custom Range' ? 'flex' : 'none'; ?>;">
+                <input type="date" name="start" id="rangeStart" value="<?php echo htmlspecialchars($range_start->format('Y-m-d')); ?>" <?php echo $selected_range === 'Custom Range' ? '' : 'disabled'; ?>>
+                <span>to</span>
+                <input type="date" name="end" id="rangeEnd" value="<?php echo htmlspecialchars($range_end->format('Y-m-d')); ?>" <?php echo $selected_range === 'Custom Range' ? '' : 'disabled'; ?>>
+                <button type="submit" class="range-apply">Apply</button>
+            </div>
+        </form>
+    </div>
+
     <!-- Statistics Cards -->
     <div class="stats-grid" id="statsGrid">
         <!-- Will be populated by JavaScript -->
-    </div>
-
-    <!-- Period selection -->
-    <div class="period-selection">
-        <span>Time Period:</span>
-        <div class="period-buttons">
-            <?php
-            // Define all periods with their display names
-            $periods = [
-                'day' => 'Daily',
-                'week' => 'Weekly',
-                'month' => 'Monthly',
-                'year' => 'Yearly'
-            ];
-
-            // Loop through periods and create buttons
-            foreach ($periods as $periodKey => $periodName) {
-                $activeClass = ($period === $periodKey) ? 'active' : '';
-                echo "<a href=\"?period={$periodKey}\" class=\"period-btn {$activeClass}\">{$periodName}</a>";
-            }
-            ?>
-        </div>
     </div>
 
     <!-- Charts -->
@@ -685,6 +810,7 @@ include __DIR__ . '/../admin_header.php';
         const bounceSessionsData = <?php echo json_encode($bounce_sessions_data); ?>;
         const bounceRateOverall = <?php echo json_encode($bounce_overall['bounce_rate']); ?>;
         const bounceSessionsTotal = <?php echo json_encode($bounce_overall['total_sessions']); ?>;
+        const visitorOverview = <?php echo json_encode($visitor_overview); ?>;
         const conversionData = <?php echo json_encode([
                                     $conversion_data['downloads'],
                                     $conversion_data['registrations']
@@ -695,58 +821,40 @@ include __DIR__ . '/../admin_header.php';
         function generateStatistics() {
             const statsGrid = document.getElementById('statsGrid');
 
-            const totalDownloads = sumArray(downloadsData);
-            const totalRegistrations = sumArray(registrationsData);
-            const totalPageViews = sumArray(pageViewsData);
-            const downloadGrowthRate = <?php echo $latest_growth; ?>;
-
-            // Calculate view growth rate
-            let viewGrowthRate = 0;
-            if (pageViewsData.length >= 2) {
-                const latestViews = pageViewsData[pageViewsData.length - 1];
-                const previousViews = pageViewsData[pageViewsData.length - 2];
-                if (previousViews > 0) {
-                    viewGrowthRate = Math.round(((latestViews - previousViews) / previousViews) * 100 * 10) / 10;
-                }
+            function formatDuration(seconds) {
+                seconds = Math.max(0, Math.round(seconds));
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                return m > 0 ? `${m}m${s}s` : `${s}s`;
             }
 
             const stats = [{
-                    title: 'Total Downloads',
-                    value: totalDownloads.toLocaleString(),
-                    subtext: 'operations'
+                    title: 'Live Visitors',
+                    value: visitorOverview.live.toLocaleString(),
+                    live: true
                 },
                 {
-                    title: 'Registrations',
-                    value: totalRegistrations.toLocaleString(),
-                    subtext: 'users'
+                    title: 'Unique Visitors',
+                    value: visitorOverview.unique_visitors.toLocaleString()
                 },
                 {
-                    title: 'Views Growth Rate',
-                    value: (viewGrowthRate >= 0 ? '+' : '') + viewGrowthRate + '%',
-                    subtext: 'period over period'
-                },
-                {
-                    title: 'Downloads Growth Rate',
-                    value: (downloadGrowthRate >= 0 ? '+' : '') + downloadGrowthRate + '%',
-                    subtext: 'period over period'
-                },
-                {
-                    title: 'Page Views',
-                    value: totalPageViews.toLocaleString(),
-                    subtext: 'total views'
+                    title: 'Total Pageviews',
+                    value: visitorOverview.total_pageviews.toLocaleString()
                 },
                 {
                     title: 'Bounce Rate',
-                    value: bounceSessionsTotal > 0 ? bounceRateOverall.toFixed(1) + '%' : '—',
-                    subtext: bounceSessionsTotal.toLocaleString() + ' sessions (30-min window)'
+                    value: bounceSessionsTotal > 0 ? bounceRateOverall.toFixed(1) + '%' : '—'
+                },
+                {
+                    title: 'Average Session',
+                    value: bounceSessionsTotal > 0 ? formatDuration(visitorOverview.avg_session_secs) : '—'
                 }
             ];
 
             statsGrid.innerHTML = stats.map(stat => `
                 <div class="stat-card">
-                    <h3>${stat.title}</h3>
+                    <h3>${stat.title}${stat.live ? ' <span class="live-dot"></span>' : ''}</h3>
                     <div class="value">${stat.value}</div>
-                    ${stat.subtext ? `<div class="subtext">${stat.subtext}</div>` : ''}
                 </div>
             `).join('');
         }
@@ -1155,12 +1263,34 @@ include __DIR__ . '/../admin_header.php';
             sessionStorage.removeItem('scrollPosition');
         }
 
-        // Save scroll position when clicking links
-        const links = document.querySelectorAll('a[href^="?period="]');
-        links.forEach(link => {
-            link.addEventListener('click', function() {
+        // Preserve scroll position across the date-range reload.
+        const rangeForm = document.getElementById('rangeForm');
+        if (rangeForm) {
+            rangeForm.addEventListener('submit', function() {
                 sessionStorage.setItem('scrollPosition', window.scrollY);
             });
-        });
+        }
     });
+
+    // Show custom date inputs for "Custom Range"; for any preset, reload immediately.
+    function onRangeChange() {
+        const preset = document.getElementById('rangePreset').value;
+        const custom = document.getElementById('rangeCustom');
+        const start = document.getElementById('rangeStart');
+        const end = document.getElementById('rangeEnd');
+
+        if (preset === 'Custom Range') {
+            custom.style.display = 'flex';
+            start.disabled = false;
+            end.disabled = false;
+            // Wait for the user to pick dates and press Apply.
+        } else {
+            custom.style.display = 'none';
+            // Disable so stale custom dates aren't appended to the URL.
+            start.disabled = true;
+            end.disabled = true;
+            sessionStorage.setItem('scrollPosition', window.scrollY);
+            document.getElementById('rangeForm').submit();
+        }
+    }
 </script>

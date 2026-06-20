@@ -289,7 +289,7 @@
 .badge {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
@@ -370,7 +370,7 @@
 
 .modal-content {
     background: var(--white);
-    border-radius: 10px;
+    border-radius: 8px;
     width: 100%;
     height: auto;
     max-height: 85vh;
@@ -926,7 +926,7 @@
 .hint code {
     background: var(--gray-100, #f3f4f6);
     padding: 1px 5px;
-    border-radius: 3px;
+    border-radius: 4px;
     font-size: 12px;
 }
 
@@ -1575,7 +1575,7 @@
 .reddit-ai-score {
     display: inline-block;
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: 8px;
     font-size: 12px;
     font-weight: 600;
 }

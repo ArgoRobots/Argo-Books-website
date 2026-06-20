@@ -60,7 +60,7 @@
 
 .chart-card {
   background: var(--white);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 6px var(--shadow-xxs);
   border: 1px solid var(--gray-200);

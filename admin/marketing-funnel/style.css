@@ -484,7 +484,7 @@
 .landing-breakdown-list .swatch {
     width: 12px;
     height: 12px;
-    border-radius: 3px;
+    border-radius: 4px;
     background: var(--gray-400);
 }
 

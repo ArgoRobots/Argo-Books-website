@@ -119,6 +119,8 @@
      Use this for body/label/heading text instead of --black so it flips
      automatically. The dark value is set in the [data-theme="dark"] block below. */
   --admin-text: var(--black);
+  /* Single monospace stack for code/IDs/values across admin pages. */
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
   --neutral-111827: #111827;
   --neutral-f8f9fa: #f8f9fa;
   --neutral-f7f7f8: #f7f7f8;

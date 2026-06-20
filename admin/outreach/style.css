@@ -984,7 +984,7 @@
 .variant-content-cell {
     max-width: 360px;
     word-break: break-word;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--font-mono);
     font-size: 13px;
     color: var(--admin-text);
 }
@@ -1166,7 +1166,7 @@
     color: var(--white);
     padding: 12px 14px;
     border-radius: 6px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--font-mono);
     font-size: 12px;
     line-height: 1.5;
     max-height: 400px;

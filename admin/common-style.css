@@ -556,7 +556,7 @@ tbody tr:hover {
 }
 
 .key-field {
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 /* Badges */
@@ -931,7 +931,7 @@ tbody tr:hover {
 .verification-input {
   letter-spacing: 0.5em !important;
   font-weight: bold;
-  font-family: monospace;
+  font-family: var(--font-mono);
   text-align: center;
   font-size: 18px;
   padding: 10px;
@@ -951,7 +951,7 @@ tbody tr:hover {
 }
 
 .secret-key {
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 20px;
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
@@ -1032,7 +1032,7 @@ tbody tr:hover {
   background: var(--gray-border);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  font-family: "Monaco", "Consolas", monospace;
+  font-family: var(--font-mono);
   font-size: 0.875rem;
   color: var(--admin-text);
 }

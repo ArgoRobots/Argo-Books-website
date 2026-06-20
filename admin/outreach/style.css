@@ -725,7 +725,7 @@
 [data-theme="dark"] .stat-card,
 [data-theme="dark"] .panel {
     background: var(--gray-800);
-    box-shadow: 0 1px 3px var(--overlay-light);
+    box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .panel-header {

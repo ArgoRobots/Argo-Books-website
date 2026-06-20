@@ -1301,7 +1301,7 @@ tbody tr:hover {
 [data-theme="dark"] .admin-header {
   background: var(--gray-800);
   border-bottom-color: var(--gray-700);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .header-title {
@@ -1429,7 +1429,7 @@ tbody tr:hover {
 [data-theme="dark"] .table-container {
   background: var(--gray-800);
   border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] th {
@@ -1451,7 +1451,7 @@ tbody tr:hover {
 [data-theme="dark"] .stat-card {
   background: var(--gray-800);
   border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .stat-card h3 {
@@ -1471,7 +1471,7 @@ tbody tr:hover {
 [data-theme="dark"] .chart-container {
   background: var(--gray-800);
   border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .chart-no-data {
@@ -1552,7 +1552,7 @@ tbody tr:hover {
 /* Dark theme - Period selection */
 [data-theme="dark"] .period-selection {
   background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .period-selection span {
@@ -1580,7 +1580,7 @@ tbody tr:hover {
   background: var(--gray-800);
   color: var(--white);
   border-color: var(--gray-700);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .range-label,
@@ -1659,7 +1659,7 @@ tbody tr:hover {
 [data-theme="dark"] .filters-bar {
   background: var(--gray-800);
   border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 /* Dark theme - Env toggle (payments) */
@@ -1677,7 +1677,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .env-toggle-btn.active {
   background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .section-tabs {
@@ -1974,7 +1974,7 @@ tbody tr:hover {
 /* Dark theme - Reports page */
 [data-theme="dark"] .reports-table {
   background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .report-row {
@@ -2005,7 +2005,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .status-badges .status-badge {
   background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .status-badge-label {

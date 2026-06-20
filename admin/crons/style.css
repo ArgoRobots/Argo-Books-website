@@ -155,7 +155,7 @@
     max-width: 320px;
     padding: 10px 12px;
     background: #1f2937;
-    color: #f9fafb;
+    color: var(--whiteBackground);
     border-radius: 6px;
     font-size: 12px;
     font-weight: 400;
@@ -189,12 +189,12 @@
 }
 
 [data-theme="dark"] .cron-info-tooltip {
-    background: #0f172a;
+    background: var(--gray-900);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme="dark"] .cron-info-tooltip::after {
-    border-top-color: #0f172a;
+    border-top-color: var(--gray-900);
 }
 
 .cron-meta {
@@ -221,19 +221,19 @@
     flex-shrink: 0;
 }
 
-.cron-pill.status-ok       { background: #dcfce7; color: #166534; }
-.cron-pill.status-stale    { background: #fef3c7; color: #854d0e; }
-.cron-pill.status-error    { background: #fee2e2; color: #991b1b; }
+.cron-pill.status-ok       { background: var(--green-100); color: var(--green-800); }
+.cron-pill.status-stale    { background: var(--amber-100); color: #854d0e; }
+.cron-pill.status-error    { background: var(--red-100); color: var(--red-800); }
 .cron-pill.status-running  { background: #dbeafe; color: #1e40af; }
 
-[data-theme="dark"] .cron-pill.status-ok      { background: #14532d; color: #bbf7d0; }
-[data-theme="dark"] .cron-pill.status-stale   { background: #78350f; color: #fde68a; }
-[data-theme="dark"] .cron-pill.status-error   { background: #7f1d1d; color: #fecaca; }
+[data-theme="dark"] .cron-pill.status-ok      { background: var(--green-900); color: var(--green-200); }
+[data-theme="dark"] .cron-pill.status-stale   { background: var(--amber-900); color: var(--amber-200); }
+[data-theme="dark"] .cron-pill.status-error   { background: #7f1d1d; color: var(--red-200); }
 [data-theme="dark"] .cron-pill.status-running { background: #1e3a8a; color: #bfdbfe; }
 
 .cron-empty {
     padding: 12px;
-    background: var(--gray-100, #f9fafb);
+    background: var(--gray-100, var(--whiteBackground));
     border-radius: 6px;
     color: var(--admin-text);
     font-size: 13px;
@@ -253,7 +253,7 @@
 
 .cron-metric {
     padding: 10px 12px;
-    background: var(--gray-100, #f9fafb);
+    background: var(--gray-100, var(--whiteBackground));
     border-radius: 6px;
 }
 
@@ -304,8 +304,8 @@
 .cron-error {
     margin: 10px 0 0;
     padding: 10px 12px;
-    background: #fef2f2;
-    color: #991b1b;
+    background: var(--red-50);
+    color: var(--red-800);
     border-radius: 6px;
     font-size: 12px;
     white-space: pre-wrap;
@@ -314,7 +314,7 @@
 
 [data-theme="dark"] .cron-error {
     background: #450a0a;
-    color: #fecaca;
+    color: var(--red-200);
 }
 
 .cron-metric-table {

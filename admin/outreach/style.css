@@ -920,7 +920,7 @@
 }
 
 .hint code {
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-bg-light));
     padding: 1px 5px;
     border-radius: 4px;
     font-size: 12px;
@@ -959,7 +959,7 @@
 }
 
 .btn-neutral:hover {
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-bg-light));
     color: var(--admin-text);
 }
 
@@ -972,8 +972,8 @@
 }
 
 .variant-remove:hover {
-    color: #dc2626;
-    border-color: #dc2626;
+    color: var(--red-600);
+    border-color: var(--red-600);
     background: var(--white);
 }
 
@@ -998,22 +998,22 @@
 }
 
 .status-draft {
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-bg-light));
     color: var(--admin-text);
 }
 
 .status-active {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--green-100);
+    color: var(--green-800);
 }
 
 .status-paused {
-    background: #fef3c7;
+    background: var(--amber-100);
     color: #854d0e;
 }
 
 .status-completed {
-    background: #ede9fe;
+    background: var(--violet-100);
     color: #6b21a8;
 }
 
@@ -1028,18 +1028,18 @@
 }
 
 .conf-insufficient {
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-bg-light));
     color: var(--admin-text);
 }
 
 .conf-trending {
-    background: #fef3c7;
+    background: var(--amber-100);
     color: #854d0e;
 }
 
 .conf-significant {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--green-100);
+    color: var(--green-800);
 }
 
 .conf-leader-row {
@@ -1048,8 +1048,8 @@
 
 .directive-pill {
     display: inline-block;
-    background: #e0e7ff;
-    color: #3730a3;
+    background: var(--indigo-100);
+    color: var(--indigo-800);
     font-size: 11px;
     font-weight: 600;
     padding: 1px 6px;
@@ -1158,7 +1158,7 @@
 
 /* Log tail in Settings tab */
 .log-tail {
-    background: var(--gray-900, #0f172a);
+    background: var(--gray-900, var(--gray-900));
     color: var(--white);
     padding: 12px 14px;
     border-radius: 6px;
@@ -1261,8 +1261,8 @@
 }
 
 [data-theme="dark"] .variant-remove:hover {
-    color: #f87171;
-    border-color: #f87171;
+    color: var(--red-400);
+    border-color: var(--red-400);
     background: var(--gray-800);
 }
 
@@ -1313,9 +1313,9 @@
 .badge-blue { background: var(--blue-100); color: var(--blue-700); }
 .badge-gray { background: var(--gray-100); color: var(--admin-text); }
 
-[data-theme="dark"] .badge-green { background: rgba(34,197,94,0.18); color: #86efac; }
-[data-theme="dark"] .badge-red { background: rgba(239,68,68,0.18); color: #fca5a5; }
-[data-theme="dark"] .badge-yellow { background: rgba(245,158,11,0.18); color: #fcd34d; }
+[data-theme="dark"] .badge-green { background: rgba(34,197,94,0.18); color: var(--green-300); }
+[data-theme="dark"] .badge-red { background: rgba(239,68,68,0.18); color: var(--red-300); }
+[data-theme="dark"] .badge-yellow { background: rgba(245,158,11,0.18); color: var(--amber-300); }
 [data-theme="dark"] .badge-blue { background: rgba(59,130,246,0.18); color: #93c5fd; }
 [data-theme="dark"] .badge-gray { background: var(--gray-700); color: var(--white); }
 
@@ -1349,19 +1349,19 @@
 .reddit-progress-banner.banner-success {
     background: var(--green-100);
     color: var(--green-700);
-    border-color: #86efac;
-    border-left-color: #16a34a;
+    border-color: var(--green-300);
+    border-left-color: var(--green-600);
 }
 
 .reddit-progress-banner.banner-error {
     background: var(--red-100);
     color: var(--red-700);
-    border-color: #fca5a5;
-    border-left-color: #dc2626;
+    border-color: var(--red-300);
+    border-left-color: var(--red-600);
 }
 
 [data-theme="dark"] .reddit-progress-banner {
-    background: var(--navy-1e3a5f, #1e3a5f);
+    background: var(--navy-1e3a5f, var(--navy-1e3a5f));
     color: var(--white);
     border-color: var(--gray-700);
 }
@@ -1372,12 +1372,12 @@
 
 [data-theme="dark"] .reddit-progress-banner.banner-success {
     background: rgba(34,197,94,0.15);
-    color: #86efac;
+    color: var(--green-300);
 }
 
 [data-theme="dark"] .reddit-progress-banner.banner-error {
     background: rgba(239,68,68,0.15);
-    color: #fca5a5;
+    color: var(--red-300);
 }
 
 /* ─── Reddit dark-mode text legibility ───────────────────────────────────
@@ -1468,9 +1468,9 @@
     transition: width 0.3s, background-color 0.2s;
 }
 
-.safety-meter-fill.safety-green { background: #16a34a; }
+.safety-meter-fill.safety-green { background: var(--green-600); }
 .safety-meter-fill.safety-yellow { background: #eab308; }
-.safety-meter-fill.safety-red { background: #dc2626; }
+.safety-meter-fill.safety-red { background: var(--red-600); }
 
 .safety-meter-help {
     position: relative;
@@ -1546,8 +1546,8 @@
 [data-theme="dark"] .safety-meter-help-icon { background: var(--gray-700); color: var(--white); }
 [data-theme="dark"] .safety-meter-help:hover .safety-meter-help-icon,
 [data-theme="dark"] .safety-meter-help:focus-visible .safety-meter-help-icon { background: var(--primary-blue); color: #fff; }
-[data-theme="dark"] .safety-meter-help-tooltip { background: #0f172a; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5); }
-[data-theme="dark"] .safety-meter-help-tooltip::after { border-top-color: #0f172a; }
+[data-theme="dark"] .safety-meter-help-tooltip { background: var(--gray-900); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5); }
+[data-theme="dark"] .safety-meter-help-tooltip::after { border-top-color: var(--gray-900); }
 
 /* ─── Reddit threads table ────────────────────────────────────────────── */
 
@@ -1560,7 +1560,7 @@
 }
 
 .reddit-table tr { cursor: pointer; }
-.reddit-table tr:hover { background: var(--gray-50, #f9fafb); }
+.reddit-table tr:hover { background: var(--gray-50, var(--whiteBackground)); }
 
 .reddit-title-cell {
     max-width: 480px;
@@ -1582,8 +1582,8 @@
 
 [data-theme="dark"] .reddit-table-wrapper { background: var(--gray-800); border-color: var(--gray-700); }
 [data-theme="dark"] .reddit-table tr:hover { background: var(--gray-700); }
-[data-theme="dark"] .reddit-ai-high { background: rgba(34,197,94,0.18); color: #86efac; }
-[data-theme="dark"] .reddit-ai-mid { background: rgba(245,158,11,0.18); color: #fcd34d; }
+[data-theme="dark"] .reddit-ai-high { background: rgba(34,197,94,0.18); color: var(--green-300); }
+[data-theme="dark"] .reddit-ai-mid { background: rgba(245,158,11,0.18); color: var(--amber-300); }
 [data-theme="dark"] .reddit-ai-low { background: var(--gray-700); color: var(--white); }
 
 /* ─── Reddit thread detail modal ──────────────────────────────────────── */
@@ -1607,7 +1607,7 @@
 .reddit-thread-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--admin-text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
 
 .reddit-thread-body {
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--whiteBackground));
     border: 1px solid var(--gray-200);
     border-radius: 6px;
     padding: 10px 12px;
@@ -1640,7 +1640,7 @@
 .reddit-regenerate-feedback {
     margin-top: 12px;
     padding: 12px;
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--whiteBackground));
     border: 1px solid var(--gray-200);
     border-radius: 6px;
 }
@@ -1672,7 +1672,7 @@
 }
 
 [data-theme="dark"] .reddit-regenerate-feedback {
-    background: var(--gray-900, #111827);
+    background: var(--gray-900, var(--neutral-111827));
     border-color: var(--gray-700);
 }
 
@@ -1691,8 +1691,8 @@
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] a:not(.btn):not(.channel-tab):not(.section-tab),
 [data-theme="dark"] #redditThreadModal a:not(.btn),
 [data-theme="dark"] #redditMarkRepliedModal a:not(.btn) { color: var(--blue-400); }
-[data-theme="dark"] .reddit-thread-body { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--white); }
-[data-theme="dark"] #redditDraftBody { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--white); }
+[data-theme="dark"] .reddit-thread-body { background: var(--gray-900, var(--neutral-111827)); border-color: var(--gray-700); color: var(--white); }
+[data-theme="dark"] #redditDraftBody { background: var(--gray-900, var(--neutral-111827)); border-color: var(--gray-700); color: var(--white); }
 
 .checkbox-label {
     display: flex;
@@ -1717,7 +1717,7 @@
 .reddit-settings-panel .panel-header {
     padding: 12px 16px;
     border-bottom: 1px solid var(--gray-200);
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--whiteBackground));
 }
 
 .reddit-settings-panel .panel-header h2 {
@@ -1783,9 +1783,9 @@
 }
 
 [data-theme="dark"] .reddit-settings-panel { background: var(--gray-800); border-color: var(--gray-700); }
-[data-theme="dark"] .reddit-settings-panel .panel-header { background: var(--gray-900, #111827); border-bottom-color: var(--gray-700); }
-[data-theme="dark"] .reddit-add-form input[type="text"] { background: var(--gray-900, #111827); border-color: var(--gray-700); color: var(--white); }
-[data-theme="dark"] .reddit-diagnostics-error { background: rgba(239,68,68,0.15); color: #fca5a5; }
+[data-theme="dark"] .reddit-settings-panel .panel-header { background: var(--gray-900, var(--neutral-111827)); border-bottom-color: var(--gray-700); }
+[data-theme="dark"] .reddit-add-form input[type="text"] { background: var(--gray-900, var(--neutral-111827)); border-color: var(--gray-700); color: var(--white); }
+[data-theme="dark"] .reddit-diagnostics-error { background: rgba(239,68,68,0.15); color: var(--red-300); }
 
 /* ─── Flash messages (for reddit-settings POST-back) ──────────────────── */
 
@@ -1799,14 +1799,14 @@
 .flash-success {
     background: var(--green-100);
     color: var(--green-700);
-    border-left: 4px solid #16a34a;
+    border-left: 4px solid var(--green-600);
 }
 
 .flash-error {
     background: var(--red-100);
     color: var(--red-700);
-    border-left: 4px solid #dc2626;
+    border-left: 4px solid var(--red-600);
 }
 
-[data-theme="dark"] .flash-success { background: rgba(34,197,94,0.18); color: #86efac; }
-[data-theme="dark"] .flash-error { background: rgba(239,68,68,0.18); color: #fca5a5; }
+[data-theme="dark"] .flash-success { background: rgba(34,197,94,0.18); color: var(--green-300); }
+[data-theme="dark"] .flash-error { background: rgba(239,68,68,0.18); color: var(--red-300); }

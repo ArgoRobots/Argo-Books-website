@@ -2208,7 +2208,7 @@ tbody tr:hover {
 
 .pg-arrow:hover:not(:disabled),
 .pg-num:hover:not(.pg-active) {
-  background: var(--neutral-ddd, #e5e7eb);
+  background: var(--neutral-ddd, var(--gray-border));
 }
 
 .pg-arrow:disabled {

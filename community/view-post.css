@@ -109,7 +109,7 @@ header .header-inner .menu-container .menu .community:after {
   font-weight: bold;
   font-size: 18px;
   margin: 8px 0;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .post-content {
@@ -130,7 +130,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-title {
   font-size: 22px;
-  color: var(--blue-900);
+  color: var(--black);
   flex: 1;
   word-break: break-word;
 }
@@ -423,7 +423,7 @@ header .header-inner .menu-container .menu .community:after {
   font-weight: bold;
   font-size: 14px;
   margin: 4px 0;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .comment-main {
@@ -696,7 +696,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .bug-report-header h3 {
   font-size: 18px;
-  color: var(--blue-900);
+  color: var(--black);
   margin: 0;
 }
 

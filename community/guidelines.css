@@ -16,7 +16,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .guidelines-header h1 {
-  color: var(--blue-900);
+  color: var(--black);
   font-size: 32px;
   margin-top: 20px;
 }
@@ -44,7 +44,7 @@ header .header-inner .menu-container .menu .community:after {
 }
 
 .guidelines-section h3 {
-  color: var(--blue-900);
+  color: var(--black);
   font-size: 20px;
   margin-bottom: 20px;
   padding-bottom: 10px;

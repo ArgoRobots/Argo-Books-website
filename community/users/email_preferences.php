@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../email_marketing.php';
 require_once __DIR__ . '/user_functions.php';
+require_once __DIR__ . '/../../resources/icons.php';
 
 require_login();
 
@@ -105,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/checkbox.css">
     <link rel="stylesheet" href="../../resources/styles/button.css">
+    <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
     <link rel="stylesheet" href="../../resources/header/dark.css">
@@ -116,6 +118,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </header>
 
     <div class="wrapper">
+        <a href="profile.php" class="link-no-underline back-link prefs-back-link">
+            <?= svg_icon('arrow-back', 16) ?>
+            Back to Profile
+        </a>
+
         <div class="prefs-container">
             <div class="prefs-header">
                 <h1>Email Preferences</h1>
@@ -189,7 +196,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="form-actions">
-                    <a href="profile.php" class="btn btn-black">Back to Profile</a>
                     <button type="submit" class="btn btn-blue">Save Preferences</button>
                 </div>
             </form>

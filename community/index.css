@@ -268,7 +268,7 @@ header .header-inner .menu-container .menu .community:after {
   font-weight: bold;
   font-size: 18px;
   margin: 8px 0;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .post-content {
@@ -289,7 +289,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .post-title {
   font-size: 18px;
-  color: var(--blue-900);
+  color: var(--black);
   flex: 1;
 }
 
@@ -438,7 +438,7 @@ header .header-inner .menu-container .menu .community:after {
 
 .selected-count {
   font-size: 14px;
-  color: var(--blue-900);
+  color: var(--black);
   font-weight: 500;
 }
 

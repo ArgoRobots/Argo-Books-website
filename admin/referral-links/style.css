@@ -12,10 +12,7 @@
 }
 
 .stat-card {
-    background: var(--white);
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-default);
+    text-align: center;
 }
 
 .stat-card h3 {

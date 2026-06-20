@@ -7,10 +7,6 @@
 }
 
 .stat-card {
-    background: var(--white);
-    padding: 14px 18px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px var(--shadow-default);
     display: flex;
     flex-direction: column;
     gap: 4px;

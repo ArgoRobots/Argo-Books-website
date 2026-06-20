@@ -22,7 +22,7 @@
     margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -30,13 +30,13 @@
 .stat-card .value {
     font-size: 32px;
     font-weight: 700;
-    color: var(--black);
+    color: var(--admin-text);
     margin-bottom: 4px;
 }
 
 .stat-card .subtext {
     font-size: 14px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .period-selection {
@@ -52,7 +52,7 @@
 
 .period-selection span {
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .period-buttons {
@@ -64,7 +64,7 @@
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
-    color: var(--black);
+    color: var(--admin-text);
     background: var(--gray-bg-light);
     font-weight: 500;
     transition: all 0.2s;
@@ -137,7 +137,7 @@ table th {
     text-align: left;
     font-weight: 600;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 2px solid var(--gray-border);
@@ -147,7 +147,7 @@ table th {
 table td {
     padding: 12px;
     border-bottom: 1px solid var(--gray-border);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 table tbody tr:hover {
@@ -281,7 +281,7 @@ code {
 }
 
 .modal-close {
-    color: var(--black);
+    color: var(--admin-text);
     float: right;
     font-size: 32px;
     font-weight: bold;
@@ -290,13 +290,13 @@ code {
 }
 
 .modal-close:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 #modalTitle {
     margin-top: 0;
     margin-bottom: 24px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .form-group {
@@ -307,7 +307,7 @@ code {
     display: block;
     font-weight: 600;
     margin-bottom: 6px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .form-group input[type="text"],
@@ -336,7 +336,7 @@ code {
 .form-group small {
     display: block;
     margin-top: 4px;
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 13px;
 }
 
@@ -382,7 +382,7 @@ code {
 
 .group-toggle > span {
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .group-toggle-buttons {
@@ -394,7 +394,7 @@ code {
     padding: 8px 16px;
     border-radius: 6px;
     text-decoration: none;
-    color: var(--black);
+    color: var(--admin-text);
     background: var(--gray-bg-light);
     font-weight: 500;
     transition: all 0.2s;
@@ -428,7 +428,7 @@ code {
 .cat-caret {
     display: inline-block;
     margin-right: 8px;
-    color: var(--black);
+    color: var(--admin-text);
     transition: transform 0.15s;
 }
 
@@ -438,12 +438,12 @@ code {
 
 .cat-name {
     font-weight: 700;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .cat-meta {
     margin-left: 10px;
-    color: var(--black);
+    color: var(--admin-text);
     font-weight: 500;
 }
 

@@ -20,7 +20,7 @@
 
 .stat-label {
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
     text-transform: uppercase;
     font-weight: 500;
 }
@@ -28,7 +28,7 @@
 .stat-value {
     font-size: 22px;
     font-weight: 700;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .stat-new { color: var(--blue-500); }
@@ -67,7 +67,7 @@
 }
 
 .panel-toggle {
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 12px;
 }
 
@@ -108,7 +108,7 @@
 .form-group label {
     font-size: 13px;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .form-group input,
@@ -120,7 +120,7 @@
     font-size: 14px;
     font-family: inherit;
     background: var(--white);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .form-group input:focus,
@@ -167,7 +167,7 @@
     gap: 10px;
     padding: 8px 20px;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
     background: var(--blue-50);
     border-bottom: 1px solid var(--gray-border);
 }
@@ -239,7 +239,7 @@
     font-weight: 600;
     font-size: 12px;
     text-transform: uppercase;
-    color: var(--black);
+    color: var(--admin-text);
     border-bottom: 2px solid var(--gray-border);
     white-space: nowrap;
 }
@@ -272,17 +272,17 @@
 .empty-state {
     text-align: center;
     padding: 30px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .empty-state-text {
     text-align: center;
-    color: var(--black);
+    color: var(--admin-text);
     padding: 20px;
 }
 
 .text-muted {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 /* ─── Badges ─── */
@@ -341,7 +341,7 @@
 
 .filter-group label {
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
     font-weight: 500;
 }
 
@@ -353,7 +353,7 @@
     font-size: 13px;
     min-width: 130px;
     background: var(--white);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 /* ─── Modals ─── */
@@ -401,13 +401,13 @@
     border: none;
     font-size: 22px;
     cursor: pointer;
-    color: var(--black);
+    color: var(--admin-text);
     padding: 0 4px;
     line-height: 1;
 }
 
 .modal-close:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .modal-body {
@@ -436,7 +436,7 @@
     border: none;
     font-size: 14px;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
     cursor: pointer;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
@@ -444,7 +444,7 @@
 }
 
 .tab:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .tab.active {
@@ -565,12 +565,12 @@
 }
 
 .activity-details {
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 12px;
 }
 
 .activity-time {
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 11px;
 }
 
@@ -651,7 +651,7 @@
 .bulk-send-status {
     padding: 12px 20px;
     font-size: 0.9rem;
-    color: var(--black);
+    color: var(--admin-text);
     border-bottom: 1px solid var(--gray-border);
 }
 
@@ -682,7 +682,7 @@
 
 .bulk-send-item-email {
     font-size: 0.85rem;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .bulk-send-item-subject {
@@ -693,7 +693,7 @@
 
 .bulk-send-item-body {
     font-size: 0.85rem;
-    color: var(--black);
+    color: var(--admin-text);
     white-space: pre-line;
     line-height: 1.5;
     max-height: 120px;
@@ -919,7 +919,7 @@
 
 .hint {
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
     margin: 12px 0;
 }
 
@@ -945,7 +945,7 @@
     align-items: center;
     margin-bottom: 8px;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .variant-row-header label {
@@ -958,13 +958,13 @@
 /* Neutral (no-color-modifier) button used inside the A/B create form. */
 .btn-neutral {
     background: var(--white);
-    color: var(--black);
+    color: var(--admin-text);
     border: 1px solid var(--gray-border);
 }
 
 .btn-neutral:hover {
     background: var(--gray-100, #f3f4f6);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .variant-remove {
@@ -986,7 +986,7 @@
     word-break: break-word;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 /* Status pills (test status) */
@@ -1003,7 +1003,7 @@
 
 .status-draft {
     background: var(--gray-100, #f3f4f6);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .status-active {
@@ -1033,7 +1033,7 @@
 
 .conf-insufficient {
     background: var(--gray-100, #f3f4f6);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .conf-trending {
@@ -1074,7 +1074,7 @@
     margin: 0 0 12px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .chart-wrap {
@@ -1099,14 +1099,14 @@
 .meta-label {
     font-size: 11px;
     text-transform: uppercase;
-    color: var(--black);
+    color: var(--admin-text);
     font-weight: 600;
     letter-spacing: 0.04em;
 }
 
 .meta-value {
     font-size: 14px;
-    color: var(--black);
+    color: var(--admin-text);
     font-weight: 500;
     margin-top: 2px;
     word-break: break-word;
@@ -1136,7 +1136,7 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .segmented-option:hover {
@@ -1146,7 +1146,7 @@
 .segmented-option.active {
     border-color: var(--primary-blue);
     background: rgba(59, 130, 246, 0.08);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .segmented-title {
@@ -1156,7 +1156,7 @@
 
 .segmented-desc {
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
     line-height: 1.4;
 }
 
@@ -1287,14 +1287,14 @@
     padding: 10px 20px;
     font-size: 15px;
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
     cursor: pointer;
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     transition: color 0.15s, border-color 0.15s;
 }
 
-.channel-tab:hover { color: var(--black); }
+.channel-tab:hover { color: var(--admin-text); }
 
 .channel-tab.active {
     color: var(--blue-700);
@@ -1315,7 +1315,7 @@
 .badge-red { background: var(--red-100); color: var(--red-700); }
 .badge-yellow { background: var(--amber-100); color: var(--amber-700); }
 .badge-blue { background: var(--blue-100); color: var(--blue-700); }
-.badge-gray { background: var(--gray-100); color: var(--black); }
+.badge-gray { background: var(--gray-100); color: var(--admin-text); }
 
 [data-theme="dark"] .badge-green { background: rgba(34,197,94,0.18); color: #86efac; }
 [data-theme="dark"] .badge-red { background: rgba(239,68,68,0.18); color: #fca5a5; }
@@ -1330,7 +1330,7 @@
     align-items: center;
     gap: 12px;
     background: var(--blue-50, #eff6ff);
-    color: var(--black);
+    color: var(--admin-text);
     border: 1px solid var(--blue-200, #bfdbfe);
     border-left: 4px solid var(--primary-blue, #3b82f6);
     border-radius: 6px;
@@ -1345,7 +1345,7 @@
 }
 
 .reddit-progress-banner .reddit-progress-counts {
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 12px;
     white-space: nowrap;
 }
@@ -1444,7 +1444,7 @@
 
 .safety-meter-label {
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
     margin-bottom: 4px;
 }
 
@@ -1455,7 +1455,7 @@
 }
 
 .safety-meter-divider {
-    color: var(--black);
+    color: var(--admin-text);
     margin: 0 4px;
 }
 
@@ -1491,7 +1491,7 @@
     height: 22px;
     border-radius: 999px;
     background: var(--gray-200);
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 13px;
     font-weight: 700;
     line-height: 1;
@@ -1582,7 +1582,7 @@
 
 .reddit-ai-high { background: var(--green-100); color: var(--green-700); }
 .reddit-ai-mid { background: var(--amber-100); color: var(--amber-700); }
-.reddit-ai-low { background: var(--gray-100); color: var(--black); }
+.reddit-ai-low { background: var(--gray-100); color: var(--admin-text); }
 
 [data-theme="dark"] .reddit-table-wrapper { background: var(--gray-800); border-color: var(--gray-700); }
 [data-theme="dark"] .reddit-table tr:hover { background: var(--gray-700); }
@@ -1608,7 +1608,7 @@
 .reddit-thread-meta a:hover { text-decoration: underline; }
 
 .reddit-thread-section { margin-bottom: 16px; }
-.reddit-thread-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--black); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.reddit-thread-section h4 { margin: 0 0 6px; font-size: 13px; color: var(--admin-text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
 
 .reddit-thread-body {
     background: var(--gray-50, #f9fafb);
@@ -1654,7 +1654,7 @@
     margin-bottom: 6px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .reddit-regenerate-feedback textarea {
@@ -1765,7 +1765,7 @@
 .form-help {
     margin: 4px 0 0;
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .reddit-diagnostics {

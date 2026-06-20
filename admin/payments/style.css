@@ -26,13 +26,13 @@
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
-    color: var(--black);
+    color: var(--admin-text);
     background: transparent;
     border: none;
 }
 
 .env-toggle-btn:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .env-toggle-btn.active {
@@ -105,7 +105,7 @@
     border: 1px solid var(--gray-input-border);
     border-radius: 6px;
     font-size: 0.875rem;
-    color: var(--black);
+    color: var(--admin-text);
     background: var(--white);
     min-width: 140px;
 }
@@ -146,7 +146,7 @@
 
 .btn-outline {
     background: var(--white);
-    color: var(--black);
+    color: var(--admin-text);
     border: 1px solid var(--gray-input-border);
 }
 
@@ -155,7 +155,7 @@
 }
 
 .result-count {
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 0.875rem;
 }
 
@@ -196,7 +196,7 @@
    ============================================================ */
 .badge-invoice-draft {
     background-color: var(--gray-bg-light);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .badge-invoice-sent {
@@ -231,7 +231,7 @@
 
 .badge-invoice-cancelled {
     background-color: var(--gray-bg-light);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 /* ============================================================
@@ -271,7 +271,7 @@
 
 .provider-badge.disconnected {
     background-color: var(--gray-bg-light);
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 /* ============================================================
@@ -293,7 +293,7 @@
 .expand-arrow {
     display: inline-block;
     transition: transform 0.2s ease;
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 0.875rem;
 }
 
@@ -323,7 +323,7 @@
 .detail-section-title {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin: 0 0 10px 0;
@@ -369,13 +369,13 @@
 .provider-card-name {
     font-weight: 600;
     font-size: 0.875rem;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .provider-card-status {
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .provider-connected .provider-card-status {
@@ -406,7 +406,7 @@
 
 .detail-label {
     font-size: 0.75rem;
-    color: var(--black);
+    color: var(--admin-text);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 500;
@@ -414,7 +414,7 @@
 
 .detail-value {
     font-size: 0.875rem;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 /* ============================================================

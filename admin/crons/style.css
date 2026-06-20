@@ -22,7 +22,7 @@
     padding: 6px 14px;
     border-radius: 6px;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
     text-decoration: none;
     transition: background 0.15s ease, color 0.15s ease;
 }
@@ -55,7 +55,7 @@
     border: 1px dashed var(--gray-300);
     border-radius: 8px;
     text-align: center;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 [data-theme="dark"] .empty-state {
@@ -122,7 +122,7 @@
     height: 18px;
     border-radius: 999px;
     background: var(--gray-200);
-    color: var(--black);
+    color: var(--admin-text);
     font-family: 'Times New Roman', serif;
     font-style: italic;
     font-size: 12px;
@@ -203,7 +203,7 @@
     flex-wrap: wrap;
     gap: 12px;
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 [data-theme="dark"] .cron-meta {
@@ -236,7 +236,7 @@
     padding: 12px;
     background: var(--gray-100, #f9fafb);
     border-radius: 6px;
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 13px;
     text-align: center;
 }
@@ -270,7 +270,7 @@
 
 .metric-label {
     font-size: 12px;
-    color: var(--black);
+    color: var(--admin-text);
     margin-top: 4px;
 }
 
@@ -291,7 +291,7 @@
 .cron-detail summary {
     cursor: pointer;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 [data-theme="dark"] .cron-detail summary {
@@ -335,7 +335,7 @@
 }
 
 .cron-metric-table td.k {
-    color: var(--black);
+    color: var(--admin-text);
     width: 40%;
 }
 

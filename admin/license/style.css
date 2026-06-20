@@ -18,7 +18,7 @@ table th {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
 }
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
@@ -63,7 +63,7 @@ table th {
 }
 .badge-expired {
     background: var(--gray-bg-light);
-    color: var(--black);
+    color: var(--admin-text);
 }
 .btn-purple {
     background: var(--purple-500);
@@ -79,7 +79,7 @@ table th {
 }
 .btn-secondary {
     background: var(--gray-bg-light);
-    color: var(--black);
+    color: var(--admin-text);
     border: 1px solid var(--gray-input-border);
 }
 .btn-secondary:hover {
@@ -123,26 +123,26 @@ table th {
 .modal-header h3 {
     margin: 0;
     font-size: 1.25rem;
-    color: var(--black);
+    color: var(--admin-text);
 }
 .modal-close {
     background: none;
     border: none;
     font-size: 1.5rem;
-    color: var(--black);
+    color: var(--admin-text);
     cursor: pointer;
     padding: 0;
     line-height: 1;
 }
 .modal-close:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 .modal-body {
     padding: 24px;
 }
 .modal-body p {
     margin: 0 0 20px 0;
-    color: var(--black);
+    color: var(--admin-text);
 }
 .modal-body .form-group {
     margin-bottom: 20px;
@@ -152,7 +152,7 @@ table th {
 }
 .modal-note {
     font-size: 0.875rem;
-    color: var(--black);
+    color: var(--admin-text);
     background: var(--gray-bg-light);
     padding: 12px;
     border-radius: 6px;
@@ -174,7 +174,7 @@ table th {
 .usage-count {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
     white-space: nowrap;
 }
 .usage-maxed {
@@ -182,7 +182,7 @@ table th {
     font-weight: 600;
 }
 .usage-na {
-    color: var(--black);
+    color: var(--admin-text);
 }
 .btn-reset-usage {
     background-color: var(--primary-blue);

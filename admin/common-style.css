@@ -165,7 +165,7 @@ body.menu-open::after {
 
 .hamburger-nav-menu ul li a {
   text-decoration: none;
-  color: var(--black);
+  color: var(--admin-text);
   padding: 20px 30px;
   display: block;
   transition: background-color 0.2s ease;
@@ -239,7 +239,7 @@ body.menu-open::after {
 .header-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 /* Desktop Navigation */
@@ -254,7 +254,7 @@ body.menu-open::after {
 .header-link {
   padding: 0.5rem 0.75rem;
   text-decoration: none;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 4px;
@@ -263,7 +263,7 @@ body.menu-open::after {
 }
 
 .header-link:hover {
-  color: var(--black);
+  color: var(--admin-text);
   background: var(--neutral-f0f0f0);
 }
 
@@ -339,7 +339,7 @@ body.menu-open::after {
 .nav-dropdown-link {
   padding: 0.5rem 0.75rem;
   text-decoration: none;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 4px;
@@ -348,7 +348,7 @@ body.menu-open::after {
 }
 
 .nav-dropdown-link:hover {
-  color: var(--black);
+  color: var(--admin-text);
   background: var(--neutral-f0f0f0);
 }
 
@@ -370,7 +370,7 @@ body.menu-open::after {
 
 .user-name {
   font-size: 0.9rem;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -381,7 +381,7 @@ body.menu-open::after {
   align-items: center;
   gap: 0.5rem;
   background: var(--gray-bg-light);
-  color: var(--black);
+  color: var(--admin-text);
   text-decoration: none;
   min-width: auto !important;
   padding: 0.5rem 0.75rem;
@@ -396,7 +396,7 @@ body.menu-open::after {
 
 .btn-home:hover {
   background: var(--gray-border);
-  color: var(--black);
+  color: var(--admin-text);
   border-color: var(--gray-input-border);
 }
 
@@ -429,12 +429,12 @@ body.menu-open::after {
 .page-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--black);
+  color: var(--admin-text);
   margin: 0 0 0.5rem 0;
 }
 
 .page-description {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.5;
@@ -447,14 +447,14 @@ h1 {
 }
 
 h2 {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
 }
 
 h3 {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 1rem;
   font-weight: 500;
   margin: 0 0 0.5rem 0;
@@ -586,7 +586,7 @@ tbody tr:hover {
 
 .badge-user {
   background-color: var(--gray-border);
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .badge-banned {
@@ -596,7 +596,7 @@ tbody tr:hover {
 
 .badge-active {
   background-color: var(--gray-bg-light);
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 /* Action Buttons */
@@ -619,7 +619,7 @@ tbody tr:hover {
 }
 
 .stat-card h3 {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -638,7 +638,7 @@ tbody tr:hover {
 }
 
 .stat-card .subtext {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.75rem;
   margin-top: 0.25rem;
   line-height: 1.2;
@@ -699,7 +699,7 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   height: 300px;
-  color: var(--black);
+  color: var(--admin-text);
   flex-direction: column;
   text-align: center;
 }
@@ -776,7 +776,7 @@ tbody tr:hover {
   padding: 8px 15px;
   background: var(--gray-bg-light);
   border-radius: 4px;
-  color: var(--black);
+  color: var(--admin-text);
   text-decoration: none;
   font-size: 14px;
   transition: all 0.2s ease;
@@ -822,14 +822,14 @@ tbody tr:hover {
 
 .range-label {
   font-weight: 500;
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 14px;
 }
 
 .range-select select {
   appearance: none;
   background: var(--white);
-  color: var(--black);
+  color: var(--admin-text);
   border: 1px solid var(--gray-border);
   border-radius: 8px;
   padding: 8px 32px 8px 14px;
@@ -849,7 +849,7 @@ tbody tr:hover {
 
 .range-display {
   align-self: flex-end;
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 12px;
   white-space: nowrap;
 }
@@ -861,7 +861,7 @@ tbody tr:hover {
 
 .range-custom input[type="date"] {
   background: var(--white);
-  color: var(--black);
+  color: var(--admin-text);
   border: 1px solid var(--gray-border);
   border-radius: 8px;
   padding: 8px 10px;
@@ -869,7 +869,7 @@ tbody tr:hover {
 }
 
 .range-custom span {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 14px;
 }
 
@@ -971,7 +971,7 @@ tbody tr:hover {
 .verification-heading {
   margin-bottom: 15px;
   font-size: 18px;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .steps {
@@ -1001,7 +1001,7 @@ tbody tr:hover {
   padding: 1rem;
   margin-bottom: 1.5rem;
   text-align: center;
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.875rem;
   font-weight: 500;
 }
@@ -1009,7 +1009,7 @@ tbody tr:hover {
 .no-data {
   text-align: center;
   padding: 3rem 2rem;
-  color: var(--black);
+  color: var(--admin-text);
   background: linear-gradient(135deg, var(--whiteBackground) 0%, var(--gray-bg-light) 100%);
   border-radius: 12px;
   border: 2px dashed var(--gray-input-border);
@@ -1019,7 +1019,7 @@ tbody tr:hover {
 .no-data h3 {
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 600;
 }
 
@@ -1034,7 +1034,7 @@ tbody tr:hover {
   border-radius: 4px;
   font-family: "Monaco", "Consolas", monospace;
   font-size: 0.875rem;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 /* Table Responsive Wrapper */
@@ -1238,13 +1238,13 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .theme-toggle:hover {
   background: var(--gray-bg-light);
   border-color: var(--gray-placeholder);
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .theme-toggle svg {
@@ -2194,7 +2194,7 @@ tbody tr:hover {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -2228,7 +2228,7 @@ tbody tr:hover {
   justify-content: center;
   min-width: 32px;
   height: 36px;
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.9rem;
 }
 
@@ -2277,7 +2277,7 @@ tbody tr:hover {
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     transition: color 0.2s, border-color 0.2s;
@@ -2285,7 +2285,7 @@ tbody tr:hover {
 }
 
 .section-tab:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .section-tab.active {

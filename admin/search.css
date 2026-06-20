@@ -6,7 +6,7 @@
 .filter-group label {
     font-size: 14px;
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
     margin-bottom: 6px;
 }
 
@@ -54,7 +54,7 @@
 
 .selection-info {
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
     margin-right: 20px;
 }
 

@@ -115,6 +115,10 @@
 
   /* Additional neutrals */
   --black: #000000;
+  /* Theme-aware primary text: black in light theme, white in dark theme.
+     Use this for body/label/heading text instead of --black so it flips
+     automatically. The dark value is set in the [data-theme="dark"] block below. */
+  --admin-text: var(--black);
   --neutral-111827: #111827;
   --neutral-f8f9fa: #f8f9fa;
   --neutral-f7f7f8: #f7f7f8;
@@ -265,4 +269,10 @@
   --hero-gradient-end: #1e293b;
   --hero-badge-bg: rgba(255, 255, 255, 0.1);
   --hero-badge-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark theme: primary text flips to white. Keep this in sync with --admin-text
+   above so body/label/heading text reads correctly on dark backgrounds. */
+[data-theme="dark"] {
+  --admin-text: var(--white);
 }

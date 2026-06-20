@@ -126,6 +126,9 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <script src="resources/scripts/main.js"></script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . '/style.css') ?>">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">
@@ -151,13 +154,14 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <div class="hero-content">
                 <div class="hero-app-title animate-fade-in">Argo Books</div>
                 <h1 class="hero-title animate-fade-in-up">
-                    <span class="hero-title-line">Run your business</span>
-                    <span class="hero-title-line text-gradient">without spreadsheets</span>
-                    <span class="hero-title-line text-gradient">or chaos</span>
+                    <span class="hero-title-line">Simple accounting</span>
+                    <span class="hero-title-line text-gradient">software for</span>
+                    <span class="hero-title-line text-gradient">small business</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
-                    Modern bookkeeping and accounting software for small business owners. 
-                    Manage invoicing, expenses, inventory, and receipts in one clean system.
+                    Track income and expenses, send invoices, and scan receipts in minutes.
+                    Automated imports and tax-ready reports keep you organized all year.
+                    Free to start, no accounting knowledge needed.
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">
@@ -173,24 +177,6 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         <button class="hero-play-btn" id="heroPlayBtn" aria-label="Watch demo video">
                             <?= svg_icon('play-filled', 28) ?>
                         </button>
-                    </div>
-                    <div class="floating-card floating-card-1 animate-float">
-                        <div class="floating-card-icon">
-                            <?= svg_icon('loading', 24) ?>
-                        </div>
-                        <div class="floating-card-content">
-                            <span class="floating-card-label">Smart Scanning</span>
-                            <span class="floating-card-value">Receipt processed</span>
-                        </div>
-                    </div>
-                    <div class="floating-card floating-card-2 animate-float-delayed">
-                        <div class="floating-card-icon success">
-                            <?= svg_icon('trending-up', 24) ?>
-                        </div>
-                        <div class="floating-card-content">
-                            <span class="floating-card-label">Revenue Up</span>
-                            <span class="floating-card-value success">+24% this month</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -252,7 +238,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Features</span>
-                <h2 class="section-title">Everything you need to grow</h2>
+                <h2 class="section-title">The tools your business actually runs on</h2>
                 <p class="section-description">Easy-to-use accounting software with smart receipt scanning, spreadsheet import, predictive analytics, and inventory management. Everything you need to run your business.</p>
             </div>
 
@@ -1274,7 +1260,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-tag">Pricing</span>
-                <h2 class="section-title">Pick a plan that's right for you</h2>
+                <h2 class="section-title">Free to start. Upgrade when you need more.</h2>
                 <p class="section-description">Start free, upgrade when you need more. No hidden fees, no surprises.</p>
             </div>
 

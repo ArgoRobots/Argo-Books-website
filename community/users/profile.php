@@ -418,8 +418,11 @@ if ($user) {
     $error_message = '';
 
     if ($is_own_profile && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        // Handle profile picture upload
-        if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
+        // Validate CSRF before the avatar upload (the only POST this page handles).
+        $posted_csrf = (string)($_POST['csrf_token'] ?? '');
+        if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $posted_csrf)) {
+            $error_message = 'Security check failed. Please refresh the page and try again.';
+        } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] !== UPLOAD_ERR_NO_FILE) {
             $avatar_result = upload_avatar($_SESSION['user_id'], $_FILES['avatar']);
             if ($avatar_result) {
                 $user['avatar'] = $avatar_result;
@@ -521,6 +524,7 @@ if ($user) {
                 <div class="profile-sidebar">
                     <div class="profile-card">
                         <form method="post" enctype="multipart/form-data" id="avatar-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                             <div class="profile-avatar <?php echo $is_own_profile ? 'editable' : ''; ?>" id="profile-avatar">
                                 <?php if (!empty($user['avatar'])): ?>
                                     <img src="../<?php echo htmlspecialchars($user['avatar']); ?>" alt="<?php echo htmlspecialchars($user['username']); ?>'s avatar" id="avatar-preview">
@@ -1151,6 +1155,13 @@ if ($user) {
 
                             // Move the input to the form
                             form.appendChild(this);
+
+                            // Include the CSRF token so the server accepts the upload
+                            const csrfInput = document.createElement('input');
+                            csrfInput.type = 'hidden';
+                            csrfInput.name = 'csrf_token';
+                            csrfInput.value = <?php echo json_encode($_SESSION['csrf_token']); ?>;
+                            form.appendChild(csrfInput);
 
                             // Add to document and submit
                             document.body.appendChild(form);

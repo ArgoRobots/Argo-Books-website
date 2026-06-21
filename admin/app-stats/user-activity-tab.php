@@ -9,6 +9,15 @@
 // groups every file by user, shows what each user did, and lets you delete a
 // user's files (e.g. your own test installs) one card at a time.
 
+// Direct-access guard. This partial is only valid when included by its parent
+// page (app-stats/index.php), which starts the session and verifies the admin
+// login. Requested directly, no session is started so $_SESSION is empty and we
+// fail closed. (An admin/.htaccess also denies *-tab.php as defense in depth.)
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
 $ua_dataDir   = __DIR__ . '/../data-logs/telemetry/';
 $ua_legacyDir = __DIR__ . '/../data-logs/';
 

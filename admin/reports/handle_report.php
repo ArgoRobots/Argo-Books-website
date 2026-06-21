@@ -17,6 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+// CSRF protection: every action below changes state (delete content, ban users,
+// reset usernames, clear bios). Require the token issued by reports/index.php.
+$posted_csrf = (string)($_POST['csrf_token'] ?? '');
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $posted_csrf)) {
+    echo json_encode(['success' => false, 'message' => 'Security check failed. Please refresh the page and try again.']);
+    exit;
+}
+
 // Get and validate input
 $report_id = isset($_POST['report_id']) ? intval($_POST['report_id']) : 0;
 $action = $_POST['action'] ?? '';

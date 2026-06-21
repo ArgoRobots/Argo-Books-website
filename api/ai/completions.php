@@ -36,6 +36,27 @@ if (is_rate_limited($rateLimitId, 60, 900, $rateLimitKey)) {
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);
 
+// Per-IP ceiling for the free (device) path only.
+// The X-Device-Id of a free request is self-asserted and not checked against any
+// record, so the per-identity limit above can be bypassed by rotating the header.
+// A per-IP cap closes that hole: the source IP can't be rotated like a header, so
+// it bounds total free AI usage from one origin regardless of how many device IDs
+// are sent. Premium (license-validated) requests are exempt because their key is
+// verified in the database and is not the abuse vector. This reuses the same
+// get_client_ip() that the license-validation and payment endpoints already rely
+// on in production. The ceiling is generous (well above the 60/identity limit) so
+// genuine shared networks (offices/households behind one NAT) are not affected;
+// raise AI_IP_MAX if a large shared deployment ever legitimately hits it.
+if (!$license) {
+    $clientIp = get_client_ip();
+    $ipRateKey = 'ai_ip';
+    $aiIpMax = 200; // requests per 15 minutes per IP
+    if (is_rate_limited($clientIp, $aiIpMax, 900, $ipRateKey)) {
+        send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
+    }
+    record_rate_limit_attempt($clientIp, $ipRateKey);
+}
+
 // Parse request body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -92,7 +113,7 @@ if (!empty($base64Image)) {
             send_error_response(400, 'Invalid base64 PDF data.', 'INVALID_DATA');
         }
 
-        $uploadUrl = "https://generativelanguage.googleapis.com/upload/v1beta/files?key={$geminiKey}";
+        $uploadUrl = "https://generativelanguage.googleapis.com/upload/v1beta/files";
         $boundary = bin2hex(random_bytes(16));
 
         // Build multipart/related body: JSON metadata + raw file bytes
@@ -111,6 +132,7 @@ if (!empty($base64Image)) {
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $multipartBody,
             CURLOPT_HTTPHEADER => [
+                "x-goog-api-key: {$geminiKey}",
                 "Content-Type: multipart/related; boundary={$boundary}",
                 'X-Goog-Upload-Protocol: multipart',
                 'Content-Length: ' . strlen($multipartBody),
@@ -139,12 +161,13 @@ if (!empty($base64Image)) {
         // Poll until the file is ACTIVE (Gemini processes uploads asynchronously)
         // Polls up to 15 times at 500ms intervals (~7.5s max). If still PROCESSING after
         // all polls, the file is used as-is (Gemini will reject it if not ready).
-        $fileStatusUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
+        $fileStatusUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}";
         $maxPolls = 15;
         for ($i = 0; $i < $maxPolls; $i++) {
             $ch = curl_init($fileStatusUrl);
             curl_setopt_array($ch, [
                 CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => ["x-goog-api-key: {$geminiKey}"],
                 CURLOPT_TIMEOUT => 10,
             ]);
             $statusResponse = curl_exec($ch);
@@ -196,7 +219,7 @@ if ($systemInstruction) {
     $geminiPayload['system_instruction'] = $systemInstruction;
 }
 
-$geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$geminiKey}";
+$geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
 $ch = curl_init($geminiUrl);
 curl_setopt_array($ch, [
@@ -204,6 +227,7 @@ curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => json_encode($geminiPayload),
     CURLOPT_HTTPHEADER => [
+        "x-goog-api-key: {$geminiKey}",
         'Content-Type: application/json',
     ],
     CURLOPT_TIMEOUT => 120,
@@ -234,11 +258,12 @@ if ($httpCode !== 200) {
 
 // Clean up uploaded PDF file from Gemini storage
 if (!empty($uploadedFileName)) {
-    $deleteUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
+    $deleteUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}";
     $ch = curl_init($deleteUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => 'DELETE',
+        CURLOPT_HTTPHEADER => ["x-goog-api-key: {$geminiKey}"],
         CURLOPT_TIMEOUT => 10,
     ]);
     curl_exec($ch);

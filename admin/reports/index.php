@@ -9,6 +9,11 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit;
 }
 
+// CSRF token for the moderation actions posted to handle_report.php.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Set page variables for the header
 $page_title = "Content Reports";
 $page_description = "Review and moderate reported posts and comments on the community page";
@@ -244,14 +249,14 @@ include __DIR__ . '/../admin_header.php';
                         <?php if ($report['reported_user_role'] !== 'admin'): ?>
                             <div class="action-group action-group-danger">
                                 <?php if ($report['content_type'] === 'user'): ?>
-                                    <button class="btn-small btn-warning" onclick="showResetUsernameModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username']); ?>')">Reset Username</button>
-                                    <button class="btn-small btn-warning" onclick="showClearBioModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username']); ?>')">Clear Bio</button>
+                                    <button class="btn-small btn-warning" onclick="showResetUsernameModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username'], ENT_QUOTES); ?>')">Reset Username</button>
+                                    <button class="btn-small btn-warning" onclick="showClearBioModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username'], ENT_QUOTES); ?>')">Clear Bio</button>
                                 <?php else: ?>
                                     <button class="btn-small btn-delete" onclick="handleReport(<?php echo $report['id']; ?>, 'delete', '<?php echo $report['content_type']; ?>', <?php echo $report['content_id']; ?>)">Delete</button>
                                 <?php endif; ?>
 
                                 <?php if ($report['reported_user_id']): ?>
-                                    <button class="btn-small btn-ban" onclick="showBanModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username']); ?>')">Ban User</button>
+                                    <button class="btn-small btn-ban" onclick="showBanModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username'], ENT_QUOTES); ?>')">Ban User</button>
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
@@ -390,6 +395,7 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
+<script>window.REPORTS_CSRF = <?php echo json_encode($_SESSION['csrf_token']); ?>;</script>
 <script src="reports.js"></script>
 
         </main>

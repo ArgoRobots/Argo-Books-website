@@ -156,15 +156,27 @@ function redeem_premium_key($key, $device_id) {
             current_environment()
         ]);
 
-        // Mark the key as redeemed with device_id
+        // Mark the key as redeemed, but only if it is still unredeemed. The
+        // "AND redeemed_at IS NULL" guard makes this claim atomic: if two
+        // requests race to redeem the same key, the database lets exactly one
+        // UPDATE match. The loser sees rowCount() === 0, undoes its speculative
+        // subscription insert, and falls through to the re-redemption path (so
+        // one key can never mint two active subscriptions).
         $stmt = $pdo->prepare("
             UPDATE premium_subscription_keys
             SET redeemed_at = NOW(),
                 device_id = ?,
                 subscription_id = ?
             WHERE subscription_key = ?
+              AND redeemed_at IS NULL
         ");
         $stmt->execute([$device_id, $subscriptionId, $key]);
+
+        if ($stmt->rowCount() === 0) {
+            // Another concurrent request already redeemed this key first.
+            $pdo->rollBack();
+            return redeem_premium_key($key, $device_id);
+        }
 
         $pdo->commit();
 

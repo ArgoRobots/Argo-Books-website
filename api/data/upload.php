@@ -92,7 +92,7 @@ function checkBucket(string $bucketKey, int $maxPerHour): bool
  */
 function checkRateLimit(string $authIdentifier, int $maxPerHour, ?int $ipMaxPerHour = null): bool
 {
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $ip = get_client_ip();
 
     if (!checkBucket($authIdentifier . '|' . $ip, $maxPerHour)) {
         return false;

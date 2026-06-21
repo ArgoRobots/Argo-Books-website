@@ -515,10 +515,17 @@ include __DIR__ . '/../admin_header.php';
                     'free' => 'Free',
                     'premium' => 'Premium',
                 ];
+                // Preserve the current tab across a tier switch (section-tabs.js keeps
+                // it in ?tab=). Whitelist against the real tabs to avoid reflecting
+                // arbitrary input into the href.
+                $validTabs = ['active-users', 'user-activity', 'geographic', 'versions', 'features', 'usage', 'api', 'errors', 'crashes'];
+                $currentTab = in_array($_GET['tab'] ?? '', $validTabs, true) ? $_GET['tab'] : '';
                 foreach ($tierLabels as $tierKey => $label):
                     $isActive = $tierFilter === $tierKey;
+                    $pillHref = '?tier=' . urlencode($tierKey);
+                    if ($currentTab !== '') $pillHref .= '&tab=' . urlencode($currentTab);
             ?>
-                <a href="?tier=<?= $tierKey ?>"
+                <a href="<?= htmlspecialchars($pillHref) ?>"
                    class="tier-pill <?= $isActive ? 'active' : '' ?>">
                     <?= htmlspecialchars($label) ?>
                 </a>
@@ -907,6 +914,20 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('a.tier-pill').forEach(function (link) {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
+            // The href is rendered server-side at load, before the user clicks a
+            // tab (section-tabs.js only updates the URL, not these hrefs). Rewrite
+            // it here so the tier switch keeps the currently-active tab.
+            try {
+                var dest = new URL(link.href, window.location.origin);
+                var activeBtn = document.querySelector('.section-tab.active[data-tab]');
+                var currentTab = activeBtn
+                    ? activeBtn.dataset.tab
+                    : new URLSearchParams(window.location.search).get('tab');
+                if (currentTab) {
+                    dest.searchParams.set('tab', currentTab);
+                    link.href = dest.toString();
+                }
+            } catch (err) { /* URL API missing; fall back to server-rendered href */ }
         });
     });
 });

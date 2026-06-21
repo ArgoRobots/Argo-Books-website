@@ -194,7 +194,7 @@ if (!function_exists('ua_fmt')) {
 }
 if (!function_exists('ua_kv')) {
     function ua_kv($arr) {
-        if (!$arr) return '<span style="color:var(--black)">none</span>';
+        if (!$arr) return '<span style="color:var(--admin-text)">none</span>';
         arsort($arr);
         $out = [];
         foreach ($arr as $k => $v) $out[] = htmlspecialchars($k) . ' <b>' . $v . '</b>';
@@ -231,9 +231,15 @@ if (!function_exists('ua_kv')) {
 .ua-evt.feature .ua-evt-text { color:#047857; }
 .ua-evt.session .ua-evt-text { color:var(--black); }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
-[data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text { color:var(--white); }
+[data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text, [data-theme="dark"] .ua-files { color:var(--white); }
 [data-theme="dark"] .ua-timeline { border-color:var(--gray-700); }
 [data-theme="dark"] .ua-evt { border-bottom-color:var(--gray-700); }
+[data-theme="dark"] .ua-evt-ts { color:var(--gray-400); }
+[data-theme="dark"] .ua-evt.error  .ua-evt-text { color:#f87171; }
+[data-theme="dark"] .ua-evt.api    .ua-evt-text { color:#a78bfa; }
+[data-theme="dark"] .ua-evt.export .ua-evt-text { color:#38bdf8; }
+[data-theme="dark"] .ua-evt.feature .ua-evt-text { color:#34d399; }
+[data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
 </style>
 
 <h2 class="section-title">User Activity</h2>

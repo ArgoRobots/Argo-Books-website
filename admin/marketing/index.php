@@ -143,6 +143,7 @@ include __DIR__ . '/../admin_header.php';
   font:500 14px/1.5 inherit;background:var(--input-bg,#fff);color:inherit;box-sizing:border-box}
 .mkt-field textarea{min-height:240px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
 .mkt-hint{font-size:12.5px;color:var(--black);margin-top:5px}
+.empty-state{text-align:center;color:var(--admin-text);padding:2rem}
 .mkt-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .mkt-test{display:flex;gap:8px;flex:1;min-width:240px}
 .mkt-test input{flex:1}

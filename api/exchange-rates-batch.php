@@ -33,7 +33,9 @@ if ($deviceId) {
     $rateLimitId = 'ip_' . substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 16);
 }
 $rateLimitKey = 'rates_' . $rateLimitId;
-if (is_rate_limited($rateLimitId, 120, 900, $rateLimitKey)) {
+// Generous limit: a normal import is a single batch request, so 1000 per 15 minutes is far beyond
+// any legitimate use while still guarding the OpenExchangeRates quota against a runaway client.
+if (is_rate_limited($rateLimitId, 1000, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);

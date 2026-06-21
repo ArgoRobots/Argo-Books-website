@@ -31,7 +31,9 @@ if ($deviceId) {
     $rateLimitId = 'ip_' . substr(hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown'), 0, 16);
 }
 $rateLimitKey = 'rates_' . $rateLimitId;
-if (is_rate_limited($rateLimitId, 120, 900, $rateLimitKey)) {
+// Shares the 'rates_' bucket with the batch endpoint; kept generous so the per-date fallback never
+// trips it during a legitimate import (the app no longer fans out on a rate-limit).
+if (is_rate_limited($rateLimitId, 1000, 900, $rateLimitKey)) {
     send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);

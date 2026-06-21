@@ -31,7 +31,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=AI+Receipt+Scanning&subtitle=Snap+a+photo%2C+let+AI+do+the+rest.+Automatic+data+extraction+for+your+business+receipts.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -40,7 +40,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <meta name="twitter:title" content="AI Receipt Scanning | Argo Books">
     <meta name="twitter:description"
         content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=AI+Receipt+Scanning&subtitle=Snap+a+photo%2C+let+AI+do+the+rest.+Automatic+data+extraction+for+your+business+receipts.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

@@ -25,7 +25,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books+Features&subtitle=AI-powered+business+tools+for+small+businesses.+Receipt+scanning%2C+expense+tracking%2C+analytics%2C+and+more.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -34,7 +34,7 @@ require_once __DIR__ . '/../track_referral.php';
     <meta name="twitter:title" content="Features: AI-Powered Business Tools | Argo Books">
     <meta name="twitter:description"
         content="Discover Argo Books features: AI receipt scanning, expense tracking, analytics, inventory, invoicing, and more.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+Features&subtitle=AI-powered+business+tools+for+small+businesses.+Receipt+scanning%2C+expense+tracking%2C+analytics%2C+and+more.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

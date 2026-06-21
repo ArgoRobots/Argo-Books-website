@@ -97,7 +97,7 @@ $niches = [
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Who+Argo+Books+is+For&subtitle=Bookkeeping+built+for+the+way+small+businesses+actually+work%2C+across+nine+industries&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -105,7 +105,7 @@ $niches = [
     <meta name="twitter:title" content="Who Argo Books is For: Industries and Trades We Built It For">
     <meta name="twitter:description"
         content="Bookkeeping built for the way small businesses actually work, across nine industries.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Who+Argo+Books+is+For&subtitle=Bookkeeping+built+for+the+way+small+businesses+actually+work%2C+across+nine+industries&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <meta name="geo.region" content="CA-SK">
     <meta name="geo.placename" content="Canada">

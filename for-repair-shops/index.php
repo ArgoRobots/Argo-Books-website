@@ -38,7 +38,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Repair+Shops&subtitle=Diagnostic+fee%2C+parts+at+your+markup%2C+and+labor+on+one+clean+invoice&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -46,7 +46,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="twitter:title" content="Argo Books for Repair Shops: Parts, Labor, and the Books, Together">
     <meta name="twitter:description"
         content="Diagnostic fee, parts at your markup, and labor at your shop rate, on one clean invoice.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Repair+Shops&subtitle=Diagnostic+fee%2C+parts+at+your+markup%2C+and+labor+on+one+clean+invoice&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <meta name="geo.region" content="CA-SK">
     <meta name="geo.placename" content="Canada">

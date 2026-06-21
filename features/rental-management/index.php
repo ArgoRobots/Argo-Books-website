@@ -28,7 +28,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Rental+Management&subtitle=Track+bookings%2C+rental+periods%2C+returns%2C+and+revenue.+Built+for+equipment+rental+businesses.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -37,7 +37,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:title" content="Rental Management | Argo Books">
     <meta name="twitter:description"
         content="Manage rental bookings, track rental periods, handle returns, and monitor revenue with Argo Books. Built for equipment rental and any rental-based business.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Rental+Management&subtitle=Track+bookings%2C+rental+periods%2C+returns%2C+and+revenue.+Built+for+equipment+rental+businesses.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

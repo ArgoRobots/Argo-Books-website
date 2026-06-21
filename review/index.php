@@ -22,7 +22,7 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Leave+a+Review&subtitle=Help+others+discover+Argo+Books+by+sharing+your+experience+on+Capterra&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -31,7 +31,7 @@
     <meta name="twitter:title" content="Leave a Review - Argo Books">
     <meta name="twitter:description"
         content="Help others discover Argo Books. Leave a review on Capterra and see what to expect from their verification process.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Leave+a+Review&subtitle=Help+others+discover+Argo+Books+by+sharing+your+experience+on+Capterra&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/review/">

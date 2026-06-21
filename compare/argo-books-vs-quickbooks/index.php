@@ -38,10 +38,10 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
     <meta name="twitter:title" content="Argo Books vs QuickBooks: A Simpler, More Affordable Alternative">
     <meta name="twitter:description"
         content="Compare Argo Books and QuickBooks side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

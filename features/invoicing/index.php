@@ -30,7 +30,7 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Invoicing&subtitle=Create+professional+invoices+and+get+paid+faster.+Templates%2C+payment+tracking%2C+and+online+payments.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -39,7 +39,7 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
     <meta name="twitter:title" content="Invoicing | Argo Books">
     <meta name="twitter:description"
         content="Create professional invoices with Argo Books. Customizable templates, payment tracking, and online payment links that help you get paid faster.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Invoicing&subtitle=Create+professional+invoices+and+get+paid+faster.+Templates%2C+payment+tracking%2C+and+online+payments.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

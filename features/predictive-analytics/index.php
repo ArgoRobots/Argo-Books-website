@@ -28,7 +28,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -37,7 +37,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:title" content="Predictive Analytics | Argo Books">
     <meta name="twitter:description"
         content="Predict revenue, expenses, and growth with AI-powered analytics. Forecast trends and detect seasonal patterns automatically.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Predictive+Analytics&subtitle=See+what%E2%80%99s+coming+before+it+happens.+AI-powered+forecasting+for+your+business.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

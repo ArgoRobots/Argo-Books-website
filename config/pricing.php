@@ -16,6 +16,8 @@
  *   FREE_RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for free tier (default: 5)
  *   AI_IMPORT_MONTHLY_LIMIT          - Monthly AI import limit for all users (default: 100)
  *   FREE_INVOICE_MONTHLY_LIMIT       - Monthly invoice send limit for free tier (default: 25)
+ *   WEB_RECEIPT_SCAN_DAILY_LIMIT       - Free web scanner per-visitor daily limit (default: 10)
+ *   WEB_RECEIPT_SCAN_GLOBAL_DAILY_CAP  - Free web scanner total scans/day across all visitors (default: 500)
  */
 
 /**
@@ -46,6 +48,8 @@ function get_pricing_config() {
         'free_receipt_scan_monthly_limit' => _pricing_parse_int_env('FREE_RECEIPT_SCAN_MONTHLY_LIMIT', 5),
         'ai_import_monthly_limit'         => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 100),
         'free_invoice_monthly_limit'      => _pricing_parse_int_env('FREE_INVOICE_MONTHLY_LIMIT', 25),
+        'web_receipt_scan_daily_limit'      => _pricing_parse_int_env('WEB_RECEIPT_SCAN_DAILY_LIMIT', 10),
+        'web_receipt_scan_global_daily_cap' => _pricing_parse_int_env('WEB_RECEIPT_SCAN_GLOBAL_DAILY_CAP', 500),
         'currency'              => 'CAD',
     ];
 

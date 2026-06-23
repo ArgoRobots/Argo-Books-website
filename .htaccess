@@ -94,6 +94,8 @@ AddDefaultCharset UTF-8
     # Content Security Policy
     Header set Content-Security-Policy "default-src 'self'; \
         script-src 'self' 'unsafe-inline' 'unsafe-eval' \
+            https://challenges.cloudflare.com \
+            https://openfpcdn.io \
             https://cdnjs.cloudflare.com \
             https://s3-us-west-2.amazonaws.com \
             https://www.paypal.com \
@@ -128,7 +130,7 @@ AddDefaultCharset UTF-8
             https://*.stripe.com \
             https://*.squarecdn.com \
             https://*.cloudfront.net; \
-        img-src 'self' data: \
+        img-src 'self' data: blob: \
             https://argorobots.com \
             https://dev.argorobots.com \
             https://starterbest.com \
@@ -152,6 +154,7 @@ AddDefaultCharset UTF-8
             https://googleads.g.doubleclick.net \
             https://*.doubleclick.net; \
         frame-src \
+            https://challenges.cloudflare.com \
             https://www.youtube.com \
             https://www.youtube-nocookie.com \
             https://www.paypal.com \
@@ -168,6 +171,8 @@ AddDefaultCharset UTF-8
             https://www.googletagmanager.com \
             https://*.googletagmanager.com; \
         connect-src 'self' \
+            https://challenges.cloudflare.com \
+            https://openfpcdn.io \
             https://formspree.io \
             https://www.paypal.com \
             https://*.paypal.com \

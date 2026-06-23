@@ -59,7 +59,6 @@ $schema = json_encode([
     <div class="links">
       <a href="#how">How it works</a>
       <a href="#trust">Privacy</a>
-      <a class="btn btn-primary" href="<?= $cta ?>">Try Argo free</a>
     </div>
   </div>
 </nav>

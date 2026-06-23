@@ -73,7 +73,7 @@ PHPUnit suite lives in `/tests/`. Run with `./vendor/bin/phpunit` from the proje
 
 ## Git workflow
 
-If there's an active version branch (e.g. `V.2.0.7`) for the next release, branch off it and target PRs to it. `main` only receives merges when a version ships to production.
+Commit directly to `main`. Don't branch-first or park changes on a feature branch unless asked.
 
 ## "What's New" page
 

@@ -113,13 +113,31 @@ jobs:
         run: composer install --no-dev --optimize-autoloader --no-interaction
 
       - name: Setup SSH
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           # Remove passphrase from key so lftp can use it non-interactively
           ssh-keygen -p -f ~/.ssh/deploy_key -P "${{ secrets.SSH_PASSPHRASE }}" -N ""
-          ssh-keyscan -T 10 -p ${{ secrets.SSH_PORT }} ${{ secrets.FTP_SERVER }} >> ~/.ssh/known_hosts 2>/dev/null
+
+          if [ -z "$SSH_PORT" ]; then
+            echo "::error::SSH_PORT secret is empty - set it in repo Settings > Secrets"
+            exit 1
+          fi
+
+          # Collect the host key. Don't let a non-zero exit kill the step before
+          # we can report WHY (ssh-keyscan exits non-zero when it fetches no keys).
+          echo "Scanning host key on port $SSH_PORT..."
+          ssh-keyscan -T 10 -p "$SSH_PORT" "$FTP_SERVER" >> ~/.ssh/known_hosts || true
+
+          if [ ! -s ~/.ssh/known_hosts ]; then
+            echo "::error::ssh-keyscan got no host key from the server on port $SSH_PORT - the SSH port is likely unreachable from the GitHub runner (firewall/allowlist?)"
+            exit 1
+          fi
+          echo "known_hosts populated OK"
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp

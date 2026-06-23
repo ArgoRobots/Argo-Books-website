@@ -180,6 +180,11 @@ function receipt_scan_build_csv(array $r): string
 function receipt_scan_csv_cell($value): string
 {
     $s = (string)$value;
+    // Neutralize spreadsheet formula injection (=, +, -, @ at the start), but
+    // leave real numbers like "-1.50" alone so they stay numeric in the sheet.
+    if ($s !== '' && strpos('=+-@', $s[0]) !== false && !preg_match('/^[+-]?\d/', $s)) {
+        $s = "'" . $s;
+    }
     if (preg_match('/[",\r\n]/', $s)) {
         return '"' . str_replace('"', '""', $s) . '"';
     }

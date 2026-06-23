@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../config/pricing.php';
 require_once __DIR__ . '/receipt_scan_lib.php';
 require_once __DIR__ . '/../../smtp_mailer.php'; // create_smtp_mailer() (loads env_helper.php)
 
-const RS_MAX_BYTES = 15 * 1024 * 1024;         // 15 MB upload ceiling; downscaled server-side after
+const RS_MAX_BYTES = 10 * 1024 * 1024;         // 10 MB upload ceiling (matches .htaccess post_max_size); downscaled server-side after
 const RS_TARGET_BYTES = 4 * 1024 * 1024;       // compress to <= 4 MB before sending (matches desktop)
 const RS_WINDOW = 86400;                        // 24h
 const RS_ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
@@ -37,6 +37,13 @@ function rs_fail(int $code, string $error, string $message, array $extra = []): 
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
     rs_fail(405, 'method_not_allowed', 'Use POST to scan a receipt.');
+}
+
+// PHP empties $_POST/$_FILES when the body exceeds post_max_size. Detect that up
+// front so an oversized upload gets a clear message instead of a generic auth or
+// "no file" error (a real scan request always has $_FILES populated).
+if (empty($_FILES) && empty($_POST) && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 1024 * 1024) {
+    rs_fail(413, 'too_large', 'That image is too large. Please use a photo under 10 MB.');
 }
 
 $cfg = get_pricing_config();
@@ -62,43 +69,26 @@ if (!$isLocal) {
 // A fresh short-lived pass the client reuses for the rest of a bulk batch.
 $authPass = $isLocal ? '' : rs_make_pass($ip);
 
-// --- 2. Rate limits. Check only; record after a successful scan. ---
+// --- 2. Identify the visitor. The daily limits are reserved ATOMICALLY just
+// before the paid Gemini call (below), so invalid uploads don't consume a scan
+// and concurrent bulk requests can't overshoot the cap. ---
 $fingerprint = preg_replace('/[^a-zA-Z0-9]/', '', (string)($_POST['fingerprint'] ?? ''));
 $fpKey = $fingerprint !== '' ? $fingerprint : 'anon';
 
-if (!$isLocal) {
-    // Global cap first: when reached, fire the once-per-day admin alert.
-    if (is_rate_limited('GLOBAL', $globalCap, RS_WINDOW, 'web_receipt_global')) {
-        // check_and_record_rate_limit returns FALSE on the call that records the
-        // attempt (the allowed case) and TRUE once the bucket is already at its
-        // max. Max is 1 per 24h here, so the FIRST blocked request of the day
-        // gets false -> sends the email; every later one gets true -> stays quiet.
-        if (!check_and_record_rate_limit('GLOBAL', 1, RS_WINDOW, 'web_receipt_alert')) {
-            rs_send_cap_alert($globalCap);
-        }
-        rs_fail(429, 'capacity', 'Free scanning is at capacity for today. Try again tomorrow, or get Argo Books for unlimited scanning.',
-            ['cta' => '/pricing/?source=receipt-scanner-capacity', 'scan_pass' => $authPass]);
-    }
-    if (is_rate_limited($fpKey, $perVisitor, RS_WINDOW, 'web_receipt_fp')) {
-        rs_fail(429, 'rate_limited', "You've used your free scans for today. Get Argo Books free to keep scanning and save them as expenses.",
-            ['cta' => '/downloads/?source=receipt-scanner-limit&utm_source=receipt-scanner&utm_medium=tool', 'scan_pass' => $authPass]);
-    }
-    if (is_rate_limited($ip, $ipMax, RS_WINDOW, 'web_receipt_ip')) {
-        rs_fail(429, 'rate_limited', "You've used your free scans for today. Get Argo Books free to keep scanning.",
-            ['cta' => '/downloads/?source=receipt-scanner-limit', 'scan_pass' => $authPass]);
-    }
-}
-
 // --- 3. File validation ---
 $file = $_FILES['receipt'] ?? null;
-if (!$file || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+$uploadErr = $file['error'] ?? UPLOAD_ERR_NO_FILE;
+if (!$file || $uploadErr === UPLOAD_ERR_NO_FILE) {
     rs_fail(400, 'no_file', 'No receipt image was uploaded.');
 }
-if (($file['error'] ?? 0) !== UPLOAD_ERR_OK) {
+if ($uploadErr === UPLOAD_ERR_INI_SIZE || $uploadErr === UPLOAD_ERR_FORM_SIZE) {
+    rs_fail(413, 'too_large', 'That image is too large. Please use a photo under 10 MB.');
+}
+if ($uploadErr !== UPLOAD_ERR_OK) {
     rs_fail(400, 'upload_error', 'The upload did not complete. Please try again.');
 }
 if (($file['size'] ?? 0) > RS_MAX_BYTES) {
-    rs_fail(413, 'too_large', 'That image is over 15 MB. Please use a smaller photo.');
+    rs_fail(413, 'too_large', 'That image is over 10 MB. Please use a smaller photo.');
 }
 
 $tmp = tempnam(sys_get_temp_dir(), 'rs_');
@@ -129,6 +119,31 @@ if ($jpeg === null) {
 }
 $base64 = base64_encode($jpeg);
 
+// --- Reserve a scan slot ATOMICALLY just before the paid call. Using
+// check_and_record (not check-then-record) closes the race where concurrent
+// bulk requests each pass a plain check and overshoot the cap. Order: per-
+// visitor, per-IP, then the global cost cap LAST so it never over-counts. Only
+// requests that reach the Gemini call consume a slot (invalid/undecodable
+// uploads were already rejected above). ---
+if (!$isLocal) {
+    if (check_and_record_rate_limit($fpKey, $perVisitor, RS_WINDOW, 'web_receipt_fp')) {
+        rs_fail(429, 'rate_limited', "You've used your free scans for today. Get Argo Books free to keep scanning and save them as expenses.",
+            ['cta' => '/downloads/?source=receipt-scanner-limit&utm_source=receipt-scanner&utm_medium=tool', 'scan_pass' => $authPass]);
+    }
+    if (check_and_record_rate_limit($ip, $ipMax, RS_WINDOW, 'web_receipt_ip')) {
+        rs_fail(429, 'rate_limited', "You've used your free scans for today. Get Argo Books free to keep scanning.",
+            ['cta' => '/downloads/?source=receipt-scanner-limit', 'scan_pass' => $authPass]);
+    }
+    if (check_and_record_rate_limit('GLOBAL', $globalCap, RS_WINDOW, 'web_receipt_global')) {
+        // First blocked request of the day -> email the admin once.
+        if (!check_and_record_rate_limit('GLOBAL', 1, RS_WINDOW, 'web_receipt_alert')) {
+            rs_send_cap_alert($globalCap);
+        }
+        rs_fail(429, 'capacity', 'Free scanning is at capacity for today. Try again tomorrow, or get Argo Books for unlimited scanning.',
+            ['cta' => '/pricing/?source=receipt-scanner-capacity', 'scan_pass' => $authPass]);
+    }
+}
+
 $model = $_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
 $content = rs_call_gemini($geminiKey, $model, 'image/jpeg', $base64);
 if ($content === null) {
@@ -140,13 +155,7 @@ if (!$normalized['ok']) {
     rs_fail(422, 'unreadable', "That doesn't look like a receipt we can read. Try a clearer, well-lit photo.", ['scan_pass' => $authPass]);
 }
 
-// --- 5. Record usage only on success ---
-if (!$isLocal) {
-    record_rate_limit_attempt($fpKey, 'web_receipt_fp', RS_WINDOW);
-    record_rate_limit_attempt($ip, 'web_receipt_ip', RS_WINDOW);
-    record_rate_limit_attempt('GLOBAL', 'web_receipt_global', RS_WINDOW);
-}
-
+// The slot was already reserved before the Gemini call (atomic, race-free).
 echo json_encode(['ok' => true, 'receipt' => $normalized['receipt'], 'scan_pass' => $authPass]);
 
 // ---------------------------------------------------------------------------
@@ -157,9 +166,16 @@ echo json_encode(['ok' => true, 'receipt' => $normalized['receipt'], 'scan_pass'
  * concurrently (Turnstile tokens are single-use). Signed with the server-side
  * Turnstile secret so it can't be forged.
  */
+/** Secret for signing scan passes: a dedicated key if set, else the Turnstile secret. */
+function rs_pass_secret(): string
+{
+    $s = $_ENV['SCAN_PASS_SECRET'] ?? '';
+    return $s !== '' ? $s : ($_ENV['TURNSTILE_SECRET_KEY'] ?? '');
+}
+
 function rs_make_pass(string $ip): string
 {
-    $secret = $_ENV['TURNSTILE_SECRET_KEY'] ?? '';
+    $secret = rs_pass_secret();
     $payload = (time() + 600) . ':' . substr(hash('sha256', $ip), 0, 16); // 10 min
     $sig = hash_hmac('sha256', $payload, $secret);
     return rtrim(strtr(base64_encode($payload), '+/', '-_'), '=') . '.' . $sig;
@@ -168,7 +184,7 @@ function rs_make_pass(string $ip): string
 /** Validate a scan pass: signature, expiry, and IP binding. */
 function rs_check_pass(string $pass, string $ip): bool
 {
-    $secret = $_ENV['TURNSTILE_SECRET_KEY'] ?? '';
+    $secret = rs_pass_secret();
     $parts = explode('.', $pass, 2);
     if (count($parts) !== 2) {
         return false;
@@ -235,6 +251,12 @@ function rs_preprocess_image(string $path, string $mime): ?string
     $img = @imagecreatefromstring($raw);
     if ($img === false) {
         return null;
+    }
+
+    // Convolution/contrast filters no-op on palette (indexed) images, e.g. 8-bit
+    // PNGs, so promote to true colour first or faded receipts skip sharpening.
+    if (function_exists('imageistruecolor') && !imageistruecolor($img)) {
+        @imagepalettetotruecolor($img);
     }
 
     // EXIF orientation (JPEG only).

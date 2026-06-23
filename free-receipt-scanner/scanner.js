@@ -240,11 +240,14 @@ function finishBulk(items) {
   setBulkOverlay(false);
 
   if (!ok.length) {
-    const limited = items.some((i) => i.status === 'limit');
-    renderLimit(limited
-      ? { error: 'rate_limited', message: "You've used your free scans for today." }
-      : { error: 'error', message: "We couldn't read those receipts. Try clearer photos." });
-    setState('limit'); show('rs-upload', false); show('rs-limit', true);
+    // All failed: show the upsell only if it was actually the daily limit;
+    // genuine read failures return to upload with a message so they can retry.
+    if (items.some((i) => i.status === 'limit')) {
+      renderLimit({ error: 'rate_limited', message: "You've used your free scans for today." });
+      setState('limit'); show('rs-upload', false); show('rs-limit', true);
+    } else {
+      rsError("We couldn't read those receipts. Try clearer, well-lit photos.");
+    }
     return;
   }
 
@@ -516,7 +519,12 @@ function allCsv() {
 }
 
 function toCsv(r) {
-  const cell = (v) => /[",\r\n]/.test(String(v)) ? '"' + String(v).replace(/"/g, '""') + '"' : String(v);
+  const cell = (v) => {
+    let s = String(v == null ? '' : v);
+    // Neutralize formula injection (=, +, -, @), but keep real numbers numeric.
+    if (/^[=+\-@\t\r]/.test(s) && !/^[+-]?\d/.test(s)) s = "'" + s;
+    return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
   const discount = r.discountTotal != null ? r.discountTotal : (r.discounts || []).reduce((s, d) => s + (Number(d.amount) || 0), 0);
   const rows = [
     ['Field', 'Value'], ['Supplier', r.supplierName || ''], ['Date', r.transactionDate || ''],

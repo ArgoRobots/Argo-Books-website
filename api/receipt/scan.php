@@ -52,7 +52,10 @@ $globalCap  = $cfg['web_receipt_scan_global_daily_cap'];
 $ipMax      = max($perVisitor * 20, 60); // lenient per-IP ceiling for shared networks
 
 $ip = get_client_ip();
-$isLocal = in_array($ip, ['127.0.0.1', '::1'], true);
+// Use REMOTE_ADDR (real TCP peer), not get_client_ip(), for the local-dev
+// bypass: get_client_ip() can honor X-Forwarded-For behind a trusted proxy, so
+// a spoofed "X-Forwarded-For: 127.0.0.1" must NOT be able to skip auth + limits.
+$isLocal = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
 
 // --- 1. Auth: a valid scan pass (issued after a Turnstile solve) OR a fresh
 // Turnstile token. The pass is signed, IP-bound, and short-lived; it lets the
@@ -100,6 +103,14 @@ $mime = rs_detect_mime($tmp);
 if (!in_array($mime, RS_ALLOWED, true)) {
     @unlink($tmp);
     rs_fail(415, 'bad_type', 'Please upload a JPEG, PNG, or WebP photo of your receipt.');
+}
+
+// Reject pixel/decompression bombs (a small file can decode to a huge bitmap and
+// exhaust memory) by checking dimensions from the header before GD decodes it.
+$dims = @getimagesize($tmp);
+if ($dims && (int)$dims[0] * (int)$dims[1] > 40 * 1000 * 1000) {
+    @unlink($tmp);
+    rs_fail(413, 'too_large', 'That image is too large to process. Please use a normal photo.');
 }
 
 // --- 4. Gemini call ---

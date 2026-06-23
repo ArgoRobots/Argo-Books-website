@@ -29,7 +29,7 @@ if ($raw === false || strlen($raw) > 2 * 1024 * 1024) {
 }
 
 $ip = get_client_ip();
-$isLocal = in_array($ip, ['127.0.0.1', '::1'], true);
+$isLocal = in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
 if (!$isLocal && is_rate_limited($ip, 120, 900, 'web_receipt_export')) {
     rx_fail(429, 'Too many exports. Please try again shortly.');
 }

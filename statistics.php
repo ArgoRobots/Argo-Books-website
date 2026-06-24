@@ -85,10 +85,70 @@ function ip_in_cidr($ip, $range)
 }
 
 /**
- * IPs we never record analytics for: the site owner's own connection(s) plus
- * known crawler netblocks whose UAs can't be trusted. Keeps the owner's casual
- * (logged-out) browsing and Google's crawler out of page-view, referral-visit,
- * and funnel-event tables.
+ * True if $ip belongs to a datacenter / cloud-hosting network rather than a
+ * residential or mobile ISP. Real customers browse from consumer ISPs; traffic
+ * originating inside AWS, Google Cloud, Azure, DigitalOcean, etc. is almost
+ * always automated (scrapers, uptime monitors, AI crawlers) wearing a spoofed
+ * browser User-Agent that is_likely_bot() can't catch by name. The June 2026
+ * invoice-generator scrape came almost entirely from Google Cloud (34/8, 35/8).
+ *
+ * This is a STATIC list of the largest published cloud aggregates, not a live
+ * IP-to-ASN lookup, so it is deliberately broad rather than exhaustive: a few
+ * uncounted real visitors costs us nothing, but a missed scraper pollutes the
+ * stats. Extend it via the DATACENTER_IP_RANGES env var (same format as
+ * EXCLUDED_TRACKING_IPS: comma-separated plain IPs or CIDR ranges). IPv4 only.
+ */
+function is_datacenter_ip($ip)
+{
+    if (empty($ip)) {
+        return false;
+    }
+
+    static $ranges = [
+        // Google Cloud Platform. 34/8 and 35/8 are predominantly GCP.
+        '34.0.0.0/8', '35.0.0.0/8',
+        // Amazon Web Services (largest aggregates).
+        '3.0.0.0/8', '13.32.0.0/15', '15.177.0.0/18', '18.0.0.0/8',
+        '52.0.0.0/8', '54.0.0.0/8',
+        // Microsoft Azure (largest aggregates).
+        '13.64.0.0/11', '20.0.0.0/8', '40.64.0.0/10', '104.40.0.0/13',
+        // DigitalOcean.
+        '104.131.0.0/16', '138.197.0.0/16', '159.65.0.0/16', '165.227.0.0/16',
+        '167.71.0.0/16', '167.99.0.0/16', '178.62.0.0/16', '188.166.0.0/16',
+        // OVH.
+        '51.68.0.0/16', '51.75.0.0/16', '51.83.0.0/16', '51.91.0.0/16',
+        '54.36.0.0/16', '145.239.0.0/16', '147.135.0.0/16',
+        // Hetzner.
+        '5.9.0.0/16', '88.99.0.0/16', '116.202.0.0/16', '116.203.0.0/16',
+        '135.181.0.0/16', '157.90.0.0/16', '162.55.0.0/16', '167.235.0.0/16',
+        // Linode / Akamai.
+        '45.33.0.0/16', '45.56.0.0/16', '50.116.0.0/16', '66.175.208.0/20',
+        '96.126.96.0/19', '139.144.0.0/16', '172.104.0.0/15', '173.255.192.0/18',
+    ];
+
+    $configured = $_ENV['DATACENTER_IP_RANGES'] ?? getenv('DATACENTER_IP_RANGES');
+    if (!empty($configured)) {
+        foreach (explode(',', $configured) as $entry) {
+            $entry = trim($entry);
+            if ($entry !== '') {
+                $ranges[] = $entry;
+            }
+        }
+    }
+
+    foreach ($ranges as $range) {
+        if (ip_in_cidr($ip, $range)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * IPs we never record analytics for: the site owner's own connection(s), known
+ * crawler netblocks whose UAs can't be trusted, and datacenter/cloud hosts.
+ * Keeps the owner's casual (logged-out) browsing, Google's crawler, and
+ * UA-spoofing scrapers out of page-view, referral-visit, and funnel-event tables.
  *
  * Configure owner/internal addresses via the EXCLUDED_TRACKING_IPS env var:
  * comma-separated, plain IPs or CIDR ranges (e.g. "64.201.195.108,203.0.113.0/24").
@@ -97,6 +157,11 @@ function is_nontracked_ip($ip)
 {
     if (empty($ip)) {
         return false;
+    }
+
+    // Cloud/datacenter source = automated traffic with a spoofed browser UA.
+    if (is_datacenter_ip($ip)) {
+        return true;
     }
 
     // Google's published crawler range. UA filtering catches the named bots

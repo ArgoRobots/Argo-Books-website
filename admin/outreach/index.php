@@ -788,6 +788,43 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
     </div>
 </div>
 
+<!-- Add Reddit Thread Modal -->
+<div id="addRedditThreadModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Add Reddit Thread</h3>
+            <button class="modal-close" onclick="closeModal('addRedditThreadModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-muted" style="margin-top:0; font-size:13px;">
+                Paste a Reddit post URL. We'll try to fetch the title, subreddit, and body automatically; fill the fields in below if it can't reach Reddit. The thread lands in the queue as drafted-pending so you can generate a reply for it.
+            </p>
+            <div class="form-group">
+                <label>Reddit post URL <span class="required">*</span></label>
+                <input type="url" id="addRedditUrl" placeholder="https://www.reddit.com/r/smallbusiness/comments/abc123/...">
+            </div>
+            <div class="detail-grid">
+                <div class="form-group">
+                    <label>Subreddit</label>
+                    <input type="text" id="addRedditSubreddit" placeholder="e.g. smallbusiness">
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label>Title</label>
+                <input type="text" id="addRedditTitle" placeholder="Auto-filled from the URL when possible">
+            </div>
+            <div class="form-group full-width">
+                <label>OP body (optional)</label>
+                <textarea id="addRedditBody" rows="5" placeholder="Paste the post body to improve the generated draft"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="closeModal('addRedditThreadModal')">Cancel</button>
+            <button class="btn btn-blue" onclick="addRedditThread()">Add Thread</button>
+        </div>
+    </div>
+</div>
+
 <!-- Shopify Rejection Reasons Modal -->
 <div id="shopifyRejectStatsModal" class="modal" style="display:none;">
     <div class="modal-content modal-large" style="height:auto; max-height:80vh;">

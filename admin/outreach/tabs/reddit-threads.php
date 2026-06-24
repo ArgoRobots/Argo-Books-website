@@ -120,6 +120,7 @@ function reddit_threads_tab_render($pdo)
                         <option value="watchlist">Watchlist</option>
                         <option value="keyword">Keyword</option>
                         <option value="both">Both</option>
+                        <option value="manual">Manual</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -130,6 +131,9 @@ function reddit_threads_tab_render($pdo)
                         <option value="30" selected>Last 30 days</option>
                         <option value="0">All time</option>
                     </select>
+                </div>
+                <div class="filter-group form-group-btn">
+                    <button class="btn btn-blue" onclick="showAddRedditThreadModal()">+ Add thread</button>
                 </div>
                 <div class="filter-group form-group-btn">
                     <button class="btn btn-blue" onclick="runRedditDiscoveryNow()" id="redditRunNowBtn">Run discovery now</button>

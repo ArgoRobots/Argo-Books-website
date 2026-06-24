@@ -1892,6 +1892,42 @@ async function runRedditDiscoveryNow() {
     startRedditProgressPolling();
 }
 
+// ─── Manually add a thread ───
+
+function showAddRedditThreadModal() {
+    document.getElementById('addRedditUrl').value = '';
+    document.getElementById('addRedditSubreddit').value = '';
+    document.getElementById('addRedditTitle').value = '';
+    document.getElementById('addRedditBody').value = '';
+    showModal('addRedditThreadModal');
+}
+
+async function addRedditThread() {
+    const url = document.getElementById('addRedditUrl').value.trim();
+    if (!url) { notify('Reddit post URL is required', 'error'); return; }
+
+    const data = {
+        url,
+        subreddit: document.getElementById('addRedditSubreddit').value.trim(),
+        title: document.getElementById('addRedditTitle').value.trim(),
+        body: document.getElementById('addRedditBody').value.trim(),
+    };
+
+    try {
+        const result = await api('reddit_add_thread', { method: 'POST', body: data });
+        if (result.success) {
+            closeModal('addRedditThreadModal');
+            notify('Thread added to the queue', 'success');
+            loadRedditThreads();
+            loadRedditStats();
+        } else {
+            notify(result.message, 'error');
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    }
+}
+
 // ─── Thread detail modal ───
 
 async function openRedditThreadDetail(id) {

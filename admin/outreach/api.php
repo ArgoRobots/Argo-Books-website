@@ -199,6 +199,9 @@ switch ($action) {
     case 'reddit_get_threads':
         reddit_api_get_threads($pdo);
         break;
+    case 'reddit_add_thread':
+        reddit_api_add_thread($pdo);
+        break;
     case 'reddit_get_thread':
         reddit_api_get_thread($pdo);
         break;
@@ -1470,7 +1473,7 @@ function reddit_api_get_threads($pdo)
         $params[] = $subreddit;
     }
 
-    if (in_array($source, ['watchlist', 'keyword', 'both'], true)) {
+    if (in_array($source, ['watchlist', 'keyword', 'both', 'manual'], true)) {
         $where[] = 'discovery_source = ?';
         $params[] = $source;
     }
@@ -1500,6 +1503,108 @@ function reddit_api_get_threads($pdo)
     }
 
     json_response(['success' => true, 'threads' => $threads]);
+}
+
+/**
+ * Manually add a Reddit thread to the queue from the Threads tab.
+ *
+ * Takes a Reddit post URL (required) plus optional subreddit/title/body the
+ * admin can type in. Parses the post id + subreddit from the URL, then makes a
+ * best-effort fetch of the live post (works under OAuth, or public mode from a
+ * non-blocked IP) to auto-fill title/body/author; typed fields win when the
+ * fetch can't reach Reddit. Inserts as discovery_source='manual',
+ * status='drafted_pending' so it lands in the actionable queue and can be
+ * drafted on demand via the existing "Generate draft" button.
+ */
+function reddit_api_add_thread($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    $url            = trim((string) ($data['url'] ?? ''));
+    $manualSub      = trim((string) ($data['subreddit'] ?? ''));
+    $manualTitle    = trim((string) ($data['title'] ?? ''));
+    $manualBody     = trim((string) ($data['body'] ?? ''));
+
+    if ($url === '') {
+        json_response(['success' => false, 'message' => 'Reddit post URL is required'], 400);
+    }
+
+    // Extract the base-36 post id from a comments URL or a redd.it short link.
+    if (!preg_match('#(?:/comments/|redd\.it/)([a-z0-9]{4,12})#i', $url, $m)) {
+        json_response(['success' => false, 'message' => "Couldn't find a Reddit post ID in that URL. It should look like reddit.com/r/<sub>/comments/<id>/..."], 400);
+    }
+    $redditId = strtolower($m[1]);
+
+    // Subreddit: typed value wins, else parse from the URL.
+    $subreddit = $manualSub;
+    if ($subreddit === '' && preg_match('#/r/([A-Za-z0-9_]+)#', $url, $ms)) {
+        $subreddit = $ms[1];
+    }
+    $subreddit = preg_replace('#^/?r/#i', '', trim($subreddit));
+
+    // Already in the queue? reddit_id is UNIQUE; report the existing row.
+    $check = $pdo->prepare("SELECT id, status FROM reddit_threads WHERE reddit_id = ? LIMIT 1");
+    $check->execute([$redditId]);
+    if ($existing = $check->fetch()) {
+        json_response([
+            'success'     => false,
+            'message'     => 'This thread is already in the queue (status: ' . $existing['status'] . ').',
+            'existing_id' => (int) $existing['id'],
+        ], 409);
+    }
+
+    // Best-effort live fetch to auto-fill the details.
+    $title        = $manualTitle;
+    $body         = $manualBody !== '' ? $manualBody : null;
+    $author       = null;
+    $postedAt     = null;
+    $commentCount = 0;
+    $canonicalUrl = $url;
+
+    try {
+        $info = reddit_api_get($pdo, '/api/info', ['id' => 't3_' . $redditId]);
+        $post = $info['data']['children'][0]['data'] ?? null;
+        if (is_array($post) && !empty($post['id'])) {
+            $n = reddit_normalize_post($post, 'manual');
+            if ($subreddit === '')                       $subreddit    = $n['subreddit'];
+            if ($title === '')                           $title        = $n['title'];
+            if ($body === null && !empty($n['body']))    $body         = $n['body'];
+            if (!empty($n['url']))                       $canonicalUrl = $n['url'];
+            $author       = $n['author'];
+            $postedAt     = $n['posted_at'];
+            $commentCount = (int) $n['comment_count'];
+        }
+    } catch (Throwable $e) {
+        // Reddit unreachable / blocked: fall back to the typed fields below.
+    }
+
+    if ($subreddit === '') {
+        json_response(['success' => false, 'message' => 'Subreddit could not be detected from the URL. Please enter it.'], 400);
+    }
+    if ($title === '') {
+        json_response(['success' => false, 'message' => "Couldn't fetch the post automatically. Please enter the title manually."], 400);
+    }
+
+    $title = mb_substr($title, 0, 500);
+    if ($postedAt === null) $postedAt = date('Y-m-d H:i:s');
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO reddit_threads
+            (reddit_id, subreddit, title, body, url, author, post_score, comment_count,
+             posted_at, discovery_source, rules_score, ai_relevance, ai_relevance_reason,
+             status, notes)
+            VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 'manual', 0, NULL, 'Manually added by admin',
+                    'drafted_pending', 'Manually added from the Threads tab')");
+        $stmt->execute([
+            $redditId, $subreddit, $title, $body, $canonicalUrl, $author, $commentCount, $postedAt,
+        ]);
+        json_response(['success' => true, 'id' => (int) $pdo->lastInsertId(), 'reddit_id' => $redditId]);
+    } catch (PDOException $e) {
+        // Unique-key race: the cron inserted the same thread between our check and insert.
+        if ($e->getCode() === '23000') {
+            json_response(['success' => false, 'message' => 'This thread is already in the queue.'], 409);
+        }
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
 }
 
 function reddit_api_get_thread($pdo)

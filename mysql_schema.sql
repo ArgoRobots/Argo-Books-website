@@ -1173,7 +1173,7 @@ CREATE TABLE IF NOT EXISTS reddit_threads (
     comment_count INT DEFAULT 0,
     posted_at DATETIME DEFAULT NULL,
     discovered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    discovery_source ENUM('watchlist','keyword','both') NOT NULL DEFAULT 'watchlist',
+    discovery_source ENUM('watchlist','keyword','both','manual') NOT NULL DEFAULT 'watchlist',
     matched_keywords JSON DEFAULT NULL,
     rules_score INT DEFAULT 0,
     ai_relevance TINYINT DEFAULT NULL COMMENT '0-10 or NULL if not checked',

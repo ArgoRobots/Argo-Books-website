@@ -1178,7 +1178,7 @@ a {
 .inv-total-value { color: hsl(var(--inv-accent)); }
 
 .inv-status {
-    position: absolute; top: 22px; right: 22px;
+    margin-left: 4px; white-space: nowrap;
     padding: 5px 12px; border-radius: 50px;
     background: var(--emerald-100); color: var(--emerald-600);
     font-size: 0.72rem; font-weight: 700;
@@ -1191,7 +1191,7 @@ a {
 .invoice-doc.theme-modern .inv-brandbar { display: none; }
 .invoice-doc.theme-modern .inv-top {
     background: hsl(var(--inv-accent));
-    margin: -24px -24px 20px; padding: 22px 24px; align-items: center;
+    margin: -24px -24px 12px; padding: 12px 24px; align-items: center;
 }
 .invoice-doc.theme-modern .inv-bizname,
 .invoice-doc.theme-modern .inv-docref { color: var(--white); }
@@ -1199,7 +1199,7 @@ a {
 .invoice-doc.theme-modern .inv-mark { color: var(--white); }
 .invoice-doc.theme-modern .inv-status { background: var(--white-alpha-20); color: var(--white); }
 .invoice-doc.theme-modern .inv-amountdue {
-    margin: 10px -24px -24px; padding: 16px 24px;
+    margin: 8px -24px -24px; padding: 11px 24px;
     background: hsl(var(--inv-accent) / 0.10); border-top: none;
 }
 

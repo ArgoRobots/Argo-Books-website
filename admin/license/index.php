@@ -804,7 +804,7 @@ include __DIR__ . '/../admin_header.php';
                                             <?php echo htmlspecialchars($key['subscription_key']); ?>
                                             <button type="button" class="btn-copy" onclick="copyToClipboard('<?php echo htmlspecialchars($key['subscription_key'], ENT_QUOTES); ?>', this)" title="Copy key">Copy</button>
                                         </td>
-                                        <td><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
+                                        <td class="col-nowrap"><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
                                         <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:var(--black);">Any user</span>'; ?></td>
                                         <td>
                                             <?php if ($key['redeemed_at']): ?>

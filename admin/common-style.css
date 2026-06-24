@@ -609,6 +609,7 @@ tbody tr:hover {
 
 /* Statistics Cards */
 .stat-card {
+  position: relative;
   flex: 1;
   background: var(--white);
   border-radius: 8px;
@@ -665,6 +666,118 @@ tbody tr:hover {
   100% {
     box-shadow: 0 0 0 0 var(--green-alpha-10);
   }
+}
+
+/* Info button: small circular "i" that reveals a tooltip on hover or keyboard
+   focus. CSS-only, no JS. Inside a stat card it pins to the top-right corner
+   and the tooltip opens down-left so it stays on screen. */
+.info-tip {
+  position: relative;
+  display: inline-flex;
+  outline: none;
+}
+
+.stat-card .info-tip {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.info-tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--gray-200);
+  color: var(--admin-text);
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: default;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.info-tip:hover .info-tip-icon,
+.info-tip:focus-visible .info-tip-icon {
+  background: var(--primary-blue);
+  color: #fff;
+}
+
+[data-theme="dark"] .info-tip-icon {
+  background: var(--gray-700);
+  color: var(--white);
+}
+
+[data-theme="dark"] .info-tip:hover .info-tip-icon,
+[data-theme="dark"] .info-tip:focus-visible .info-tip-icon {
+  background: var(--primary-blue);
+  color: #fff;
+}
+
+.info-tip-tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: max-content;
+  max-width: 260px;
+  padding: 10px 12px;
+  background: #1f2937;
+  color: var(--whiteBackground);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+  pointer-events: none;
+  z-index: 10;
+  white-space: normal;
+}
+
+.info-tip-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 8px;
+  border: 6px solid transparent;
+  border-bottom-color: #1f2937;
+}
+
+.info-tip:hover .info-tip-tooltip,
+.info-tip:focus-visible .info-tip-tooltip,
+.info-tip:focus-within .info-tip-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
+[data-theme="dark"] .info-tip-tooltip {
+  background: var(--gray-900);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .info-tip-tooltip::after {
+  border-bottom-color: var(--gray-900);
+}
+
+/* Table cells default to word-break: break-word (table-auto-size.css) so long
+   keys/IDs wrap. Add this to short-label columns so a single word like
+   "Permanent" isn't broken mid-word in a narrow column. */
+td.col-nowrap,
+th.col-nowrap {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 /* Charts */

@@ -761,12 +761,12 @@ include __DIR__ . '/../admin_header.php';
             <div class="subtext">initial Premium payments</div>
         </div>
         <div class="stat-card hero">
-            <h3>Customer Acquisition Cost (CAC)</h3>
+            <h3>Customer Acquisition Cost</h3>
             <div class="value"><?php echo $cac !== null ? '$' . number_format($cac, 2) : '—'; ?></div>
             <div class="subtext">spend &divide; paying customers</div>
         </div>
         <div class="stat-card hero <?php echo $ratio_class; ?>">
-            <h3>Lifetime Value : CAC</h3>
+            <h3>Lifetime Value : Customer Acquisition Cost</h3>
             <div class="value">
                 <?php
                     if ($total_spend == 0 && $total_paying > 0) {

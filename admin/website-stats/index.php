@@ -843,7 +843,8 @@ include __DIR__ . '/../admin_header.php';
                 },
                 {
                     title: 'Bounce Rate',
-                    value: bounceSessionsTotal > 0 ? bounceRateOverall.toFixed(1) + '%' : '—'
+                    value: bounceSessionsTotal > 0 ? bounceRateOverall.toFixed(1) + '%' : '—',
+                    info: 'The share of visits where someone looked at a single page and then left. Each visit counts as one session, and the same person returning after 30+ minutes of inactivity starts a fresh one. A high bounce rate is normal for pages people read and leave, like an article or landing page.'
                 },
                 {
                     title: 'Average Session',
@@ -853,6 +854,10 @@ include __DIR__ . '/../admin_header.php';
 
             statsGrid.innerHTML = stats.map(stat => `
                 <div class="stat-card">
+                    ${stat.info ? `<span class="info-tip" tabindex="0" aria-label="What does ${stat.title} mean?">
+                        <span class="info-tip-icon" aria-hidden="true">i</span>
+                        <span class="info-tip-tooltip" role="tooltip">${stat.info}</span>
+                    </span>` : ''}
                     <h3>${stat.title}${stat.live ? ' <span class="live-dot"></span>' : ''}</h3>
                     <div class="value">${stat.value}</div>
                 </div>

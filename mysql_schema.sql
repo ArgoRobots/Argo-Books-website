@@ -1268,7 +1268,42 @@ INSERT IGNORE INTO reddit_subreddits (name, notes) VALUES
     ('sweatystartup', 'service-business owners'),
     ('microsaas', 'indie SaaS founders: invoicing + subscription accounting'),
     ('graphic_design', 'designers with invoicing pain'),
-    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking');
+    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking'),
+    -- Expanded watchlist: more small-business owner / freelancer / service-biz
+    -- communities. Low-yield or high-removal subs auto-disable over time.
+    ('EntrepreneurRideAlong', 'early founders sharing the journey'),
+    ('startups', 'startup founders'),
+    ('smallbiz', 'small-business owners'),
+    ('selfemployed', 'self-employed / sole proprietors'),
+    ('Upwork', 'freelancers: client invoicing pain'),
+    ('Fiverr', 'freelancers / gig sellers'),
+    ('freelanceWriters', 'freelance writers: invoicing'),
+    ('WorkOnline', 'online earners / side income'),
+    ('digitalnomad', 'location-independent freelancers'),
+    ('SaaS', 'indie SaaS founders: subscription accounting'),
+    ('QuickBooks', 'QuickBooks users: strong switch-intent'),
+    ('Accounting', 'software-rec questions surface here, tune carefully'),
+    ('tax', 'US tax + software questions'),
+    ('cantax', 'Canadian tax: strong local fit'),
+    ('Contractor', 'contractors: invoicing + job costing'),
+    ('HVAC', 'HVAC business owners, tune carefully'),
+    ('lawncare', 'lawn-care operators'),
+    ('landscaping', 'landscaping businesses'),
+    ('pressurewashing', 'new service-biz owners'),
+    ('cleaningbusiness', 'cleaning-business owners'),
+    ('photography', 'photographers: client invoicing'),
+    ('WeddingPhotography', 'wedding pros: deposits + invoicing'),
+    ('videography', 'videographers: project invoicing'),
+    ('personaltraining', 'solo trainers: client billing'),
+    ('RealEstate', 'agents: expense tracking'),
+    ('realtors', 'realtors: expense + commission tracking'),
+    ('dropship', 'dropshippers: fees + bookkeeping'),
+    ('FulfillmentByAmazon', 'FBA sellers: fees + inventory'),
+    ('Etsy', 'broader Etsy community'),
+    ('Handmade', 'makers selling handmade'),
+    ('foodtrucks', 'food-truck owners'),
+    ('restaurateur', 'restaurant owners'),
+    ('nonprofit', 'nonprofit bookkeeping needs');
 
 INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('bookkeeping software', 'broad intent'),
@@ -1303,4 +1338,13 @@ INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('vendor tracking software', 'supplier mgmt'),
     -- General SMB / self-employed
     ('self-employed accounting', 'self-employed broad intent'),
-    ('sole proprietor taxes', 'sole proprietor pain');
+    ('sole proprietor taxes', 'sole proprietor pain'),
+    -- Expanded keyword pool: switch-intent, price pain, and broad SMB intent
+    ('xero alternative', 'switch-intent from Xero'),
+    ('free accounting software', 'price-sensitive new businesses'),
+    ('best accounting software small business', 'broad SMB intent'),
+    ('quickbooks too expensive', 'price pain / switch-intent'),
+    ('quickbooks self employed', 'switch-intent from QBSE'),
+    ('mileage tracking app', 'expense tracking for self-employed'),
+    ('contractor invoicing app', 'trades invoicing'),
+    ('profit and loss small business', 'bookkeeping reporting need');

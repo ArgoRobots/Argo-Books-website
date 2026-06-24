@@ -683,6 +683,18 @@ function shopify_run_dork($pdo)
     $totalEvaluated       = 0;
     $queriesRun           = [];
 
+    // Within-run dedup. The same store surfaces across multiple dork queries
+    // (and via different deep links that all canonicalize to one origin), so
+    // without these we'd show (and re-evaluate) the same storefront many times.
+    //   $seenCanonicals: skip a canonical URL we've already processed this run,
+    //                    BEFORE the expensive evaluator call.
+    //   $seenIdentities: backstop for the case where two different canonical
+    //                    URLs resolve to the same final store + email (e.g. a
+    //                    .myshopify.com link and a custom-domain link for the
+    //                    same shop). Keyed on final-URL host + harvested email.
+    $seenCanonicals = [];
+    $seenIdentities = [];
+
     while (count($fits) < $limit && $callsToday < $serpapiLimit) {
         $query = SHOPIFY_DORK_POOL[$cursor % $poolSize];
         $cursor++;
@@ -705,6 +717,12 @@ function shopify_run_dork($pdo)
 
             $canonical = shopify_canonical_url($r['link'] ?? '');
             if ($canonical === '') continue;
+
+            // Skip canonicals already handled this run (dup SERP hits / deep
+            // links to the same store). Marked seen even if it later rejects,
+            // so we never pay to evaluate the same origin twice.
+            if (isset($seenCanonicals[$canonical])) continue;
+            $seenCanonicals[$canonical] = true;
 
             // Already-imported check FIRST, before the expensive evaluator
             // call. Uses outreach_shopify_candidates.canonical_url (stable,
@@ -729,11 +747,23 @@ function shopify_run_dork($pdo)
             }
 
             $meta = $result['metadata'] ?? [];
+            $finalUrl = $result['final_url'] ?? $canonical;
+
+            // Identity dedup: two different canonical URLs can resolve to the
+            // same shop (the Scholar's Choice case: many .myshopify.com links
+            // all redirect to scholarschoice.ca with the same email). Key on
+            // final-URL host + email so we only surface the store once.
+            $identityHost = parse_url($finalUrl, PHP_URL_HOST) ?: $canonical;
+            $identityHost = strtolower(preg_replace('/^www\./', '', (string) $identityHost));
+            $identityKey  = $identityHost . '|' . strtolower(trim((string) ($meta['email'] ?? '')));
+            if (isset($seenIdentities[$identityKey])) continue;
+            $seenIdentities[$identityKey] = true;
+
             $fits[] = [
                 'canonical_url'    => $canonical,
                 'serp_title'       => $r['title'] ?? '',
                 'fit'              => true,
-                'final_url'        => $result['final_url'] ?? $canonical,
+                'final_url'        => $finalUrl,
                 'business_name'    => $meta['business_name'] ?? '',
                 'email'            => $meta['email'] ?? '',
                 'products_count'   => $meta['products_count'] ?? null,

@@ -333,48 +333,6 @@ function detect_accounting_tool(string $html): ?string
 }
 
 /**
- * Scan storefront HTML for an explicit business-founding year.
- *
- * Looks for copyright, "since YYYY", "established YYYY", "founded YYYY", and
- * "YYYY-present" patterns and returns the OLDEST plausible founding year
- * (1900..current year) found, or null if no signal is detected.
- *
- * Intended for the business_too_old reject path: a 30-year-old company that
- * just migrated to Shopify is not a startup, even if its oldest product is
- * less than 24 months old.
- */
-function detect_storefront_founded_year(string $html): ?int
-{
-    $text = strip_tags($html);
-    $currentYear = (int) date('Y');
-    $oldestYear = null;
-
-    $patterns = [
-        '/©.{0,80}?(\d{4})/s',                                    // © 1995, © Acme Co 1995-2026
-        '/\bcopyright\b.{0,80}?(\d{4})/is',                       // copyright Acme Co 1995
-        '/\bsince\s+(\d{4})\b/i',                                 // since 1995
-        '/\b(?:est(?:ablished)?\.?)\s+(?:in\s+)?(\d{4})\b/i',     // est. 1995, established in 1995
-        '/\bfounded\s+(?:in\s+)?(\d{4})\b/i',                     // founded 1995, founded in 1995
-        '/\b(\d{4})\s*[-–—]\s*(?:present|today|now)\b/i',         // 1995-present
-    ];
-
-    foreach ($patterns as $pattern) {
-        if (preg_match_all($pattern, $text, $matches)) {
-            foreach ($matches[1] as $yearStr) {
-                $year = (int) $yearStr;
-                if ($year >= 1900 && $year <= $currentYear) {
-                    if ($oldestYear === null || $year < $oldestYear) {
-                        $oldestYear = $year;
-                    }
-                }
-            }
-        }
-    }
-
-    return $oldestYear;
-}
-
-/**
  * Evaluate a Shopify storefront URL for outreach fitness.
  *
  * Runs a pipeline of checks (agency detection, products count, age, country,

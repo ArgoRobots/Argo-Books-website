@@ -104,6 +104,9 @@ switch ($action) {
     case 'create_lead':
         create_lead($pdo);
         break;
+    case 'create_lead_from_website':
+        create_lead_from_website($pdo);
+        break;
     case 'update_lead':
         update_lead($pdo);
         break;
@@ -387,6 +390,74 @@ function create_lead($pdo)
     log_activity($pdo, $id, 'lead_created', 'Lead created: ' . $data['business_name']);
 
     json_response(['success' => true, 'id' => $id, 'message' => 'Lead created']);
+}
+
+/**
+ * Create a lead from just a website URL: fetch the site, auto-fill business
+ * name / email / phone / category / city / summary via enrich_lead_from_website,
+ * then insert. Backs the slimmed-down "Add Lead" modal (one website field).
+ */
+function create_lead_from_website($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $website = trim((string) ($data['website'] ?? ''));
+
+    if ($website === '') {
+        json_response(['success' => false, 'message' => 'Website is required'], 400);
+    }
+    if (!preg_match('#^https?://#i', $website)) {
+        $website = 'https://' . $website;
+    }
+    if (!filter_var($website, FILTER_VALIDATE_URL)) {
+        json_response(['success' => false, 'message' => "That doesn't look like a valid website URL"], 400);
+    }
+
+    // Enrichment fetches the site + makes one Gemini call, so give it room.
+    @set_time_limit(60);
+    $enriched = enrich_lead_from_website($website);
+
+    $finalWebsite = $enriched['website'] ?: $website;
+    $email = $enriched['email'] ?: null;
+
+    // Dedup by website (and email when we found one), like the other channels.
+    if ($email) {
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? OR email = ? LIMIT 1");
+        $check->execute([$finalWebsite, $email]);
+    } else {
+        $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+        $check->execute([$finalWebsite]);
+    }
+    if ($existing = $check->fetchColumn()) {
+        json_response([
+            'success'          => false,
+            'message'          => 'A lead with this website or email already exists',
+            'existing_lead_id' => (int) $existing,
+        ], 409);
+    }
+
+    $stmt = $pdo->prepare("INSERT INTO outreach_leads
+        (business_name, email, phone, website, address, category, city, source, status, business_summary)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'manual', 'new', ?)");
+    $stmt->execute([
+        $enriched['business_name'] ?: $finalWebsite,
+        $email,
+        $enriched['phone'] ?: null,
+        $finalWebsite,
+        $enriched['address'] ?: null,
+        $enriched['category'] ?: null,
+        $enriched['city'] ?: null,
+        $enriched['business_summary'] ?: null,
+    ]);
+
+    $id = (int) $pdo->lastInsertId();
+    log_activity($pdo, $id, 'lead_created', 'Lead auto-added from website: ' . $finalWebsite);
+
+    json_response([
+        'success'  => true,
+        'id'       => $id,
+        'enriched' => $enriched,
+        'message'  => 'Lead added: ' . ($enriched['business_name'] ?: $finalWebsite),
+    ]);
 }
 
 function update_lead($pdo)

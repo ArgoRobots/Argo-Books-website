@@ -622,48 +622,17 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
             <button class="modal-close" onclick="closeModal('addLeadModal')">&times;</button>
         </div>
         <div class="modal-body">
-            <div class="detail-grid">
-                <div class="form-group">
-                    <label>Business Name <span class="required">*</span></label>
-                    <input type="text" id="addBusinessName" required>
-                </div>
-                <div class="form-group">
-                    <label>Contact Name</label>
-                    <input type="text" id="addContactName">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="addEmail">
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" id="addPhone">
-                </div>
-                <div class="form-group">
-                    <label>Website</label>
-                    <input type="url" id="addWebsite">
-                </div>
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" id="addAddress">
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" id="addCategory">
-                </div>
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" id="addCity">
-                </div>
-            </div>
+            <p class="text-muted" style="margin-top:0; font-size:13px;">
+                Just paste the business's website. We'll fetch the page and auto-fill the name, email, phone, category, city, and a short summary. You can edit anything afterward by opening the lead.
+            </p>
             <div class="form-group full-width">
-                <label>Notes</label>
-                <textarea id="addNotes" rows="3"></textarea>
+                <label>Website <span class="required">*</span></label>
+                <input type="url" id="addWebsite" placeholder="example.com">
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-blue" onclick="closeModal('addLeadModal')">Cancel</button>
-            <button class="btn btn-blue" onclick="createLead()">Add Lead</button>
+            <button class="btn btn-blue" id="btnAddLead" onclick="createLead()">Add Lead</button>
         </div>
     </div>
 </div>

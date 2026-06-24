@@ -717,38 +717,24 @@ async function deleteCurrentLead() {
 
 // ─── Add Lead ───
 function showAddLeadModal() {
-    document.getElementById('addBusinessName').value = '';
-    document.getElementById('addContactName').value = '';
-    document.getElementById('addEmail').value = '';
-    document.getElementById('addPhone').value = '';
     document.getElementById('addWebsite').value = '';
-    document.getElementById('addAddress').value = '';
-    document.getElementById('addCategory').value = '';
-    document.getElementById('addCity').value = '';
-    document.getElementById('addNotes').value = '';
     showModal('addLeadModal');
 }
 
 async function createLead() {
-    const name = document.getElementById('addBusinessName').value.trim();
-    if (!name) { notify('Business name is required', 'error'); return; }
+    const website = document.getElementById('addWebsite').value.trim();
+    if (!website) { notify('Website is required', 'error'); return; }
 
-    const data = {
-        business_name: name,
-        contact_name: document.getElementById('addContactName').value.trim(),
-        email: document.getElementById('addEmail').value.trim(),
-        phone: document.getElementById('addPhone').value.trim(),
-        website: document.getElementById('addWebsite').value.trim(),
-        address: document.getElementById('addAddress').value.trim(),
-        category: document.getElementById('addCategory').value.trim(),
-        city: document.getElementById('addCity').value.trim(),
-        notes: document.getElementById('addNotes').value.trim(),
-    };
+    // Enrichment fetches the site + makes an AI call, so it takes a few seconds.
+    const btn = document.getElementById('btnAddLead');
+    const originalText = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Fetching…'; }
 
     try {
-        const result = await api('create_lead', { method: 'POST', body: data });
+        const result = await api('create_lead_from_website', { method: 'POST', body: { website } });
         if (result.success) {
             closeModal('addLeadModal');
+            notify(result.message || 'Lead added', 'success');
             loadLeads();
             loadStats();
         } else {
@@ -756,6 +742,8 @@ async function createLead() {
         }
     } catch (e) {
         notify(e.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
     }
 }
 

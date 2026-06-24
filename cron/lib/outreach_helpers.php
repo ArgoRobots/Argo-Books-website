@@ -2056,6 +2056,100 @@ Be specific and factual based on the website content. Do not include any other t
     return $result['content'] ?? null;
 }
 
+// ─── Lead enrichment from a website ───
+
+/**
+ * Given just a website URL, best-effort auto-fill the fields needed to create
+ * an outreach lead: business name, email, phone, category, city, and a short
+ * summary. Used by the admin "Add Lead" flow (paste a URL, we fill the rest).
+ *
+ * Combines the cheap signals (contact-page email scrape, <title> tag) with a
+ * single Gemini extraction call over the page text. Everything is best-effort:
+ * any field we can't determine comes back null, and the caller still creates
+ * the lead (a name falls back to the domain) so the admin can edit afterward.
+ *
+ * Returns an associative array; never throws.
+ */
+function enrich_lead_from_website($url): array
+{
+    $url = trim((string) $url);
+    if ($url !== '' && !preg_match('#^https?://#i', $url)) {
+        $url = 'https://' . $url;
+    }
+
+    $out = [
+        'website'          => $url,
+        'business_name'    => null,
+        'email'            => null,
+        'phone'            => null,
+        'category'         => null,
+        'city'             => null,
+        'address'          => null,
+        'business_summary' => null,
+    ];
+    if ($url === '') return $out;
+
+    // Email from the contact-page scraper (cached).
+    $email = scrape_email_from_website($url);
+    if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $out['email'] = $email;
+    }
+
+    // Page text + raw HTML (single fetch, shared below).
+    $fetched = fetch_website_text($url);
+    $host = parse_url($url, PHP_URL_HOST) ?: $url;
+    $domainName = ucwords(str_replace(['-', '_'], ' ', preg_replace('/\.[a-z.]+$/i', '', preg_replace('/^www\./', '', $host))));
+
+    if ($fetched === null) {
+        // Couldn't fetch the page: still give the caller a usable name.
+        $out['business_name'] = $domainName !== '' ? $domainName : $host;
+        return $out;
+    }
+
+    // <title> as a quick business-name candidate.
+    if (preg_match('/<title[^>]*>([^<]+)<\/title>/i', $fetched['html'], $tm)) {
+        $title = html_entity_decode(trim($tm[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if ($title !== '') $out['business_name'] = mb_substr($title, 0, 200);
+    }
+
+    // One Gemini call to pull structured fields out of the page text.
+    $systemPrompt = <<<'PROMPT'
+You extract structured business details from website text. Return ONLY a JSON
+object with exactly these keys, using null (not a guess) when the text doesn't
+say:
+{"business_name": string|null, "category": string|null, "city": string|null, "address": string|null, "phone": string|null, "summary": string|null}
+
+- business_name: the business's real name, cleaned of taglines/slogans.
+- category: a short industry label (e.g. "plumber", "bakery", "law firm").
+- city: the city they operate in, if stated.
+- address: a full street address, if stated.
+- phone: a single primary phone number, if present.
+- summary: 2-3 sentences on what they do and how they likely bill clients.
+No preamble, JSON only.
+PROMPT;
+
+    $res = call_gemini($systemPrompt, "Website: {$url}\n\n" . $fetched['text']);
+    if (empty($res['error']) && !empty($res['content'])) {
+        $content = preg_replace('/^```json\s*/i', '', trim((string) $res['content']));
+        $content = preg_replace('/\s*```$/', '', $content);
+        $parsed = json_decode($content, true);
+        if (is_array($parsed)) {
+            if (!empty($parsed['business_name'])) $out['business_name']    = mb_substr(trim((string) $parsed['business_name']), 0, 200);
+            if (!empty($parsed['category']))      $out['category']         = mb_substr(trim((string) $parsed['category']), 0, 100);
+            if (!empty($parsed['city']))          $out['city']             = mb_substr(trim((string) $parsed['city']), 0, 100);
+            if (!empty($parsed['address']))       $out['address']          = mb_substr(trim((string) $parsed['address']), 0, 255);
+            if (!empty($parsed['phone']))         $out['phone']            = mb_substr(trim((string) $parsed['phone']), 0, 40);
+            if (!empty($parsed['summary']))       $out['business_summary'] = mb_substr(trim((string) $parsed['summary']), 0, 1000);
+        }
+    }
+
+    if (empty($out['business_name'])) {
+        $out['business_name'] = $domainName !== '' ? $domainName : $host;
+    }
+
+    return $out;
+}
+
 // ─── Draft Generation ───
 
 /**

@@ -32,6 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     }
 }
 
+// Release the session lock now that auth + CSRF have been read. PHP's default
+// file session handler holds an EXCLUSIVE lock from session_start() until the
+// request ends, so without this a long-running action (discovery can run for
+// minutes; shopify_run_dork even sets a 300s time limit) blocks every other
+// request carrying the same session cookie at its own session_start() — admin
+// pages AND public pages like the landing page would hang until it finished,
+// and concurrent discovery runs would serialize instead of overlapping. No
+// handler below writes to $_SESSION, so closing it here is safe.
+session_write_close();
+
 // Ensure tables exist
 
 // Check if the cron pipeline is currently running

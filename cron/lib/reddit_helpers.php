@@ -709,12 +709,13 @@ A thread does NOT qualify (score ≤4) if:
 - It's a "best of" / "favorite tool" karma post with no specific problem
 - It's a complaint thread with no openness to alternatives
 - It's about an industry too large for Argo Books (enterprise, mid-market with employees, multi-entity)
+- The OP is primarily after software in a category Argo Books does NOT cover. Argo Books is bookkeeping and invoicing ONLY. Out-of-category requests include: point-of-sale (POS), payroll, CRM / lead management, e-commerce platforms or website builders, inventory / warehouse, ERP, appointment / scheduling, time-tracking, and project management. A passing mention of one of these alongside a genuine bookkeeping or invoicing need is fine (score on the bookkeeping need); but if the core ask is one of these categories, score ≤4 even when the OP is clearly and actively seeking software.
 
 Score 5–6 for borderline cases: relevant but ambiguous fit.
 
 Return JSON only: {"relevance": <0-10 integer>, "reason": "<one sentence>"}
 
-Do NOT consider whether any specific product is a good fit. Do NOT recommend a reply. Just score software-recommendation intent.
+Do NOT recommend a reply, and do NOT reason about whether Argo Books is the single best option among bookkeeping tools. But the intent MUST be for bookkeeping / accounting / invoicing software: strong software-recommendation intent for a DIFFERENT category (POS, payroll, CRM, e-commerce, inventory, ERP, scheduling, etc.) does NOT qualify and scores ≤4.
 SYS;
 
     $commentsBlock = empty($topComments)

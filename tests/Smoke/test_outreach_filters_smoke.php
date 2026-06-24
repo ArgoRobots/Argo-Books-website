@@ -125,24 +125,79 @@ assert_true(filter_category_type_mismatch('plumber', null) === true,
 assert_true(filter_category_type_mismatch('plumber', []) === true,
     "empty types with expectation: mismatch");
 
-// ─── Section 5: filter_review_count_too_high ───
+// ─── Section 5: filter_review_count_too_high (default lowered to 15) ───
 echo "Section 5: filter_review_count_too_high\n";
 
-assert_true(filter_review_count_too_high(50) === false,    "50 reviews: pass");
-assert_true(filter_review_count_too_high(299) === false,   "299 reviews: pass (just under threshold)");
-assert_true(filter_review_count_too_high(300) === false,   "300 reviews: pass (at threshold, not over)");
-assert_true(filter_review_count_too_high(301) === true,    "301 reviews: reject");
+assert_true(filter_review_count_too_high(10) === false,    "10 reviews: pass (under default 15)");
+assert_true(filter_review_count_too_high(15) === false,    "15 reviews: pass (at default threshold, not over)");
+assert_true(filter_review_count_too_high(16) === true,     "16 reviews: reject (over default 15)");
+assert_true(filter_review_count_too_high(50) === true,     "50 reviews: reject (default lowered)");
 assert_true(filter_review_count_too_high(5000) === true,   "5000 reviews: reject (chain)");
 assert_true(filter_review_count_too_high(null) === false,  "null: pass (no signal)");
 assert_true(filter_review_count_too_high(0) === false,     "0: pass (new business)");
 assert_true(filter_review_count_too_high('') === false,    "empty string: pass");
 assert_true(filter_review_count_too_high('400') === true,  "stringified 400: still rejects");
 
-// Custom threshold
+// Custom threshold still honoured
 assert_true(filter_review_count_too_high(150, 100) === true,
     "custom threshold: 150 > 100");
 assert_true(filter_review_count_too_high(50, 100) === false,
     "custom threshold: 50 <= 100");
+
+// ─── Section 5b: outreach_max_review_count precedence (env -> default) ───
+// The DB-state branch isn't exercised here (no $pdo in this smoke harness);
+// it falls through to env, then to the built-in default of 15.
+echo "Section 5b: outreach_max_review_count\n";
+
+$savedEnv = $_ENV['OUTREACH_MAX_REVIEW_COUNT'] ?? null;
+
+$_ENV['OUTREACH_MAX_REVIEW_COUNT'] = '40';
+assert_true(outreach_max_review_count() === 40, "env override honoured (40)");
+
+$_ENV['OUTREACH_MAX_REVIEW_COUNT'] = '0';
+assert_true(outreach_max_review_count() === 15, "env 0 is invalid -> default 15");
+
+$_ENV['OUTREACH_MAX_REVIEW_COUNT'] = 'abc';
+assert_true(outreach_max_review_count() === 15, "env non-numeric -> default 15");
+
+unset($_ENV['OUTREACH_MAX_REVIEW_COUNT']);
+assert_true(outreach_max_review_count() === 15, "env unset -> default 15");
+
+// Restore whatever the environment had so later sections are unaffected.
+if ($savedEnv === null) { unset($_ENV['OUTREACH_MAX_REVIEW_COUNT']); }
+else { $_ENV['OUTREACH_MAX_REVIEW_COUNT'] = $savedEnv; }
+
+// ─── Section 5c: detect_established_signals (newness gate, pure regex) ───
+echo "Section 5c: detect_established_signals\n";
+
+$currentYear = (int) date('Y');
+$oldYear = $currentYear - 20;
+
+$sig = detect_established_signals("<p>Proudly serving the community since {$oldYear}.</p>");
+assert_true($sig['founded_year'] === $oldYear, "founded year detected from 'since YYYY'");
+
+$sig = detect_established_signals('<footer>&copy; ' . $oldYear . ' Acme Co. All rights reserved.</footer>');
+assert_true($sig['founded_year'] === $oldYear, "founded year detected from copyright");
+
+$sig = detect_established_signals('<h2>With over 25 years of experience in plumbing</h2>');
+assert_true($sig['years_experience'] === 25, "years experience detected ('over 25 years of experience')");
+
+$sig = detect_established_signals('<p>20+ years in business serving Saskatoon</p>');
+assert_true($sig['years_experience'] === 20, "years experience detected ('20+ years in business')");
+
+$sig = detect_established_signals('<h1>Now open! Fresh new bakery launching this spring.</h1>');
+assert_true($sig['founded_year'] === null && $sig['years_experience'] === null,
+    "brand-new site has no established signals (passes through)");
+
+$sig = detect_established_signals('<p>We sell handmade candles. Contact us today.</p>');
+assert_true($sig['founded_year'] === null && $sig['years_experience'] === null,
+    "sparse site has no established signals (passes through)");
+
+// detect_storefront_founded_year (shared with the Shopify evaluator)
+assert_true(detect_storefront_founded_year("<p>Founded in {$oldYear}.</p>") === $oldYear,
+    "detect_storefront_founded_year still works after move to shared helpers");
+assert_true(detect_storefront_founded_year('<p>no year here</p>') === null,
+    "detect_storefront_founded_year returns null when no signal");
 
 // ─── Section 6: _outreach_host_from (helper for chain-domain logic) ───
 echo "Section 6: _outreach_host_from\n";

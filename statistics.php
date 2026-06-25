@@ -105,8 +105,14 @@ function is_datacenter_ip($ip)
     }
 
     static $ranges = [
-        // Google Cloud Platform. 34/8 and 35/8 are predominantly GCP.
+        // Google Cloud Platform. GCP is scattered well beyond 34/8 and 35/8;
+        // these extra blocks were confirmed from scraper traffic that slipped
+        // the two /8s above (104.154/15, 104.196/14, 146.148, 136.112/12, ...).
         '34.0.0.0/8', '35.0.0.0/8',
+        '104.154.0.0/15', '104.196.0.0/14', '104.199.0.0/16',
+        '130.211.0.0/16', '136.112.0.0/12', '146.148.0.0/17',
+        '107.178.192.0/18', '108.170.192.0/18', '108.177.0.0/17',
+        '162.216.148.0/22', '199.36.153.0/24',
         // Amazon Web Services (largest aggregates).
         '3.0.0.0/8', '13.32.0.0/15', '15.177.0.0/18', '18.0.0.0/8',
         '52.0.0.0/8', '54.0.0.0/8',

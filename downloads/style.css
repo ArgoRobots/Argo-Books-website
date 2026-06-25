@@ -332,7 +332,11 @@ body {
     padding: 2px 6px;
     border-radius: 6px;
     font-size: 0.85em;
-    word-break: break-all;
+    /* anywhere lets the long filename wrap inside the modal; clone makes the
+       padding/background apply per wrapped line so the last char isn't clipped. */
+    overflow-wrap: anywhere;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
 }
 
 /* SmartScreen Guide */
@@ -440,7 +444,9 @@ body {
     font-size: 0.95rem;
     color: var(--gray-800);
     line-height: 1.45;
-    min-height: 2.9em;
+    /* Reserve room for the longest title (3 lines) so every image starts at the
+       same height and the images line up along their tops. */
+    min-height: 4.4em;
     max-width: 280px;
 }
 

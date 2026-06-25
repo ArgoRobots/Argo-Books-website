@@ -228,11 +228,11 @@
         <div class="container">
             <div class="founder-grid">
                 <div class="founder-image animate-on-scroll">
-                    <img src="../resources/images/founder.jpg" alt="Evan Di Placido, founder of Argo Books" loading="lazy">
+                    <img src="../resources/images/founder.jpg" alt="Evan, founder of Argo Books" loading="lazy">
                 </div>
                 <div class="founder-content animate-on-scroll">
                     <span class="section-label">Meet the Founder</span>
-                    <h2>Hi, I'm Evan Di Placido</h2>
+                    <h2>Hi, I'm Evan</h2>
                     <p>I'm the founder and developer behind Argo Books, based in Saskatoon. I started it
                         after watching small businesses get stuck choosing between clunky spreadsheets and
                         bloated, overpriced accounting software built for big companies, not them.</p>
@@ -240,7 +240,7 @@
                         installer and on every update: I stand behind the software you're trusting with
                         your business.</p>
                     <div class="founder-footer">
-                        <p class="founder-signature">Evan Di Placido<span>Founder &amp; Developer, Argo Books</span></p>
+                        <p class="founder-signature">Evan<span>Founder &amp; Developer, Argo Books</span></p>
                         <a href="../contact-us/" class="founder-contact">
                             <span>Have a question? Contact me</span>
                             <?= svg_icon('arrow-right', 18) ?>

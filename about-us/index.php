@@ -233,12 +233,12 @@
                 <div class="founder-content animate-on-scroll">
                     <span class="section-label">Meet the Founder</span>
                     <h2>Hi, I'm Evan</h2>
-                    <p>I'm the founder and developer behind Argo Books, based in Saskatoon. I started it
-                        after watching small businesses get stuck choosing between clunky spreadsheets and
-                        bloated, overpriced accounting software built for big companies, not them.</p>
-                    <p>I build and support Argo Books personally. That's why you'll see my name on the
-                        installer and on every update: I stand behind the software you're trusting with
-                        your business.</p>
+                    <p>I'm the founder of Argo Books, based in Saskatoon. I built it to give small
+                        businesses accounting software they can count on: capable enough to run the whole
+                        business, simple enough to use from day one, and genuinely affordable.</p>
+                    <p>Handling your business's finances is a responsibility I take seriously. Every
+                        release is tested, and your data is kept secure. I'm committed
+                        to keeping Argo Books dependable and improving it for years to come.</p>
                     <div class="founder-footer">
                         <p class="founder-signature">Evan<span>Founder &amp; Developer, Argo Books</span></p>
                         <a href="../contact-us/" class="founder-contact">

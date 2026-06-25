@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 320" font-family="'Segoe UI Variable','Segoe UI',system-ui,sans-serif" role="img" aria-label="Windows protected your PC dialog for Argo Books Installer, publisher Evan Di Placido, with the Run anyway button highlighted">
+  <defs>
+    <filter id="win-panel-shadow" x="-10%" y="-5%" width="120%" height="118%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#000" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="380" height="320" fill="#ffffff"/>
+
+  <!-- Blue SmartScreen dialog -->
+  <rect x="14" y="18" width="352" height="284" rx="12" fill="#0b6cba" filter="url(#win-panel-shadow)"/>
+
+  <!-- Close X -->
+  <g transform="translate(338,38)" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.9">
+    <line x1="0" y1="0" x2="11" y2="11"/>
+    <line x1="11" y1="0" x2="0" y2="11"/>
+  </g>
+
+  <!-- Title -->
+  <text x="34" y="66" font-size="18" font-weight="700" fill="#ffffff">Windows protected your PC</text>
+
+  <!-- Description -->
+  <text x="34" y="100" font-size="11.5" fill="#d8e7f6">
+    <tspan x="34" dy="0">Microsoft Defender SmartScreen prevented an</tspan>
+    <tspan x="34" dy="16">unrecognized app from starting. Running this app</tspan>
+    <tspan x="34" dy="16">might put your PC at risk.</tspan>
+  </text>
+
+  <!-- App / Publisher -->
+  <text x="34" y="178" font-size="12" fill="#b9d4ee">App:</text>
+  <text x="104" y="178" font-size="12" font-weight="600" fill="#ffffff">Argo Books Installer</text>
+  <text x="34" y="200" font-size="12" fill="#b9d4ee">Publisher:</text>
+  <text x="104" y="200" font-size="12" font-weight="600" fill="#ffffff">Evan Di Placido</text>
+
+  <!-- Highlight ring around the button to click -->
+  <rect x="161" y="247" width="106" height="42" rx="8" fill="none" stroke="#ffd23f" stroke-width="3"/>
+
+  <!-- Run anyway button -->
+  <rect x="166" y="252" width="96" height="32" rx="3" fill="#ededed" stroke="#cfcfcf" stroke-width="1"/>
+  <text x="214" y="272" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1a1a1a">Run anyway</text>
+
+  <!-- Don't run button -->
+  <rect x="272" y="252" width="80" height="32" rx="3" fill="#ededed" stroke="#cfcfcf" stroke-width="1"/>
+  <text x="312" y="272" text-anchor="middle" font-size="12.5" fill="#1a1a1a">Don't run</text>
+</svg>

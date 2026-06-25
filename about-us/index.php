@@ -152,14 +152,7 @@
                         <?= svg_icon('receipt-scan-detail', null, '', 1.5) ?>
                     </div>
                     <h3>Receipt Scanning</h3>
-                    <p>Snap a photo and let AI extract all the details automatically</p>
-                </div>
-                <div class="feature-item animate-on-scroll">
-                    <div class="feature-icon purple">
-                        <?= svg_icon('analytics', null, '', 1.5) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>Forecast sales trends and make data-driven decisions</p>
+                    <p>Snap a photo and let Argo Books extract all the details automatically</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon green">
@@ -169,11 +162,18 @@
                     <p>Create professional invoices and get paid faster</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
-                    <div class="feature-icon amber">
-                        <?= svg_icon('package', null, '', 1.5) ?>
+                    <div class="feature-icon purple">
+                        <?= svg_icon('analytics', null, '', 1.5) ?>
                     </div>
-                    <h3>Inventory Management</h3>
-                    <p>Track stock levels and never run out of best-sellers</p>
+                    <h3>Predictive Analytics</h3>
+                    <p>Forecast sales trends and make data-driven decisions</p>
+                </div>
+                <div class="feature-item animate-on-scroll">
+                    <div class="feature-icon amber">
+                        <?= svg_icon('dollar', null, '', 1.5) ?>
+                    </div>
+                    <h3>Expense &amp; Revenue</h3>
+                    <p>See exactly where your money comes in and goes out, all in one place</p>
                 </div>
             </div>
             <div class="features-cta animate-on-scroll">
@@ -189,13 +189,6 @@
     <section class="our-story">
         <div class="container">
             <div class="story-grid">
-                <div class="story-image animate-on-scroll">
-                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline" loading="lazy">
-                    <div class="image-badge">
-                        <?= svg_icon('map-pin', 16) ?>
-                        Saskatoon, SK, Canada
-                    </div>
-                </div>
                 <div class="story-content animate-on-scroll">
                     <span class="section-label">Our Story</span>
                     <h2>Built by entrepreneurs, for entrepreneurs</h2>
@@ -217,6 +210,41 @@
                             <span class="stat-value">Free</span>
                             <span class="stat-label">Core Version</span>
                         </div>
+                    </div>
+                </div>
+                <div class="story-image animate-on-scroll">
+                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline" loading="lazy">
+                    <div class="image-badge">
+                        <?= svg_icon('map-pin', 16) ?>
+                        Saskatoon, SK, Canada
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Founder Section -->
+    <section class="founder">
+        <div class="container">
+            <div class="founder-grid">
+                <div class="founder-image animate-on-scroll">
+                    <img src="../resources/images/founder.jpg" alt="Evan Di Placido, founder of Argo Books" loading="lazy">
+                </div>
+                <div class="founder-content animate-on-scroll">
+                    <span class="section-label">Meet the Founder</span>
+                    <h2>Hi, I'm Evan Di Placido</h2>
+                    <p>I'm the founder and developer behind Argo Books, based in Saskatoon. I started it
+                        after watching small businesses get stuck choosing between clunky spreadsheets and
+                        bloated, overpriced accounting software built for big companies, not them.</p>
+                    <p>I build and support Argo Books personally. That's why you'll see my name on the
+                        installer and on every update: I stand behind the software you're trusting with
+                        your business.</p>
+                    <div class="founder-footer">
+                        <p class="founder-signature">Evan Di Placido<span>Founder &amp; Developer, Argo Books</span></p>
+                        <a href="../contact-us/" class="founder-contact">
+                            <span>Have a question? Contact me</span>
+                            <?= svg_icon('arrow-right', 18) ?>
+                        </a>
                     </div>
                 </div>
             </div>

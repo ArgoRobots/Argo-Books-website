@@ -463,6 +463,84 @@ body {
 /* ========================================
    Values Section
    ======================================== */
+.founder {
+  padding: 100px 0;
+}
+
+.founder-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.founder-image {
+  display: flex;
+  justify-content: center;
+}
+
+.founder-image img {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px var(--shadow-lg);
+}
+
+.founder-content h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.founder-content p {
+  font-size: 1.1rem;
+  color: var(--black);
+  margin-bottom: 16px;
+  line-height: 1.7;
+}
+
+.founder-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.founder-signature {
+  display: flex;
+  flex-direction: column;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.founder-signature span {
+  margin-top: 2px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--gray-600);
+}
+
+.founder-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.founder-contact svg {
+  transition: transform 0.2s ease;
+}
+
+.founder-contact:hover svg {
+  transform: translateX(3px);
+}
+
 .values {
   padding: 100px 0;
   background: var(--gray-50);
@@ -674,7 +752,8 @@ body {
    ======================================== */
 @media (max-width: 1100px) {
   .mission-grid,
-  .story-grid {
+  .story-grid,
+  .founder-grid {
     grid-template-columns: 1fr;
     gap: 48px;
   }
@@ -719,6 +798,7 @@ body {
   .mission,
   .product-overview,
   .our-story,
+  .founder,
   .values,
   .future,
   .contact-section {
@@ -728,6 +808,7 @@ body {
   .mission-content h2,
   .overview-content h2,
   .story-content h2,
+  .founder-content h2,
   .values-header h2,
   .future-content h2,
   .contact-card h2 {

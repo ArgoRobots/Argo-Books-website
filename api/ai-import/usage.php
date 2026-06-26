@@ -1,8 +1,10 @@
 <?php
 /**
- * AI Spreadsheet Import Usage Tracking API
- * Tracks and enforces monthly import limits for all users.
- * Every user gets 100 AI-powered imports per month.
+ * AI Import Usage Tracking API
+ * Tracks and enforces monthly import limits per user, per import type.
+ * Spreadsheet imports and bank statement imports have separate monthly counters
+ * and separate limits (see config/pricing.php). Pass `type` = "spreadsheet" (default)
+ * or "bank".
  */
 
 header('Content-Type: application/json');
@@ -43,6 +45,12 @@ if (!isset($input['action']) || !in_array($input['action'], ['check', 'increment
 }
 
 $action = $input['action'];
+
+// Import type. Bank and spreadsheet imports track separate monthly counters.
+$type = $input['type'] ?? 'spreadsheet';
+if (!in_array($type, ['spreadsheet', 'bank'], true)) {
+    $type = 'spreadsheet';
+}
 
 // Load database connection and pricing config
 require_once __DIR__ . '/../../db_connect.php';
@@ -198,14 +206,25 @@ try {
     }
 
     $tier = $tierInfo['tier'];
-    $monthly_limit = $tierInfo['limit'];
     $identifier = $tierInfo['identifier'];
+
+    // Resolve the limit by tier + import type. Bank imports use a separate, prefixed
+    // identifier so they get their own monthly counter row, distinct from spreadsheet imports.
+    $config = get_pricing_config();
+    if ($type === 'bank') {
+        $identifier = 'bank:' . $identifier;
+        $monthly_limit = $tier === 'premium'
+            ? $config['premium_bank_import_monthly_limit']
+            : $config['bank_import_monthly_limit'];
+    } else {
+        $monthly_limit = $tier === 'premium'
+            ? $config['premium_ai_import_monthly_limit']
+            : $config['ai_import_monthly_limit'];
+    }
 
     // Get or create usage record
     $usage = getOrCreateUsageRecord($pdo, $identifier, $monthly_limit);
     $import_count = $usage['scan_count'];
-    // Use the limit from the tier info (in case it changed)
-    $monthly_limit = $tierInfo['limit'];
 
     if ($action === 'check') {
         // Just return current status

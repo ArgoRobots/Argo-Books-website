@@ -14,7 +14,10 @@
  *   PROCESSING_FEE_FIXED        - Payment processing fixed fee in CAD (default: 0.30)
  *   RECEIPT_SCAN_MONTHLY_LIMIT       - Monthly receipt scan limit for premium tier (default: 500)
  *   FREE_RECEIPT_SCAN_MONTHLY_LIMIT  - Monthly receipt scan limit for free tier (default: 5)
- *   AI_IMPORT_MONTHLY_LIMIT          - Monthly AI import limit for all users (default: 100)
+ *   AI_IMPORT_MONTHLY_LIMIT          - Monthly AI spreadsheet import limit for free tier (default: 100)
+ *   PREMIUM_AI_IMPORT_MONTHLY_LIMIT  - Monthly AI spreadsheet import limit for premium tier (default: 500)
+ *   BANK_IMPORT_MONTHLY_LIMIT        - Monthly AI bank statement import limit for free tier (default: 25)
+ *   PREMIUM_BANK_IMPORT_MONTHLY_LIMIT- Monthly AI bank statement import limit for premium tier (default: 500)
  *   FREE_INVOICE_MONTHLY_LIMIT       - Monthly invoice send limit for free tier (default: 25)
  *   WEB_RECEIPT_SCAN_DAILY_LIMIT       - Free web scanner per-visitor daily limit (default: 10)
  *   WEB_RECEIPT_SCAN_GLOBAL_DAILY_CAP  - Free web scanner total scans/day across all visitors (default: 500)
@@ -47,6 +50,9 @@ function get_pricing_config() {
         'receipt_scan_monthly_limit'      => _pricing_parse_int_env('RECEIPT_SCAN_MONTHLY_LIMIT', 500),
         'free_receipt_scan_monthly_limit' => _pricing_parse_int_env('FREE_RECEIPT_SCAN_MONTHLY_LIMIT', 5),
         'ai_import_monthly_limit'         => _pricing_parse_int_env('AI_IMPORT_MONTHLY_LIMIT', 100),
+        'premium_ai_import_monthly_limit' => _pricing_parse_int_env('PREMIUM_AI_IMPORT_MONTHLY_LIMIT', 500),
+        'bank_import_monthly_limit'        => _pricing_parse_int_env('BANK_IMPORT_MONTHLY_LIMIT', 25),
+        'premium_bank_import_monthly_limit' => _pricing_parse_int_env('PREMIUM_BANK_IMPORT_MONTHLY_LIMIT', 500),
         'free_invoice_monthly_limit'      => _pricing_parse_int_env('FREE_INVOICE_MONTHLY_LIMIT', 25),
         'web_receipt_scan_daily_limit'      => _pricing_parse_int_env('WEB_RECEIPT_SCAN_DAILY_LIMIT', 10),
         'web_receipt_scan_global_daily_cap' => _pricing_parse_int_env('WEB_RECEIPT_SCAN_GLOBAL_DAILY_CAP', 500),
@@ -124,6 +130,9 @@ function get_plan_features() {
         '{free_invoice_monthly_limit}'      => (string) $cfg['free_invoice_monthly_limit'],
         '{free_receipt_scan_monthly_limit}' => (string) $cfg['free_receipt_scan_monthly_limit'],
         '{ai_import_monthly_limit}'         => (string) $cfg['ai_import_monthly_limit'],
+        '{premium_ai_import_monthly_limit}' => (string) $cfg['premium_ai_import_monthly_limit'],
+        '{bank_import_monthly_limit}'       => (string) $cfg['bank_import_monthly_limit'],
+        '{premium_bank_import_monthly_limit}' => (string) $cfg['premium_bank_import_monthly_limit'],
         '{receipt_scan_monthly_limit}'      => (string) $cfg['receipt_scan_monthly_limit'],
     ]);
     $plans = json_decode($json, true);

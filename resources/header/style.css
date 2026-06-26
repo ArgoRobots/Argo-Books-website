@@ -204,7 +204,7 @@ header .header-inner {
 }
 
 header .header-inner .logo {
-  width: 160px;
+  width: 185px;
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -237,8 +237,8 @@ header .header-inner .menu-container ul li a {
   text-decoration: none;
   position: relative;
   color: var(--white);
-  font-size: 0.85rem;
-  padding-inline: 7px;
+  font-size: 0.95rem;
+  padding-inline: 9px;
 }
 
 header .header-inner .menu-container ul li a:after {

@@ -1276,7 +1276,7 @@ th.col-nowrap {
    ============================================================ */
 .theme-toggle {
   background: none;
-  border: 1px solid var(--gray-input-border);
+  border: 1px solid var(--gray-200);
   border-radius: 6px;
   cursor: pointer;
   padding: 4px 8px;
@@ -1310,13 +1310,13 @@ th.col-nowrap {
    Dark Theme
    ============================================================ */
 [data-theme="dark"] .theme-toggle {
-  border-color: var(--black);
+  border-color: var(--gray-700);
   color: var(--white);
 }
 
 [data-theme="dark"] .theme-toggle:hover {
   background: var(--gray-700);
-  border-color: var(--black);
+  border-color: var(--gray-600);
   color: var(--white);
 }
 
@@ -1532,7 +1532,7 @@ th.col-nowrap {
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
   background: var(--gray-700);
-  border-color: var(--black);
+  border-color: var(--gray-600);
   color: var(--white);
 }
 
@@ -1634,6 +1634,10 @@ th.col-nowrap {
 [data-theme="dark"] .login-container {
   background: var(--gray-800);
   box-shadow: 0 4px 6px var(--overlay-light);
+}
+
+[data-theme="dark"] .login-header h1 {
+  color: var(--white);
 }
 
 /* Dark theme - 2FA */
@@ -1861,7 +1865,7 @@ th.col-nowrap {
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .form-group textarea {
   background: var(--gray-700);
-  border-color: var(--black);
+  border-color: var(--gray-600);
   color: var(--white);
 }
 

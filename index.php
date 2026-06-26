@@ -839,12 +839,12 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         </div>
     </section>
 
-    <!-- AI Spreadsheet Import Section -->
+    <!-- Import / Switching Section -->
     <section class="ai-import-section">
         <div class="container">
             <div class="ai-import-header animate-on-scroll">
-                <h2 class="section-title">Import any spreadsheet in seconds</h2>
-                <p class="section-description">Drop your file in and Argo Books handles the rest. No reformatting, no manual mapping, no headaches.</p>
+                <h2 class="section-title">Switch in minutes, not weekends</h2>
+                <p class="section-description">Bring your history with you. Drop in a spreadsheet or a bank statement and Argo Books turns it into clean, organized books. No reformatting, no manual mapping, no re-typing.</p>
             </div>
 
             <div class="imp-demo animate-on-scroll" id="aiImportDemo">
@@ -889,16 +889,16 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <!-- Capability strip -->
             <div class="ai-import-points animate-on-scroll">
                 <div class="ai-point">
-                    <strong>Instant detection</strong>
-                    <span>Names, dates, and currencies recognized automatically</span>
+                    <strong>Bring your whole history</strong>
+                    <span>Import months of spreadsheets or bank statements at once. CSV, Excel, or PDF.</span>
                 </div>
                 <div class="ai-point">
-                    <strong>Any format</strong>
-                    <span>Messy columns and unusual names, no cleanup needed</span>
+                    <strong>Categorized for you</strong>
+                    <span>Statement lines become sorted expenses and revenue, and it learns your preferences as you go.</span>
                 </div>
                 <div class="ai-point">
-                    <strong>Private &amp; secure</strong>
-                    <span>Encrypted, never stored or used for training</span>
+                    <strong>No bank login required</strong>
+                    <span>Just the file you download from your bank. Encrypted on your device, never stored or used for training.</span>
                 </div>
             </div>
         </div>

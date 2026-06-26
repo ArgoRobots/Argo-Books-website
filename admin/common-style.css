@@ -864,49 +864,6 @@ th.col-nowrap {
   font-style: italic;
 }
 
-/* Period Selection */
-.period-selection {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  background: var(--white);
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-.period-selection span {
-  font-weight: 500;
-  margin-right: 15px;
-}
-
-.period-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.period-btn {
-  padding: 8px 15px;
-  background: var(--gray-bg-light);
-  border-radius: 4px;
-  color: var(--admin-text);
-  text-decoration: none;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-}
-
-.period-btn:hover {
-  background: var(--gray-border);
-}
-
-.period-btn.active {
-  background: var(--primary-blue);
-  color: var(--white);
-  border: 2px solid var(--blue-800);
-  font-weight: bold;
-}
-
 /* Date range toolbar (website stats).
    Wrapper/label/select/input/button styling now comes from the shared
    .control-bar component; only page-specific layout + the range readout and
@@ -1040,18 +997,6 @@ th.col-nowrap {
   margin-bottom: 1.5rem;
 }
 
-.data-info {
-  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
-  border: 1px solid var(--gray-300);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: var(--admin-text);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
 .no-data {
   text-align: center;
   padding: 3rem 2rem;
@@ -1108,29 +1053,6 @@ th.col-nowrap {
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
   background: var(--gray-400);
-}
-
-/* Responsive Design */
-@media (max-width: 900px) {
-  .period-selection {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .period-selection span {
-    margin-bottom: 10px;
-  }
-
-  .period-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-    gap: 10px;
-  }
-
-  .period-btn {
-    text-align: center;
-  }
 }
 
 /* Mobile Navigation - Hide desktop nav and show mobile nav */
@@ -1595,31 +1517,6 @@ th.col-nowrap {
   border-color: var(--red-alpha-30);
 }
 
-/* Dark theme - Period selection */
-[data-theme="dark"] .period-selection {
-  background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-[data-theme="dark"] .period-selection span {
-  color: var(--white);
-}
-
-[data-theme="dark"] .period-btn {
-  background: var(--gray-700);
-  color: var(--white);
-}
-
-[data-theme="dark"] .period-btn:hover {
-  background: var(--gray-600);
-}
-
-[data-theme="dark"] .period-btn.active {
-  background: var(--gray-600);
-  color: var(--white);
-  border-color: var(--black);
-}
-
 /* Dark theme - date range toolbar (select/input styling inherited from
    the shared .control-bar dark rules; only page-specific bits remain) */
 [data-theme="dark"] .range-display {
@@ -1658,13 +1555,7 @@ th.col-nowrap {
   color: var(--white);
 }
 
-/* Dark theme - Data info / No data */
-[data-theme="dark"] .data-info {
-  background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
-  border-color: var(--gray-600);
-  color: var(--white);
-}
-
+/* Dark theme - No data */
 [data-theme="dark"] .no-data {
   color: var(--white);
   background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-800) 100%);
@@ -2014,19 +1905,6 @@ th.col-nowrap {
 
 [data-theme="dark"] .content-preview:after {
   background: linear-gradient(transparent, var(--gray-800));
-}
-
-[data-theme="dark"] .status-badges .status-badge {
-  background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-[data-theme="dark"] .status-badge-label {
-  color: var(--white);
-}
-
-[data-theme="dark"] .status-badge-count {
-  color: var(--white);
 }
 
 /* Dark theme - Filter groups */

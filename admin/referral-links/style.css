@@ -181,15 +181,6 @@ code {
     background: var(--blue-600);
 }
 
-.btn-yellow, .btn-small.btn-yellow {
-    background: var(--amber-500);
-    color: var(--white);
-}
-
-.btn-yellow:hover, .btn-small.btn-yellow:hover {
-    background: var(--amber-600);
-}
-
 .btn-red, .btn-small.btn-red {
     background: var(--red-500);
     color: var(--white);

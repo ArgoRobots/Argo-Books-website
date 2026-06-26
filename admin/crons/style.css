@@ -1,54 +1,5 @@
 /* Cron Activity page */
 
-.range-row {
-    display: flex;
-    justify-content: flex-end;
-    padding: 0 24px 16px;
-}
-
-.range-selector {
-    display: flex;
-    gap: 4px;
-    background: var(--gray-100);
-    padding: 4px;
-    border-radius: 8px;
-}
-
-[data-theme="dark"] .range-selector {
-    background: var(--gray-800);
-}
-
-.range-btn {
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--admin-text);
-    text-decoration: none;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-.range-btn:hover {
-    background: var(--gray-200);
-}
-
-.range-btn.active {
-    background: var(--primary-blue);
-    color: #fff;
-}
-
-[data-theme="dark"] .range-btn {
-    color: var(--white);
-}
-
-[data-theme="dark"] .range-btn:hover {
-    background: var(--gray-700);
-}
-
-[data-theme="dark"] .range-btn.active {
-    background: var(--primary-blue);
-    color: #fff;
-}
-
 .empty-state {
     margin: 32px 24px;
     padding: 24px;

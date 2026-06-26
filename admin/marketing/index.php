@@ -134,7 +134,6 @@ include __DIR__ . '/../admin_header.php';
 ?>
 
 <style>
-.mkt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
 .mkt-section-head{text-align:center}
 .mkt-compose{display:flex;flex-direction:column;gap:14px;max-width:760px;margin:0 auto}
 .mkt-field label{display:block;font-weight:600;margin-bottom:6px;font-size:14px}
@@ -172,17 +171,17 @@ include __DIR__ . '/../admin_header.php';
     <div class="alert alert-<?= htmlspecialchars($flash_type) ?>"><?= htmlspecialchars($flash) ?></div>
 <?php endif; ?>
 
-<div class="mkt-grid">
+<div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-label">Confirmed subscribers</div>
+        <h3>Confirmed subscribers</h3>
         <div class="stat-value"><?= number_format($subCounts['confirmed']) ?></div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Pending confirmation</div>
+        <h3>Pending confirmation</h3>
         <div class="stat-value"><?= number_format($subCounts['pending']) ?></div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Unsubscribed</div>
+        <h3>Unsubscribed</h3>
         <div class="stat-value"><?= number_format($subCounts['unsubscribed']) ?></div>
     </div>
 </div>

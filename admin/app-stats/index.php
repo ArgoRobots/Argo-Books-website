@@ -436,59 +436,8 @@ include __DIR__ . '/../admin_header.php';
     margin-top: 1rem;
 }
 
-/* Tier filter pills (matches the funnel-pill pattern from other admin pages) */
-.tier-filter-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.tier-filter-label {
-    font-weight: 600;
-    color: var(--black);
-    margin-right: 4px;
-}
-
-.tier-pill {
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: var(--gray-bg-light);
-    color: var(--black);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.15s;
-    border: 1px solid transparent;
-}
-
-.tier-pill:hover {
-    background: var(--gray-border);
-}
-
-.tier-pill.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
-
-[data-theme="dark"] .tier-filter-label {
-    color: var(--white);
-}
-
-[data-theme="dark"] .tier-pill {
-    background: var(--gray-700);
-    color: var(--white);
-}
-
-[data-theme="dark"] .tier-pill:hover {
-    background: var(--gray-600);
-}
-
-[data-theme="dark"] .tier-pill.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
+/* Tier filter pills use the shared .control-bar / .control-pill component
+   (admin/common-style.css). No page-specific styles needed. */
 </style>
 
 <div class="container">
@@ -507,29 +456,33 @@ include __DIR__ . '/../admin_header.php';
     ?>
 
     <?php if ($hasAnyData): ?>
-        <div class="tier-filter-bar">
-            <span class="tier-filter-label">Tier:</span>
-            <?php
-                $tierLabels = [
-                    'all' => 'All',
-                    'free' => 'Free',
-                    'premium' => 'Premium',
-                ];
-                // Preserve the current tab across a tier switch (section-tabs.js keeps
-                // it in ?tab=). Whitelist against the real tabs to avoid reflecting
-                // arbitrary input into the href.
-                $validTabs = ['active-users', 'user-activity', 'geographic', 'versions', 'features', 'usage', 'api', 'errors', 'crashes'];
-                $currentTab = in_array($_GET['tab'] ?? '', $validTabs, true) ? $_GET['tab'] : '';
-                foreach ($tierLabels as $tierKey => $label):
-                    $isActive = $tierFilter === $tierKey;
-                    $pillHref = '?tier=' . urlencode($tierKey);
-                    if ($currentTab !== '') $pillHref .= '&tab=' . urlencode($currentTab);
-            ?>
-                <a href="<?= htmlspecialchars($pillHref) ?>"
-                   class="tier-pill <?= $isActive ? 'active' : '' ?>">
-                    <?= htmlspecialchars($label) ?>
-                </a>
-            <?php endforeach; ?>
+        <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Tier:</span>
+                <div class="control-pills">
+                    <?php
+                        $tierLabels = [
+                            'all' => 'All',
+                            'free' => 'Free',
+                            'premium' => 'Premium',
+                        ];
+                        // Preserve the current tab across a tier switch (section-tabs.js keeps
+                        // it in ?tab=). Whitelist against the real tabs to avoid reflecting
+                        // arbitrary input into the href.
+                        $validTabs = ['active-users', 'user-activity', 'geographic', 'versions', 'features', 'usage', 'api', 'errors', 'crashes'];
+                        $currentTab = in_array($_GET['tab'] ?? '', $validTabs, true) ? $_GET['tab'] : '';
+                        foreach ($tierLabels as $tierKey => $label):
+                            $isActive = $tierFilter === $tierKey;
+                            $pillHref = '?tier=' . urlencode($tierKey);
+                            if ($currentTab !== '') $pillHref .= '&tab=' . urlencode($currentTab);
+                    ?>
+                        <a href="<?= htmlspecialchars($pillHref) ?>"
+                           class="control-pill <?= $isActive ? 'active' : '' ?>">
+                            <?= htmlspecialchars($label) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -911,7 +864,7 @@ document.addEventListener('DOMContentLoaded', function () {
         window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
         sessionStorage.removeItem('scrollPosition');
     }
-    document.querySelectorAll('a.tier-pill').forEach(function (link) {
+    document.querySelectorAll('.control-bar a.control-pill').forEach(function (link) {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
             // The href is rendered server-side at load, before the user clicks a

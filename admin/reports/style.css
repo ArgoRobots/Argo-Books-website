@@ -1,66 +1,7 @@
-.filters-container {
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.filters-row {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.filter-group label {
-  font-size: 14px;
-  color: var(--admin-text);
-}
-
-.filter-group select {
-  padding: 8px 12px;
-  border: 1px solid var(--gray-input-border);
-  border-radius: 6px;
-  font-size: 14px;
-  min-width: 150px;
-}
-
-.status-badges {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-  justify-content: center;
-}
-
-.status-badge {
-  background: var(--white);
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px var(--shadow-default);
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.status-badge-label {
-  font-size: 13px;
-  color: var(--admin-text);
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-.status-badge-count {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--admin-text);
-  text-align: center;
-}
-
-.status-badge.pending .status-badge-count {
+/* Summary cards use the shared .stats-grid / .stat-card component
+   (admin/common-style.css). Only the amber accent on the actionable
+   Pending count is page-specific. */
+.stat-card.pending .value {
   color: var(--amber-500);
 }
 

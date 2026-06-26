@@ -672,32 +672,28 @@ include __DIR__ . '/../admin_header.php';
 
 <div class="container">
     <!-- Date range controls (the chart bucket is derived automatically from the range) -->
-    <div class="stats-toolbar">
+    <div class="control-bar">
         <form method="get" id="rangeForm" class="range-controls">
-            <div class="range-picker">
-                <div class="range-top">
-                    <span class="range-label">Date Range:</span>
-                    <div class="range-select">
-                        <select name="range" id="rangePreset" onchange="onRangeChange()">
-                            <?php foreach ($presets as $preset_option): ?>
-                                <option value="<?php echo htmlspecialchars($preset_option); ?>"
-                                    <?php echo $preset_option === $selected_range ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($preset_option); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="range-display" title="Grouped by <?php echo htmlspecialchars($bucket); ?>">
+            <div class="control-group">
+                <span class="control-label">Date Range:</span>
+                <select name="range" id="rangePreset" class="control-select" onchange="onRangeChange()">
+                    <?php foreach ($presets as $preset_option): ?>
+                        <option value="<?php echo htmlspecialchars($preset_option); ?>"
+                            <?php echo $preset_option === $selected_range ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($preset_option); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <span class="range-display" title="Grouped by <?php echo htmlspecialchars($bucket); ?>">
                     <?php echo htmlspecialchars($range_display); ?>
-                </div>
+                </span>
             </div>
 
-            <div class="range-custom" id="rangeCustom" style="display: <?php echo $selected_range === 'Custom Range' ? 'flex' : 'none'; ?>;">
-                <input type="date" name="start" id="rangeStart" value="<?php echo htmlspecialchars($range_start->format('Y-m-d')); ?>" <?php echo $selected_range === 'Custom Range' ? '' : 'disabled'; ?>>
+            <div class="control-group range-custom" id="rangeCustom" style="display: <?php echo $selected_range === 'Custom Range' ? 'flex' : 'none'; ?>;">
+                <input type="date" name="start" id="rangeStart" class="control-input" value="<?php echo htmlspecialchars($range_start->format('Y-m-d')); ?>" <?php echo $selected_range === 'Custom Range' ? '' : 'disabled'; ?>>
                 <span>to</span>
-                <input type="date" name="end" id="rangeEnd" value="<?php echo htmlspecialchars($range_end->format('Y-m-d')); ?>" <?php echo $selected_range === 'Custom Range' ? '' : 'disabled'; ?>>
-                <button type="submit" class="range-apply">Apply</button>
+                <input type="date" name="end" id="rangeEnd" class="control-input" value="<?php echo htmlspecialchars($range_end->format('Y-m-d')); ?>" <?php echo $selected_range === 'Custom Range' ? '' : 'disabled'; ?>>
+                <button type="submit" class="control-pill">Apply</button>
             </div>
         </form>
     </div>

@@ -712,22 +712,25 @@ include __DIR__ . '/../admin_header.php';
             }
         }
     ?>
-    <div class="funnel-controls">
-        <span class="control-label">Period:</span>
-        <div class="funnel-pill-row">
-            <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
-                $href_params = ['tab' => 'funnel', 'funnel_period' => $pkey];
-                if ($funnel_source_filter !== '') $href_params['source'] = $funnel_source_filter;
-                $href = 'index.php?' . http_build_query($href_params);
-            ?>
-                <a href="<?php echo htmlspecialchars($href); ?>"
-                   class="funnel-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
-                    <?php echo $plabel; ?>
-                </a>
-            <?php endforeach; ?>
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Period:</span>
+            <div class="control-pills">
+                <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
+                    $href_params = ['tab' => 'funnel', 'funnel_period' => $pkey];
+                    if ($funnel_source_filter !== '') $href_params['source'] = $funnel_source_filter;
+                    $href = 'index.php?' . http_build_query($href_params);
+                ?>
+                    <a href="<?php echo htmlspecialchars($href); ?>"
+                       class="control-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
+                        <?php echo $plabel; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </div>
 
-        <span class="control-label" style="margin-left:auto;">Source:</span>
+        <div class="control-group control-spacer">
+        <span class="control-label">Source:</span>
         <div class="source-combobox" id="sourceCombobox" data-period="<?php echo htmlspecialchars($funnel_period_key); ?>">
             <input type="text" class="source-combobox-input" id="sourceComboboxInput"
                    autocomplete="off" spellcheck="false" placeholder="Search sources&hellip;"
@@ -746,6 +749,7 @@ include __DIR__ . '/../admin_header.php';
                         data-source="<?php echo htmlspecialchars($rl['source_code']); ?>" role="option"><?php echo htmlspecialchars($rl['source_code']); ?></li>
                 <?php endforeach; ?>
             </ul>
+        </div>
         </div>
     </div>
 
@@ -1066,17 +1070,19 @@ include __DIR__ . '/../admin_header.php';
             ? round(($total_tool_clicks / $total_tool_sessions) * 100, 1)
             : null;
     ?>
-    <div class="funnel-controls">
-        <span class="control-label">Period:</span>
-        <div class="funnel-pill-row">
-            <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
-                $href = 'index.php?' . http_build_query(['tab' => 'tools', 'funnel_period' => $pkey]);
-            ?>
-                <a href="<?php echo htmlspecialchars($href); ?>"
-                   class="funnel-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
-                    <?php echo $plabel; ?>
-                </a>
-            <?php endforeach; ?>
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Period:</span>
+            <div class="control-pills">
+                <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
+                    $href = 'index.php?' . http_build_query(['tab' => 'tools', 'funnel_period' => $pkey]);
+                ?>
+                    <a href="<?php echo htmlspecialchars($href); ?>"
+                       class="control-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
+                        <?php echo $plabel; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 
@@ -1481,7 +1487,7 @@ include __DIR__ . '/../admin_header.php';
 
     // Save scroll position when clicking funnel filter pills so the page
     // reload doesn't jump back to the top.
-    document.querySelectorAll('.funnel-pill').forEach(link => {
+    document.querySelectorAll('.control-pill').forEach(link => {
         link.addEventListener('click', function() {
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });

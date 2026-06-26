@@ -232,33 +232,33 @@ function ab_tests_tab_render_list($pdo)
     }
     ?>
 
-    <div class="stats-row" style="margin-top:4px;">
+    <div class="stats-grid" style="margin-top:4px;">
         <div class="stat-card">
-            <div class="stat-label">Active Tests</div>
+            <h3>Active Tests</h3>
             <div class="stat-value stat-active"><?php echo (int) $stats['active']; ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Completed</div>
+            <h3>Completed</h3>
             <div class="stat-value stat-completed"><?php echo (int) $stats['completed']; ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Leads Assigned</div>
+            <h3>Leads Assigned</h3>
             <div class="stat-value"><?php echo (int) $stats['assigned']; ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Leads Opened</div>
+            <h3>Leads Opened</h3>
             <div class="stat-value stat-opened-ab"><?php echo (int) $stats['opened']; ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Leads Clicked</div>
+            <h3>Leads Clicked</h3>
             <div class="stat-value stat-clicked-ab"><?php echo (int) $stats['clicked']; ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Leads Replied</div>
+            <h3>Leads Replied</h3>
             <div class="stat-value stat-replied-ab"><?php echo (int) $stats['replied']; ?></div>
         </div>
         <div class="stat-card">
-            <div class="stat-label">Leads Bounced</div>
+            <h3>Leads Bounced</h3>
             <div class="stat-value stat-bounced-ab"><?php echo (int) $stats['bounced']; ?></div>
         </div>
     </div>

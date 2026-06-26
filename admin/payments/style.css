@@ -5,48 +5,9 @@
     margin: 0 auto;
 }
 
-/* ============================================================
-   Environment Toggle
-   ============================================================ */
-.env-toggle-bar {
-    display: flex;
-    gap: 0;
-    margin-bottom: 1.25rem;
-    background: var(--gray-bg-light);
-    border-radius: 8px;
-    padding: 4px;
-    width: fit-content;
-}
-
-.env-toggle-btn {
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    color: var(--admin-text);
-    background: transparent;
-    border: none;
-}
-
-.env-toggle-btn:hover {
-    color: var(--admin-text);
-}
-
-.env-toggle-btn.active {
-    background: var(--white);
-    box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-.env-toggle-production.active {
-    color: var(--emerald-800);
-}
-
-.env-toggle-sandbox.active {
-    color: var(--amber-800);
-}
+/* Environment toggle uses the shared .control-bar / .control-pill component
+   (admin/common-style.css) with no page-specific overrides, so its active
+   state matches every other admin page. */
 
 /* Tab styles are shared across admin pages: see admin/common-style.css (.section-tabs / .section-tab / .tab-content) */
 
@@ -77,48 +38,22 @@
 
 /* ============================================================
    Filters Bar
+   ------------------------------------------------------------
+   The bar, controls and dark-mode styling come from the shared
+   .control-bar / .control-group / .control-input / .control-select
+   component (admin/common-style.css). Only the form layout glue
+   and the search input's wider min-width are page-specific.
    ============================================================ */
-.filters-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 1.5rem;
-    padding: 15px 20px;
-    background: var(--white);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px var(--shadow-default);
-    border: 1px solid var(--gray-border);
-    flex-wrap: wrap;
-}
-
 .filters-form {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
     flex: 1;
 }
 
-.filter-group input,
-.filter-group select {
-    padding: 8px 12px;
-    border: 1px solid var(--gray-input-border);
-    border-radius: 6px;
-    font-size: 0.875rem;
-    color: var(--admin-text);
-    background: var(--white);
-    min-width: 140px;
-}
-
-.filter-group input {
+.filters-form .control-input {
     min-width: 220px;
-}
-
-.filter-group input:focus,
-.filter-group select:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 2px var(--blue-alpha-15);
 }
 
 .payments-page .btn {
@@ -421,7 +356,7 @@
    Responsive
    ============================================================ */
 @media (max-width: 900px) {
-    .filters-bar {
+    .payments-page .control-bar {
         flex-direction: column;
         align-items: stretch;
     }
@@ -430,8 +365,9 @@
         flex-direction: column;
     }
 
-    .filter-group input,
-    .filter-group select {
+    .filters-form .control-group,
+    .filters-form .control-input,
+    .filters-form .control-select {
         width: 100%;
         min-width: unset;
     }

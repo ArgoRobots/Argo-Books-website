@@ -436,9 +436,14 @@ include __DIR__ . '/../admin_header.php';
 
     <!-- Environment Toggle -->
     <?php $current_tab = $_GET['tab'] ?? ''; $tab_param = !empty($current_tab) ? '&tab=' . urlencode($current_tab) : ''; ?>
-    <div class="env-toggle-bar">
-        <a href="?view_env=production<?php echo $tab_param; ?>" class="env-toggle-btn env-toggle-production <?php echo $view_env === 'production' ? 'active' : ''; ?>">Production</a>
-        <a href="?view_env=sandbox<?php echo $tab_param; ?>" class="env-toggle-btn env-toggle-sandbox <?php echo $view_env === 'sandbox' ? 'active' : ''; ?>">Sandbox</a>
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Environment:</span>
+            <div class="control-pills">
+                <a href="?view_env=production<?php echo $tab_param; ?>" class="control-pill env-toggle-production <?php echo $view_env === 'production' ? 'active' : ''; ?>">Production</a>
+                <a href="?view_env=sandbox<?php echo $tab_param; ?>" class="control-pill env-toggle-sandbox <?php echo $view_env === 'sandbox' ? 'active' : ''; ?>">Sandbox</a>
+            </div>
+        </div>
     </div>
 
     <!-- Tab Navigation -->
@@ -563,22 +568,22 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <div id="transactions" class="tab-content">
         <!-- Filters -->
-        <div class="filters-bar">
+        <div class="control-bar">
             <form method="GET" class="filters-form" id="tx-filters-form">
                 <input type="hidden" name="tab" value="transactions">
-                <div class="filter-group">
-                    <input type="text" name="tx_search" placeholder="Search customer, reference, company..." value="<?php echo htmlspecialchars($tx_search); ?>">
+                <div class="control-group">
+                    <input type="text" class="control-input" name="tx_search" placeholder="Search customer, reference, company..." value="<?php echo htmlspecialchars($tx_search); ?>">
                 </div>
-                <div class="filter-group">
-                    <select name="tx_method" onchange="document.getElementById('tx-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="tx_method" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Methods</option>
                         <option value="stripe" <?php echo $tx_method === 'stripe' ? 'selected' : ''; ?>>Stripe</option>
                         <option value="paypal" <?php echo $tx_method === 'paypal' ? 'selected' : ''; ?>>PayPal</option>
                         <option value="square" <?php echo $tx_method === 'square' ? 'selected' : ''; ?>>Square</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <select name="tx_status" onchange="document.getElementById('tx-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="tx_status" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Statuses</option>
                         <option value="completed" <?php echo $tx_status === 'completed' ? 'selected' : ''; ?>>Completed</option>
                         <option value="pending" <?php echo $tx_status === 'pending' ? 'selected' : ''; ?>>Pending</option>
@@ -587,8 +592,8 @@ include __DIR__ . '/../admin_header.php';
                     </select>
                 </div>
                 <input type="hidden" name="view_env" value="<?php echo htmlspecialchars($view_env); ?>">
-                <div class="filter-group">
-                    <select name="tx_company" onchange="document.getElementById('tx-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="tx_company" onchange="document.getElementById('tx-filters-form').submit()">
                         <option value="">All Companies</option>
                         <?php foreach ($company_options as $co): ?>
                             <option value="<?php echo $co['id']; ?>" <?php echo $tx_company == $co['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($co['company_name']); ?></option>
@@ -890,15 +895,15 @@ include __DIR__ . '/../admin_header.php';
     <!-- ============================================================ -->
     <div id="invoices" class="tab-content">
         <!-- Filters -->
-        <div class="filters-bar">
+        <div class="control-bar">
             <form method="GET" class="filters-form" id="inv-filters-form">
                 <input type="hidden" name="tab" value="invoices">
                 <input type="hidden" name="view_env" value="<?php echo htmlspecialchars($view_env); ?>">
-                <div class="filter-group">
-                    <input type="text" name="inv_search" placeholder="Search customer, invoice ID, company..." value="<?php echo htmlspecialchars($inv_search); ?>">
+                <div class="control-group">
+                    <input type="text" class="control-input" name="inv_search" placeholder="Search customer, invoice ID, company..." value="<?php echo htmlspecialchars($inv_search); ?>">
                 </div>
-                <div class="filter-group">
-                    <select name="inv_status" onchange="document.getElementById('inv-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="inv_status" onchange="document.getElementById('inv-filters-form').submit()">
                         <option value="">All Statuses</option>
                         <option value="draft" <?php echo $inv_status === 'draft' ? 'selected' : ''; ?>>Draft</option>
                         <option value="sent" <?php echo $inv_status === 'sent' ? 'selected' : ''; ?>>Sent</option>
@@ -910,8 +915,8 @@ include __DIR__ . '/../admin_header.php';
                         <option value="cancelled" <?php echo $inv_status === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
                     </select>
                 </div>
-                <div class="filter-group">
-                    <select name="inv_company" onchange="document.getElementById('inv-filters-form').submit()">
+                <div class="control-group">
+                    <select class="control-select" name="inv_company" onchange="document.getElementById('inv-filters-form').submit()">
                         <option value="">All Companies</option>
                         <?php foreach ($company_options as $co): ?>
                             <option value="<?php echo $co['id']; ?>" <?php echo $inv_company == $co['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($co['company_name']); ?></option>

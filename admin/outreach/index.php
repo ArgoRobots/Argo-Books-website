@@ -267,37 +267,37 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
 </div>
 
 <!-- Dashboard Stats -->
-<div class="stats-row" id="statsRow">
+<div class="stats-grid" id="statsRow">
     <div class="stat-card">
-        <div class="stat-label">Total Leads</div>
+        <h3>Total Leads</h3>
         <div class="stat-value" id="statTotal">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">New</div>
+        <h3>New</h3>
         <div class="stat-value stat-new" id="statNew">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Drafts Pending</div>
+        <h3>Drafts Pending</h3>
         <div class="stat-value stat-pending" id="statDraftsPending">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Follow-ups pending review</div>
+        <h3>Follow-ups pending review</h3>
         <div class="stat-value stat-pending" id="statFollowupsPending">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Contacted</div>
+        <h3>Contacted</h3>
         <div class="stat-value stat-contacted" id="statContacted">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Replied</div>
+        <h3>Replied</h3>
         <div class="stat-value stat-replied" id="statReplied">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Interested</div>
+        <h3>Interested</h3>
         <div class="stat-value stat-interested" id="statInterested">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Clicked</div>
+        <h3>Clicked</h3>
         <div class="stat-value stat-clicked" id="statClicked">0</div>
     </div>
 </div>
@@ -314,15 +314,14 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
     </div>
 
     <!-- Filters -->
-    <div class="filters-container">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label for="filterSearch">Search</label>
-                <input type="text" id="filterSearch" placeholder="Name, email, city..." oninput="debounceLoadLeads()">
+    <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Search</span>
+                <input type="text" class="control-input" id="filterSearch" placeholder="Name, email, city..." oninput="debounceLoadLeads()">
             </div>
-            <div class="filter-group">
-                <label for="filterStatus">Status</label>
-                <select id="filterStatus" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Status</span>
+                <select class="control-select" id="filterStatus" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="new">New</option>
                     <option value="draft_generated">Draft Generated</option>
@@ -334,9 +333,9 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="disqualified">Disqualified</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterResponse">Response</label>
-                <select id="filterResponse" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Response</span>
+                <select class="control-select" id="filterResponse" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="no_response">No Response</option>
                     <option value="positive">Positive</option>
@@ -344,18 +343,18 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="negative">Negative</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterCompanySize">Company Size</label>
-                <select id="filterCompanySize" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Company Size</span>
+                <select class="control-select" id="filterCompanySize" onchange="loadLeads()">
                     <option value="">All Sizes</option>
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
                     <option value="large">Large</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterSource">Source</label>
-                <select id="filterSource" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Source</span>
+                <select class="control-select" id="filterSource" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="google_places">Google Places</option>
                     <option value="shopify">Shopify</option>
@@ -363,9 +362,9 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="csv_import">CSV</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterSort">Sort</label>
-                <select id="filterSort" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Sort</span>
+                <select class="control-select" id="filterSort" onchange="loadLeads()">
                     <option value="date_added_desc">Newest First</option>
                     <option value="date_added_asc">Oldest First</option>
 
@@ -373,7 +372,6 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="business_name_asc">Name A-Z</option>
                 </select>
             </div>
-        </div>
     </div>
 
     <!-- Bulk Actions -->

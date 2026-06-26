@@ -36,45 +36,7 @@
     color: var(--admin-text);
 }
 
-.period-selection {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    padding: 15px;
-    background: var(--white);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-default);
-}
-
-.period-selection span {
-    font-weight: 600;
-    color: var(--admin-text);
-}
-
-.period-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.period-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--admin-text);
-    background: var(--gray-bg-light);
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.period-btn:hover {
-    background: var(--gray-border);
-}
-
-.period-btn.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
+/* Control bar styles now live in admin/common-style.css (.control-bar). */
 
 .chart-row {
     display: grid;
@@ -366,46 +328,6 @@ code {
 
 /* ─── Group-by toggle (source vs category) ────────────────────────────── */
 
-.group-toggle {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 15px;
-    background: var(--white);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-default);
-}
-
-.group-toggle > span {
-    font-weight: 600;
-    color: var(--admin-text);
-}
-
-.group-toggle-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.group-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-    color: var(--admin-text);
-    background: var(--gray-bg-light);
-    font-weight: 500;
-    transition: all 0.2s;
-}
-
-.group-btn:hover {
-    background: var(--gray-border);
-}
-
-.group-btn.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
-
 /* ─── Category groups in the management table ─────────────────────────── */
 
 .category-header {
@@ -448,27 +370,7 @@ code {
     display: none;
 }
 
-[data-theme="dark"] .group-toggle {
-    background: var(--gray-800);
-}
-
-[data-theme="dark"] .group-toggle > span {
-    color: var(--white);
-}
-
-[data-theme="dark"] .group-btn {
-    background: var(--gray-700);
-    color: var(--white);
-}
-
-[data-theme="dark"] .group-btn:hover {
-    background: var(--gray-600);
-}
-
-[data-theme="dark"] .group-btn.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
+/* Control bar dark-theme styles now live in admin/common-style.css. */
 
 [data-theme="dark"] .category-header {
     background: var(--gray-800);

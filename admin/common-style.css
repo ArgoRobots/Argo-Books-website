@@ -616,7 +616,7 @@ tbody tr:hover {
   padding: 15px;
   box-shadow: 0 1px 3px var(--shadow-default);
   text-align: center;
-  border: 1px solid var(--gray-border);
+  border: 1px solid var(--gray-200);
 }
 
 .stat-card h3 {
@@ -786,7 +786,7 @@ th.col-nowrap {
   padding: 20px 20px 60px 20px;
   margin-bottom: 30px;
   box-shadow: 0 1px 3px var(--shadow-default);
-  border: 1px solid var(--gray-border);
+  border: 1px solid var(--gray-200);
   position: relative;
   height: 300px;
   display: flex;
@@ -907,61 +907,18 @@ th.col-nowrap {
   font-weight: bold;
 }
 
-/* Date range toolbar (website stats) */
-.stats-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.5rem;
-}
-
+/* Date range toolbar (website stats).
+   Wrapper/label/select/input/button styling now comes from the shared
+   .control-bar component; only page-specific layout + the range readout and
+   custom-range row remain here. */
 .range-controls {
   display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.range-picker {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.range-top {
-  display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.range-label {
-  font-weight: 500;
-  color: var(--admin-text);
-  font-size: 14px;
-}
-
-.range-select select {
-  appearance: none;
-  background: var(--white);
-  color: var(--admin-text);
-  border: 1px solid var(--gray-border);
-  border-radius: 8px;
-  padding: 8px 32px 8px 14px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: 0 1px 3px var(--shadow-default);
-  /* caret */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
-
-.range-select select:hover {
-  border-color: var(--gray-placeholder);
+  flex-wrap: wrap;
+  gap: 15px 30px;
 }
 
 .range-display {
-  align-self: flex-end;
   color: var(--admin-text);
   font-size: 12px;
   white-space: nowrap;
@@ -972,33 +929,9 @@ th.col-nowrap {
   gap: 8px;
 }
 
-.range-custom input[type="date"] {
-  background: var(--white);
-  color: var(--admin-text);
-  border: 1px solid var(--gray-border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 14px;
-}
-
 .range-custom span {
   color: var(--admin-text);
   font-size: 14px;
-}
-
-.range-apply {
-  background: var(--primary-blue);
-  color: var(--white);
-  border: none;
-  border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.range-apply:hover {
-  background: var(--blue-800);
 }
 
 /* Login Styles */
@@ -1563,7 +1496,7 @@ th.col-nowrap {
 /* Dark theme - Stat cards */
 [data-theme="dark"] .stat-card {
   background: var(--gray-800);
-  border-color: var(--black);
+  border-color: var(--gray-700);
   box-shadow: 0 1px 3px var(--shadow-default);
 }
 
@@ -1573,7 +1506,7 @@ th.col-nowrap {
 
 [data-theme="dark"] .stat-card .stat-value,
 [data-theme="dark"] .stat-card .value {
-  color: var(--blue-300);
+  color: var(--white);
 }
 
 [data-theme="dark"] .stat-card .subtext {
@@ -1583,7 +1516,7 @@ th.col-nowrap {
 /* Dark theme - Charts */
 [data-theme="dark"] .chart-container {
   background: var(--gray-800);
-  border-color: var(--black);
+  border-color: var(--gray-700);
   box-shadow: 0 1px 3px var(--shadow-default);
 }
 
@@ -1687,26 +1620,14 @@ th.col-nowrap {
   border-color: var(--black);
 }
 
-/* Dark theme - date range toolbar */
-[data-theme="dark"] .range-select select,
-[data-theme="dark"] .range-custom input[type="date"] {
-  background: var(--gray-800);
-  color: var(--white);
-  border-color: var(--gray-700);
-  box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-[data-theme="dark"] .range-label,
+/* Dark theme - date range toolbar (select/input styling inherited from
+   the shared .control-bar dark rules; only page-specific bits remain) */
 [data-theme="dark"] .range-display {
   color: var(--white);
 }
 
 [data-theme="dark"] .range-custom input[type="date"] {
   color-scheme: dark;
-}
-
-[data-theme="dark"] .range-select select:hover {
-  border-color: var(--gray-600);
 }
 
 /* Dark theme - Login */
@@ -1766,31 +1687,6 @@ th.col-nowrap {
 
 [data-theme="dark"] .table-responsive::-webkit-scrollbar-thumb:hover {
   background: var(--gray-500);
-}
-
-/* Dark theme - Filters bar (payments) */
-[data-theme="dark"] .filters-bar {
-  background: var(--gray-800);
-  border-color: var(--black);
-  box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-/* Dark theme - Env toggle (payments) */
-[data-theme="dark"] .env-toggle-bar {
-  background: var(--gray-700);
-}
-
-[data-theme="dark"] .env-toggle-btn {
-  color: var(--white);
-}
-
-[data-theme="dark"] .env-toggle-btn:hover {
-  color: var(--white);
-}
-
-[data-theme="dark"] .env-toggle-btn.active {
-  background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .section-tabs {
@@ -2184,7 +2080,7 @@ th.col-nowrap {
 /* Dark theme - Dashboard chart cards */
 [data-theme="dark"] .chart-card {
   background: var(--gray-800);
-  border-color: var(--black);
+  border-color: var(--gray-700);
   box-shadow: 0 4px 6px var(--shadow-xl);
 }
 
@@ -2462,4 +2358,136 @@ th.col-nowrap {
     /* accent-color tints the native checkbox in both light and dark themes
        without needing a fully custom appearance: none implementation. */
     accent-color: var(--primary-blue);
+}
+
+/* ─── Control bar ─────────────────────────────────────────────────────────
+   Canonical filter/toggle bar shared by every admin page (period pills,
+   group-by toggles, source dropdowns, search, date ranges). Put all page
+   filter controls in a .control-bar so they look identical site-wide.
+
+   Structure:
+     <div class="control-bar">
+       <div class="control-group">
+         <span class="control-label">Period:</span>
+         <div class="control-pills">
+           <a class="control-pill active">Last 30 days</a> ...
+         </div>
+       </div>
+       <div class="control-group control-spacer">   (push to the right)
+         <span class="control-label">Source:</span>
+         <select class="control-select"> ... </select>
+       </div>
+     </div>
+   Pills work as <a>, <button>, or <span>. Use .control-select / .control-input
+   for dropdowns / text / date inputs that belong in the same bar.        */
+
+.control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px 30px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-default);
+    border: 1px solid var(--gray-200);
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Pushes a group (and everything after it) to the right edge of the bar. */
+.control-spacer {
+    margin-left: auto;
+}
+
+.control-label {
+    font-weight: 600;
+    color: var(--admin-text);
+    white-space: nowrap;
+}
+
+.control-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.control-pill {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--admin-text);
+    background: var(--gray-bg-light);
+    font: inherit;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.control-pill:hover {
+    background: var(--gray-border);
+}
+
+.control-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+.control-select,
+.control-input {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 6px;
+    color: var(--admin-text);
+    background: var(--gray-bg-light);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.control-input {
+    cursor: text;
+}
+
+.control-select:focus,
+.control-input:focus {
+    outline: none;
+    border-color: var(--blue-500);
+}
+
+[data-theme="dark"] .control-bar {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+[data-theme="dark"] .control-label {
+    color: var(--white);
+}
+
+[data-theme="dark"] .control-pill {
+    background: var(--gray-700);
+    color: var(--white);
+}
+
+[data-theme="dark"] .control-pill:hover {
+    background: var(--gray-600);
+}
+
+[data-theme="dark"] .control-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+[data-theme="dark"] .control-select,
+[data-theme="dark"] .control-input {
+    background: var(--gray-700);
+    color: var(--white);
+    border-color: var(--gray-600);
 }

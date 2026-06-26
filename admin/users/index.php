@@ -263,16 +263,16 @@ include __DIR__ . '/../admin_header.php';
         <div class="card-header">
             <h2>Users</h2>
             <div class="search-container">
-                <form method="GET" action="" class="search-form">
+                <form method="GET" action="" class="control-bar search-form">
                     <input type="text"
                            id="search"
                            name="search"
                            placeholder="Search by username or email..."
                            value="<?php echo htmlspecialchars($search); ?>"
-                           class="search-input">
+                           class="control-input search-input">
 
-                    <div class="filter-group">
-                        <select name="date_preset" id="date_preset" onchange="this.form.submit()">
+                    <div class="control-group">
+                        <select name="date_preset" id="date_preset" class="control-select" onchange="this.form.submit()">
                             <option value="">All Time</option>
                             <option value="today" <?php echo $date_preset === 'today' ? 'selected' : ''; ?>>Today</option>
                             <option value="last_week" <?php echo $date_preset === 'last_week' ? 'selected' : ''; ?>>Last 7 Days</option>
@@ -284,8 +284,8 @@ include __DIR__ . '/../admin_header.php';
                         </select>
                     </div>
 
-                    <div class="filter-group">
-                        <select name="ban_status" id="ban_status" onchange="this.form.submit()">
+                    <div class="control-group">
+                        <select name="ban_status" id="ban_status" class="control-select" onchange="this.form.submit()">
                             <option value="all" <?php echo $ban_status === 'all' ? 'selected' : ''; ?>>All Users</option>
                             <option value="banned" <?php echo $ban_status === 'banned' ? 'selected' : ''; ?>>Banned</option>
                             <option value="unbanned" <?php echo $ban_status === 'unbanned' ? 'selected' : ''; ?>>Not Banned</option>
@@ -301,18 +301,20 @@ include __DIR__ . '/../admin_header.php';
                     <?php endif; ?>
 
                     <div id="custom_date_range" class="custom-date-range" style="display: <?php echo $date_preset === 'custom' ? 'flex' : 'none'; ?>;">
-                        <div class="filter-group">
-                            <label for="date_from">From</label>
+                        <div class="control-group">
+                            <label for="date_from" class="control-label">From</label>
                             <input type="date"
                                    name="date_from"
                                    id="date_from"
+                                   class="control-input"
                                    value="<?php echo htmlspecialchars($date_from); ?>">
                         </div>
-                        <div class="filter-group">
-                            <label for="date_to">To</label>
+                        <div class="control-group">
+                            <label for="date_to" class="control-label">To</label>
                             <input type="date"
                                    name="date_to"
                                    id="date_to"
+                                   class="control-input"
                                    value="<?php echo htmlspecialchars($date_to); ?>">
                         </div>
                         <button type="submit" class="apply-button">Apply</button>

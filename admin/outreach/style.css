@@ -1,32 +1,6 @@
-/* ─── Stats Row ─── */
-.stats-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 12px;
-    margin-bottom: 20px;
-}
-
-.stat-card {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 100px;
-    text-align: center;
-}
-
-.stat-label {
-    font-size: 12px;
-    color: var(--admin-text);
-    text-transform: uppercase;
-    font-weight: 500;
-}
-
-.stat-value {
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--admin-text);
-}
-
+/* ─── Stat value color modifiers ───
+   Stat cards/grid come from admin/common-style.css; only the semantic value
+   colors are page-specific. */
 .stat-new { color: var(--blue-500); }
 .stat-pending { color: var(--amber-500); }
 .stat-contacted { color: var(--purple-500); }
@@ -310,48 +284,6 @@
 .badge-size-large { background: var(--purple-100); color: var(--purple-700); }
 
 
-/* ─── Filters ─── */
-.filters-container {
-    padding: 12px 20px;
-    border-bottom: 1px solid var(--gray-border);
-}
-
-.filters-row {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.filter-group:first-child {
-    flex: 1;
-    max-width: 350px;
-}
-
-.filter-group label {
-    font-size: 12px;
-    color: var(--admin-text);
-    font-weight: 500;
-}
-
-.filter-group select,
-.filter-group input {
-    padding: 6px 10px;
-    border: 1px solid var(--gray-input-border);
-    border-radius: 6px;
-    font-size: 13px;
-    min-width: 130px;
-    background: var(--white);
-    color: var(--admin-text);
-}
-
 /* ─── Modals ─── */
 .modal {
     position: fixed;
@@ -596,19 +528,6 @@
 
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
-    .stats-row {
-        gap: 8px;
-    }
-
-    .stat-card {
-        min-width: 70px;
-        padding: 10px 12px;
-    }
-
-    .stat-value {
-        font-size: 18px;
-    }
-
     .form-row {
         flex-direction: column;
     }
@@ -619,19 +538,6 @@
 
     .detail-grid {
         grid-template-columns: 1fr;
-    }
-
-    .filters-row {
-        flex-direction: column;
-    }
-
-    .filter-group {
-        width: 100%;
-    }
-
-    .filter-group select,
-    .filter-group input {
-        width: 100%;
     }
 
     .panel-actions {
@@ -718,7 +624,6 @@
 }
 
 /* ─── Dark Theme ─── */
-[data-theme="dark"] .stat-card,
 [data-theme="dark"] .panel {
     background: var(--gray-800);
     box-shadow: 0 1px 3px var(--shadow-default);
@@ -726,10 +631,6 @@
 
 [data-theme="dark"] .panel-header {
     border-bottom-color: var(--gray-700);
-}
-
-[data-theme="dark"] .stat-value {
-    color: var(--white);
 }
 
 [data-theme="dark"] .data-table th {
@@ -744,17 +645,14 @@
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
-[data-theme="dark"] .form-group textarea,
-[data-theme="dark"] .filter-group select,
-[data-theme="dark"] .filter-group input {
+[data-theme="dark"] .form-group textarea {
     background: var(--gray-900);
     border-color: var(--gray-700);
     color: var(--white);
     color-scheme: dark;
 }
 
-[data-theme="dark"] .form-group label,
-[data-theme="dark"] .filter-group label {
+[data-theme="dark"] .form-group label {
     color: var(--white);
 }
 
@@ -857,10 +755,6 @@
 }
 
 [data-theme="dark"] .activity-item {
-    border-bottom-color: var(--gray-700);
-}
-
-[data-theme="dark"] .filters-container {
     border-bottom-color: var(--gray-700);
 }
 
@@ -1060,7 +954,7 @@
 
 .chart-card {
     background: var(--white);
-    border: 1px solid var(--gray-border);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 16px 20px;
     margin-top: 16px;
@@ -1396,7 +1290,7 @@
 }
 
 [data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .safety-meter-label,
-[data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .stat-label {
+[data-theme="dark"] .channel-pane[data-channel-pane="reddit"] .stat-card h3 {
     color: var(--white);
 }
 

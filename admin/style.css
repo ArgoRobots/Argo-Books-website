@@ -5,37 +5,6 @@
   padding: 2rem;
 }
 
-/* Summary Stat Cards */
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.summary-card {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 1.25rem 1.5rem;
-  box-shadow: 0 1px 3px var(--shadow);
-  border: 1px solid var(--gray-200);
-}
-
-.summary-card-label {
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--admin-text);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  margin-bottom: 0.25rem;
-}
-
-.summary-card-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--admin-text);
-}
-
 /* Hero Section */
 .hero-section {
   text-align: center;
@@ -81,20 +50,6 @@
 }
 
 /* Dark Theme */
-[data-theme="dark"] .summary-card {
-  background: var(--gray-800);
-  border-color: var(--gray-700);
-  box-shadow: 0 1px 3px var(--shadow-default);
-}
-
-[data-theme="dark"] .summary-card-label {
-  color: var(--white);
-}
-
-[data-theme="dark"] .summary-card-value {
-  color: var(--white);
-}
-
 [data-theme="dark"] .hero-section h1 {
   color: var(--white);
 }
@@ -117,10 +72,6 @@
 }
 
 @media (max-width: 768px) {
-  .summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .dashboard-home {
     padding: 1rem;
   }

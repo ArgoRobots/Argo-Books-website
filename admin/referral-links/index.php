@@ -149,7 +149,7 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
             FROM referral_visits rv
             INNER JOIN referral_links rl ON rl.source_code = rv.source_code
             WHERE rv.source_code = ?
-            GROUP BY period
+            GROUP BY period, display_period
             ORDER BY period DESC
             LIMIT ?";
 
@@ -164,7 +164,7 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
                 SUM(CASE WHEN rv.converted = 1 THEN 1 ELSE 0 END) as conversions
             FROM referral_visits rv
             INNER JOIN referral_links rl ON rl.source_code = rv.source_code
-            GROUP BY period
+            GROUP BY period, display_period
             ORDER BY period DESC
             LIMIT ?";
 
@@ -231,6 +231,9 @@ function referral_category_key($source_code)
     if (strncmp($code, 'ai-', 3) === 0) {
         return 'ai';
     }
+    if (strncmp($code, 'dir-', 4) === 0) {
+        return 'directory';
+    }
     return 'other';
 }
 
@@ -254,10 +257,11 @@ $category_labels = [
     'website' => 'My website (guides & articles)',
     'social'  => 'Social media',
     'youtube' => 'YouTube',
-    'ai'      => 'AI assistants',
-    'other'   => 'Other',
+    'ai'        => 'AI assistants',
+    'directory' => 'Directories (launch & SaaS sites)',
+    'other'     => 'Other',
 ];
-$category_order = ['paid', 'website', 'social', 'youtube', 'ai', 'other'];
+$category_order = ['paid', 'website', 'social', 'youtube', 'ai', 'directory', 'other'];
 
 // Bucket every referral link by category and tally per-category subtotals.
 $grouped_links = [];
@@ -347,6 +351,36 @@ include __DIR__ . '/../admin_header.php';
         </div>
     <?php endif; ?>
 
+    <!-- Controls: group-by toggle + time period selector, combined into one bar -->
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Group by:</span>
+            <div class="control-pills">
+                <a href="?group=source&amp;period=<?php echo htmlspecialchars($period); ?>"
+                   class="control-pill <?php echo $group_mode === 'source' ? 'active' : ''; ?>">By source</a>
+                <a href="?group=category&amp;period=<?php echo htmlspecialchars($period); ?>"
+                   class="control-pill <?php echo $group_mode === 'category' ? 'active' : ''; ?>">By category</a>
+            </div>
+        </div>
+        <div class="control-group">
+            <span class="control-label">Time period:</span>
+            <div class="control-pills">
+                <?php
+                $periods = [
+                    'day' => 'Daily',
+                    'week' => 'Weekly',
+                    'month' => 'Monthly'
+                ];
+
+                foreach ($periods as $periodKey => $periodName) {
+                    $activeClass = ($period === $periodKey) ? 'active' : '';
+                    echo "<a href=\"?period={$periodKey}&amp;group={$group_mode}\" class=\"control-pill {$activeClass}\">{$periodName}</a>";
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+
     <!-- Summary Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -368,36 +402,6 @@ include __DIR__ . '/../admin_header.php';
             <h3>Active Sources</h3>
             <div class="value"><?php echo count($visits_by_source); ?></div>
             <div class="subtext">referral sources</div>
-        </div>
-    </div>
-
-    <!-- Group-by toggle: flips the breakdown charts + table between per-source and per-category -->
-    <div class="group-toggle">
-        <span>Group by:</span>
-        <div class="group-toggle-buttons">
-            <a href="?group=source&amp;period=<?php echo htmlspecialchars($period); ?>"
-               class="group-btn <?php echo $group_mode === 'source' ? 'active' : ''; ?>">By source</a>
-            <a href="?group=category&amp;period=<?php echo htmlspecialchars($period); ?>"
-               class="group-btn <?php echo $group_mode === 'category' ? 'active' : ''; ?>">By category</a>
-        </div>
-    </div>
-
-    <!-- Period selection for time series chart -->
-    <div class="period-selection">
-        <span>Time Period:</span>
-        <div class="period-buttons">
-            <?php
-            $periods = [
-                'day' => 'Daily',
-                'week' => 'Weekly',
-                'month' => 'Monthly'
-            ];
-
-            foreach ($periods as $periodKey => $periodName) {
-                $activeClass = ($period === $periodKey) ? 'active' : '';
-                echo "<a href=\"?period={$periodKey}&amp;group={$group_mode}\" class=\"period-btn {$activeClass}\">{$periodName}</a>";
-            }
-            ?>
         </div>
     </div>
 

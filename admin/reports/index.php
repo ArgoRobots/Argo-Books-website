@@ -129,48 +129,44 @@ include __DIR__ . '/../admin_header.php';
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Status badges -->
-<div class="status-badges">
-    <div class="status-badge pending">
-        <div class="status-badge-label">Pending</div>
-        <div class="status-badge-count"><?php echo $status_counts['pending']; ?></div>
+<!-- Summary Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card pending">
+        <h3>Pending</h3>
+        <div class="value"><?php echo $status_counts['pending']; ?></div>
     </div>
-    <div class="status-badge">
-        <div class="status-badge-label">Resolved</div>
-        <div class="status-badge-count"><?php echo $status_counts['resolved']; ?></div>
+    <div class="stat-card">
+        <h3>Resolved</h3>
+        <div class="value"><?php echo $status_counts['resolved']; ?></div>
     </div>
-    <div class="status-badge">
-        <div class="status-badge-label">Dismissed</div>
-        <div class="status-badge-count"><?php echo $status_counts['dismissed']; ?></div>
+    <div class="stat-card">
+        <h3>Dismissed</h3>
+        <div class="value"><?php echo $status_counts['dismissed']; ?></div>
     </div>
 </div>
 
 <!-- Filters -->
-<div class="filters-container">
-    <form method="GET" action="">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label for="status">Status</label>
-                <select name="status" id="status" onchange="this.form.submit()">
-                    <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="resolved" <?php echo $status_filter === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
-                    <option value="dismissed" <?php echo $status_filter === 'dismissed' ? 'selected' : ''; ?>>Dismissed</option>
-                    <option value="all" <?php echo $status_filter === 'all' ? 'selected' : ''; ?>>All</option>
-                </select>
-            </div>
+<form method="GET" action="" class="control-bar">
+    <div class="control-group">
+        <span class="control-label">Status</span>
+        <select name="status" id="status" class="control-select" onchange="this.form.submit()">
+            <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
+            <option value="resolved" <?php echo $status_filter === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
+            <option value="dismissed" <?php echo $status_filter === 'dismissed' ? 'selected' : ''; ?>>Dismissed</option>
+            <option value="all" <?php echo $status_filter === 'all' ? 'selected' : ''; ?>>All</option>
+        </select>
+    </div>
 
-            <div class="filter-group">
-                <label for="content_type">Content Type</label>
-                <select name="content_type" id="content_type" onchange="this.form.submit()">
-                    <option value="all" <?php echo $content_type_filter === 'all' ? 'selected' : ''; ?>>All</option>
-                    <option value="post" <?php echo $content_type_filter === 'post' ? 'selected' : ''; ?>>Posts</option>
-                    <option value="comment" <?php echo $content_type_filter === 'comment' ? 'selected' : ''; ?>>Comments</option>
-                    <option value="user" <?php echo $content_type_filter === 'user' ? 'selected' : ''; ?>>Users</option>
-                </select>
-            </div>
-        </div>
-    </form>
-</div>
+    <div class="control-group">
+        <span class="control-label">Content Type</span>
+        <select name="content_type" id="content_type" class="control-select" onchange="this.form.submit()">
+            <option value="all" <?php echo $content_type_filter === 'all' ? 'selected' : ''; ?>>All</option>
+            <option value="post" <?php echo $content_type_filter === 'post' ? 'selected' : ''; ?>>Posts</option>
+            <option value="comment" <?php echo $content_type_filter === 'comment' ? 'selected' : ''; ?>>Comments</option>
+            <option value="user" <?php echo $content_type_filter === 'user' ? 'selected' : ''; ?>>Users</option>
+        </select>
+    </div>
+</form>
 
 <!-- Reports list -->
 <div class="reports-table">

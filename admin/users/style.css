@@ -49,28 +49,12 @@
   width: 100%;
 }
 
-.search-form {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
+/* Layout tweaks layered on top of the shared .control-bar: let the search box
+   stretch to fill the row. Base styling (padding, border, focus) comes from
+   .control-input in admin/common-style.css. */
 .search-input {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--gray-input-border);
-  border-radius: 6px;
-  font-size: 0.875rem;
   flex: 3;
   min-width: 300px;
-  height: 38px;
-  box-sizing: border-box;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
 .search-button {
@@ -119,49 +103,9 @@
   color: var(--admin-text);
 }
 
-/* Filter Groups (inline with search) */
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.filter-group label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--admin-text);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.filter-group select,
-.filter-group input[type="date"] {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--gray-input-border);
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background: var(--white);
-  min-width: 150px;
-  height: 38px;
-  box-sizing: border-box;
-}
-
-.filter-group select:focus,
-.filter-group input[type="date"]:focus {
-  outline: none;
-  border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px var(--blue-alpha-10);
-}
-
-/* The shared dark-theme input rules only cover text/number/email/password, so
-   the date pickers keep their white background here; style them explicitly. */
-[data-theme="dark"] .filter-group input[type="date"] {
-  background: var(--gray-700);
-  border-color: var(--black);
-  color: var(--white);
-}
-
-[data-theme="dark"] .filter-group input[type="date"]::-webkit-calendar-picker-indicator {
+/* The shared .control-input dark-theme rule sets the background/border, but the
+   native date picker icon still needs inverting to stay visible on dark. */
+[data-theme="dark"] .custom-date-range input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
 
@@ -306,12 +250,12 @@
     justify-content: center;
   }
 
-  .filter-group {
+  .control-group {
     width: 100%;
   }
 
-  .filter-group select,
-  .filter-group input[type="date"] {
+  .control-group .control-select,
+  .control-group .control-input {
     width: 100%;
   }
 

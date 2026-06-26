@@ -221,22 +221,22 @@ include __DIR__ . '/admin_header.php';
     </div>
 
     <!-- Summary Stat Cards -->
-    <div class="summary-cards">
-        <div class="summary-card">
-            <div class="summary-card-label">Paid Licenses</div>
-            <div class="summary-card-value"><?php echo $total_paid_licenses; ?></div>
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Paid Licenses</h3>
+            <div class="value"><?php echo $total_paid_licenses; ?></div>
         </div>
-        <div class="summary-card">
-            <div class="summary-card-label">Revenue (30 days)</div>
-            <div class="summary-card-value">$<?php echo number_format($revenue_30d, 2); ?></div>
+        <div class="stat-card">
+            <h3>Revenue (30 days)</h3>
+            <div class="value">$<?php echo number_format($revenue_30d, 2); ?></div>
         </div>
-        <div class="summary-card">
-            <div class="summary-card-label">Revenue (1 year)</div>
-            <div class="summary-card-value">$<?php echo number_format($revenue_365d, 2); ?></div>
+        <div class="stat-card">
+            <h3>Revenue (1 year)</h3>
+            <div class="value">$<?php echo number_format($revenue_365d, 2); ?></div>
         </div>
-        <div class="summary-card">
-            <div class="summary-card-label">Revenue (All Time)</div>
-            <div class="summary-card-value">$<?php echo number_format($revenue_all, 2); ?></div>
+        <div class="stat-card">
+            <h3>Revenue (All Time)</h3>
+            <div class="value">$<?php echo number_format($revenue_all, 2); ?></div>
         </div>
     </div>
 

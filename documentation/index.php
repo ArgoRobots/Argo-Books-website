@@ -205,6 +205,13 @@ $isDocsLanding = true;
                     <h3>Invoicing & Payments</h3>
                     <p>Create invoices, accept payments</p>
                 </a>
+                <a href="pages/features/bank-statement-import.php" class="doc-card">
+                    <div class="card-icon">
+                        <?= svg_icon('document-download', 20) ?>
+                    </div>
+                    <h3>Bank Statement Import</h3>
+                    <p>Turn a bank statement into categorized transactions</p>
+                </a>
                 <a href="pages/features/bank-matching.php" class="doc-card">
                     <div class="card-icon">
                         <?= svg_icon('credit-card', 20) ?>

@@ -43,14 +43,14 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Transform your small business with Argo Books. Smart receipt scanning, spreadsheet import, predictive analytics, inventory management and more. Free software.">
+        content="Argo Books is free accounting and invoicing software for small business. Track income and expenses, send invoices, and scan receipts in minutes.">
     <meta name="keywords"
         content="receipt scanning, smart spreadsheet import, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation, data import">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books - Smart Business Management Software">
+    <meta property="og:title" content="Argo Books: Free Accounting Software for Small Business">
     <meta property="og:description"
-        content="Transform your business with smart receipt scanning, predictive analytics, inventory management and automated invoicing.">
+        content="Free accounting and invoicing software for small business. Track income and expenses, send invoices, and scan receipts in minutes.">
     <meta property="og:url" content="https://argorobots.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -58,9 +58,9 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books - Smart Business Management Software">
+    <meta name="twitter:title" content="Argo Books: Free Accounting Software for Small Business">
     <meta name="twitter:description"
-        content="Transform your business with smart receipt scanning, predictive analytics, and automated business management.">
+        content="Free accounting and invoicing software for small business. Track income and expenses, send invoices, and scan receipts in minutes.">
     <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -93,7 +93,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Argo Books",
-            "description": "Smart business management software with receipt scanning, predictive analytics, and inventory management",
+            "description": "Free accounting and invoicing software for small business, with receipt scanning, spreadsheet import, and inventory management",
             "url": "https://argorobots.com/",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Windows, macOS, Linux",
@@ -122,7 +122,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books - Smart Business Management Software</title>
+    <title>Argo Books: Free Accounting Software for Small Business</title>
 
     <script src="resources/scripts/main.js"></script>
 
@@ -152,8 +152,8 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         </div>
         <div class="container">
             <div class="hero-content">
-                <div class="hero-app-title animate-fade-in">Argo Books</div>
                 <h1 class="hero-title animate-fade-in-up">
+                    <span class="hero-app-title hero-title-line">Argo Books</span>
                     <span class="hero-title-line">Simple accounting</span>
                     <span class="hero-title-line text-gradient">software for</span>
                     <span class="hero-title-line text-gradient">small business</span>

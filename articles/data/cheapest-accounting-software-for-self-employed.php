@@ -6,9 +6,9 @@ return [
 
   'slug' => 'cheapest-accounting-software-for-self-employed',
 
-  'h1' => 'Cheapest accounting software for the self-employed',
+  'h1' => 'Cheapest accounting software for the self-employed (2026)',
 
-  'meta_title' => 'Cheapest Accounting Software for Self-Employed | Argo Books',
+  'meta_title' => 'Cheapest Accounting Software for Self-Employed (2026) | Argo Books',
 
   'meta_description' => 'The cheapest accounting software for self-employed people and sole proprietors, free tiers first, with honest trade-offs and how to pick what actually fits.',
 
@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 

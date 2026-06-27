@@ -19,7 +19,7 @@ return [
   'hub_weight' => 30,
 
   'published' => '2026-05-30',
-  'updated' => '2026-05-30',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 7,
 

@@ -6,9 +6,9 @@ return [
 
   'slug' => 'small-business-tax-deductions',
 
-  'h1' => 'Small business tax deductions you might be missing',
+  'h1' => 'Small business tax deductions you might be missing (2026)',
 
-  'meta_title' => 'Small Business Tax Deductions You Might Be Missing | Argo Books',
+  'meta_title' => 'Small Business Tax Deductions (2026) | Argo Books',
 
   'meta_description' => 'The business tax deductions small businesses most often miss, the difference between an expense and an asset, and how to keep records that hold up.',
 
@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-02',
 
-  'updated' => '2026-06-02',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 

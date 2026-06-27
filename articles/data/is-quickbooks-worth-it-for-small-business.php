@@ -6,9 +6,9 @@ return [
 
   'slug' => 'is-quickbooks-worth-it-for-small-business',
 
-  'h1' => 'Is QuickBooks worth it for a small business?',
+  'h1' => 'Is QuickBooks worth it for a small business in 2026?',
 
-  'meta_title' => 'Is QuickBooks Worth It for Small Business? | Argo Books',
+  'meta_title' => 'Is QuickBooks Worth It for Small Business in 2026? | Argo Books',
 
   'meta_description' => 'An honest answer to whether QuickBooks is worth it for a small business: where it earns its price, where it\'s overkill, and a clear worth-it-if verdict.',
 
@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 

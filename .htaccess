@@ -420,4 +420,5 @@ php_value upload_max_filesize 10M
     RewriteRule ^is-quickbooks-worth-it-for-small-business/?$ articles/article-page.php?slug=is-quickbooks-worth-it-for-small-business [L,QSA]
     RewriteRule ^one-time-purchase-vs-subscription-accounting-software/?$ articles/article-page.php?slug=one-time-purchase-vs-subscription-accounting-software [L,QSA]
     RewriteRule ^accounting-software-for-people-who-hate-accounting/?$ articles/article-page.php?slug=accounting-software-for-people-who-hate-accounting [L,QSA]
+    RewriteRule ^free-accounting-software-canada/?$ articles/article-page.php?slug=free-accounting-software-canada [L,QSA]
 </IfModule>

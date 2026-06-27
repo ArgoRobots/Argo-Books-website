@@ -81,7 +81,14 @@ $base_schema = [
   'description' => $data['meta_description'] ?? '',
   'datePublished' => $published,
   'dateModified' => $updated,
-  'author' => ['@type' => 'Organization', 'name' => 'Argo Books', 'url' => 'https://argorobots.com/'],
+  'author' => [
+    '@type' => 'Person',
+    'name' => 'Evan',
+    'url' => 'https://argorobots.com/about-us/',
+    'jobTitle' => 'Founder',
+    'image' => 'https://argorobots.com/resources/images/founder.jpg',
+    'worksFor' => ['@type' => 'Organization', 'name' => 'Argo Books', 'url' => 'https://argorobots.com/'],
+  ],
   'publisher' => [
     '@type' => 'Organization',
     'name' => 'Argo Books',
@@ -246,11 +253,46 @@ ob_start();
         <?php endif; ?>
       </p>
     <?php endif; ?>
+    <div class="article-byline">
+      <img class="article-byline-avatar"
+           src="<?= INVGEN_BASE ?>/resources/images/founder.jpg"
+           alt="Evan, founder of Argo Books" width="44" height="44" loading="lazy">
+      <span class="article-byline-text">
+        By <a class="article-byline-name" href="<?= INVGEN_BASE ?>/about-us/">Evan</a>
+        <span class="article-byline-role">Founder, Argo Books</span>
+      </span>
+    </div>
   </header>
 
   <section class="article-intro">
     <?= article_tag_source(pricing_substitute($data['intro_html'] ?? ''), $invgen_ref) ?>
   </section>
+
+  <?php
+    // Table of contents, built from the section headings. The anchor fallback
+    // mirrors the section loop below so every link resolves. Skipped on very
+    // short articles where a TOC adds nothing.
+    $toc = [];
+    foreach ($data['sections'] as $i => $section) {
+        if (empty($section['h2'])) {
+            continue;
+        }
+        $toc[] = [
+            'anchor' => $section['anchor'] ?? ('section-' . ($i + 1)),
+            'label'  => $section['h2'],
+        ];
+    }
+  ?>
+  <?php if (count($toc) >= 2): ?>
+    <nav class="article-toc" aria-label="Table of contents">
+      <p class="article-toc-title">In this guide</p>
+      <ol class="article-toc-list">
+        <?php foreach ($toc as $t): ?>
+          <li><a href="#<?= htmlspecialchars($t['anchor']) ?>"><?= htmlspecialchars($t['label']) ?></a></li>
+        <?php endforeach; ?>
+      </ol>
+    </nav>
+  <?php endif; ?>
 
   <?php foreach ($data['sections'] as $i => $section): ?>
     <section class="article-section" id="<?= htmlspecialchars($section['anchor'] ?? ('section-' . ($i + 1))) ?>">
@@ -299,7 +341,7 @@ ob_start();
   <?php endif; ?>
 
   <section class="article-related-niches">
-    <h2>Related guides</h2>
+    <h2>Free invoice generators</h2>
     <?php
       $related_niche_slugs = array_values(array_filter(
         $data['related_niche_slugs'] ?? [],

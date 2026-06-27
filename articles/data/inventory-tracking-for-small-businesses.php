@@ -58,6 +58,7 @@ HTML,
       'anchor' => 'stock-levels',
       'html' => <<<'HTML'
 <p>Beyond the accounting, there is the day-to-day question every product business has to answer: how much of each thing do I have, and when do I buy more? Getting this wrong costs money in two directions. Run out of a popular item and you lose sales you were ready to make. Overstock a slow item and you tie up cash in goods that just sit there, sometimes until they expire or go out of style.</p>
+{{illustration:inventory-boxes}}
 <p>The core habit is knowing your count for each product and updating it as stock comes in and goes out. From there, the tool that prevents most stockouts is a reorder point: a stock level for each item that, when you hit it, tells you it's time to buy more. You set it based on how fast the item sells and how long a new order takes to arrive. A fast seller that takes two weeks to restock needs a high reorder point so you don't run dry while waiting. A slow item that arrives next day can sit near zero before you reorder.</p>
 <p>This is also where you learn which products carry your business. Just as a service business benefits from tracking earnings per job, a product business benefits from seeing which items sell quickly and earn well, and which gather dust. That knowledge tells you what to reorder aggressively, what to discount to clear, and what to stop buying altogether. You cannot see it from a single lump inventory total. It only appears when you track stock item by item.</p>
 HTML,

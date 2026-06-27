@@ -41,6 +41,7 @@ HTML,
 <p>Free invoicing tools are good enough for most sole traders, side hustlers, and very small businesses. If you send under five invoices a month, bill one or two clients, don't take card payments through the invoice, and only see your accountant once a year, you're spending money for no reason if you pay for invoicing software.</p>
 <p>Paid tools earn their cost in specific places. The big ones: <a href="/recurring-invoices-when-to-use-them/">recurring billing on a fixed schedule</a>, integrated card and bank payments, expense and revenue tracking that flows through to tax-time reports, multiple users on the same set of books, and a client portal that lets customers pay and download past invoices on their own. None of those are gimmicks. They each save hours a month for the right business, and at $15 to $40 a month a paid tool only has to save you two hours to pay for itself.</p>
 <p>The trick is matching your real workload to the right side of that line, not the side a sales page wants you on. Most of the people we talk to who are paying for software they don't need are doing it because somebody talked them out of a free tool that was working fine. And most of the people we talk to who are buried in admin are running a real five-employee business on a spreadsheet and a free generator, because they got the message that paid software is only for big companies. Both of those are wrong.</p>
+{{illustration:compare-scale}}
 <p>The rest of this article is the test for which side you're on, and the names of the tools worth looking at on each side.</p>
 HTML,
     ],
@@ -75,6 +76,7 @@ HTML,
 <li><strong>Stripe invoices.</strong> If you already take card payments through Stripe, you can send a Stripe-hosted invoice with no extra signup. The client pays by clicking a link. The trade-off: Stripe charges the standard card fee (around 2.9% plus 30 cents in the US) plus a 0.4% per-paid-invoice fee on the starter Invoicing plan, and the invoice layout is fixed.</li>
 </ul>
 <p>All four are honest options. The right pick depends on whether you need invoice history saved for you (Zoho), card payments built in (Stripe or Zoho), or just a fast PDF with no signup (the generator on this site, or invoice-generator.com). Try one or two for a month and see which one you like the best. None of them will lock you in, because invoices are just PDFs at the end of the day.</p>
+{{illustration:invoice-doc}}
 HTML,
     ],
 

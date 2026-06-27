@@ -41,6 +41,7 @@ HTML,
 <li><strong>Open-source.</strong> Free because the software is community-built and you run it yourself. Genuinely free forever, with a steeper learning curve and no support line.</li>
 <li><strong>A free trial.</strong> Not free at all, just delayed billing. Useful for testing a paid tool, but not a long-term answer.</li>
 </ul>
+{{illustration:coins}}
 <p>On a free tier, invoicing and basic income and expense tracking are almost always included. The features that tend to sit behind a paid plan are automatic bank feeds, payroll, and higher invoice volumes. None of that is Canada-specific, but the next part is: a free tool is only useful to you if it handles Canadian sales tax, and not all of them do it well.</p>
 HTML,
     ],

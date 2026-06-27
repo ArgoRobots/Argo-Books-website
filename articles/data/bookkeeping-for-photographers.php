@@ -64,6 +64,7 @@ HTML,
       'html' => <<<'HTML'
 <p>This is the part most photographers get wrong, and it's worth a few minutes to get right. A deposit or retainer is money a client pays up front to hold a date. It's in your account, but you haven't done the work yet, so in accounting terms it isn't fully earned income until the shoot happens.</p>
 <p>Two practical points come out of that. First, don't spend a deposit as if it's profit. If a couple cancels, or the shoot moves, that money may have to go back, and a deposit you've already spent on a new lens is a problem. Treat retainers as money you're holding until you've earned it.</p>
+{{illustration:invoice-doc}}
 <p>Second, the timing affects which tax year the income lands in, and that depends on your accounting method and your country's rules. On a simple cash basis, you often count the money when it arrives; on an accrual basis, you count it when you've earned it. This is exactly the kind of thing worth one short question to an accountant, because getting it right keeps a January deposit from landing in the wrong year's return. Whatever the answer, the habit is the same: record every deposit, note which shoot it's for and which part is still owed, so the full picture of a booking, deposit plus balance, is always clear.</p>
 HTML,
     ],
@@ -118,6 +119,7 @@ HTML,
 <li><strong>Chase anything missing while it's fresh.</strong> A receipt you can't find or a second shooter's details you never collected is easy to fix this month and painful in April.</li>
 <li><strong>Hand your accountant clean totals.</strong> Income by shoot, costs by category, gear purchases with dates, mileage, and contractor payments, with receipts available if asked. Accountants bill by the hour, so the cleaner your numbers, the smaller the bill.</li>
 </ol>
+{{illustration:checklist}}
 <p>None of this is hard. It's a handful of habits done consistently. The photographers who dread tax season are almost always the ones who left it all to the end. The ones who spend a few minutes a week keeping it current barely notice it, and they get the bonus prize: real numbers that tell them which work is actually worth booking.</p>
 HTML,
     ],

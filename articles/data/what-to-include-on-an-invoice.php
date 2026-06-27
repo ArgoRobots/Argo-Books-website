@@ -47,6 +47,7 @@ HTML,
   <li><strong>Totals.</strong> A subtotal before tax, the tax amount (if any), the total including tax, and the balance due if a deposit has already been paid. Show the math on the page so the client doesn't have to redo it on a calculator.</li>
   <li><strong>Payment instructions.</strong> How and where to pay. Bank account number and sort code or routing number, a payment link, an email address for a card transfer, whatever applies. If the client has to email you back to ask how to pay, you've already lost three days.</li>
 </ul>
+{{illustration:checklist}}
 <p>Those nine fields are the floor, not the ceiling. Every other section in this guide adds fields on top, depending on what you sell, where you operate, and whether you charge tax. But if you nail these nine, the invoice is legally valid in most countries and clear enough for any accounts payable team to process.</p>
 <p>Do a quick sanity check before you hit send: read the invoice top to bottom and ask yourself, "Could a stranger pay this without asking me a single question?" If the answer's no, something is missing.</p>
 HTML,
@@ -57,6 +58,7 @@ HTML,
       'anchor' => 'products',
       'html' => <<<'HTML'
 <p>Service invoices are simpler. You describe the work, list the hours or the fixed fee, and total it up. Product invoices need a few extra fields because physical goods get tracked, stocked, returned, and audited in ways that hours of service generally don't do.</p>
+{{illustration:invoice-doc}}
 <p><strong>SKU or product code.</strong> Every product you sell should have a unique code that ties the line item back to your inventory system. A SKU like "TSHIRT-BLK-L" tells the client (and your warehouse) exactly which item they bought. Without it, returns and exchanges turn into guessing games about which black t-shirt in which size left the building.</p>
 <p><strong>Unit of measure.</strong> Spell out what one unit is. "10 hours" is clear. "10" isn't. Common units: each (for discrete items), hour (for time), kg or lb (for weight), m or ft (for length), litre or gallon (for volume), box, case, or pallet (for bulk packaging). On a product invoice the unit of measure removes any ambiguity about what 10 of something actually means.</p>
 <p><strong>Taxable flag per line.</strong> Not every product is taxed at the same rate, and some aren't taxed at all. Basic food in Australia is GST-free. Books in the UK are zero-rated for VAT. Children's clothing in some Canadian provinces sits outside the standard rate. If your invoice mixes taxable and non-taxable lines, mark each one so the totals tie back to the correct tax bucket. The free invoice generator handles this with a tick box on each line.</p>

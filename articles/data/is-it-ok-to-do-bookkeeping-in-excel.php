@@ -96,6 +96,7 @@ HTML,
 <li><strong>You don't trust the numbers anymore.</strong> If you find yourself double-checking the sheet because you're not sure a formula is right, the spreadsheet has stopped doing its main job, which is to be trustworthy.</li>
 <li><strong>You avoid it.</strong> The clearest sign of all. When the books become the chore you put off until the night before tax season, the spreadsheet has lost.</li>
 </ul>
+{{illustration:spreadsheet-to-books}}
 <p>If a few of those ring true, moving to software isn't admitting defeat, it's the same upgrade as hiring help when the work outgrows one pair of hands. And you don't lose your history doing it: a good importer reads your existing spreadsheet, whatever the column layout, and brings it across, so the years you built in Excel come with you. The guide on <a href="/how-to-move-from-spreadsheets-to-bookkeeping-software/">moving from spreadsheets to bookkeeping software</a> walks through the switch. Until those signs show up, though, Excel done well is a perfectly good place to keep your books, and the cheapest one going.</p>
 HTML,
     ],

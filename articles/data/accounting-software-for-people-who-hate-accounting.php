@@ -91,6 +91,7 @@ HTML,
 <li><strong>Let the software categorize, and just confirm.</strong> When the app suggests a category, glance and tap yes. You are not doing accounting; you are approving a guess. Over a few weeks it gets better at guessing and the glance gets faster.</li>
 <li><strong>Do a five-minute check once a month.</strong> Once a month, open the business account and run down the month's transactions to make sure each one is recorded. With separate accounts and capture-as-you-go, most months there is nothing to fix. This is the safety net that stops anything from quietly piling up, and it's short precisely because the other three steps did the heavy lifting.</li>
 </ol>
+{{illustration:checklist}}
 <p>That is the entire system. No spreadsheet to maintain, no evening of data entry, no learning what a ledger is. Set it up once and the daily cost is a photo at the till and a five-minute look once a month. People who hate accounting can absolutely live with that, because there is barely any accounting left to do.</p>
 HTML,
     ],
@@ -116,6 +117,7 @@ HTML,
       'anchor' => 'when-spreadsheet-is-fine',
       'html' => <<<'HTML'
 <p>It would be dishonest to end a guide on accounting software without admitting that some people don't need any. If you have a tiny handful of transactions a month, a one-person operation with a separate account and a folder of receipt photos, a simple spreadsheet you keep current is a complete and valid system. Plenty of small businesses run that way for years and never buy a thing. There is no rule that says you must.</p>
+{{illustration:spreadsheet-to-books}}
 <p>The spreadsheet stops being kind to you when the volume climbs and the typing becomes the bottleneck: lots of receipts a week, several suppliers, a tax return that is getting complicated. That is the point where the manual entry costs more of the evenings you hate than software costs in dollars, and where the missed receipts start costing you real deductions. If you dread the spreadsheet, or you spend more than an hour a month wrestling it, that dread is the signal, not a moral failing. Move to a tool that captures and categorizes for you and the dread mostly goes with it. The point was never to sell you software. It was to get your books clean with the least misery, and for a busy business that hates the job, the least misery means letting a tool do it.</p>
 HTML,
     ],

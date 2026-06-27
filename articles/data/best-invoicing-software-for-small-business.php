@@ -46,6 +46,7 @@ HTML,
 <li><strong>Saved history and clients.</strong> A record of past invoices and a client list you don't re-type. The difference between software and a one-off generator.</li>
 <li><strong>Does it connect to your books?</strong> Invoicing that flows into expense tracking and tax-time reports saves you entering the same numbers twice.</li>
 </ul>
+{{illustration:invoice-doc}}
 <p>Write down which of these matter to you. That list, not the most popular name, is what picks your tool.</p>
 HTML,
     ],
@@ -64,6 +65,19 @@ HTML,
       'anchor' => 'the-options',
       'html' => <<<'HTML'
 <p>Order roughly follows breadth of appeal, not preference. Match these to the feature list you wrote, and confirm current pricing yourself, since plans change.</p>
+<table>
+<thead>
+<tr><th>Tool</th><th>Pricing</th><th>Best for</th></tr>
+</thead>
+<tbody>
+<tr><td>Wave</td><td>Free tier; Pro around ${wave_pro} CAD/mo</td><td>Free invoicing tied to free books</td></tr>
+<tr><td>FreshBooks</td><td>From ${freshbooks_lite} CAD/mo (Lite)</td><td>Service businesses, time and project billing</td></tr>
+<tr><td>Zoho Invoice</td><td>Free (customer cap)</td><td>Existing Zoho users</td></tr>
+<tr><td>Square / PayPal</td><td>Processing fee per paid invoice</td><td>When payments are the main thing</td></tr>
+<tr><td>Argo Books</td><td>Free tier; Premium ${argo_premium_monthly} CAD/mo</td><td>Free invoicing with books, data on your machine</td></tr>
+<tr><td>Free invoice generator</td><td>Free</td><td>Very low volume, a quick PDF</td></tr>
+</tbody>
+</table>
 <ul>
 <li><strong>Wave.</strong> The strongest free pick. Invoicing, recurring invoices, and basic accounting are free with no time limit, and you pay only for card payments, payroll, or the Pro tier (around ${wave_pro} CAD a month). Best for sole operators and small service businesses that want free invoicing tied to free books. The trade-offs: thinner support, slower development than it once had, and some features have moved to Pro.</li>
 <li><strong>FreshBooks.</strong> Built for service businesses and freelancers, and the friendliest to learn. Strong on time tracking, project billing, a clean client portal, and automatic reminders. Plans start around ${freshbooks_lite} CAD a month for Lite, with Plus nearer ${freshbooks_plus} CAD. The trade-off: lower tiers cap your number of billable clients, and a long client list pushes you up the price tiers.</li>

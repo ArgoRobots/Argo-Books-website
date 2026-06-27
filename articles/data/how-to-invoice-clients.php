@@ -65,6 +65,7 @@ HTML,
 <li><strong>Due date.</strong> Calculated from the invoice date plus your payment terms. For example, 30 days from the invoice date.</li>
 <li><strong>Purchase order or job reference.</strong> If the client gave you a PO number, put it on the invoice. Larger clients won't pay without it. Small clients usually don't have one, and that's fine.</li>
 </ul>
+{{illustration:checklist}}
 <p>Spending two minutes on this list before you open the invoice form is the difference between a finished invoice and three rounds of email back and forth asking for a missing address.</p>
 HTML,
     ],
@@ -119,6 +120,7 @@ HTML,
       'step_text' => 'Email a PDF of the invoice to the client. Use a clear subject line that includes the invoice number, and keep the body short.',
       'html' => <<<'HTML'
 <p>Send it by email, as a PDF attachment. PDF over Word for the formal send: the layout is locked, the file opens on any device, and accounts payable systems are built to handle PDFs. A Word file can shift when the client opens it in a different version, and it looks like a draft rather than a final document.</p>
+{{illustration:invoice-doc}}
 <p>The subject line decides whether the email gets opened today or sits in the inbox. Include your business name, the word "invoice", and the invoice number. A subject like this works well:</p>
 <p><strong>Subject: Invoice 2026-0042 from [Your Business Name], due June 29</strong></p>
 <p>The body of the email should be three sentences. Long emails don't get read, and they don't need to be. Here's a copy-and-paste template:</p>

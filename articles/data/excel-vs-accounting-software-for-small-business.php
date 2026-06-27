@@ -71,6 +71,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Excel feels easier because you already know it. There's no new app to learn, no sign-up, no menus to figure out. You open a blank grid and start typing. For a lot of people that familiarity is the whole appeal.</p>
 <p>The catch is that knowing Excel and knowing how to build a bookkeeping system in Excel are different things. A spreadsheet doesn't tell you what a small business needs to track. You have to design the columns, write the formulas, build the categories, and make sure it all adds up, and if you get the structure wrong you may not find out until tax time. The familiarity is real, but you're still building the accounting logic yourself.</p>
+{{illustration:compare-scale}}
 <p>Accounting software has the opposite shape. There's a setup cost up front: you sign up, connect or import a few things, and learn where the buttons are. But the accounting logic is already built in. It knows what an invoice is, what an expense is, and how they roll into a report. Once you're past the first week, it guides you instead of leaving you to design it. So the trade is a steeper start in exchange for never having to build the structure yourself.</p>
 HTML,
     ],
@@ -122,6 +123,7 @@ HTML,
 <p>There's no universal winner, so here's the honest split.</p>
 <p><strong>Choose Excel if</strong> your business is small and simple: a low number of transactions a month, no sales tax to track or a very simple tax setup, one person on the books, and a profit picture you can read at a glance. If you're a sole operation with a separate bank account, a folder of receipts, and a sheet you actually keep current, Excel is a complete and valid system and you don't need to spend a cent. The guide on <a href="/is-it-ok-to-do-bookkeeping-in-excel/">whether it's OK to do bookkeeping in Excel</a> makes the case for staying put when staying put is right.</p>
 <p><strong>Choose software if</strong> the volume has climbed, the manual typing is eating real time, you charge sales tax, more than one person needs into the books, or a wrong number would actually cost you. The tipping point is rarely a feature you're missing. It's the hour a week you're spending on data entry, the deduction you didn't claim because a receipt vanished, and the nagging worry that a formula is quietly off. When the spreadsheet becomes the thing you avoid, that's the signal.</p>
+{{illustration:spreadsheet-to-books}}
 <p>If you do decide to move, you don't have to retype a thing. A good importer reads your existing spreadsheet, whatever the column layout, and brings it across, so the years of history you built in Excel come with you. The guide on <a href="/how-to-move-from-spreadsheets-to-bookkeeping-software/">moving from spreadsheets to bookkeeping software</a> walks through it. And if Excel is still serving you, the cheapest, smartest thing you can do is keep using it.</p>
 HTML,
     ],

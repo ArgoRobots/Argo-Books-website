@@ -44,6 +44,7 @@ HTML,
 <li><strong>Extraction.</strong> Reading the image and pulling out fields. At minimum that's supplier, date, and total. Stronger tools also grab the tax amount, the payment method, and each line item. This is the part the "AI" label refers to, and it's where accuracy is won or lost.</li>
 <li><strong>Storage and export.</strong> What happens to the result. A scan is only useful if it lands somewhere you can search later and hand to an accountant. The weakest tools give you a photo in a folder. The strong ones give you a categorized, searchable expense record with the original image attached.</li>
 </ul>
+{{illustration:receipt-scan}}
 <p>When you compare tools, check all three. A free app that captures and extracts beautifully but won't let you export the data is a dead end at tax time. One that stores everything neatly but misreads half the totals just moves the typing from the receipt to the correction screen.</p>
 HTML,
     ],
@@ -77,6 +78,17 @@ HTML,
       'anchor' => 'best-free',
       'html' => <<<'HTML'
 <p>These all have a genuinely free path to scanning receipts. Order roughly follows how generous the free side is, not preference. Check the current limits yourself before committing, because free tiers change.</p>
+<table>
+<thead>
+<tr><th>Tool</th><th>Free scanning</th><th>Best for</th></tr>
+</thead>
+<tbody>
+<tr><td>Wave</td><td>No hard monthly scan cap</td><td>Free scanning and free books in one place</td></tr>
+<tr><td>Zoho Expense</td><td>Capped auto-scans per month</td><td>Individuals already in the Zoho world</td></tr>
+<tr><td>Expensify</td><td>Around 25 SmartScans a month</td><td>Light expense tracking, slick capture</td></tr>
+<tr><td>Argo Books</td><td>{argo_free_receipt_scan_limit} scans a month</td><td>Accurate scans, data on your own machine</td></tr>
+</tbody>
+</table>
 <ul>
 <li><strong>Wave.</strong> Wave's receipt scanning is part of its free accounting product, with no hard monthly scan cap, and the extracted expense flows straight into free bookkeeping. Strong value if you want free scanning and free books in one place. The trade-offs: extraction accuracy is decent rather than excellent, support on the free plan is thin, and some features have shifted to the paid Pro tier over time.</li>
 <li><strong>Zoho Expense.</strong> The free plan is aimed at individuals and includes automatic receipt scanning, though the free tier limits how many auto-scans you get each month before you're entering them by hand. Clean mobile app, good if you already live in the Zoho world. The trade-off: you'll feel the free-tier scan cap quickly if you travel, and the wider Zoho suite has a learning curve.</li>
@@ -113,6 +125,7 @@ HTML,
 <li><strong>Do a five-minute month-end check.</strong> Once a month, scan anything you missed and skim the list for blanks or odd totals. Catching a misread in May is a glance; catching it next April is an archaeology project.</li>
 <li><strong>Keep the originals until you've filed.</strong> Even with images stored, hold the paper receipts for the current tax year in one envelope. Once the return is filed and accepted, the digital copies are your record and the paper can go.</li>
 </ol>
+{{illustration:checklist}}
 <p>None of this depends on which tool you pick. A free scanner used every week beats a paid one used in a panic the night before the deadline.</p>
 HTML,
     ],

@@ -43,6 +43,7 @@ HTML,
 <li><strong>The plan most businesses actually want</strong> (Plus) sits closer to ${quickbooks_plus} CAD a month. This is where the features people associate with QuickBooks live: more users, detailed reporting, inventory, project tracking, and more.</li>
 <li><strong>Payroll and higher tiers</strong> cost more again, with payroll usually an add-on on top of the base plan.</li>
 </ul>
+{{illustration:price-trend}}
 <p>The thing to notice is that the entry price and the real-use price are quite different. Many people start on the cheap plan, find the feature they need is a tier up, and end up paying the Plus price. So when you ask "is QuickBooks worth it," ask it against the plan you'll actually use, which for most businesses is Plus, not the entry sticker. The published prices also rise over time, so factor in that this year's number is likely the lowest you'll pay.</p>
 HTML,
     ],
@@ -97,6 +98,7 @@ HTML,
 <li>You feel like you're fighting the complexity rather than using it.</li>
 <li>Cost is your main concern and you'd use a fraction of the features.</li>
 </ul>
+{{illustration:compare-scale}}
 <p>If you're in the "skip it" group, you have good cheaper options, several of them free. Wave has free invoicing and accounting. FreshBooks is friendlier for freelancers who bill by time. Xero is the closest thing to a full QuickBooks experience if you want capability without the QuickBooks name. Argo Books has a free tier with no time limit and keeps your data on your own machine. The guide on <a href="/best-quickbooks-alternatives/">the best QuickBooks alternatives</a> covers each in detail. If you're in the "worth it" group, stay, and don't feel you're overpaying just because cheaper tools exist; they don't do what you need.</p>
 HTML,
     ],

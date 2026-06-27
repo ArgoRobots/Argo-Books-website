@@ -44,6 +44,7 @@ HTML,
   <li><strong>Finding the invoice in an email thread.</strong> A client emails you saying "I paid invoice 47 last week, why are you chasing me?" If you have one invoice numbered 47, you can pull it up in two seconds. If you reset your numbers every January and have three different invoice 47s sitting in your sent folder, you'll waste time trying to figure it out.</li>
   <li><strong>Double-billing.</strong> If you ever accidentally send the same invoice twice with two different numbers, the client may pay it twice, and you have a refund to issue. A clean numbering scheme makes duplicates obvious before they go out.</li>
 </ul>
+{{illustration:invoice-doc}}
 <p>The good news: this is a one-time decision. Pick a system in the next five minutes, write it down somewhere you'll see it again, and you're done. The rest of this guide are the five rules that make the choice almost automatic.</p>
 HTML,
     ],
@@ -144,6 +145,7 @@ HTML,
   <li>Symbols beyond the hyphen: <code>#1001</code>, <code>1001*</code>, <code>1001!</code>. Often rejected by stricter validators.</li>
   <li>Mixed case in unpredictable spots: <code>Inv-1001</code> in some, <code>INV-1002</code> in others. Importers may treat these as different prefixes.</li>
 </ul>
+{{illustration:checklist}}
 <p>Two practical rules. First, stick to letters, digits, and hyphens. Second, be consistent: if you start with INV-1001, keep INV- on every invoice. Don't mix INV-1001 with 1002 with #1003. A consistent format imports in one click. A mixed bag means you spend an evening cleaning up a spreadsheet before the import will run.</p>
 <p>Even if you have no plans to switch tools, this rule is also a kindness to your future self. A consistent format sorts properly in a spreadsheet, searches cleanly, and copies into emails without any quoting weirdness.</p>
 HTML,

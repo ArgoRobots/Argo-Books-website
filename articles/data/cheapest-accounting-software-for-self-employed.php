@@ -59,6 +59,7 @@ HTML,
 <li><strong>Argo Books.</strong> Freemium, with a free tier of {argo_free_invoice_limit} invoices a month, basic bookkeeping, and {argo_free_receipt_scan_limit} free receipt scans a month, no time limit. It's a desktop app for Windows, macOS, and Linux, so your data lives on your own machine rather than in someone else's cloud, which some self-employed people prefer. Premium is ${argo_premium_monthly} CAD a month or ${argo_premium_yearly} a year if you outgrow the free limits. The trade-offs: a smaller accountant ecosystem and fewer integrations than the older tools, and no built-in payroll.</li>
 <li><strong>Zoho Books.</strong> Has a real free tier for the smallest businesses, though it's limited to those under an annual revenue threshold (around US$50,000 a year, varying by region), with full accounting and strong automation. It shines if you already use other Zoho products. The trade-off: it's at its best inside the wider Zoho world, and the suite has its own learning curve.</li>
 </ul>
+{{illustration:coins}}
 <p>If you're a sole proprietor whose needs are simple, start here. There's no reason to pay for software before you've confirmed a free tier can't do what you need, and for many one-person businesses it can do all of it.</p>
 HTML,
     ],

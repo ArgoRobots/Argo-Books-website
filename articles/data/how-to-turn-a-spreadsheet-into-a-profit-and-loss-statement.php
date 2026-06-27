@@ -43,6 +43,7 @@ HTML,
 <li><strong>Expenses.</strong> Everything the business spent to earn that income, grouped into sensible categories so you can see where the money went.</li>
 <li><strong>Profit.</strong> Income minus expenses. If it's positive, the business made money. If it's negative, it spent more than it earned, which is a loss. That's the whole point of the report.</li>
 </ul>
+{{illustration:price-trend}}
 <p>Two things make a P&L a P&L rather than just a list. First, it always covers a <strong>set period</strong>: a month, a quarter, or a year. "Profit" only means something when you say profit over what stretch of time. Second, the expenses are <strong>grouped into categories</strong> instead of listed one by one, so you can see at a glance that fuel cost you more than materials, or that software subscriptions crept up over the year.</p>
 <p>That's it. A P&L is a list of transactions, summarized by category, over a period, with one subtraction at the bottom. If your spreadsheet already records what came in and what went out, the rest of this guide is just reshaping it.</p>
 HTML,
@@ -121,6 +122,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Everything you just did by hand, list income, group expenses, total each side, subtract, is exactly what accounting software does automatically. Once your income and expenses are recorded in a tool, the P&L isn't a thing you build; it's a report you open. You pick the period, and the software groups the categories, totals each one, and shows the profit line, recalculated every time a new transaction goes in. There's no manual SUMIF, no risk of a blank category, no typing a number twice.</p>
 <p>The work shifts from building the report to just recording transactions, and even that gets lighter. The hardest part of moving off a spreadsheet is usually getting your existing data in, which is where an importer helps. <a href="/how-to-convert-excel-spreadsheet-to-accounting-software/">Argo Books</a> reads an Excel or CSV file and maps your columns to the right fields automatically, whatever order they're in and whatever you named them, so the spreadsheet you've been keeping becomes the starting data set rather than something you retype. From there it produces the profit and loss report on its own, for any period you choose.</p>
+{{illustration:spreadsheet-to-books}}
 <p>This matters most at tax time and when you need to show your numbers to someone. A lender or an accountant asking for a P&L is a five-minute job when the software generates it, versus an evening of formulas and bank-checking when it's a spreadsheet. If you're doing a P&L more than a couple of times a year, or you've ever handed one over and worried it was wrong, that's the point where letting software build it pays for itself.</p>
 HTML,
     ],

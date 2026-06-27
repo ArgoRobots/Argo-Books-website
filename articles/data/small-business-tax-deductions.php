@@ -38,6 +38,7 @@ HTML,
       'anchor' => 'why-missed',
       'html' => <<<'HTML'
 <p>The deductions you lose are almost never the rent or the big equipment purchase. Those are large, memorable, and easy to find on a bank statement. What slips away is the long tail of small costs: a tank of fuel, a box of supplies, a year of a software subscription, a parking fee at a client site. Individually they're trivial. Added up across a year, they're often thousands of dollars of deductions, and thousands of dollars is real tax.</p>
+{{illustration:coins}}
 <p>They get missed for one reason: no record. The receipt was never captured, the cost never made it into the books, and at tax time nobody remembers a small purchase from nine months ago. You can't claim what you can't show, so the deduction quietly disappears. The fix isn't knowing more tax law; it's capturing the cost when it happens. The <a href="/how-to-track-business-expenses-without-spreadsheets/">guide on tracking expenses</a> covers the system; this guide covers what to make sure you're capturing.</p>
 HTML,
     ],
@@ -59,6 +60,7 @@ HTML,
 <li><strong>Materials and supplies.</strong> The consumables you buy to deliver the work. Easy to capture for big purchases, easy to lose for the small frequent ones bought across several suppliers.</li>
 <li><strong>Startup costs.</strong> Money spent getting the business going before it opened, like registration, initial equipment, and early marketing, can often be claimed, sometimes spread over time. Many first-year owners don't realise these count.</li>
 </ul>
+{{illustration:checklist}}
 <p>You won't have all of these, and you shouldn't claim ones you don't genuinely incur. But most businesses have several they're not capturing, and each one is tax you're paying that you don't owe.</p>
 HTML,
     ],

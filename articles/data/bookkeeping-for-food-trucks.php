@@ -65,6 +65,7 @@ HTML,
 <p>This is the daily habit, and it's the one that makes or breaks a food truck's books. At the end of each service, before you drive off or while you wait to, record the day's sales: the card total from your reader, and the cash counted from the till. Write down both, dated, every day.</p>
 <p>Cash is the part that needs the discipline. A card payment leaves a record automatically; cash only exists in the books if you count it and write it down. The clean routine is to start each day with a known float, count what's in the till at the end, subtract the float, and that's your cash sales. Bank the cash regularly rather than letting it pile up, so the deposit in your account lines up with the sales you recorded.</p>
 <p>Doing this daily, not weekly, is the whole point. By the next day you won't remember whether Tuesday was busy or quiet, and a week of guessed totals is a week of books you can't trust. A till reading and a cash count take two minutes at close. That two minutes is what gives you a sales figure you can actually rely on, and a clear answer if anyone ever asks where the cash came from.</p>
+{{illustration:cashflow-cycle}}
 HTML,
     ],
 
@@ -75,6 +76,7 @@ HTML,
 <p>Food cost is the number that decides whether a food truck makes money, and it's the one most owners track by gut feel. The idea is simple: compare what you spent on ingredients against what you sold, and you learn your food cost as a share of sales. If that share creeps up, your profit is quietly leaking, and you want to know why.</p>
 <p>You don't need a full warehouse inventory system to do this. A simple approach works for most trucks: keep every ingredient and supply receipt, and do a rough stock check at sensible intervals, weekly is fine for many. Note what you're throwing away, too, because spoilage is real money and it's the first thing to fix. If you're over-buying a perishable and binning the rest each week, that's a portion size or an ordering habit you can change once you can see it.</p>
 <p>The bigger your menu and the more you carry, the more a proper system helps, and the guide on <a href="/inventory-tracking-for-small-businesses/">inventory tracking for small businesses</a> covers when it's worth stepping up. But the starting habit is just this: keep the supply receipts, watch what you waste, and compare ingredient spend to sales each month. That comparison is where a thin-margin business finds its money.</p>
+{{illustration:coins}}
 HTML,
     ],
 

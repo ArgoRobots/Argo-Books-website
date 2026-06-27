@@ -73,6 +73,7 @@ HTML,
 <li><strong>Lower upfront cost.</strong> A few dollars a month is easier to start with than a large one-time payment, which matters when cash is tight, as it often is early on.</li>
 <li><strong>Access anywhere, with cloud tools.</strong> Web-based subscriptions let you work from any device and share access with an accountant easily. That convenience is part of what you're paying for.</li>
 </ul>
+{{illustration:price-trend}}
 <p>The downside is the one everyone feels: you pay for as long as you use it, the price can rise, and if you stop paying you can lose access to the tool and sometimes the convenience of getting at your data. Whether that's worth it depends on how much the updates, support, and convenience are actually worth to your business.</p>
 HTML,
     ],
@@ -88,6 +89,7 @@ HTML,
 <li><strong>Lock-in and your data.</strong> This is the one people underweight. With a cloud subscription, your data lives on the vendor's servers, and if you stop paying, getting it out cleanly can be awkward. With a desktop tool, one-time or subscription, your data is usually on your own machine, which you control. Whatever you choose, confirm you can export your data in a standard format before you commit.</li>
 <li><strong>Support and risk.</strong> Subscriptions tend to include help and active maintenance. A one-time tool from a small or fading vendor can leave you stranded if the company stops developing it.</li>
 </ul>
+{{illustration:compare-scale}}
 <p>Notice that "your data on your own machine" and "subscription versus one-time" are separate questions. A desktop subscription can keep your data on your computer; a cloud one-time tool, if it existed, would not. Don't assume buying once is the only way to control your own records.</p>
 HTML,
     ],

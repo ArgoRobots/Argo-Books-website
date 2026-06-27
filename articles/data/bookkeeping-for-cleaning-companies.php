@@ -65,6 +65,7 @@ HTML,
 <p>Because most of your income is the same clients on a schedule, the bookkeeping question is keeping clear which invoices went out and which were paid. A handful of regular clients is easy to hold in your head; twenty or thirty is not, and that's where money goes uncollected.</p>
 <p>For a small client list, a simple record works: a row per client with what they're billed and when they pay. Once the list grows, billing the same clients every cycle by hand becomes a chore that's easy to forget, and a missed invoice is income you never collected. That's the point where <a href="/recurring-invoices-when-to-use-them/">recurring invoices</a> earn their place, sending the regular bill automatically so nothing is missed. Whatever you use, the rule is the same: every invoice has a number, you can see at a glance which are unpaid, and you follow up on the ones that go overdue.</p>
 <p>The unpaid ones matter. A steady-looking cleaning business can still be short of cash if a few clients are quietly behind, so knowing who owes you, and chasing it, is part of the books, not separate from them.</p>
+{{illustration:cashflow-cycle}}
 HTML,
     ],
 
@@ -107,6 +108,7 @@ HTML,
 <li><strong>Set tax money aside as you're paid.</strong> Steady income makes this easy to skip, but the tax is still owed. Moving a percentage of each payment into a separate account as it lands means the bill isn't a shock.</li>
 <li><strong>Hand your accountant clean totals.</strong> Income, costs by category, mileage, and what you paid your cleaners, with receipts available. Accountants bill by the hour, so clean records mean a smaller bill and every deduction claimed.</li>
 </ol>
+{{illustration:calendar-due}}
 <p>It's a handful of habits, not a second job. The cleaning businesses that dread tax season are the ones who left it all for the end; the ones who spend a few minutes a week keeping it current barely notice it.</p>
 HTML,
     ],

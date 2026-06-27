@@ -64,6 +64,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Before any tool or technique, do this: open a separate bank account, and ideally a separate card for the business. Run all business income and costs through it, and keep personal spending on personal accounts.</p>
 <p>This is the single highest-value thing a new business owner can do for their books, and it costs nothing. When business and personal money share one account, every tax season becomes a forensic exercise of sorting hundreds of transactions into business and personal. Mixed accounts also hide whether the business is actually profitable, because the rent and the grocery bills sit in the same list. With a separate account, the business statement is your business record. You're no longer sorting; you're just categorizing.</p>
+{{illustration:coins}}
 <p>You don't need a fancy business account with fees. A second basic account in the business name is enough. Get this in place first, and half the difficulty of bookkeeping disappears before you've learned a single term.</p>
 HTML,
     ],
@@ -89,6 +90,7 @@ HTML,
 <li><strong>Look at who owes you.</strong> Check which invoices are unpaid and follow up on anything overdue. This is how you actually get paid, and it's part of the books.</li>
 <li><strong>Set tax money aside.</strong> Move a percentage of what you earned into a separate account so the tax bill isn't a shock. Your accountant can suggest a sensible percentage.</li>
 </ol>
+{{illustration:checklist}}
 <p>Done monthly, the year-end is just handing your accountant tidy totals. Skipped all year, it's a two-week scramble and a bigger accounting bill. The habit is the whole game.</p>
 HTML,
     ],

@@ -55,6 +55,7 @@ HTML,
 <li><strong>Categorize.</strong> Put each expense in a bucket: materials, vehicle and travel, tools, software, insurance and fees, meals separately. Categorized costs are what turn a pile of records into a tax return.</li>
 <li><strong>Check against the bank monthly.</strong> Once a month, run down the business account and confirm every transaction is recorded and categorized. This is the safety net that catches what slipped through while it's still fresh.</li>
 </ol>
+{{illustration:checklist}}
 <p>That's the whole job. Notice it's mostly capture-as-you-go, not a big month-end session. The owners who find bookkeeping painful are almost always the ones who skip the daily capture and try to rebuild a whole month from memory and a drawer of receipts. Five minutes a week beats a lost weekend every quarter.</p>
 HTML,
     ],

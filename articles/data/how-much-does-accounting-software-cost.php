@@ -42,6 +42,7 @@ HTML,
 <li><strong>Free forever, with caps.</strong> Tools like Wave and Argo Books let you do core invoicing and bookkeeping at no cost with no time limit. The catch is volume and features: Argo Books's free tier covers {argo_free_invoice_limit} invoices a month, basic bookkeeping, and {argo_free_receipt_scan_limit} receipt scans a month, with higher volumes and advanced features on the paid plan. Wave keeps core accounting free and charges for payments, payroll, and its Pro tier (around ${wave_pro} CAD a month). For a sole operation, a free tier can be a complete system for years.</li>
 <li><strong>Free trial, then paid.</strong> Most of the bigger names (QuickBooks, FreshBooks, Xero) give you 30 days free, then the plan starts. This isn't a free tier; it's a paid product you're test-driving. Useful for deciding, but not a long-term zero-cost option.</li>
 </ul>
+{{illustration:coins}}
 <p>Free stops being enough when you need built-in payroll, heavy inventory, complex multi-region tax, or a team in the books at once. If you need those, you're comparing paid plans. If you don't, a free tier can replace a paid plan outright, and the saving is real money, not a trick. The honest test is whether the cap fits your volume: if you send more invoices a month than the free tier allows, you've outgrown free, and that's fine.</p>
 HTML,
     ],
@@ -72,6 +73,7 @@ HTML,
 <li><strong>Annual price rises.</strong> Published prices, especially on the big names, tend to creep up year over year. The plan you sign up for at one price may be noticeably more two renewals later. Promotional first-year discounts make this worse, because the "real" price arrives in year two.</li>
 <li><strong>Features locked behind tiers.</strong> The single most common surprise. A report, an integration, or a higher invoice cap that you assumed was included turns out to need the next plan up. This is why pricing your must-have features matters more than the headline.</li>
 </ul>
+{{illustration:price-trend}}
 <p>Add these up and a "${quickbooks_easystart} a month" tool can be several times that in practice once payments, payroll, and the tier you actually need are counted. None of it's hidden in a dishonest way; it's just not in the big number. Knowing it's there is how you avoid the sticker shock at renewal.</p>
 HTML,
     ],

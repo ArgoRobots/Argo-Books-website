@@ -79,6 +79,7 @@ HTML,
 <li><strong>Set tax money aside as you earn it.</strong> The tax on a profitable summer is owed later, often when cash is tight. Park a percentage of income as it comes in so the bill isn't a crisis.</li>
 <li><strong>Watch what you're owed.</strong> Unpaid invoices hurt most going into the slow season. Chase overdue payments while the client is still thinking about the work, not in November.</li>
 </ul>
+{{illustration:cashflow-cycle}}
 <p>Bookkeeping is what makes this possible, because you can only set aside the right amount if you know your real numbers. A landscaper who tracks income and costs through the season knows what winter needs; one who doesn't is guessing, and usually guesses short.</p>
 HTML,
     ],
@@ -103,6 +104,7 @@ HTML,
       'anchor' => 'crew-and-tax',
       'html' => <<<'HTML'
 <p>Once you take on help, labour becomes your biggest cost and your biggest paperwork job. Whether your workers are employees or subcontractors is set by law and the working relationship, not by what you call them, and it changes your obligations significantly, so it's worth confirming with an accountant. Employees usually mean running payroll, with tax withheld and paid across; genuine subcontractors invoice you, but you still keep records of who you paid and report it. Either way, collect details up front and keep a clean record of every payment, because it's all deductible cost that has to be captured.</p>
+{{illustration:calendar-due}}
 <p>Pull it together with a short monthly routine and tax time is calm:</p>
 <ol>
 <li><strong>Once a month, check your records against the bank</strong> and confirm everything's recorded and tagged, ideally to the right job.</li>

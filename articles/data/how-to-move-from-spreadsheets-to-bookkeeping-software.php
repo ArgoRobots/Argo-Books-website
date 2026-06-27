@@ -89,6 +89,7 @@ HTML,
 <li><strong>Invoice and revenue history.</strong> Now that the customers exist, the invoices attach to them instead of creating duplicates.</li>
 <li><strong>Expenses last.</strong> Your money-out history.</li>
 </ol>
+{{illustration:spreadsheet-to-books}}
 <p>This is where a good importer earns its keep. You drag the file in and the software reads your column headers and proposes which field each column is, so you're reviewing a mapping rather than building one from scratch. The spreadsheet importer in Argo Books does exactly this: drop in an Excel or CSV file and it reads whatever you named your columns, in whatever order, and maps them to customers, products, invoices, expenses, or revenue automatically. It handles Excel and CSV specifically, and messy real-world sheets import without reformatting. Every import has a one-click undo, so if a file goes in wrong, you roll it back and try again rather than cleaning up by hand. Do a small test import of a few rows first if you can, confirm they land correctly, then bring in the rest.</p>
 HTML,
       'step_name' => 'Import customers, products, and history in order',

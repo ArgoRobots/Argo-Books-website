@@ -61,6 +61,7 @@ HTML,
       'anchor' => 'chase-invoices',
       'html' => <<<'HTML'
 <p>An invoice you sent is not money you have. For freelancers, late payment is one of the biggest real-world problems, because you don't have a credit department and chasing feels awkward when it's your own name on the email. Bookkeeping is what makes chasing easy, because it tells you exactly who owes what and how late they are.</p>
+{{illustration:invoice-doc}}
 <p>Keep a simple list of what you have invoiced and what has been paid, so the unpaid ones are visible at a glance instead of slipping your mind. The moment an invoice passes its due date, send a short, polite reminder. There is nothing rude about it; you did the work, payment is due, and a calm reminder the day after the due date is normal business, not nagging. Most late payments are not refusals, they are an invoice that got buried in someone's inbox, and a nudge fixes them.</p>
 <p>A few things that get you paid faster, all of which start with good record-keeping: put clear payment terms and a due date on every invoice, number your invoices so both sides can refer to them, and send the invoice promptly rather than batching them up at month-end. The guide on <a href="/how-to-invoice-clients/">how to invoice clients</a> covers the details. The bookkeeping job here is small but vital: know what is outstanding, and act on it before it goes cold, because the older an unpaid invoice gets, the harder it's to collect.</p>
 HTML,
@@ -103,6 +104,7 @@ HTML,
 <li><strong>Confirm the tax money moved.</strong> Make sure the percentage from each payment actually went into the tax account. It's easy to skip in a busy week, and the whole point is that it never gets skipped.</li>
 <li><strong>Note how the month went.</strong> A quick look at what came in versus what went out tells you whether the business is healthy, which for a freelancer is the difference between steering and hoping.</li>
 </ol>
+{{illustration:checklist}}
 <p>That is the whole job: a few minutes once a month on top of capturing things as they happen. The freelancers who dread tax season are nearly always the ones who left it all for the end. The ones who spend a few minutes a month barely notice it, and they walk into tax time with clean numbers, every deduction claimed, and the tax money already saved. You don't need to like bookkeeping to get there. You just need the habit.</p>
 HTML,
     ],

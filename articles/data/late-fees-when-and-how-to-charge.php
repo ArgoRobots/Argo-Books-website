@@ -60,6 +60,7 @@ HTML,
 <li><strong>Simple monthly.</strong> The fee is calculated once per month on the original overdue balance. A $1,000 invoice at 1.5% simple gives $15 the first month, $15 the second month, $15 the third month. Three months overdue: $45 in fees.</li>
 <li><strong>Compounding.</strong> The fee is calculated each month on the new balance, including previous late fees. A $1,000 invoice at 1.5% compounded gives $15.00 the first month, $15.23 the second month, $15.45 the third month. Three months overdue: $45.68 in fees.</li>
 </ul>
+{{illustration:coins}}
 <p>For most small-business work, simple monthly is the right call. It's easier to explain, easier to calculate, and easier to defend if the client argues. Compounding makes a noticeable difference only on large balances that have been overdue for many months, and at that point the late fee is no longer the main issue. Whatever you pick, write it down in the contract or invoice terms in plain language. "1.5% simple interest per month on overdue balances" is clearer than a paragraph of formulas.</p>
 HTML,
     ],
@@ -76,6 +77,7 @@ HTML,
 <li>"Invoices unpaid 10 days after the due date are subject to a 1.5% monthly late fee."</li>
 <li>"Overdue invoices accrue a flat $25 late fee, plus 1.5% per month on balances over $500."</li>
 </ul>
+{{illustration:calendar-due}}
 <p>Pick one rule, write it on every invoice, and apply it the same way to every client. Inconsistent fees, where you charge one client and waive it for another with no clear reason, are where disputes start. If you want the option to waive in a particular case, that's fine: the rule is the default, and waiving is a deliberate choice you make for a specific reason. More on when to waive below.</p>
 HTML,
     ],

@@ -933,6 +933,34 @@ body {
   border-color: #16a34a;
 }
 
+/* Email example card: groups the "Subject:" line and the <pre> body, with the
+   copy button (added by JS) overlaying the top-right corner. */
+.email-example {
+  position: relative;
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+}
+
+.email-example .email-subject {
+  margin: 0 0 10px;
+  padding: 0 70px 10px 0;
+  border-bottom: 1px solid var(--gray-border);
+  font-size: 14px;
+  color: var(--dark-gray);
+}
+
+/* Inside the card the <pre> is just the wrapping text, not its own box. */
+.email-example pre {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
 /* In-content tool callout. Subtle: bordered card with an accent stripe.
    Reads as a friendly nudge between sections, not an advertisement. */
 .tool-callout {

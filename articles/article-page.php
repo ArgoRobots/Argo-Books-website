@@ -424,13 +424,29 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 HTML;
 
-// Copy-to-clipboard button on every <pre> email/quote block.
+// Group each email example (an optional "Subject:" paragraph + the <pre> body)
+// into one card and add a copy-to-clipboard button that copies subject + body.
 $extra_scripts .= <<<'HTML'
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('.article-section pre').forEach(function (pre) {
-    // Capture the text before adding the button so the label isn't copied.
-    var text = pre.innerText;
+    if (pre.closest('.email-example')) return;
+
+    var subject = null;
+    var prev = pre.previousElementSibling;
+    if (prev && prev.tagName === 'P' && /^\s*Subject:/i.test(prev.textContent)) {
+      subject = prev;
+    }
+
+    var wrap = document.createElement('div');
+    wrap.className = 'email-example';
+    pre.parentNode.insertBefore(wrap, subject || pre);
+    if (subject) { subject.classList.add('email-subject'); wrap.appendChild(subject); }
+    wrap.appendChild(pre);
+
+    // Build copy text before adding the button so its label isn't included.
+    var copyText = (subject ? subject.textContent.trim() + '\n\n' : '') + pre.innerText;
+
     var btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'pre-copy-btn';
@@ -443,17 +459,17 @@ document.addEventListener('DOMContentLoaded', function () {
         setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
       };
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(done).catch(function () {});
+        navigator.clipboard.writeText(copyText).then(done).catch(function () {});
       } else {
         var ta = document.createElement('textarea');
-        ta.value = text;
+        ta.value = copyText;
         document.body.appendChild(ta);
         ta.select();
         try { document.execCommand('copy'); done(); } catch (e) {}
         document.body.removeChild(ta);
       }
     });
-    pre.appendChild(btn);
+    wrap.appendChild(btn);
   });
 });
 </script>

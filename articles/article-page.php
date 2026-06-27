@@ -69,6 +69,19 @@ $page_title = $data['meta_title'] ?? ($data['h1'] . ' | Argo Books');
 $page_description = $data['meta_description'] ?? '';
 $canonical_url = 'https://argorobots.com/' . $slug . '/';
 
+// Reading time, computed from the actual body (intro + sections + FAQ text) at
+// ~220 words per minute, rounded up. This replaces the hand-set
+// reading_time_min field so the badge always matches the real length.
+$reading_text = (string) ($data['intro_html'] ?? '');
+foreach ($data['sections'] as $sec) {
+    $reading_text .= ' ' . (string) ($sec['html'] ?? '');
+}
+foreach (($data['faqs'] ?? []) as $faq) {
+    $reading_text .= ' ' . (string) ($faq['q'] ?? '') . ' ' . (string) ($faq['a'] ?? '');
+}
+$reading_text = preg_replace('/\{\{illustration:[a-z0-9-]+\}\}/', ' ', $reading_text);
+$reading_time_min = max(1, (int) ceil(str_word_count(strip_tags($reading_text)) / 220));
+
 // --- 5. JSON-LD ---------------------------------------------------------------
 
 $schema_type = $data['schema_type'] ?? 'Article';
@@ -244,16 +257,12 @@ ob_start();
 
   <header class="article-head">
     <h1><?= htmlspecialchars($data['h1']) ?></h1>
-    <?php if (!empty($data['updated']) || !empty($data['reading_time_min'])): ?>
       <p class="article-meta">
         <?php if (!empty($data['updated'])): ?>
           <span class="article-updated">Updated <?= htmlspecialchars($data['updated']) ?></span>
         <?php endif; ?>
-        <?php if (!empty($data['reading_time_min'])): ?>
-          <span class="article-reading-time"><?= (int)$data['reading_time_min'] ?> min read</span>
-        <?php endif; ?>
+        <span class="article-reading-time"><?= $reading_time_min ?> min read</span>
       </p>
-    <?php endif; ?>
     <div class="article-byline">
       <img class="article-byline-avatar"
            src="<?= INVGEN_BASE ?>/resources/images/founder.jpg"

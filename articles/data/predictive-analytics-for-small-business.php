@@ -27,6 +27,9 @@ return [
   'total_time_iso8601' => null,
 
   'intro_html' => <<<'HTML'
+<figure class="article-figure">
+<img src="/resources/images/features/analytics-ml-engine.svg" alt="How Argo Books forecasts: seasonal pattern detection, trend analysis, and confidence scoring">
+</figure>
 <p>Open any accounting or business tool right now and you will see the same three words stamped on the marketing: "AI-powered insights". It sounds impressive. It also usually means nothing, because the page never says what the tool actually does, how confident it is, or whether its past predictions came true.</p>
 <p>Predictive analytics is a real thing, and it is genuinely useful for a small business. It is also a phrase that gets stretched over a lot of empty marketing. The maths underneath a good forecast is well understood and decades old. It does not require a data science team, and it does not require shipping your books off to someone else's cloud.</p>
 <p>This article explains what predictive analytics genuinely is, the real methods that power it in plain English, why so much "AI" branding is just decoration, and four honest tests you can run on any forecast a tool puts in front of you.</p>

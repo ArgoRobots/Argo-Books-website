@@ -26,6 +26,9 @@ return [
   'total_time_iso8601' => null,
 
   'intro_html' => <<<'HTML'
+<figure class="article-figure">
+<img src="/resources/images/features/analytics-insights.svg" alt="Argo Books business insights showing revenue trends and opportunities">
+</figure>
 <p>Knowing roughly what next month's revenue will be is one of the most useful things you can do for a small business, because it changes real decisions. Whether you can afford to hire, how much stock to order, when to spend on marketing, whether this is the month to take a deposit on that bigger machine: all of those get easier when you have a number to plan against instead of a feeling.</p>
 <p>The good news is that forecasting revenue does not need a data scientist or a finance degree. The basic methods are simple arithmetic you can do with the numbers you already have. This article walks through why gut-feel forecasts tend to be wrong, three plain ways to build a forecast yourself, how to use last year as your starting point, how to tell whether your forecast is any good, and where letting software handle it saves you the effort.</p>
 HTML,

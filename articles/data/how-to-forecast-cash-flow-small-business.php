@@ -27,6 +27,9 @@ return [
   'total_time_iso8601' => null,
 
   'intro_html' => <<<'HTML'
+<figure class="article-figure">
+<img src="/resources/images/features/analytics-dashboard.svg" alt="Argo Books predictive analytics dashboard with forecasted revenue, expenses, and profit">
+</figure>
 <p>The median small business holds just 27 days of cash buffer, which is the number of days it could keep covering its bills if the money stopped coming in, according to a <a href="https://www.jpmorganchase.com/institute/all-topics/business-growth-and-entrepreneurship/report-cash-flows-balances-and-buffer-days" target="_blank" rel="noopener noreferrer">JPMorgan Chase Institute study of 600,000 small businesses</a>. Cash runs that tight because of a trap that catches profitable businesses, not just struggling ones: profit and cash are not the same thing. You can show a healthy profit on paper and still not have the money in the bank to cover payroll on Friday, because the profit is sitting in invoices your clients haven't paid yet.</p>
 <p>A cash flow forecast is the tool that closes that gap. It looks forward, not back, and answers one question: how much money will actually be in your account on a given day. That is a different question from "did I make money this month," and it is the one that keeps the lights on.</p>
 <p>This guide covers what a cash flow forecast really is, the four inputs every forecast needs, why timing is the assumption that makes or breaks it, the difference between a short-term and a rolling forecast, and where doing all of this by hand starts to fall apart.</p>

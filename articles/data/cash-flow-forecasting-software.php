@@ -26,6 +26,9 @@ return [
   'total_time_iso8601' => null,
 
   'intro_html' => <<<'HTML'
+<figure class="article-figure">
+<img src="/resources/images/features/analytics-accuracy.svg" alt="Argo Books past-predictions accuracy table comparing forecast versus actual results">
+</figure>
 <p>Most small businesses start forecasting cash flow in a spreadsheet, and for a while that works fine. You list the money you expect in, the money you expect out, and you eyeball the bottom of the column to see if you'll make rent next month. For a steady business with a handful of regular clients, that's often all you need.</p>
 <p>The spreadsheet starts to creak when the picture gets harder to hold in your head: income that swings with the season, a growing pile of invoices with different due dates, or a string of months where you keep being surprised by how tight things got. That's the point where people start searching for cash flow forecasting software, and the honest first question is whether you need a dedicated tool at all, or whether the accounting software you already pay for does enough.</p>
 <p>This guide covers what your accounting software already forecasts, what a paid add-on adds on top and when it's worth it, what to actually look for in a forecasting feature, and an honest roundup of the three ways to get it: built in, bolted on, or all in one.</p>

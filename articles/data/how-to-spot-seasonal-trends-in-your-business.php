@@ -26,6 +26,9 @@ return [
   'total_time_iso8601' => null,
 
   'intro_html' => <<<'HTML'
+<figure class="article-figure">
+<img src="/resources/images/features/analytics-ml-engine.svg" alt="How Argo Books forecasts: seasonal pattern detection, trend analysis, and confidence scoring">
+</figure>
 <p>Almost every business has a hidden rhythm. There are stretches of the year when the work and the money pour in, and stretches when both go quiet. If you have ever wondered why one month feels flush and another feels like a struggle, even though nothing about how you run the business has changed, the answer is usually seasonality.</p>
 <p>The problem is that this rhythm is easy to feel and hard to see. You sense that summer is busy or that January is dead, but you rarely have the exact shape of it written down. So the slow months keep catching you off guard, and the busy months arrive before you have hired or stocked up for them.</p>
 <p>This guide shows you how to find your own seasonal pattern in numbers you already have, and how to plan around it so the swings stop being surprises and start being something you prepare for in advance.</p>

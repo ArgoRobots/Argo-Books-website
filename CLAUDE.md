@@ -53,11 +53,16 @@ For local dev, set up MailHog so the fallback path doesn't try to hit a real MTA
 
 ## Header / footer loading
 
-Pages include empty `<div id="includeHeader"></div>` and `<div id="includeFooter"></div>` containers that `resources/scripts/main.js` fills via jQuery `.load()` from `resources/header/index.html` and `resources/footer/index.html`.
+The header and footer are **server-side PHP includes**, already in the DOM on first paint. Each page renders them with `<?php include __DIR__ . '/resources/header/header.php'; ?>` and the matching `resources/footer/footer.php` (path depth varies, e.g. `/../../resources/...` from nested pages). There is no client-side injection: the old jQuery `.load()` mechanism (empty `#includeHeader`/`#includeFooter` divs filled from `resources/header/index.html`) is gone, and those HTML files no longer exist.
+
+`resources/scripts/main.js` (loaded in `<head>`) is small and vanilla. It only:
+- detects the base path for local Laragon subfolder installs vs production root (`getBasePath()` / `BASE_PATH`),
+- populates the account avatar in the already-rendered header via `fetch` to `community/get_avatar_info.php`,
+- lazy-appends `cursor-orb.js` on `DOMContentLoaded`.
 
 Consequences:
-- Any `<script>` a page depends on must load before `main.js`.
-- New site-wide URL prefixes (e.g. `/unsubscribe/`) must be registered in `main.js`'s `fixLinks` logic.
+- Header/footer markup changes go in `header.php` / `footer.php` directly. New site-wide footer links (e.g. a new compare or guide page) are added there; there is no `fixLinks` URL-rewriting step anymore.
+- Internal links inside header/footer use a `$base` prefix so they resolve under the local subfolder mount; keep that pattern when adding links.
 
 ## CSS / theming
 

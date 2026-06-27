@@ -153,6 +153,7 @@ HTML,
 
   'related_article_slugs' => [
     'bookkeeping-for-contractors',
+    'bookkeeping-for-cleaning-companies',
     'how-to-track-business-expenses-without-spreadsheets',
     'small-business-tax-deductions',
   ],

@@ -150,6 +150,7 @@ HTML,
 
   'related_article_slugs' => [
     'bookkeeping-for-contractors',
+    'bookkeeping-for-landscapers',
     'how-to-track-business-expenses-without-spreadsheets',
     'best-free-ai-receipt-scanner',
   ],

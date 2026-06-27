@@ -627,6 +627,48 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
         </div>
     </section>
 
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Learn the thinking behind the forecasts.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../how-to-forecast-cash-flow-small-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>How to forecast cash flow</h3>
+                    <p>Build a forecast from your real numbers, without a spreadsheet.</p>
+                </a>
+                <a href="../../how-to-forecast-revenue-small-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>How to forecast revenue</h3>
+                    <p>Three simple ways to predict next month's sales.</p>
+                </a>
+                <a href="../../how-to-spot-seasonal-trends-in-your-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Spot your seasonal trends</h3>
+                    <p>Find your busy and slow cycles and plan for them.</p>
+                </a>
+                <a href="../../free-cash-flow-forecast-template/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Free cash flow forecast template</h3>
+                    <p>Build a simple template, and know when to outgrow it.</p>
+                </a>
+                <a href="../../cash-flow-forecasting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Cash flow forecasting software</h3>
+                    <p>Native, add-on, or all-in-one: what to look for.</p>
+                </a>
+                <a href="../../predictive-analytics-for-small-business/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Predictive analytics, explained</h3>
+                    <p>Is the "AI" real? How to judge a forecast.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
     </main>
 
     <!-- CTA + Footer Wrapper -->

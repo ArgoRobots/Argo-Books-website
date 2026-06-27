@@ -887,6 +887,37 @@ body {
   color: var(--gray-500);
 }
 
+/* Downloadable asset (e.g. the cash flow forecast template). */
+.article-download {
+  margin: 24px 0;
+  padding: 20px 22px;
+  border: 1px solid var(--gray-border);
+  border-radius: 10px;
+  background: var(--gray-50);
+  text-align: center;
+}
+
+.article-download-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: var(--primary-blue);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.article-download-btn:hover {
+  filter: brightness(0.94);
+}
+
+.article-download-note {
+  display: block;
+  margin-top: 9px;
+  font-size: 13px;
+  color: var(--gray-500);
+}
+
 /* Email/quote examples authored as <pre>. Wrap long lines (default <pre> is
    no-wrap, which overflows) while keeping the author's intentional blank lines,
    and render in the body font as a tidy quoted block. */

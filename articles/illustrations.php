@@ -18,6 +18,7 @@
  *
  * Available names and what they depict (use the closest fit per article):
  *   price-trend          rising cost / price climbing            (spot)
+ *   forecast             a forecast: solid past + dotted future  (spot)
  *   coins                money, free/cheap, savings              (spot)
  *   invoice-doc          an invoice / billing                    (spot)
  *   receipt-scan         scanning a receipt with a phone         (spot)
@@ -61,6 +62,23 @@ function _article_illustration_definitions(): array
   <path class="ai-accent" d="M48 116 L109 86 L159 60 L205 36"/>
   <circle class="ai-accent" cx="205" cy="36" r="15" fill="#fff"/>
   <text class="ai-accent-fill" x="205" y="42" font-size="17" text-anchor="middle" font-weight="700" stroke="none">$</text>
+</svg>
+SVG,
+        ],
+
+        // Forecast: solid past line continuing as a dotted future projection,
+        // inside a widening confidence band. The signature visual for the
+        // predictive-analytics / forecasting cluster.
+        'forecast' => [
+            'kind' => 'spot',
+            'svg' => <<<'SVG'
+<svg viewBox="0 0 260 180" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+  <path class="ai-soft" d="M150 92 L216 46 L216 86 Z" stroke="none"/>
+  <path d="M30 22 V150 H232"/>
+  <path d="M42 125 L72 110 L100 118 L126 100 L150 92"/>
+  <path class="ai-accent" d="M150 92 L216 64" stroke-dasharray="2 7"/>
+  <circle cx="150" cy="92" r="4" fill="currentColor" stroke="none"/>
+  <circle class="ai-accent" cx="216" cy="64" r="6" fill="#fff"/>
 </svg>
 SVG,
         ],

@@ -262,6 +262,22 @@ php_value upload_max_filesize 10M
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # --- Canonical host + scheme -------------------------------------------
+    # Force every request to https://argorobots.com so each page is indexed
+    # under a single URL. Without this the same page is served (HTTP 200) at
+    # http/https and www/non-www, and Google indexes them as separate pages,
+    # splitting ranking signals (e.g. /pricing/ ranking twice). Scoped to the
+    # production host by name so local Laragon and dev.argorobots.com are left
+    # alone. The X-Forwarded-Proto check prevents a redirect loop should SSL
+    # ever be terminated by an upstream proxy.
+    RewriteCond %{HTTP_HOST} ^www\.argorobots\.com$ [NC]
+    RewriteRule ^ https://argorobots.com%{REQUEST_URI} [L,R=301]
+
+    RewriteCond %{HTTP_HOST} ^argorobots\.com$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://argorobots.com%{REQUEST_URI} [L,R=301]
+
     # Protect database directory
     RewriteRule ^database/ - [F,L]
     

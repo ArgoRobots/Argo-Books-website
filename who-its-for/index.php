@@ -86,7 +86,7 @@ $niches = [
     <meta name="author" content="Argo">
 
     <meta name="description"
-        content="Argo Books was built for small business owners doing their own bookkeeping. See how it fits landscapers, contractors, repair shops, rental businesses, cleaning companies, wholesalers, resellers, auto detailers, and solo operators with inventory.">
+        content="Accounting software for small business owners who do their own bookkeeping. See how Argo Books fits landscapers, contractors, repair shops, rentals, and more.">
     <meta name="keywords"
         content="who is argo books for, argo books industries, accounting software by industry, small business accounting software by trade">
 

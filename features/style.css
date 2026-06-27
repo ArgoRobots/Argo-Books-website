@@ -738,6 +738,16 @@ body {
   gap: 24px;
 }
 
+/* Center a related-card grid that holds exactly two cards (on desktop, where
+   the grid is multi-column) so they don't sit left with an empty third slot.
+   Below 900px the grid is already a single centered column. */
+@media (min-width: 901px) {
+  .related-grid:has(> .related-card:nth-child(2):last-child) {
+    grid-template-columns: repeat(2, minmax(0, 340px));
+    justify-content: center;
+  }
+}
+
 .related-card {
   background: var(--white);
   padding: 28px;

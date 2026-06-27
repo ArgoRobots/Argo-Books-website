@@ -423,6 +423,10 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         </div>
     </section>
 
+    <section class="container" style="max-width:720px;text-align:center;padding-bottom:48px;">
+        <p>Want the bookkeeping side in plain language? Read our guide to <a href="../bookkeeping-for-landscapers/">bookkeeping for landscapers</a>.</p>
+    </section>
+
     </main>
 
     <!-- CTA + Footer Wrapper -->

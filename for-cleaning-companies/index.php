@@ -397,6 +397,10 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
         </div>
     </section>
 
+    <section class="container" style="max-width:720px;text-align:center;padding-bottom:48px;">
+        <p>Want the bookkeeping side in plain language? Read our guide to <a href="../bookkeeping-for-cleaning-companies/">bookkeeping for cleaning companies</a>.</p>
+    </section>
+
     </main>
 
     <div class="dark-section-wrapper">

@@ -47,7 +47,7 @@ HTML,
       'h2' => 'The simple system: a five-part loop',
       'anchor' => 'the-system',
       'html' => <<<'HTML'
-<p>Doing your own books is the same small loop repeated. Run it and you're a bookkeeper. The five parts:</p>
+<p><a href="/small-business-bookkeeping-basics/">Doing your own books</a> is the same small loop repeated. Run it and you're a bookkeeper. The five parts:</p>
 <ol>
 <li><strong>Record income as it comes in.</strong> Every payment the business receives gets logged: the date, who paid, what for, and the amount. This is your record of what the business earned.</li>
 <li><strong>Record expenses as they go out.</strong> Every business cost gets logged the same way, with a category on each one. This is the record that becomes your deductions, so it's the half that lowers your tax bill.</li>
@@ -67,7 +67,7 @@ HTML,
 <p>You can run the loop above with a notebook, but a few tools take most of the typing out of it. Match the tool to your volume, not to what's most popular:</p>
 <ul>
 <li><strong>A spreadsheet.</strong> The free starting point. An income tab, an expense tab with categories, and a summary that totals them is a complete system at low volume. It works as long as you keep it current and don't mind the manual entry.</li>
-<li><strong>A receipt-scanning app.</strong> The biggest single time-saver for the capture step. You photograph a receipt and the app reads the supplier, date, total, and tax and files it as an expense with the image attached, no typing. For more than a handful of receipts a week, this is the difference between minutes a month and an evening.</li>
+<li><strong>A receipt-scanning app.</strong> The biggest single time-saver for the capture step. You <a href="/how-to-track-business-expenses-without-spreadsheets/">photograph a receipt and the app reads the supplier, date, total, and tax</a> and files it as an expense with the image attached, no typing. For more than a handful of receipts a week, this is the difference between minutes a month and an evening.</li>
 <li><strong>Accounting software.</strong> Pulls the whole loop into one place: it records, categorizes, attaches receipts, and lines your records up against the bank for you. It's the step up when the spreadsheet's manual entry becomes the bottleneck. Plenty of options have real free tiers, so doing your own books doesn't have to mean paying for software.</li>
 </ul>
 <p>The honest order is: start with the spreadsheet, add receipt scanning when the typing annoys you, and move to software when the volume makes the spreadsheet the slow part. There's no prize for jumping straight to the most powerful tool. The best one is the one you'll actually keep up with.</p>
@@ -80,7 +80,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Doing your own bookkeeping doesn't mean doing everything yourself. The smart split is to keep the books current all year, then bring a professional in for the parts where their expertise pays for itself. Even committed do-it-yourselfers usually hand over:</p>
 <ul>
-<li><strong>Year-end and tax filing.</strong> The actual tax return is where rules get specific and mistakes get expensive. An accountant who knows your country's rules will often find deductions you missed and structure things you wouldn't have thought of. Handing them clean, categorized totals means their bill is small, because you've done the time-consuming part.</li>
+<li><strong>Year-end and tax filing.</strong> The actual tax return is where rules get specific and mistakes get expensive. An accountant who knows your country's rules will often <a href="/small-business-tax-deductions/">find deductions you missed</a> and structure things you wouldn't have thought of. Handing them clean, categorized totals means their bill is small, because you've done the time-consuming part.</li>
 <li><strong>How larger purchases are claimed.</strong> Big equipment or vehicles may have to be written down over several years rather than claimed all at once, and the rules vary. This is worth a quick professional answer rather than a guess.</li>
 <li><strong>Setting up correctly at the start.</strong> A one-time session to confirm your categories, your business structure, and how much tax to set aside can save a lot of grief later. You only need it once.</li>
 <li><strong>Anything unusual.</strong> Selling the business, bringing on a partner, a tax authority asking questions, expanding to another country. These are not yearly events, and they are exactly when an hour of professional advice is worth it.</li>

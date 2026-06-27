@@ -52,7 +52,7 @@ HTML,
       'h2' => 'Free tiers: real software for zero dollars',
       'anchor' => 'free-tiers',
       'html' => <<<'HTML'
-<p>For a lot of self-employed people, the cheapest accounting software is free software, and these aren't trial-then-pay traps. They have free tiers with no time limit.</p>
+<p>For a lot of self-employed people, the cheapest accounting software is <a href="/best-free-accounting-software-for-small-business/">free software</a>, and these aren't trial-then-pay traps. They have free tiers with no time limit.</p>
 <ul>
 <li><strong>Wave.</strong> The best-known free pick. Core invoicing and accounting are genuinely free with no time limit, and you only pay if you want card payments, payroll, or the Pro tier (around ${wave_pro} CAD a month). For a sole proprietor who invoices and tracks income and expenses, the free side does the job. The trade-offs: support is thinner, development has slowed compared to its early years, and a few features have drifted from free to Pro over time.</li>
 <li><strong>ZipBooks.</strong> Lighter and simpler than the big names, with a free starter tier and a clean interface. Good for someone who wants the basics without a busy, crowded screen. Paid plans start around ${zipbooks_smarter} CAD a month when you need more. The trade-off: fewer advanced features and a smaller ecosystem than the larger players.</li>
@@ -68,7 +68,7 @@ HTML,
       'h2' => 'When free runs out: the cheapest paid plans',
       'anchor' => 'cheapest-paid',
       'html' => <<<'HTML'
-<p>Free stops being enough when you hit a limit you can't work around, or you need a feature the free tools hold back, usually bank feeds, more billable clients, or higher invoice volume. At that point you're shopping for the cheapest paid plan that fits, not the cheapest plan overall.</p>
+<p>Free stops being enough when you hit a limit you can't work around, or you need a feature the free tools hold back, usually bank feeds, more billable clients, or higher invoice volume. At that point you're shopping for the cheapest paid plan that fits, not <a href="/how-much-does-accounting-software-cost/">the cheapest plan overall</a>.</p>
 <ul>
 <li><strong>ZipBooks Smarter,</strong> around ${zipbooks_smarter} CAD a month, adds more to the free starter while staying inexpensive and simple.</li>
 <li><strong>Xero Starter,</strong> around ${xero_starter} CAD a month, gives you strong bank feeds and proper double-entry accounting. It's the usual pick outside North America and the closest cheap-ish tool to a full QuickBooks experience. The catch: the Starter plan caps how many invoices you can send each month, which can bite in a busy stretch.</li>
@@ -123,7 +123,7 @@ HTML,
       'h2' => 'When paying a little more is the cheaper choice',
       'anchor' => 'when-pay-more',
       'html' => <<<'HTML'
-<p>This is the part most "cheapest software" lists skip, so it's worth saying plainly: sometimes the lowest sticker price is the more expensive decision. A free tool that makes you type every receipt by hand, that you avoid until the night before tax season, isn't free. It costs you the hours you spend on it and the deductions you miss because the records were never kept.</p>
+<p>This is the part most "cheapest software" lists skip, so it's worth saying plainly: sometimes the lowest sticker price is the more expensive decision. A <a href="/how-to-track-business-expenses-without-spreadsheets/">free tool that makes you type every receipt by hand</a>, that you avoid until the night before tax season, isn't free. It costs you the hours you spend on it and the deductions you miss because the records were never kept.</p>
 <p>If you find yourself spending more than an hour or two a month wrestling a cheap tool, or dreading it, the few dollars a month for one that scans receipts, imports bank transactions, and keeps your totals current can easily save more than it costs. Accountants also bill by the hour, so clean, ready books can knock real money off your tax-prep bill. The goal isn't to spend as little as possible on software. It's to spend as little as possible overall, software plus your time plus missed deductions plus your accountant's hours. Often that total is lowest on a free tier. Sometimes it's lowest a few dollars up. Be honest about which is you.</p>
 HTML,
     ],

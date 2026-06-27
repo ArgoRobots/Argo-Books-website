@@ -562,6 +562,33 @@ $argo_free_invoice_limit = (int) get_pricing_config()['free_invoice_monthly_limi
         </div>
     </section>
 
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../how-to-invoice-clients/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>How to invoice clients</h3>
+                    <p>A step-by-step guide to billing clients and getting paid faster.</p>
+                </a>
+                <a href="../../what-to-include-on-an-invoice/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>What to include on an invoice</h3>
+                    <p>The fields every invoice needs so you get paid without back-and-forth.</p>
+                </a>
+                <a href="../../invoice-numbering-best-practices/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Invoice numbering best practices</h3>
+                    <p>How to number invoices cleanly for your records and your accountant.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
     </main>
 
     <!-- CTA + Footer Wrapper -->

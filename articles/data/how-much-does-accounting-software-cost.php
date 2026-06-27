@@ -39,7 +39,7 @@ HTML,
       'html' => <<<'HTML'
 <p>The cheapest accounting software is free, and for some businesses that's genuinely all they need. Free tiers fall into two honest camps:</p>
 <ul>
-<li><strong>Free forever, with caps.</strong> Tools like Wave and Argo Books let you do core invoicing and bookkeeping at no cost with no time limit. The catch is volume and features: Argo Books's free tier covers {argo_free_invoice_limit} invoices a month, basic bookkeeping, and {argo_free_receipt_scan_limit} receipt scans a month, with higher volumes and advanced features on the paid plan. Wave keeps core accounting free and charges for payments, payroll, and its Pro tier (around ${wave_pro} CAD a month). For a sole operation, a free tier can be a complete system for years.</li>
+<li><strong>Free forever, with caps.</strong> Tools like Wave and Argo Books let you do <a href="/best-free-accounting-software-for-small-business/">core invoicing and bookkeeping at no cost</a> with no time limit. The catch is volume and features: Argo Books's free tier covers {argo_free_invoice_limit} invoices a month, basic bookkeeping, and {argo_free_receipt_scan_limit} receipt scans a month, with higher volumes and advanced features on the paid plan. Wave keeps core accounting free and charges for payments, payroll, and its Pro tier (around ${wave_pro} CAD a month). For a sole operation, a free tier can be a complete system for years.</li>
 <li><strong>Free trial, then paid.</strong> Most of the bigger names (QuickBooks, FreshBooks, Xero) give you 30 days free, then the plan starts. This isn't a free tier; it's a paid product you're test-driving. Useful for deciding, but not a long-term zero-cost option.</li>
 </ul>
 {{illustration:coins}}
@@ -70,7 +70,7 @@ HTML,
 <li><strong>Payment processing fees.</strong> If clients pay you by card through the software, you pay a percentage on every payment, commonly around 2.9% plus a small fixed fee. On real revenue this can dwarf the subscription. It's optional, you don't have to take card payments, but if you do, it's a genuine ongoing cost.</li>
 <li><strong>Payroll.</strong> Almost always a separate add-on, often a base fee plus a charge per employee per month. If you run payroll through your accounting tool, this can easily cost more than the accounting plan itself.</li>
 <li><strong>Per-user fees.</strong> Some tools charge per person in the books. A solo owner won't notice; a business adding staff or giving an accountant access can see the bill climb as the team grows.</li>
-<li><strong>Annual price rises.</strong> Published prices, especially on the big names, tend to creep up year over year. The plan you sign up for at one price may be noticeably more two renewals later. Promotional first-year discounts make this worse, because the "real" price arrives in year two.</li>
+<li><strong>Annual price rises.</strong> Published prices, especially on the big names, tend to creep up year over year. <a href="/one-time-purchase-vs-subscription-accounting-software/">The plan you sign up for at one price</a> may be noticeably more two renewals later. Promotional first-year discounts make this worse, because the "real" price arrives in year two.</li>
 <li><strong>Features locked behind tiers.</strong> The single most common surprise. A report, an integration, or a higher invoice cap that you assumed was included turns out to need the next plan up. This is why pricing your must-have features matters more than the headline.</li>
 </ul>
 {{illustration:price-trend}}
@@ -97,7 +97,7 @@ HTML,
 <tr><td>Odoo</td><td>One app free</td><td>Standard around ${odoo_standard}</td><td>Scales with modules added</td></tr>
 </tbody>
 </table>
-<p>The split is clear. Wave, Argo Books, and ZipBooks anchor the free-and-cheap end and suit cost-driven sole operations. QuickBooks, FreshBooks, and Xero are paid from day one and aim at businesses that want a fuller feature set or a big accountant network. Odoo is its own thing: free for a single app, then priced by how many modules you bolt on. Match the column to what you actually need rather than the most familiar name.</p>
+<p>The split is clear. Wave, Argo Books, and ZipBooks anchor the free-and-cheap end and suit <a href="/cheapest-accounting-software-for-self-employed/">cost-driven sole operations</a>. QuickBooks, FreshBooks, and Xero are paid from day one and aim at businesses that want a fuller feature set or a big accountant network. Odoo is its own thing: free for a single app, then priced by how many modules you bolt on. Match the column to what you actually need rather than the most familiar name.</p>
 HTML,
     ],
 

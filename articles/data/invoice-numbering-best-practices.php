@@ -37,7 +37,7 @@ HTML,
       'h2' => 'Why invoice numbers matter',
       'anchor' => 'why-it-matters',
       'html' => <<<'HTML'
-<p>Every invoice you send needs its own unique number. That number is what your client writes on the cheque, what your bank statement quotes when the payment lands, and what you or your accountant use to tie a sale to a deposit.</p>
+<p>Every invoice you send needs its own unique number. That number is <a href="/how-to-invoice-clients/">what your client writes on the cheque</a>, what your bank statement quotes when the payment lands, and what you or your accountant use to tie a sale to a deposit.</p>
 <p>Three concrete reasons the number matters:</p>
 <ul>
   <li><strong>Tax audits.</strong> Tax offices in most countries can ask to see a continuous list of invoices for a given year. They're checking that you didn't quietly skip a sale. In Australia, the UK, Canada, and most of the EU, gaps in your numbering are a flag to look closer. In the US, the IRS doesn't require sequential numbers by federal rule, but state sales-tax auditors often expect them, and a clean sequence is much easier to defend than a messy one either way.</li>
@@ -56,7 +56,7 @@ HTML,
       'step_name' => 'Pick a starting number',
       'step_text' => 'Choose your first invoice number. 1001, 0001, or INV-2026-001 all work. Higher starting numbers can look more established, but the format you pick matters more than the digit you start at.',
       'html' => <<<'HTML'
-<p>Your first decision is what number invoice number one will actually be. There are three common choices and none of them are wrong.</p>
+<p>Your first decision is what number to give your very first invoice. There are three common choices and none of them are wrong.</p>
 <ul>
   <li><strong>Start at 1001.</strong> This is what most consultants and freelancers do. It avoids the optics of sending a client "Invoice 1", which some people worry signals you just started out. Whether a client actually notices is a different question (more on that in the FAQ below), but 1001 is a safe, common starting point.</li>
   <li><strong>Start at 0001.</strong> Padded with zeros so the number is always four digits. Looks tidy in a spreadsheet because every row is the same width. The downside: once you cross 9999, you have to add a fifth digit, which can look odd next to the older ones.</li>
@@ -131,7 +131,7 @@ HTML,
       'step_name' => 'Match what your accounting software expects',
       'step_text' => 'Pick a numbering format that can be imported into accounting tools later. Plain numbers and number-with-prefix formats import cleanly. Heavy use of slashes, spaces, or symbols often does not.',
       'html' => <<<'HTML'
-<p>Even if you're sending invoices from a free generator or a Word template today, there's a good chance you'll move to dedicated accounting software at some point. Maybe you start using Argo Books, or your accountant asks you to switch to QuickBooks, Xero, FreshBooks, or Wave. Almost all of these tools can import an existing list of invoices, but they're pickier than you might expect about what an invoice number can look like.</p>
+<p>Even if you're <a href="/how-to-send-an-invoice-for-free/">sending invoices from a free generator or a Word template</a> today, there's a good chance you'll move to dedicated accounting software at some point. Maybe you start using Argo Books, or your accountant asks you to switch to QuickBooks, Xero, FreshBooks, or Wave. Almost all of these tools can import an existing list of invoices, but they're pickier than you might expect about what an invoice number can look like.</p>
 <p>Formats that import cleanly into almost everything:</p>
 <ul>
   <li>Plain digits: <code>1001</code>, <code>1002</code>, <code>1003</code>.</li>

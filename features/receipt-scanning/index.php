@@ -584,6 +584,28 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
         </div>
     </section>
 
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../best-free-ai-receipt-scanner/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Best free AI receipt scanner</h3>
+                    <p>Honest picks for scanning receipts without a subscription.</p>
+                </a>
+                <a href="../../how-to-track-business-expenses-without-spreadsheets/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Track expenses without spreadsheets</h3>
+                    <p>A simpler way to capture every expense as it happens.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
     </main>
 
     <!-- CTA + Footer Wrapper -->

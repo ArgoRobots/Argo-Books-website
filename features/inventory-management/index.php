@@ -559,6 +559,28 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
         </div>
     </section>
 
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../inventory-tracking-for-small-businesses/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Inventory tracking for small businesses</h3>
+                    <p>The basics of tracking stock and reorder points.</p>
+                </a>
+                <a href="../../bookkeeping-for-online-sellers/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Bookkeeping for online sellers</h3>
+                    <p>Track fees, inventory, and cost of goods across channels.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
     </main>
 
     <!-- CTA + Footer Wrapper -->

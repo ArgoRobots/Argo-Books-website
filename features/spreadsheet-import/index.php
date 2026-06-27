@@ -538,6 +538,33 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
         </div>
     </section>
 
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../how-to-convert-excel-spreadsheet-to-accounting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Convert Excel to accounting software</h3>
+                    <p>Move your spreadsheet into real software without losing history.</p>
+                </a>
+                <a href="../../how-to-move-from-spreadsheets-to-bookkeeping-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Move from spreadsheets to software</h3>
+                    <p>When and how to make the switch cleanly.</p>
+                </a>
+                <a href="../../import-bank-transactions-from-csv-into-accounting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Import bank transactions from CSV</h3>
+                    <p>Pull your bank history in with automatic column mapping.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
     </main>
 
     <!-- CTA + Footer Wrapper -->

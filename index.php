@@ -79,15 +79,6 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <link rel="preconnect" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17210317271"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'AW-17210317271');
-    </script>
-
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -124,7 +115,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
     <title>Argo Books: Free Accounting Software for Small Business</title>
 
-    <script src="resources/scripts/main.js"></script>
+    <script defer src="resources/scripts/main.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -173,7 +164,10 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <div class="hero-visual animate-fade-in-up delay-2">
                 <div class="hero-device">
                     <div class="device-frame">
-                        <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen" width="2400" height="1524">
+                        <img src="resources/images/dashboard.webp"
+                             srcset="resources/images/dashboard-800.webp 800w, resources/images/dashboard-1200.webp 1200w, resources/images/dashboard-1600.webp 1600w, resources/images/dashboard.webp 2400w"
+                             sizes="(max-width: 768px) 90vw, 600px"
+                             alt="Argo Books Dashboard" class="device-screen" width="2400" height="1528" fetchpriority="high">
                         <button class="hero-play-btn" id="heroPlayBtn" aria-label="Watch demo video">
                             <?= svg_icon('play-filled', 28) ?>
                         </button>

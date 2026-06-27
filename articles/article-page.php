@@ -127,6 +127,42 @@ $breadcrumb_schema_json = json_encode([
   'itemListElement' => $breadcrumb_items,
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 
+// FAQPage schema, emitted only when the article defines FAQs. Built from the
+// same q/a pairs rendered in the body below so the structured data and the
+// visible content stay in lockstep (Google requires the match for FAQ rich
+// results). Answers are plain text, so tags are stripped defensively.
+$faq_schema_json = null;
+if (!empty($data['faqs'])) {
+    $faq_entities = [];
+    foreach ($data['faqs'] as $faq) {
+        if (empty($faq['q']) || empty($faq['a'])) {
+            continue;
+        }
+        $faq_entities[] = [
+            '@type' => 'Question',
+            'name' => strip_tags(pricing_substitute($faq['q'])),
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => strip_tags(pricing_substitute($faq['a'])),
+            ],
+        ];
+    }
+    if (!empty($faq_entities)) {
+        $faq_schema_json = json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'mainEntity' => $faq_entities,
+        ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+}
+
+// Layout has dedicated slots only for the primary + breadcrumb schema, so the
+// FAQ block rides along in $extra_head (echoed inside <head>).
+$extra_head = $extra_head ?? '';
+if ($faq_schema_json !== null) {
+    $extra_head .= "\n<script type=\"application/ld+json\">" . $faq_schema_json . "</script>";
+}
+
 // --- 6. Body ------------------------------------------------------------------
 
 $callout_after = isset($data['callout_after_section_index']) ? (int)$data['callout_after_section_index'] : -1;

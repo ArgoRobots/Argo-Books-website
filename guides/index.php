@@ -181,7 +181,7 @@ ob_start();
     <?php $position = 0; ?>
     <?php foreach ($groups as $group): ?>
       <li class="guides-hub-group" role="presentation">
-        <span class="guides-hub-group-label"><?= htmlspecialchars($group['label']) ?></span>
+        <h2 class="guides-hub-group-label"><?= htmlspecialchars($group['label']) ?></h2>
         <span class="guides-hub-group-rule" aria-hidden="true"></span>
       </li>
 

@@ -251,7 +251,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                     <p>Accuracy on printed receipts</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>&lt; 5 seconds</h3>
+                    <h3>&lt; 10 seconds</h3>
                     <p>Average processing time per receipt</p>
                 </div>
                 <div class="highlight-item">

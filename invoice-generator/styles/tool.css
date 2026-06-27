@@ -822,8 +822,115 @@ body {
 }
 
 .article-section thead th {
-  background: var(--white);
+  background: var(--gray-bg-light);
   font-weight: 600;
+}
+
+.article-section tbody tr:nth-child(even) td {
+  background: var(--gray-50);
+}
+
+/* Reusable substantial SVG illustrations dropped between sections via the
+   {{illustration:name}} token. Line color comes from `color` (currentColor);
+   accents and soft fills are tagged in the SVG markup. */
+.article-illustration {
+  margin: 32px 0;
+  color: var(--gray-600);
+  display: flex;
+  justify-content: center;
+}
+
+.article-illustration svg {
+  width: 100%;
+  height: auto;
+}
+
+.article-illustration--band svg {
+  max-width: 560px;
+}
+
+.article-illustration--spot svg {
+  max-width: 230px;
+}
+
+.article-illustration .ai-accent {
+  stroke: var(--primary-blue);
+}
+
+.article-illustration .ai-accent-fill {
+  fill: var(--primary-blue);
+  stroke: none;
+}
+
+.article-illustration .ai-soft {
+  fill: #dbeafe;
+}
+
+/* In-article images (screenshots, photos) with an optional caption. */
+.article-figure {
+  margin: 32px 0;
+  text-align: center;
+}
+
+.article-figure img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 12px;
+  border: 1px solid var(--gray-border);
+}
+
+.article-figure figcaption {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--gray-500);
+}
+
+/* Email/quote examples authored as <pre>. Wrap long lines (default <pre> is
+   no-wrap, which overflows) while keeping the author's intentional blank lines,
+   and render in the body font as a tidy quoted block. */
+.article-section pre {
+  position: relative;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--dark-gray);
+}
+
+.pre-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--primary-blue);
+  background: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pre-copy-btn:hover {
+  background: var(--gray-bg-light);
+}
+
+.pre-copy-btn.copied {
+  color: #16a34a;
+  border-color: #16a34a;
 }
 
 /* In-content tool callout. Subtle: bordered card with an accent stripe.

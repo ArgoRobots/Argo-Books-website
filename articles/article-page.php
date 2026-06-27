@@ -18,6 +18,7 @@
 
 require_once __DIR__ . '/../invoice-generator/_base.php';
 require_once __DIR__ . '/../config/pricing.php';
+require_once __DIR__ . '/illustrations.php';
 
 // --- 1. Sanitize the slug -----------------------------------------------------
 
@@ -396,7 +397,7 @@ ob_start();
 
 </article>
 <?php
-$body_content = article_apply_link_class(article_prefix_internal_links(ob_get_clean()));
+$body_content = article_expand_illustrations(article_apply_link_class(article_prefix_internal_links(ob_get_clean())));
 
 // Collapsible FAQ click handler. Same pattern as niches/niche-page.php.
 $extra_scripts = <<<'HTML'
@@ -418,6 +419,41 @@ document.addEventListener('DOMContentLoaded', function () {
         question.setAttribute('aria-expanded', 'true');
       }
     });
+  });
+});
+</script>
+HTML;
+
+// Copy-to-clipboard button on every <pre> email/quote block.
+$extra_scripts .= <<<'HTML'
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.article-section pre').forEach(function (pre) {
+    // Capture the text before adding the button so the label isn't copied.
+    var text = pre.innerText;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pre-copy-btn';
+    btn.setAttribute('aria-label', 'Copy to clipboard');
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function () {
+      var done = function () {
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+    pre.appendChild(btn);
   });
 });
 </script>
@@ -445,11 +481,12 @@ function article_apply_link_class(string $html): string
 }
 
 /**
- * Prefix INVGEN_BASE onto any root-absolute internal href that does not
- * already carry it. Lets article data files write friendly root paths
- * like `<a href="/net-30-vs-due-on-receipt/">` and have them resolve
- * correctly under Laragon's `/argo-books-website/...` mount point. On
- * production INVGEN_BASE is empty so this function is a no-op.
+ * Prefix INVGEN_BASE onto any root-absolute internal href or img src that does
+ * not already carry it. Lets article data files write friendly root paths
+ * like `<a href="/net-30-vs-due-on-receipt/">` or
+ * `<img src="/resources/images/foo.webp">` and have them resolve correctly
+ * under Laragon's `/argo-books-website/...` mount point. On production
+ * INVGEN_BASE is empty so this function is a no-op.
  *
  * Skipped: protocol-relative (`//cdn...`), absolute (`https://`),
  * fragment (`#x`), mailto, tel, and already-prefixed paths.
@@ -460,14 +497,32 @@ function article_prefix_internal_links(string $html): string
         return $html;
     }
     return preg_replace_callback(
-        '/\bhref="(\/[^"\/][^"]*)"/i',
+        '/\b(href|src)="(\/[^"\/][^"]*)"/i',
         function ($m) {
-            $path = $m[1];
+            $attr = $m[1];
+            $path = $m[2];
             if (strpos($path, INVGEN_BASE . '/') === 0 || $path === INVGEN_BASE) {
                 return $m[0];
             }
-            return 'href="' . INVGEN_BASE . $path . '"';
+            return $attr . '="' . INVGEN_BASE . $path . '"';
         },
+        $html
+    );
+}
+
+/**
+ * Expand {{illustration:name}} tokens in article body HTML to the reusable
+ * SVG figures defined in articles/illustrations.php. Runs as a final pass over
+ * the assembled body, mirroring the link-class / link-prefix passes.
+ */
+function article_expand_illustrations(string $html): string
+{
+    if (strpos($html, '{{illustration:') === false) {
+        return $html;
+    }
+    return preg_replace_callback(
+        '/\{\{illustration:([a-z0-9-]+)\}\}/',
+        fn($m) => article_illustration($m[1]),
         $html
     );
 }

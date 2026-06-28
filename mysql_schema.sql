@@ -1348,3 +1348,32 @@ INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('mileage tracking app', 'expense tracking for self-employed'),
     ('contractor invoicing app', 'trades invoicing'),
     ('profit and loss small business', 'bookkeeping reporting need');
+
+-- Per-call timing of desktop AI operations (receipt scan, bank categorize, supplier
+-- suggestion, spreadsheet analysis/processing via /api/ai/completions.php, and bank
+-- PDF extraction via /api/bank/extract.php). elapsed_ms is the SERVER-measured Gemini
+-- wall time, isolated from the user's network. The desktop app fetches aggregated
+-- p50/p90 priors from /api/ai/timing-priors.php to drive accurate, smooth progress
+-- bars. No user/device identity is stored (not needed for duration priors). Also
+-- created lazily by api/ai/_timing.php so a fresh server works without a migration.
+CREATE TABLE IF NOT EXISTS ai_call_timings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    operation VARCHAR(40) NOT NULL COMMENT 'receipt_scan, bank_categorize, supplier_category, spreadsheet_analysis, spreadsheet_process, bank_pdf_extract, completion',
+    model VARCHAR(50) NOT NULL,
+    size_feature INT DEFAULT NULL COMMENT 'Op-specific size hint: image bytes, line count, column count, pdf bytes',
+    page_count INT DEFAULT NULL COMMENT 'PDFs only',
+    input_bytes INT DEFAULT NULL,
+    mime VARCHAR(30) DEFAULT NULL,
+    prompt_tokens INT DEFAULT NULL,
+    output_tokens INT DEFAULT NULL,
+    max_output_tokens INT DEFAULT NULL,
+    finish_reason VARCHAR(20) DEFAULT NULL COMMENT 'Non-STOP rows are excluded from priors',
+    elapsed_ms INT NOT NULL COMMENT 'Server-measured Gemini generate wall time',
+    poll_count INT DEFAULT NULL COMMENT 'PDF Files-API polls until ACTIVE',
+    success TINYINT(1) NOT NULL DEFAULT 1,
+    app_platform VARCHAR(20) DEFAULT NULL,
+    environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_op_model_created (operation, model, created_at),
+    INDEX idx_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

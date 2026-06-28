@@ -9,6 +9,7 @@
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/_timing.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -77,6 +78,13 @@ $maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 16000)); // Clamp 1-1
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 $base64Image = $data['base64Image'] ?? null;
 $mimeType = $data['mimeType'] ?? 'image/jpeg';
+
+// Optional timing metadata sent by the desktop app so pooled duration priors can be
+// kept per operation (receipt scan vs spreadsheet analysis vs bank categorize, which
+// are otherwise indistinguishable here). Absent/older clients default to 'completion'.
+$operation = isset($data['operation']) ? (string) $data['operation'] : 'completion';
+$sizeFeature = isset($data['sizeFeature']) && is_numeric($data['sizeFeature']) ? (int) $data['sizeFeature'] : null;
+$appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 
 // Validate model: Gemini is the only supported provider
 $geminiModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
@@ -221,6 +229,10 @@ if ($systemInstruction) {
 
 $geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
 
+// Server-measured Gemini wall time (isolated from the user's network) feeds the
+// timing priors and the response 'timing' block.
+$aiTimingStart = microtime(true);
+
 $ch = curl_init($geminiUrl);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
@@ -235,6 +247,7 @@ curl_setopt_array($ch, [
 ]);
 
 $response = curl_exec($ch);
+$aiElapsedMs = (int) round((microtime(true) - $aiTimingStart) * 1000);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
 
@@ -307,11 +320,33 @@ if ($content === null) {
     send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
 }
 
+// Record the server-measured timing (best-effort; never breaks the response).
+ai_timing_record([
+    'operation' => $operation,
+    'model' => $model,
+    'size_feature' => $sizeFeature,
+    'input_bytes' => !empty($base64Image) ? (int) (strlen($base64Image) * 0.75) : strlen($userPrompt),
+    'mime' => !empty($base64Image) ? $mimeType : null,
+    'prompt_tokens' => $usage['prompt_tokens'] ?? null,
+    'output_tokens' => $usage['completion_tokens'] ?? null,
+    'max_output_tokens' => $maxTokens,
+    'finish_reason' => $finishReason,
+    'elapsed_ms' => $aiElapsedMs,
+    'success' => true,
+    'app_platform' => $appPlatform,
+]);
+
 send_json_response(200, [
     'success' => true,
     'content' => $content,
     'model' => $model,
     'usage' => $usage,
     'finishReason' => $finishReason,
+    'timing' => [
+        'elapsed_ms' => $aiElapsedMs,
+        'prompt_tokens' => $usage['prompt_tokens'] ?? 0,
+        'output_tokens' => $usage['completion_tokens'] ?? 0,
+        'load_factor' => ai_timing_load_factor(),
+    ],
     'timestamp' => date('c'),
 ]);

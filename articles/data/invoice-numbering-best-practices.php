@@ -141,7 +141,7 @@ HTML,
 <p>Formats that often cause import problems:</p>
 <ul>
   <li>Slashes inside the number: <code>2026/05/001</code>. Some tools interpret the slash as a path separator and fail.</li>
-  <li>Spaces: <code>INV 1001</code>. Get stripped or replaced inconsistently between tools.</li>
+  <li>Spaces: <code>INV 1001</code>. They get stripped or replaced inconsistently between tools.</li>
   <li>Symbols beyond the hyphen: <code>#1001</code>, <code>1001*</code>, <code>1001!</code>. Often rejected by stricter validators.</li>
   <li>Mixed case in unpredictable spots: <code>Inv-1001</code> in some, <code>INV-1002</code> in others. Importers may treat these as different prefixes.</li>
 </ul>

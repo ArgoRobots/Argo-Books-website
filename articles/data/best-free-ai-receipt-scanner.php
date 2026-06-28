@@ -56,7 +56,7 @@ HTML,
 <p>"Free receipt scanner" covers three different things, and the difference matters before you commit your receipts to one.</p>
 <ul>
 <li><strong>Free tier, capped by scans.</strong> The most common. You get a set number of scans a month at no cost, and you need to pay for higher usage limits. This is fine if your volume is low or you just want to test the accuracy.</li>
-<li><strong>Free tier, full feature, paid for extras.</strong> The scanning is genuinely free and unlimited, and the company makes money elsewhere (payments, payroll, a higher tier). Best value if the scanning quality is good, although, they tend not to be.</li>
+<li><strong>Free tier, full feature, paid for extras.</strong> The scanning is genuinely free and unlimited, and the company makes money elsewhere (payments, payroll, a higher tier). Best value if the scanning quality is good, although it often isn't.</li>
 <li><strong>Free trial.</strong> Not really free. You get full access for 14 or 30 days, then it stops. Useful for a one-time tax-season catch-up, not for ongoing use.</li>
 </ul>
 <p>Read which one you're signing up for before you scan a month of receipts into it. Pick a tool you're willing to stay on before you load it up.</p>

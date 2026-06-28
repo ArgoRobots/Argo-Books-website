@@ -156,7 +156,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Yes, partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the alternatives listed. We tried to keep it honest: Argo Books appears last in the list, not first, every competitor is described with real strengths, and the article says plainly that some people shopping for an alternative should stay on QuickBooks. If the right answer for you is Wave, Xero, or even staying put, that is the answer, and we would rather tell you that than sell you a switch you don\'t need.',
+      'a' => 'Yes, partly, and you should read it that way. It\'s on the Argo Books site, and Argo Books is one of the alternatives listed. We tried to keep it honest: Argo Books appears last in the list, not first, every competitor is described with real strengths, and the article says plainly that some people shopping for an alternative should stay on QuickBooks. If the right answer for you is Wave, Xero, or even staying put, that is the answer, and we would rather tell you that than sell you a switch you don\'t need.',
     ],
     [
       'q' => 'Will my accountant accept a QuickBooks alternative?',
@@ -172,7 +172,7 @@ HTML,
     ],
     [
       'q' => 'Which alternative is closest to QuickBooks itself?',
-      'a' => 'Xero is generally the nearest in scope and feel: full double-entry accounting, strong bank feeds, a large accountant network, and a comparable feature set, with an interface many people find cleaner. It is the usual pick for someone who wants QuickBooks-level capability without QuickBooks. The catch is that Xero is paid, with invoice caps on lower tiers, so it solves the complexity complaint more than the cost one. If price is your main reason for leaving, a free tool like Wave or Argo Books is a bigger change than Xero, but a bigger saving too.',
+      'a' => 'Xero is generally the nearest in scope and feel: full double-entry accounting, strong bank feeds, a large accountant network, and a comparable feature set, with an interface many people find cleaner. It\'s the usual pick for someone who wants QuickBooks-level capability without QuickBooks. The catch is that Xero is paid, with invoice caps on lower tiers, so it solves the complexity complaint more than the cost one. If price is your main reason for leaving, a free tool like Wave or Argo Books is a bigger change than Xero, but a bigger saving too.',
     ],
   ],
 

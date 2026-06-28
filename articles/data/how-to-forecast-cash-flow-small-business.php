@@ -45,7 +45,7 @@ HTML,
 <p>It helps to be clear about how this differs from your profit and loss statement. The profit and loss statement looks backward and tells you whether your business made money over a period that has already happened. A cash flow forecast looks forward and tells you whether you'll have money in the account on a date that hasn't arrived yet. One is a report card; the other is a weather forecast.</p>
 <p>This is why a profitable business can still run out of cash. Imagine you invoice a client $20,000 in March for work you've finished. Your profit and loss statement records that $20,000 as revenue in March, so the month looks great. But if the client pays on net 30 terms, the actual cash doesn't land until late April. If your rent, payroll, and supplier bills all fall due in early April, you can be profitable on paper and short of cash in reality at the exact same moment. The forecast is what shows you that gap before you hit it, while there's still time to chase the invoice, delay a purchase, or arrange cover.</p>
 {{illustration:cashflow-cycle}}
-<p>So the job of a forecast is not to predict the future perfectly. It is to give you enough warning. A forecast that flags a tight week three weeks out has done its job, because three weeks is enough time to do something about it.</p>
+<p>So the job of a forecast is not to predict the future perfectly. It's to give you enough warning. A forecast that flags a tight week three weeks out has done its job, because three weeks is enough time to do something about it.</p>
 HTML,
     ],
 

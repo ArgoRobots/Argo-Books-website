@@ -136,7 +136,7 @@ HTML,
     ],
     [
       'q' => 'What is the most common bookkeeping mistake contractors make?',
-      'a' => 'Mixing business and personal money in one account. It is the root of most year-end pain: it hides whether the business is profitable, turns tax prep into sorting hundreds of transactions by hand, and makes any tax-authority question harder to answer. The fix costs nothing but a second bank account and the discipline to keep business money in it. The second most common mistake is letting receipts pile up untagged, so the job-costing and the deductions both fall apart. Both mistakes are about habits, not knowledge, which is good news, because habits are fixable starting today.',
+      'a' => 'Mixing business and personal money in one account. It\'s the root of most year-end pain: it hides whether the business is profitable, turns tax prep into sorting hundreds of transactions by hand, and makes any tax-authority question harder to answer. The fix costs nothing but a second bank account and the discipline to keep business money in it. The second most common mistake is letting receipts pile up untagged, so the job-costing and the deductions both fall apart. Both mistakes are about habits, not knowledge, which is good news, because habits are fixable starting today.',
     ],
   ],
 

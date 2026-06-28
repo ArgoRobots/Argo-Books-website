@@ -135,7 +135,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'How do I track cash sales properly?',
-      'a' => 'Count it and write it down every single day, because cash only exists in your books if you record it. The clean routine is to start each service with a known float, count the till at close, subtract the float, and that figure is your cash sales for the day. Record it dated alongside the card total from your reader. Bank the cash regularly so the deposits in your account line up with the sales you recorded, which makes your books easy to back up if a tax authority ever asks. The key is doing it daily, not weekly. By the next day you will not remember whether a service was busy or quiet, so a week of guessed cash totals is a week of books you cannot trust.',
+      'a' => 'Count it and write it down every single day, because cash only exists in your books if you record it. The clean routine is to start each service with a known float, count the till at close, subtract the float, and that figure is your cash sales for the day. Record it with the date, alongside the card total from your reader. Bank the cash regularly so the deposits in your account line up with the sales you recorded, which makes your books easy to back up if a tax authority ever asks. The key is doing it daily, not weekly. By the next day you will not remember whether a service was busy or quiet, so a week of guessed cash totals is a week of books you cannot trust.',
     ],
     [
       'q' => 'How do I work out my food cost?',

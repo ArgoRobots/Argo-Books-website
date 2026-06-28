@@ -135,7 +135,7 @@ HTML,
     ],
     [
       'q' => 'Do I need to track each job separately?',
-      'a' => 'It is worth it, because landscaping jobs vary so much in margin. Job costing means tagging each cost, materials, crew hours, fuel, equipment, and each payment to a specific job, so you can see what that job actually earned after everything. Do it across a season and you learn which kinds of work genuinely pay and which just feel busy, which changes how you quote and what work you chase. You don\'t need special software to start; a job name on every receipt and a simple per-job tally works. The hard part is capturing material and fuel receipts at the moment of purchase and tagging the job then, because they cannot be split back from memory later.',
+      'a' => 'It\'s worth it, because landscaping jobs vary so much in margin. Job costing means tagging each cost, materials, crew hours, fuel, equipment, and each payment to a specific job, so you can see what that job actually earned after everything. Do it across a season and you learn which kinds of work genuinely pay and which just feel busy, which changes how you quote and what work you chase. You don\'t need special software to start; a job name on every receipt and a simple per-job tally works. The hard part is capturing material and fuel receipts at the moment of purchase and tagging the job then, because they cannot be split back from memory later.',
     ],
     [
       'q' => 'Are my crew employees or subcontractors?',

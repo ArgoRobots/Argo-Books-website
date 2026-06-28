@@ -151,7 +151,7 @@ HTML,
     ],
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears third, not first, every competitor is described with real strengths, and a plain spreadsheet is named as a legitimate free option too. The article also says clearly that the right move for many people is to stay on whatever free tool is already working. If your answer turns out to be Wave, GnuCash, or a spreadsheet, that is a real answer, and we would rather you use it than sign up for something you don\'t need.',
+      'a' => 'Partly, and you should read it that way. It\'s on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears third, not first, every competitor is described with real strengths, and a plain spreadsheet is named as a legitimate free option too. The article also says clearly that the right move for many people is to stay on whatever free tool is already working. If your answer turns out to be Wave, GnuCash, or a spreadsheet, that is a real answer, and we would rather you use it than sign up for something you don\'t need.',
     ],
   ],
 

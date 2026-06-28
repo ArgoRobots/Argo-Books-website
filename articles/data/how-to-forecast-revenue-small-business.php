@@ -39,7 +39,7 @@ HTML,
       'h2' => 'Why gut-feel forecasting fails',
       'anchor' => 'why-gut-fails',
       'html' => <<<'HTML'
-<p>Most small business owners forecast in their head, and most of those forecasts are off. It is not because owners are bad at their business. It is because the human brain is wired in a few specific ways that work against an accurate guess.</p>
+<p>Most small business owners forecast in their head, and most of those forecasts are off. It's not because owners are bad at their business. It's because the human brain is wired in a few specific ways that work against an accurate guess.</p>
 <ul>
 <li><strong>Recency bias.</strong> You remember last week far more clearly than last spring. If the last two weeks were quiet, next month feels doomed. If they were busy, you feel unstoppable. A short stretch of good or bad luck colors the whole forecast, even though it tells you very little about a full month.</li>
 <li><strong>Ignoring seasonality.</strong> Almost every business has a rhythm. A landscaper is slammed in summer and quiet in winter. A gift shop lives and dies by December. When you forecast from memory, it is easy to project this month forward as if next month will look the same, when the calendar says it will not.</li>

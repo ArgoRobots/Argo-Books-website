@@ -139,7 +139,7 @@ HTML,
     ],
     [
       'q' => 'Is this article tax advice?',
-      'a' => 'No. It is a plain-language checklist of deductions small businesses commonly miss and the records that support them, written to help you ask your accountant better questions. The actual rules, rates, thresholds, and limits vary by country and by your specific situation, and only someone who knows your circumstances and your local tax law can tell you what you can claim and how. Use this to make sure you are capturing the right costs through the year; use a qualified accountant to turn those records into a correct return. This guide lives on the Argo Books site, and Argo Books sells expense-tracking software, so read the one product mention with that in mind.',
+      'a' => 'No. It\'s a plain-language checklist of deductions small businesses commonly miss and the records that support them, written to help you ask your accountant better questions. The actual rules, rates, thresholds, and limits vary by country and by your specific situation, and only someone who knows your circumstances and your local tax law can tell you what you can claim and how. Use this to make sure you are capturing the right costs through the year; use a qualified accountant to turn those records into a correct return. This guide lives on the Argo Books site, and Argo Books sells expense-tracking software, so read the one product mention with that in mind.',
     ],
   ],
 

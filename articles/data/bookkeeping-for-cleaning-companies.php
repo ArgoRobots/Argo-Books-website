@@ -80,7 +80,7 @@ HTML,
 <li><strong>Equipment.</strong> Vacuums, machines, and larger gear. Smaller items are often claimed in full the year you buy them; bigger ones may be claimed over several years depending on your country's rules. Keep the receipts so the right treatment can be applied.</li>
 <li><strong>Other running costs.</strong> The business share of your phone, any scheduling or invoicing software, insurance, and uniforms or branded workwear. Small individually, real across a year.</li>
 </ul>
-<p>The theme is the one that runs through all bookkeeping: the deduction is only as good as the record. A receipt-scanning app helps here because the volume of small receipts is exactly what makes manual entry tedious, but a photo into a labelled folder works too. Capture as you go and you claim everything; reconstruct at tax time and you'll undercount.</p>
+<p>The theme is the one that runs through all bookkeeping: the deduction is only as good as the record. A receipt-scanning app helps here because the volume of small receipts is exactly what makes manual entry tedious, but a photo dropped into a labelled folder works too. Capture as you go and you claim everything; reconstruct at tax time and you'll undercount.</p>
 HTML,
     ],
 

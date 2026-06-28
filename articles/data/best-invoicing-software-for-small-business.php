@@ -143,7 +143,7 @@ HTML,
     ],
     [
       'q' => 'Is this article biased toward Argo Books?',
-      'a' => 'Partly, and you should read it that way. It is on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears well down the list, not first, every competitor is described with real strengths, and a plain free generator is named as a legitimate choice. The article also says plainly that most small businesses can invoice for free and should pick the tool that fits how they bill rather than the one with the biggest name. If the right answer for you is Wave, FreshBooks, or a free generator, that is a real answer, and we would rather you use it than pay for something you don\'t need.',
+      'a' => 'Partly, and you should read it that way. It\'s on the Argo Books site, and Argo Books is one of the options listed. We tried to keep it fair: Argo Books appears well down the list, not first, every competitor is described with real strengths, and a plain free generator is named as a legitimate choice. The article also says plainly that most small businesses can invoice for free and should pick the tool that fits how they bill rather than the one with the biggest name. If the right answer for you is Wave, FreshBooks, or a free generator, that is a real answer, and we would rather you use it than pay for something you don\'t need.',
     ],
   ],
 

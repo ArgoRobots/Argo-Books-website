@@ -139,7 +139,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'Is QuickBooks worth it for a freelancer or sole proprietor?',
-      'a' => 'Usually not, if your accounting is mainly invoicing and tracking a few expenses and you don\'t run payroll. At that level you would be paying the Plus price, often closer to the higher of QuickBooks\' tiers once you want useful features, for a fraction of what the tool does. Free tools like Wave or a free tier handle a simple one-person business well, and friendlier paid tools like FreshBooks cost less and suit freelancers better. QuickBooks becomes worth it for a sole proprietor mainly when your accountant insists on it or you are about to grow into needing more. If you are a simple one-person operation and cost matters, it\'s probably overkill.',
+      'a' => 'Usually not, if your accounting is mainly invoicing and tracking a few expenses and you don\'t run payroll. At that level you would be paying the Plus price, often closer to the higher end of QuickBooks\' tiers once you want useful features, for a fraction of what the tool does. Free tools like Wave or a free tier handle a simple one-person business well, and friendlier paid tools like FreshBooks cost less and suit freelancers better. QuickBooks becomes worth it for a sole proprietor mainly when your accountant insists on it or you are about to grow into needing more. If you are a simple one-person operation and cost matters, it\'s probably overkill.',
     ],
     [
       'q' => 'Why is QuickBooks so expensive compared to other tools?',

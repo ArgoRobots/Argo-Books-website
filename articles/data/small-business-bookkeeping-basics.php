@@ -124,7 +124,7 @@ HTML,
     ],
     [
       'q' => 'Should I use cash basis or accrual basis bookkeeping?',
-      'a' => 'Most small businesses start on cash basis, where you record income when the money lands and expenses when you pay them. It is simpler and tracks the cash you can actually see. Accrual basis records income when you invoice and costs when you are billed, which gives a truer picture of profit but is more work, and it is sometimes required once a business passes a certain size or in certain industries. The right answer depends on your country and your situation, so it is a good early question for an accountant. If you are small and just starting, cash basis is almost always the sensible, correct place to begin.',
+      'a' => 'Most small businesses start on cash basis, where you record income when the money lands and expenses when you pay them. It\'s simpler and tracks the cash you can actually see. Accrual basis records income when you invoice and costs when you are billed, which gives a truer picture of profit but is more work, and it is sometimes required once a business passes a certain size or in certain industries. The right answer depends on your country and your situation, so it is a good early question for an accountant. If you are small and just starting, cash basis is almost always the sensible, correct place to begin.',
     ],
     [
       'q' => 'How often should I do my bookkeeping?',
@@ -132,7 +132,7 @@ HTML,
     ],
     [
       'q' => 'Is this article tax advice?',
-      'a' => 'No. It is a plain-language introduction to bookkeeping to help a new business owner get started and ask an accountant the right questions. The specific rules, including which accounting basis you can use, what records you must keep, and what you can claim, vary by country and by your circumstances, and only someone who knows your situation and your local law can advise you. Use this to set up good habits; use a qualified accountant for decisions about your tax. This guide is on the Argo Books site, which sells bookkeeping software, so read the single product mention with that in mind.',
+      'a' => 'No. It\'s a plain-language introduction to bookkeeping to help a new business owner get started and ask an accountant the right questions. The specific rules, including which accounting basis you can use, what records you must keep, and what you can claim, vary by country and by your circumstances, and only someone who knows your situation and your local law can advise you. Use this to set up good habits; use a qualified accountant for decisions about your tax. This guide is on the Argo Books site, which sells bookkeeping software, so read the single product mention with that in mind.',
     ],
   ],
 

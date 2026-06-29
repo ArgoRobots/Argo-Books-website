@@ -79,7 +79,18 @@ function get_premium_subscription_keys()
     $keys = [];
 
     try {
-        $stmt = $pdo->query("SELECT * FROM premium_subscription_keys ORDER BY created_at DESC");
+        // Only genuine free/promo keys. Paid subscriptions auto-create a row in
+        // this table (so the desktop app can redeem the paid key), but those are
+        // not free keys and must not show in this list. Exclude any key tied to a
+        // paid subscription; keep unredeemed keys (no subscription yet) and keys
+        // redeemed into a free_key subscription.
+        $stmt = $pdo->query("
+            SELECT k.*
+            FROM premium_subscription_keys k
+            LEFT JOIN premium_subscriptions s ON s.subscription_id = k.subscription_id
+            WHERE s.subscription_id IS NULL OR s.payment_method = 'free_key'
+            ORDER BY k.created_at DESC
+        ");
         $keys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching Premium subscription keys: " . $e->getMessage());
@@ -737,7 +748,7 @@ include __DIR__ . '/../admin_header.php';
                     <div class="form-group">
                         <label for="notes">Notes (optional)</label>
                         <input type="text" id="notes" name="notes" placeholder="e.g., Giveaway winner">
-                         <p style="position: absolute; margin: 5px 0 20px; color: var(--black);">This will also appear in the recipient's email.</p>
+                         <p style="position: absolute; margin: 5px 0 20px; color: var(--admin-text);">This will also appear in the recipient's email.</p>
                     </div>
                     <div class="form-group">
                         <button type="submit" name="generate_sub_key" class="btn btn-purple" style="margin-top: 24px;">Generate Key</button>
@@ -749,6 +760,10 @@ include __DIR__ . '/../admin_header.php';
         <div class="table-container">
             <h2>Free Subscription Keys</h2>
 
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')" style="max-width: 350px;">
+            </div>
+
             <!-- Bulk Actions for Subscription Keys -->
             <div class="bulk-actions-container" id="sub-key-bulk-actions">
                 <div class="selection-info">
@@ -759,10 +774,6 @@ include __DIR__ . '/../admin_header.php';
                     <button type="button" class="btn btn-bulk btn-reset-usage" id="sub-key-bulk-reset-usage" disabled>Reset Usage</button>
                     <button type="button" class="btn btn-bulk btn-delete" id="sub-key-bulk-delete" data-action="delete" disabled>Delete Selected</button>
                 </div>
-            </div>
-
-            <div style="margin-bottom: 12px;">
-                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')" style="max-width: 350px;">
             </div>
 
             <?php if (empty($premium_subscription_keys)): ?>
@@ -805,7 +816,7 @@ include __DIR__ . '/../admin_header.php';
                                             <button type="button" class="btn-copy" onclick="copyToClipboard('<?php echo htmlspecialchars($key['subscription_key'], ENT_QUOTES); ?>', this)" title="Copy key">Copy</button>
                                         </td>
                                         <td class="col-nowrap"><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
-                                        <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:var(--black);">Any user</span>'; ?></td>
+                                        <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:var(--admin-text);">Any user</span>'; ?></td>
                                         <td>
                                             <?php if ($key['redeemed_at']): ?>
                                                 <span class="badge badge-redeemed">Redeemed</span>

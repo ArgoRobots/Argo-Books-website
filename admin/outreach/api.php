@@ -563,9 +563,6 @@ function get_stats($pdo)
         SUM(status = 'interested') as interested
     FROM outreach_leads")->fetch();
 
-    // Follow-ups pending review (drafted, awaiting admin approval)
-    $rows['followups_pending'] = (int) $pdo->query("SELECT COUNT(*) FROM outreach_followups WHERE status = 'drafted'")->fetchColumn();
-
     // Count distinct leads clicked. SUBSTRING_INDEX collapses "outreach-42-v7" → "outreach-42"
     // so a lead that received multiple variants and had any of them clicked counts once.
     $rows['clicked'] = $pdo->query("SELECT COUNT(DISTINCT SUBSTRING_INDEX(rv.source_code, '-v', 1)) FROM referral_visits rv WHERE rv.source_code LIKE 'outreach-%'")->fetchColumn();

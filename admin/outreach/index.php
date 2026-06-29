@@ -281,10 +281,6 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
         <div class="stat-value stat-pending" id="statDraftsPending">0</div>
     </div>
     <div class="stat-card">
-        <h3>Follow-ups pending review</h3>
-        <div class="stat-value stat-pending" id="statFollowupsPending">0</div>
-    </div>
-    <div class="stat-card">
         <h3>Contacted</h3>
         <div class="stat-value stat-contacted" id="statContacted">0</div>
     </div>

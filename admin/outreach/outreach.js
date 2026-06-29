@@ -146,7 +146,6 @@ async function loadStats() {
             document.getElementById('statReplied').textContent = s.replied || 0;
             document.getElementById('statInterested').textContent = s.interested || 0;
             document.getElementById('statClicked').textContent = s.clicked || 0;
-            document.getElementById('statFollowupsPending').textContent = s.followups_pending || 0;
 
             // Show/hide pipeline running banner
             const banner = document.getElementById('pipelineBanner');

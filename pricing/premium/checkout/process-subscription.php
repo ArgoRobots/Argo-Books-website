@@ -927,6 +927,43 @@ try {
             error_log("Failed to send Premium subscription email: " . $e->getMessage());
         }
 
+        // Notify the team that a new paying customer just signed up. Best-effort:
+        // a failed notification must never affect the customer's checkout. Mirrors
+        // the admin-alert pattern used by the PayPal price-drift guard below.
+        try {
+            $providerNames = ['paypal' => 'PayPal', 'stripe' => 'Stripe', 'square' => 'Square'];
+            $custEmail  = htmlspecialchars($email);
+            $planSafe   = htmlspecialchars(ucfirst($billing));
+            $amtSafe    = htmlspecialchars(number_format((float) $amount, 2));
+            $curSafe    = htmlspecialchars($currency);
+            $methodSafe = htmlspecialchars($providerNames[strtolower($paymentMethod)] ?? ucfirst($paymentMethod));
+            $subSafe    = htmlspecialchars($subscriptionId);
+            $envLabel   = htmlspecialchars(current_environment());
+            $newCustomerBody = <<<HTML
+                <h2>You have a new paying customer 🎉</h2>
+                <p>A new Premium subscription was just created.</p>
+                <ul>
+                    <li><strong>Customer:</strong> $custEmail</li>
+                    <li><strong>Plan:</strong> $planSafe</li>
+                    <li><strong>Amount:</strong> \$$amtSafe $curSafe</li>
+                    <li><strong>Payment method:</strong> $methodSafe</li>
+                    <li><strong>Subscription ID:</strong> $subSafe</li>
+                    <li><strong>Environment:</strong> $envLabel</li>
+                </ul>
+                HTML;
+            send_styled_email(
+                'contact@argorobots.com',
+                "[Argo Books] New paying customer: $custEmail",
+                $newCustomerBody,
+                'purple',
+                null,
+                null,
+                $email
+            );
+        } catch (Exception $e) {
+            error_log("Failed to send new-customer admin notification: " . $e->getMessage());
+        }
+
         // PayPal price-drift guard. PayPal bills the plan's baked-in price, not
         // the amount we compute here, so a stale plan (e.g. created before a
         // price change and never regenerated) silently charges the wrong amount

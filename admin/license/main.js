@@ -1,8 +1,14 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Premium Subscriptions Chart initialization
     const subLabels = subscriptionChartData.map(item => item.date);
-    const subTotals = subscriptionChartData.map(item => parseInt(item.total));
-    const subActive = subscriptionChartData.map(item => parseInt(item.active));
+    // The query returns per-day counts (how many were created that day). Plot a
+    // running total instead, so the line shows how many subscriptions exist as
+    // of each date and reaches the real total (matching the stat card) rather
+    // than sitting at 1 when each day only adds one.
+    let runningTotal = 0;
+    let runningActive = 0;
+    const subTotals = subscriptionChartData.map(item => (runningTotal += parseInt(item.total)));
+    const subActive = subscriptionChartData.map(item => (runningActive += parseInt(item.active)));
 
     const subCtx = document.getElementById('subscriptionsChart').getContext('2d');
     new Chart(subCtx, {

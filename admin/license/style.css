@@ -57,6 +57,14 @@ table th {
     background: var(--emerald-100);
     color: var(--emerald-800);
 }
+/* common-style.css paints .badge-active a neutral gray in dark theme (there it
+   marks an "active" user). On this page Active means an active paid
+   subscription, so keep it green in dark theme too. This file loads after
+   common-style.css, so the same-specificity override wins. */
+[data-theme="dark"] .badge-active {
+    background: var(--emerald-800);
+    color: var(--emerald-100);
+}
 .badge-cancelled {
     background: var(--red-100);
     color: var(--red-800);

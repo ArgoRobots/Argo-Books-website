@@ -427,4 +427,5 @@ php_value upload_max_filesize 10M
     RewriteRule ^free-cash-flow-forecast-template/?$ articles/article-page.php?slug=free-cash-flow-forecast-template [L,QSA]
     RewriteRule ^cash-flow-forecasting-software/?$ articles/article-page.php?slug=cash-flow-forecasting-software [L,QSA]
     RewriteRule ^predictive-analytics-for-small-business/?$ articles/article-page.php?slug=predictive-analytics-for-small-business [L,QSA]
+    RewriteRule ^quickbooks-desktop-discontinued/?$ articles/article-page.php?slug=quickbooks-desktop-discontinued [L,QSA]
 </IfModule>

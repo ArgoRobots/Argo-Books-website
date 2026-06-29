@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/../resources/icons.php';
+<?php
+require_once __DIR__ . '/../resources/icons.php';
+require_once __DIR__ . '/../config/pricing.php';
+$pricing = get_pricing_config();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -85,6 +88,48 @@
 
     <div class="container">
         <div class="version-grid">
+
+            <!-- Version 2.0.9 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.9</span>
+                        <span class="date-tag">June 26 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Bank statement import:</strong> Import a bank statement and Argo Books turns each line into a categorized expense or revenue, filling in the product, category, and supplier or customer for you. A quick way to catch up on your books or stay on top of them each month, with no bank login or connection required.</li>
+                                <li><strong>Sales by Product analytics:</strong> A new Sales by Product tab and report on the Analytics page shows exactly which products bring in the most revenue.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Smarter AI import:</strong> Spreadsheet import is now better at reading unusual spreadsheet layouts and matching entries to your existing data.</li>
+                                <li><strong>Quick "Create one":</strong> Add a new category, supplier, customer, or product right from the dropdown you're filling in, without leaving the form.</li>
+                                <li><strong>Multi-currency spreadsheet import:</strong> Spreadsheet import now support spreadsheets that use multiple difference currencies.</li>
+                                <li><strong>Smoother performance:</strong> The interface stays responsive in more situations. Opening companies is now around 5 times faster.</li>
+                                <li><strong>Clearer offline messages:</strong> When a feature needs the internet, you'll see one consistent message across the app.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes</h4>
+                            <ul class="changelog-list">
+                                <li><strong>More reliable receipt scanning:</strong> Longer, more detailed receipts now scan more reliably.</li>
+                                <li><strong>Readable tooltips in light mode:</strong> Tooltip text now displays clearly against light backgrounds.</li>
+                                <li><strong>Clearer save messages:</strong> If your save location isn't available, Argo Books now shows a helpful message explaining what to do.</li>
+                                <li>Various stability improvements.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Version 2.0.8 -->
             <div class="version-card">
@@ -227,7 +272,7 @@
                         <div class="changelog-section">
                             <h4 class="section-label feature">New Features</h4>
                             <ul class="changelog-list">
-                                <li><strong>AI receipt scanning for everyone:</strong> AI-powered receipt scanning is now available in the free plan with a 5 receipt per month usage limit.</li>
+                                <li><strong>AI receipt scanning for everyone:</strong> AI-powered receipt scanning is now available in the free plan with a <?= (int) $pricing['free_receipt_scan_monthly_limit'] ?> receipt per month usage limit.</li>
                                 <li><strong>Company name in payment portal:</strong> Directly control which business name your customers see in the payment portal. There is now a dedicated control for this in the settings.</li>
                                 <li><strong>Export world map to Excel:</strong> The world map on the Analytics page can now be exported to Excel.</li>
                             </ul>

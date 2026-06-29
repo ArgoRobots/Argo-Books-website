@@ -16,6 +16,7 @@
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/../ai/_timing.php';
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
@@ -72,6 +73,10 @@ if (substr($pdfBytes, 0, 5) !== '%PDF-') {
     send_error_response(415, 'That file does not look like a PDF.', 'BAD_TYPE');
 }
 
+// Page count is the strongest up-front predictor of extraction time; capture it for
+// the timing priors (best-effort heuristic, null when it can't be determined).
+$pageCount = bs_pdf_page_count($pdfBytes);
+
 // --- 4. Config ---
 $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';
 if ($geminiKey === '') {
@@ -84,13 +89,16 @@ $fileName = bs_upload_pdf($geminiKey, $pdfBytes);
 if ($fileName === null) {
     send_error_response(502, 'Failed to upload the PDF to the extraction service.', 'UPSTREAM_ERROR');
 }
-if (!bs_wait_active($geminiKey, $fileName)) {
+$pollCount = 0;
+if (!bs_wait_active($geminiKey, $fileName, $pollCount)) {
     bs_delete_file($geminiKey, $fileName);
     send_error_response(502, 'The extraction service could not process the PDF.', 'UPSTREAM_ERROR');
 }
 
 // --- 6. Ask the model to extract the rows. ---
-$content = bs_call_gemini($geminiKey, $model, $fileName);
+$extractElapsedMs = null;
+$extractUsage = null;
+$content = bs_call_gemini($geminiKey, $model, $fileName, $extractElapsedMs, $extractUsage);
 bs_delete_file($geminiKey, $fileName); // store nothing past this point
 
 if ($content === null) {
@@ -99,11 +107,34 @@ if ($content === null) {
 
 $lines = bs_normalize_lines($content);
 
+// Record the server-measured timing (best-effort; never breaks the response).
+ai_timing_record([
+    'operation' => 'bank_pdf_extract',
+    'model' => $model,
+    'size_feature' => strlen($pdfBytes),
+    'page_count' => $pageCount,
+    'input_bytes' => strlen($pdfBytes),
+    'mime' => 'application/pdf',
+    'prompt_tokens' => $extractUsage['promptTokenCount'] ?? null,
+    'output_tokens' => $extractUsage['candidatesTokenCount'] ?? null,
+    'max_output_tokens' => 16000,
+    'finish_reason' => 'STOP',
+    'elapsed_ms' => $extractElapsedMs ?? 0,
+    'poll_count' => $pollCount,
+    'success' => true,
+]);
+
 // A valid-but-empty result (no transactions found) is still success: the client
 // shows its own "no transactions" message. Hard failures returned errors above.
 send_json_response(200, [
     'success' => true,
     'lines' => $lines,
+    'timing' => [
+        'elapsed_ms' => $extractElapsedMs ?? 0,
+        'prompt_tokens' => $extractUsage['promptTokenCount'] ?? 0,
+        'output_tokens' => $extractUsage['candidatesTokenCount'] ?? 0,
+        'load_factor' => ai_timing_load_factor(),
+    ],
     'timestamp' => date('c'),
 ]);
 
@@ -159,10 +190,11 @@ function bs_upload_pdf(string $geminiKey, string $pdfBytes): ?string
  * Polls the uploaded file until it reaches ACTIVE state (Gemini processes uploads
  * asynchronously). Returns true once ACTIVE, false on FAILED or timeout (~7.5s).
  */
-function bs_wait_active(string $geminiKey, string $fileName): bool
+function bs_wait_active(string $geminiKey, string $fileName, int &$pollCount = 0): bool
 {
     $statusUrl = "https://generativelanguage.googleapis.com/v1beta/{$fileName}";
     for ($i = 0; $i < 15; $i++) {
+        $pollCount = $i + 1;
         $ch = curl_init($statusUrl);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -196,8 +228,12 @@ function bs_delete_file(string $geminiKey, string $fileName): void
     curl_exec($ch);
 }
 
-/** Calls Gemini generateContent referencing the uploaded PDF. Returns the JSON text or null. */
-function bs_call_gemini(string $geminiKey, string $model, string $fileName): ?string
+/**
+ * Calls Gemini generateContent referencing the uploaded PDF. Returns the JSON text or null.
+ * Reports the server-measured wall time (ms) and Gemini usageMetadata via by-ref params
+ * for the timing priors.
+ */
+function bs_call_gemini(string $geminiKey, string $model, string $fileName, ?int &$elapsedMs = null, ?array &$usage = null): ?string
 {
     $fileUri = "https://generativelanguage.googleapis.com/v1beta/{$fileName}";
 
@@ -249,13 +285,16 @@ PROMPT;
         CURLOPT_TIMEOUT => 120,
         CURLOPT_CONNECTTIMEOUT => 10,
     ]);
+    $t0 = microtime(true);
     $resp = curl_exec($ch);
+    $elapsedMs = (int) round((microtime(true) - $t0) * 1000);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if ($resp === false || $httpCode !== 200) {
         error_log('[bank-extract] Gemini error ' . $httpCode . ': ' . substr((string)$resp, 0, 500));
         return null;
     }
     $data = json_decode($resp, true);
+    $usage = $data['usageMetadata'] ?? null;
     $candidate = $data['candidates'][0] ?? [];
     // gemini-2.5-flash spends hidden "thinking" tokens out of maxOutputTokens; log any
     // non-STOP finish so truncation on a very long statement is visible, not silent.
@@ -308,4 +347,18 @@ function bs_normalize_lines(string $content): array
         ];
     }
     return $out;
+}
+
+/**
+ * Best-effort page count from raw PDF bytes, used only as a timing size-feature.
+ * Counts "/Type /Page" objects (the word boundary excludes the "/Pages" tree node).
+ * Returns null when it cannot be determined; never throws.
+ */
+function bs_pdf_page_count(string $pdfBytes): ?int
+{
+    if (@preg_match_all('/\/Type\s*\/Page\b/', $pdfBytes, $m)) {
+        $count = count($m[0]);
+        return $count > 0 ? $count : null;
+    }
+    return null;
 }

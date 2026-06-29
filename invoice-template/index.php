@@ -5,7 +5,7 @@
 // SoftwareApplication is NOT the right schema here (the page is a directory,
 // not a tool); use CollectionPage instead.
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../statistics.php';
@@ -101,4 +101,4 @@ ob_start();
 $body_content = ob_get_clean();
 $tools_back = ['href' => INVGEN_BASE . '/tools/', 'label' => 'All tools'];
 
-include __DIR__ . '/../invoice-generator/layout.php';
+include __DIR__ . '/../shared/layout.php';

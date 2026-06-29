@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-31',
 
-  'updated' => '2026-06-26',
+  'updated' => '2026-06-29',
 
   'reading_time_min' => 10,
 
@@ -40,7 +40,7 @@ HTML,
       'html' => <<<'HTML'
 <p>It helps to be clear about which problem you're actually trying to solve, because each one points at a different replacement.</p>
 <ul>
-<li><strong>Price.</strong> The most common reason. Entry plans start around ${quickbooks_easystart} CAD a month, but the features most businesses want sit in Plus, closer to ${quickbooks_plus} CAD a month, and the published price tends to rise each year. If cost is the driver, free and low-cost options below will feel like a different world.</li>
+<li><strong>Price.</strong> The most common reason. Entry plans start around ${quickbooks_easystart} CAD a month, but the features most businesses want sit in Plus, closer to ${quickbooks_plus} CAD a month, and the published price keeps climbing: the popular Plus plan rose by around two-thirds in the five years to 2025 (<a href="https://report.woodard.com/articles/intuit-announces-2025-quickbooks-price-increases-fpwr" target="_blank" rel="noopener nofollow">pricing updates</a>). If cost is the driver, free and low-cost options below will feel like a different world.</li>
 <li><strong>Complexity.</strong> QuickBooks is built to do almost everything, which makes it slow and busy if you only need a fraction of it. If you spend more time hunting through menus than doing the task, a simpler tool will save you hours.</li>
 <li><strong>Feature gatekeeping.</strong> Things you'd consider basic, like more detailed reports or certain integrations, are often held back for higher tiers. If you're paying for Plus to unlock one feature you use, a different tool may include it lower down.</li>
 <li><strong>You've outgrown it the other way.</strong> Less common, but some businesses leave because they need something more specialized, like heavy inventory or a specific industry workflow QuickBooks doesn't handle well.</li>

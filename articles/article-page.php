@@ -16,7 +16,7 @@
 //   <h2>            Related guides
 //   <h2>            Related articles (when $data['related_article_slugs'] non-empty)
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 require_once __DIR__ . '/../config/pricing.php';
 require_once __DIR__ . '/illustrations.php';
 
@@ -484,7 +484,16 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 HTML;
 
-include __DIR__ . '/../invoice-generator/layout.php';
+// Editorial header nav for guide pages. Content/credibility links only,
+// deliberately no Pricing or buy CTA so the page reads as a blog, not a
+// funnel. The shared tool layout renders this only when it is set.
+$header_nav = [
+  ['label' => 'Guides',        'href' => 'guides/'],
+  ['label' => 'Docs',          'href' => 'documentation/'],
+  ['label' => 'About',         'href' => 'about-us/'],
+];
+
+include __DIR__ . '/../shared/layout.php';
 
 // -----------------------------------------------------------------------------
 

@@ -1259,9 +1259,39 @@ body {
   max-width: 180px;
 }
 
+/* Editorial section nav on guide pages. Content links only (no pricing/CTA)
+   so the header reads as a blog section, not a sales funnel. */
+.site-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 0 0 auto;
+}
+
+.site-header-nav a {
+  text-decoration: none;
+  color: var(--tool-text);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.site-header-nav a:hover,
+.site-header-nav a:focus {
+  color: var(--tool-primary);
+}
+
 @media (max-width: 540px) {
   .site-header-inner {
     padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .site-header-nav {
+    gap: 16px;
+  }
+
+  .site-header-nav a {
+    font-size: 14px;
   }
 
   .tool-breadcrumb {

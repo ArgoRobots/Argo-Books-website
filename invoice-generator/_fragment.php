@@ -15,7 +15,7 @@
 //   That value goes into the ?source= query param, which track_referral.php
 //   reads on the destination (argorobots.com/) to attribute the visit.
 //   Falls back to 'invgen-tool' when callers forget to set it.
-require_once __DIR__ . '/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 require_once __DIR__ . '/doc-config.php';
 // Document-type config drives copy, accessibility labels, conversion-CTA
 // attribution, and which invoice-only fields render. Defaults to 'invoice'

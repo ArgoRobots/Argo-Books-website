@@ -12,7 +12,7 @@
 //   no H2s on the index entries themselves (each list item is a link, not
 //   a section). Group dividers carry small-caps labels but no headings.
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 
 if (PHP_SAPI !== 'cli') {
     // Referral tracking: capture ?source so a direct landing on the guides hub
@@ -226,4 +226,4 @@ ob_start();
 <?php
 $body_content = ob_get_clean();
 
-include __DIR__ . '/../invoice-generator/layout.php';
+include __DIR__ . '/../shared/layout.php';

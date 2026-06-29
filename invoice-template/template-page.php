@@ -15,7 +15,7 @@
 //   <h2>     Frequently asked questions
 //   <h2>     Related templates
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 
 // --- 1. Sanitize the slug -----------------------------------------------------
 
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 HTML;
 
-include __DIR__ . '/../invoice-generator/layout.php';
+include __DIR__ . '/../shared/layout.php';
 
 // -----------------------------------------------------------------------------
 

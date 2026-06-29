@@ -5,7 +5,7 @@
 // cards). Mirrors the desktop scanner's review UI; funnels to the free app +
 // Premium at the daily limit.
 
-require_once __DIR__ . '/../invoice-generator/_base.php'; // defines INVGEN_BASE
+require_once __DIR__ . '/../shared/_base.php'; // defines INVGEN_BASE
 
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../statistics.php'; // self-loads db_connect.php

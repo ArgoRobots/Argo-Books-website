@@ -1,5 +1,5 @@
 <?php
-// invoice-generator/_base.php
+// shared/_base.php
 // Auto-detected URL prefix that maps to this project's root.
 //
 // In production at argorobots.com (DocumentRoot is the project root): ''.

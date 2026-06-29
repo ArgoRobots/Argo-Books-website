@@ -1,8 +1,9 @@
 <?php
-// invoice-generator/layout.php
-// Minimal tool-isolated layout. Used by tool pages only.
-// Do NOT include the main site's header, footer, or main.js.
-// One-way funnel: tool pages link out to argorobots.com, never the reverse.
+// shared/layout.php
+// Minimal self-contained page shell shared across the standalone tools
+// (invoice-generator, profit-analyzer, etc.), the guides/articles, and the
+// niche pages. Does NOT include the main site's header, footer, or main.js;
+// these pages link out to argorobots.com rather than pulling its chrome in.
 
 require_once __DIR__ . '/_base.php';
 
@@ -96,6 +97,13 @@ $site_schema = [
     <a class="site-brand" href="<?= INVGEN_BASE ?>/" aria-label="Argo Books home">
       <img src="<?= INVGEN_BASE ?>/resources/images/argo-logo/argo-logo-black.png" alt="Argo Books" width="160" height="28">
     </a>
+    <?php if (!empty($header_nav)): ?>
+    <nav class="site-header-nav" aria-label="Section navigation">
+      <?php foreach ($header_nav as $nav_item): ?>
+      <a href="<?= INVGEN_BASE ?>/<?= ltrim(htmlspecialchars($nav_item['href']), '/') ?>"><?= htmlspecialchars($nav_item['label']) ?></a>
+      <?php endforeach; ?>
+    </nav>
+    <?php endif; ?>
   </div>
 </header>
 <?php if ($tools_back): ?>

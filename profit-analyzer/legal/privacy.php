@@ -1,6 +1,6 @@
 <?php
 // profit-analyzer/legal/privacy.php — Profit Analyzer data & privacy policy.
-require_once __DIR__ . '/../../invoice-generator/_base.php';
+require_once __DIR__ . '/../../shared/_base.php';
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../../statistics.php';
     track_page_view('profit_analyzer_privacy');

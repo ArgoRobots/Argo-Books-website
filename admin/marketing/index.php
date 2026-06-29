@@ -233,7 +233,7 @@ include __DIR__ . '/../admin_header.php';
     <p class="empty-state">No broadcasts yet.</p>
 <?php else: ?>
     <div class="table-container">
-        <table>
+        <table data-paginate="25">
             <thead>
                 <tr>
                     <th>Subject</th>

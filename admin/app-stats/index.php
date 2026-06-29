@@ -589,7 +589,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <h2 class="section-title" style="margin-top: 2rem;">User Details</h2>
                 <div class="error-details-wrapper">
-                    <table class="error-details-table" id="activeUsersTable">
+                    <table class="error-details-table" id="activeUsersTable" data-paginate="25" data-paginate-noun="users">
                         <thead>
                             <tr>
                                 <th>User ID</th>

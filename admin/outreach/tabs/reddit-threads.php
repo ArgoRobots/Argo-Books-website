@@ -138,7 +138,7 @@ function reddit_threads_tab_render($pdo)
 
     <!-- Threads table -->
     <div class="reddit-table-wrapper">
-        <table class="data-table reddit-table">
+        <table class="data-table reddit-table" data-paginate="25">
             <thead>
                 <tr>
                     <th>Subreddit</th>

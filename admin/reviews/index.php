@@ -189,7 +189,7 @@ include __DIR__ . '/../admin_header.php';
             <?php if (count($rows) === 0): ?>
                 <p class="empty-state">No eligible customers in this group.</p>
             <?php else: ?>
-                <table class="reviews-table">
+                <table class="reviews-table" data-paginate="25">
                     <thead>
                         <tr>
                             <th><input type="checkbox" class="select-all" data-section="<?= $variantClass ?>" checked></th>

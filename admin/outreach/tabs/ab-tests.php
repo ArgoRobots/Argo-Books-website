@@ -342,7 +342,7 @@ function ab_tests_tab_render_list($pdo)
                 <p class="empty-state">No A/B tests yet. Turn on automation in the Settings tab, or create one above.</p>
             <?php else: ?>
                 <div class="table-wrap">
-                    <table class="data-table">
+                    <table class="data-table" data-paginate="25">
                         <thead>
                             <tr>
                                 <th>Name</th>
@@ -677,7 +677,7 @@ function ab_tests_tab_render_detail($pdo, $testId)
                     </p>
                 <?php endif; ?>
                 <div class="table-wrap">
-                    <table class="data-table">
+                    <table class="data-table" data-paginate="25">
                         <thead>
                             <tr>
                                 <th>Label</th>

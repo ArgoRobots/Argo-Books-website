@@ -202,7 +202,7 @@ if (!in_array($activeChannel, ['email', 'reddit'], true)) {
                 </div>
             </div>
             <div class="discovery-table-wrapper">
-                <table class="data-table discovery-table">
+                <table class="data-table discovery-table" data-paginate="25">
                     <thead>
                         <tr>
                             <th>Store</th>

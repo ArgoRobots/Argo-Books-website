@@ -755,7 +755,7 @@ include __DIR__ . '/../admin_header.php';
     <div class="table-container">
         <h2>Most Active Community Users</h2>
         <div class="table-responsive">
-            <table>
+            <table data-paginate="25">
                 <thead>
                     <tr>
                         <th>Username</th>

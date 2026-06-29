@@ -156,19 +156,20 @@ $base_path = $in_subdir ? '../' : '';
                         </a>
                     </li>
                     <li><a href="<?php echo $base_path; ?>index.php" class="<?php echo $current_dir === 'admin' ? 'active' : ''; ?>">Dashboard</a></li>
-                    <li><a href="<?php echo $base_path; ?>license/" class="<?php echo $current_dir === 'license' ? 'active' : ''; ?>">Licenses</a></li>
-                    <li><a href="<?php echo $base_path; ?>payments/" class="<?php echo $current_dir === 'payments' ? 'active' : ''; ?>">Payment Portal</a></li>
-                    <li><a href="<?php echo $base_path; ?>app-stats/" class="<?php echo $current_dir === 'app-stats' ? 'active' : ''; ?>">App Stats</a></li>
-                    <li><a href="<?php echo $base_path; ?>website-stats/" class="<?php echo $current_dir === 'website-stats' ? 'active' : ''; ?>">Website Stats</a></li>
-                    <li><a href="<?php echo $base_path; ?>referral-links/" class="<?php echo $current_dir === 'referral-links' ? 'active' : ''; ?>">Referrals</a></li>
-                    <li><a href="<?php echo $base_path; ?>marketing-funnel/" class="<?php echo $current_dir === 'marketing-funnel' ? 'active' : ''; ?>">Funnel</a></li>
-                    <li><a href="<?php echo $base_path; ?>marketing/" class="<?php echo $current_dir === 'marketing' ? 'active' : ''; ?>">Marketing</a></li>
-                    <li><a href="<?php echo $base_path; ?>users/" class="<?php echo $current_dir === 'users' ? 'active' : ''; ?>">Users</a></li>
-                    <li><a href="<?php echo $base_path; ?>reports/" class="<?php echo $current_dir === 'reports' ? 'active' : ''; ?>">Reports</a></li>
-                    <li><a href="<?php echo $base_path; ?>outreach/" class="<?php echo $current_dir === 'outreach' ? 'active' : ''; ?>">Outreach</a></li>
-                    <li><a href="<?php echo $base_path; ?>reviews/" class="<?php echo $current_dir === 'reviews' ? 'active' : ''; ?>">Reviews</a></li>
-                    <li><a href="<?php echo $base_path; ?>crons/" class="<?php echo $current_dir === 'crons' ? 'active' : ''; ?>">Crons</a></li>
-                    <li><a href="<?php echo $base_path; ?>settings/" class="<?php echo $current_dir === 'settings' ? 'active' : ''; ?>">2FA</a></li>
+                    <?php // Built from the same $nav_groups as the desktop nav, so the two
+                          // never drift. On mobile every group is expanded under its label
+                          // instead of being a hover dropdown.
+                    foreach ($nav_groups as $label => $items): ?>
+                        <?php if (count($items) === 1): ?>
+                            <?php $dir = array_key_first($items); ?>
+                            <li><a href="<?php echo $base_path . $dir; ?>/" class="<?php echo $current_dir === $dir ? 'active' : ''; ?>"><?php echo htmlspecialchars($items[$dir]); ?></a></li>
+                        <?php else: ?>
+                            <li class="mobile-nav-group-label"><?php echo htmlspecialchars($label); ?></li>
+                            <?php foreach ($items as $dir => $text): ?>
+                                <li><a href="<?php echo $base_path . $dir; ?>/" class="<?php echo $current_dir === $dir ? 'active' : ''; ?>"><?php echo htmlspecialchars($text); ?></a></li>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                     <li><a href="<?php echo $base_path; ?>logout.php" class="logout-link">Logout</a></li>
                 </ul>
             </div>

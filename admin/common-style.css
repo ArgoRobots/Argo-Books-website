@@ -187,6 +187,19 @@ body.menu-open::after {
   gap: 8px;
 }
 
+/* Group heading inside the mobile menu (not a link). Mirrors the desktop
+   nav's group labels so the expanded mobile list reads as the same groups. */
+.hamburger-nav-menu ul li.mobile-nav-group-label {
+  padding: 14px 20px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--admin-text);
+  opacity: 0.55;
+  cursor: default;
+}
+
 .hamburger-nav-menu ul li a.logout-link {
   color: var(--red-600);
   font-weight: 500;
@@ -1056,7 +1069,7 @@ th.col-nowrap {
 }
 
 /* Mobile Navigation - Hide desktop nav and show mobile nav */
-@media (max-width: 1350px) {
+@media (max-width: 1024px) {
   .desktop-nav {
     display: none;
   }
@@ -1183,7 +1196,7 @@ th.col-nowrap {
 }
 
 /* Hide mobile dropdown on desktop */
-@media (min-width: 1350px) {
+@media (min-width: 1025px) {
   .hamburger-nav-menu {
     display: none !important;
   }
@@ -2049,23 +2062,70 @@ th.col-nowrap {
 .pagination-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 12px 16px;
-  gap: 4px;
+  gap: 12px;
   position: relative;
+  flex-wrap: wrap;
 }
 
-.pg-rows-selector.filter-group {
-  position: absolute;
-  left: 16px;
+/* Left cluster: "1-N of M" summary, a divider, then the rows-per-page select,
+   mirroring the desktop app's table footer. */
+.pg-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-summary {
+  font-size: 13px;
+  color: var(--admin-text);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.pg-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--gray-border);
+}
+
+.pg-rows-selector {
+  display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
-.pg-rows-selector.filter-group select {
+.pg-rows-selector label {
+  font-size: 13px;
+  color: var(--admin-text);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.pg-rows-selector select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   min-width: auto;
-  width: 4.5rem;
+  padding: 5px 28px 5px 10px;
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  color: var(--admin-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .pg-rows-selector select {
+  background-color: var(--gray-700);
+  border-color: var(--gray-600, #4b5563);
+  color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
 .pg-nav {

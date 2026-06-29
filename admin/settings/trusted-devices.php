@@ -77,7 +77,7 @@ include __DIR__ . '/../admin_header.php';
         </div>
 
         <div class="table-container">
-            <table class="table-auto-size">
+            <table class="table-auto-size" data-paginate="25">
                 <thead>
                     <tr>
                         <th>Device</th>

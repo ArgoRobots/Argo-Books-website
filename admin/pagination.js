@@ -29,6 +29,22 @@ class TablePaginator {
         wrapper.after(this.controlsEl);
 
         this.update();
+
+        // Auto-repaginate when rows are added or removed, so tables whose rows
+        // are injected or replaced by JavaScript/AJAX after load paginate the
+        // same way as server-rendered ones, with no per-page wiring. We only
+        // watch childList: the paginator toggles row display/classes, never the
+        // row set itself, so this can't loop. Debounced to one run per frame.
+        this._observerScheduled = false;
+        this._observer = new MutationObserver(() => {
+            if (this._observerScheduled) return;
+            this._observerScheduled = true;
+            requestAnimationFrame(() => {
+                this._observerScheduled = false;
+                this.reset();
+            });
+        });
+        this._observer.observe(this.tbody, { childList: true });
     }
 
     /** Returns rows that are NOT hidden by external filters. */
@@ -96,10 +112,20 @@ class TablePaginator {
             }
         }
 
+        // Range summary, e.g. "1-10 of 35". Optional noun via data-paginate-noun
+        // (e.g. data-paginate-noun="expenses" -> "1-10 of 35 expenses").
+        const start = total === 0 ? 0 : (this.currentPage - 1) * this.perPage + 1;
+        const end = Math.min(this.currentPage * this.perPage, total);
+        const noun = this.table.dataset.paginateNoun ? ' ' + this.table.dataset.paginateNoun : '';
+
         this.controlsEl.innerHTML = `
-            <div class="pg-rows-selector filter-group">
-                <label>Rows</label>
-                <select>${rowOpts}</select>
+            <div class="pg-left">
+                <span class="pg-summary">${start}\u2013${end} of ${total}${noun}</span>
+                <span class="pg-divider"></span>
+                <div class="pg-rows-selector">
+                    <label>Rows per page:</label>
+                    <select>${rowOpts}</select>
+                </div>
             </div>
             <div class="pg-nav">
                 <button class="pg-arrow" ${cur <= 1 ? 'disabled' : ''} data-pg="prev">\u2039</button>

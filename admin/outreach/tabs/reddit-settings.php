@@ -297,7 +297,7 @@ function reddit_settings_tab_render($pdo)
                 <button type="submit" class="btn btn-small btn-blue">Add</button>
             </form>
 
-            <table class="data-table reddit-config-table">
+            <table class="data-table reddit-config-table" data-paginate="25">
                 <thead>
                     <tr>
                         <th>Subreddit</th>
@@ -389,7 +389,7 @@ function reddit_settings_tab_render($pdo)
                 <button type="submit" class="btn btn-small btn-blue">Add</button>
             </form>
 
-            <table class="data-table reddit-config-table">
+            <table class="data-table reddit-config-table" data-paginate="25">
                 <thead>
                     <tr>
                         <th>Keyword</th>

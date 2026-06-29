@@ -1723,12 +1723,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
     const msPerDay = 86400000;
 
-    // Helper: date string YYYY-MM-DD from timestamp
+    // Local date string YYYY-MM-DD (not UTC). This dashboard is read in the
+    // admin's own timezone, so "today" and the day buckets must be local.
+    // toISOString() bucketed by UTC and shifted every axis label back a day for
+    // timezones west of UTC (e.g. today, Jun 29, rendered as Jun 28).
+    const toLocalDateStr = (ts) => {
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
+    // Format a YYYY-MM-DD bucket as an axis label, parsing it as a local date
+    // (T00:00:00) so it isn't shifted back a day.
+    const fmtDayLabel = (d) =>
+      new Date(d + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+    const todayStr = toLocalDateStr(now);
+
+    // Helper: date string YYYY-MM-DD from timestamp (local)
     function toDateStr(ts) {
-      return new Date(ts).toISOString().split("T")[0];
+      return toLocalDateStr(ts);
     }
 
     // Build user map: hashedIP -> { firstSeen, lastSeen, platform, country, appVersion, sessionCount, days }
@@ -1774,7 +1791,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     allUsers.forEach((ip) => {
       const u = userMap[ip];
-      if (u.lastSeen >= new Date(todayStr).getTime()) todayUsers.add(ip);
+      if (u.lastSeen >= new Date(todayStr + "T00:00:00").getTime()) todayUsers.add(ip);
       if (u.lastSeen >= sevenDaysAgo) weekUsers.add(ip);
       if (u.lastSeen >= thirtyDaysAgo) monthUsers.add(ip);
     });
@@ -1796,7 +1813,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const last30Dates = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now.getTime() - i * msPerDay);
-      last30Dates.push(d.toISOString().split("T")[0]);
+      last30Dates.push(toLocalDateStr(d));
     }
     const dauData = last30Dates.map((d) =>
       dailyUsers[d] ? dailyUsers[d].size : 0
@@ -1805,10 +1822,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("dauChart"), {
       type: "line",
       data: {
-        labels: last30Dates.map((d) => {
-          const dt = new Date(d);
-          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        }),
+        labels: last30Dates.map((d) => fmtDayLabel(d)),
         datasets: [
           {
             label: "Unique Users",
@@ -1895,10 +1909,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("newVsReturningChart"), {
       type: "bar",
       data: {
-        labels: last30Dates.map((d) => {
-          const dt = new Date(d);
-          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        }),
+        labels: last30Dates.map((d) => fmtDayLabel(d)),
         datasets: [
           {
             label: "New",
@@ -1990,10 +2001,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("avgSessionDurationChart"), {
       type: "bar",
       data: {
-        labels: last30Dates.map((d) => {
-          const dt = new Date(d);
-          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        }),
+        labels: last30Dates.map((d) => fmtDayLabel(d)),
         datasets: [
           {
             label: "Avg Duration (min)",

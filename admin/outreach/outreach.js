@@ -129,8 +129,14 @@ async function api(action, options = {}) {
     return await res.json();
 }
 
-function notify(message) {
-    alert(message);
+function notify(message, type) {
+    // Non-blocking toast instead of a native alert box. notifications.js (loaded
+    // by admin_header.php) watches for .success-message/.error-message nodes and
+    // removes them when the fadeInOut animation ends.
+    const el = document.createElement('div');
+    el.className = type === 'error' ? 'error-message' : 'success-message';
+    el.textContent = message;
+    document.body.appendChild(el);
 }
 
 // ─── Stats ───

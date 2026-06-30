@@ -1473,7 +1473,9 @@ th.col-nowrap {
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: var(--white);
+  /* Placeholder text stays a muted gray, not white. Only the typed input text
+     is white in dark theme; a white placeholder reads as real content. */
+  color: var(--gray-400);
 }
 
 [data-theme="dark"] input[type="password"]::-ms-reveal {

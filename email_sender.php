@@ -796,6 +796,8 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
 
         <p>You can manage your subscription anytime from your <a href="{$site_url}/community/users/subscription.php">account settings</a>.</p>
 
+        <p>Have a question or some feedback? Just reply to this email or reach me at <a href="mailto:contact@argorobots.com">contact@argorobots.com</a>. I read every message, and I'm always looking for ways to make Argo Books better.</p>
+
         <div class="receipt-footer">
             <p>License Key: {$subscriptionId}</p>
             <p>Thank you for using Argo Books!</p>

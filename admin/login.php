@@ -1,15 +1,7 @@
 <?php
-// Harden the admin session cookie before session_start. Secure must be off in
-// local dev (HTTP) but on in production (HTTPS): gate on APP_ENV via env().
-require_once __DIR__ . '/../env_helper.php';
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'secure' => env('APP_ENV', 'sandbox') === 'production',
-    'httponly' => true,
-    'samesite' => 'Strict',
-]);
-session_start();
+// Configure and start the admin session (private store, 8h lifetime, hardened
+// cookie). Shared by every admin entry point so login behaves identically.
+require_once __DIR__ . '/admin_session.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/settings/2fa.php';

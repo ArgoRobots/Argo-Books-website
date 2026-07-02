@@ -279,10 +279,12 @@
 }
 .stat-card.ratio-profitable .value { color: var(--green-700); }
 
+/* No ad spend yet ("free"): this is not a profitability signal, so keep the
+   card neutral in light theme rather than tinting it green. */
 .stat-card.ratio-organic {
-    background: linear-gradient(135deg, var(--emerald-50), var(--white));
+    background: var(--white);
 }
-.stat-card.ratio-organic .value { color: var(--emerald-700); }
+.stat-card.ratio-organic .value { color: var(--admin-text); }
 
 [data-theme="dark"] .stat-card.ratio-losing,
 [data-theme="dark"] .stat-card.ratio-marginal,

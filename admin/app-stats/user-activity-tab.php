@@ -18,6 +18,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit('Forbidden');
 }
 
+require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+
 $ua_dataDir   = __DIR__ . '/../data-logs/telemetry/';
 $ua_legacyDir = __DIR__ . '/../data-logs/';
 
@@ -116,6 +118,11 @@ foreach ($ua_files as $name => $path) {
     $tier   = $d['tier'] ?? 'premium';
     $authId = $d['authId'] ?? '(no authId)';
     $geo    = $d['geoLocation'] ?? [];
+
+    // Hide the founder's own installs (single source of truth: EXCLUDED_AUTH_IDS).
+    if (is_excluded_auth_id($authId)) {
+        continue;
+    }
 
     if (!isset($ua_users[$authId])) {
         $ua_users[$authId] = [

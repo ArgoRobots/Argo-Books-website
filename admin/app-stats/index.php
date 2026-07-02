@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -209,6 +210,13 @@ if (empty($dataDirs)) {
                     $fileTier = 'premium';
                 }
                 $fileAuthId = $fileData['authId'] ?? '';
+
+                // Never let the founder's own installs count toward app stats, even
+                // for files that reached disk before their id was added to
+                // EXCLUDED_AUTH_IDS. Skips the whole file: tier counts, DAU, geo.
+                if (is_excluded_auth_id($fileAuthId)) {
+                    continue;
+                }
 
                 // Always count toward per-tier stats, even if the file is filtered out below
                 $aggregatedData['tierStats'][$fileTier]['files']++;

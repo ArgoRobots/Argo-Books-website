@@ -14,6 +14,8 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit('Forbidden');
 }
 
+require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+
 $crashDir = __DIR__ . '/../data-logs/crashes';
 $crashFiles = is_dir($crashDir) ? (glob($crashDir . '/argo_crash_*.json') ?: []) : [];
 
@@ -29,6 +31,11 @@ foreach ($crashFiles as $crashFile) {
     }
     $data = json_decode($raw, true);
     if (!is_array($data) || empty($data['crashes']) || !is_array($data['crashes'])) {
+        continue;
+    }
+
+    // Hide the founder's own installs (single source of truth: EXCLUDED_AUTH_IDS).
+    if (is_excluded_auth_id($data['authId'] ?? null)) {
         continue;
     }
 

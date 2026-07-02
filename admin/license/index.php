@@ -704,17 +704,17 @@ include __DIR__ . '/../admin_header.php';
     <!-- Free Subscription Keys Tab -->
     <div id="free-sub-keys" class="tab-content">
         <div class="stats-grid">
-            <div class="stat-card free">
-                <h3>Available Keys</h3>
-                <div class="value"><?php echo $unredeemed_keys; ?></div>
+            <div class="stat-card">
+                <h3>Total Generated</h3>
+                <div class="value"><?php echo count($premium_subscription_keys); ?></div>
             </div>
             <div class="stat-card pending">
                 <h3>Redeemed Keys</h3>
                 <div class="value"><?php echo count($premium_subscription_keys) - $unredeemed_keys; ?></div>
             </div>
-            <div class="stat-card">
-                <h3>Total Generated</h3>
-                <div class="value"><?php echo count($premium_subscription_keys); ?></div>
+            <div class="stat-card free">
+                <h3>Available Keys</h3>
+                <div class="value"><?php echo $unredeemed_keys; ?></div>
             </div>
         </div>
 

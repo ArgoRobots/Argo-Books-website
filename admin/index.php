@@ -19,28 +19,70 @@ try {
     $env = current_environment();
 
     // --- MRR (Monthly Recurring Revenue) last 12 months ---
-    // Use actual completed payments, normalizing yearly payments to monthly equivalent (/12)
+    // True MRR: the recurring run-rate at the end of each month, i.e. the
+    // normalized monthly value of every subscription that was live then. This is
+    // NOT cash collected that month (that is the cumulative-revenue chart below),
+    // so the line stays flat while a customer is subscribed and only moves when
+    // someone subscribes or cancels. Yearly plans are divided by 12.
+    //
+    // "Live at month end" = created on/before month end, not yet cancelled, and
+    // either still marked active (an auto-renewing plan whose next renewal date
+    // may fall before today) or paid through past month end. The status check is
+    // what keeps the current month from reading $0 before this month's renewal
+    // payment has posted.
     $stmt = $pdo->query("
         SELECT
-            DATE_FORMAT(p.created_at, '%Y-%m') as month,
-            COALESCE(SUM(
-                CASE WHEN s.billing_cycle = 'yearly' THEN p.amount / 12
-                     ELSE p.amount
-                END
-            ), 0) as mrr
-        FROM premium_subscription_payments p
-        JOIN premium_subscriptions s ON p.subscription_id = s.subscription_id
-        WHERE p.status = 'completed'
-        AND s.payment_method != 'free_key'
-        AND s.environment = '$env'
-        AND p.created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
-        GROUP BY DATE_FORMAT(p.created_at, '%Y-%m')
-        ORDER BY month ASC
+            DATE_FORMAT(months.month_date, '%Y-%m') as month,
+            COALESCE(SUM(CASE
+                WHEN s.created_at <= LAST_DAY(months.month_date)
+                     AND (s.cancelled_at IS NULL OR s.cancelled_at > LAST_DAY(months.month_date))
+                     AND (s.status = 'active' OR s.end_date > LAST_DAY(months.month_date))
+                THEN (CASE WHEN s.billing_cycle = 'yearly' THEN s.amount / 12 ELSE s.amount END)
+                ELSE 0 END), 0) as mrr
+        FROM (
+            SELECT DATE_SUB(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL n MONTH) as month_date
+            FROM (
+                SELECT 0 as n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3
+                UNION SELECT 4 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7
+                UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION SELECT 11
+            ) nums
+        ) months
+        LEFT JOIN premium_subscriptions s ON s.payment_method != 'free_key' AND s.environment = '$env'
+        GROUP BY months.month_date
+        ORDER BY months.month_date ASC
     ");
     $mrr_by_month = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $mrr_by_month[$row['month']] = round((float)$row['mrr'], 2);
     }
+
+    // --- Actual cash revenue per month (for the cumulative-revenue chart) ---
+    // Real completed payments booked in each calendar month (not normalized).
+    $stmt = $pdo->query("
+        SELECT
+            DATE_FORMAT(created_at, '%Y-%m') as month,
+            COALESCE(SUM(amount), 0) as revenue
+        FROM premium_subscription_payments
+        WHERE status = 'completed'
+        AND environment = '$env'
+        AND created_at >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(created_at, '%Y-%m')
+        ORDER BY month ASC
+    ");
+    $revenue_by_month = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $revenue_by_month[$row['month']] = round((float)$row['revenue'], 2);
+    }
+
+    // Revenue booked before the 12-month window, so the cumulative line starts
+    // from the true all-time total rather than resetting to $0 a year ago.
+    $stmt = $pdo->query("
+        SELECT COALESCE(SUM(amount), 0) as total FROM premium_subscription_payments
+        WHERE status = 'completed'
+        AND environment = '$env'
+        AND created_at < DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 11 MONTH), '%Y-%m-01')
+    ");
+    $revenue_before_window = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
 
     // --- Active vs Inactive license counts per month (last 12 months) ---
     // For each month, count subscriptions that were active at end of that month using date-based logic
@@ -167,6 +209,8 @@ try {
 } catch (Exception $e) {
     error_log("Error fetching subscription stats: " . $e->getMessage());
     $mrr_by_month = [];
+    $revenue_by_month = [];
+    $revenue_before_window = 0;
     $license_by_month = [];
     $cancelled_by_month = [];
     $active_start_by_month = [];
@@ -184,19 +228,20 @@ $active_data = [];
 $inactive_data = [];
 $churn_data = [];
 
-$running_total = 0;
+// Seed the cumulative line with revenue booked before the 12-month window.
+$running_total = $revenue_before_window;
 
 for ($i = 11; $i >= 0; $i--) {
     $month_key = date('Y-m', strtotime("-$i months"));
     $month_label = date('M Y', strtotime("-$i months"));
     $chart_labels[] = $month_label;
 
-    // MRR
+    // MRR run-rate (flat while subscribed; moves only on signup/cancel)
     $mrr = $mrr_by_month[$month_key] ?? 0;
     $mrr_data[] = $mrr;
 
-    // Cumulative normalized MRR (running sum of MRR; not actual cash revenue)
-    $running_total += $mrr;
+    // Cumulative actual cash revenue (running sum of real completed payments)
+    $running_total += $revenue_by_month[$month_key] ?? 0;
     $cumulative_data[] = round($running_total, 2);
 
     // Active vs Inactive
@@ -250,9 +295,9 @@ include __DIR__ . '/admin_header.php';
             </div>
         </div>
 
-        <!-- Cumulative MRR Chart -->
+        <!-- Cumulative Revenue Chart -->
         <div class="chart-card">
-            <h2 class="chart-card-title">Cumulative MRR</h2>
+            <h2 class="chart-card-title">Cumulative Revenue</h2>
             <div class="chart-card-container">
                 <canvas id="cumulativeChart"></canvas>
             </div>
@@ -334,13 +379,13 @@ new Chart(document.getElementById('mrrChart').getContext('2d'), {
     }
 });
 
-// 2. Cumulative MRR Area Chart
+// 2. Cumulative Revenue Area Chart
 new Chart(document.getElementById('cumulativeChart').getContext('2d'), {
     type: 'line',
     data: {
         labels: chartLabels,
         datasets: [{
-            label: 'Cumulative MRR',
+            label: 'Cumulative Revenue',
             data: <?php echo json_encode($cumulative_data); ?>,
             borderColor: '#8b5cf6',
             backgroundColor: 'rgba(139, 92, 246, 0.15)',

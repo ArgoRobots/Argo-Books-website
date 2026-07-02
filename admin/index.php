@@ -85,22 +85,28 @@ try {
     $revenue_before_window = round((float)$stmt->fetch(PDO::FETCH_ASSOC)['total'], 2);
 
     // --- Active vs Inactive license counts per month (last 12 months) ---
-    // For each month, count subscriptions that were active at end of that month using date-based logic
+    // For each month, count subscriptions active at the end of that month. A sub
+    // is active if it existed by month end, was not yet cancelled, and is either
+    // still marked active (an auto-renewing plan whose next renewal may fall later
+    // this month) or paid through past month end. The status check keeps the
+    // current month from flipping a live sub to "inactive" before its renewal
+    // payment posts. Inactive is the exact complement, so the two never overlap.
+    // Mirrors the MRR "live at month end" logic above.
     $stmt = $pdo->query("
         SELECT
             DATE_FORMAT(months.month_date, '%Y-%m') as month,
             COALESCE(SUM(CASE
                 WHEN s.created_at <= LAST_DAY(months.month_date)
-                     AND (s.end_date IS NULL OR s.end_date > LAST_DAY(months.month_date))
                      AND (s.cancelled_at IS NULL OR s.cancelled_at > LAST_DAY(months.month_date))
+                     AND (s.status = 'active' OR s.end_date > LAST_DAY(months.month_date))
                      AND s.payment_method != 'free_key'
                 THEN 1 ELSE 0 END), 0) as active_count,
             COALESCE(SUM(CASE
                 WHEN s.created_at <= LAST_DAY(months.month_date)
                      AND s.payment_method != 'free_key'
                      AND (
-                         (s.end_date IS NOT NULL AND s.end_date <= LAST_DAY(months.month_date))
-                         OR (s.cancelled_at IS NOT NULL AND s.cancelled_at <= LAST_DAY(months.month_date))
+                         (s.cancelled_at IS NOT NULL AND s.cancelled_at <= LAST_DAY(months.month_date))
+                         OR (s.status <> 'active' AND (s.end_date IS NULL OR s.end_date <= LAST_DAY(months.month_date)))
                      )
                 THEN 1 ELSE 0 END), 0) as inactive_count
         FROM (

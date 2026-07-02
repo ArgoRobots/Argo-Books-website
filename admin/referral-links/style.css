@@ -131,29 +131,43 @@ code {
     text-decoration: underline;
 }
 
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+/* Actions column. Keep this a normal table cell (do NOT set display:flex on the
+   td, which breaks table-cell layout and misaligns the row's bottom border).
+   The icon buttons are inline-flex, so they sit side by side on their own. */
+.actions-cell {
     white-space: nowrap;
-    display: inline-block;
+    text-align: left;
 }
 
-.status-active {
-    background: var(--emerald-100);
-    color: var(--emerald-800);
+.actions-cell .btn-icon + .btn-icon {
+    margin-left: 6px;
 }
 
-.status-inactive {
-    background: var(--red-100);
-    color: var(--red-800);
+/* Compact, neutral icon-only action buttons (pencil / trash) so the column
+   stays tight and unobtrusive. Gray/outlined rather than colored. */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--gray-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--admin-text);
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.action-buttons {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+.btn-icon:hover {
+    background: var(--gray-bg-light);
+}
+
+.btn-icon svg {
+    width: 16px;
+    height: 16px;
 }
 
 .btn, .btn-small {

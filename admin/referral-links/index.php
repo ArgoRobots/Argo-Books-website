@@ -45,10 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name']);
             $description = trim($_POST['description']);
             $target_url = trim($_POST['target_url']);
-            $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-            $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ?, is_active = ? WHERE id = ?');
-            $stmt->execute([$name, $description, $target_url, $is_active, $id]);
+            $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ? WHERE id = ?');
+            $stmt->execute([$name, $description, $target_url, $id]);
 
             $_SESSION['success_message'] = 'Referral link updated successfully!';
             header('Location: index.php');
@@ -457,7 +456,6 @@ include __DIR__ . '/../admin_header.php';
                         <th>Visits</th>
                         <th>Conversions</th>
                         <th>Rate</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -475,7 +473,7 @@ include __DIR__ . '/../admin_header.php';
                     ?>
                     <tbody class="category-group<?php echo $collapsed ? ' collapsed' : ''; ?>" data-cat="<?php echo htmlspecialchars($ckey); ?>">
                         <tr class="category-header" role="button" tabindex="0" aria-expanded="<?php echo $collapsed ? 'false' : 'true'; ?>">
-                            <td colspan="9">
+                            <td colspan="8">
                                 <span class="cat-caret" aria-hidden="true">&#9656;</span>
                                 <span class="cat-name"><?php echo htmlspecialchars($category_labels[$ckey]); ?></span>
                                 <span class="cat-meta"><?php echo count($clinks); ?> source<?php echo count($clinks) === 1 ? '' : 's'; ?>
@@ -494,14 +492,9 @@ include __DIR__ . '/../admin_header.php';
                                 <td><?php echo number_format($link['total_visits']); ?></td>
                                 <td><?php echo number_format($link['conversions']); ?></td>
                                 <td><?php echo $conv_rate; ?>%</td>
-                                <td>
-                                    <span class="status-badge <?php echo $link['is_active'] ? 'status-active' : 'status-inactive'; ?>">
-                                        <?php echo $link['is_active'] ? 'Active' : 'Inactive'; ?>
-                                    </span>
-                                </td>
-                                <td class="action-buttons">
-                                    <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-small btn-blue" title="Edit">Edit</button>
-                                    <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-small btn-red" title="Delete">Delete</button>
+                                <td class="actions-cell">
+                                    <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-icon" title="Edit" aria-label="Edit"><?php echo svg_icon('pencil', 16); ?></button>
+                                    <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-icon" title="Delete" aria-label="Delete"><?php echo svg_icon('trash', 16); ?></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -545,13 +538,6 @@ include __DIR__ . '/../admin_header.php';
                 <label for="target_url">Target URL *</label>
                 <input type="url" name="target_url" id="target_url" required>
                 <small>The page users will land on (usually your homepage)</small>
-            </div>
-
-            <div class="form-group checkbox-group" id="activeCheckboxGroup" style="display: none;">
-                <label>
-                    <input type="checkbox" name="is_active" id="is_active" value="1" checked>
-                    Active
-                </label>
             </div>
 
             <div class="form-actions">
@@ -826,7 +812,6 @@ include __DIR__ . '/../admin_header.php';
         document.getElementById('formAction').value = 'create';
         document.getElementById('modalTitle').textContent = 'Create Referral Link';
         document.getElementById('source_code').removeAttribute('readonly');
-        document.getElementById('activeCheckboxGroup').style.display = 'none';
     }
 
     function editLink(link) {
@@ -837,8 +822,6 @@ include __DIR__ . '/../admin_header.php';
         document.getElementById('name').value = link.name;
         document.getElementById('description').value = link.description;
         document.getElementById('target_url').value = link.target_url;
-        document.getElementById('is_active').checked = link.is_active == 1;
-        document.getElementById('activeCheckboxGroup').style.display = 'block';
         document.getElementById('modalTitle').textContent = 'Edit Referral Link';
         openModal();
     }

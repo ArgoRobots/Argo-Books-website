@@ -22,6 +22,7 @@
               <div class="dropdown-col">
                 <span class="dropdown-col-header">Automation</span>
                 <a class="dropdown-item" href="<?= $base ?>features/receipt-scanning/">Receipt Scanning</a>
+                <a class="dropdown-item" href="<?= $base ?>features/bank-statement-import/">Bank Statement Import</a>
                 <a class="dropdown-item" href="<?= $base ?>features/spreadsheet-import/">Spreadsheet Import</a>
                 <a class="dropdown-item" href="<?= $base ?>features/predictive-analytics/">Predictive Analytics</a>
               </div>
@@ -29,15 +30,19 @@
                 <span class="dropdown-col-header">Financial Tools</span>
                 <a class="dropdown-item" href="<?= $base ?>features/expense-revenue-tracking/">Expense & Revenue Tracking</a>
                 <a class="dropdown-item" href="<?= $base ?>features/invoicing/">Invoicing</a>
-                <a class="dropdown-item" href="<?= $base ?>features/customer-management/">Customer Management</a>
+                <a class="dropdown-item" href="<?= $base ?>features/report-builder/">Report Builder</a>
               </div>
               <div class="dropdown-col">
                 <span class="dropdown-col-header">Operations</span>
                 <a class="dropdown-item" href="<?= $base ?>features/inventory-management/">Inventory Management</a>
                 <a class="dropdown-item" href="<?= $base ?>features/rental-management/">Rental Management</a>
-                <a class="dropdown-item" href="<?= $base ?>features/">View All Features →</a>
+                <a class="dropdown-item" href="<?= $base ?>features/customer-management/">Customer Management</a>
               </div>
             </div>
+            <a class="dropdown-all-features" href="<?= $base ?>features/">
+              View all features
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
           </div>
         </li>
         <li><a class="pricing" href="<?= $base ?>pricing/">Pricing</a></li>

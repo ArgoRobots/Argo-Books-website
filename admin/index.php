@@ -274,7 +274,7 @@ include __DIR__ . '/admin_header.php';
     <!-- Summary Stat Cards -->
     <div class="stats-grid">
         <div class="stat-card">
-            <h3>Paid Licenses</h3>
+            <h3>Active Licenses</h3>
             <div class="value"><?php echo $total_paid_licenses; ?></div>
         </div>
         <div class="stat-card">
@@ -301,9 +301,9 @@ include __DIR__ . '/admin_header.php';
             </div>
         </div>
 
-        <!-- Cumulative Revenue Chart -->
+        <!-- Revenue (All Time) Chart -->
         <div class="chart-card">
-            <h2 class="chart-card-title">Cumulative Revenue</h2>
+            <h2 class="chart-card-title">Revenue (All Time)</h2>
             <div class="chart-card-container">
                 <canvas id="cumulativeChart"></canvas>
             </div>
@@ -391,7 +391,7 @@ new Chart(document.getElementById('cumulativeChart').getContext('2d'), {
     data: {
         labels: chartLabels,
         datasets: [{
-            label: 'Cumulative Revenue',
+            label: 'Revenue (All Time)',
             data: <?php echo json_encode($cumulative_data); ?>,
             borderColor: '#8b5cf6',
             backgroundColor: 'rgba(139, 92, 246, 0.15)',

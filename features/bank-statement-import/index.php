@@ -2,11 +2,11 @@
 // Referral tracking: capture ?source so article/ad clicks landing here attribute.
 require_once __DIR__ . '/../../track_referral.php';
 require_once __DIR__ . '/../../resources/icons.php';
-require_once __DIR__ . '/../../resources/components/feature-video.php';
 require_once __DIR__ . '/../../config/pricing.php';
-$argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
-$argo_free_scan_limit = (int) get_pricing_config()['free_receipt_scan_monthly_limit'];
-$argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
+$argo_cfg = get_pricing_config();
+$argo_monthly = (int) $argo_cfg['premium_monthly_price'];
+$argo_bank_limit = (int) $argo_cfg['bank_import_monthly_limit'];
+$argo_premium_bank_limit = (int) $argo_cfg['premium_bank_import_monthly_limit'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,15 +19,15 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Argo Books' AI receipt scanner eliminates manual data entry and keeps your books accurate.">
+        content="Import a bank statement (CSV, Excel, or PDF) into Argo Books and every line becomes a categorized expense or revenue, ready to review. Match against your books too. No bank login required.">
     <meta name="keywords"
-        content="AI receipt scanner, OCR receipt, automatic receipt scanning, receipt data extraction, receipt management software, scan receipts app, receipt OCR software, digital receipt organizer, receipt tracker, expense receipt app">
+        content="bank statement import, import bank statement CSV, bank statement to accounting software, bank reconciliation software, categorize bank transactions, PDF bank statement import, bank matching, no bank connection bookkeeping">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="AI Receipt Scanning | Argo Books">
+    <meta property="og:title" content="Bank Statement Import | Argo Books">
     <meta property="og:description"
-        content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry and keep your books accurate.">
-    <meta property="og:url" content="https://argorobots.com/features/receipt-scanning/">
+        content="Drop in a bank statement and every line becomes a categorized expense or revenue. Match against your books, all without connecting your bank.">
+    <meta property="og:url" content="https://argorobots.com/features/bank-statement-import/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
@@ -37,9 +37,9 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="AI Receipt Scanning | Argo Books">
+    <meta name="twitter:title" content="Bank Statement Import | Argo Books">
     <meta name="twitter:description"
-        content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry.">
+        content="Drop in a bank statement and every line becomes a categorized expense or revenue. Match against your books, all without connecting your bank.">
     <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
@@ -47,7 +47,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <meta name="geo.placename" content="Canada">
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://argorobots.com/features/receipt-scanning/">
+    <link rel="canonical" href="https://argorobots.com/features/bank-statement-import/">
 
     <!-- Breadcrumb Schema -->
     <script type="application/ld+json">
@@ -57,7 +57,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
             "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://argorobots.com/"},
                 {"@type": "ListItem", "position": 2, "name": "Features", "item": "https://argorobots.com/features/"},
-                {"@type": "ListItem", "position": 3, "name": "AI Receipt Scanning", "item": "https://argorobots.com/features/receipt-scanning/"}
+                {"@type": "ListItem", "position": 3, "name": "Bank Statement Import", "item": "https://argorobots.com/features/bank-statement-import/"}
             ]
         }
     </script>
@@ -70,34 +70,42 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
             "mainEntity": [
                 {
                     "@type": "Question",
-                    "name": "How does AI receipt scanning work?",
+                    "name": "What bank statement formats can I import?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Take a photo of any receipt, or upload an image, and Argo Books uses AI to extract the store name, individual line items, totals, taxes, and date automatically. The extracted data is used to create an expense record with no manual typing. It achieves 99.9% accuracy, so you spend less time on data entry and more time running your business."
+                        "text": "Argo Books imports bank statements as CSV, Excel (.xlsx and .xls), or PDF. Export a statement from your online banking, drop the file in, and each transaction line is read and pre-filled for you."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "What types of receipts can Argo Books scan?",
+                    "name": "Do I need to connect my bank account?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Argo Books can scan printed receipts, handwritten receipts, and digital receipt images. It supports photos taken with your phone camera, screenshots, and uploaded image files in common formats like JPG and PNG. Whether it's a crumpled gas station receipt or a clean digital invoice, the AI handles it."
+                        "text": "No. There is no bank login, no connection, and no third-party aggregator. Argo Books works entirely from the statement file you export yourself, so nothing is ever linked to your bank."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "Is my receipt data private?",
+                    "name": "Does it record transactions automatically?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "Yes. AI processing uses a secure API call to extract the data, but your receipt images and all extracted information are stored locally on your computer. No receipt data is kept on third-party servers after processing. Your financial records remain fully under your control."
+                        "text": "Every line is pre-filled for you with a type, category, and supplier or customer, but nothing is saved until you review and confirm. You stay in control of what goes into your books."
                     }
                 },
                 {
                     "@type": "Question",
-                    "name": "How many receipts can I scan per month?",
+                    "name": "How is importing different from matching?",
                     "acceptedAnswer": {
                         "@type": "Answer",
-                        "text": "The Free plan includes <?= $argo_free_scan_limit ?> AI receipt scans per month: enough to get started and see how it works. Premium users get <?= $argo_scan_limit ?> scans per month, which is more than enough for even the busiest small businesses. If you regularly collect receipts, Premium pays for itself in time saved."
+                        "text": "Import turns each bank line into a new categorized expense or revenue. Matching compares your statement against records you have already entered, confirms the ones that line up, and shows anything missing from your books. You can use either, or both."
+                    }
+                },
+                {
+                    "@type": "Question",
+                    "name": "How many bank statements can I import per month?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "The Free plan includes <?= $argo_bank_limit ?> AI bank imports per month and Premium includes <?= $argo_premium_bank_limit ?>. Reading a CSV or Excel file without AI categorization doesn't count against your limit, and even at the limit you can still import and fill lines in by hand."
                     }
                 }
             ]
@@ -118,13 +126,13 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                 "priceCurrency": "CAD",
                 "description": "Free plan available. Premium for $<?= $argo_monthly ?>/month."
             },
-            "description": "Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry and keep your books accurate.",
-            "featureList": "AI-powered receipt data extraction, Automatic expense record creation, Receipt archive with search, Support for printed and handwritten receipts"
+            "description": "Import bank statements into Argo Books from CSV, Excel, or PDF. Each line becomes a categorized expense or revenue, with a separate matching mode to reconcile against your existing records. No bank connection required.",
+            "featureList": "CSV, Excel and PDF bank statements, Automatic categorization, Bank matching with month calendar, No bank login, Full undo for every import"
         }
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../../resources/images/argo-logo/argo-icon.ico">
-    <title>AI Receipt Scanning | Argo Books</title>
+    <title>Bank Statement Import | Argo Books</title>
 
     <script src="../../resources/scripts/main.js"></script>
 
@@ -150,8 +158,8 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
             <div class="hero-gradient-orb hero-orb-2"></div>
         </div>
         <div class="container">
-            <h1 class="animate-fade-in">Turn any receipt into organized data, instantly</h1>
-            <p class="hero-subtitle animate-fade-in">Stop typing. Start scanning. Argo Books reads your receipts with AI and pulls out every detail: store name, items, totals, and taxes, so your books stay accurate without the busywork.</p>
+            <h1 class="animate-fade-in">Turn your bank statement into clean books</h1>
+            <p class="hero-subtitle animate-fade-in">Drop in a CSV, Excel, or PDF statement in any format and every line comes back as a categorized expense or revenue, ready to review. No template to match, no bank login, no copying and pasting.</p>
             <div class="hero-ctas animate-fade-in">
                 <a href="../../downloads/" class="btn-cta btn-cta-primary">
                     <span>Get Started Free</span>
@@ -164,58 +172,33 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
         </div>
     </section>
 
-    <?php feature_video_section('UuYg174V2RM', 'Argo Books AI receipt scanning demo'); ?>
-
     <!-- =============================================
-         DETAIL SECTION 1: The Problem + Solution
-         Text left, image right
+         DETAIL SECTION 1: Problem + Solution
          ============================================= -->
     <section class="feature-detail-section">
         <div class="container">
             <div class="feature-detail animate-on-scroll">
                 <div class="feature-detail-text">
                     <span class="section-label">The Problem</span>
-                    <h2>Manual receipt entry is costing you hours every week</h2>
-                    <p>Typing receipts by hand wastes time and introduces errors. Argo Books uses AI to read your receipts in seconds and log every detail directly into your expense records, accurately, every time.</p>
+                    <h2>Stop typing your statement line by line</h2>
+                    <p>Catching up on a month of banking usually means squinting at a PDF and retyping every row. Argo Books reads the whole statement for you and turns each line into a categorized expense or revenue, with the type, category, and supplier or customer already filled in.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Automatic extraction of store name, date, and address</span>
+                            <span>Reads any bank's format, in CSV, Excel, or PDF, with no template to set up</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Line-by-line item detection with individual prices</span>
+                            <span>Each line comes back categorized and ready to review</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Tax, tip, and total calculation verification</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Handles any receipt format: printed, handwritten, photo, screenshot, or PDF</span>
+                            <span>No bank login, no connection, no aggregator</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <div class="receipt-visual-wrapper scan-visual">
-                        <img src="../../resources/images/receipt-phone.webp" alt="Phone scanning a receipt with Argo Books AI" loading="lazy">
-                        <div class="scan-line"></div>
-                        <div class="scan-tag scan-tag-vendor">
-                            <span class="scan-tag-label">Vendor</span>
-                            <span class="scan-tag-value">Store Name</span>
-                            <?= svg_icon('check', 14) ?>
-                        </div>
-                        <div class="scan-tag scan-tag-total">
-                            <span class="scan-tag-label">Total</span>
-                            <span class="scan-tag-value">$25.20</span>
-                            <?= svg_icon('check', 14) ?>
-                        </div>
-                        <div class="scan-tag scan-tag-tax">
-                            <span class="scan-tag-label">Tax</span>
-                            <span class="scan-tag-value">$1.97</span>
-                            <?= svg_icon('check', 14) ?>
-                        </div>
-                    </div>
+                    <img src="../../resources/images/features/bank-statement-import.svg" alt="Bank statement import review showing each transaction categorized as an expense or revenue with a category and amount" loading="lazy">
                 </div>
             </div>
         </div>
@@ -225,8 +208,8 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Try AI receipt scanning for free</h3>
-                <p>Download Argo Books and scan your first receipt in under a minute. No credit card or account required.</p>
+                <h3>Catch up on your books in minutes</h3>
+                <p>Download Argo Books and import your first statement in a few minutes. No credit card needed.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -247,69 +230,49 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
         <div class="container">
             <div class="highlight-grid animate-on-scroll">
                 <div class="highlight-item">
-                    <h3>99.9%</h3>
-                    <p>Accuracy on printed receipts</p>
+                    <h3>CSV, Excel, PDF</h3>
+                    <p>Whatever your bank exports</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>&lt; 10 seconds</h3>
-                    <p>Average processing time per receipt</p>
+                    <h3>No bank login</h3>
+                    <p>Nothing is ever connected to your bank</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>0</h3>
-                    <p>Receipts you need to type manually</p>
+                    <h3><?= $argo_bank_limit ?> free</h3>
+                    <p>AI bank imports every month on the free plan</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 2: How the AI works
-         Image left, text right (reversed)
+         DETAIL SECTION 2: Matching (reversed)
          ============================================= -->
     <section class="feature-detail-section" style="background: var(--gray-50);">
         <div class="container">
             <div class="feature-detail reversed animate-on-scroll">
                 <div class="feature-detail-text">
-                    <span class="section-label">Under the Hood</span>
-                    <h2>AI that reads receipts like a human, but faster</h2>
-                    <p>Our receipt scanner uses advanced optical character recognition (OCR) combined with a large language model (LLM) to understand your receipts contextually, not just reading characters, but understanding what they mean. It can handle faded thermal paper, and even read handwritten amounts.</p>
-                    <p>After scanning, Argo Books structures the data into clean, organized fields: vendor, date, individual items, quantities, prices, subtotal, tax, and total. You review the results, make any corrections, and save, all in a few seconds.</p>
-                    <p>As a rule of thumb: if you can read the receipt in the image, Argo Books can too.</p>
+                    <span class="section-label">Bank Matching</span>
+                    <h2>Check your statement against your books</h2>
+                    <p>Already recording as you go? Use matching instead. Argo Books lines up each bank transaction with the expense or revenue you already entered, confirms the ones that agree, and flags anything that's missing, so you can be sure your books and your bank tell the same story.</p>
+                    <p>A month calendar view shows matched and unmatched activity at a glance, and a separate list surfaces records in your books that never showed up on the statement.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>OCR + LLM for a deeper understanding</span>
+                            <span>Matches bank lines to your recorded expenses and revenue</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Handles faded thermal paper, wrinkled receipts, and poor lighting</span>
+                            <span>Month calendar view of matched and unmatched days</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Multi-currency support for international purchases</span>
-                        </li>
-                        <li>
-                            <?= svg_icon('check', 20) ?>
-                            <span>Review and edit before saving. You're always in control</span>
+                            <span>Runs on your computer, with no data sent out to match</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <div class="receipt-visual-wrapper annotate-visual">
-                        <img src="../../resources/images/receipt-desk.webp" alt="Receipt on desk with AI-detected fields highlighted" loading="lazy">
-                        <div class="annotate-box annotate-vendor">
-                            <span class="annotate-label">Vendor</span>
-                        </div>
-                        <div class="annotate-box annotate-date">
-                            <span class="annotate-label">Date</span>
-                        </div>
-                        <div class="annotate-box annotate-items">
-                            <span class="annotate-label">Line Items</span>
-                        </div>
-                        <div class="annotate-box annotate-total">
-                            <span class="annotate-label">Total</span>
-                        </div>
-                    </div>
+                    <img src="../../resources/images/features/bank-statement-matching.svg" alt="Bank matching page with a month calendar showing matched, suggested, and unmatched transactions" loading="lazy">
                 </div>
             </div>
         </div>
@@ -322,24 +285,24 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">How It Works</span>
-                <h2 class="section-title">Three steps to organized receipts</h2>
-                <p class="section-desc">From paper receipt to organized expense record in under a minute. No typing, no guessing, no lost receipts.</p>
+                <h2 class="section-title">Three steps from statement to sorted</h2>
+                <p class="section-desc">Export, drop, review. Argo Books does the reading and the categorizing so you don't have to.</p>
             </div>
             <div class="steps-grid">
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">1</div>
-                    <h3>Snap a photo or upload an image</h3>
-                    <p>Take a photo of your receipt and open it in Argo Books.</p>
+                    <h3>Export from your bank</h3>
+                    <p>Download a statement from your online banking as a CSV, Excel, or PDF file. Any bank works.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">2</div>
-                    <h3>AI reads and structures the data</h3>
-                    <p>Argo Books extracts the vendor, date, line items, tax, tip, and total, even from faded ink or messy formatting.</p>
+                    <h3>Drop in the file</h3>
+                    <p>Argo Books reads every line, even statements with header notes or unusual columns, and pre-fills each one.</p>
                 </div>
                 <div class="step-card animate-on-scroll">
                     <div class="step-number">3</div>
-                    <h3>Verify and save</h3>
-                    <p>Argo Books auto-categorizes each expense. Just confirm the details and save.</p>
+                    <h3>Review and import</h3>
+                    <p>Check the categorized lines, adjust anything you like, and import. Or switch to matching to reconcile against your books.</p>
                 </div>
             </div>
         </div>
@@ -349,8 +312,8 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Stop losing receipts</h3>
-                <p>Every receipt scanned, categorized, and stored, ready for tax season. Get started in minutes.</p>
+                <h3>Never re-type a bank statement again</h3>
+                <p>Every transaction read, categorized, and ready to confirm.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Get Started Free</span>
@@ -362,91 +325,90 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 3: Organized + Searchable
-         Text left, image right
+         DETAIL SECTION 3: Smart pre-fill
          ============================================= -->
     <section class="feature-detail-section">
         <div class="container">
             <div class="feature-detail animate-on-scroll">
                 <div class="feature-detail-text">
-                    <span class="section-label">Stay Organized</span>
-                    <h2>Every receipt, filed and searchable</h2>
-                    <p>Once scanned, your receipts become part of your financial records. Every expense is categorized, timestamped, and linked to the receipt. No more digging through shoeboxes before tax season. Everything is organized and searchable from day one.</p>
-                    <p>Need to find that $342 equipment purchase from last July? Do a quick search and find it in seconds.</p>
+                    <span class="section-label">Filled In For You</span>
+                    <h2>Every line pre-filled before you review</h2>
+                    <p>Argo Books fills each line in two passes. First, it applies rules it has learned from your past imports and matches obvious names against your existing products, suppliers, and customers. Then AI fills in whatever is left, choosing a product and category and a supplier or customer for each transaction.</p>
+                    <p>Nothing is written to your books until you confirm, and every import you approve teaches Argo Books your merchants, so the next statement fills in even faster.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Receipts attached to expense records automatically</span>
+                            <span>Picks the product, category, and supplier or customer</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Original receipt images stored alongside extracted data</span>
+                            <span>Learns each merchant so repeat statements pre-fill themselves</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Export expense reports for accountants and tax filing</span>
+                            <span>You review and confirm before anything is saved</span>
                         </li>
                     </ul>
                 </div>
                 <div class="feature-detail-visual">
-                    <img src="../../resources/images/features/expenses-table.svg" alt="Argo Books expenses page showing organized, searchable expense records with supplier details and status" loading="lazy">
+                    <img src="../../resources/images/features/bank-statement-prefill.svg" alt="A single bank line pre-filled with a type, product and category, and supplier, with a learned-rule badge" loading="lazy">
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         BENEFITS GRID, 6 benefit cards
+         BENEFITS GRID
          ============================================= -->
     <section class="benefits-section" style="background: var(--gray-50);">
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Why It Matters</span>
-                <h2 class="section-title">Explore more features</h2>
-                <p class="section-desc">AI receipt scanning isn't just about saving time. It changes how you manage your business finances.</p>
+                <h2 class="section-title">More than a statement reader</h2>
+                <p class="section-desc">It changes how you catch up, how you check your books, and how much of it you have to do by hand.</p>
             </div>
             <div class="benefits-grid">
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon">
                         <?= svg_icon('clock', 22) ?>
                     </div>
-                    <h3>Save hours every week</h3>
-                    <p>Stop typing receipt data by hand. Most small business owners spend several hours every week on manual receipt entry. Argo Books cuts that to minutes.</p>
+                    <h3>Catch up in minutes</h3>
+                    <p>A whole month of transactions, read and categorized, in the time it used to take to do a handful by hand.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon green">
-                        <?= svg_icon('check', 22, '', 2.5) ?>
-                    </div>
-                    <h3>Eliminate data entry errors</h3>
-                    <p>Manual entry leads to typos, wrong totals, and missing items. Argo Books reads receipts accurately and catches math errors humans miss.</p>
-                </div>
-                <div class="benefit-card animate-on-scroll">
-                    <div class="benefit-card-icon purple">
                         <?= svg_icon('shield', 22) ?>
                     </div>
-                    <h3>Tax-ready records all year</h3>
-                    <p>Every scanned receipt is categorized and stored with the original image. When tax season arrives, your records are already organized and audit-ready.</p>
+                    <h3>No bank connection</h3>
+                    <p>No login, no linked account, no aggregator. You export the file, and that's the only thing Argo Books ever sees.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon amber">
                         <?= svg_icon('bolt', 22) ?>
                     </div>
-                    <h3>Process receipts in seconds</h3>
-                    <p>No more "I'll do it later". Scan receipts the moment you get them. The entire process from photo to saved expense takes under 30 seconds.</p>
+                    <h3>Handles messy statements</h3>
+                    <p>Header notes, odd column names, separate debit and credit columns: Argo Books finds the real data and reads it.</p>
+                </div>
+                <div class="benefit-card animate-on-scroll">
+                    <div class="benefit-card-icon purple">
+                        <?= svg_icon('bank', 22) ?>
+                    </div>
+                    <h3>Learns your merchants</h3>
+                    <p>Confirm an import once and Argo Books remembers it, so the same merchant fills in automatically next time.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon cyan">
-                        <?= svg_icon('search', 22) ?>
+                        <?= svg_icon('calendar', 22) ?>
                     </div>
-                    <h3>Find any receipt</h3>
-                    <p>Search your records in seconds. No more digging through files. Every receipt is digital and searchable.</p>
+                    <h3>Spot what's missing</h3>
+                    <p>Matching mode shows any records in your books that never appeared on the statement, so nothing slips through.</p>
                 </div>
                 <div class="benefit-card animate-on-scroll">
                     <div class="benefit-card-icon red">
-                        <?= svg_icon('trending-up', 22) ?>
+                        <?= svg_icon('refresh', 22) ?>
                     </div>
-                    <h3>Better insights</h3>
-                    <p>When all your receipts are digitized, you can see spending patterns you'd otherwise miss, like which vendors cost you the most, and where you can save money.</p>
+                    <h3>Fully undoable</h3>
+                    <p>Every import and every match is a single undo step. If something looks off, roll it back and try again.</p>
                 </div>
             </div>
         </div>
@@ -456,8 +418,8 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <section class="inline-cta">
         <div class="container">
             <div class="inline-cta-inner animate-on-scroll">
-                <h3>Start saving time with Argo Books today</h3>
-                <p>Join small business owners who eliminated manual receipt entry with Argo Books.</p>
+                <h3>Import your first statement today</h3>
+                <p>Get a month of banking into Argo Books in a few minutes.</p>
                 <div class="inline-cta-buttons">
                     <a href="../../downloads/" class="btn-cta btn-cta-primary">
                         <span>Download Free</span>
@@ -478,66 +440,65 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
         <div class="container">
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Who It's For</span>
-                <h2 class="section-title">Built for the way you actually work</h2>
-                <p class="section-desc">Whether you're a freelancer with a few receipts a week or a retail shop with dozens per day, AI scanning adapts to your workflow.</p>
+                <h2 class="section-title">Built for real-world bookkeeping</h2>
+                <p class="section-desc">Whether you're catching up, switching over, or double-checking, bank import handles it.</p>
             </div>
             <div class="use-cases-grid">
                 <div class="use-case-card animate-on-scroll">
                     <h3>
-                        <?= svg_icon('users', 22) ?>
-                        Freelancers & consultants
-                    </h3>
-                    <p>Track client-related expenses by scanning receipts on the go. Every receipt is categorized and stored, so when it's time to bill a client you have a clean, searchable record to reference.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
-                        <?= svg_icon('package', 22) ?>
-                        Retail & e-commerce
-                    </h3>
-                    <p>Scan supplier invoices and purchase receipts to keep inventory costs accurate. Know exactly what you paid for every product on your shelves.</p>
-                </div>
-                <div class="use-case-card animate-on-scroll">
-                    <h3>
                         <?= svg_icon('calendar', 22) ?>
-                        Service businesses
+                        Monthly catch-up
                     </h3>
-                    <p>Scan fuel receipts, material purchases, and equipment costs. Categorize expenses by job or project to track profitability on every engagement.</p>
+                    <p>Fell behind? Import last month's statement and turn a whole page of transactions into sorted records in one sitting.</p>
+                </div>
+                <div class="use-case-card animate-on-scroll">
+                    <h3>
+                        <?= svg_icon('bank', 22) ?>
+                        Bringing in your history
+                    </h3>
+                    <p>New to Argo Books? Import past statements to build up your records instead of starting from an empty slate.</p>
+                </div>
+                <div class="use-case-card animate-on-scroll">
+                    <h3>
+                        <?= svg_icon('refresh', 22) ?>
+                        Reconciling your books
+                    </h3>
+                    <p>Match your statement against what you've recorded to confirm everything agrees and catch anything you missed.</p>
                 </div>
                 <div class="use-case-card animate-on-scroll">
                     <h3>
                         <?= svg_icon('document', 22) ?>
-                        Anyone at tax time
+                        Accountant handoffs
                     </h3>
-                    <p>No more January panic. Every receipt is already scanned, categorized, and stored, ready to hand to your accountant or file with your return.</p>
+                    <p>Keep clean, categorized records that line up with your bank, so tax time and accountant reviews go smoothly.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- =============================================
-         DETAIL SECTION 4: Privacy & Security
-         Image left, text right (reversed)
+         DETAIL SECTION 4: Privacy (reversed)
          ============================================= -->
     <section class="feature-detail-section" style="background: var(--gray-50);">
         <div class="container">
             <div class="feature-detail reversed animate-on-scroll">
                 <div class="feature-detail-text">
                     <span class="section-label">Privacy First</span>
-                    <h2>Your receipts stay on your computer</h2>
-                    <p>Unlike cloud-based receipt scanners that store your financial data on third-party servers, Argo Books is a desktop application. Your receipts and expense data are stored locally on your device, not on someone else's cloud.</p>
-                    <p>The AI processing happens securely, and your scanned receipt images are saved alongside your financial records on your own machine. You control your data, always.</p>
+                    <h2>Your banking stays yours</h2>
+                    <p>Argo Books is a desktop app, not a cloud service, and it never connects to your bank. CSV and Excel statements are read right on your computer, and matching runs entirely on your machine.</p>
+                    <p>Only reading a PDF statement and the optional AI categorization send transaction lines out for analysis. There's never a bank login involved, because there's no bank connection to begin with.</p>
                     <ul class="feature-checklist">
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Desktop app: your data stays on your computer</span>
+                            <span>No bank login, connection, or third-party aggregator</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>No third-party cloud storage of your financial documents</span>
+                            <span>CSV and Excel are read on your own computer</span>
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Receipt images stored locally alongside expense records</span>
+                            <span>Matching happens locally, with nothing sent out</span>
                         </li>
                     </ul>
                 </div>
@@ -556,7 +517,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
             <div class="section-header animate-on-scroll">
                 <span class="section-label">Related Features</span>
                 <h2 class="section-title">Works great with</h2>
-                <p class="section-desc">AI receipt scanning is even more powerful when combined with these features.</p>
+                <p class="section-desc">Bank import works even better alongside these.</p>
             </div>
             <div class="related-grid">
                 <a href="../expense-revenue-tracking/" class="related-card animate-on-scroll">
@@ -564,21 +525,21 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                         <?= svg_icon('dollar', 22) ?>
                     </div>
                     <h3>Expense & Revenue Tracking</h3>
-                    <p>Scanned receipts flow directly into your records. Every transaction is categorized and ready for reports.</p>
-                </a>
-                <a href="../predictive-analytics/" class="related-card animate-on-scroll">
-                    <div class="related-card-icon">
-                        <?= svg_icon('analytics', 22) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>More expense data means better forecasts. Receipt scanning feeds your analytics engine with accurate, detailed financial data.</p>
+                    <p>Imported transactions land straight in your expense and revenue records, categorized and ready for reports.</p>
                 </a>
                 <a href="../spreadsheet-import/" class="related-card animate-on-scroll">
                     <div class="related-card-icon">
                         <?= svg_icon('document-upload', 22) ?>
                     </div>
                     <h3>Spreadsheet Import</h3>
-                    <p>Have existing receipt data in spreadsheets? Import it instantly with Argo Book's spreadsheet importer, then scan new receipts going forward.</p>
+                    <p>Bring in customers, products, and more from any spreadsheet, with columns mapped for you automatically.</p>
+                </a>
+                <a href="../receipt-scanning/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon">
+                        <?= svg_icon('receipt-scan-detail', 22) ?>
+                    </div>
+                    <h3>Receipt Scanning</h3>
+                    <p>Scan receipts for new purchases as they happen, and import your statement to catch anything that slipped by.</p>
                 </a>
             </div>
         </div>
@@ -592,15 +553,20 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                 <p class="section-desc">Go deeper with these step-by-step guides.</p>
             </div>
             <div class="related-grid">
-                <a href="../../best-free-ai-receipt-scanner/" class="related-card animate-on-scroll">
+                <a href="../../import-bank-transactions-from-csv-into-accounting-software/" class="related-card animate-on-scroll">
                     <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Best free AI receipt scanner</h3>
-                    <p>Honest picks for scanning receipts without a subscription.</p>
+                    <h3>Import bank transactions from CSV</h3>
+                    <p>Pull your bank history in with automatic column mapping and categorization.</p>
                 </a>
-                <a href="../../how-to-track-business-expenses-without-spreadsheets/" class="related-card animate-on-scroll">
+                <a href="../../how-to-move-from-spreadsheets-to-bookkeeping-software/" class="related-card animate-on-scroll">
                     <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
-                    <h3>Track expenses without spreadsheets</h3>
-                    <p>A simpler way to capture every expense as it happens.</p>
+                    <h3>Move from spreadsheets to software</h3>
+                    <p>When and how to make the switch to real bookkeeping software cleanly.</p>
+                </a>
+                <a href="../../how-to-convert-excel-spreadsheet-to-accounting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Convert Excel to accounting software</h3>
+                    <p>Move your existing spreadsheets into real software without losing history.</p>
                 </a>
             </div>
         </div>
@@ -614,8 +580,8 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
         <section class="cta-section">
             <div class="container">
                 <div class="cta-card animate-on-scroll">
-                    <h2>Ready to ditch manual data entry?</h2>
-                    <p>Download now and start scanning receipts with Argo Books. With a generous free tier, and no credit card or account required.</p>
+                    <h2>Ready to import your statement?</h2>
+                    <p>Download Argo Books and turn your next bank statement into clean, categorized records in minutes. Free to start, with no credit card and no trial.</p>
                     <div class="cta-buttons">
                         <a href="../../downloads/" class="btn-cta btn-cta-primary">
                             <span>Download for Free</span>

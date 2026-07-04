@@ -182,6 +182,26 @@ require_once __DIR__ . '/../track_referral.php';
                     <p>Import data from any spreadsheet format. Our AI automatically maps columns, detects data types, and imports everything cleanly, with no manual mapping required.</p>
                     <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
                 </a>
+
+                <!-- Bank Statement Import -->
+                <a href="bank-statement-import/" class="feature-card animate-on-scroll">
+                    <div class="feature-card-icon purple">
+                        <?= svg_icon('bank', 24) ?>
+                    </div>
+                    <h3>Bank Statement Import</h3>
+                    <p>Drop in a CSV, Excel, or PDF bank statement and every line comes back as a categorized expense or revenue. Match against your books too, all without connecting your bank.</p>
+                    <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
+                </a>
+
+                <!-- Report Builder -->
+                <a href="report-builder/" class="feature-card animate-on-scroll">
+                    <div class="feature-card-icon cyan">
+                        <?= svg_icon('report', 24) ?>
+                    </div>
+                    <h3>Report Builder</h3>
+                    <p>Build Income Statements, Balance Sheets, tax summaries, and more from your own data. Design each report your way and export a clean, branded PDF. Free to use.</p>
+                    <span class="feature-card-link">Learn more <?= svg_icon('arrow-right', 16) ?></span>
+                </a>
             </div>
         </div>
     </section>

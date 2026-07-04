@@ -248,25 +248,17 @@ if (!function_exists('ua_kv')) {
 [data-theme="dark"] .ua-evt.feature .ua-evt-text { color:#34d399; }
 [data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
 
-/* Filter + pagination controls */
+/* Filter controls. Pagination itself is the shared admin TablePaginator. */
 .ua-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:1rem; }
 .ua-input { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:.85rem; background:#fff; color:var(--admin-text); }
 .ua-input:focus { outline:none; border-color:#3b82f6; }
 #ua-search { flex:1; min-width:220px; }
 .ua-count { font-size:.8rem; color:#6b7280; margin-left:auto; white-space:nowrap; }
 .ua-noresults { color:#6b7280; font-size:.9rem; padding:1rem 0; }
-.ua-pager { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:.75rem; }
-.ua-pager-info { font-size:.8rem; color:#6b7280; }
-.ua-pager-btns { display:flex; align-items:center; gap:10px; }
-.ua-pager-btns button { padding:6px 14px; border:1px solid #d1d5db; border-radius:6px; background:#fff; color:var(--admin-text); font-size:.8rem; cursor:pointer; }
-.ua-pager-btns button:disabled { opacity:.45; cursor:not-allowed; }
-.ua-pager-btns button:not(:disabled):hover { background:#f3f4f6; }
-#ua-pageind { font-size:.8rem; color:var(--admin-text); }
+.ua-table { width:100%; border-collapse:collapse; }
+.ua-table td.ua-td { padding:0; border:0; background:transparent; }
 [data-theme="dark"] .ua-input { background:var(--gray-800); border-color:var(--gray-700); color:var(--white); }
-[data-theme="dark"] .ua-pager-btns button { background:var(--gray-800); border-color:var(--gray-700); color:var(--white); }
-[data-theme="dark"] .ua-pager-btns button:not(:disabled):hover { background:var(--gray-700); }
-[data-theme="dark"] .ua-count, [data-theme="dark"] .ua-pager-info, [data-theme="dark"] .ua-noresults { color:var(--gray-400); }
-[data-theme="dark"] #ua-pageind { color:var(--white); }
+[data-theme="dark"] .ua-count, [data-theme="dark"] .ua-noresults { color:var(--gray-400); }
 </style>
 
 <h2 class="section-title">User Activity</h2>
@@ -289,30 +281,29 @@ if (!function_exists('ua_kv')) {
             <option value="30">Active last 30 days</option>
             <option value="90">Active last 90 days</option>
         </select>
-        <select id="ua-perpage" class="ua-input">
-            <option value="10">10 / page</option>
-            <option value="25" selected>25 / page</option>
-            <option value="50">50 / page</option>
-        </select>
         <span class="ua-count" id="ua-count"></span>
     </div>
 
-    <div id="ua-list">
+    <div class="table-responsive">
+    <table class="ua-table" data-paginate="25" data-paginate-noun="users">
+        <tbody>
     <?php foreach ($ua_users as $u):
         // Newest-first timeline for display.
         $timeline = $u['timeline'];
         usort($timeline, fn($a, $b) => $b['ts'] <=> $a['ts']);
-        // Searchable haystack + filter keys for the client-side controls.
+        // Searchable haystack + filter keys for the client-side filters.
         $ua_haystack = strtolower(trim(
             $u['authId'] . ' ' . $u['country'] . ' ' . $u['region'] . ' ' .
             implode(' ', array_keys($u['versions'])) . ' ' .
             implode(' ', array_keys($u['platforms']))
         ));
     ?>
-    <div class="ua-card"
-         data-tier="<?= htmlspecialchars($u['tier']) ?>"
-         data-last="<?= (int)($u['last'] ?? 0) ?>"
-         data-search="<?= htmlspecialchars($ua_haystack) ?>">
+    <tr class="ua-user"
+        data-tier="<?= htmlspecialchars($u['tier']) ?>"
+        data-last="<?= (int)($u['last'] ?? 0) ?>"
+        data-search="<?= htmlspecialchars($ua_haystack) ?>">
+      <td class="ua-td">
+        <div class="ua-card">
         <div class="ua-del">
             <form method="post" action="?tab=user-activity"
                   onsubmit="return confirm('Delete ALL <?= count($u['files']) ?> file(s) for this user? This cannot be undone.');">
@@ -357,95 +348,62 @@ if (!function_exists('ua_kv')) {
         <?php endif; ?>
 
         <div class="ua-files"><?= count($u['files']) ?> file(s): <?= htmlspecialchars(implode(', ', $u['files'])) ?></div>
-    </div>
+        </div>
+      </td>
+    </tr>
     <?php endforeach; ?>
-    </div><!-- /#ua-list -->
+        </tbody>
+    </table>
+    </div><!-- /.table-responsive -->
 
     <p class="ua-noresults" id="ua-noresults" style="display:none;">No users match your filters.</p>
 
-    <div class="ua-pager" id="ua-pager" style="display:none;">
-        <span class="ua-pager-info" id="ua-pager-info"></span>
-        <div class="ua-pager-btns">
-            <button type="button" id="ua-prev">Prev</button>
-            <span id="ua-pageind"></span>
-            <button type="button" id="ua-next">Next</button>
-        </div>
-    </div>
-
     <script>
+    // Filtering only. Pagination is the shared admin TablePaginator, which we
+    // re-run via reset() after hiding non-matching rows. Rows we hide use
+    // display:none WITHOUT the .pg-hidden class, so the paginator excludes them
+    // from its counts and pages (see admin/pagination.js _rows()).
     (function () {
-        var list = document.getElementById('ua-list');
-        if (!list) return;
-        var cards = Array.prototype.slice.call(list.querySelectorAll('.ua-card'));
+        var table = document.querySelector('.ua-table');
+        if (!table) return;
+        var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr.ua-user'));
         var search = document.getElementById('ua-search');
         var tierSel = document.getElementById('ua-tier');
         var periodSel = document.getElementById('ua-period');
-        var perPageSel = document.getElementById('ua-perpage');
         var countEl = document.getElementById('ua-count');
         var noRes = document.getElementById('ua-noresults');
-        var pager = document.getElementById('ua-pager');
-        var pagerInfo = document.getElementById('ua-pager-info');
-        var pageInd = document.getElementById('ua-pageind');
-        var prevBtn = document.getElementById('ua-prev');
-        var nextBtn = document.getElementById('ua-next');
-        var page = 1;
         var nowSec = Math.floor(Date.now() / 1000);
+        var t;
 
-        function getVisible() {
+        function apply() {
             var q = (search.value || '').trim().toLowerCase();
             var tier = tierSel.value;
             var days = parseInt(periodSel.value, 10) || 0;
             var cutoff = days > 0 ? nowSec - days * 86400 : 0;
-            return cards.filter(function (c) {
-                if (tier && c.dataset.tier !== tier) return false;
-                if (cutoff && (parseInt(c.dataset.last, 10) || 0) < cutoff) return false;
-                if (q && (c.dataset.search || '').indexOf(q) === -1) return false;
-                return true;
+            var visible = 0;
+
+            rows.forEach(function (tr) {
+                var ok = (!tier || tr.dataset.tier === tier)
+                    && (!cutoff || (parseInt(tr.dataset.last, 10) || 0) >= cutoff)
+                    && (!q || (tr.dataset.search || '').indexOf(q) !== -1);
+                if (ok) {
+                    tr.style.display = '';
+                    visible++;
+                } else {
+                    tr.style.display = 'none';
+                    tr.classList.remove('pg-hidden');
+                }
             });
+
+            countEl.textContent = visible + (visible === 1 ? ' user' : ' users');
+            noRes.style.display = visible === 0 ? '' : 'none';
+            if (table._paginator) table._paginator.reset();
         }
 
-        function render() {
-            var vis = getVisible();
-            var perPage = parseInt(perPageSel.value, 10) || 25;
-            var total = vis.length;
-            var pages = Math.max(1, Math.ceil(total / perPage));
-            if (page > pages) page = pages;
-            if (page < 1) page = 1;
-            var start = (page - 1) * perPage;
-            var end = start + perPage;
-
-            cards.forEach(function (c) { c.style.display = 'none'; });
-            vis.forEach(function (c, i) { if (i >= start && i < end) c.style.display = ''; });
-
-            countEl.textContent = total + (total === 1 ? ' user' : ' users');
-            noRes.style.display = total === 0 ? '' : 'none';
-
-            if (total === 0 || total <= perPage) {
-                pager.style.display = 'none';
-                return;
-            }
-            pager.style.display = 'flex';
-            pagerInfo.textContent = 'Showing ' + (start + 1) + '–' + Math.min(end, total) + ' of ' + total;
-            pageInd.textContent = 'Page ' + page + ' of ' + pages;
-            prevBtn.disabled = page <= 1;
-            nextBtn.disabled = page >= pages;
-        }
-
-        function reset() { page = 1; render(); }
-
-        var t;
-        search.addEventListener('input', function () { clearTimeout(t); t = setTimeout(reset, 150); });
-        tierSel.addEventListener('change', reset);
-        periodSel.addEventListener('change', reset);
-        perPageSel.addEventListener('change', reset);
-        prevBtn.addEventListener('click', function () {
-            if (page > 1) { page--; render(); document.getElementById('ua-controls').scrollIntoView({ block: 'start' }); }
-        });
-        nextBtn.addEventListener('click', function () {
-            page++; render(); document.getElementById('ua-controls').scrollIntoView({ block: 'start' });
-        });
-
-        render();
+        search.addEventListener('input', function () { clearTimeout(t); t = setTimeout(apply, 150); });
+        tierSel.addEventListener('change', apply);
+        periodSel.addEventListener('change', apply);
+        apply();
     })();
     </script>
 <?php endif; ?>

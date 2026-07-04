@@ -1290,8 +1290,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const dates = Object.keys(dailyStats).sort();
-    const avgDurations = dates.map((date) =>
-      Math.round(dailyStats[date].totalDuration / dailyStats[date].count)
+    // Convert average seconds to minutes (one decimal) for a more readable scale.
+    const avgDurations = dates.map(
+      (date) =>
+        Math.round(
+          dailyStats[date].totalDuration / dailyStats[date].count / 6
+        ) / 10
     );
 
     new Chart(document.getElementById("sessionDurationChart"), {
@@ -1300,7 +1304,7 @@ document.addEventListener("DOMContentLoaded", function () {
         labels: dates,
         datasets: [
           {
-            label: "Average Session Duration (seconds)",
+            label: "Average Session Duration (minutes)",
             data: avgDurations,
             backgroundColor: "#3b82f6",
             borderColor: "#2563eb",
@@ -1315,13 +1319,18 @@ document.addEventListener("DOMContentLoaded", function () {
           legend: {
             display: false,
           },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ctx.parsed.y + " min",
+            },
+          },
         },
         scales: {
           y: {
             beginAtZero: true,
             title: {
               display: true,
-              text: "Duration (seconds)",
+              text: "Duration (minutes)",
             },
           },
           x: {

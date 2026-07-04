@@ -718,7 +718,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <div class="chart-row">
                     <div class="chart-container">
-                        <h2>Average Session Duration</h2>
+                        <h2>Average Session Duration (minutes)</h2>
                         <canvas id="sessionDurationChart"></canvas>
                     </div>
                     <div class="chart-container">

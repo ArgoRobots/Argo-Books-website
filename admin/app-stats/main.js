@@ -2080,7 +2080,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const dates = Object.keys(categoryByDate).sort().slice(-30);
-    const categoryArray = Array.from(categories).slice(0, 6);
+
     const categoryColors = [
       "#ef4444",
       "#f59e0b",
@@ -2088,7 +2088,28 @@ document.addEventListener("DOMContentLoaded", function () {
       "#10b981",
       "#8b5cf6",
       "#ec4899",
+      "#14b8a6",
+      "#f97316",
+      "#6366f1",
+      "#06b6d4",
+      "#84cc16",
+      "#a855f7",
     ];
+
+    // Rank categories by their total count over the shown window, so the most
+    // active categories are plotted, including ones that only appear recently
+    // (e.g. Network). Previously this kept the first six categories the data
+    // happened to mention, which silently dropped any later ones.
+    const categoryTotals = {};
+    Array.from(categories).forEach((cat) => {
+      categoryTotals[cat] = dates.reduce(
+        (sum, date) => sum + (categoryByDate[date]?.[cat] || 0),
+        0
+      );
+    });
+    const categoryArray = Array.from(categories)
+      .sort((a, b) => categoryTotals[b] - categoryTotals[a])
+      .slice(0, categoryColors.length);
 
     const datasets = categoryArray.map((category, index) => ({
       label: category,

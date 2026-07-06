@@ -65,7 +65,7 @@ include __DIR__ . '/../admin_header.php';
 // everything else (including legacy URLs without a tab param) maps to email.
 $redditTabs = ['reddit-threads', 'reddit-settings'];
 $activeChannel = $_GET['channel'] ?? (in_array($activeTab, $redditTabs, true) ? 'reddit' : 'email');
-if (!in_array($activeChannel, ['email', 'reddit'], true)) {
+if (!in_array($activeChannel, ['email', 'reddit', 'editorial'], true)) {
     $activeChannel = 'email';
 }
 ?>
@@ -74,6 +74,7 @@ if (!in_array($activeChannel, ['email', 'reddit'], true)) {
 <div class="channel-tabs">
     <button class="channel-tab <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel="email">Email</button>
     <button class="channel-tab <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel="reddit">Reddit</button>
+    <button class="channel-tab <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel="editorial">Editorial</button>
 </div>
 
 <!-- Email channel -->
@@ -215,53 +216,6 @@ if (!in_array($activeChannel, ['email', 'reddit'], true)) {
                         </tr>
                     </thead>
                     <tbody id="shopifyResultsBody"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="panel discovery-panel">
-    <div class="panel-header" onclick="togglePanel('editorialContent')">
-        <h2><?= svg_icon('search', 18) ?> Editorial / Roundups</h2>
-        <span class="panel-toggle" id="editorialToggle">&#9660;</span>
-    </div>
-    <div class="panel-content" id="editorialContent">
-        <div class="discovery-form">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="editorialLimit">How many articles to find</label>
-                    <input type="number" id="editorialLimit" value="8" min="1" max="30">
-                </div>
-                <div class="form-group form-group-btn">
-                    <button class="btn btn-blue" onclick="runEditorialDiscovery()" id="editorialRunBtn">Run</button>
-                </div>
-            </div>
-            <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
-                Searches "best free accounting software" and "QuickBooks alternatives" listicles, finds the author (Hunter.io, else the outlet's contact page), and surfaces the ones that don't already list Argo. Review each in the Leads tab before sending. SerpAPI usage today: <span id="editorialSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="editorialHunterState">&hellip;</span>.
-            </p>
-        </div>
-
-        <div id="editorialResults" style="display:none; margin-top:16px;">
-            <div class="discovery-actions">
-                <span id="editorialResultsCount">0 results</span>
-                <div>
-                    <button class="btn btn-small btn-blue" onclick="importAllEditorialFits()" id="editorialImportAllBtn">Import All Fits</button>
-                </div>
-            </div>
-            <div class="discovery-table-wrapper">
-                <table class="data-table discovery-table" data-paginate="25">
-                    <thead>
-                        <tr>
-                            <th>Outlet</th>
-                            <th>Author</th>
-                            <th>Email</th>
-                            <th>Already lists</th>
-                            <th>Article</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="editorialResultsBody"></tbody>
                 </table>
             </div>
         </div>
@@ -497,6 +451,67 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
         <?php reddit_settings_tab_render($pdo); ?>
     </div>
 </div> <!-- /.channel-pane[data-channel-pane="reddit"] -->
+
+<!-- Editorial channel -->
+<div class="channel-pane <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel-pane="editorial">
+
+    <div class="section-tabs">
+        <button class="section-tab active" data-tab="editorial-discovery">Discovery</button>
+    </div>
+
+    <div id="editorial-discovery" class="tab-content active">
+        <div class="panel discovery-panel">
+            <div class="panel-header" onclick="togglePanel('editorialContent')">
+                <h2><?= svg_icon('search', 18) ?> Editorial / Roundups</h2>
+                <span class="panel-toggle" id="editorialToggle">&#9660;</span>
+            </div>
+            <div class="panel-content" id="editorialContent">
+                <div class="discovery-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editorialLimit">How many articles to find</label>
+                            <input type="number" id="editorialLimit" value="8" min="1" max="30">
+                        </div>
+                        <div class="form-group form-group-btn">
+                            <button class="btn btn-blue" onclick="runEditorialDiscovery()" id="editorialRunBtn">Run</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
+                        Searches "best free accounting software" and "QuickBooks alternatives" listicles, finds the author (Hunter.io, else the outlet's contact page), and surfaces the ones that don't already list Argo. SerpAPI usage today: <span id="editorialSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="editorialHunterState">&hellip;</span>.
+                    </p>
+                </div>
+
+                <div id="editorialResults" style="display:none; margin-top:16px;">
+                    <div class="discovery-actions">
+                        <span id="editorialResultsCount">0 results</span>
+                        <div>
+                            <button class="btn btn-small btn-blue" onclick="importAllEditorialFits()" id="editorialImportAllBtn">Import All Fits</button>
+                        </div>
+                    </div>
+                    <div class="discovery-table-wrapper">
+                        <table class="data-table discovery-table" data-paginate="25">
+                            <thead>
+                                <tr>
+                                    <th>Outlet</th>
+                                    <th>Author</th>
+                                    <th>Email</th>
+                                    <th>Already lists</th>
+                                    <th>Article</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="editorialResultsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-muted" style="margin-top:12px; font-size:13px;">
+            Imported articles become leads in the <a href="?channel=email&amp;tab=leads" class="link">Email &rarr; Leads</a> tab (filter Source: editorial), where you review the AI-drafted pitch and send it. Keep Send mode on Review-before-send.
+        </p>
+    </div>
+</div> <!-- /.channel-pane[data-channel-pane="editorial"] -->
 
 <!-- Lead Detail Modal -->
 <div id="leadDetailModal" class="modal" style="display:none;">

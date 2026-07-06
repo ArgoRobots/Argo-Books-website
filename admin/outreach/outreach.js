@@ -1714,7 +1714,13 @@ async function importEditorialRow(idx, btn) {
     btn.disabled = true;
     btn.textContent = 'Importing…';
     try {
-        const data = await api('editorial_import', { method: 'POST', body: { canonical_url: row.canonical_url, serp_title: row.serp_title } });
+        const data = await api('editorial_import', { method: 'POST', body: {
+            canonical_url: row.canonical_url,
+            outlet_name: row.outlet_name,
+            author_name: row.author_name,
+            email: row.email,
+            business_summary: row.business_summary
+        } });
         if (data.success) {
             editorialResults = editorialResults.filter(r => r.canonical_url !== row.canonical_url);
             if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + 1;
@@ -1736,7 +1742,13 @@ async function importEditorialRow(idx, btn) {
 async function importAllEditorialFits() {
     if (editorialResults.length === 0) return;
     if (!confirm(`Import ${editorialResults.length} article${editorialResults.length === 1 ? '' : 's'} as new editorial leads?`)) return;
-    const toImport = editorialResults.map(r => ({ canonical_url: r.canonical_url, serp_title: r.serp_title }));
+    const toImport = editorialResults.map(r => ({
+        canonical_url: r.canonical_url,
+        outlet_name: r.outlet_name,
+        author_name: r.author_name,
+        email: r.email,
+        business_summary: r.business_summary
+    }));
     const btn = document.getElementById('editorialImportAllBtn');
     btn.disabled = true;
     btn.textContent = 'Importing…';
@@ -1800,11 +1812,14 @@ function switchChannel(channel) {
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('channel', channel);
-        if (channel === 'email' && url.searchParams.get('tab') && url.searchParams.get('tab').startsWith('reddit-')) {
+        if (channel === 'email' && /^(reddit|editorial)-/.test(url.searchParams.get('tab') || '')) {
             url.searchParams.set('tab', 'leads');
         }
         if (channel === 'reddit' && !['reddit-threads', 'reddit-settings'].includes(url.searchParams.get('tab') || '')) {
             url.searchParams.set('tab', 'reddit-threads');
+        }
+        if (channel === 'editorial') {
+            url.searchParams.set('tab', 'editorial-discovery');
         }
         history.replaceState({}, '', url.toString());
     } catch (e) { /* ignore */ }
@@ -1823,6 +1838,9 @@ function switchChannel(channel) {
         loadRedditThreads();
         loadRedditStats();
         startRedditProgressPolling();
+    }
+    if (channel === 'editorial') {
+        loadEditorialStatus();
     }
 }
 

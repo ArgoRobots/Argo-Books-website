@@ -1078,13 +1078,14 @@ function editorial_run_discovery($pdo)
 
             $meta = $result['metadata'] ?? [];
             $fits[] = [
-                'canonical_url' => $canonical,
-                'serp_title'    => $r['title'] ?? '',
-                'outlet_name'   => $meta['outlet_name'] ?? '',
-                'author_name'   => $meta['author_name'] ?? '',
-                'email'         => $meta['email'] ?? '',
-                'email_source'  => $meta['email_source'] ?? '',
-                'listed_tools'  => implode(', ', array_slice($meta['listed_tools'] ?? [], 0, 8)),
+                'canonical_url'    => $canonical,
+                'serp_title'       => $r['title'] ?? '',
+                'outlet_name'      => $meta['outlet_name'] ?? '',
+                'author_name'      => $meta['author_name'] ?? '',
+                'email'            => $meta['email'] ?? '',
+                'email_source'     => $meta['email_source'] ?? '',
+                'listed_tools'     => implode(', ', array_slice($meta['listed_tools'] ?? [], 0, 8)),
+                'business_summary' => $meta['business_summary'] ?? '',
             ];
         }
     }
@@ -1108,34 +1109,26 @@ function editorial_run_discovery($pdo)
 
 function editorial_import($pdo)
 {
-    require_once __DIR__ . '/../../cron/lib/editorial_discovery.php';
-
     $data         = json_decode(file_get_contents('php://input'), true) ?: [];
     $canonicalUrl = trim($data['canonical_url'] ?? '');
-    if ($canonicalUrl === '') {
-        json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
+    $email        = trim($data['email'] ?? '');
+    $outlet       = trim($data['outlet_name'] ?? '');
+    $author       = trim($data['author_name'] ?? '');
+    $summary      = trim($data['business_summary'] ?? '');
+    $articleUrl   = $canonicalUrl;
+
+    // Import from the data the discovery run already computed, rather than
+    // re-evaluating. The editorial evaluator does a live page fetch plus a
+    // non-deterministic Gemini extraction, so re-running it here is slow and
+    // flaky (a borderline page can flip its roundup verdict on the second pass,
+    // which was causing spurious import failures). This is an authenticated
+    // admin action reviewing results it just generated, so trusting them is the
+    // right tradeoff; we still validate the email and dedup against existing leads.
+    if ($canonicalUrl === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        json_response(['success' => false, 'message' => 'canonical_url and a valid email are required'], 400);
     }
-
-    // Re-evaluate server-side; don't trust client-passed metadata.
-    $result = evaluate_editorial_candidate($canonicalUrl, $pdo, trim($data['serp_title'] ?? ''));
-    if (empty($result['fit'])) {
-        json_response([
-            'success' => false,
-            'message' => 'Article no longer passes evaluation: ' . ($result['reason'] ?? 'unknown'),
-            'reason'  => $result['reason'] ?? '',
-            'detail'  => $result['detail'] ?? '',
-        ], 400);
-    }
-
-    $meta       = $result['metadata'];
-    $email      = $meta['email'] ?? '';
-    $outlet     = $meta['outlet_name'] ?? '';
-    $author     = $meta['author_name'] ?? '';
-    $articleUrl = $meta['article_url'] ?? $canonicalUrl;
-    $summary    = $meta['business_summary'] ?? '';
-
-    if ($email === '') {
-        json_response(['success' => false, 'message' => 'Re-evaluation returned fit but no email, refusing to import'], 500);
+    if ($summary === '') {
+        $summary = 'Roundup article' . ($outlet !== '' ? " on {$outlet}" : '') . '. Goal: get Argo Books added to the list.';
     }
 
     $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1");

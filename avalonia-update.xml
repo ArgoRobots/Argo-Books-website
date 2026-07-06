@@ -6,34 +6,34 @@
         <description>Updates for Argo Books (cross-platform)</description>
         <language>en</language>
         <item>
-            <title>Version 2.0.9</title>
-            <sparkle:version>2.0.9</sparkle:version>
+            <title>Version 2.0.10</title>
+            <sparkle:version>2.0.10</sparkle:version>
             <sparkle:releaseNotesLink>https://argorobots.com/whats-new/</sparkle:releaseNotesLink>
             <pubDate>Thu, 01 Jan 2026 10:00:00 +0000</pubDate>
 
             <!-- Windows -->
-            <enclosure url="https://argorobots.com/resources/downloads/2.0.9/Argo%20Books%20Installer%20V.2.0.9.exe"
-                       sparkle:version="2.0.9"
+            <enclosure url="https://argorobots.com/resources/downloads/2.0.10/Argo%20Books%20Installer%20V.2.0.10.exe"
+                       sparkle:version="2.0.10"
                        sparkle:os="windows"
                        type="application/octet-stream"
                        length="0"
-                       sparkle:edSignature="xMb3I+BGw02h5qIku+oVyJM6d/2FUyOMCBijaDb2rxkv670vt8WCkf13lCsd2kpHySmyZdbnWA9O7eSA5t0oDw==" />
+                       sparkle:edSignature="zsFb8kzx89APxmtLLaomuXQPBUXsmcdxhs6CN5VmF/fAmE5ZJBHBI3sNwvqFpOH4rf7IH8BAX8XxPtTaoexUBw==" />
 
             <!-- macOS -->
             <enclosure url=""
-                       sparkle:version="2.0.9"
+                       sparkle:version="2.0.10"
                        sparkle:os="macos"
                        type="application/octet-stream"
                        length="0"
                        sparkle:edSignature="" />
 
             <!-- Linux -->
-            <enclosure url="https://argorobots.com/resources/downloads/2.0.9/ArgoBooks-2.0.9-linux-x64.AppImage"
-                       sparkle:version="2.0.9"
+            <enclosure url="https://argorobots.com/resources/downloads/2.0.10/ArgoBooks-2.0.10-linux-x64.AppImage"
+                       sparkle:version="2.0.10"
                        sparkle:os="linux"
                        type="application/octet-stream"
                        length="0"
-                       sparkle:edSignature="/T8kyJF+4cFlCCw9+4ylCGLlOjk0HkPXC6lmNp2qBF/rNE2CDqNnWBeB0t2SyeIVwZutsvKb51IyPQYTpbN9AQ==" />
+                       sparkle:edSignature="/E2u810HdnYYY4IS9q27fMOPjYdxrpE1dSvBA8nfEZPl8YaDlTOmT7ZORT7BiCJ3EFgHAH6GjVa6sJNnzCDZAw==" />
         </item>
     </channel>
 </rss>

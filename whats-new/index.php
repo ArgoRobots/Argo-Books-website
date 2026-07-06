@@ -89,6 +89,40 @@ $pricing = get_pricing_config();
     <div class="container">
         <div class="version-grid">
 
+            <!-- Version 2.0.10 -->
+            <div class="version-card">
+                <div class="version-header">
+                    <div class="version-info">
+                        <span class="version-tag">Version 2.0.10</span>
+                        <span class="date-tag">July 6 2026</span>
+                    </div>
+                    <?= svg_icon('chevron-down', 24, 'dropdown-arrow', null, 'stroke-linecap="round" stroke-linejoin="round"') ?>
+                </div>
+
+                <div class="version-content">
+                    <div class="changelog">
+                        <div class="changelog-section">
+                            <h4 class="section-label feature">New Features</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Redesigned invoice editor:</strong> Build invoices right on the invoice itself, so what you see on screen is exactly what your customer receives. Click any part of the invoice to edit line items, dates, or notes, and pick products and services from a dropdown as you type. No more filling out a separate form and hoping the layout looks right.</li>
+                                <li><strong>Recurring invoices, expenses, and revenue:</strong> Set any invoice, expense, or revenue entry to repeat on a schedule you choose. Perfect for retainers, subscriptions, rent, and any regular bill or income. Argo Books creates each one automatically, so your books stay up to date without the repeat data entry.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label enhancement">Enhancements</h4>
+                            <ul class="changelog-list">
+                                <li><strong>Multi-currency precision:</strong> Amounts stay accurate to the cent across every currency, so your totals, charts, and summary cards always agree.</li>
+                                <li><strong>Smoother data imports:</strong> Importing from spreadsheets, bank statements, and receipts is more reliable, including unusual date and currency formats.</li>
+                            </ul>
+                        </div>
+                        <div class="changelog-section">
+                            <h4 class="section-label fix">Fixes &amp; Improvements</h4>
+                            <p class="changelog-intro">This release also brings a large round of fixes, performance gains, and general refinements throughout the app. Plenty of small polish to keep everything running smoothly and reliably.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Version 2.0.9 -->
             <div class="version-card">
                 <div class="version-header">

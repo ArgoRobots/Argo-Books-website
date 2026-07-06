@@ -64,7 +64,7 @@ function is_pipeline_running(): bool
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // Block actions that conflict with a running pipeline
-$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import'];
+$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import', 'editorial_run_discovery', 'editorial_import'];
 if (in_array($action, $pipelineActions) && is_pipeline_running()) {
     echo json_encode([
         'success' => false,
@@ -134,6 +134,17 @@ switch ($action) {
         break;
     case 'shopify_import':
         shopify_import($pdo);
+        break;
+
+    // Editorial / roundup discovery
+    case 'editorial_get_status':
+        editorial_get_status($pdo);
+        break;
+    case 'editorial_run_discovery':
+        editorial_run_discovery($pdo);
+        break;
+    case 'editorial_import':
+        editorial_import($pdo);
         break;
 
     // AI draft
@@ -968,6 +979,204 @@ function shopify_import($pdo)
         ]);
     } catch (Exception $e) {
         outreach_log("Shopify import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
+}
+
+// ─── Editorial / roundup discovery ───
+// Finds "best free accounting software" / "QuickBooks alternatives" listicles
+// and their authors, so we can pitch getting Argo Books added. Mirrors the
+// Shopify discovery handlers. Shares the SerpAPI daily budget with Shopify.
+
+function editorial_get_status($pdo)
+{
+    _shopify_reset_daily_counters_if_needed($pdo);
+    json_response([
+        'success'             => true,
+        'enabled'             => ($_ENV['OUTREACH_EDITORIAL_ENABLED'] ?? 'false') === 'true',
+        'has_key'             => !empty($_ENV['SERPAPI_KEY']),
+        'has_hunter'          => !empty($_ENV['HUNTER_API_KEY']),
+        'serpapi_calls_today' => (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0'),
+        'serpapi_limit'       => (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3),
+    ]);
+}
+
+function editorial_run_discovery($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/editorial_discovery.php';
+
+    // Each candidate does a page fetch + a Gemini extraction + a Hunter/scrape
+    // lookup, so a run can take a few minutes. The daily SerpAPI quota bounds it.
+    @set_time_limit(300);
+
+    $data  = json_decode(file_get_contents('php://input'), true) ?: [];
+    $limit = min(30, max(1, (int) ($data['limit'] ?? 8)));
+
+    $apiKey = $_ENV['SERPAPI_KEY'] ?? '';
+    if ($apiKey === '') {
+        json_response(['success' => false, 'message' => 'SerpAPI key not configured. Set SERPAPI_KEY in .env'], 500);
+    }
+
+    _shopify_reset_daily_counters_if_needed($pdo);
+    $serpapiLimit = (int) ($_ENV['SERPAPI_DAILY_QUERY_LIMIT'] ?? 3);
+    $callsToday   = (int) _shopify_state_get($pdo, 'serpapi_calls_today', '0');
+    if ($callsToday >= $serpapiLimit) {
+        json_response([
+            'success' => false,
+            'message' => "SerpAPI daily limit reached ($callsToday/$serpapiLimit). Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.",
+        ], 429);
+    }
+
+    $cursor               = (int) _shopify_state_get($pdo, 'editorial_query_cursor', '0');
+    $poolSize             = count(EDITORIAL_QUERY_POOL);
+    $fits                 = [];
+    $rejectedCount        = 0;
+    $rejectReasons        = [];
+    $alreadyImportedCount = 0;
+    $totalEvaluated       = 0;
+    $queriesRun           = [];
+    $seen                 = [];
+
+    while (count($fits) < $limit && $callsToday < $serpapiLimit) {
+        $query = EDITORIAL_QUERY_POOL[$cursor % $poolSize];
+        $cursor++;
+        _shopify_state_set($pdo, 'editorial_query_cursor', (string) $cursor);
+
+        $searchResult = editorial_search($query, $apiKey, 15, $pdo);
+        if (!$searchResult['from_cache']) {
+            $callsToday++;
+            _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
+        }
+        $queriesRun[] = $query;
+
+        $serpResults = $searchResult['results'];
+        if (empty($serpResults)) continue;
+        $totalEvaluated += count($serpResults);
+
+        foreach ($serpResults as $r) {
+            if (count($fits) >= $limit) break 2;
+
+            $canonical = $r['url'];
+            if (isset($seen[$canonical])) continue;
+            $seen[$canonical] = true;
+
+            $importedCheck = $pdo->prepare("SELECT 1 FROM outreach_editorial_candidates
+                WHERE canonical_url = ? AND status = 'imported' AND lead_id IS NOT NULL LIMIT 1");
+            $importedCheck->execute([$canonical]);
+            if ($importedCheck->fetchColumn() !== false) {
+                $alreadyImportedCount++;
+                continue;
+            }
+
+            $result = evaluate_editorial_candidate($canonical, $pdo, $r['title'] ?? '');
+            if (empty($result['fit'])) {
+                $rejectedCount++;
+                $reason = $result['reason'] ?? 'unknown';
+                $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
+                continue;
+            }
+
+            $meta = $result['metadata'] ?? [];
+            $fits[] = [
+                'canonical_url' => $canonical,
+                'serp_title'    => $r['title'] ?? '',
+                'outlet_name'   => $meta['outlet_name'] ?? '',
+                'author_name'   => $meta['author_name'] ?? '',
+                'email'         => $meta['email'] ?? '',
+                'email_source'  => $meta['email_source'] ?? '',
+                'listed_tools'  => implode(', ', array_slice($meta['listed_tools'] ?? [], 0, 8)),
+            ];
+        }
+    }
+
+    $quotaExhausted = $callsToday >= $serpapiLimit && count($fits) < $limit;
+
+    json_response([
+        'success'                => true,
+        'results'                => $fits,
+        'requested_limit'        => $limit,
+        'quota_exhausted'        => $quotaExhausted,
+        'rejected_count'         => $rejectedCount,
+        'reject_reasons'         => $rejectReasons,
+        'already_imported_count' => $alreadyImportedCount,
+        'total_evaluated'        => $totalEvaluated,
+        'queries_run'            => $queriesRun,
+        'serpapi_calls_today'    => $callsToday,
+        'serpapi_limit'          => $serpapiLimit,
+    ]);
+}
+
+function editorial_import($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/editorial_discovery.php';
+
+    $data         = json_decode(file_get_contents('php://input'), true) ?: [];
+    $canonicalUrl = trim($data['canonical_url'] ?? '');
+    if ($canonicalUrl === '') {
+        json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
+    }
+
+    // Re-evaluate server-side; don't trust client-passed metadata.
+    $result = evaluate_editorial_candidate($canonicalUrl, $pdo, trim($data['serp_title'] ?? ''));
+    if (empty($result['fit'])) {
+        json_response([
+            'success' => false,
+            'message' => 'Article no longer passes evaluation: ' . ($result['reason'] ?? 'unknown'),
+            'reason'  => $result['reason'] ?? '',
+            'detail'  => $result['detail'] ?? '',
+        ], 400);
+    }
+
+    $meta       = $result['metadata'];
+    $email      = $meta['email'] ?? '';
+    $outlet     = $meta['outlet_name'] ?? '';
+    $author     = $meta['author_name'] ?? '';
+    $articleUrl = $meta['article_url'] ?? $canonicalUrl;
+    $summary    = $meta['business_summary'] ?? '';
+
+    if ($email === '') {
+        json_response(['success' => false, 'message' => 'Re-evaluation returned fit but no email, refusing to import'], 500);
+    }
+
+    $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE email = ? OR website = ? LIMIT 1");
+    $check->execute([$email, $articleUrl]);
+    if ($existing = $check->fetchColumn()) {
+        json_response([
+            'success'          => false,
+            'message'          => 'A lead with this email or article already exists',
+            'existing_lead_id' => (int) $existing,
+        ], 409);
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, contact_name, email, website, source, contact_page_url, business_summary, category, country)
+            VALUES (?, ?, ?, ?, 'editorial_auto', ?, ?, 'editorial', 'US')");
+        $stmt->execute([
+            $outlet ?: $canonicalUrl,
+            $author !== '' ? $author : null,
+            $email,
+            $articleUrl,
+            $articleUrl,
+            $summary,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_editorial_candidates
+            (canonical_url, status, lead_id, outlet_name, author_name, harvested_email, last_query)
+            VALUES (?, 'imported', ?, ?, ?, ?, 'admin-ui')
+            ON DUPLICATE KEY UPDATE
+                status          = 'imported',
+                lead_id         = VALUES(lead_id),
+                outlet_name     = VALUES(outlet_name),
+                author_name     = VALUES(author_name),
+                harvested_email = VALUES(harvested_email)");
+        $stmt->execute([$canonicalUrl, $leadId, $outlet, $author, $email]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Imported from Editorial discovery UI');
+        json_response(['success' => true, 'lead_id' => $leadId]);
+    } catch (Exception $e) {
+        outreach_log("Editorial import failed: " . $e->getMessage());
         json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
     }
 }

@@ -1606,6 +1606,161 @@ async function importAllShopifyFits() {
 // Load Shopify status on page load so the usage display is populated
 document.addEventListener('DOMContentLoaded', loadShopifyStatus);
 
+// ─── Editorial / Roundup Discovery ───
+
+let editorialResults = [];
+let editorialLastSummary = null;
+
+async function loadEditorialStatus() {
+    try {
+        const data = await api('editorial_get_status');
+        if (data.success) {
+            const usage = document.getElementById('editorialSerpUsage');
+            if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+            const hunter = document.getElementById('editorialHunterState');
+            if (hunter) hunter.textContent = data.has_hunter ? 'connected' : 'not set (scrapes contact pages instead)';
+        }
+    } catch (e) { /* non-fatal */ }
+}
+
+async function runEditorialDiscovery() {
+    const limit = Math.min(30, Math.max(1, parseInt(document.getElementById('editorialLimit').value, 10) || 8));
+    const btn = document.getElementById('editorialRunBtn');
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    try {
+        const data = await api('editorial_run_discovery', { method: 'POST', body: { limit } });
+        if (!data.success) {
+            notify(data.message || 'Editorial discovery failed');
+            return;
+        }
+        editorialResults = data.results || [];
+        editorialLastSummary = {
+            rejected_count: data.rejected_count || 0,
+            reject_reasons: data.reject_reasons || {},
+            already_imported_count: data.already_imported_count || 0,
+            total_evaluated: data.total_evaluated || 0,
+            requested_limit: data.requested_limit || limit,
+            quota_exhausted: !!data.quota_exhausted,
+            queries_run: (data.queries_run || []).length,
+        };
+        const usage = document.getElementById('editorialSerpUsage');
+        if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+        document.getElementById('editorialResults').style.display = 'block';
+        renderEditorialResults();
+        if (editorialLastSummary.quota_exhausted) {
+            notify(`SerpAPI daily quota hit before finding ${editorialLastSummary.requested_limit}. Got ${editorialResults.length} fit${editorialResults.length === 1 ? '' : 's'}. Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.`);
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run';
+    }
+}
+
+function renderEditorialResults() {
+    const body = document.getElementById('editorialResultsBody');
+    const countEl = document.getElementById('editorialResultsCount');
+    const importAllBtn = document.getElementById('editorialImportAllBtn');
+    const safe = (s) => escapeHtml(String(s ?? ''));
+
+    let summary = `${editorialResults.length} fit`;
+    if (editorialLastSummary) {
+        if (editorialLastSummary.already_imported_count > 0) {
+            summary += ` · ${editorialLastSummary.already_imported_count} already imported (hidden)`;
+        }
+        if (editorialLastSummary.rejected_count > 0) {
+            const reasons = editorialLastSummary.reject_reasons || {};
+            const reasonStr = Object.entries(reasons)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 3)
+                .map(([k, n]) => `${n}× ${k}`)
+                .join(', ');
+            summary += ` · ${editorialLastSummary.rejected_count} skipped`;
+            if (reasonStr) summary += ` (${reasonStr})`;
+        }
+    }
+    countEl.textContent = summary;
+
+    if (importAllBtn) {
+        importAllBtn.disabled = editorialResults.length === 0;
+        importAllBtn.textContent = editorialResults.length > 0 ? `Import ${editorialResults.length} Fit${editorialResults.length !== 1 ? 's' : ''}` : 'Import All Fits';
+    }
+
+    if (editorialResults.length === 0) {
+        const n = (editorialLastSummary && editorialLastSummary.total_evaluated) || 0;
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#888;">No new roundups to pitch (evaluated ${n}). They were not roundups, already list Argo, or had no findable contact.</td></tr>`;
+        return;
+    }
+
+    body.innerHTML = editorialResults.map((r, idx) => {
+        const outlet = `<div><strong>${safe(r.outlet_name) || safe(r.canonical_url)}</strong></div>`;
+        const emailSrc = r.email_source ? ` <span style="color:#888; font-size:11px;">(${safe(r.email_source)})</span>` : '';
+        return '<tr>' +
+            `<td>${outlet}</td>` +
+            `<td>${safe(r.author_name) || '—'}</td>` +
+            `<td>${safe(r.email) || '—'}${emailSrc}</td>` +
+            `<td style="max-width:220px; font-size:12px;">${safe(r.listed_tools) || '—'}</td>` +
+            `<td><a href="${safe(r.canonical_url)}" target="_blank" rel="noopener" class="link">open</a></td>` +
+            `<td><button class="btn btn-small btn-blue" onclick="importEditorialRow(${idx}, this)">Import</button></td>` +
+        '</tr>';
+    }).join('');
+}
+
+async function importEditorialRow(idx, btn) {
+    const row = editorialResults[idx];
+    if (!row) return;
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    try {
+        const data = await api('editorial_import', { method: 'POST', body: { canonical_url: row.canonical_url, serp_title: row.serp_title } });
+        if (data.success) {
+            editorialResults = editorialResults.filter(r => r.canonical_url !== row.canonical_url);
+            if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + 1;
+            renderEditorialResults();
+            loadStats();
+            loadLeads();
+        } else {
+            notify(data.message || 'Import failed');
+            btn.disabled = false;
+            btn.textContent = 'Import';
+        }
+    } catch (e) {
+        notify(e.message);
+        btn.disabled = false;
+        btn.textContent = 'Import';
+    }
+}
+
+async function importAllEditorialFits() {
+    if (editorialResults.length === 0) return;
+    if (!confirm(`Import ${editorialResults.length} article${editorialResults.length === 1 ? '' : 's'} as new editorial leads?`)) return;
+    const toImport = editorialResults.map(r => ({ canonical_url: r.canonical_url, serp_title: r.serp_title }));
+    const btn = document.getElementById('editorialImportAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    const succeeded = new Set();
+    let failed = 0;
+    for (const item of toImport) {
+        try {
+            const data = await api('editorial_import', { method: 'POST', body: item });
+            if (data.success) succeeded.add(item.canonical_url);
+            else failed++;
+        } catch (e) {
+            failed++;
+        }
+    }
+    editorialResults = editorialResults.filter(r => !succeeded.has(r.canonical_url));
+    if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + succeeded.size;
+    renderEditorialResults();
+    loadStats();
+    loadLeads();
+    notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
+}
+
+document.addEventListener('DOMContentLoaded', loadEditorialStatus);
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Reddit outreach
 // ═══════════════════════════════════════════════════════════════════════════

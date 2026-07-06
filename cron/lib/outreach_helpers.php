@@ -2174,7 +2174,11 @@ function generate_draft_for_lead($pdo, $lead)
     // is cheap enough (~$0.0001/lead) that we don't bother caching the
     // verdict in a column.
     $sourceVal = strtolower((string) ($lead['source'] ?? ''));
-    $isAutoLead = str_ends_with($sourceVal, '_auto');
+    // Editorial (roundup) leads are publications, not small businesses, so the
+    // AI size gate and the newness gate below don't apply. They also arrive with
+    // their article context pre-summarized, so the SMB summary call is skipped.
+    $isEditorial = ($sourceVal === 'editorial_auto');
+    $isAutoLead = str_ends_with($sourceVal, '_auto') && !$isEditorial;
     if ($isAutoLead) {
         $gate = classify_lead_size_with_ai($lead);
         if (isset($gate['error'])) {
@@ -2320,7 +2324,7 @@ function generate_draft_for_lead($pdo, $lead)
     $summary = $lead['business_summary'] ?? null;
     if ($personalizationOff) {
         $summary = null;
-    } elseif (empty($summary) && !empty($lead['website'])) {
+    } elseif (empty($summary) && !empty($lead['website']) && !$isEditorial) {
         // Reuse the page text fetched by the newness gate above (if any) so we
         // don't fetch the same homepage twice.
         $summary = summarize_business($lead['website'], $prefetchedSiteText);
@@ -2365,6 +2369,39 @@ function generate_draft_for_lead($pdo, $lead)
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
+    if ($isEditorial) {
+        $systemPrompt = "You are helping write a short, genuine outreach email from Evan, the developer behind Argo Books, to the author or editor of a published \"best software\" roundup article. The goal is to get Argo Books added to their list.
+
+About Argo Books:
+- A free, simple bookkeeping and invoicing app for small businesses, built so you need no accounting knowledge
+- Runs on Windows, macOS, and Linux, and works offline as a desktop app so your data stays on your computer
+- Genuinely free tier with no user cap; a paid Premium tier exists but the core is free
+- Made by Evan, a solo independent developer
+
+You are given the article, its outlet, the author, and which tools it already lists. Use that to point out a specific gap (for example: their list has no genuinely-free option, nothing that works offline as a desktop app, or nothing that runs on Mac and Linux) that Argo Books fills.
+
+Rules:
+- Keep it short (2-3 short paragraphs, under 120 words). Sound like one human emailing another, not a PR blast
+- Address the author by first name if known (e.g. \"Hi Sarah\"); otherwise \"Hi there\"
+- First sentence: say you read their specific article and noticed it is missing a certain kind of tool. Do NOT open with generic flattery
+- Briefly say what Argo Books is and why it fills that gap for their readers. Do NOT list every feature
+- Include a ready-to-paste blurb they can drop straight into the article, on its own line, in this style: \"Argo Books, a free bookkeeping and invoicing app for small businesses that needs no accounting knowledge. Works offline on Windows, Mac, and Linux, with a free tier that has no user limit. https://argorobots.com/\"
+- Offer an honest, non-monetary incentive: you will link to their article from your comparison page (a real backlink), and you are happy to answer questions or give a walkthrough
+- Frame it as keeping their already-strong article complete and current for their readers, not as a favor to you
+- Do NOT offer money, paid placement, or affiliate commissions
+- Confident but not pushy. NEVER use em dashes; use commas, periods, or regular hyphens
+- NEVER use placeholders like [Your Name] or [Publication]
+- ALWAYS include the link https://argorobots.com/ in the body
+- The subject line should read like a real person emailing about their article. Under 8 words. Good: \"a free option missing from your roundup\", \"quick addition for your accounting software list\". Avoid salesy hooks$abSubjectOverride
+- End with a friendly line inviting a reply, then the sign-off
+- After the reply line, add ONE short, respectful opt-out line on its own paragraph: \"Not the right contact, or not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include the literal token {UNSUBSCRIBE_URL} verbatim; it is replaced with a real tracked link before sending
+- Sign off with three separate lines: \"Thanks,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
+
+Return your response as JSON with two fields:
+{\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
+
+Return ONLY the JSON object, nothing else.";
+    } else {
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 About Argo Books:
@@ -2409,14 +2446,22 @@ Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
 
 Return ONLY the JSON, no other text.";
+    }
 
-    $details = "Business: {$lead['business_name']}";
-    if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
-    if ($lead['city']) $details .= "\nCity: {$lead['city']}";
-    if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
-    if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
-    if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
-    if ($summary) $details .= "\nBusiness summary: $summary";
+    if ($isEditorial) {
+        $details = "Outlet / Publication: {$lead['business_name']}";
+        if (!empty($lead['contact_name'])) $details .= "\nAuthor: {$lead['contact_name']}";
+        if (!empty($lead['website'])) $details .= "\nArticle URL: {$lead['website']}";
+        if ($summary) $details .= "\nArticle context (what it lists and its angle): $summary";
+    } else {
+        $details = "Business: {$lead['business_name']}";
+        if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
+        if ($lead['city']) $details .= "\nCity: {$lead['city']}";
+        if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
+        if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
+        if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
+        if ($summary) $details .= "\nBusiness summary: $summary";
+    }
 
     $result = call_gemini($systemPrompt, $details);
 

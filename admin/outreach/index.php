@@ -221,6 +221,53 @@ if (!in_array($activeChannel, ['email', 'reddit'], true)) {
     </div>
 </div>
 
+<div class="panel discovery-panel">
+    <div class="panel-header" onclick="togglePanel('editorialContent')">
+        <h2><?= svg_icon('search', 18) ?> Editorial / Roundups</h2>
+        <span class="panel-toggle" id="editorialToggle">&#9660;</span>
+    </div>
+    <div class="panel-content" id="editorialContent">
+        <div class="discovery-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="editorialLimit">How many articles to find</label>
+                    <input type="number" id="editorialLimit" value="8" min="1" max="30">
+                </div>
+                <div class="form-group form-group-btn">
+                    <button class="btn btn-blue" onclick="runEditorialDiscovery()" id="editorialRunBtn">Run</button>
+                </div>
+            </div>
+            <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
+                Searches "best free accounting software" and "QuickBooks alternatives" listicles, finds the author (Hunter.io, else the outlet's contact page), and surfaces the ones that don't already list Argo. Review each in the Leads tab before sending. SerpAPI usage today: <span id="editorialSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="editorialHunterState">&hellip;</span>.
+            </p>
+        </div>
+
+        <div id="editorialResults" style="display:none; margin-top:16px;">
+            <div class="discovery-actions">
+                <span id="editorialResultsCount">0 results</span>
+                <div>
+                    <button class="btn btn-small btn-blue" onclick="importAllEditorialFits()" id="editorialImportAllBtn">Import All Fits</button>
+                </div>
+            </div>
+            <div class="discovery-table-wrapper">
+                <table class="data-table discovery-table" data-paginate="25">
+                    <thead>
+                        <tr>
+                            <th>Outlet</th>
+                            <th>Author</th>
+                            <th>Email</th>
+                            <th>Already lists</th>
+                            <th>Article</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="editorialResultsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php
 // Shopify reject-reason distribution (last 30 days). Helps tune which
 // filters are killing leads so the discovery cron can be adjusted.

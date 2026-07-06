@@ -1073,6 +1073,28 @@ CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
     INDEX idx_lead (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Candidate roundup/listicle articles for the Editorial outreach channel. One
+-- row per article URL (identity is the article, not the outlet), tracking
+-- fitness + dedup so discovery re-runs skip already-imported articles. Mirrors
+-- outreach_shopify_candidates.
+CREATE TABLE IF NOT EXISTS outreach_editorial_candidates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    canonical_url VARCHAR(500) NOT NULL,
+    status ENUM('imported','rejected','error','pending') NOT NULL DEFAULT 'pending',
+    reject_reason VARCHAR(100) DEFAULT NULL,
+    reject_detail VARCHAR(500) DEFAULT NULL,
+    outlet_name VARCHAR(150) DEFAULT NULL,
+    author_name VARCHAR(120) DEFAULT NULL,
+    harvested_email VARCHAR(255) DEFAULT NULL,
+    lead_id INT DEFAULT NULL,
+    last_query VARCHAR(255) DEFAULT NULL,
+    checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_canonical_url (canonical_url),
+    INDEX idx_status_checked (status, checked_at),
+    INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 14-day cache of SerpAPI organic-results responses. The Shopify discovery
 -- cron rotates through ~12 dork queries on a daily schedule, and Google's
 -- site:myshopify.com results for these queries change slowly. Caching cuts

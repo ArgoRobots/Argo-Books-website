@@ -44,7 +44,7 @@ HTML,
 <li><strong>Payroll and higher tiers</strong> cost more again, with payroll usually an add-on on top of the base plan.</li>
 </ul>
 {{illustration:price-trend}}
-<p>The thing to notice is that the entry price and the real-use price are quite different. Many people start on the cheap plan, find the feature they need is a tier up, and end up paying the Plus price. So when you ask "is QuickBooks worth it," ask it against the plan you'll actually use, which for most businesses is Plus, not the entry sticker. The published prices also rise over time, so factor in that this year's number is likely the lowest you'll pay.</p>
+<p>The thing to notice is that the entry price and the real-use price are quite different. Many people start on the cheap plan, find the feature they need is a tier up, and end up paying the Plus price. So when you ask "is QuickBooks worth it," ask it against the plan you'll actually use, which for most businesses is Plus, not the entry sticker. The published prices also rise over time, so factor in that this year's number is likely the lowest you'll pay: the guide on <a href="/quickbooks-price-increases/">QuickBooks price increases</a> shows how much each plan has climbed over the last five years.</p>
 HTML,
     ],
 

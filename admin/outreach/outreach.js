@@ -1024,6 +1024,10 @@ async function sendEmail() {
             openLeadDetail(currentLeadId);
             loadLeads();
             loadStats();
+            // If this lead was opened from the Editorial tab, refresh that table
+            // too so its row reflects the new sent status instead of staying on
+            // "Draft Generated" until a manual refresh (mirrors executeBulkSend).
+            if (editorialLeadsPaginator) loadEditorialLeads();
         } else {
             notify(result.message, 'error');
             btn.disabled = false;

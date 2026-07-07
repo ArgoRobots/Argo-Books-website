@@ -64,7 +64,7 @@ function is_pipeline_running(): bool
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
 // Block actions that conflict with a running pipeline
-$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import', 'editorial_run_discovery', 'editorial_import'];
+$pipelineActions = ['send_email', 'generate_draft', 'import_leads', 'search_businesses', 'regenerate_followup', 'shopify_run_dork', 'shopify_import', 'editorial_run_discovery', 'editorial_import', 'editorial_add_url'];
 if (in_array($action, $pipelineActions) && is_pipeline_running()) {
     echo json_encode([
         'success' => false,
@@ -145,6 +145,9 @@ switch ($action) {
         break;
     case 'editorial_import':
         editorial_import($pdo);
+        break;
+    case 'editorial_add_url':
+        editorial_add_url($pdo);
         break;
 
     // AI draft
@@ -1151,6 +1154,86 @@ function editorial_run_discovery($pdo)
         'serpapi_calls_today'    => $callsToday,
         'serpapi_limit'          => $serpapiLimit,
     ]);
+}
+
+function editorial_add_url($pdo)
+{
+    require_once __DIR__ . '/../../cron/lib/editorial_discovery.php';
+    @set_time_limit(120);
+
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    $url  = trim($data['url'] ?? '');
+    if ($url !== '' && !preg_match('#^https?://#i', $url)) {
+        $url = 'https://' . $url;
+    }
+    if ($url === '' || !filter_var($url, FILTER_VALIDATE_URL)) {
+        json_response(['success' => false, 'message' => 'A valid article URL is required'], 400);
+    }
+
+    $canonical = editorial_canonical_url($url);
+
+    $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+    $check->execute([$canonical]);
+    if ($existing = $check->fetchColumn()) {
+        json_response(['success' => false, 'message' => 'This article is already a lead', 'existing_lead_id' => (int) $existing], 409);
+    }
+
+    // Best-effort research in forced mode: a URL the operator added by hand gets
+    // imported even if it is blocked, borderline, or already mentions Argo. We
+    // keep whatever the evaluator extracts (outlet, author, listed tools, email,
+    // summary); a missing email is fine, the operator can fill it in on the lead.
+    $meta = [];
+    try {
+        $result = evaluate_editorial_candidate($canonical, $pdo, '', true);
+        $meta = $result['metadata'] ?? [];
+    } catch (Throwable $e) {
+        outreach_log("Editorial add-url evaluate error for $canonical: " . $e->getMessage());
+    }
+
+    $domain  = editorial_domain_from_url($canonical);
+    $outlet  = trim((string) ($meta['outlet_name'] ?? '')) ?: ucfirst($domain);
+    $author  = trim((string) ($meta['author_name'] ?? ''));
+    $email   = trim((string) ($meta['email'] ?? ''));
+    $summary = trim((string) ($meta['business_summary'] ?? ''));
+    if ($summary === '') {
+        $summary = "Roundup/listicle to pitch: {$canonical}. Goal: get Argo Books added to the list.";
+    }
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO outreach_leads
+            (business_name, contact_name, email, website, source, contact_page_url, business_summary, category, country)
+            VALUES (?, ?, ?, ?, 'editorial_auto', ?, ?, 'editorial', 'US')");
+        $stmt->execute([
+            $outlet,
+            $author !== '' ? $author : null,
+            $email !== '' ? $email : null,
+            $canonical,
+            $canonical,
+            $summary,
+        ]);
+        $leadId = (int) $pdo->lastInsertId();
+
+        $stmt = $pdo->prepare("INSERT INTO outreach_editorial_candidates
+            (canonical_url, status, lead_id, outlet_name, author_name, harvested_email, last_query)
+            VALUES (?, 'imported', ?, ?, ?, ?, 'admin-url')
+            ON DUPLICATE KEY UPDATE status = 'imported', lead_id = VALUES(lead_id),
+                outlet_name = VALUES(outlet_name), author_name = VALUES(author_name),
+                harvested_email = VALUES(harvested_email)");
+        $stmt->execute([$canonical, $leadId, $outlet, $author, $email]);
+
+        log_activity($pdo, $leadId, 'lead_created', 'Added by URL to the Editorial channel');
+        json_response([
+            'success'   => true,
+            'lead_id'   => $leadId,
+            'outlet'    => $outlet,
+            'author'    => $author,
+            'email'     => $email,
+            'has_email' => $email !== '',
+        ]);
+    } catch (Exception $e) {
+        outreach_log("Editorial add-url import failed: " . $e->getMessage());
+        json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
+    }
 }
 
 function editorial_import($pdo)

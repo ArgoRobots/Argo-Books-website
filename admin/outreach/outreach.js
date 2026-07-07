@@ -1775,6 +1775,34 @@ async function importAllEditorialFits() {
     notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
 }
 
+// Add one specific article URL directly (bypasses SerpAPI discovery). Reads the
+// page, scrapes an email, researches the listed tools, and imports it as a lead.
+async function addEditorialUrl() {
+    const input = document.getElementById('editorialUrl');
+    const url = (input.value || '').trim();
+    if (!url) { notify('Enter an article URL'); return; }
+    const btn = document.getElementById('editorialAddBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    try {
+        const data = await api('editorial_add_url', { method: 'POST', body: { url } });
+        if (data.success) {
+            input.value = '';
+            const emailMsg = data.has_email ? `email ${data.email}` : 'no email found — add it on the lead';
+            notify(`Added ${data.outlet || 'article'} (${emailMsg})`, 'success');
+            loadEditorialLeads();
+            loadStats();
+        } else {
+            notify(data.message || 'Could not add that URL');
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', loadEditorialStatus);
 
 // Editorial leads list (own tab, scoped to source=editorial_auto). Reuses the

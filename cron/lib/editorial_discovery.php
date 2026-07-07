@@ -153,7 +153,7 @@ function editorial_search(string $query, string $apiKey, int $limit, PDO $pdo): 
  *   metadata: array<string,mixed>
  * }
  */
-function evaluate_editorial_candidate(string $url, PDO $pdo, string $serpTitle = ''): array
+function evaluate_editorial_candidate(string $url, PDO $pdo, string $serpTitle = '', bool $force = false): array
 {
     $fail = static function (string $reason, string $detail, string $finalUrl, array $meta = []): array {
         return ['fit' => false, 'reason' => $reason, 'detail' => $detail, 'final_url' => $finalUrl, 'metadata' => $meta];
@@ -215,10 +215,13 @@ PROMPT;
         'domain'       => $domain,
     ];
 
-    if (!$isRoundup) {
+    // $force skips the roundup/mentions gates: a URL the operator adds by hand is
+    // a deliberate choice, so import it even if the AI is unsure it's a roundup or
+    // sees Argo already mentioned.
+    if (!$isRoundup && !$force) {
         return $fail('not_a_roundup', 'Page is not a multi-tool roundup', $url, $baseMeta);
     }
-    if ($mentions) {
+    if ($mentions && !$force) {
         return $fail('already_lists_argo', 'Article already mentions Argo Books', $url, $baseMeta);
     }
 
@@ -241,7 +244,7 @@ PROMPT;
             $emailSource = 'scraped';
         }
     }
-    if ($email === null) {
+    if ($email === null && !$force) {
         return $fail('no_contact_found', 'No author or outlet email found', $url, $baseMeta);
     }
 
@@ -255,7 +258,7 @@ PROMPT;
         . " Argo Books is NOT yet included. Goal: get it added to the list.";
 
     $meta = $baseMeta + [
-        'email'        => $email,
+        'email'        => $email ?? '',
         'email_source' => $emailSource,
         'article_url'  => $url,
         'business_summary' => mb_substr($summary, 0, 1000),

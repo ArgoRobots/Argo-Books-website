@@ -480,6 +480,19 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                     <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
                         Searches "best free accounting software" and "QuickBooks alternatives" listicles, finds the author (Hunter.io, else the outlet's contact page), and surfaces the ones that don't already list Argo. SerpAPI usage today: <span id="editorialSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="editorialHunterState">&hellip;</span>.
                     </p>
+
+                    <div class="form-row" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color, #e2e8f0);">
+                        <div class="form-group" style="flex:1;">
+                            <label for="editorialUrl">Or add a specific article URL you already found</label>
+                            <input type="text" id="editorialUrl" placeholder="https://example.com/best-quickbooks-alternatives" style="width:100%;">
+                        </div>
+                        <div class="form-group form-group-btn">
+                            <button class="btn btn-blue" onclick="addEditorialUrl()" id="editorialAddBtn">Add</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="margin:8px 0 0; font-size:12px; text-align:center;">
+                        Reads the page, scrapes a contact email, and researches which tools it lists, then adds it to your Leads. If no email is found, add it on the lead and generate the pitch.
+                    </p>
                 </div>
 
                 <div id="editorialResults" style="display:none; margin-top:16px;">

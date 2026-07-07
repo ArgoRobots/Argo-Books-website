@@ -621,15 +621,23 @@
 }
 .aff-final p {
     font-size: 18px;
-    color: var(--aff-text-inv-soft);
+    color: var(--aff-text-inv);
     line-height: 1.6;
     margin: 0 0 32px;
 }
 /* Needs to out-specify `.aff-final p` above, which otherwise zeroes the top margin. */
 .aff-final .aff-final-note {
     font-size: 13.5px;
-    color: var(--aff-text-inv-soft);
+    color: var(--aff-text-inv);
     margin: 30px 0 0;
+}
+
+/* Brighter link + underline so it reads clearly on the dark final section
+   (the shared .link blue is too dark here). */
+.aff-final .aff-final-note a,
+.aff-final .aff-final-note a.link {
+    color: var(--aff-blue-glow);
+    text-decoration: underline;
 }
 
 /* ============================================================

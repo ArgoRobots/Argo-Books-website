@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 
 // Check if user is logged in as admin
@@ -65,7 +65,7 @@ include __DIR__ . '/../admin_header.php';
 // everything else (including legacy URLs without a tab param) maps to email.
 $redditTabs = ['reddit-threads', 'reddit-settings'];
 $activeChannel = $_GET['channel'] ?? (in_array($activeTab, $redditTabs, true) ? 'reddit' : 'email');
-if (!in_array($activeChannel, ['email', 'reddit'], true)) {
+if (!in_array($activeChannel, ['email', 'reddit', 'editorial'], true)) {
     $activeChannel = 'email';
 }
 ?>
@@ -74,6 +74,7 @@ if (!in_array($activeChannel, ['email', 'reddit'], true)) {
 <div class="channel-tabs">
     <button class="channel-tab <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel="email">Email</button>
     <button class="channel-tab <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel="reddit">Reddit</button>
+    <button class="channel-tab <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel="editorial">Editorial</button>
 </div>
 
 <!-- Email channel -->
@@ -202,7 +203,7 @@ if (!in_array($activeChannel, ['email', 'reddit'], true)) {
                 </div>
             </div>
             <div class="discovery-table-wrapper">
-                <table class="data-table discovery-table">
+                <table class="data-table discovery-table" data-paginate="25">
                     <thead>
                         <tr>
                             <th>Store</th>
@@ -267,37 +268,33 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
 </div>
 
 <!-- Dashboard Stats -->
-<div class="stats-row" id="statsRow">
+<div class="stats-grid" id="statsRow">
     <div class="stat-card">
-        <div class="stat-label">Total Leads</div>
+        <h3>Total Leads</h3>
         <div class="stat-value" id="statTotal">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">New</div>
+        <h3>New</h3>
         <div class="stat-value stat-new" id="statNew">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Drafts Pending</div>
+        <h3>Drafts Pending</h3>
         <div class="stat-value stat-pending" id="statDraftsPending">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Follow-ups pending review</div>
-        <div class="stat-value stat-pending" id="statFollowupsPending">0</div>
-    </div>
-    <div class="stat-card">
-        <div class="stat-label">Contacted</div>
+        <h3>Contacted</h3>
         <div class="stat-value stat-contacted" id="statContacted">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Replied</div>
+        <h3>Replied</h3>
         <div class="stat-value stat-replied" id="statReplied">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Interested</div>
+        <h3>Interested</h3>
         <div class="stat-value stat-interested" id="statInterested">0</div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Clicked</div>
+        <h3>Clicked</h3>
         <div class="stat-value stat-clicked" id="statClicked">0</div>
     </div>
 </div>
@@ -314,15 +311,14 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
     </div>
 
     <!-- Filters -->
-    <div class="filters-container">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label for="filterSearch">Search</label>
-                <input type="text" id="filterSearch" placeholder="Name, email, city..." oninput="debounceLoadLeads()">
+    <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Search</span>
+                <input type="text" class="control-input" id="filterSearch" placeholder="Name, email, city..." oninput="debounceLoadLeads()">
             </div>
-            <div class="filter-group">
-                <label for="filterStatus">Status</label>
-                <select id="filterStatus" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Status</span>
+                <select class="control-select" id="filterStatus" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="new">New</option>
                     <option value="draft_generated">Draft Generated</option>
@@ -334,9 +330,9 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="disqualified">Disqualified</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterResponse">Response</label>
-                <select id="filterResponse" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Response</span>
+                <select class="control-select" id="filterResponse" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="no_response">No Response</option>
                     <option value="positive">Positive</option>
@@ -344,18 +340,18 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="negative">Negative</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterCompanySize">Company Size</label>
-                <select id="filterCompanySize" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Company Size</span>
+                <select class="control-select" id="filterCompanySize" onchange="loadLeads()">
                     <option value="">All Sizes</option>
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
                     <option value="large">Large</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterSource">Source</label>
-                <select id="filterSource" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Source</span>
+                <select class="control-select" id="filterSource" onchange="loadLeads()">
                     <option value="">All</option>
                     <option value="google_places">Google Places</option>
                     <option value="shopify">Shopify</option>
@@ -363,9 +359,9 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="csv_import">CSV</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label for="filterSort">Sort</label>
-                <select id="filterSort" onchange="loadLeads()">
+            <div class="control-group">
+                <span class="control-label">Sort</span>
+                <select class="control-select" id="filterSort" onchange="loadLeads()">
                     <option value="date_added_desc">Newest First</option>
                     <option value="date_added_asc">Oldest First</option>
 
@@ -373,7 +369,6 @@ $shopifyRejectedTotal = max(0, $shopifyTotal30d - $shopifyImported30d);
                     <option value="business_name_asc">Name A-Z</option>
                 </select>
             </div>
-        </div>
     </div>
 
     <!-- Bulk Actions -->
@@ -456,6 +451,157 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
         <?php reddit_settings_tab_render($pdo); ?>
     </div>
 </div> <!-- /.channel-pane[data-channel-pane="reddit"] -->
+
+<!-- Editorial channel -->
+<div class="channel-pane <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel-pane="editorial">
+
+    <div class="section-tabs">
+        <button class="section-tab active" data-tab="editorial-discovery">Discovery</button>
+        <button class="section-tab" data-tab="editorial-leads">Leads</button>
+    </div>
+
+    <div id="editorial-discovery" class="tab-content active">
+        <div class="panel discovery-panel">
+            <div class="panel-header" onclick="togglePanel('editorialContent')">
+                <h2><?= svg_icon('search', 18) ?> Editorial / Roundups</h2>
+                <span class="panel-toggle" id="editorialToggle">&#9660;</span>
+            </div>
+            <div class="panel-content" id="editorialContent">
+                <div class="discovery-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editorialLimit">How many articles to find</label>
+                            <input type="number" id="editorialLimit" value="8" min="1" max="30">
+                        </div>
+                        <div class="form-group form-group-btn">
+                            <button class="btn btn-blue" onclick="runEditorialDiscovery()" id="editorialRunBtn">Run</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
+                        Searches "best free accounting software" and "QuickBooks alternatives" listicles, finds the author (Hunter.io, else the outlet's contact page), and surfaces the ones that don't already list Argo. SerpAPI usage today: <span id="editorialSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="editorialHunterState">&hellip;</span>.
+                    </p>
+
+                    <div class="form-row" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color, #e2e8f0);">
+                        <div class="form-group" style="flex:1;">
+                            <label for="editorialUrl">Or add a specific article URL you already found</label>
+                            <input type="text" id="editorialUrl" placeholder="https://example.com/best-quickbooks-alternatives" style="width:100%;">
+                        </div>
+                        <div class="form-group form-group-btn">
+                            <button class="btn btn-blue" onclick="addEditorialUrl()" id="editorialAddBtn">Add</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="margin:8px 0 0; font-size:12px; text-align:center;">
+                        Reads the page, scrapes a contact email, and researches which tools it lists, then adds it to your Leads. If no email is found, add it on the lead and generate the pitch.
+                    </p>
+                </div>
+
+                <div id="editorialResults" style="display:none; margin-top:16px;">
+                    <div class="discovery-actions">
+                        <span id="editorialResultsCount">0 results</span>
+                        <div>
+                            <button class="btn btn-small btn-blue" onclick="importAllEditorialFits()" id="editorialImportAllBtn">Import All Fits</button>
+                        </div>
+                    </div>
+                    <div class="discovery-table-wrapper">
+                        <table class="data-table discovery-table" data-paginate="25">
+                            <thead>
+                                <tr>
+                                    <th>Outlet</th>
+                                    <th>Author</th>
+                                    <th>Email</th>
+                                    <th>Already lists</th>
+                                    <th>Article</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="editorialResultsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-muted" style="margin-top:12px; font-size:13px;">
+            Imported articles become leads in the <strong>Leads</strong> tab above, where you review the AI-drafted pitch and send it. Keep Send mode on Review-before-send.
+        </p>
+    </div>
+
+    <div id="editorial-leads" class="tab-content">
+        <!-- Filters -->
+        <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Search</span>
+                <input type="text" class="control-input" id="edFilterSearch" placeholder="Outlet, author, email..." oninput="debounceLoadEditorialLeads()">
+            </div>
+            <div class="control-group">
+                <span class="control-label">Status</span>
+                <select class="control-select" id="edFilterStatus" onchange="loadEditorialLeads()">
+                    <option value="">All</option>
+                    <option value="new">New</option>
+                    <option value="draft_generated">Draft Generated</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="replied">Replied</option>
+                    <option value="interested">Interested</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="onboarded">Onboarded</option>
+                    <option value="disqualified">Disqualified</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Response</span>
+                <select class="control-select" id="edFilterResponse" onchange="loadEditorialLeads()">
+                    <option value="">All</option>
+                    <option value="no_response">No Response</option>
+                    <option value="positive">Positive</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="negative">Negative</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Sort</span>
+                <select class="control-select" id="edFilterSort" onchange="loadEditorialLeads()">
+                    <option value="date_added_desc">Newest First</option>
+                    <option value="date_added_asc">Oldest First</option>
+                    <option value="last_contact_desc">Last Contacted</option>
+                    <option value="business_name_asc">Name A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions-bar" id="edBulkActionsBar" style="display:none;">
+            <span><strong id="edSelectedCount">0</strong> selected</span>
+            <button class="btn btn-small btn-blue" id="edBtnDraftSelected" onclick="bulkGenerateEditorialDrafts()">Draft Selected</button>
+            <button class="btn btn-small btn-blue" onclick="openEditorialBulkSend()">Send Email</button>
+            <button class="btn btn-small btn-blue" onclick="bulkDeleteEditorialLeads()">Delete Selected</button>
+        </div>
+
+        <!-- Bulk Draft Progress -->
+        <div class="bulk-draft-progress" id="edBulkDraftProgress" style="display:none;">
+            <span class="bulk-draft-spinner"></span>
+            <span id="edBulkDraftProgressText"></span>
+            <button class="btn btn-small btn-neutral" id="edBtnCancelDraft" onclick="cancelBulkDrafts()" style="margin-left:8px;">Cancel</button>
+        </div>
+
+        <div class="leads-table-wrapper">
+            <table class="data-table editorial-leads-table">
+                <thead>
+                    <tr>
+                        <th class="checkbox-column"><div class="checkbox"><input type="checkbox" id="edLeadsSelectAll" onchange="toggleEditorialLeadCheckboxes(this)"><label for="edLeadsSelectAll"></label></div></th>
+                        <th>Outlet</th>
+                        <th>Article</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Sent</th>
+                        <th>Clicked</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="editorialLeadsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div> <!-- /.channel-pane[data-channel-pane="editorial"] -->
 
 <!-- Lead Detail Modal -->
 <div id="leadDetailModal" class="modal" style="display:none;">
@@ -622,48 +768,17 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
             <button class="modal-close" onclick="closeModal('addLeadModal')">&times;</button>
         </div>
         <div class="modal-body">
-            <div class="detail-grid">
-                <div class="form-group">
-                    <label>Business Name <span class="required">*</span></label>
-                    <input type="text" id="addBusinessName" required>
-                </div>
-                <div class="form-group">
-                    <label>Contact Name</label>
-                    <input type="text" id="addContactName">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="addEmail">
-                </div>
-                <div class="form-group">
-                    <label>Phone</label>
-                    <input type="text" id="addPhone">
-                </div>
-                <div class="form-group">
-                    <label>Website</label>
-                    <input type="url" id="addWebsite">
-                </div>
-                <div class="form-group">
-                    <label>Address</label>
-                    <input type="text" id="addAddress">
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <input type="text" id="addCategory">
-                </div>
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" id="addCity">
-                </div>
-            </div>
+            <p class="text-muted" style="margin-top:0; font-size:13px;">
+                Just paste the business's website. We'll fetch the page and auto-fill the name, email, phone, category, city, and a short summary. You can edit anything afterward by opening the lead.
+            </p>
             <div class="form-group full-width">
-                <label>Notes</label>
-                <textarea id="addNotes" rows="3"></textarea>
+                <label>Website <span class="required">*</span></label>
+                <input type="url" id="addWebsite" placeholder="example.com">
             </div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-blue" onclick="closeModal('addLeadModal')">Cancel</button>
-            <button class="btn btn-blue" onclick="createLead()">Add Lead</button>
+            <button class="btn btn-blue" id="btnAddLead" onclick="createLead()">Add Lead</button>
         </div>
     </div>
 </div>
@@ -784,6 +899,43 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
         <div class="modal-footer">
             <button class="btn btn-neutral" onclick="closeModal('redditMarkRepliedModal')">Cancel</button>
             <button class="btn btn-blue" onclick="confirmMarkRedditReplied()" id="redditConfirmMarkRepliedBtn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Reddit Thread Modal -->
+<div id="addRedditThreadModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3>Add Reddit Thread</h3>
+            <button class="modal-close" onclick="closeModal('addRedditThreadModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-muted" style="margin-top:0; font-size:13px;">
+                Paste a Reddit post URL. We'll try to fetch the title, subreddit, and body automatically; fill the fields in below if it can't reach Reddit. The thread lands in the queue as drafted-pending so you can generate a reply for it.
+            </p>
+            <div class="form-group">
+                <label>Reddit post URL <span class="required">*</span></label>
+                <input type="url" id="addRedditUrl" placeholder="https://www.reddit.com/r/smallbusiness/comments/abc123/...">
+            </div>
+            <div class="detail-grid">
+                <div class="form-group">
+                    <label>Subreddit</label>
+                    <input type="text" id="addRedditSubreddit" placeholder="e.g. smallbusiness">
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label>Title</label>
+                <input type="text" id="addRedditTitle" placeholder="Auto-filled from the URL when possible">
+            </div>
+            <div class="form-group full-width">
+                <label>OP body (optional)</label>
+                <textarea id="addRedditBody" rows="5" placeholder="Paste the post body to improve the generated draft"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="closeModal('addRedditThreadModal')">Cancel</button>
+            <button class="btn btn-blue" onclick="addRedditThread()">Add Thread</button>
         </div>
     </div>
 </div>

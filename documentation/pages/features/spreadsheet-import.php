@@ -83,7 +83,7 @@ include __DIR__ . '/../../docs-header.php';
             </ul>
 
             <h2>Usage Limits</h2>
-            <p>Every user gets <?= (int) $pricing['ai_import_monthly_limit'] ?> AI-powered imports per month. Each file you import (regardless of the number of sheets) counts as one import.</p>
+            <p>Free accounts get <?= (int) $pricing['ai_import_monthly_limit'] ?> AI-powered imports per month and Premium gets <?= (int) $pricing['premium_ai_import_monthly_limit'] ?>. Each file you import (regardless of the number of sheets) counts as one import.</p>
 
             <div class="page-navigation">
                 <a href="receipt-scanning.php" class="nav-button prev">

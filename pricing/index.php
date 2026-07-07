@@ -26,7 +26,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
         content="argo books pricing, buy full version, unlimited products, business software pricing, finance tracker, premium subscription">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Pricing - Argo Books">
+    <meta property="og:title" content="Argo Books Pricing: Free Plan and Affordable Premium">
     <meta property="og:description"
         content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
     <meta property="og:url" content="https://argorobots.com/pricing/">
@@ -36,13 +36,13 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Pricing - Argo Books">
+    <meta name="twitter:title" content="Argo Books Pricing: Free Plan and Affordable Premium">
     <meta name="twitter:description"
         content="Argo Books Pricing. Subscribe to Premium for $<?php echo number_format($monthlyPrice, 0); ?>/month. Unlimited products, AI-powered insights, and more.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses%2C+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses%2C+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://argorobots.com/pricing/">
@@ -122,7 +122,7 @@ $yearlySavings = ($monthlyPrice * 12) - $yearlyPrice;
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="../resources/images/argo-logo/argo-icon.ico">
-    <title>Pricing - Argo Books</title>
+    <title>Argo Books Pricing: Free Plan and Affordable Premium</title>
 
     <script src="../resources/scripts/main.js"></script>
 

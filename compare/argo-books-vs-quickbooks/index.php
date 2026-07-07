@@ -38,10 +38,10 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
     <meta name="twitter:title" content="Argo Books vs QuickBooks: A Simpler, More Affordable Alternative">
     <meta name="twitter:description"
         content="Compare Argo Books and QuickBooks side by side. See why small businesses are choosing Argo Books for simpler, more affordable finance management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -395,6 +395,7 @@ $qb_advanced  = competitor_price('quickbooks', 'advanced');
                 <span class="section-label">An Honest Take</span>
                 <h2>QuickBooks is powerful, but is it right for you?</h2>
                 <p class="section-desc">QuickBooks is a mature platform with payroll, tax filing, and hundreds of integrations. If your business needs those features today, it's a solid choice. But as a publicly traded company, Intuit's priorities don't always align with small business owners, and it shows in the rising prices, aggressive feature gating, and complexity you don't need. Argo Books is built for you. Simple pricing, no upsells, and every feature included in one plan.</p>
+                <p class="section-desc">Still weighing your options? Read our roundup of the <a class="link" href="../../best-quickbooks-alternatives/">best QuickBooks alternatives</a>, an honest look at Wave, Xero, FreshBooks, Zoho, and more, with where each one fits best.</p>
                 <a href="../../downloads/" class="btn-cta btn-cta-primary honest-take-cta">
                     <span>Get Started Now</span>
                     <?= svg_icon('arrow-right', 18) ?>

@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -48,6 +48,7 @@ HTML,
       'anchor' => 'setup',
       'html' => <<<'HTML'
 <p>This one is closer than people expect, and it splits two ways.</p>
+{{illustration:compare-scale}}
 <p>A template wins on the very first day. You open it, you understand it because it's just rows and columns, and you start typing. There's nothing to learn because you already know spreadsheets. For someone who needs to record their first ten transactions tonight, a template is the fastest possible start.</p>
 <p>Software wins over the first month. There's a setup cost: you create an account, learn where things live, and possibly import your existing data. That's a few hours of friction the template doesn't have. But once it's set up, the day-to-day is usually less work than the template, not more, because the tool is doing the sorting and totalling you'd otherwise do by hand.</p>
 <p>The deciding question is how long you'll use it. If this is a quick, short-term need, the template's instant start wins. If you're setting up bookkeeping you'll run for years, the few hours to learn software are a one-time cost that pays back every month after, so the setup gap stops mattering and the daily effort takes over as the thing that counts.</p>
@@ -81,6 +82,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Two pressures break templates as a business grows: volume and people.</p>
 <p>On <strong>volume</strong>, a template that's comfortable at twenty transactions a month becomes a part-time data-entry job at two hundred. The structure still works; it's the manual entry that becomes the bottleneck, and the error risk climbs with every row you type. Software scales here because the per-transaction effort barely changes whether you have twenty or two thousand.</p>
+{{illustration:spreadsheet-to-books}}
 <p>On <strong>people</strong>, templates struggle the moment more than one person needs the books. Two people editing the same file leads to version chaos: "the latest one," emailed copies, a change one person made that another overwrote. Even cloud spreadsheets, which handle simultaneous editing better, give you no real permissions, no record of who changed what, and no protection against someone overwriting a month of work. Software is built for this, with proper multi-user access and a trail of changes.</p>
 <p>If you're a solo operator who'll stay solo, the people problem never arrives and you can ignore it. If you expect to bring in a bookkeeper, a partner, or staff who touch the numbers, it's worth weighing now, because the time to move is before the spreadsheet is the shared mess everyone's afraid to touch.</p>
 HTML,

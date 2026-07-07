@@ -12,7 +12,8 @@ error_log
 create_admin.php
 create_community_admin.php
 reset_admin_password.php
-/community/uploads/
+/community/uploads/*
+!/community/uploads/.htaccess
 /cron/logs/
 /api/invoice/config.php
 /api/invoice/logs/*.log
@@ -24,3 +25,5 @@ reset_admin_password.php
 /.superpowers/
 /node_modules/
 package-lock.json
+# Brainstorming visual companion scratch
+.superpowers/

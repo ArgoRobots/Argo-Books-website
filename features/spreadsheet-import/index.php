@@ -29,7 +29,7 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Spreadsheet+Import&subtitle=Drop+a+spreadsheet%2C+get+clean+records.+Automatic+column+mapping+for+your+business+data.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -38,7 +38,7 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
     <meta name="twitter:title" content="Spreadsheet Import | Argo Books">
     <meta name="twitter:description"
         content="Drop a spreadsheet, get clean records. Argo Books imports your customers, products, invoices, and expenses from Excel or CSV files automatically.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Spreadsheet+Import&subtitle=Drop+a+spreadsheet%2C+get+clean+records.+Automatic+column+mapping+for+your+business+data.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -533,6 +533,33 @@ $argo_import_limit = (int) get_pricing_config()['ai_import_monthly_limit'];
                     </div>
                     <h3>Predictive Analytics</h3>
                     <p>More data means better forecasts. Importing your full history helps predictions stay accurate from day one.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../how-to-convert-excel-spreadsheet-to-accounting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Convert Excel to accounting software</h3>
+                    <p>Move your spreadsheet into real software without losing history.</p>
+                </a>
+                <a href="../../how-to-move-from-spreadsheets-to-bookkeeping-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Move from spreadsheets to software</h3>
+                    <p>When and how to make the switch cleanly.</p>
+                </a>
+                <a href="../../import-bank-transactions-from-csv-into-accounting-software/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Import bank transactions from CSV</h3>
+                    <p>Pull your bank history in with automatic column mapping.</p>
                 </a>
             </div>
         </div>

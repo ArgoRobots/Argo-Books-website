@@ -28,7 +28,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Expense+%26+Revenue+Tracking&subtitle=Track+every+dollar+in+and+out.+Guided+forms%2C+smart+validation%2C+and+real-time+profit+monitoring.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -37,7 +37,7 @@ $argo_monthly = (int) get_pricing_config()['premium_monthly_price'];
     <meta name="twitter:title" content="Expense &amp; Revenue Tracking | Argo Books">
     <meta name="twitter:description"
         content="Track business expenses and revenue with Argo Books. Guided forms, smart validation, and automatic categorization make bookkeeping simple.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Expense+%26+Revenue+Tracking&subtitle=Track+every+dollar+in+and+out.+Guided+forms%2C+smart+validation%2C+and+real-time+profit+monitoring.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">

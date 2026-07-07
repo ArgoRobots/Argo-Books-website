@@ -1109,19 +1109,193 @@ function filter_category_type_mismatch($expectedType, $types)
 }
 
 /**
- * Soft signal: a Google business with hundreds of ratings is almost
- * certainly a national chain location (or a major tourist attraction).
- * Real Saskatoon plumbers/accountants/salons rarely exceed ~300 reviews.
+ * Soft signal: a Google business with lots of ratings is almost certainly an
+ * established operator (and a national chain location once it gets into the
+ * hundreds). A brand-new business still on spreadsheets, the kind Argo Books
+ * is trying to reach, has very few reviews. The default ceiling is deliberately
+ * low (15) to skew discovery toward newer businesses; callers that want the
+ * configured value should pass outreach_max_review_count().
  *
  * Returns true if review count exceeds threshold. NULL or 0 reviews are
  * treated as "no signal" and pass through.
  */
-function filter_review_count_too_high($reviewCount, $threshold = 300)
+function filter_review_count_too_high($reviewCount, $threshold = 15)
 {
     if ($reviewCount === null || $reviewCount === '') return false;
     $n = (int) $reviewCount;
     if ($n <= 0) return false;
     return $n > $threshold;
+}
+
+/**
+ * Resolve the configured max-review-count ceiling for discovery. Precedence:
+ *   1. DB state `max_review_count` in outreach_pipeline_state (Settings knob)
+ *   2. env OUTREACH_MAX_REVIEW_COUNT
+ *   3. hardcoded default (15)
+ *
+ * Uses the global $pdo defensively: if it's unavailable or the query fails
+ * (e.g. table missing on a fresh install), we silently fall back to env/default
+ * so discovery never breaks on a missing knob. Only positive integers count as
+ * a valid override; a blank/0/non-numeric state value means "use env/default".
+ */
+function outreach_max_review_count(): int
+{
+    $default = 15;
+
+    global $pdo;
+    if (isset($pdo)) {
+        try {
+            $stmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = 'max_review_count'");
+            $stmt->execute();
+            $val = $stmt->fetchColumn();
+            if ($val !== false && is_numeric($val) && (int) $val > 0) {
+                return (int) $val;
+            }
+        } catch (PDOException $e) {
+            // Table missing or query failed: fall through to env/default.
+        }
+    }
+
+    $env = $_ENV['OUTREACH_MAX_REVIEW_COUNT'] ?? '';
+    if (is_numeric($env) && (int) $env > 0) {
+        return (int) $env;
+    }
+
+    return $default;
+}
+
+// ─── Newness / business-age detection ───
+
+/**
+ * Scan website HTML for an explicit business-founding year. Looks for
+ * copyright, "since YYYY", "established YYYY", "founded YYYY", and
+ * "YYYY-present" patterns and returns the OLDEST plausible founding year
+ * (1900..current year) found, or null if no signal is detected.
+ *
+ * Shared by the Shopify evaluator (business_too_old reject) and the Google
+ * Places newness gate. An established business that just refreshed its site
+ * still advertises its real age, which is exactly the "20-year-old shop that
+ * already has accounting software" we want to skip.
+ */
+function detect_storefront_founded_year(string $html): ?int
+{
+    // Decode entities so "&copy; 2006" footers match the © pattern below.
+    $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $currentYear = (int) date('Y');
+    $oldestYear = null;
+
+    $patterns = [
+        '/©.{0,80}?(\d{4})/s',                                    // © 1995, © Acme Co 1995-2026
+        '/\bcopyright\b.{0,80}?(\d{4})/is',                       // copyright Acme Co 1995
+        '/\bsince\s+(\d{4})\b/i',                                 // since 1995
+        '/\b(?:est(?:ablished)?\.?)\s+(?:in\s+)?(\d{4})\b/i',     // est. 1995, established in 1995
+        '/\bfounded\s+(?:in\s+)?(\d{4})\b/i',                     // founded 1995, founded in 1995
+        '/\b(\d{4})\s*[-–—]\s*(?:present|today|now)\b/i',         // 1995-present
+    ];
+
+    foreach ($patterns as $pattern) {
+        if (preg_match_all($pattern, $text, $matches)) {
+            foreach ($matches[1] as $yearStr) {
+                $year = (int) $yearStr;
+                if ($year >= 1900 && $year <= $currentYear) {
+                    if ($oldestYear === null || $year < $oldestYear) {
+                        $oldestYear = $year;
+                    }
+                }
+            }
+        }
+    }
+
+    return $oldestYear;
+}
+
+/**
+ * Detect "this is an established business" signals from website HTML so the
+ * newness gate can skip operators that have clearly been around for years
+ * (and almost certainly already run accounting software). Pure / network-free.
+ *
+ * Returns:
+ *   [
+ *     'founded_year'     => int|null,   // oldest founding year detected
+ *     'years_experience' => int|null,   // largest "N years experience/in business" claim
+ *     'phrase'           => string|null // short snippet of the matched claim (for the log/reason)
+ *   ]
+ *
+ * Examples it catches: "serving the community since 1998", "© 2003",
+ * "20+ years experience", "over 25 years in business", "30 years of experience".
+ * Sparse / new / "now open" / "launching" sites match nothing and return all
+ * nulls, so they pass through.
+ */
+function detect_established_signals(string $html): array
+{
+    $foundedYear = detect_storefront_founded_year($html);
+
+    $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $yearsExperience = null;
+    $phrase = null;
+
+    // "20+ years", "over 25 years", "more than 30 years", "25 years of experience",
+    // "20 years in business". Require the word "year(s)" plus an experience/business
+    // qualifier nearby so we don't match unrelated "N years" copy.
+    $expPatterns = [
+        '/\b(?:over|more than|nearly|almost)?\s*(\d{1,2})\s*\+?\s*years?\s+(?:of\s+)?(?:experience|expertise|in\s+business|serving|in\s+the\s+industry|of\s+service)\b/i',
+        '/\b(?:experience|expertise|in\s+business|serving|in\s+the\s+industry)\s+(?:for\s+)?(?:over|more than)?\s*(\d{1,2})\s*\+?\s*years?\b/i',
+    ];
+    foreach ($expPatterns as $pattern) {
+        if (preg_match_all($pattern, $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $m) {
+                $n = (int) $m[1];
+                if ($n >= 1 && $n <= 99 && ($yearsExperience === null || $n > $yearsExperience)) {
+                    $yearsExperience = $n;
+                    $phrase = trim(preg_replace('/\s+/', ' ', $m[0]));
+                    if (strlen($phrase) > 120) $phrase = substr($phrase, 0, 120);
+                }
+            }
+        }
+    }
+
+    return [
+        'founded_year'     => $foundedYear,
+        'years_experience' => $yearsExperience,
+        'phrase'           => $phrase,
+    ];
+}
+
+/**
+ * Fetch a website and return both the raw HTML and a cleaned, capped text
+ * version. Extracted from summarize_business() so a single fetch can feed
+ * both the newness check and the AI summary. Returns null on fetch failure
+ * or when the page has too little readable text to be useful.
+ *
+ * @return array{html:string, text:string}|null
+ */
+function fetch_website_text($website): ?array
+{
+    if (empty($website)) return null;
+
+    $context = stream_context_create([
+        'http' => [
+            'timeout' => 5,
+            'user_agent' => 'Mozilla/5.0',
+            'follow_location' => true,
+            'max_redirects' => 3,
+        ],
+        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
+    ]);
+
+    $html = @file_get_contents($website, false, $context);
+    if (!$html) return null;
+
+    // Strip scripts, styles, and tags to get readable text
+    $text = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $html);
+    $text = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $text);
+    $text = strip_tags($text);
+    $text = preg_replace('/\s+/', ' ', $text);
+    $text = trim(mb_substr($text, 0, 3000)); // Cap at 3000 chars
+
+    if (strlen($text) < 50) return null;
+
+    return ['html' => $html, 'text' => $text];
 }
 
 // ─── Layer 3: AI Size Gate ───
@@ -1216,6 +1390,83 @@ PROMPT;
     if (strlen($reason) > 240) $reason = substr($reason, 0, 240);
 
     return ['classification' => $cls, 'reason' => $reason];
+}
+
+/**
+ * Ask Gemini whether a business looks NEW/early vs ESTABLISHED, based on its
+ * website text. This is the AI half of the newness gate: the cheap regex in
+ * detect_established_signals() catches explicit "since 1998 / 20+ years" copy;
+ * this catches softer signals (long client lists, decades of awards, "trusted
+ * for generations", a mature product catalogue) that have no literal year.
+ *
+ * Returns one of:
+ *   ['maturity' => 'new',         'reason' => '...']
+ *   ['maturity' => 'established', 'reason' => '...']
+ *   ['maturity' => 'unknown',     'reason' => '...']
+ *   ['error' => 'message']                              (API or parse failure)
+ *
+ * On 'error' or 'unknown', callers should pass-through (do NOT reject): the
+ * goal is to skew newer, not to block legitimate outreach on a Gemini hiccup.
+ */
+function classify_business_maturity_with_ai($businessName, $websiteText)
+{
+    $name = trim((string) $businessName);
+    $text = trim((string) $websiteText);
+    if ($text === '') {
+        return ['error' => 'missing website text'];
+    }
+    if (strlen($text) > 3000) {
+        $text = substr($text, 0, 3000);
+    }
+
+    $systemPrompt = <<<PROMPT
+You are screening outreach leads for Argo Books, simple bookkeeping software
+aimed at NEW and early-stage small businesses that likely haven't settled on
+accounting software yet. We want to SKIP businesses that are clearly long
+established (they almost always already run QuickBooks/Xero/Sage).
+
+Read the website text and judge how mature the business is:
+
+  "new"         — recently launched, "now open", "coming soon", sparse site,
+                  one or two offerings, no history, no long client roster.
+  "established" — clearly been operating for many years: talks about decades
+                  of service, "trusted since", generations, long awards history,
+                  hundreds of past projects/clients, a deep product catalogue.
+  "unknown"     — genuinely can't tell from the text.
+
+When torn between "new" and "unknown", prefer "unknown". Only answer
+"established" when the text gives clear evidence of long operation.
+
+Respond with ONLY a JSON object, no preamble:
+{"maturity": "new" | "established" | "unknown", "reason": "one short sentence"}
+PROMPT;
+
+    $details = $name !== '' ? "Business name: {$name}\n\nWebsite text:\n{$text}" : "Website text:\n{$text}";
+
+    $result = call_gemini($systemPrompt, $details);
+    if (isset($result['error'])) {
+        return ['error' => $result['error']];
+    }
+
+    $content = trim((string) ($result['content'] ?? ''));
+    $content = preg_replace('/^```json\s*/i', '', $content);
+    $content = preg_replace('/\s*```$/', '', $content);
+
+    $parsed = json_decode($content, true);
+    if (!is_array($parsed) || !isset($parsed['maturity'])) {
+        return ['error' => 'AI returned non-JSON or missing maturity field'];
+    }
+
+    $maturity = strtolower(trim((string) $parsed['maturity']));
+    if (!in_array($maturity, ['new', 'established', 'unknown'], true)) {
+        return ['error' => 'AI returned unknown maturity value: ' . $maturity];
+    }
+
+    $reason = trim((string) ($parsed['reason'] ?? ''));
+    if ($reason === '') $reason = '(no reason given)';
+    if (strlen($reason) > 240) $reason = substr($reason, 0, 240);
+
+    return ['maturity' => $maturity, 'reason' => $reason];
 }
 
 /**
@@ -1463,6 +1714,11 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
     }
     $roundsUsed = 0;
 
+    // Resolve the review-count ceiling once up front. It's a config lookup
+    // (DB state -> env -> default), so we must not re-run it per candidate
+    // inside the rounds/pages loop below.
+    $maxReviewCount = outreach_max_review_count();
+
     // Build query variations to search across multiple rounds
     $queries = [];
     if ($category) {
@@ -1630,8 +1886,10 @@ function search_businesses_core($city, $province, $category, $limit, $apiKey, $e
                     continue;
                 }
 
-                // (c) Review-count cap: real local SMBs almost never exceed 300.
-                if (filter_review_count_too_high($reviewCount)) {
+                // (c) Review-count cap: a low ceiling (configurable via the
+                //     Outreach → Settings knob / OUTREACH_MAX_REVIEW_COUNT) skews
+                //     discovery toward newer businesses with few reviews.
+                if (filter_review_count_too_high($reviewCount, $maxReviewCount)) {
                     _outreach_filter_log("Filter reject [review_count_too_high:{$reviewCount}]: '{$businessName}' ({$website})");
                     continue;
                 }
@@ -1770,29 +2028,18 @@ function call_gemini($systemPrompt, $userPrompt)
 
 // ─── Business Summarization ───
 
-function summarize_business($website)
+function summarize_business($website, $prefetchedText = null)
 {
-    if (empty($website)) return null;
-
-    $context = stream_context_create([
-        'http' => [
-            'timeout' => 5,
-            'user_agent' => 'Mozilla/5.0',
-            'follow_location' => true,
-            'max_redirects' => 3,
-        ],
-        'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
-    ]);
-
-    $html = @file_get_contents($website, false, $context);
-    if (!$html) return null;
-
-    // Strip scripts, styles, and tags to get readable text
-    $text = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $html);
-    $text = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $text);
-    $text = strip_tags($text);
-    $text = preg_replace('/\s+/', ' ', $text);
-    $text = trim(mb_substr($text, 0, 3000)); // Cap at 3000 chars
+    // Reuse already-fetched page text when the caller has it (the draft flow
+    // fetches once for the newness check), otherwise fetch now.
+    if ($prefetchedText !== null && trim((string) $prefetchedText) !== '') {
+        $text = trim((string) $prefetchedText);
+    } else {
+        if (empty($website)) return null;
+        $fetched = fetch_website_text($website);
+        if ($fetched === null) return null;
+        $text = $fetched['text'];
+    }
 
     if (strlen($text) < 50) return null;
 
@@ -1807,6 +2054,100 @@ Be specific and factual based on the website content. Do not include any other t
     );
 
     return $result['content'] ?? null;
+}
+
+// ─── Lead enrichment from a website ───
+
+/**
+ * Given just a website URL, best-effort auto-fill the fields needed to create
+ * an outreach lead: business name, email, phone, category, city, and a short
+ * summary. Used by the admin "Add Lead" flow (paste a URL, we fill the rest).
+ *
+ * Combines the cheap signals (contact-page email scrape, <title> tag) with a
+ * single Gemini extraction call over the page text. Everything is best-effort:
+ * any field we can't determine comes back null, and the caller still creates
+ * the lead (a name falls back to the domain) so the admin can edit afterward.
+ *
+ * Returns an associative array; never throws.
+ */
+function enrich_lead_from_website($url): array
+{
+    $url = trim((string) $url);
+    if ($url !== '' && !preg_match('#^https?://#i', $url)) {
+        $url = 'https://' . $url;
+    }
+
+    $out = [
+        'website'          => $url,
+        'business_name'    => null,
+        'email'            => null,
+        'phone'            => null,
+        'category'         => null,
+        'city'             => null,
+        'address'          => null,
+        'business_summary' => null,
+    ];
+    if ($url === '') return $out;
+
+    // Email from the contact-page scraper (cached).
+    $email = scrape_email_from_website($url);
+    if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $out['email'] = $email;
+    }
+
+    // Page text + raw HTML (single fetch, shared below).
+    $fetched = fetch_website_text($url);
+    $host = parse_url($url, PHP_URL_HOST) ?: $url;
+    $domainName = ucwords(str_replace(['-', '_'], ' ', preg_replace('/\.[a-z.]+$/i', '', preg_replace('/^www\./', '', $host))));
+
+    if ($fetched === null) {
+        // Couldn't fetch the page: still give the caller a usable name.
+        $out['business_name'] = $domainName !== '' ? $domainName : $host;
+        return $out;
+    }
+
+    // <title> as a quick business-name candidate.
+    if (preg_match('/<title[^>]*>([^<]+)<\/title>/i', $fetched['html'], $tm)) {
+        $title = html_entity_decode(trim($tm[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if ($title !== '') $out['business_name'] = mb_substr($title, 0, 200);
+    }
+
+    // One Gemini call to pull structured fields out of the page text.
+    $systemPrompt = <<<'PROMPT'
+You extract structured business details from website text. Return ONLY a JSON
+object with exactly these keys, using null (not a guess) when the text doesn't
+say:
+{"business_name": string|null, "category": string|null, "city": string|null, "address": string|null, "phone": string|null, "summary": string|null}
+
+- business_name: the business's real name, cleaned of taglines/slogans.
+- category: a short industry label (e.g. "plumber", "bakery", "law firm").
+- city: the city they operate in, if stated.
+- address: a full street address, if stated.
+- phone: a single primary phone number, if present.
+- summary: 2-3 sentences on what they do and how they likely bill clients.
+No preamble, JSON only.
+PROMPT;
+
+    $res = call_gemini($systemPrompt, "Website: {$url}\n\n" . $fetched['text']);
+    if (empty($res['error']) && !empty($res['content'])) {
+        $content = preg_replace('/^```json\s*/i', '', trim((string) $res['content']));
+        $content = preg_replace('/\s*```$/', '', $content);
+        $parsed = json_decode($content, true);
+        if (is_array($parsed)) {
+            if (!empty($parsed['business_name'])) $out['business_name']    = mb_substr(trim((string) $parsed['business_name']), 0, 200);
+            if (!empty($parsed['category']))      $out['category']         = mb_substr(trim((string) $parsed['category']), 0, 100);
+            if (!empty($parsed['city']))          $out['city']             = mb_substr(trim((string) $parsed['city']), 0, 100);
+            if (!empty($parsed['address']))       $out['address']          = mb_substr(trim((string) $parsed['address']), 0, 255);
+            if (!empty($parsed['phone']))         $out['phone']            = mb_substr(trim((string) $parsed['phone']), 0, 40);
+            if (!empty($parsed['summary']))       $out['business_summary'] = mb_substr(trim((string) $parsed['summary']), 0, 1000);
+        }
+    }
+
+    if (empty($out['business_name'])) {
+        $out['business_name'] = $domainName !== '' ? $domainName : $host;
+    }
+
+    return $out;
 }
 
 // ─── Draft Generation ───
@@ -1833,7 +2174,11 @@ function generate_draft_for_lead($pdo, $lead)
     // is cheap enough (~$0.0001/lead) that we don't bother caching the
     // verdict in a column.
     $sourceVal = strtolower((string) ($lead['source'] ?? ''));
-    $isAutoLead = str_ends_with($sourceVal, '_auto');
+    // Editorial (roundup) leads are publications, not small businesses, so the
+    // AI size gate and the newness gate below don't apply. They also arrive with
+    // their article context pre-summarized, so the SMB summary call is skipped.
+    $isEditorial = ($sourceVal === 'editorial_auto');
+    $isAutoLead = str_ends_with($sourceVal, '_auto') && !$isEditorial;
     if ($isAutoLead) {
         $gate = classify_lead_size_with_ai($lead);
         if (isset($gate['error'])) {
@@ -1853,6 +2198,65 @@ function generate_draft_for_lead($pdo, $lead)
             ];
         }
         // classification === 'small_independent' falls through to drafting.
+    }
+
+    // ─── Newness gate ───
+    // Argo Books targets NEW / early businesses that likely haven't settled on
+    // accounting software yet. Skip auto-discovered leads whose own website
+    // shows clear "established" signals (old founding year, "20+ years
+    // experience", decades of service). Two layers: a free regex pass, then an
+    // AI judgment for softer signals. Both pass-through on failure so a fetch
+    // miss or Gemini hiccup never blocks legitimate outreach.
+    //
+    // We fetch the homepage once here and hand the text to summarize_business
+    // below, so this adds at most one HTTP GET (and only at first draft, when
+    // no business_summary is stored yet). On regenerate, the lead was already
+    // vetted, so we skip the re-check.
+    $prefetchedSiteText = null;
+    if ($isAutoLead && empty($lead['business_summary']) && !empty($lead['website'])) {
+        $fetched = fetch_website_text($lead['website']);
+        if ($fetched !== null) {
+            $prefetchedSiteText = $fetched['text'];
+
+            $maxAgeYears = (int) ($_ENV['OUTREACH_ESTABLISHED_MAX_AGE_YEARS'] ?? 8);
+            if ($maxAgeYears < 1) $maxAgeYears = 8;
+            $currentYear = (int) date('Y');
+
+            // Layer A: cheap regex on the page HTML.
+            $signals = detect_established_signals($fetched['html']);
+            $establishedDetail = null;
+            if ($signals['founded_year'] !== null && $signals['founded_year'] <= ($currentYear - $maxAgeYears)) {
+                $age = $currentYear - $signals['founded_year'];
+                $establishedDetail = "Website shows founding year {$signals['founded_year']} (~{$age} years old)";
+            } elseif ($signals['years_experience'] !== null && $signals['years_experience'] >= $maxAgeYears) {
+                $establishedDetail = "Website advertises " . $signals['years_experience'] . "+ years"
+                    . ($signals['phrase'] ? " (\"{$signals['phrase']}\")" : '');
+            }
+            if ($establishedDetail !== null) {
+                disqualify_lead($pdo, $id, 'established_business', 'Newness gate: ' . $establishedDetail);
+                return [
+                    'success' => true,
+                    'disqualified' => true,
+                    'reason' => 'established_business',
+                    'detail' => $establishedDetail,
+                ];
+            }
+
+            // Layer B: AI maturity judgment for softer signals with no literal year.
+            $maturity = classify_business_maturity_with_ai($lead['business_name'] ?? '', $prefetchedSiteText);
+            if (isset($maturity['error'])) {
+                log_activity($pdo, $id, 'newness_gate_skipped', 'AI maturity error, proceeding: ' . $maturity['error']);
+            } elseif ($maturity['maturity'] === 'established') {
+                disqualify_lead($pdo, $id, 'ai_established_business', 'AI newness gate: ' . $maturity['reason']);
+                return [
+                    'success' => true,
+                    'disqualified' => true,
+                    'reason' => 'ai_established_business',
+                    'detail' => $maturity['reason'],
+                ];
+            }
+            // 'new' / 'unknown' fall through to drafting.
+        }
     }
 
     // A/B variant lookup must happen before the summary block so a
@@ -1920,8 +2324,10 @@ function generate_draft_for_lead($pdo, $lead)
     $summary = $lead['business_summary'] ?? null;
     if ($personalizationOff) {
         $summary = null;
-    } elseif (empty($summary) && !empty($lead['website'])) {
-        $summary = summarize_business($lead['website']);
+    } elseif (empty($summary) && !empty($lead['website']) && !$isEditorial) {
+        // Reuse the page text fetched by the newness gate above (if any) so we
+        // don't fetch the same homepage twice.
+        $summary = summarize_business($lead['website'], $prefetchedSiteText);
         if ($summary) {
             $stmt = $pdo->prepare("UPDATE outreach_leads SET business_summary = ? WHERE id = ?");
             $stmt->execute([$summary, $id]);
@@ -1963,6 +2369,41 @@ function generate_draft_for_lead($pdo, $lead)
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
+    if ($isEditorial) {
+        $systemPrompt = "You are helping write a short, genuine outreach email from Evan, the developer behind Argo Books, to the author or editor of a published \"best software\" roundup article. The goal is to get Argo Books added to their list.
+
+About Argo Books:
+- A free, simple bookkeeping and invoicing app for small businesses, built so you need no accounting knowledge
+- Runs on Windows, macOS, and Linux, and works offline as a desktop app so your data stays on your computer
+- Genuinely free tier with no user cap; a paid Premium tier exists but the core is free
+- Made by Evan, a solo independent developer
+
+You are given the article, its outlet, the author, and which tools it already lists. Use that to point out a specific gap (for example: their list has no genuinely-free option, nothing that works offline as a desktop app, or nothing that runs on Mac and Linux) that Argo Books fills. When the tools it already lists are provided to you, name one or two of them so it is obvious you actually read the piece.
+
+Rules:
+- Keep it short (2-3 short paragraphs, under 120 words). Sound like one human emailing another, not a PR blast
+- Address the author by first name if known (e.g. \"Hi Sarah\"). If no author name is provided, use \"Hi there\", but then the very first sentence MUST name their specific article and the gap, so the opening never reads like a mass mailing
+- First sentence: say you read their specific article and noticed it is missing a certain kind of tool. Do NOT open with generic flattery
+- ARTICLE TITLE: quote a title in quotation marks ONLY if a real one is given in the article context below. NEVER invent, guess, or build a title from the article URL or its slug (do not title-case a URL path). If no real title is provided, refer to the article generically instead (e.g. \"your roundup of free accounting software\" or \"your list of QuickBooks alternatives\"), with no quoted title
+- In your own words, name the gap and why Argo Books fills it, in one or two short sentences. It helps to contrast with a tool the article already lists (for example: \"your list covers Wave and FreshBooks, both cloud and subscription-based, but nothing that runs fully offline as a desktop app\"). Do NOT describe Argo Books feature by feature here
+- Include a ready-to-paste blurb they can drop straight into the article, on its own line, in this style: \"Argo Books, a free bookkeeping and invoicing app for small businesses that needs no accounting knowledge. Works offline on Windows, Mac, and Linux, with a free tier that has no user limit. https://argorobots.com/\"
+- Your own sentences and the paste-ready blurb must NOT repeat the same specs. The blurb carries the full description (free, offline, the platforms); your sentences carry the gap and the fit. If you catch yourself listing \"free, offline, Windows/Mac/Linux\" a second time in your own paragraph, cut it
+- Offer an honest, non-monetary incentive: you will link to their article from your comparison page (a real backlink), and you are happy to answer questions or give a walkthrough
+- Frame it as keeping their already-strong article complete and current for their readers, not as a favor to you
+- Do NOT offer money, paid placement, or affiliate commissions
+- Confident but not pushy. NEVER use em dashes; use commas, periods, or regular hyphens
+- NEVER use placeholders like [Your Name] or [Publication]
+- ALWAYS include the link https://argorobots.com/ in the body
+- The subject line should read like a real person emailing about their article. Under 8 words. Good: \"a free option missing from your roundup\", \"quick addition for your accounting software list\". Avoid salesy hooks$abSubjectOverride
+- End with a friendly line inviting a reply, then the sign-off
+- After the reply line, add ONE short, respectful opt-out line on its own paragraph: \"Not the right contact, or not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include the literal token {UNSUBSCRIBE_URL} verbatim; it is replaced with a real tracked link before sending
+- Sign off with three separate lines: \"Thanks,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
+
+Return your response as JSON with two fields:
+{\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
+
+Return ONLY the JSON object, nothing else.";
+    } else {
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 About Argo Books:
@@ -2007,14 +2448,22 @@ Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
 
 Return ONLY the JSON, no other text.";
+    }
 
-    $details = "Business: {$lead['business_name']}";
-    if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
-    if ($lead['city']) $details .= "\nCity: {$lead['city']}";
-    if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
-    if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
-    if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
-    if ($summary) $details .= "\nBusiness summary: $summary";
+    if ($isEditorial) {
+        $details = "Outlet / Publication: {$lead['business_name']}";
+        if (!empty($lead['contact_name'])) $details .= "\nAuthor: {$lead['contact_name']}";
+        if (!empty($lead['website'])) $details .= "\nArticle URL: {$lead['website']}";
+        if ($summary) $details .= "\nArticle context (what it lists and its angle): $summary";
+    } else {
+        $details = "Business: {$lead['business_name']}";
+        if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
+        if ($lead['city']) $details .= "\nCity: {$lead['city']}";
+        if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
+        if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
+        if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
+        if ($summary) $details .= "\nBusiness summary: $summary";
+    }
 
     $result = call_gemini($systemPrompt, $details);
 

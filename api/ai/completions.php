@@ -9,6 +9,7 @@
  */
 
 require_once __DIR__ . '/../portal/portal-helper.php';
+require_once __DIR__ . '/_timing.php';
 
 // Load environment variables
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -36,6 +37,27 @@ if (is_rate_limited($rateLimitId, 60, 900, $rateLimitKey)) {
 }
 record_rate_limit_attempt($rateLimitId, $rateLimitKey);
 
+// Per-IP ceiling for the free (device) path only.
+// The X-Device-Id of a free request is self-asserted and not checked against any
+// record, so the per-identity limit above can be bypassed by rotating the header.
+// A per-IP cap closes that hole: the source IP can't be rotated like a header, so
+// it bounds total free AI usage from one origin regardless of how many device IDs
+// are sent. Premium (license-validated) requests are exempt because their key is
+// verified in the database and is not the abuse vector. This reuses the same
+// get_client_ip() that the license-validation and payment endpoints already rely
+// on in production. The ceiling is generous (well above the 60/identity limit) so
+// genuine shared networks (offices/households behind one NAT) are not affected;
+// raise AI_IP_MAX if a large shared deployment ever legitimately hits it.
+if (!$license) {
+    $clientIp = get_client_ip();
+    $ipRateKey = 'ai_ip';
+    $aiIpMax = 200; // requests per 15 minutes per IP
+    if (is_rate_limited($clientIp, $aiIpMax, 900, $ipRateKey)) {
+        send_error_response(429, 'Rate limit exceeded. Please try again later.', 'RATE_LIMITED');
+    }
+    record_rate_limit_attempt($clientIp, $ipRateKey);
+}
+
 // Parse request body
 $input = file_get_contents('php://input');
 $data = json_decode($input, true);
@@ -56,6 +78,13 @@ $maxTokens = max(1, min((int)($data['maxTokens'] ?? 4000), 16000)); // Clamp 1-1
 $temperature = max(0, min(2, (float)($data['temperature'] ?? 0.1)));
 $base64Image = $data['base64Image'] ?? null;
 $mimeType = $data['mimeType'] ?? 'image/jpeg';
+
+// Optional timing metadata sent by the desktop app so pooled duration priors can be
+// kept per operation (receipt scan vs spreadsheet analysis vs bank categorize, which
+// are otherwise indistinguishable here). Absent/older clients default to 'completion'.
+$operation = isset($data['operation']) ? (string) $data['operation'] : 'completion';
+$sizeFeature = isset($data['sizeFeature']) && is_numeric($data['sizeFeature']) ? (int) $data['sizeFeature'] : null;
+$appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 
 // Validate model: Gemini is the only supported provider
 $geminiModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
@@ -92,7 +121,7 @@ if (!empty($base64Image)) {
             send_error_response(400, 'Invalid base64 PDF data.', 'INVALID_DATA');
         }
 
-        $uploadUrl = "https://generativelanguage.googleapis.com/upload/v1beta/files?key={$geminiKey}";
+        $uploadUrl = "https://generativelanguage.googleapis.com/upload/v1beta/files";
         $boundary = bin2hex(random_bytes(16));
 
         // Build multipart/related body: JSON metadata + raw file bytes
@@ -111,6 +140,7 @@ if (!empty($base64Image)) {
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $multipartBody,
             CURLOPT_HTTPHEADER => [
+                "x-goog-api-key: {$geminiKey}",
                 "Content-Type: multipart/related; boundary={$boundary}",
                 'X-Goog-Upload-Protocol: multipart',
                 'Content-Length: ' . strlen($multipartBody),
@@ -139,12 +169,13 @@ if (!empty($base64Image)) {
         // Poll until the file is ACTIVE (Gemini processes uploads asynchronously)
         // Polls up to 15 times at 500ms intervals (~7.5s max). If still PROCESSING after
         // all polls, the file is used as-is (Gemini will reject it if not ready).
-        $fileStatusUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
+        $fileStatusUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}";
         $maxPolls = 15;
         for ($i = 0; $i < $maxPolls; $i++) {
             $ch = curl_init($fileStatusUrl);
             curl_setopt_array($ch, [
                 CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => ["x-goog-api-key: {$geminiKey}"],
                 CURLOPT_TIMEOUT => 10,
             ]);
             $statusResponse = curl_exec($ch);
@@ -196,7 +227,11 @@ if ($systemInstruction) {
     $geminiPayload['system_instruction'] = $systemInstruction;
 }
 
-$geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$geminiKey}";
+$geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent";
+
+// Server-measured Gemini wall time (isolated from the user's network) feeds the
+// timing priors and the response 'timing' block.
+$aiTimingStart = microtime(true);
 
 $ch = curl_init($geminiUrl);
 curl_setopt_array($ch, [
@@ -204,6 +239,7 @@ curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => json_encode($geminiPayload),
     CURLOPT_HTTPHEADER => [
+        "x-goog-api-key: {$geminiKey}",
         'Content-Type: application/json',
     ],
     CURLOPT_TIMEOUT => 120,
@@ -211,6 +247,7 @@ curl_setopt_array($ch, [
 ]);
 
 $response = curl_exec($ch);
+$aiElapsedMs = (int) round((microtime(true) - $aiTimingStart) * 1000);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
 
@@ -234,11 +271,12 @@ if ($httpCode !== 200) {
 
 // Clean up uploaded PDF file from Gemini storage
 if (!empty($uploadedFileName)) {
-    $deleteUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}?key={$geminiKey}";
+    $deleteUrl = "https://generativelanguage.googleapis.com/v1beta/{$uploadedFileName}";
     $ch = curl_init($deleteUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CUSTOMREQUEST => 'DELETE',
+        CURLOPT_HTTPHEADER => ["x-goog-api-key: {$geminiKey}"],
         CURLOPT_TIMEOUT => 10,
     ]);
     curl_exec($ch);
@@ -282,11 +320,33 @@ if ($content === null) {
     send_error_response(502, 'Invalid response from AI service.', 'UPSTREAM_ERROR');
 }
 
+// Record the server-measured timing (best-effort; never breaks the response).
+ai_timing_record([
+    'operation' => $operation,
+    'model' => $model,
+    'size_feature' => $sizeFeature,
+    'input_bytes' => !empty($base64Image) ? (int) (strlen($base64Image) * 0.75) : strlen($userPrompt),
+    'mime' => !empty($base64Image) ? $mimeType : null,
+    'prompt_tokens' => $usage['prompt_tokens'] ?? null,
+    'output_tokens' => $usage['completion_tokens'] ?? null,
+    'max_output_tokens' => $maxTokens,
+    'finish_reason' => $finishReason,
+    'elapsed_ms' => $aiElapsedMs,
+    'success' => true,
+    'app_platform' => $appPlatform,
+]);
+
 send_json_response(200, [
     'success' => true,
     'content' => $content,
     'model' => $model,
     'usage' => $usage,
     'finishReason' => $finishReason,
+    'timing' => [
+        'elapsed_ms' => $aiElapsedMs,
+        'prompt_tokens' => $usage['prompt_tokens'] ?? 0,
+        'output_tokens' => $usage['completion_tokens'] ?? 0,
+        'load_factor' => ai_timing_load_factor(),
+    ],
     'timestamp' => date('c'),
 ]);

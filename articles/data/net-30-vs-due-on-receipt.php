@@ -19,7 +19,7 @@ return [
   'hub_weight' => 40,
 
   'published' => '2026-05-30',
-  'updated'   => '2026-05-30',
+  'updated'   => '2026-06-26',
 
   'reading_time_min' => 7,
 
@@ -38,6 +38,7 @@ HTML,
 <p>Net 30 means the invoice is due 30 days after the invoice date. If you issue an invoice on June 1, the payment is due on July 1. The word "net" just means the full amount with nothing taken off, so Net 30 is the full balance, no discount, due in 30 days.</p>
 <p>Most US and UK businesses count from the invoice date, not the date the client opened the email or signed for the package. That's the standard, and it's what accounts payable teams assume unless your invoice says otherwise. If you want to count from a different starting point, say so in writing. Something like "Payment due 30 days from receipt of invoice" makes the rule explicit and removes the back-and-forth.</p>
 <p>There's one common variation worth knowing: Net 30 EOM, which stands for end of month. That means the 30-day clock doesn't start the day you send the invoice, it starts on the last day of the month the invoice was issued. So an invoice sent on June 5 with Net 30 EOM is due 30 days after June 30, which is July 30. Bigger clients with monthly payment schedules sometimes ask for this. It buys them up to a full extra month, so don't agree to it lightly on a small invoice.</p>
+{{illustration:calendar-due}}
 <p>A few practical notes. Net 30 is calendar days, not business days, unless the contract says otherwise. Weekends and bank holidays count. If the due date lands on a Sunday, most clients will pay the Monday after and that's fine. And Net 30 doesn't require the client to wait 30 days, it just means they have up to 30 days. Plenty of well-run finance teams pay on day 7 or day 14 if the invoice is clean and the bank details are clear.</p>
 HTML,
     ],
@@ -70,6 +71,7 @@ HTML,
   <li>The client specifically asked for Net 30 (more common than you'd think).</li>
   <li>You're happy to wait up to 30 days for the money without it hurting cash flow.</li>
 </ul>
+{{illustration:compare-scale}}
 <p>If a 30-day wait would put you in a tight spot, that's a cash-flow problem to solve another way: a deposit, milestone billing, or a smaller buffer in your account. Trying to fight Net 30 on a client whose whole company runs on it usually ends with you switching the term to Net 30 anyway, just two emails later.</p>
 HTML,
     ],

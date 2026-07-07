@@ -41,7 +41,11 @@ if (!$input) {
 
 // Extract common fields
 $email = $input['email'] ?? $input['payer_email'] ?? '';
-$currency = $input['currency'] ?? 'CAD';
+// Only CAD is supported. Never trust a client-supplied currency: it is stored
+// on the subscription and used for PayPal refund currency, so a bad value
+// corrupts records and breaks refunds. The actual gateway charge is already
+// hardcoded to CAD.
+$currency = 'CAD';
 $billing = $input['billing'] ?? 'monthly';
 $paymentMethod = $input['payment_method'] ?? 'unknown';
 // Use session user_id as authoritative source (POST user_id is untrusted)
@@ -63,25 +67,46 @@ $amount = $baseCharge + $processingFee;
 // Get environment configuration
 $isProduction = ($_ENV['APP_ENV'] ?? 'development') === 'production';
 
-if (empty($email) || $userId <= 0 || $amount <= 0) {
+if ($userId <= 0 || $amount <= 0) {
     http_response_code(400);
     echo json_encode(['success' => false, 'error' => 'Missing required fields or invalid user']);
     exit();
 }
 
-// Verify user exists
+// Verify the user exists and use their ACCOUNT email (never trust a
+// client-supplied email) for the subscription record and receipt.
 try {
-    $stmt = $pdo->prepare("SELECT id FROM community_users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, email FROM community_users WHERE id = ?");
     $stmt->execute([$userId]);
-    if (!$stmt->fetch()) {
+    $userRow = $stmt->fetch();
+    if (!$userRow) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error' => 'Invalid user']);
         exit();
     }
+    $email = $userRow['email'];
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'error' => 'Database error']);
     exit();
+}
+
+// Serialize concurrent checkout requests for the same user so a double-submit
+// can't create two subscriptions: the existing-subscription check and the
+// INSERT below are not otherwise atomic. The lock auto-releases when the
+// request (DB connection) ends.
+try {
+    $lockStmt = $pdo->prepare("SELECT GET_LOCK(?, 10)");
+    $lockStmt->execute(["premium_checkout_$userId"]);
+    $lockResult = $lockStmt->fetchColumn();
+    if ($lockResult === '0' || $lockResult === 0) {
+        http_response_code(409);
+        echo json_encode(['success' => false, 'error' => 'Another checkout is already in progress. Please wait a moment and try again.']);
+        exit();
+    }
+} catch (PDOException $e) {
+    // Best-effort: if advisory locking is unavailable, proceed rather than block checkout.
+    error_log("Checkout GET_LOCK failed for user $userId: " . $e->getMessage());
 }
 
 // Check if user is updating payment method for existing subscription
@@ -164,9 +189,15 @@ try {
                 $transactionId = $paypalSubscriptionId;
                 $paymentToken = $paypalSubscriptionId; // Store subscription ID as token
             } else {
-                // One-time PayPal payment (fallback)
-                $transactionId = $input['orderID'] ?? '';
-                $paymentToken = null;
+                // One-time PayPal payments are NOT supported here. This endpoint
+                // only creates recurring subscriptions, and there is no
+                // server-side capture verification for a one-off order id, so
+                // trusting a client-supplied orderID would let a logged-in user
+                // create a paid subscription without actually paying. Reject it.
+                $pdo->rollBack();
+                error_log("Rejected unsupported one-time PayPal payment. user_id=$userId");
+                echo json_encode(['success' => false, 'error' => 'Unsupported PayPal payment type']);
+                exit();
             }
             break;
 
@@ -375,8 +406,12 @@ try {
         // Update existing subscription with new payment method and billing cycle
         $subscriptionId = $existingSubscription['subscription_id'];
 
-        // Calculate new amount based on billing cycle (from centralized config)
+        // Calculate new amount based on billing cycle (from centralized config).
+        // $newAmount is the base price (used for signup_base_price / grandfathering);
+        // $newAmountCharged includes the processing fee and is what goes in the
+        // amount column, keeping it consistent with the new-signup path.
         $newAmount = ($billing === 'yearly') ? $pricingConfig['premium_yearly_price'] : $pricingConfig['premium_monthly_price'];
+        $newAmountCharged = $newAmount + calculate_processing_fee($newAmount);
 
         // Determine the new end date:
         // - If subscription still valid (end_date > now) AND not charged: keep existing end_date
@@ -529,6 +564,7 @@ try {
                     transaction_id = ?,
                     billing_cycle = ?,
                     amount = ?,
+                    signup_base_price = ?,
                     end_date = ?,
                     paypal_subscription_id = ?,
                     previous_paypal_subscription_id = ?,
@@ -545,6 +581,9 @@ try {
                 $stripeCustomerId,
                 $transactionId,
                 $billing,
+                $newAmountCharged,
+                // Cycle switch is a deliberate plan change, so re-lock to the
+                // current price for the new cycle (not the old grandfathered one).
                 $newAmount,
                 $newEndDate,
                 $paypalSubscriptionId,
@@ -584,6 +623,7 @@ try {
                     transaction_id = ?,
                     billing_cycle = ?,
                     amount = ?,
+                    signup_base_price = ?,
                     end_date = ?,
                     status = 'active',
                     auto_renew = 1,
@@ -597,6 +637,8 @@ try {
                 $stripeCustomerId,
                 $transactionId,
                 $billing,
+                $newAmountCharged,
+                // Re-lock to the current price for the new cycle.
                 $newAmount,
                 $newEndDate,
                 $subscriptionId
@@ -702,6 +744,23 @@ try {
             }
         }
 
+        // If this cycle switch raised the customer's effective rate (e.g. they
+        // had an older, lower locked-in price), say so plainly so a higher
+        // charge isn't a surprise. Compare monthly-equivalent rates, and only
+        // when we have a recorded old locked price to compare against.
+        $priceIncreaseNote = '';
+        $oldLockedBase = $existingSubscription['signup_base_price'] ?? null;
+        if ($oldLockedBase !== null && (float) $oldLockedBase > 0) {
+            $oldMonthly = ($existingSubscription['billing_cycle'] === 'yearly')
+                ? (float) $oldLockedBase / 12
+                : (float) $oldLockedBase;
+            $newMonthly = ($billing === 'yearly') ? (float) $newAmount / 12 : (float) $newAmount;
+            if ($newMonthly > $oldMonthly + 0.01) {
+                $newRateStr = '$' . number_format((float) $newAmount, 2) . '/' . ($billing === 'yearly' ? 'year' : 'month');
+                $priceIncreaseNote = " Note: changing your plan moves you to our current rate ($newRateStr). Your previous price was locked in when you first subscribed, and switching plans applies today's pricing.";
+            }
+        }
+
         // Build appropriate success message
         $formattedEndDate = date('F j, Y', strtotime($newEndDate));
         if ($isPayPalCycleSwitch) {
@@ -711,6 +770,7 @@ try {
         } else {
             $chargeMessage = "Payment successful! Your subscription is now active until $formattedEndDate.";
         }
+        $chargeMessage .= $priceIncreaseNote;
 
         $responseData = [
             'success' => true,
@@ -727,11 +787,11 @@ try {
         // Create new subscription
         $stmt = $pdo->prepare("
             INSERT INTO premium_subscriptions (
-                subscription_id, user_id, email, billing_cycle, amount, currency,
+                subscription_id, user_id, email, billing_cycle, amount, signup_base_price, currency,
                 start_date, end_date, status, payment_method, transaction_id,
                 payment_token, stripe_customer_id, auto_renew, environment, created_at
             ) VALUES (
-                ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?, ?, ?,
                 ?, ?, 'active', ?, ?,
                 ?, ?, 1, ?, NOW()
             )
@@ -743,6 +803,9 @@ try {
             $email,
             $billing,
             $amount,
+            // Lock the base price (pre-fee) at signup so future renewals charge
+            // this rate even if the env price changes later. Grandfathering.
+            $baseCharge,
             $currency,
             $startDate,
             $endDate,
@@ -862,6 +925,43 @@ try {
         } catch (Exception $e) {
             // Log email error but don't fail the transaction
             error_log("Failed to send Premium subscription email: " . $e->getMessage());
+        }
+
+        // Notify the team that a new paying customer just signed up. Best-effort:
+        // a failed notification must never affect the customer's checkout. Mirrors
+        // the admin-alert pattern used by the PayPal price-drift guard below.
+        try {
+            $providerNames = ['paypal' => 'PayPal', 'stripe' => 'Stripe', 'square' => 'Square'];
+            $custEmail  = htmlspecialchars($email);
+            $planSafe   = htmlspecialchars(ucfirst($billing));
+            $amtSafe    = htmlspecialchars(number_format((float) $amount, 2));
+            $curSafe    = htmlspecialchars($currency);
+            $methodSafe = htmlspecialchars($providerNames[strtolower($paymentMethod)] ?? ucfirst($paymentMethod));
+            $subSafe    = htmlspecialchars($subscriptionId);
+            $envLabel   = htmlspecialchars(current_environment());
+            $newCustomerBody = <<<HTML
+                <h2>You have a new paying customer 🎉</h2>
+                <p>A new Premium subscription was just created.</p>
+                <ul>
+                    <li><strong>Customer:</strong> $custEmail</li>
+                    <li><strong>Plan:</strong> $planSafe</li>
+                    <li><strong>Amount:</strong> \$$amtSafe $curSafe</li>
+                    <li><strong>Payment method:</strong> $methodSafe</li>
+                    <li><strong>Subscription ID:</strong> $subSafe</li>
+                    <li><strong>Environment:</strong> $envLabel</li>
+                </ul>
+                HTML;
+            send_styled_email(
+                'contact@argorobots.com',
+                "[Argo Books] New paying customer: $custEmail",
+                $newCustomerBody,
+                'purple',
+                null,
+                null,
+                $email
+            );
+        } catch (Exception $e) {
+            error_log("Failed to send new-customer admin notification: " . $e->getMessage());
         }
 
         // PayPal price-drift guard. PayPal bills the plan's baked-in price, not

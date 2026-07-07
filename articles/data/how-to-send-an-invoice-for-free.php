@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-01',
 
-  'updated' => '2026-06-01',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 8,
 
@@ -79,6 +79,7 @@ HTML,
 <li><strong>A line for each item.</strong> Description, quantity, rate, and the line total. Be specific: "Website homepage redesign, 6 hours" beats "design work". Specific descriptions head off "what was this for?" emails that delay payment.</li>
 <li><strong>Subtotal, tax, and total due.</strong> If you charge tax, show it as its own line so the client can see the breakdown. The total due should be big and obvious.</li>
 </ul>
+{{illustration:invoice-doc}}
 <p>If you used a generator or software, the totals and tax are calculated for you, which removes the most common source of invoice errors. If you used a template, double-check the calculations before you send.</p>
 HTML,
     ],

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../email_sender.php';
 
@@ -14,6 +14,14 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 // Validate request method
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    exit;
+}
+
+// CSRF protection: every action below changes state (delete content, ban users,
+// reset usernames, clear bios). Require the token issued by reports/index.php.
+$posted_csrf = (string)($_POST['csrf_token'] ?? '');
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $posted_csrf)) {
+    echo json_encode(['success' => false, 'message' => 'Security check failed. Please refresh the page and try again.']);
     exit;
 }
 

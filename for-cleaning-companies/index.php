@@ -38,7 +38,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Cleaning+Companies&subtitle=Recurring+invoices%2C+supply+costs%2C+and+same-day+billing+for+residential+and+commercial+cleaners&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -46,7 +46,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="twitter:title" content="Argo Books for Cleaning Companies: Recurring Invoices and Real Numbers">
     <meta name="twitter:description"
         content="Recurring invoices, marked-up supplies, and same-day billing, without the bookkeeping headache.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Cleaning+Companies&subtitle=Recurring+invoices%2C+supply+costs%2C+and+same-day+billing+for+residential+and+commercial+cleaners&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <meta name="geo.region" content="CA-SK">
     <meta name="geo.placename" content="Canada">
@@ -395,6 +395,10 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
                 </div>
             </div>
         </div>
+    </section>
+
+    <section class="container" style="max-width:720px;text-align:center;padding-bottom:48px;">
+        <p>Want the bookkeeping side in plain language? Read our guide to <a href="../bookkeeping-for-cleaning-companies/">bookkeeping for cleaning companies</a>.</p>
     </section>
 
     </main>

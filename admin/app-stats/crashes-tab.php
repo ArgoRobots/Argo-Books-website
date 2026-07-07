@@ -5,6 +5,17 @@
 // them grouped by exception signature. Reuses .stats-grid / .stat-card /
 // .section-title from the host page's styles.
 
+// Direct-access guard. This partial is only valid when included by its parent
+// page (app-stats/index.php), which starts the session and verifies the admin
+// login. Requested directly, no session is started so $_SESSION is empty and we
+// fail closed. (An admin/.htaccess also denies *-tab.php as defense in depth.)
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+
 $crashDir = __DIR__ . '/../data-logs/crashes';
 $crashFiles = is_dir($crashDir) ? (glob($crashDir . '/argo_crash_*.json') ?: []) : [];
 
@@ -20,6 +31,11 @@ foreach ($crashFiles as $crashFile) {
     }
     $data = json_decode($raw, true);
     if (!is_array($data) || empty($data['crashes']) || !is_array($data['crashes'])) {
+        continue;
+    }
+
+    // Hide the founder's own installs (single source of truth: EXCLUDED_AUTH_IDS).
+    if (is_excluded_auth_id($data['authId'] ?? null)) {
         continue;
     }
 
@@ -143,6 +159,15 @@ if (!function_exists('crash_fmt')) {
 .occ-table th { color: var(--text-muted); font-weight: 600; }
 .crash-empty { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
 .crash-empty .big { font-size: 1.2rem; color: var(--text-color); margin-bottom: 0.5rem; }
+.crash-stack-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 1.25rem 0 0.5rem; }
+.crash-stack-head h4 { margin: 0; }
+.crash-copy {
+    flex: 0 0 auto; border: 1px solid var(--border-color); background: var(--code-bg, rgba(127,127,127,0.08));
+    color: var(--text-color); border-radius: 6px; padding: 0.3rem 0.75rem;
+    font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.crash-copy:hover { background: var(--hover-color, rgba(127,127,127,0.15)); }
+.crash-copy.copied { color: #16a34a; border-color: #16a34a; }
 </style>
 
 <h2 class="section-title">Crash Reports</h2>
@@ -201,8 +226,11 @@ if (!function_exists('crash_fmt')) {
             </div>
 
             <?php if (!empty($sample['stackTrace'])): ?>
-                <h4>Stack Trace</h4>
-                <pre><?= htmlspecialchars($sample['stackTrace']) ?></pre>
+                <div class="crash-stack-head">
+                    <h4>Stack Trace</h4>
+                    <button type="button" class="crash-copy">Copy</button>
+                </div>
+                <pre class="crash-stack"><?= htmlspecialchars($sample['stackTrace']) ?></pre>
             <?php endif; ?>
 
             <?php if (!empty($sample['breadcrumbs']) && is_array($sample['breadcrumbs'])): ?>
@@ -232,3 +260,48 @@ if (!function_exists('crash_fmt')) {
     </details>
     <?php endforeach; ?>
 <?php endif; ?>
+
+<script>
+(function () {
+    function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text);
+        }
+        // Fallback for non-secure contexts (e.g. local http).
+        return new Promise(function (resolve, reject) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); resolve(); }
+            catch (e) { reject(e); }
+            finally { document.body.removeChild(ta); }
+        });
+    }
+
+    document.querySelectorAll('.crash-copy').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            var detail = btn.closest('.crash-detail');
+            var pre = detail && detail.querySelector('pre.crash-stack');
+            if (!pre) return;
+            copyText(pre.textContent).then(function () {
+                var orig = btn.getAttribute('data-label') || btn.textContent;
+                btn.setAttribute('data-label', orig);
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(function () {
+                    btn.textContent = orig;
+                    btn.classList.remove('copied');
+                }, 1500);
+            }).catch(function () {
+                var orig = btn.getAttribute('data-label') || btn.textContent;
+                btn.textContent = 'Copy failed';
+                setTimeout(function () { btn.textContent = orig; }, 1500);
+            });
+        });
+    });
+})();
+</script>

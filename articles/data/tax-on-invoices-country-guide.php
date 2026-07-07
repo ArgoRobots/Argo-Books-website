@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-30',
 
-  'updated' => '2026-05-30',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -38,6 +38,18 @@ HTML,
       'anchor' => 'what-this-covers',
       'html' => <<<'HTML'
 <p>When you pick one of the five built-in countries at the top of the generator, it relabels the tax row (sales tax, GST, or VAT) and sets the currency for you. The per-country sections below give the standard rate, the registration threshold, and the main fields each invoice has to include.</p>
+<table>
+<thead>
+<tr><th>Country</th><th>Tax label</th><th>Standard rate</th></tr>
+</thead>
+<tbody>
+<tr><td>United States</td><td>Sales tax</td><td>Set by state and local rates</td></tr>
+<tr><td>Canada</td><td>GST / HST</td><td>5% to 15% by province</td></tr>
+<tr><td>United Kingdom</td><td>VAT</td><td>20%</td></tr>
+<tr><td>Australia</td><td>GST</td><td>10%</td></tr>
+<tr><td>India</td><td>GST</td><td>18% standard slab</td></tr>
+</tbody>
+</table>
 <p>For every other country, the generator still works. You just set the tax row manually instead of having a built-in default. Pick the currency, type the rate, choose whether the rate is exclusive or inclusive of the line totals, and the math runs the same way. That's enough for invoicing a client in Germany, Singapore, Brazil, the UAE, South Africa, or anywhere else, as long as you know what rate you're supposed to charge.</p>
 <p>This guide is not tax advice for your specific situation. Rates change, thresholds change, and categories get reclassified. A photographer in California has different sales-tax exposure than a software developer in California, and both can change again if the customer is across a state line. The rates and thresholds below were accurate as of writing, but check the current rules with a local accountant before you rely on any of them. Use this to set up an invoice with the right labels and fields; confirm the rate itself with someone who knows your books and your jurisdiction.</p>
 HTML,
@@ -91,6 +103,7 @@ HTML,
 <li>The VAT rate applied to each line.</li>
 <li>The total excluding VAT, the total VAT amount, and the total including VAT.</li>
 </ul>
+{{illustration:checklist}}
 <p>Making Tax Digital for VAT means VAT-registered businesses also need to keep digital records and file VAT returns through compatible software. The free generator produces a clean VAT invoice that includes the fields above, but it doesn't file your returns. Pair it with bookkeeping software or a full accounting app, and confirm the rate on each line with an accountant if any of your services sit near a reduced or zero band. The country page for <a href="/free-invoice-generator/uk/">UK invoices</a> covers the layout details.</p>
 HTML,
     ],
@@ -101,6 +114,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Australia uses a single flat Goods and Services Tax of 10%. There are no state-level sales taxes to layer on top, and there's no reduced rate for most categories, which makes Australian invoicing one of the simpler cases on this list. A handful of supplies are GST-free, including most basic food, some health and education services, and exports, but the default for a typical professional services invoice is 10% flat.</p>
 <p>The registration threshold is 75,000 Australian dollars in annual turnover, or 150,000 for non-profits. Taxi and ride-share drivers must register regardless of turnover. Once you cross the threshold, you have to register for GST within 21 days and start including GST on your invoices from the effective registration date.</p>
+{{illustration:calendar-due}}
 <p>Your Australian Business Number (ABN) is the single most important field on an Australian invoice. The ABN identifies you to the Australian Taxation Office, and it has to appear on every invoice you send. If you leave it off, the customer is required to withhold Pay As You Go (PAYG) at 47% of the invoice amount, which isn't a position you want to put a client in.</p>
 <p>For any invoice of 82.50 Australian dollars or more (including GST), the document has to qualify as a tax invoice. The ATO requires that a tax invoice clearly states "Tax invoice" somewhere on the document, shows the seller's name and ABN, shows the date, lists what's being sold with quantities and prices, and either shows the GST amount or shows that the total includes GST. For sales of 1,000 AUD or more, the tax invoice has to show either the buyer's identity (business name) or the buyer's ABN. Either one is acceptable; you don't need both.</p>
 <p>The country page for <a href="/free-invoice-generator/australia/">Australian invoices</a> covers ABN placement and the tax invoice label. Ask your accountant if you're unsure whether something you sell is GST-free or not.</p>

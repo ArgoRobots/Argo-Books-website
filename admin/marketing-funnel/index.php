@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -228,6 +228,56 @@ function get_funnel_per_source(?string $period_start, string $environment): arra
         ORDER BY landings DESC, rl.created_at DESC";
 
     $bind = array_merge($params, $params_spend, [$environment], $params_rev_extra);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($bind);
+    return $stmt->fetchAll();
+}
+
+/**
+ * Paying customers grouped by the source they were attributed to, for the
+ * "where paying customers came from" pie. A subscription counts as paying once
+ * it has any completed payment. Its source is the source_code captured on its
+ * premium_signup referral event; subscriptions with no such event fall into the
+ * "Direct / untracked" bucket (organic, or a returning visitor we couldn't tie
+ * back to a campaign). The inner GROUP BY collapses each subscription to a
+ * single row so a customer is only counted once.
+ */
+function get_paying_customers_by_source(?string $period_start, string $environment): array
+{
+    global $pdo;
+
+    $pay_period_clause = $period_start !== null ? ' AND p.created_at >= ?' : '';
+
+    $sql = "
+        SELECT lbl AS label, COUNT(*) AS payers
+        FROM (
+            SELECT ps.subscription_id,
+                   COALESCE(MAX(rl.name), MAX(re.source_code), 'Direct / untracked') AS lbl
+              FROM premium_subscriptions ps
+              JOIN premium_subscription_payments p
+                ON p.subscription_id = ps.subscription_id
+               AND p.status = 'completed'
+               $pay_period_clause
+              LEFT JOIN referral_events re
+                ON re.subscription_id = ps.subscription_id
+               AND re.event_type = 'premium_signup'
+               AND re.environment = ?
+              LEFT JOIN referral_links rl ON rl.source_code = re.source_code
+             WHERE ps.environment = ?
+               AND ps.payment_method != 'free_key'
+             GROUP BY ps.subscription_id
+        ) t
+        GROUP BY lbl
+        ORDER BY payers DESC, lbl ASC";
+
+    // Bind order matches placeholder order: [period?], re.environment, ps.environment
+    $bind = [];
+    if ($period_start !== null) {
+        $bind[] = $period_start;
+    }
+    $bind[] = $environment;
+    $bind[] = $environment;
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute($bind);
     return $stmt->fetchAll();
@@ -621,6 +671,13 @@ include __DIR__ . '/../admin_header.php';
         // always reflects "users we couldn't attribute by token".
         $survey_breakdown = get_unattributed_survey_breakdown($funnel_period_start_dt, current_environment());
 
+        // Where paying customers came from: one slice per attributed source, plus
+        // a "Direct / untracked" slice for payers we couldn't tie to a campaign.
+        $payer_source_rows   = get_paying_customers_by_source($funnel_period_start_dt, current_environment());
+        $payer_source_total  = array_sum(array_map(fn($r) => (int)$r['payers'], $payer_source_rows));
+        $payer_source_labels = array_map(fn($r) => $r['label'], $payer_source_rows);
+        $payer_source_counts = array_map(fn($r) => (int)$r['payers'], $payer_source_rows);
+
         // Landing-page breakdown: only meaningful for "All traffic" since a
         // specific tracked source usually points at a single destination page.
         $landing_breakdown = [];
@@ -712,22 +769,25 @@ include __DIR__ . '/../admin_header.php';
             }
         }
     ?>
-    <div class="funnel-controls">
-        <span class="control-label">Period:</span>
-        <div class="funnel-pill-row">
-            <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
-                $href_params = ['tab' => 'funnel', 'funnel_period' => $pkey];
-                if ($funnel_source_filter !== '') $href_params['source'] = $funnel_source_filter;
-                $href = 'index.php?' . http_build_query($href_params);
-            ?>
-                <a href="<?php echo htmlspecialchars($href); ?>"
-                   class="funnel-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
-                    <?php echo $plabel; ?>
-                </a>
-            <?php endforeach; ?>
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Period:</span>
+            <div class="control-pills">
+                <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
+                    $href_params = ['tab' => 'funnel', 'funnel_period' => $pkey];
+                    if ($funnel_source_filter !== '') $href_params['source'] = $funnel_source_filter;
+                    $href = 'index.php?' . http_build_query($href_params);
+                ?>
+                    <a href="<?php echo htmlspecialchars($href); ?>"
+                       class="control-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
+                        <?php echo $plabel; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </div>
 
-        <span class="control-label" style="margin-left:auto;">Source:</span>
+        <div class="control-group control-spacer">
+        <span class="control-label">Source:</span>
         <div class="source-combobox" id="sourceCombobox" data-period="<?php echo htmlspecialchars($funnel_period_key); ?>">
             <input type="text" class="source-combobox-input" id="sourceComboboxInput"
                    autocomplete="off" spellcheck="false" placeholder="Search sources&hellip;"
@@ -747,6 +807,7 @@ include __DIR__ . '/../admin_header.php';
                 <?php endforeach; ?>
             </ul>
         </div>
+        </div>
     </div>
 
     <div class="stats-grid">
@@ -761,12 +822,12 @@ include __DIR__ . '/../admin_header.php';
             <div class="subtext">initial Premium payments</div>
         </div>
         <div class="stat-card hero">
-            <h3>Customer Acquisition Cost (CAC)</h3>
+            <h3>Customer Acquisition Cost</h3>
             <div class="value"><?php echo $cac !== null ? '$' . number_format($cac, 2) : '—'; ?></div>
             <div class="subtext">spend &divide; paying customers</div>
         </div>
         <div class="stat-card hero <?php echo $ratio_class; ?>">
-            <h3>Lifetime Value : CAC</h3>
+            <h3>Lifetime Value : Customer Acquisition Cost</h3>
             <div class="value">
                 <?php
                     if ($total_spend == 0 && $total_paying > 0) {
@@ -821,6 +882,32 @@ include __DIR__ . '/../admin_header.php';
                 <?php endif; ?>
             <?php endforeach; ?>
         </div>
+
+        <?php if ($payer_source_total > 0): ?>
+            <div class="landing-breakdown">
+                <h3>Where paying customers came from</h3>
+                <p class="muted-note">
+                    Each paying customer attributed to the source captured at signup. "Direct / untracked"
+                    means we couldn't tie them to a campaign (organic, or a returning visitor).
+                </p>
+                <div class="landing-breakdown-body">
+                    <div class="landing-breakdown-chart">
+                        <canvas id="payerSourcesChart"></canvas>
+                    </div>
+                    <ul class="landing-breakdown-list">
+                        <?php foreach ($payer_source_rows as $i => $row):
+                            $pct = $payer_source_total > 0 ? round(((int)$row['payers'] / $payer_source_total) * 100, 1) : 0;
+                        ?>
+                            <li>
+                                <span class="swatch" data-payer-swatch-idx="<?php echo $i; ?>"></span>
+                                <span class="lbl"><?php echo htmlspecialchars($row['label']); ?></span>
+                                <span class="pct"><?php echo (int)$row['payers']; ?> &middot; <?php echo $pct; ?>%</span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </div>
+        <?php endif; ?>
 
         <?php if (!empty($landing_breakdown)): ?>
             <div class="landing-breakdown">
@@ -1066,17 +1153,19 @@ include __DIR__ . '/../admin_header.php';
             ? round(($total_tool_clicks / $total_tool_sessions) * 100, 1)
             : null;
     ?>
-    <div class="funnel-controls">
-        <span class="control-label">Period:</span>
-        <div class="funnel-pill-row">
-            <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
-                $href = 'index.php?' . http_build_query(['tab' => 'tools', 'funnel_period' => $pkey]);
-            ?>
-                <a href="<?php echo htmlspecialchars($href); ?>"
-                   class="funnel-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
-                    <?php echo $plabel; ?>
-                </a>
-            <?php endforeach; ?>
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Period:</span>
+            <div class="control-pills">
+                <?php foreach (['30d' => 'Last 30 days', '90d' => 'Last 90 days', 'all' => 'All time'] as $pkey => $plabel):
+                    $href = 'index.php?' . http_build_query(['tab' => 'tools', 'funnel_period' => $pkey]);
+                ?>
+                    <a href="<?php echo htmlspecialchars($href); ?>"
+                       class="control-pill <?php echo $funnel_period_key === $pkey ? 'active' : ''; ?>">
+                        <?php echo $plabel; ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
         </div>
     </div>
 
@@ -1481,7 +1570,7 @@ include __DIR__ . '/../admin_header.php';
 
     // Save scroll position when clicking funnel filter pills so the page
     // reload doesn't jump back to the top.
-    document.querySelectorAll('.funnel-pill').forEach(link => {
+    document.querySelectorAll('.control-pill').forEach(link => {
         link.addEventListener('click', function() {
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });
@@ -1667,6 +1756,62 @@ include __DIR__ . '/../admin_header.php';
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: '55%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+                                return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    })();
+
+    // Where paying customers came from (pie).
+    (function () {
+        const canvas = document.getElementById('payerSourcesChart');
+        if (!canvas || typeof Chart === 'undefined') return;
+
+        const labels = <?php echo json_encode($payer_source_labels ?? [], JSON_UNESCAPED_SLASHES); ?>;
+        const counts = <?php echo json_encode($payer_source_counts ?? []); ?>;
+        if (!labels.length) return;
+
+        // Same palette as the other breakdown charts; "Direct / untracked" always
+        // takes the gray slot (last in the palette).
+        const palette = [
+            'rgba(59, 130, 246, 0.85)',   // blue
+            'rgba(139, 92, 246, 0.85)',   // purple
+            'rgba(16, 185, 129, 0.85)',   // emerald
+            'rgba(245, 158, 11, 0.85)',   // amber
+            'rgba(239, 68, 68, 0.85)',    // red
+            'rgba(14, 165, 233, 0.85)',   // sky
+            'rgba(168, 85, 247, 0.85)',   // violet
+            'rgba(107, 114, 128, 0.85)',  // gray
+        ];
+        const GRAY = palette[palette.length - 1];
+        const colors = labels.map((lbl, i) => lbl === 'Direct / untracked' ? GRAY : palette[i % (palette.length - 1)]);
+
+        document.querySelectorAll('.landing-breakdown-list .swatch[data-payer-swatch-idx]').forEach(el => {
+            const idx = parseInt(el.getAttribute('data-payer-swatch-idx'), 10);
+            if (!Number.isNaN(idx) && colors[idx]) {
+                el.style.backgroundColor = colors[idx];
+            }
+        });
+
+        new Chart(canvas, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{ data: counts, backgroundColor: colors, borderWidth: 0 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
                     tooltip: {

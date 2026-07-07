@@ -117,8 +117,21 @@ foreach ($subscriptions as $subscription) {
 
     // Decide credit/charge split (and add processing fee). Single source of
     // truth lives in cron/lib/renewal_helpers.php so it can be unit-tested.
+    //
+    // Grandfathering: charge the base price locked at signup, not the current
+    // env price, so raising prices never re-prices existing customers. Legacy
+    // rows with no recorded signup_base_price fall back to the current env price.
     $pricingConfig = get_pricing_config();
-    $decision = decide_renewal_charge((float) $creditBalance, $billing, $pricingConfig);
+    $renewalConfig = $pricingConfig;
+    $lockedBase = $subscription['signup_base_price'] ?? null;
+    if ($lockedBase !== null && (float) $lockedBase > 0) {
+        if ($billing === 'yearly') {
+            $renewalConfig['premium_yearly_price'] = (float) $lockedBase;
+        } else {
+            $renewalConfig['premium_monthly_price'] = (float) $lockedBase;
+        }
+    }
+    $decision = decide_renewal_charge((float) $creditBalance, $billing, $renewalConfig);
     $useCredit = $decision['useCredit'];
     $creditUsed = $decision['creditUsed'];
     $amount = $decision['baseAmount'];
@@ -551,7 +564,11 @@ function processSquareRenewal($cardId, $amount, $subscriptionId, $email, $access
 
         // Create payment request with customer_id
         $paymentData = [
-            'idempotency_key' => bin2hex(random_bytes(16)),
+            // Deterministic per (subscription, month) so a retry after a lost
+            // response reuses the key and Square dedups the charge instead of
+            // billing the card twice. A random key would let a lost-response
+            // retry double-charge.
+            'idempotency_key' => hash('sha256', 'sqrenew_' . $subscriptionId . '_' . date('Y-m')),
             'source_id' => $cardId,
             'customer_id' => $customerId,
             'amount_money' => [

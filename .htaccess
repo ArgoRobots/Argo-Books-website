@@ -1,8 +1,16 @@
-# Protect sensitive files from direct access
-<Files ".env">
+# Protect sensitive files from direct access.
+# FilesMatch (not Files) so this covers every env variant, not just ".env":
+# ".env.testing", ".env - production", ".env - sandbox", etc.
+<FilesMatch "^\.env">
 Order allow,deny
 Deny from all
-</Files>
+</FilesMatch>
+
+# Block private keys, secret backups, and stray editor/backup files anywhere.
+<FilesMatch "\.(ppk|pem|key|p12|pfx|bak|old|orig|save|swp|dist)$">
+Order allow,deny
+Deny from all
+</FilesMatch>
 
 <Files "composer.json">
 Order allow,deny
@@ -53,6 +61,16 @@ Deny from all
     RewriteRule ^database/ - [F,L]
     RewriteRule ^vendor/ - [F,L]
     RewriteRule ^cron/logs/ - [F,L]
+    # Deploy secrets (SSH key, secret backups) must never be served as static
+    # files. They are gitignored and not deployed by CI; this is defense in
+    # depth in case they are ever placed on the server manually.
+    RewriteRule ^secrets/ - [F,L]
+    # Never serve/execute scripts from the user-upload directories. Authoritative
+    # here in the root .htaccess because /community/uploads/ is gitignored, so a
+    # per-directory .htaccess inside it would not be deployed. Images and other
+    # static uploads are unaffected.
+    RewriteRule ^community/uploads/.*\.(php|phtml|phar|phps|cgi|pl|py|rb|asp|aspx|sh)$ - [F,L,NC]
+    RewriteRule ^resources/uploads/.*\.(php|phtml|phar|phps|cgi|pl|py|rb|asp|aspx|sh)$ - [F,L,NC]
     # Stored telemetry + crash reports are read only by the authenticated admin
     # pages (via the filesystem), never served as static files. The endpoints
     # write here over the filesystem too, so blocking web access is safe.
@@ -76,6 +94,8 @@ AddDefaultCharset UTF-8
     # Content Security Policy
     Header set Content-Security-Policy "default-src 'self'; \
         script-src 'self' 'unsafe-inline' 'unsafe-eval' \
+            https://challenges.cloudflare.com \
+            https://openfpcdn.io \
             https://cdnjs.cloudflare.com \
             https://s3-us-west-2.amazonaws.com \
             https://www.paypal.com \
@@ -110,7 +130,7 @@ AddDefaultCharset UTF-8
             https://*.stripe.com \
             https://*.squarecdn.com \
             https://*.cloudfront.net; \
-        img-src 'self' data: \
+        img-src 'self' data: blob: \
             https://argorobots.com \
             https://dev.argorobots.com \
             https://starterbest.com \
@@ -134,6 +154,7 @@ AddDefaultCharset UTF-8
             https://googleads.g.doubleclick.net \
             https://*.doubleclick.net; \
         frame-src \
+            https://challenges.cloudflare.com \
             https://www.youtube.com \
             https://www.youtube-nocookie.com \
             https://www.paypal.com \
@@ -150,6 +171,8 @@ AddDefaultCharset UTF-8
             https://www.googletagmanager.com \
             https://*.googletagmanager.com; \
         connect-src 'self' \
+            https://challenges.cloudflare.com \
+            https://openfpcdn.io \
             https://formspree.io \
             https://www.paypal.com \
             https://*.paypal.com \
@@ -238,6 +261,22 @@ php_value upload_max_filesize 10M
     # which sends no Authorization header and has no gate active).
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # --- Canonical host + scheme -------------------------------------------
+    # Force every request to https://argorobots.com so each page is indexed
+    # under a single URL. Without this the same page is served (HTTP 200) at
+    # http/https and www/non-www, and Google indexes them as separate pages,
+    # splitting ranking signals (e.g. /pricing/ ranking twice). Scoped to the
+    # production host by name so local Laragon and dev.argorobots.com are left
+    # alone. The X-Forwarded-Proto check prevents a redirect loop should SSL
+    # ever be terminated by an upstream proxy.
+    RewriteCond %{HTTP_HOST} ^www\.argorobots\.com$ [NC]
+    RewriteRule ^ https://argorobots.com%{REQUEST_URI} [L,R=301]
+
+    RewriteCond %{HTTP_HOST} ^argorobots\.com$ [NC]
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^ https://argorobots.com%{REQUEST_URI} [L,R=301]
 
     # Protect database directory
     RewriteRule ^database/ - [F,L]
@@ -381,4 +420,13 @@ php_value upload_max_filesize 10M
     RewriteRule ^is-quickbooks-worth-it-for-small-business/?$ articles/article-page.php?slug=is-quickbooks-worth-it-for-small-business [L,QSA]
     RewriteRule ^one-time-purchase-vs-subscription-accounting-software/?$ articles/article-page.php?slug=one-time-purchase-vs-subscription-accounting-software [L,QSA]
     RewriteRule ^accounting-software-for-people-who-hate-accounting/?$ articles/article-page.php?slug=accounting-software-for-people-who-hate-accounting [L,QSA]
+    RewriteRule ^free-accounting-software-canada/?$ articles/article-page.php?slug=free-accounting-software-canada [L,QSA]
+    RewriteRule ^how-to-forecast-cash-flow-small-business/?$ articles/article-page.php?slug=how-to-forecast-cash-flow-small-business [L,QSA]
+    RewriteRule ^how-to-forecast-revenue-small-business/?$ articles/article-page.php?slug=how-to-forecast-revenue-small-business [L,QSA]
+    RewriteRule ^how-to-spot-seasonal-trends-in-your-business/?$ articles/article-page.php?slug=how-to-spot-seasonal-trends-in-your-business [L,QSA]
+    RewriteRule ^free-cash-flow-forecast-template/?$ articles/article-page.php?slug=free-cash-flow-forecast-template [L,QSA]
+    RewriteRule ^cash-flow-forecasting-software/?$ articles/article-page.php?slug=cash-flow-forecasting-software [L,QSA]
+    RewriteRule ^predictive-analytics-for-small-business/?$ articles/article-page.php?slug=predictive-analytics-for-small-business [L,QSA]
+    RewriteRule ^quickbooks-desktop-discontinued/?$ articles/article-page.php?slug=quickbooks-desktop-discontinued [L,QSA]
+    RewriteRule ^quickbooks-price-increases/?$ articles/article-page.php?slug=quickbooks-price-increases [L,QSA]
 </IfModule>

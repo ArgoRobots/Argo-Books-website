@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -44,7 +44,7 @@ HTML,
 <li><strong>It piles up.</strong> A receipt captured the day you got it takes two seconds. The same receipt a year later, faded and out of context, takes ten minutes and a guess. Leaving it for "later" is what turns a small chore into a dreaded one.</li>
 <li><strong>The stakes feel high.</strong> It's your money and the tax office is involved, so a mistake feels scary, which makes you avoid the whole thing, which makes mistakes more likely. A nasty loop.</li>
 </ul>
-<p>The good news running through all of these: the cure is not willpower or a personality transplant. It's software that removes the tedious data entry, hides the jargon, and a consistent workflow that keeps your books and finances under control. You can dislike accounting forever and still have clean books.</p>
+<p>The good news running through all of these: the cure is not willpower or a personality transplant. It's software that removes the tedious data entry, hides the jargon, and a consistent workflow that <a href="/small-business-bookkeeping-basics/">keeps your books and finances under control</a>. You can dislike accounting forever and still have clean books.</p>
 HTML,
     ],
 
@@ -84,13 +84,14 @@ HTML,
       'h2' => 'Setting up a near-zero-effort system',
       'anchor' => 'zero-effort-system',
       'html' => <<<'HTML'
-<p>The goal is a system that mostly runs itself, so that staying on top of your books costs you a few minutes here and there instead of a dreaded marathon. Four steps, none of them hard:</p>
+<p>The goal is a system that mostly runs itself, so that <a href="/how-to-do-bookkeeping-without-an-accountant/">staying on top of your books</a> costs you a few minutes here and there instead of a dreaded marathon. Four steps, none of them hard:</p>
 <ol>
 <li><strong>Open a separate business account.</strong> This is the one that costs nothing and saves the most. Run every business payment in and every business purchase out through one account, and keep personal spending off it. Now your business account statement <em>is</em> your list of business activity. You never have to sort "was this work or life?" again, which is half the misery gone before you start.</li>
 <li><strong>Capture receipts on the spot.</strong> The moment you get a receipt, photograph it into your receipt-scanning app, right there at the counter or in the car. Two seconds, and the expense is recorded with proof attached. The whole system lives or dies on this habit, and it's the easiest one to build because it happens where the receipt does, while you still remember what it was for.</li>
 <li><strong>Let the software categorize, and just confirm.</strong> When the app suggests a category, glance and tap yes. You are not doing accounting; you are approving a guess. Over a few weeks it gets better at guessing and the glance gets faster.</li>
 <li><strong>Do a five-minute check once a month.</strong> Once a month, open the business account and run down the month's transactions to make sure each one is recorded. With separate accounts and capture-as-you-go, most months there is nothing to fix. This is the safety net that stops anything from quietly piling up, and it's short precisely because the other three steps did the heavy lifting.</li>
 </ol>
+{{illustration:checklist}}
 <p>That is the entire system. No spreadsheet to maintain, no evening of data entry, no learning what a ledger is. Set it up once and the daily cost is a photo at the till and a five-minute look once a month. People who hate accounting can absolutely live with that, because there is barely any accounting left to do.</p>
 HTML,
     ],
@@ -107,7 +108,7 @@ HTML,
 <li><strong>Does it skip what you don't need?</strong> If it's just you with no staff, a tool without payroll can be simpler and cheaper. Don't pay for the big feature you will never run.</li>
 <li><strong>Will your accountant work with it?</strong> If you have one, send a one-line email asking if the tool is fine by them before you commit. Saves a tax-season headache.</li>
 </ul>
-<p>For the bookkeeping-averse specifically, the honest shortlist is small. If you want free and simple with strong receipt scanning, look at Wave and Argo Books. If you bill clients and want a friendly, polished feel, FreshBooks. Pick one, run it for a month, and if it does not stick, try the next. The right tool is the one you don't dread opening, and the only way to find that out is to use it.</p>
+<p>For the bookkeeping-averse specifically, the honest shortlist is small. If you want <a href="/best-free-accounting-software-for-small-business/">free and simple with strong receipt scanning</a>, look at Wave and Argo Books. If you bill clients and want a friendly, polished feel, FreshBooks. Pick one, run it for a month, and if it does not stick, try the next. The right tool is the one you don't dread opening, and the only way to find that out is to use it.</p>
 HTML,
     ],
 
@@ -116,6 +117,7 @@ HTML,
       'anchor' => 'when-spreadsheet-is-fine',
       'html' => <<<'HTML'
 <p>It would be dishonest to end a guide on accounting software without admitting that some people don't need any. If you have a tiny handful of transactions a month, a one-person operation with a separate account and a folder of receipt photos, a simple spreadsheet you keep current is a complete and valid system. Plenty of small businesses run that way for years and never buy a thing. There is no rule that says you must.</p>
+{{illustration:spreadsheet-to-books}}
 <p>The spreadsheet stops being kind to you when the volume climbs and the typing becomes the bottleneck: lots of receipts a week, several suppliers, a tax return that is getting complicated. That is the point where the manual entry costs more of the evenings you hate than software costs in dollars, and where the missed receipts start costing you real deductions. If you dread the spreadsheet, or you spend more than an hour a month wrestling it, that dread is the signal, not a moral failing. Move to a tool that captures and categorizes for you and the dread mostly goes with it. The point was never to sell you software. It was to get your books clean with the least misery, and for a busy business that hates the job, the least misery means letting a tool do it.</p>
 HTML,
     ],

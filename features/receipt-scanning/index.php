@@ -31,7 +31,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=AI+Receipt+Scanning&subtitle=Snap+a+photo%2C+let+AI+do+the+rest.+Automatic+data+extraction+for+your+business+receipts.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -40,7 +40,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
     <meta name="twitter:title" content="AI Receipt Scanning | Argo Books">
     <meta name="twitter:description"
         content="Scan receipts with AI and automatically extract store names, items, totals, and taxes. Eliminate manual data entry.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=AI+Receipt+Scanning&subtitle=Snap+a+photo%2C+let+AI+do+the+rest.+Automatic+data+extraction+for+your+business+receipts.&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -192,7 +192,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                         </li>
                         <li>
                             <?= svg_icon('check', 20) ?>
-                            <span>Works with printed receipts, handwritten notes, and faded ink</span>
+                            <span>Handles any receipt format: printed, handwritten, photo, screenshot, or PDF</span>
                         </li>
                     </ul>
                 </div>
@@ -251,7 +251,7 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                     <p>Accuracy on printed receipts</p>
                 </div>
                 <div class="highlight-item">
-                    <h3>&lt; 5 seconds</h3>
+                    <h3>&lt; 10 seconds</h3>
                     <p>Average processing time per receipt</p>
                 </div>
                 <div class="highlight-item">
@@ -579,6 +579,28 @@ $argo_scan_limit = (int) get_pricing_config()['receipt_scan_monthly_limit'];
                     </div>
                     <h3>Spreadsheet Import</h3>
                     <p>Have existing receipt data in spreadsheets? Import it instantly with Argo Book's spreadsheet importer, then scan new receipts going forward.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-features">
+        <div class="container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-label">Guides</span>
+                <h2 class="section-title">Related guides</h2>
+                <p class="section-desc">Go deeper with these step-by-step guides.</p>
+            </div>
+            <div class="related-grid">
+                <a href="../../best-free-ai-receipt-scanner/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Best free AI receipt scanner</h3>
+                    <p>Honest picks for scanning receipts without a subscription.</p>
+                </a>
+                <a href="../../how-to-track-business-expenses-without-spreadsheets/" class="related-card animate-on-scroll">
+                    <div class="related-card-icon"><?= svg_icon('book', 22) ?></div>
+                    <h3>Track expenses without spreadsheets</h3>
+                    <p>A simpler way to capture every expense as it happens.</p>
                 </a>
             </div>
         </div>

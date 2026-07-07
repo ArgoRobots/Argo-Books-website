@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../cron/lib/broadcast_helpers.php'; // pulls in email_marketing + env_helper
 
@@ -134,7 +134,6 @@ include __DIR__ . '/../admin_header.php';
 ?>
 
 <style>
-.mkt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
 .mkt-section-head{text-align:center}
 .mkt-compose{display:flex;flex-direction:column;gap:14px;max-width:760px;margin:0 auto}
 .mkt-field label{display:block;font-weight:600;margin-bottom:6px;font-size:14px}
@@ -142,7 +141,8 @@ include __DIR__ . '/../admin_header.php';
   width:100%;padding:10px 12px;border:1px solid var(--border-color,#d8e2f0);border-radius:8px;
   font:500 14px/1.5 inherit;background:var(--input-bg,#fff);color:inherit;box-sizing:border-box}
 .mkt-field textarea{min-height:240px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
-.mkt-hint{font-size:12.5px;color:var(--text-muted,#6b7280);margin-top:5px}
+.mkt-hint{font-size:12.5px;color:var(--black);margin-top:5px}
+.empty-state{text-align:center;color:var(--admin-text);padding:2rem}
 .mkt-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .mkt-test{display:flex;gap:8px;flex:1;min-width:240px}
 .mkt-test input{flex:1}
@@ -150,7 +150,7 @@ include __DIR__ . '/../admin_header.php';
 .mkt-badge.queued{background:#fef3c7;color:#92400e}
 .mkt-badge.sending{background:#dbeafe;color:#1e40af}
 .mkt-badge.sent{background:#dcfce7;color:#166534}
-.mkt-badge.canceled{background:#f3f4f6;color:#6b7280}
+.mkt-badge.canceled{background:#f3f4f6;color:var(--black)}
 
 /* Dark theme. The base input rule hardcodes a light background and the shared
    .btn-gray / .mkt-hint colors have no dark variant, so override them here to
@@ -159,29 +159,29 @@ include __DIR__ . '/../admin_header.php';
 [data-theme="dark"] .mkt-field input[type=email],
 [data-theme="dark"] .mkt-field select,
 [data-theme="dark"] .mkt-field textarea{
-  background:var(--gray-700);border-color:var(--black);color:var(--gray-200)}
+  background:var(--gray-700);border-color:var(--black);color:var(--white)}
 [data-theme="dark"] .mkt-field input::placeholder,
-[data-theme="dark"] .mkt-field textarea::placeholder{color:var(--gray-500)}
-[data-theme="dark"] .mkt-hint{color:var(--gray-400)}
-[data-theme="dark"] .btn-gray{background-color:var(--gray-700);color:var(--gray-200);border-color:var(--black)}
-[data-theme="dark"] .btn-gray:hover{background-color:var(--gray-600);color:var(--gray-100)}
+[data-theme="dark"] .mkt-field textarea::placeholder{color:var(--white)}
+[data-theme="dark"] .mkt-hint{color:var(--white)}
+[data-theme="dark"] .btn-gray{background-color:var(--gray-700);color:var(--white);border-color:var(--black)}
+[data-theme="dark"] .btn-gray:hover{background-color:var(--gray-600);color:var(--white)}
 </style>
 
 <?php if ($flash): ?>
     <div class="alert alert-<?= htmlspecialchars($flash_type) ?>"><?= htmlspecialchars($flash) ?></div>
 <?php endif; ?>
 
-<div class="mkt-grid">
+<div class="stats-grid">
     <div class="stat-card">
-        <div class="stat-label">Confirmed subscribers</div>
+        <h3>Confirmed subscribers</h3>
         <div class="stat-value"><?= number_format($subCounts['confirmed']) ?></div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Pending confirmation</div>
+        <h3>Pending confirmation</h3>
         <div class="stat-value"><?= number_format($subCounts['pending']) ?></div>
     </div>
     <div class="stat-card">
-        <div class="stat-label">Unsubscribed</div>
+        <h3>Unsubscribed</h3>
         <div class="stat-value"><?= number_format($subCounts['unsubscribed']) ?></div>
     </div>
 </div>
@@ -233,7 +233,7 @@ include __DIR__ . '/../admin_header.php';
     <p class="empty-state">No broadcasts yet.</p>
 <?php else: ?>
     <div class="table-container">
-        <table>
+        <table data-paginate="25">
             <thead>
                 <tr>
                     <th>Subject</th>

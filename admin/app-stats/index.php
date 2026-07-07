@@ -1,6 +1,7 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -210,6 +211,13 @@ if (empty($dataDirs)) {
                 }
                 $fileAuthId = $fileData['authId'] ?? '';
 
+                // Never let the founder's own installs count toward app stats, even
+                // for files that reached disk before their id was added to
+                // EXCLUDED_AUTH_IDS. Skips the whole file: tier counts, DAU, geo.
+                if (is_excluded_auth_id($fileAuthId)) {
+                    continue;
+                }
+
                 // Always count toward per-tier stats, even if the file is filtered out below
                 $aggregatedData['tierStats'][$fileTier]['files']++;
 
@@ -338,7 +346,7 @@ include __DIR__ . '/../admin_header.php';
 .stat-card h3 {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--black);
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -347,13 +355,13 @@ include __DIR__ . '/../admin_header.php';
 .stat-card .value {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--black);
     margin: 0.5rem 0;
 }
 
 .stat-card .subtext {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--black);
     margin: 0;
 }
 
@@ -364,7 +372,7 @@ include __DIR__ . '/../admin_header.php';
 .section-title {
     text-align: center;
     margin-bottom: 1.5rem;
-    color: #374151;
+    color: var(--black);
     font-size: 1.5rem;
     font-weight: 600;
 }
@@ -405,7 +413,7 @@ include __DIR__ . '/../admin_header.php';
 .error-details-table th {
     background: #f9fafb;
     font-weight: 600;
-    color: #374151;
+    color: var(--black);
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
@@ -426,7 +434,7 @@ include __DIR__ . '/../admin_header.php';
 .error-details-table td.error-source {
     font-family: monospace;
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--black);
 }
 
 .error-details-wrapper {
@@ -436,59 +444,8 @@ include __DIR__ . '/../admin_header.php';
     margin-top: 1rem;
 }
 
-/* Tier filter pills (matches the funnel-pill pattern from other admin pages) */
-.tier-filter-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.tier-filter-label {
-    font-weight: 600;
-    color: var(--black);
-    margin-right: 4px;
-}
-
-.tier-pill {
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: var(--gray-bg-light);
-    color: var(--black);
-    text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.15s;
-    border: 1px solid transparent;
-}
-
-.tier-pill:hover {
-    background: var(--gray-border);
-}
-
-.tier-pill.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
-
-[data-theme="dark"] .tier-filter-label {
-    color: var(--gray-200);
-}
-
-[data-theme="dark"] .tier-pill {
-    background: var(--gray-700);
-    color: var(--gray-200);
-}
-
-[data-theme="dark"] .tier-pill:hover {
-    background: var(--gray-600);
-}
-
-[data-theme="dark"] .tier-pill.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
+/* Tier filter pills use the shared .control-bar / .control-pill component
+   (admin/common-style.css). No page-specific styles needed. */
 </style>
 
 <div class="container">
@@ -507,22 +464,33 @@ include __DIR__ . '/../admin_header.php';
     ?>
 
     <?php if ($hasAnyData): ?>
-        <div class="tier-filter-bar">
-            <span class="tier-filter-label">Tier:</span>
-            <?php
-                $tierLabels = [
-                    'all' => 'All',
-                    'free' => 'Free',
-                    'premium' => 'Premium',
-                ];
-                foreach ($tierLabels as $tierKey => $label):
-                    $isActive = $tierFilter === $tierKey;
-            ?>
-                <a href="?tier=<?= $tierKey ?>"
-                   class="tier-pill <?= $isActive ? 'active' : '' ?>">
-                    <?= htmlspecialchars($label) ?>
-                </a>
-            <?php endforeach; ?>
+        <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Tier:</span>
+                <div class="control-pills">
+                    <?php
+                        $tierLabels = [
+                            'all' => 'All',
+                            'free' => 'Free',
+                            'premium' => 'Premium',
+                        ];
+                        // Preserve the current tab across a tier switch (section-tabs.js keeps
+                        // it in ?tab=). Whitelist against the real tabs to avoid reflecting
+                        // arbitrary input into the href.
+                        $validTabs = ['active-users', 'user-activity', 'geographic', 'versions', 'features', 'usage', 'api', 'errors', 'crashes'];
+                        $currentTab = in_array($_GET['tab'] ?? '', $validTabs, true) ? $_GET['tab'] : '';
+                        foreach ($tierLabels as $tierKey => $label):
+                            $isActive = $tierFilter === $tierKey;
+                            $pillHref = '?tier=' . urlencode($tierKey);
+                            if ($currentTab !== '') $pillHref .= '&tab=' . urlencode($currentTab);
+                    ?>
+                        <a href="<?= htmlspecialchars($pillHref) ?>"
+                           class="control-pill <?= $isActive ? 'active' : '' ?>">
+                            <?= htmlspecialchars($label) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
         </div>
     <?php endif; ?>
 
@@ -543,23 +511,6 @@ include __DIR__ . '/../admin_header.php';
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <div class="data-info">
-            <strong>Data Summary:</strong>
-            <?= $fileInfo['processed_files'] ?> files processed
-            (<?= $fileInfo['total_files'] ?> total files)
-            <?php if ($fileInfo['failed_files'] > 0): ?>
-                | <?= $fileInfo['failed_files'] ?> files failed to process
-            <?php endif; ?>
-            <?php if ($tierFilter !== 'all'): ?>
-                | <strong>Filter:</strong> <?= htmlspecialchars(ucfirst($tierFilter)) ?> tier only
-            <?php endif; ?>
-            <br>
-            <strong>Latest Data:</strong> <?= date('M j, Y g:i A', $fileInfo['latest_modified']) ?>
-            <?php if ($fileInfo['oldest_file'] !== $fileInfo['latest_file']): ?>
-                | <strong>Oldest Data:</strong> <?= date('M j, Y g:i A', $fileInfo['oldest_modified']) ?>
-            <?php endif; ?>
-        </div>
-
         <div class="tabs-container">
             <div class="section-tabs">
                 <button class="section-tab active" data-tab="active-users">Active Users</button>
@@ -604,12 +555,12 @@ include __DIR__ . '/../admin_header.php';
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Free Users (MAU)</h3>
+                        <h3>Free Users (Monthly Active Users)</h3>
                         <div class="value"><?= number_format($aggregatedData['tierStats']['free']['mauUsers']) ?></div>
                         <p class="subtext"><?= number_format($aggregatedData['tierStats']['free']['totalUsers']) ?> total · last 30 days</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Premium Users (MAU)</h3>
+                        <h3>Premium Users (Monthly Active Users)</h3>
                         <div class="value"><?= number_format($aggregatedData['tierStats']['premium']['mauUsers']) ?></div>
                         <p class="subtext"><?= number_format($aggregatedData['tierStats']['premium']['totalUsers']) ?> total · last 30 days</p>
                     </div>
@@ -646,7 +597,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <h2 class="section-title" style="margin-top: 2rem;">User Details</h2>
                 <div class="error-details-wrapper">
-                    <table class="error-details-table" id="activeUsersTable">
+                    <table class="error-details-table" id="activeUsersTable" data-paginate="25" data-paginate-noun="users">
                         <thead>
                             <tr>
                                 <th>User ID</th>
@@ -767,7 +718,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <div class="chart-row">
                     <div class="chart-container">
-                        <h2>Average Session Duration</h2>
+                        <h2>Average Session Duration (minutes)</h2>
                         <canvas id="sessionDurationChart"></canvas>
                     </div>
                     <div class="chart-container">
@@ -894,7 +845,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <h2 class="section-title" style="margin-top: 2rem;">Error Details</h2>
                 <div class="error-details-wrapper" id="errorDetailsTableWrapper">
-                    <p style="text-align: center; color: #9ca3af;">No error data available</p>
+                    <p style="text-align: center; color: var(--black);">No error data available</p>
                 </div>
             </div>
 
@@ -921,9 +872,23 @@ document.addEventListener('DOMContentLoaded', function () {
         window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
         sessionStorage.removeItem('scrollPosition');
     }
-    document.querySelectorAll('a.tier-pill').forEach(function (link) {
+    document.querySelectorAll('.control-bar a.control-pill').forEach(function (link) {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
+            // The href is rendered server-side at load, before the user clicks a
+            // tab (section-tabs.js only updates the URL, not these hrefs). Rewrite
+            // it here so the tier switch keeps the currently-active tab.
+            try {
+                var dest = new URL(link.href, window.location.origin);
+                var activeBtn = document.querySelector('.section-tab.active[data-tab]');
+                var currentTab = activeBtn
+                    ? activeBtn.dataset.tab
+                    : new URLSearchParams(window.location.search).get('tab');
+                if (currentTab) {
+                    dest.searchParams.set('tab', currentTab);
+                    link.href = dest.toString();
+                }
+            } catch (err) { /* URL API missing; fall back to server-rendered href */ }
         });
     });
 });

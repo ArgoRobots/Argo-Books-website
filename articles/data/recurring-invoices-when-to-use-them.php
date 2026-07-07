@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-30',
 
-  'updated'   => '2026-05-30',
+  'updated'   => '2026-06-26',
 
   'reading_time_min' => 8,
 
@@ -65,6 +65,7 @@ HTML,
 <li><strong>Memberships and dues.</strong> Gym memberships, professional association fees, club dues. The same fee on the same day, billed forever or until the member cancels.</li>
 <li><strong>Equipment rental.</strong> Monthly rental of a copier, a coffee machine, a piece of gear. Same machine, same client, same rate.</li>
 </ul>
+{{illustration:cashflow-cycle}}
 <p>The common thread in all of these is that nothing about the bill changes month to month unless the scope itself changes. The client isn't surprised by the invoice, the price was agreed up front, and you don't have to remember anything new each cycle. Those are the engagements where putting the bill on a schedule saves you the most time and saves the client the most confusion.</p>
 HTML,
     ],
@@ -117,6 +118,7 @@ HTML,
       'html' => <<<'HTML'
 <p>Recurring invoices need a Terms section that does more work than a one-off invoice. Three clauses are worth having, in plain language, on every cycle.</p>
 <p><strong>Cancellation notice.</strong> Thirty days is the most common, and it's enough that you aren't left empty-handed on the first of next month if the client decides to end the arrangement on the 30th. Word it as the client's right, not as a trap: "Either party may cancel this arrangement with 30 days written notice. The final invoice will cover work performed up to and including the cancellation date." Most clients will respect the notice if it's visible from the start. The few who won't respect it wouldn't have respected a 60-day notice either, so don't over-engineer this.</p>
+{{illustration:calendar-due}}
 <p><strong>Price-change notice.</strong> Sixty days is a fair default for raising a recurring rate. That gives the client two full cycles to either accept the new price or move on, which protects the relationship even if they choose to leave. Word it the same way: "The fee may be adjusted with 60 days written notice. The new rate takes effect on the next regular invoice issued after that period." Then actually send the notice in writing, not buried in a P.S., when the time comes.</p>
 <p><strong>Late-fee policy that doesn't auto-fire on day one.</strong> A late fee that hits the day after the due date will end a long-term relationship over $15. A grace period of 10 days is normal, and you can word it so the fee is your right to charge, not your default behavior: "Invoices unpaid more than 10 days after the due date may be subject to a late fee of 1.5% per month on the outstanding balance." That keeps the policy in place without making the first late payment a fight. See <a href="/late-fees-when-and-how-to-charge/">late fees: when and how to charge them</a> for the full version of this clause.</p>
 <p>Two more small things that help. Spell out exactly what the recurring price covers, so a request for extra work outside the scope is clearly an extra. And state in plain language that the invoice is for the upcoming period or the just-finished period, so the client isn't confused about what month they're paying for. Retainers are usually billed in advance, cleaning is usually billed in arrears, and writing it on the invoice addresses any questions.</p>

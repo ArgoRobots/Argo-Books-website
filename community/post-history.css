@@ -51,7 +51,7 @@ header .header-inner .menu-container .menu .community:after {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 10px;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .history-content {
@@ -73,7 +73,7 @@ header .header-inner .menu-container .menu .community:after {
 .history-metadata-title {
   font-weight: 600;
   margin-bottom: 10px;
-  color: var(--blue-900);
+  color: var(--black);
 }
 
 .metadata-field {

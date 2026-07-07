@@ -1,15 +1,7 @@
 <?php
-// Harden the admin session cookie before session_start. Secure must be off in
-// local dev (HTTP) but on in production (HTTPS): gate on APP_ENV via env().
-require_once __DIR__ . '/../env_helper.php';
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path' => '/',
-    'secure' => env('APP_ENV', 'sandbox') === 'production',
-    'httponly' => true,
-    'samesite' => 'Strict',
-]);
-session_start();
+// Configure and start the admin session (private store, 8h lifetime, hardened
+// cookie). Shared by every admin entry point so login behaves identically.
+require_once __DIR__ . '/admin_session.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/settings/2fa.php';
@@ -181,6 +173,24 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 </head>
 
 <body>
+    <!-- Minimal header: Argo Books logo + theme toggle only (no nav) -->
+    <header class="admin-header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="../" class="logo-section">
+                    <img src="../resources/images/argo-logo/argo-icon.ico" alt="Argo Logo" class="header-logo">
+                    <span class="header-title">Admin Dashboard</span>
+                </a>
+            </div>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light theme">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
     <div class="login-container">
         <?php if ($show_2fa_form): ?>
             <div class="login-header">
@@ -285,6 +295,17 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             });
         </script>
     <?php endif; ?>
+
+    <script>
+        // Theme toggle for the login header. No Chart.js here, so this is the
+        // simple version (the dashboard's toggleTheme also re-renders charts).
+        function toggleTheme() {
+            var current = document.documentElement.getAttribute('data-theme') || 'dark';
+            var next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('admin-theme', next);
+        }
+    </script>
 </body>
 
 </html>

@@ -277,7 +277,7 @@ function send_notification_email($type, $data)
 
     // Prepare email content
     $subject = '';
-    $site_url = get_site_url();
+    $site_url = site_url();
     $body_template = '';
 
     if ($type === 'new_post') {
@@ -361,11 +361,10 @@ function send_notification_email($type, $data)
 function send_password_reset_email($email, $token, $username)
 {
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
-    // Get the base URL
-    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' : 'http://';
-    $host = $_SERVER['HTTP_HOST'];
-    $base_url = $protocol . $host;
-    $reset_link = $base_url . "/community/users/reset_password.php?token=" . $token;
+    // Build the reset link from the configured SITE_URL, never from the request
+    // Host header. A forged Host would otherwise place a valid reset token in a
+    // link pointing at an attacker's domain (account-takeover vector).
+    $reset_link = site_url('/community/users/reset_password.php?token=' . $token);
 
     $body = <<<HTML
         <h1>Password Reset Request</h1>
@@ -796,6 +795,8 @@ function send_premium_subscription_receipt($email, $subscriptionId, $billing, $a
         </ul>
 
         <p>You can manage your subscription anytime from your <a href="{$site_url}/community/users/subscription.php">account settings</a>.</p>
+
+        <p>Have a question or some feedback? Just reply to this email or reach me at <a href="mailto:contact@argorobots.com">contact@argorobots.com</a>. I read every message, and I'm always looking for ways to make Argo Books better.</p>
 
         <div class="receipt-footer">
             <p>License Key: {$subscriptionId}</p>

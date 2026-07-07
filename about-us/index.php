@@ -29,10 +29,10 @@
     <meta name="twitter:title" content="About Us - Argo Books | Canadian Software Company">
     <meta name="twitter:description"
         content="Learn about Argo, the Canada-based startup creating affordable finance management software for small businesses. Our mission: Better tools, built by entrepreneurs who understand your challenges.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -152,14 +152,7 @@
                         <?= svg_icon('receipt-scan-detail', null, '', 1.5) ?>
                     </div>
                     <h3>Receipt Scanning</h3>
-                    <p>Snap a photo and let AI extract all the details automatically</p>
-                </div>
-                <div class="feature-item animate-on-scroll">
-                    <div class="feature-icon purple">
-                        <?= svg_icon('analytics', null, '', 1.5) ?>
-                    </div>
-                    <h3>Predictive Analytics</h3>
-                    <p>Forecast sales trends and make data-driven decisions</p>
+                    <p>Snap a photo and let Argo Books extract all the details automatically</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
                     <div class="feature-icon green">
@@ -169,11 +162,18 @@
                     <p>Create professional invoices and get paid faster</p>
                 </div>
                 <div class="feature-item animate-on-scroll">
-                    <div class="feature-icon amber">
-                        <?= svg_icon('package', null, '', 1.5) ?>
+                    <div class="feature-icon purple">
+                        <?= svg_icon('analytics', null, '', 1.5) ?>
                     </div>
-                    <h3>Inventory Management</h3>
-                    <p>Track stock levels and never run out of best-sellers</p>
+                    <h3>Predictive Analytics</h3>
+                    <p>Forecast sales trends and make data-driven decisions</p>
+                </div>
+                <div class="feature-item animate-on-scroll">
+                    <div class="feature-icon amber">
+                        <?= svg_icon('dollar', null, '', 1.5) ?>
+                    </div>
+                    <h3>Expense &amp; Revenue</h3>
+                    <p>See exactly where your money comes in and goes out, all in one place</p>
                 </div>
             </div>
             <div class="features-cta animate-on-scroll">
@@ -189,13 +189,6 @@
     <section class="our-story">
         <div class="container">
             <div class="story-grid">
-                <div class="story-image animate-on-scroll">
-                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline" loading="lazy">
-                    <div class="image-badge">
-                        <?= svg_icon('map-pin', 16) ?>
-                        Saskatoon, SK, Canada
-                    </div>
-                </div>
                 <div class="story-content animate-on-scroll">
                     <span class="section-label">Our Story</span>
                     <h2>Built by entrepreneurs, for entrepreneurs</h2>
@@ -217,6 +210,41 @@
                             <span class="stat-value">Free</span>
                             <span class="stat-label">Core Version</span>
                         </div>
+                    </div>
+                </div>
+                <div class="story-image animate-on-scroll">
+                    <img src="../resources/images/saskatoon.webp" alt="Saskatoon Skyline" loading="lazy">
+                    <div class="image-badge">
+                        <?= svg_icon('map-pin', 16) ?>
+                        Saskatoon, SK, Canada
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Founder Section -->
+    <section class="founder">
+        <div class="container">
+            <div class="founder-grid">
+                <div class="founder-image animate-on-scroll">
+                    <img src="../resources/images/founder.jpg" alt="Evan, founder of Argo Books" loading="lazy">
+                </div>
+                <div class="founder-content animate-on-scroll">
+                    <span class="section-label">Meet the Founder</span>
+                    <h2>Hi, I'm Evan</h2>
+                    <p>I'm the founder of Argo Books, based in Saskatoon. I built it to give small
+                        businesses accounting software they can count on: capable enough to run the whole
+                        business, simple enough to use from day one, and genuinely affordable.</p>
+                    <p>Handling your business's finances is a responsibility I take seriously. Every
+                        release is tested, and your data is kept secure. I'm committed
+                        to keeping Argo Books dependable and improving it for years to come.</p>
+                    <div class="founder-footer">
+                        <p class="founder-signature">Evan<span>Founder &amp; Developer, Argo Books</span></p>
+                        <a href="../contact-us/" class="founder-contact">
+                            <span>Have a question? Contact me</span>
+                            <?= svg_icon('arrow-right', 18) ?>
+                        </a>
                     </div>
                 </div>
             </div>

@@ -2,77 +2,6 @@
    table-container, chart-container, section-tabs, btn) come from
    admin/common-style.css; only funnel/spend-specific styles live here. */
 
-/* ─── Funnel controls (period + source pill rows) ──────────────────────── */
-
-.funnel-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 24px;
-    padding: 16px;
-    background: var(--white);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px var(--shadow-default);
-}
-
-.funnel-controls .control-label {
-    font-weight: 600;
-    color: var(--black);
-    font-size: 13px;
-    margin-right: 4px;
-}
-
-.funnel-pill-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.funnel-pill {
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: var(--gray-bg-light);
-    color: var(--black);
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.15s;
-    border: 1px solid transparent;
-}
-
-.funnel-pill:hover {
-    background: var(--gray-border);
-}
-
-.funnel-pill.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
-
-[data-theme="dark"] .funnel-controls {
-    background: var(--gray-800);
-    border: 1px solid var(--black);
-}
-
-[data-theme="dark"] .funnel-controls .control-label {
-    color: var(--gray-200);
-}
-
-[data-theme="dark"] .funnel-pill {
-    background: var(--gray-700);
-    color: var(--gray-200);
-}
-
-[data-theme="dark"] .funnel-pill:hover {
-    background: var(--gray-600);
-}
-
-[data-theme="dark"] .funnel-pill.active {
-    background: var(--blue-500);
-    color: var(--white);
-}
-
 /* ─── Searchable source filter (combobox) ─────────────────────────────── */
 
 .source-combobox {
@@ -86,7 +15,7 @@
     border-radius: 999px;
     border: 1px solid var(--gray-border);
     background: var(--gray-bg-light);
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 13px;
     font-weight: 500;
     box-sizing: border-box;
@@ -104,7 +33,7 @@
     top: 50%;
     transform: translateY(-50%);
     font-size: 11px;
-    color: var(--gray-500);
+    color: var(--admin-text);
     pointer-events: auto;
     cursor: pointer;
 }
@@ -135,7 +64,7 @@
     padding: 7px 12px;
     border-radius: 6px;
     font-size: 13px;
-    color: var(--black);
+    color: var(--admin-text);
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
@@ -156,7 +85,7 @@
 [data-theme="dark"] .source-combobox-input {
     background: var(--gray-700);
     border-color: var(--black);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .source-combobox-input:focus {
@@ -170,7 +99,7 @@
 }
 
 [data-theme="dark"] .source-combobox-option {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .source-combobox-option:hover,
@@ -202,7 +131,7 @@
     margin: 0 0 24px 0;
     font-size: 20px;
     font-weight: 600;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .funnel-container h2 .source-tag {
@@ -214,11 +143,11 @@
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
-    font-family: 'Courier New', monospace;
+    font-family: var(--font-mono);
 }
 
 [data-theme="dark"] .funnel-container h2 {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .funnel-container h2 .source-tag {
@@ -241,12 +170,12 @@
 
 .funnel-label {
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
     font-size: 14px;
 }
 
 [data-theme="dark"] .funnel-label {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 .funnel-bar-wrap {
@@ -280,12 +209,12 @@
     text-align: right;
     font-size: 22px;
     font-weight: 700;
-    color: var(--black);
+    color: var(--admin-text);
     font-variant-numeric: tabular-nums;
 }
 
 [data-theme="dark"] .funnel-count {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 .funnel-dropoff {
@@ -294,12 +223,12 @@
     gap: 12px;
     padding: 6px 0 6px 220px;
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--admin-text);
 }
 
 .funnel-dropoff .kept { color: var(--emerald-600); font-weight: 600; }
-.funnel-dropoff .lost { color: var(--gray-400); }
-.funnel-dropoff .sep  { color: var(--gray-300); }
+.funnel-dropoff .lost { color: var(--admin-text); }
+.funnel-dropoff .sep  { color: var(--admin-text); }
 
 .funnel-dropoff.biggest { color: var(--red-600); }
 .funnel-dropoff.biggest .kept { color: var(--red-600); }
@@ -309,9 +238,9 @@
     color: var(--red-600);
 }
 
-[data-theme="dark"] .funnel-dropoff       { color: var(--gray-500); }
+[data-theme="dark"] .funnel-dropoff       { color: var(--white); }
 [data-theme="dark"] .funnel-dropoff .kept { color: var(--emerald-400); }
-[data-theme="dark"] .funnel-dropoff .lost { color: var(--gray-500); }
+[data-theme="dark"] .funnel-dropoff .lost { color: var(--white); }
 [data-theme="dark"] .funnel-dropoff.biggest { color: var(--red-400); }
 [data-theme="dark"] .funnel-dropoff.biggest .kept { color: var(--red-400); }
 [data-theme="dark"] .funnel-dropoff.biggest::before { color: var(--red-400); }
@@ -330,7 +259,7 @@
 
 .stat-card.hero .suffix {
     font-size: 13px;
-    color: var(--gray-500);
+    color: var(--admin-text);
     margin-left: 8px;
     font-weight: 500;
 }
@@ -350,10 +279,12 @@
 }
 .stat-card.ratio-profitable .value { color: var(--green-700); }
 
+/* No ad spend yet ("free"): this is not a profitability signal, so keep the
+   card neutral in light theme rather than tinting it green. */
 .stat-card.ratio-organic {
-    background: linear-gradient(135deg, var(--emerald-50), var(--white));
+    background: var(--white);
 }
-.stat-card.ratio-organic .value { color: var(--emerald-700); }
+.stat-card.ratio-organic .value { color: var(--admin-text); }
 
 [data-theme="dark"] .stat-card.ratio-losing,
 [data-theme="dark"] .stat-card.ratio-marginal,
@@ -367,7 +298,7 @@
 [data-theme="dark"] .stat-card.ratio-profitable .value { color: var(--emerald-400); }
 [data-theme="dark"] .stat-card.ratio-organic .value    { color: var(--emerald-400); }
 
-[data-theme="dark"] .stat-card.hero .suffix { color: var(--gray-400); }
+[data-theme="dark"] .stat-card.hero .suffix { color: var(--white); }
 
 /* ─── Comparison table ─────────────────────────────────────────────────── */
 
@@ -400,7 +331,7 @@
 .empty-state {
     text-align: center;
     padding: 48px 24px;
-    color: var(--gray-500);
+    color: var(--admin-text);
 }
 
 .empty-state p {
@@ -424,11 +355,11 @@
     margin: 0 0 16px 0;
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-600);
+    color: var(--admin-text);
 }
 
 [data-theme="dark"] .landing-breakdown h3 {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 .landing-breakdown-body {
@@ -484,18 +415,18 @@
 .landing-breakdown-list .swatch {
     width: 12px;
     height: 12px;
-    border-radius: 3px;
+    border-radius: 4px;
     background: var(--gray-400);
 }
 
 .landing-breakdown-list .pct {
     font-variant-numeric: tabular-nums;
-    color: var(--gray-700);
+    color: var(--admin-text);
     font-weight: 600;
 }
 
 [data-theme="dark"] .landing-breakdown-list .pct {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 /* ─── Modal (ad-spend create/edit) ─────────────────────────────────────── */
@@ -522,7 +453,7 @@
 }
 
 .modal-close {
-    color: var(--gray-placeholder);
+    color: var(--admin-text);
     float: right;
     font-size: 32px;
     font-weight: bold;
@@ -531,17 +462,17 @@
 }
 
 .modal-close:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 #spendModalTitle {
     margin-top: 0;
     margin-bottom: 24px;
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 [data-theme="dark"] #spendModalTitle {
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 /* The month picker and textarea aren't covered by the shared input sizing
@@ -588,13 +519,13 @@
    button renders light-on-dark without this. */
 [data-theme="dark"] #spendModal .btn-gray {
     background-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
     border-color: var(--black);
 }
 
 [data-theme="dark"] #spendModal .btn-gray:hover {
     background-color: var(--gray-600);
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 /* ─── Mobile responsive ────────────────────────────────────────────────── */
@@ -643,13 +574,13 @@
 .survey-other-details summary {
     cursor: pointer;
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--admin-text);
     user-select: none;
     margin-bottom: 8px;
 }
 
 [data-theme="dark"] .survey-other-details summary {
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 .survey-other-list {
@@ -680,10 +611,10 @@
 
 .survey-other-list .count {
     font-variant-numeric: tabular-nums;
-    color: var(--gray-600);
+    color: var(--admin-text);
     flex-shrink: 0;
 }
 
 [data-theme="dark"] .survey-other-list .count {
-    color: var(--gray-400);
+    color: var(--white);
 }

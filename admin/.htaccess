@@ -1,0 +1,8 @@
+# Tab/partial includes (e.g. *-tab.php) are rendered by their parent admin page,
+# which starts the session and enforces login. They must never be requested
+# directly. The parent pages themselves (index.php, login.php, etc.) are not
+# matched by this pattern and keep working normally.
+<FilesMatch "-tab\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

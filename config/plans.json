@@ -4,15 +4,18 @@
             {"label": "All core features"},
             {"label": "Real-time analytics"},
             {"label": "Receipt management"},
-            {"label": "{free_invoice_monthly_limit} invoices / month"},
+            {"label": "Invoices & payments", "detail": "{free_invoice_monthly_limit}/month"},
             {"label": "AI receipt scanning", "detail": "{free_receipt_scan_monthly_limit}/month"},
-            {"label": "AI spreadsheet import", "detail": "{ai_import_monthly_limit}/month"}
+            {"label": "AI spreadsheet import", "detail": "{ai_import_monthly_limit}/month"},
+            {"label": "AI bank statement import", "detail": "{bank_import_monthly_limit}/month"}
         ]
     },
     "premium": {
         "features": [
-            {"label": "Unlimited invoices & payments"},
+            {"label": "Invoices & payments", "detail": "Unlimited"},
             {"label": "AI receipt scanning", "detail": "{receipt_scan_monthly_limit}/month"},
+            {"label": "AI spreadsheet import", "detail": "{premium_ai_import_monthly_limit}/month"},
+            {"label": "AI bank statement import", "detail": "{premium_bank_import_monthly_limit}/month"},
             {"label": "Predictive analytics"},
             {"label": "Biometric login security"},
             {"label": "Priority support"}

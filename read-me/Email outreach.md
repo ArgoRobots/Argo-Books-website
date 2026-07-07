@@ -16,6 +16,10 @@ Google Places finds small brick-and-mortar businesses.
 
 1. **Picks a city**, rotating through Saskatchewan first and then expanding outward into the rest of Canada.
 2. **Finds small businesses** there by category (plumbers, cafes, salons, and 90-odd other small-business types) and grabs their public contact email from their website.
+
+   The channel is biased toward new and early businesses (the ones least likely to already have accounting software):
+   - Businesses with more Google reviews than the review-count ceiling are skipped. The default is 15, since chains and long-established shops accrue lots of reviews. You can change it in Outreach, Settings (Discovery filters), and it also reads `OUTREACH_MAX_REVIEW_COUNT` from `.env`.
+   - Before drafting, the system reads the business's own website and skips ones that look clearly established: an old founding year (older than `OUTREACH_ESTABLISHED_MAX_AGE_YEARS`, default 8 years), copyright dates, or "20+ years experience" style claims. A cheap text check handles the obvious cases, then a quick AI pass catches softer signals (decades of awards, long client lists) with no literal year. Sparse, brand-new, or "now open" sites pass through. This is a deliberate skew, not a perfect classifier.
 3. **Writes each one a short email** with Gemini (currently `gemini-2.5-flash`). The email references the kind of business they run and the everyday headaches that category tends to have.
 4. **Runs a A/B test** alongside the send. It splits traffic across 2–4 variants and keeps the one that gets the most clicks or replies.
 5. **Sends the first emails**, up to the daily cap (`OUTREACH_DAILY_SEND_LIMIT`), with a tracked link so clicks can be attributed back to the lead and variant.
@@ -137,6 +141,7 @@ The Settings tab has two runtime controls plus the sequence configuration:
 
 - **Outreach system**: master enable/disable for the whole pipeline.
 - **Send mode**: Auto-send vs Review-before-send (affects both first emails AND follow-ups).
+- **Discovery filters**: the Google Places review-count ceiling. Lower it to bias discovery toward newer and smaller businesses; raise it to cast a wider net. Leave it blank to fall back to `OUTREACH_MAX_REVIEW_COUNT` in `.env` (or the built-in default of 15). The panel shows the value currently in effect and where it comes from.
 - **Follow-up sequence**: an editable table of touches. Each row is one touch: how many days after the previous touch it sends (1-90), and a default "intent" string that drives Gemini's wording (used when no follow-up A/B test is active). Add/remove rows for between 0 and 6 follow-up touches. Setting 0 touches disables follow-ups entirely.
 
 A/B automation runs unconditionally whenever the outreach system is enabled. The Settings tab also shows the active A/B test snapshot and a tail of the day's pipeline log for quick health checks.

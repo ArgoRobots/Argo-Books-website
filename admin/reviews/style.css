@@ -27,31 +27,31 @@
 .review-section h2 {
     font-size: 18px;
     margin: 0 0 4px 0;
-    color: var(--blue-900);
+    color: var(--admin-text);
 }
 
 .review-section h2 .count {
-    color: var(--gray-600, #6b7280);
+    color: var(--admin-text);
     font-weight: 400;
     font-size: 14px;
 }
 
 .review-section.active h2 {
-    color: var(--emerald-800, #065f46);
+    color: var(--emerald-800, var(--emerald-800));
 }
 
 .review-section.inactive h2 {
-    color: var(--amber-700, #b45309);
+    color: var(--amber-700, var(--amber-700));
 }
 
 .section-description {
     font-size: 13px;
-    color: var(--gray-600, #6b7280);
+    color: var(--admin-text);
     margin: 0 0 14px 0;
 }
 
 .empty-state {
-    color: var(--gray-500, #9ca3af);
+    color: var(--admin-text);
     font-style: italic;
     margin: 0;
 }
@@ -66,13 +66,13 @@
 .reviews-table td {
     padding: 8px 12px;
     text-align: left;
-    border-bottom: 1px solid var(--gray-100, #f3f4f6);
+    border-bottom: 1px solid var(--gray-100, var(--gray-bg-light));
 }
 
 .reviews-table th {
     font-weight: 600;
-    background: var(--gray-50, #f9fafb);
-    color: var(--gray-700, #374151);
+    background: var(--gray-50, var(--whiteBackground));
+    color: var(--admin-text);
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.4px;
@@ -83,7 +83,7 @@
 }
 
 .reviews-table code {
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-bg-light));
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 12px;
@@ -105,24 +105,24 @@
    light-on-dark without this. */
 [data-theme="dark"] .btn-gray {
     background-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
     border-color: var(--black);
 }
 
 [data-theme="dark"] .btn-gray:hover {
     background-color: var(--gray-600);
-    color: var(--gray-100);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reviews-intro {
     background: var(--blue-alpha-15);
     border-left-color: var(--blue-400);
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .review-section {
     background: var(--gray-800);
-    box-shadow: 0 1px 3px var(--overlay-light);
+    box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .review-section h2 {
@@ -130,31 +130,31 @@
 }
 
 [data-theme="dark"] .review-section.active h2 {
-    color: var(--emerald-300, #6ee7b7);
+    color: var(--emerald-300, var(--emerald-300));
 }
 
 [data-theme="dark"] .review-section.inactive h2 {
-    color: var(--amber-300, #fcd34d);
+    color: var(--amber-300, var(--amber-300));
 }
 
 [data-theme="dark"] .review-section h2 .count,
 [data-theme="dark"] .section-description,
 [data-theme="dark"] .empty-state {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reviews-table th,
 [data-theme="dark"] .reviews-table td {
     border-bottom-color: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reviews-table th {
     background: var(--gray-700);
-    color: var(--gray-300);
+    color: var(--white);
 }
 
 [data-theme="dark"] .reviews-table code {
     background: var(--gray-700);
-    color: var(--gray-200);
+    color: var(--white);
 }

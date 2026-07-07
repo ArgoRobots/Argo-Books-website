@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../email_sender.php';
 require_once __DIR__ . '/../../community/report/ban_check.php';
@@ -94,6 +94,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['bulk_action'])) {
             } else {
                 $_SESSION['message'] = 'No active bans found for selected users.';
                 $_SESSION['message_type'] = 'error';
+            }
+        } elseif ($action === 'ban') {
+            $ban_reason = trim($_POST['ban_reason'] ?? '');
+            $ban_duration = $_POST['ban_duration'] ?? 'permanent';
+            $allowed_durations = ['5_days', '10_days', '30_days', '100_days', '1_year', 'permanent'];
+            if (!in_array($ban_duration, $allowed_durations, true)) {
+                $ban_duration = 'permanent';
+            }
+
+            if ($ban_reason === '') {
+                $_SESSION['message'] = 'A ban reason is required.';
+                $_SESSION['message_type'] = 'error';
+            } else {
+                // Expiry from duration; null = permanent. Mirrors admin/reports/handle_report.php.
+                $duration_days = ['5_days' => 5, '10_days' => 10, '30_days' => 30, '100_days' => 100];
+                $expires_at = null;
+                if (isset($duration_days[$ban_duration])) {
+                    $expires_at = date('Y-m-d H:i:s', strtotime('+' . $duration_days[$ban_duration] . ' days'));
+                } elseif ($ban_duration === '1_year') {
+                    $expires_at = date('Y-m-d H:i:s', strtotime('+1 year'));
+                }
+
+                $skipped = 0;
+                foreach ($selected_ids as $user_id) {
+                    // Don't stack a second active ban on an already-banned user.
+                    if (is_user_banned($user_id)) {
+                        $skipped++;
+                        continue;
+                    }
+                    try {
+                        // banned_by stays NULL: admins authenticate against admin_users,
+                        // not community_users (same as the unban handler above).
+                        if ($expires_at) {
+                            $stmt = $pdo->prepare('INSERT INTO user_bans (user_id, banned_by, ban_reason, ban_duration, expires_at) VALUES (?, NULL, ?, ?, ?)');
+                            $ok = $stmt->execute([$user_id, $ban_reason, $ban_duration, $expires_at]);
+                        } else {
+                            $stmt = $pdo->prepare('INSERT INTO user_bans (user_id, banned_by, ban_reason, ban_duration) VALUES (?, NULL, ?, ?)');
+                            $ok = $stmt->execute([$user_id, $ban_reason, $ban_duration]);
+                        }
+                        if ($ok) {
+                            $success_count++;
+                            $stmt2 = $pdo->prepare('SELECT username, email FROM community_users WHERE id = ?');
+                            $stmt2->execute([$user_id]);
+                            $u = $stmt2->fetch();
+                            if ($u) {
+                                send_ban_notification_email($u['email'], $u['username'], $ban_reason, $ban_duration, $expires_at);
+                            }
+                        } else {
+                            $fail_count++;
+                        }
+                    } catch (Exception $e) {
+                        $fail_count++;
+                    }
+                }
+
+                if ($success_count > 0) {
+                    $msg = $success_count . ' user' . ($success_count > 1 ? 's' : '') . ' banned successfully.';
+                    if ($skipped > 0) $msg .= ' ' . $skipped . ' already banned, skipped.';
+                    if ($fail_count > 0) $msg .= ' ' . $fail_count . ' failed.';
+                    $_SESSION['message'] = $msg;
+                    $_SESSION['message_type'] = 'success';
+                } else {
+                    $_SESSION['message'] = $skipped > 0 ? 'Selected user(s) are already banned.' : 'Failed to ban users.';
+                    $_SESSION['message_type'] = $skipped > 0 ? 'info' : 'error';
+                }
             }
         }
 
@@ -263,16 +328,16 @@ include __DIR__ . '/../admin_header.php';
         <div class="card-header">
             <h2>Users</h2>
             <div class="search-container">
-                <form method="GET" action="" class="search-form">
+                <form method="GET" action="" class="control-bar search-form">
                     <input type="text"
                            id="search"
                            name="search"
                            placeholder="Search by username or email..."
                            value="<?php echo htmlspecialchars($search); ?>"
-                           class="search-input">
+                           class="control-input search-input">
 
-                    <div class="filter-group">
-                        <select name="date_preset" id="date_preset" onchange="this.form.submit()">
+                    <div class="control-group">
+                        <select name="date_preset" id="date_preset" class="control-select" onchange="this.form.submit()">
                             <option value="">All Time</option>
                             <option value="today" <?php echo $date_preset === 'today' ? 'selected' : ''; ?>>Today</option>
                             <option value="last_week" <?php echo $date_preset === 'last_week' ? 'selected' : ''; ?>>Last 7 Days</option>
@@ -284,8 +349,8 @@ include __DIR__ . '/../admin_header.php';
                         </select>
                     </div>
 
-                    <div class="filter-group">
-                        <select name="ban_status" id="ban_status" onchange="this.form.submit()">
+                    <div class="control-group">
+                        <select name="ban_status" id="ban_status" class="control-select" onchange="this.form.submit()">
                             <option value="all" <?php echo $ban_status === 'all' ? 'selected' : ''; ?>>All Users</option>
                             <option value="banned" <?php echo $ban_status === 'banned' ? 'selected' : ''; ?>>Banned</option>
                             <option value="unbanned" <?php echo $ban_status === 'unbanned' ? 'selected' : ''; ?>>Not Banned</option>
@@ -301,18 +366,20 @@ include __DIR__ . '/../admin_header.php';
                     <?php endif; ?>
 
                     <div id="custom_date_range" class="custom-date-range" style="display: <?php echo $date_preset === 'custom' ? 'flex' : 'none'; ?>;">
-                        <div class="filter-group">
-                            <label for="date_from">From</label>
+                        <div class="control-group">
+                            <label for="date_from" class="control-label">From</label>
                             <input type="date"
                                    name="date_from"
                                    id="date_from"
+                                   class="control-input"
                                    value="<?php echo htmlspecialchars($date_from); ?>">
                         </div>
-                        <div class="filter-group">
-                            <label for="date_to">To</label>
+                        <div class="control-group">
+                            <label for="date_to" class="control-label">To</label>
                             <input type="date"
                                    name="date_to"
                                    id="date_to"
+                                   class="control-input"
                                    value="<?php echo htmlspecialchars($date_to); ?>">
                         </div>
                         <button type="submit" class="apply-button">Apply</button>
@@ -338,6 +405,10 @@ include __DIR__ . '/../admin_header.php';
                             <?= svg_icon('shield-check') ?>
                             Unban Selected
                         </button>
+                        <button type="button" class="btn btn-bulk btn-ban" data-action="ban" disabled>
+                            <?= svg_icon('shield') ?>
+                            Ban Selected
+                        </button>
 <button type="button" class="btn btn-bulk btn-delete" data-action="delete" disabled>
                             <?= svg_icon('trash') ?>
                             Delete Selected
@@ -346,6 +417,8 @@ include __DIR__ . '/../admin_header.php';
                 </div>
 
                 <input type="hidden" name="bulk_action" id="bulk_action_input">
+                <input type="hidden" name="ban_reason" id="ban_reason_input">
+                <input type="hidden" name="ban_duration" id="ban_duration_input">
 
                 <div class="table-responsive">
                     <table data-paginate="25">
@@ -401,6 +474,39 @@ include __DIR__ . '/../admin_header.php';
                     </table>
                 </div>
             </form>
+
+            <!-- Ban Users Modal -->
+            <div id="ban-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3>Ban users</h3>
+                        <button type="button" class="modal-close" id="ban-modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Ban <strong><span id="ban-modal-count">0</span></strong> selected user(s). Already-banned users are skipped.</p>
+                        <div class="form-group">
+                            <label for="ban-modal-duration">Duration</label>
+                            <select id="ban-modal-duration">
+                                <option value="permanent">Permanent</option>
+                                <option value="5_days">5 days</option>
+                                <option value="10_days">10 days</option>
+                                <option value="30_days">30 days</option>
+                                <option value="100_days">100 days</option>
+                                <option value="1_year">1 year</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ban-modal-reason">Reason</label>
+                            <textarea id="ban-modal-reason" rows="3" placeholder="Shown to the user in their ban notification email."></textarea>
+                        </div>
+                        <p class="modal-note">The user will be emailed to let them know they have been banned.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" id="ban-modal-cancel">Cancel</button>
+                        <button type="button" class="btn btn-bulk btn-ban" id="ban-modal-confirm">Ban users</button>
+                    </div>
+                </div>
+            </div>
         <?php endif; ?>
     </div>
 </div>
@@ -412,10 +518,22 @@ include __DIR__ . '/../admin_header.php';
         const rowCheckboxes = document.querySelectorAll('.row-checkbox');
         const bulkButtons = document.querySelectorAll('.btn-bulk');
         const unbanButton = document.querySelector('.btn-unban');
+        const banButton = document.querySelector('.btn-ban');
         const deleteButton = document.querySelector('.btn-delete');
         const selectedCountSpan = document.getElementById('selected-count');
         const bulkForm = document.getElementById('bulk-form');
         const bulkActionInput = document.getElementById('bulk_action_input');
+        const banReasonInput = document.getElementById('ban_reason_input');
+        const banDurationInput = document.getElementById('ban_duration_input');
+
+        // Ban modal elements
+        const banModal = document.getElementById('ban-modal');
+        const banModalCount = document.getElementById('ban-modal-count');
+        const banModalReason = document.getElementById('ban-modal-reason');
+        const banModalDuration = document.getElementById('ban-modal-duration');
+        const banModalConfirm = document.getElementById('ban-modal-confirm');
+        const banModalCancel = document.getElementById('ban-modal-cancel');
+        const banModalClose = document.getElementById('ban-modal-close');
 
         function updateSelectedCount() {
             const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
@@ -433,10 +551,13 @@ include __DIR__ . '/../admin_header.php';
             // Enable/disable buttons based on selection
             if (count === 0) {
                 unbanButton.disabled = true;
+                if (banButton) banButton.disabled = true;
                 deleteButton.disabled = true;
             } else {
-                // Only enable unban if at least one banned user is selected
+                // Only enable unban if at least one banned user is selected,
+                // and ban if at least one NOT-banned user is selected.
                 unbanButton.disabled = bannedUsersSelected === 0;
+                if (banButton) banButton.disabled = (count - bannedUsersSelected) === 0;
                 deleteButton.disabled = false;
             }
 
@@ -470,10 +591,23 @@ include __DIR__ . '/../admin_header.php';
         bulkButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const action = this.dataset.action;
+                // The modal's confirm button shares .btn-bulk styling but has no
+                // data-action; it has its own handler, so ignore it here.
+                if (!action) return;
                 const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
                 const count = checkedBoxes.length;
 
                 if (count === 0) return;
+
+                // Ban needs a reason + duration, so it opens a modal instead of a confirm.
+                if (action === 'ban') {
+                    banModalCount.textContent = count;
+                    banModalReason.value = '';
+                    banModalDuration.value = 'permanent';
+                    banModal.style.display = 'flex';
+                    banModalReason.focus();
+                    return;
+                }
 
                 let confirmMessage = '';
 
@@ -489,6 +623,35 @@ include __DIR__ . '/../admin_header.php';
                     bulkForm.submit();
                 }
             });
+        });
+
+        // Ban modal wiring
+        function closeBanModal() {
+            if (banModal) banModal.style.display = 'none';
+        }
+        if (banModalConfirm) {
+            banModalConfirm.addEventListener('click', function() {
+                const reason = banModalReason.value.trim();
+                if (!reason) {
+                    banModalReason.focus();
+                    return;
+                }
+                banReasonInput.value = reason;
+                banDurationInput.value = banModalDuration.value;
+                bulkActionInput.value = 'ban';
+                sessionStorage.setItem('scrollPosition', window.scrollY);
+                bulkForm.submit();
+            });
+        }
+        if (banModalCancel) banModalCancel.addEventListener('click', closeBanModal);
+        if (banModalClose) banModalClose.addEventListener('click', closeBanModal);
+        if (banModal) {
+            banModal.addEventListener('click', function(e) {
+                if (e.target === banModal) closeBanModal();
+            });
+        }
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && banModal && banModal.style.display === 'flex') closeBanModal();
         });
 
         // Initial count

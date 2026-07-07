@@ -176,6 +176,14 @@ if (!$requestedPlatform || !isset($platformPatterns[$requestedPlatform])) {
     die('Missing or invalid platform. Use: win, mac, or linux');
 }
 
+// Validate the version format before it is ever used to build a filesystem path.
+// The /download/avalonia/<ver>/<platform> rewrite already constrains this, but
+// the script is also reachable directly, so guard here too (blocks ../ traversal).
+if ($requestedVersion !== null && !preg_match('/^\d+\.\d+\.\d+$/', $requestedVersion)) {
+    http_response_code(400);
+    die('Invalid version format.');
+}
+
 // If a specific version was requested, serve it
 if ($requestedVersion) {
     $installer = findInstaller($requestedVersion, $requestedPlatform);

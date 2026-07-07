@@ -9,6 +9,17 @@
 // groups every file by user, shows what each user did, and lets you delete a
 // user's files (e.g. your own test installs) one card at a time.
 
+// Direct-access guard. This partial is only valid when included by its parent
+// page (app-stats/index.php), which starts the session and verifies the admin
+// login. Requested directly, no session is started so $_SESSION is empty and we
+// fail closed. (An admin/.htaccess also denies *-tab.php as defense in depth.)
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+require_once __DIR__ . '/../../founder_exclusion.php'; // is_excluded_auth_id()
+
 $ua_dataDir   = __DIR__ . '/../data-logs/telemetry/';
 $ua_legacyDir = __DIR__ . '/../data-logs/';
 
@@ -108,6 +119,11 @@ foreach ($ua_files as $name => $path) {
     $authId = $d['authId'] ?? '(no authId)';
     $geo    = $d['geoLocation'] ?? [];
 
+    // Hide the founder's own installs (single source of truth: EXCLUDED_AUTH_IDS).
+    if (is_excluded_auth_id($authId)) {
+        continue;
+    }
+
     if (!isset($ua_users[$authId])) {
         $ua_users[$authId] = [
             'tier'      => $tier,
@@ -185,7 +201,7 @@ if (!function_exists('ua_fmt')) {
 }
 if (!function_exists('ua_kv')) {
     function ua_kv($arr) {
-        if (!$arr) return '<span style="color:#9ca3af">none</span>';
+        if (!$arr) return '<span style="color:var(--admin-text)">none</span>';
         arsort($arr);
         $out = [];
         foreach ($arr as $k => $v) $out[] = htmlspecialchars($k) . ' <b>' . $v . '</b>';
@@ -194,18 +210,18 @@ if (!function_exists('ua_kv')) {
 }
 ?>
 <style>
-.ua-intro { color:#6b7280; margin-bottom:1rem; }
+.ua-intro { color:var(--black); margin-bottom:1rem; }
 .ua-flash { background:#ecfdf5; border:1px solid #6ee7b7; color:#065f46; padding:10px 14px; border-radius:8px; margin-bottom:1rem; }
 .ua-card { border:1px solid #e5e7eb; border-radius:10px; padding:1rem 1.25rem; margin-bottom:1rem; background:#fff; }
 .ua-card h3 { margin:0 0 .25rem; font-family:monospace; font-size:1rem; word-break:break-all; }
 .ua-badge { display:inline-block; font-size:.7rem; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:999px; margin-left:.5rem; vertical-align:middle; }
 .ua-badge.free { background:#dbeafe; color:#1e40af; }
 .ua-badge.premium { background:#fef3c7; color:#92400e; }
-.ua-meta { color:#374151; font-size:.85rem; margin:.4rem 0; }
+.ua-meta { color:var(--black); font-size:.85rem; margin:.4rem 0; }
 .ua-meta span { display:inline-block; margin-right:1.25rem; }
 .ua-row { font-size:.85rem; margin:.25rem 0; }
-.ua-row b { color:#111827; }
-.ua-files { font-family:monospace; font-size:.7rem; color:#9ca3af; margin-top:.5rem; word-break:break-all; }
+.ua-row b { color:var(--black); }
+.ua-files { font-family:monospace; font-size:.7rem; color:var(--black); margin-top:.5rem; word-break:break-all; }
 .ua-del { float:right; }
 .ua-del button { background:#ef4444; color:#fff; border:0; border-radius:6px; padding:6px 12px; font-size:.8rem; cursor:pointer; }
 .ua-del button:hover { background:#dc2626; }
@@ -214,17 +230,35 @@ if (!function_exists('ua_kv')) {
 .ua-timeline { margin-top:.5rem; max-height:340px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:8px; }
 .ua-evt { display:flex; gap:.75rem; padding:5px 12px; font-size:.78rem; border-bottom:1px solid #f3f4f6; }
 .ua-evt:last-child { border-bottom:0; }
-.ua-evt-ts { color:#9ca3af; font-family:monospace; white-space:nowrap; }
-.ua-evt-text { color:#374151; }
+.ua-evt-ts { color:var(--black); font-family:monospace; white-space:nowrap; }
+.ua-evt-text { color:var(--black); }
 .ua-evt.error  .ua-evt-text { color:#b91c1c; font-family:monospace; }
 .ua-evt.api    .ua-evt-text { color:#7c3aed; }
 .ua-evt.export .ua-evt-text { color:#0369a1; }
 .ua-evt.feature .ua-evt-text { color:#047857; }
-.ua-evt.session .ua-evt-text { color:#6b7280; }
+.ua-evt.session .ua-evt-text { color:var(--black); }
 [data-theme="dark"] .ua-card { background:var(--gray-800); border-color:var(--gray-700); }
-[data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text { color:var(--gray-200); }
+[data-theme="dark"] .ua-card h3, [data-theme="dark"] .ua-meta, [data-theme="dark"] .ua-row, [data-theme="dark"] .ua-row b, [data-theme="dark"] .ua-evt-text, [data-theme="dark"] .ua-files { color:var(--white); }
 [data-theme="dark"] .ua-timeline { border-color:var(--gray-700); }
 [data-theme="dark"] .ua-evt { border-bottom-color:var(--gray-700); }
+[data-theme="dark"] .ua-evt-ts { color:var(--gray-400); }
+[data-theme="dark"] .ua-evt.error  .ua-evt-text { color:#f87171; }
+[data-theme="dark"] .ua-evt.api    .ua-evt-text { color:#a78bfa; }
+[data-theme="dark"] .ua-evt.export .ua-evt-text { color:#38bdf8; }
+[data-theme="dark"] .ua-evt.feature .ua-evt-text { color:#34d399; }
+[data-theme="dark"] .ua-evt.session .ua-evt-text { color:var(--white); }
+
+/* Filter controls. Pagination itself is the shared admin TablePaginator. */
+.ua-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:1rem; }
+.ua-input { padding:8px 10px; border:1px solid #d1d5db; border-radius:6px; font-size:.85rem; background:#fff; color:var(--admin-text); }
+.ua-input:focus { outline:none; border-color:#3b82f6; }
+#ua-search { flex:1; min-width:220px; }
+.ua-count { font-size:.8rem; color:#6b7280; margin-left:auto; white-space:nowrap; }
+.ua-noresults { color:#6b7280; font-size:.9rem; padding:1rem 0; }
+.ua-table { width:100%; border-collapse:collapse; }
+.ua-table td.ua-td { padding:0; border:0; background:transparent; }
+[data-theme="dark"] .ua-input { background:var(--gray-800); border-color:var(--gray-700); color:var(--white); }
+[data-theme="dark"] .ua-count, [data-theme="dark"] .ua-noresults { color:var(--gray-400); }
 </style>
 
 <h2 class="section-title">User Activity</h2>
@@ -233,12 +267,43 @@ if (!function_exists('ua_kv')) {
 
 <?php if (!$ua_users): ?>
     <p>No telemetry files found.</p>
-<?php else: foreach ($ua_users as $u):
-    // Newest-first timeline for display.
-    $timeline = $u['timeline'];
-    usort($timeline, fn($a, $b) => $b['ts'] <=> $a['ts']);
-?>
-    <div class="ua-card">
+<?php else: ?>
+    <div class="ua-controls" id="ua-controls">
+        <input type="text" id="ua-search" class="ua-input" placeholder="Search id, country, region, version&hellip;">
+        <select id="ua-tier" class="ua-input">
+            <option value="">All tiers</option>
+            <option value="free">Free</option>
+            <option value="premium">Premium</option>
+        </select>
+        <select id="ua-period" class="ua-input">
+            <option value="0">Any time</option>
+            <option value="7">Active last 7 days</option>
+            <option value="30">Active last 30 days</option>
+            <option value="90">Active last 90 days</option>
+        </select>
+        <span class="ua-count" id="ua-count"></span>
+    </div>
+
+    <div class="table-responsive">
+    <table class="ua-table" data-paginate="25" data-paginate-noun="users">
+        <tbody>
+    <?php foreach ($ua_users as $u):
+        // Newest-first timeline for display.
+        $timeline = $u['timeline'];
+        usort($timeline, fn($a, $b) => $b['ts'] <=> $a['ts']);
+        // Searchable haystack + filter keys for the client-side filters.
+        $ua_haystack = strtolower(trim(
+            $u['authId'] . ' ' . $u['country'] . ' ' . $u['region'] . ' ' .
+            implode(' ', array_keys($u['versions'])) . ' ' .
+            implode(' ', array_keys($u['platforms']))
+        ));
+    ?>
+    <tr class="ua-user"
+        data-tier="<?= htmlspecialchars($u['tier']) ?>"
+        data-last="<?= (int)($u['last'] ?? 0) ?>"
+        data-search="<?= htmlspecialchars($ua_haystack) ?>">
+      <td class="ua-td">
+        <div class="ua-card">
         <div class="ua-del">
             <form method="post" action="?tab=user-activity"
                   onsubmit="return confirm('Delete ALL <?= count($u['files']) ?> file(s) for this user? This cannot be undone.');">
@@ -283,5 +348,62 @@ if (!function_exists('ua_kv')) {
         <?php endif; ?>
 
         <div class="ua-files"><?= count($u['files']) ?> file(s): <?= htmlspecialchars(implode(', ', $u['files'])) ?></div>
-    </div>
-<?php endforeach; endif; ?>
+        </div>
+      </td>
+    </tr>
+    <?php endforeach; ?>
+        </tbody>
+    </table>
+    </div><!-- /.table-responsive -->
+
+    <p class="ua-noresults" id="ua-noresults" style="display:none;">No users match your filters.</p>
+
+    <script>
+    // Filtering only. Pagination is the shared admin TablePaginator, which we
+    // re-run via reset() after hiding non-matching rows. Rows we hide use
+    // display:none WITHOUT the .pg-hidden class, so the paginator excludes them
+    // from its counts and pages (see admin/pagination.js _rows()).
+    (function () {
+        var table = document.querySelector('.ua-table');
+        if (!table) return;
+        var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr.ua-user'));
+        var search = document.getElementById('ua-search');
+        var tierSel = document.getElementById('ua-tier');
+        var periodSel = document.getElementById('ua-period');
+        var countEl = document.getElementById('ua-count');
+        var noRes = document.getElementById('ua-noresults');
+        var nowSec = Math.floor(Date.now() / 1000);
+        var t;
+
+        function apply() {
+            var q = (search.value || '').trim().toLowerCase();
+            var tier = tierSel.value;
+            var days = parseInt(periodSel.value, 10) || 0;
+            var cutoff = days > 0 ? nowSec - days * 86400 : 0;
+            var visible = 0;
+
+            rows.forEach(function (tr) {
+                var ok = (!tier || tr.dataset.tier === tier)
+                    && (!cutoff || (parseInt(tr.dataset.last, 10) || 0) >= cutoff)
+                    && (!q || (tr.dataset.search || '').indexOf(q) !== -1);
+                if (ok) {
+                    tr.style.display = '';
+                    visible++;
+                } else {
+                    tr.style.display = 'none';
+                    tr.classList.remove('pg-hidden');
+                }
+            });
+
+            countEl.textContent = visible + (visible === 1 ? ' user' : ' users');
+            noRes.style.display = visible === 0 ? '' : 'none';
+            if (table._paginator) table._paginator.reset();
+        }
+
+        search.addEventListener('input', function () { clearTimeout(t); t = setTimeout(apply, 150); });
+        tierSel.addEventListener('change', apply);
+        periodSel.addEventListener('change', apply);
+        apply();
+    })();
+    </script>
+<?php endif; ?>

@@ -3,7 +3,7 @@
 // Post-upload result page: the full analytics view (sample data for now;
 // the real build feeds NormalizedData into the same markup + charts).
 
-require_once __DIR__ . '/../../invoice-generator/_base.php';
+require_once __DIR__ . '/../../shared/_base.php';
 
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../../statistics.php';

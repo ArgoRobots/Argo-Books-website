@@ -107,13 +107,22 @@ body:has(.guides-hub) {
   padding-top: 0;
 }
 
+/* Left rule, mirroring .guides-hub-group-rule on the right, so the label
+   centers horizontally between the two lines. */
+.guides-hub-group::before {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--hub-rule);
+}
+
 .guides-hub-group-label {
-  font-family: var(--hub-sans);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: var(--hub-muted);
+  margin: 0;
+  font-family: var(--hub-serif);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--hub-text);
 }
 
 .guides-hub-group-rule {

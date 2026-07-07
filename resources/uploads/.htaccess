@@ -1,0 +1,19 @@
+# User-uploaded files (company logos, etc.) live here. They are never code.
+# Deny serving/executing any script type, whatever the server's PHP handler is.
+# Images and other static files are still served normally.
+<FilesMatch "(?i)\.(php|phtml|phar|phps|php[0-9]|cgi|pl|py|rb|asp|aspx|sh|htaccess)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Belt-and-suspenders for mod_php hosts (skipped under PHP-FPM/FastCGI so this
+# never triggers an "Invalid command 'php_flag'" 500).
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>

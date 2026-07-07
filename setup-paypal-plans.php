@@ -101,11 +101,11 @@ echo "SUCCESS! Add these to your .env file:\n";
 echo "===========================================\n\n";
 
 if ($isProduction) {
-    echo "PAYPAL_LIVE_MONTHLY_PLAN_ID=$monthlyPlanId\n";
-    echo "PAYPAL_LIVE_YEARLY_PLAN_ID=$yearlyPlanId\n";
+    echo "PAYPAL_LIVE_MONTHLY_PLAN_ID=\"$monthlyPlanId\"\n";
+    echo "PAYPAL_LIVE_YEARLY_PLAN_ID=\"$yearlyPlanId\"\n";
 } else {
-    echo "PAYPAL_SANDBOX_MONTHLY_PLAN_ID=$monthlyPlanId\n";
-    echo "PAYPAL_SANDBOX_YEARLY_PLAN_ID=$yearlyPlanId\n";
+    echo "PAYPAL_SANDBOX_MONTHLY_PLAN_ID=\"$monthlyPlanId\"\n";
+    echo "PAYPAL_SANDBOX_YEARLY_PLAN_ID=\"$yearlyPlanId\"\n";
 }
 
 

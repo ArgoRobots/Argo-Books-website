@@ -165,7 +165,7 @@ body.menu-open::after {
 
 .hamburger-nav-menu ul li a {
   text-decoration: none;
-  color: var(--black);
+  color: var(--admin-text);
   padding: 20px 30px;
   display: block;
   transition: background-color 0.2s ease;
@@ -185,6 +185,19 @@ body.menu-open::after {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+/* Group heading inside the mobile menu (not a link). Mirrors the desktop
+   nav's group labels so the expanded mobile list reads as the same groups. */
+.hamburger-nav-menu ul li.mobile-nav-group-label {
+  padding: 14px 20px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--admin-text);
+  opacity: 0.55;
+  cursor: default;
 }
 
 .hamburger-nav-menu ul li a.logout-link {
@@ -239,7 +252,7 @@ body.menu-open::after {
 .header-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: var(--admin-text);
 }
 
 /* Desktop Navigation */
@@ -254,7 +267,7 @@ body.menu-open::after {
 .header-link {
   padding: 0.5rem 0.75rem;
   text-decoration: none;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 4px;
@@ -263,7 +276,7 @@ body.menu-open::after {
 }
 
 .header-link:hover {
-  color: var(--dark-gray);
+  color: var(--admin-text);
   background: var(--neutral-f0f0f0);
 }
 
@@ -339,7 +352,7 @@ body.menu-open::after {
 .nav-dropdown-link {
   padding: 0.5rem 0.75rem;
   text-decoration: none;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 500;
   font-size: 0.9rem;
   border-radius: 4px;
@@ -348,7 +361,7 @@ body.menu-open::after {
 }
 
 .nav-dropdown-link:hover {
-  color: var(--dark-gray);
+  color: var(--admin-text);
   background: var(--neutral-f0f0f0);
 }
 
@@ -370,7 +383,7 @@ body.menu-open::after {
 
 .user-name {
   font-size: 0.9rem;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -381,7 +394,7 @@ body.menu-open::after {
   align-items: center;
   gap: 0.5rem;
   background: var(--gray-bg-light);
-  color: var(--black);
+  color: var(--admin-text);
   text-decoration: none;
   min-width: auto !important;
   padding: 0.5rem 0.75rem;
@@ -396,7 +409,7 @@ body.menu-open::after {
 
 .btn-home:hover {
   background: var(--gray-border);
-  color: var(--black);
+  color: var(--admin-text);
   border-color: var(--gray-input-border);
 }
 
@@ -429,12 +442,12 @@ body.menu-open::after {
 .page-title {
   font-size: 1.75rem;
   font-weight: 600;
-  color: var(--dark-gray);
+  color: var(--admin-text);
   margin: 0 0 0.5rem 0;
 }
 
 .page-description {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.5;
@@ -442,19 +455,19 @@ body.menu-open::after {
 
 /* Typography */
 h1 {
-  color: var(--blue-900);
+  color: var(--admin-text);
   margin: 0 0 1rem 0;
 }
 
 h2 {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 1.125rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
 }
 
 h3 {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 1rem;
   font-weight: 500;
   margin: 0 0 0.5rem 0;
@@ -556,7 +569,7 @@ tbody tr:hover {
 }
 
 .key-field {
-  font-family: monospace;
+  font-family: var(--font-mono);
 }
 
 /* Badges */
@@ -586,7 +599,7 @@ tbody tr:hover {
 
 .badge-user {
   background-color: var(--gray-border);
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .badge-banned {
@@ -596,7 +609,7 @@ tbody tr:hover {
 
 .badge-active {
   background-color: var(--gray-bg-light);
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 /* Action Buttons */
@@ -609,17 +622,18 @@ tbody tr:hover {
 
 /* Statistics Cards */
 .stat-card {
+  position: relative;
   flex: 1;
   background: var(--white);
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 1px 3px var(--shadow-default);
   text-align: center;
-  border: 1px solid var(--gray-border);
+  border: 1px solid var(--gray-200);
 }
 
 .stat-card h3 {
-  color: var(--black);
+  color: var(--admin-text);
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
@@ -632,16 +646,151 @@ tbody tr:hover {
 .stat-card .value {
   font-size: 1.75rem;
   font-weight: bold;
-  color: var(--blue-900);
+  color: var(--admin-text);
   margin: 0;
   line-height: 1.2;
 }
 
 .stat-card .subtext {
-  color: var(--gray-placeholder);
+  color: var(--admin-text);
   font-size: 0.75rem;
   margin-top: 0.25rem;
   line-height: 1.2;
+}
+
+.stat-card .live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background: var(--success-green);
+  vertical-align: middle;
+  animation: live-pulse 1.6s ease-out infinite;
+}
+
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--green-alpha-40);
+  }
+  70% {
+    box-shadow: 0 0 0 6px var(--green-alpha-10);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--green-alpha-10);
+  }
+}
+
+/* Info button: small circular "i" that reveals a tooltip on hover or keyboard
+   focus. CSS-only, no JS. Inside a stat card it pins to the top-right corner
+   and the tooltip opens down-left so it stays on screen. */
+.info-tip {
+  position: relative;
+  display: inline-flex;
+  outline: none;
+}
+
+.stat-card .info-tip {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.info-tip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--gray-200);
+  color: var(--admin-text);
+  font-style: italic;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: default;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.info-tip:hover .info-tip-icon,
+.info-tip:focus-visible .info-tip-icon {
+  background: var(--primary-blue);
+  color: #fff;
+}
+
+[data-theme="dark"] .info-tip-icon {
+  background: var(--gray-700);
+  color: var(--white);
+}
+
+[data-theme="dark"] .info-tip:hover .info-tip-icon,
+[data-theme="dark"] .info-tip:focus-visible .info-tip-icon {
+  background: var(--primary-blue);
+  color: #fff;
+}
+
+.info-tip-tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: max-content;
+  max-width: 260px;
+  padding: 10px 12px;
+  background: #1f2937;
+  color: var(--whiteBackground);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.12s ease, transform 0.12s ease, visibility 0s linear 0.12s;
+  pointer-events: none;
+  z-index: 10;
+  white-space: normal;
+}
+
+.info-tip-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  right: 8px;
+  border: 6px solid transparent;
+  border-bottom-color: #1f2937;
+}
+
+.info-tip:hover .info-tip-tooltip,
+.info-tip:focus-visible .info-tip-tooltip,
+.info-tip:focus-within .info-tip-tooltip {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
+[data-theme="dark"] .info-tip-tooltip {
+  background: var(--gray-900);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .info-tip-tooltip::after {
+  border-bottom-color: var(--gray-900);
+}
+
+/* Table cells default to word-break: break-word (table-auto-size.css) so long
+   keys/IDs wrap. Add this to short-label columns so a single word like
+   "Permanent" isn't broken mid-word in a narrow column. */
+td.col-nowrap,
+th.col-nowrap {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 /* Charts */
@@ -650,7 +799,7 @@ tbody tr:hover {
   padding: 20px 20px 60px 20px;
   margin-bottom: 30px;
   box-shadow: 0 1px 3px var(--shadow-default);
-  border: 1px solid var(--gray-border);
+  border: 1px solid var(--gray-200);
   position: relative;
   height: 300px;
   display: flex;
@@ -676,7 +825,7 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   height: 300px;
-  color: var(--black);
+  color: var(--admin-text);
   flex-direction: column;
   text-align: center;
 }
@@ -728,47 +877,31 @@ tbody tr:hover {
   font-style: italic;
 }
 
-/* Period Selection */
-.period-selection {
+/* Date range toolbar (website stats).
+   Wrapper/label/select/input/button styling now comes from the shared
+   .control-bar component; only page-specific layout + the range readout and
+   custom-range row remain here. */
+.range-controls {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
-  background: var(--white);
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px var(--shadow-default);
+  flex-wrap: wrap;
+  gap: 15px 30px;
 }
 
-.period-selection span {
-  font-weight: 500;
-  margin-right: 15px;
+.range-display {
+  color: var(--admin-text);
+  font-size: 12px;
+  white-space: nowrap;
 }
 
-.period-buttons {
-  display: flex;
-  gap: 10px;
+.range-custom {
+  align-items: center;
+  gap: 8px;
 }
 
-.period-btn {
-  padding: 8px 15px;
-  background: var(--gray-bg-light);
-  border-radius: 4px;
-  color: var(--black);
-  text-decoration: none;
+.range-custom span {
+  color: var(--admin-text);
   font-size: 14px;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-}
-
-.period-btn:hover {
-  background: var(--gray-border);
-}
-
-.period-btn.active {
-  background: var(--primary-blue);
-  color: var(--white);
-  border: 2px solid var(--blue-800);
-  font-weight: bold;
 }
 
 /* Login Styles */
@@ -791,7 +924,7 @@ tbody tr:hover {
 }
 
 .login-header h1 {
-  color: var(--blue-900);
+  color: var(--admin-text);
   margin-bottom: 10px;
 }
 
@@ -814,7 +947,7 @@ tbody tr:hover {
 .verification-input {
   letter-spacing: 0.5em !important;
   font-weight: bold;
-  font-family: monospace;
+  font-family: var(--font-mono);
   text-align: center;
   font-size: 18px;
   padding: 10px;
@@ -834,7 +967,7 @@ tbody tr:hover {
 }
 
 .secret-key {
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 20px;
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
@@ -854,7 +987,7 @@ tbody tr:hover {
 .verification-heading {
   margin-bottom: 15px;
   font-size: 18px;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .steps {
@@ -877,22 +1010,10 @@ tbody tr:hover {
   margin-bottom: 1.5rem;
 }
 
-.data-info {
-  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
-  border: 1px solid var(--gray-300);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: var(--gray-600);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
 .no-data {
   text-align: center;
   padding: 3rem 2rem;
-  color: var(--black);
+  color: var(--admin-text);
   background: linear-gradient(135deg, var(--whiteBackground) 0%, var(--gray-bg-light) 100%);
   border-radius: 12px;
   border: 2px dashed var(--gray-input-border);
@@ -902,7 +1023,7 @@ tbody tr:hover {
 .no-data h3 {
   margin: 0 0 1rem 0;
   font-size: 1.5rem;
-  color: var(--black);
+  color: var(--admin-text);
   font-weight: 600;
 }
 
@@ -915,9 +1036,9 @@ tbody tr:hover {
   background: var(--gray-border);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  font-family: "Monaco", "Consolas", monospace;
+  font-family: var(--font-mono);
   font-size: 0.875rem;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 /* Table Responsive Wrapper */
@@ -947,31 +1068,8 @@ tbody tr:hover {
   background: var(--gray-400);
 }
 
-/* Responsive Design */
-@media (max-width: 900px) {
-  .period-selection {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .period-selection span {
-    margin-bottom: 10px;
-  }
-
-  .period-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 100%;
-    gap: 10px;
-  }
-
-  .period-btn {
-    text-align: center;
-  }
-}
-
 /* Mobile Navigation - Hide desktop nav and show mobile nav */
-@media (max-width: 1350px) {
+@media (max-width: 1024px) {
   .desktop-nav {
     display: none;
   }
@@ -1098,7 +1196,7 @@ tbody tr:hover {
 }
 
 /* Hide mobile dropdown on desktop */
-@media (min-width: 1350px) {
+@media (min-width: 1025px) {
   .hamburger-nav-menu {
     display: none !important;
   }
@@ -1113,7 +1211,7 @@ tbody tr:hover {
    ============================================================ */
 .theme-toggle {
   background: none;
-  border: 1px solid var(--gray-input-border);
+  border: 1px solid var(--gray-200);
   border-radius: 6px;
   cursor: pointer;
   padding: 4px 8px;
@@ -1121,13 +1219,13 @@ tbody tr:hover {
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .theme-toggle:hover {
   background: var(--gray-bg-light);
   border-color: var(--gray-placeholder);
-  color: var(--black);
+  color: var(--admin-text);
 }
 
 .theme-toggle svg {
@@ -1147,14 +1245,14 @@ tbody tr:hover {
    Dark Theme
    ============================================================ */
 [data-theme="dark"] .theme-toggle {
-  border-color: var(--black);
-  color: var(--gray-input-border);
+  border-color: var(--gray-700);
+  color: var(--white);
 }
 
 [data-theme="dark"] .theme-toggle:hover {
   background: var(--gray-700);
-  border-color: var(--black);
-  color: var(--whiteBackground);
+  border-color: var(--gray-600);
+  color: var(--white);
 }
 
 [data-theme="dark"] .theme-toggle .icon-moon {
@@ -1177,26 +1275,26 @@ tbody tr:hover {
 
 [data-theme="dark"] body {
   background: var(--neutral-111827);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Header */
 [data-theme="dark"] .admin-header {
   background: var(--gray-800);
   border-bottom-color: var(--gray-700);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .header-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .header-link {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .header-link:hover {
-  color: var(--gray-200);
+  color: var(--white);
   background: var(--gray-700);
 }
 
@@ -1212,11 +1310,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .nav-dropdown-link {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .nav-dropdown-link:hover {
-  color: var(--gray-200);
+  color: var(--white);
   background: var(--gray-700);
 }
 
@@ -1226,7 +1324,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .user-name {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .menu-icon .nav-icon,
@@ -1242,13 +1340,13 @@ tbody tr:hover {
 /* Dark theme - Home button */
 [data-theme="dark"] .btn-home {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
   border-color: var(--gray-600);
 }
 
 [data-theme="dark"] .btn-home:hover {
   background: var(--slate-3f4f63);
-  color: var(--gray-200);
+  color: var(--white);
   border-color: var(--gray-500);
 }
 
@@ -1266,7 +1364,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .hamburger-nav-menu ul li a {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .hamburger-nav-menu ul li a:hover {
@@ -1288,11 +1386,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .page-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .page-description {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Typography */
@@ -1301,29 +1399,29 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] h2 {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] h3 {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 /* Dark theme - Tables */
 [data-theme="dark"] .table-container {
   background: var(--gray-800);
   border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] th {
   background-color: var(--gray-800);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] th,
 [data-theme="dark"] td {
   border-bottom-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] tbody tr:hover {
@@ -1333,32 +1431,32 @@ tbody tr:hover {
 /* Dark theme - Stat cards */
 [data-theme="dark"] .stat-card {
   background: var(--gray-800);
-  border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  border-color: var(--gray-700);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .stat-card h3 {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .stat-card .stat-value,
 [data-theme="dark"] .stat-card .value {
-  color: var(--blue-300);
+  color: var(--white);
 }
 
 [data-theme="dark"] .stat-card .subtext {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 /* Dark theme - Charts */
 [data-theme="dark"] .chart-container {
   background: var(--gray-800);
-  border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  border-color: var(--gray-700);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .chart-no-data {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Forms & Inputs */
@@ -1369,13 +1467,15 @@ tbody tr:hover {
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
   background: var(--gray-700);
-  border-color: var(--black);
-  color: var(--gray-200);
+  border-color: var(--gray-600);
+  color: var(--white);
 }
 
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
-  color: var(--gray-500);
+  /* Placeholder text stays a muted gray, not white. Only the typed input text
+     is white in dark theme; a white placeholder reads as real content. */
+  color: var(--gray-400);
 }
 
 [data-theme="dark"] input[type="password"]::-ms-reveal {
@@ -1383,7 +1483,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] label {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 /* Dark theme - Badges */
@@ -1404,7 +1504,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .badge-user {
   background-color: var(--gray-alpha-30);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .badge-banned {
@@ -1414,7 +1514,7 @@ tbody tr:hover {
 
 [data-theme="dark"] .badge-active {
   background-color: var(--gray-alpha-20);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Alerts */
@@ -1432,29 +1532,14 @@ tbody tr:hover {
   border-color: var(--red-alpha-30);
 }
 
-/* Dark theme - Period selection */
-[data-theme="dark"] .period-selection {
-  background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
+/* Dark theme - date range toolbar (select/input styling inherited from
+   the shared .control-bar dark rules; only page-specific bits remain) */
+[data-theme="dark"] .range-display {
+  color: var(--white);
 }
 
-[data-theme="dark"] .period-selection span {
-  color: var(--gray-300);
-}
-
-[data-theme="dark"] .period-btn {
-  background: var(--gray-700);
-  color: var(--gray-400);
-}
-
-[data-theme="dark"] .period-btn:hover {
-  background: var(--gray-600);
-}
-
-[data-theme="dark"] .period-btn.active {
-  background: var(--gray-600);
-  color: var(--gray-100);
-  border-color: var(--black);
+[data-theme="dark"] .range-custom input[type="date"] {
+  color-scheme: dark;
 }
 
 /* Dark theme - Login */
@@ -1463,44 +1548,42 @@ tbody tr:hover {
   box-shadow: 0 4px 6px var(--overlay-light);
 }
 
+[data-theme="dark"] .login-header h1 {
+  color: var(--white);
+}
+
 /* Dark theme - 2FA */
 [data-theme="dark"] .secret-key {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .verification-heading {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .verification-code,
 [data-theme="dark"] .verification-input {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
-/* Dark theme - Data info / No data */
-[data-theme="dark"] .data-info {
-  background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
-  border-color: var(--gray-600);
-  color: var(--gray-400);
-}
-
+/* Dark theme - No data */
 [data-theme="dark"] .no-data {
-  color: var(--gray-400);
+  color: var(--white);
   background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-800) 100%);
   border-color: var(--gray-600);
 }
 
 [data-theme="dark"] .no-data h3 {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .no-data code {
   background: var(--gray-700);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Scrollbar */
@@ -1516,41 +1599,16 @@ tbody tr:hover {
   background: var(--gray-500);
 }
 
-/* Dark theme - Filters bar (payments) */
-[data-theme="dark"] .filters-bar {
-  background: var(--gray-800);
-  border-color: var(--black);
-  box-shadow: 0 1px 3px var(--overlay-light);
-}
-
-/* Dark theme - Env toggle (payments) */
-[data-theme="dark"] .env-toggle-bar {
-  background: var(--gray-700);
-}
-
-[data-theme="dark"] .env-toggle-btn {
-  color: var(--gray-400);
-}
-
-[data-theme="dark"] .env-toggle-btn:hover {
-  color: var(--gray-200);
-}
-
-[data-theme="dark"] .env-toggle-btn.active {
-  background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
-}
-
 [data-theme="dark"] .section-tabs {
   border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .section-tab {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .section-tab:hover {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Payment status badges */
@@ -1576,7 +1634,7 @@ tbody tr:hover {
 [data-theme="dark"] .badge-invoice-draft,
 [data-theme="dark"] .badge-invoice-cancelled {
   background: var(--gray-alpha-20);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .badge-invoice-sent {
@@ -1625,16 +1683,16 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .detail-section-title {
-  color: var(--gray-300);
+  color: var(--white);
   border-bottom-color: var(--black);
 }
 
 [data-theme="dark"] .detail-label {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .detail-value {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .provider-card {
@@ -1652,11 +1710,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .provider-card-name {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .provider-card-status {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .expandable-row:hover {
@@ -1674,24 +1732,24 @@ tbody tr:hover {
 
 [data-theme="dark"] .provider-badge.disconnected {
   background-color: var(--gray-alpha-20);
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 /* Dark theme - Result count */
 [data-theme="dark"] .result-count {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Btn outline */
 [data-theme="dark"] .btn-outline {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
   border-color: var(--black);
 }
 
 [data-theme="dark"] .btn-outline:hover {
   background: var(--gray-600);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Badge method */
@@ -1702,19 +1760,19 @@ tbody tr:hover {
 
 /* Dark theme - License page */
 [data-theme="dark"] .form-group label {
-  color: var(--gray-300);
+  color: var(--white);
 }
 
 [data-theme="dark"] .form-group small {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .form-group input,
 [data-theme="dark"] .form-group select,
 [data-theme="dark"] .form-group textarea {
   background: var(--gray-700);
-  border-color: var(--black);
-  color: var(--gray-200);
+  border-color: var(--gray-600);
+  color: var(--white);
 }
 
 [data-theme="dark"] .key-display {
@@ -1744,20 +1802,20 @@ tbody tr:hover {
 
 [data-theme="dark"] .badge-expired {
   background: var(--gray-alpha-20);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .usage-count {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .usage-na {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .btn-secondary {
   background: var(--gray-700);
-  color: var(--gray-200);
+  color: var(--white);
   border-color: var(--black);
 }
 
@@ -1775,24 +1833,24 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .modal-header h3 {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-close {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-close:hover {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-body p {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-note {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .modal-footer {
@@ -1801,7 +1859,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] #modalTitle {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Referral links page */
@@ -1810,7 +1868,7 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] table td {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] table tbody tr:hover {
@@ -1835,7 +1893,7 @@ tbody tr:hover {
 /* Dark theme - Reports page */
 [data-theme="dark"] .reports-table {
   background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
+  box-shadow: 0 1px 3px var(--shadow-default);
 }
 
 [data-theme="dark"] .report-row {
@@ -1843,20 +1901,20 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .report-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .report-id {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .report-meta-row {
-  color: var(--gray-500);
+  color: var(--white);
 }
 
 [data-theme="dark"] .content-preview {
   background: var(--gray-800);
-  color: var(--gray-400);
+  color: var(--white);
   border-left-color: var(--gray-600);
 }
 
@@ -1864,28 +1922,15 @@ tbody tr:hover {
   background: linear-gradient(transparent, var(--gray-800));
 }
 
-[data-theme="dark"] .status-badges .status-badge {
-  background: var(--gray-800);
-  box-shadow: 0 1px 3px var(--overlay-light);
-}
-
-[data-theme="dark"] .status-badge-label {
-  color: var(--gray-400);
-}
-
-[data-theme="dark"] .status-badge-count {
-  color: var(--gray-100);
-}
-
 /* Dark theme - Filter groups */
 [data-theme="dark"] .filter-group select {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .filter-group label {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 
@@ -1900,23 +1945,23 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .card-header h2 {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 [data-theme="dark"] .search-input {
   background: var(--gray-700);
   border-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .clear-button {
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .clear-button:hover {
   background: var(--gray-600);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 /* Dark theme - Bulk actions (users) */
@@ -1926,23 +1971,23 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .selection-info {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Dashboard chart cards */
 [data-theme="dark"] .chart-card {
   background: var(--gray-800);
-  border-color: var(--black);
+  border-color: var(--gray-700);
   box-shadow: 0 4px 6px var(--shadow-xl);
 }
 
 [data-theme="dark"] .chart-card-title {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Search results */
 [data-theme="dark"] .search-results {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - Checkboxes */
@@ -1961,7 +2006,7 @@ tbody tr:hover {
 
 /* Dark theme - Dashboard hero */
 [data-theme="dark"] .hero-section h1 {
-  color: var(--gray-100);
+  color: var(--white);
 }
 
 /* Dark theme - Env toggle production/sandbox */
@@ -1980,12 +2025,12 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .bulk-actions-container .selection-info {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* Dark theme - App stats inline styles */
 [data-theme="dark"] .section-title {
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .error-details-table {
@@ -1995,12 +2040,12 @@ tbody tr:hover {
 
 [data-theme="dark"] .error-details-table th {
   background: var(--gray-800);
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 [data-theme="dark"] .error-details-table td {
   border-bottom-color: var(--black);
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 [data-theme="dark"] .error-details-table tr:hover {
@@ -2012,30 +2057,77 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .error-details-table td.error-source {
-  color: var(--gray-400);
+  color: var(--white);
 }
 
 /* ─── Pagination Controls ─── */
 .pagination-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 12px 16px;
-  gap: 4px;
+  gap: 12px;
   position: relative;
+  flex-wrap: wrap;
 }
 
-.pg-rows-selector.filter-group {
-  position: absolute;
-  left: 16px;
+/* Left cluster: "1-N of M" summary, a divider, then the rows-per-page select,
+   mirroring the desktop app's table footer. */
+.pg-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pg-summary {
+  font-size: 13px;
+  color: var(--admin-text);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.pg-divider {
+  width: 1px;
+  height: 16px;
+  background: var(--gray-border);
+}
+
+.pg-rows-selector {
+  display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
-.pg-rows-selector.filter-group select {
+.pg-rows-selector label {
+  font-size: 13px;
+  color: var(--admin-text);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.pg-rows-selector select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   min-width: auto;
-  width: 4.5rem;
+  padding: 5px 28px 5px 10px;
+  border: 1px solid var(--gray-border);
+  border-radius: 6px;
+  background-color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  color: var(--admin-text);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .pg-rows-selector select {
+  background-color: var(--gray-700);
+  border-color: var(--gray-600, #4b5563);
+  color: var(--white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
 .pg-nav {
@@ -2055,7 +2147,7 @@ tbody tr:hover {
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: var(--dark-gray, #374151);
+  color: var(--admin-text);
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -2069,7 +2161,7 @@ tbody tr:hover {
 
 .pg-arrow:hover:not(:disabled),
 .pg-num:hover:not(.pg-active) {
-  background: var(--neutral-ddd, #e5e7eb);
+  background: var(--neutral-ddd, var(--gray-border));
 }
 
 .pg-arrow:disabled {
@@ -2089,13 +2181,13 @@ tbody tr:hover {
   justify-content: center;
   min-width: 32px;
   height: 36px;
-  color: var(--gray-500);
+  color: var(--admin-text);
   font-size: 0.9rem;
 }
 
 [data-theme="dark"] .pg-arrow,
 [data-theme="dark"] .pg-num {
-  color: var(--gray-300, #d1d5db);
+  color: var(--white);
 }
 
 [data-theme="dark"] .pg-arrow:hover:not(:disabled),
@@ -2138,7 +2230,7 @@ tbody tr:hover {
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
-    color: var(--black);
+    color: var(--admin-text);
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
     transition: color 0.2s, border-color 0.2s;
@@ -2146,7 +2238,7 @@ tbody tr:hover {
 }
 
 .section-tab:hover {
-    color: var(--black);
+    color: var(--admin-text);
 }
 
 .section-tab.active {
@@ -2167,11 +2259,11 @@ tbody tr:hover {
 }
 
 [data-theme="dark"] .section-tab {
-    color: var(--gray-400);
+    color: var(--white);
 }
 
 [data-theme="dark"] .section-tab:hover {
-    color: var(--gray-200);
+    color: var(--white);
 }
 
 [data-theme="dark"] .section-tab.active {
@@ -2210,4 +2302,136 @@ tbody tr:hover {
     /* accent-color tints the native checkbox in both light and dark themes
        without needing a fully custom appearance: none implementation. */
     accent-color: var(--primary-blue);
+}
+
+/* ─── Control bar ─────────────────────────────────────────────────────────
+   Canonical filter/toggle bar shared by every admin page (period pills,
+   group-by toggles, source dropdowns, search, date ranges). Put all page
+   filter controls in a .control-bar so they look identical site-wide.
+
+   Structure:
+     <div class="control-bar">
+       <div class="control-group">
+         <span class="control-label">Period:</span>
+         <div class="control-pills">
+           <a class="control-pill active">Last 30 days</a> ...
+         </div>
+       </div>
+       <div class="control-group control-spacer">   (push to the right)
+         <span class="control-label">Source:</span>
+         <select class="control-select"> ... </select>
+       </div>
+     </div>
+   Pills work as <a>, <button>, or <span>. Use .control-select / .control-input
+   for dropdowns / text / date inputs that belong in the same bar.        */
+
+.control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px 30px;
+    margin-bottom: 30px;
+    padding: 15px;
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--shadow-default);
+    border: 1px solid var(--gray-200);
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Pushes a group (and everything after it) to the right edge of the bar. */
+.control-spacer {
+    margin-left: auto;
+}
+
+.control-label {
+    font-weight: 600;
+    color: var(--admin-text);
+    white-space: nowrap;
+}
+
+.control-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.control-pill {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--admin-text);
+    background: var(--gray-bg-light);
+    font: inherit;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.control-pill:hover {
+    background: var(--gray-border);
+}
+
+.control-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+.control-select,
+.control-input {
+    padding: 8px 12px;
+    border: 1px solid var(--gray-border);
+    border-radius: 6px;
+    color: var(--admin-text);
+    background: var(--gray-bg-light);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.control-input {
+    cursor: text;
+}
+
+.control-select:focus,
+.control-input:focus {
+    outline: none;
+    border-color: var(--blue-500);
+}
+
+[data-theme="dark"] .control-bar {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+[data-theme="dark"] .control-label {
+    color: var(--white);
+}
+
+[data-theme="dark"] .control-pill {
+    background: var(--gray-700);
+    color: var(--white);
+}
+
+[data-theme="dark"] .control-pill:hover {
+    background: var(--gray-600);
+}
+
+[data-theme="dark"] .control-pill.active {
+    background: var(--blue-500);
+    color: var(--white);
+}
+
+[data-theme="dark"] .control-select,
+[data-theme="dark"] .control-input {
+    background: var(--gray-700);
+    color: var(--white);
+    border-color: var(--gray-600);
 }

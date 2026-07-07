@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-01',
 
-  'updated' => '2026-06-01',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -67,6 +67,7 @@ HTML,
 <li><strong>A photo and a folder.</strong> The free, no-tool version. Snap the receipt with your phone into a labelled folder. It keeps the image as proof, but you still type the numbers in later, so it only works at low volume.</li>
 <li><strong>A receipt-scanning app.</strong> The real upgrade. You photograph the receipt and the app reads the supplier, date, total, and tax, then files it as an expense with the image attached, no typing. For a business doing more than a handful of receipts a week, this is the difference between expense tracking taking minutes a month and taking an evening. The guide on the <a href="/best-free-ai-receipt-scanner/">best free AI receipt scanners</a> covers the options.</li>
 </ul>
+{{illustration:receipt-scan}}
 <p>The principle is the same whichever you use: capture at the point of sale, not at month-end. A receipt scanned in the car takes two seconds. The same receipt reconstructed from memory in April takes ten minutes and is probably wrong. Capture-as-you-go is the single biggest reason a system works or fails.</p>
 HTML,
     ],
@@ -105,6 +106,7 @@ HTML,
       'html' => <<<'HTML'
 <p>If you've done the four habits, tax time isn't a project, it's a button. Your expenses are captured, categorized, checked against the bank, and the receipts are attached. The report your accountant needs, total expenses broken down by category, already exists.</p>
 <p>This is where dropping the spreadsheet pays off most. With a spreadsheet, the year-end report is more typing and a final round of error-hunting. With a system that's been current all year, the categories are already totalled, and you, or your accountant, just read them off. Accountants bill by the hour, so handing over clean, categorized totals with receipts available is the cheapest way to do tax time, often by hundreds of dollars.</p>
+{{illustration:coins}}
 <p>The receipts matter here too. Tax authorities in most countries want the original kept, and a scan stored alongside the record means that if you're ever asked to back up a claim, the proof is already filed, not faded to nothing in a drawer. Captured-as-you-go, your records and your proof are the same thing.</p>
 HTML,
     ],

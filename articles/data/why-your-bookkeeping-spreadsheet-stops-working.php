@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 12,
 
@@ -54,6 +54,7 @@ HTML,
 <li><strong>A sort that scrambled the rows.</strong> You sort one column without expanding the selection, and the amounts no longer line up with the dates or categories they belonged to.</li>
 <li><strong>A transposed digit.</strong> $540 entered as $450. The formula faithfully totals the wrong number.</li>
 </ul>
+{{illustration:spreadsheet-to-books}}
 <p><strong>The signal:</strong> the spreadsheet's totals don't match your bank, and you can't immediately find why. Or worse, you've stopped checking, so you don't know whether they match at all. A nagging sense that you can't quite trust the bottom line is the warning sign here, and it's worth taking seriously.</p>
 <p><strong>The fix:</strong> the discipline fix is to check your records against the bank every month, line by line, so a broken total gets caught while it's small. That works, but it's exactly the tedious job people skip. The structural fix is a tool where totals can't drift, because there's no formula range to break, and which checks your records against the bank for you and flags what doesn't match. If you've been bitten by a silent miscalculation once, you'll understand why this category, more than any other, is the one that pushes people off spreadsheets.</p>
 HTML,

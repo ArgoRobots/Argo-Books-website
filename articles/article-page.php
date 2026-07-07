@@ -16,8 +16,9 @@
 //   <h2>            Related guides
 //   <h2>            Related articles (when $data['related_article_slugs'] non-empty)
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 require_once __DIR__ . '/../config/pricing.php';
+require_once __DIR__ . '/illustrations.php';
 
 // --- 1. Sanitize the slug -----------------------------------------------------
 
@@ -68,6 +69,19 @@ $page_title = $data['meta_title'] ?? ($data['h1'] . ' | Argo Books');
 $page_description = $data['meta_description'] ?? '';
 $canonical_url = 'https://argorobots.com/' . $slug . '/';
 
+// Reading time, computed from the actual body (intro + sections + FAQ text) at
+// ~220 words per minute, rounded up. This replaces the hand-set
+// reading_time_min field so the badge always matches the real length.
+$reading_text = (string) ($data['intro_html'] ?? '');
+foreach ($data['sections'] as $sec) {
+    $reading_text .= ' ' . (string) ($sec['html'] ?? '');
+}
+foreach (($data['faqs'] ?? []) as $faq) {
+    $reading_text .= ' ' . (string) ($faq['q'] ?? '') . ' ' . (string) ($faq['a'] ?? '');
+}
+$reading_text = preg_replace('/\{\{illustration:[a-z0-9-]+\}\}/', ' ', $reading_text);
+$reading_time_min = max(1, (int) ceil(str_word_count(strip_tags($reading_text)) / 220));
+
 // --- 5. JSON-LD ---------------------------------------------------------------
 
 $schema_type = $data['schema_type'] ?? 'Article';
@@ -81,7 +95,14 @@ $base_schema = [
   'description' => $data['meta_description'] ?? '',
   'datePublished' => $published,
   'dateModified' => $updated,
-  'author' => ['@type' => 'Organization', 'name' => 'Argo Books', 'url' => 'https://argorobots.com/'],
+  'author' => [
+    '@type' => 'Person',
+    'name' => 'Evan',
+    'url' => 'https://argorobots.com/about-us/',
+    'jobTitle' => 'Founder',
+    'image' => 'https://argorobots.com/resources/images/founder.jpg',
+    'worksFor' => ['@type' => 'Organization', 'name' => 'Argo Books', 'url' => 'https://argorobots.com/'],
+  ],
   'publisher' => [
     '@type' => 'Organization',
     'name' => 'Argo Books',
@@ -126,6 +147,42 @@ $breadcrumb_schema_json = json_encode([
   '@type' => 'BreadcrumbList',
   'itemListElement' => $breadcrumb_items,
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+
+// FAQPage schema, emitted only when the article defines FAQs. Built from the
+// same q/a pairs rendered in the body below so the structured data and the
+// visible content stay in lockstep (Google requires the match for FAQ rich
+// results). Answers are plain text, so tags are stripped defensively.
+$faq_schema_json = null;
+if (!empty($data['faqs'])) {
+    $faq_entities = [];
+    foreach ($data['faqs'] as $faq) {
+        if (empty($faq['q']) || empty($faq['a'])) {
+            continue;
+        }
+        $faq_entities[] = [
+            '@type' => 'Question',
+            'name' => strip_tags(pricing_substitute($faq['q'])),
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => strip_tags(pricing_substitute($faq['a'])),
+            ],
+        ];
+    }
+    if (!empty($faq_entities)) {
+        $faq_schema_json = json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'mainEntity' => $faq_entities,
+        ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    }
+}
+
+// Layout has dedicated slots only for the primary + breadcrumb schema, so the
+// FAQ block rides along in $extra_head (echoed inside <head>).
+$extra_head = $extra_head ?? '';
+if ($faq_schema_json !== null) {
+    $extra_head .= "\n<script type=\"application/ld+json\">" . $faq_schema_json . "</script>";
+}
 
 // --- 6. Body ------------------------------------------------------------------
 
@@ -200,21 +257,52 @@ ob_start();
 
   <header class="article-head">
     <h1><?= htmlspecialchars($data['h1']) ?></h1>
-    <?php if (!empty($data['updated']) || !empty($data['reading_time_min'])): ?>
       <p class="article-meta">
         <?php if (!empty($data['updated'])): ?>
           <span class="article-updated">Updated <?= htmlspecialchars($data['updated']) ?></span>
         <?php endif; ?>
-        <?php if (!empty($data['reading_time_min'])): ?>
-          <span class="article-reading-time"><?= (int)$data['reading_time_min'] ?> min read</span>
-        <?php endif; ?>
+        <span class="article-reading-time"><?= $reading_time_min ?> min read</span>
       </p>
-    <?php endif; ?>
+    <div class="article-byline">
+      <img class="article-byline-avatar"
+           src="<?= INVGEN_BASE ?>/resources/images/founder.jpg"
+           alt="Evan, founder of Argo Books" width="44" height="44" loading="lazy">
+      <span class="article-byline-text">
+        By <a class="article-byline-name" href="<?= INVGEN_BASE ?>/about-us/">Evan</a>
+        <span class="article-byline-role">Founder, Argo Books</span>
+      </span>
+    </div>
   </header>
 
   <section class="article-intro">
     <?= article_tag_source(pricing_substitute($data['intro_html'] ?? ''), $invgen_ref) ?>
   </section>
+
+  <?php
+    // Table of contents, built from the section headings. The anchor fallback
+    // mirrors the section loop below so every link resolves. Skipped on very
+    // short articles where a TOC adds nothing.
+    $toc = [];
+    foreach ($data['sections'] as $i => $section) {
+        if (empty($section['h2'])) {
+            continue;
+        }
+        $toc[] = [
+            'anchor' => $section['anchor'] ?? ('section-' . ($i + 1)),
+            'label'  => $section['h2'],
+        ];
+    }
+  ?>
+  <?php if (count($toc) >= 2): ?>
+    <nav class="article-toc" aria-label="Table of contents">
+      <p class="article-toc-title">In this guide</p>
+      <ol class="article-toc-list">
+        <?php foreach ($toc as $t): ?>
+          <li><a href="#<?= htmlspecialchars($t['anchor']) ?>"><?= htmlspecialchars($t['label']) ?></a></li>
+        <?php endforeach; ?>
+      </ol>
+    </nav>
+  <?php endif; ?>
 
   <?php foreach ($data['sections'] as $i => $section): ?>
     <section class="article-section" id="<?= htmlspecialchars($section['anchor'] ?? ('section-' . ($i + 1))) ?>">
@@ -263,7 +351,7 @@ ob_start();
   <?php endif; ?>
 
   <section class="article-related-niches">
-    <h2>Related guides</h2>
+    <h2>Free invoice generators</h2>
     <?php
       $related_niche_slugs = array_values(array_filter(
         $data['related_niche_slugs'] ?? [],
@@ -318,7 +406,7 @@ ob_start();
 
 </article>
 <?php
-$body_content = article_apply_link_class(article_prefix_internal_links(ob_get_clean()));
+$body_content = article_expand_illustrations(article_apply_link_class(article_prefix_internal_links(ob_get_clean())));
 
 // Collapsible FAQ click handler. Same pattern as niches/niche-page.php.
 $extra_scripts = <<<'HTML'
@@ -345,7 +433,67 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 HTML;
 
-include __DIR__ . '/../invoice-generator/layout.php';
+// Group each email example (an optional "Subject:" paragraph + the <pre> body)
+// into one card and add a copy-to-clipboard button that copies subject + body.
+$extra_scripts .= <<<'HTML'
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('.article-section pre').forEach(function (pre) {
+    if (pre.closest('.email-example')) return;
+
+    var subject = null;
+    var prev = pre.previousElementSibling;
+    if (prev && prev.tagName === 'P' && /^\s*Subject:/i.test(prev.textContent)) {
+      subject = prev;
+    }
+
+    var wrap = document.createElement('div');
+    wrap.className = 'email-example';
+    pre.parentNode.insertBefore(wrap, subject || pre);
+    if (subject) { subject.classList.add('email-subject'); wrap.appendChild(subject); }
+    wrap.appendChild(pre);
+
+    // Build copy text before adding the button so its label isn't included.
+    var copyText = (subject ? subject.textContent.trim() + '\n\n' : '') + pre.innerText;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pre-copy-btn';
+    btn.setAttribute('aria-label', 'Copy to clipboard');
+    btn.textContent = 'Copy';
+    btn.addEventListener('click', function () {
+      var done = function () {
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function () { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(copyText).then(done).catch(function () {});
+      } else {
+        var ta = document.createElement('textarea');
+        ta.value = copyText;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+    });
+    wrap.appendChild(btn);
+  });
+});
+</script>
+HTML;
+
+// Editorial header nav for guide pages. Content/credibility links only,
+// deliberately no Pricing or buy CTA so the page reads as a blog, not a
+// funnel. The shared tool layout renders this only when it is set.
+$header_nav = [
+  ['label' => 'Guides',        'href' => 'guides/'],
+  ['label' => 'Docs',          'href' => 'documentation/'],
+  ['label' => 'About',         'href' => 'about-us/'],
+];
+
+include __DIR__ . '/../shared/layout.php';
 
 // -----------------------------------------------------------------------------
 
@@ -367,11 +515,12 @@ function article_apply_link_class(string $html): string
 }
 
 /**
- * Prefix INVGEN_BASE onto any root-absolute internal href that does not
- * already carry it. Lets article data files write friendly root paths
- * like `<a href="/net-30-vs-due-on-receipt/">` and have them resolve
- * correctly under Laragon's `/argo-books-website/...` mount point. On
- * production INVGEN_BASE is empty so this function is a no-op.
+ * Prefix INVGEN_BASE onto any root-absolute internal href or img src that does
+ * not already carry it. Lets article data files write friendly root paths
+ * like `<a href="/net-30-vs-due-on-receipt/">` or
+ * `<img src="/resources/images/foo.webp">` and have them resolve correctly
+ * under Laragon's `/argo-books-website/...` mount point. On production
+ * INVGEN_BASE is empty so this function is a no-op.
  *
  * Skipped: protocol-relative (`//cdn...`), absolute (`https://`),
  * fragment (`#x`), mailto, tel, and already-prefixed paths.
@@ -382,14 +531,32 @@ function article_prefix_internal_links(string $html): string
         return $html;
     }
     return preg_replace_callback(
-        '/\bhref="(\/[^"\/][^"]*)"/i',
+        '/\b(href|src)="(\/[^"\/][^"]*)"/i',
         function ($m) {
-            $path = $m[1];
+            $attr = $m[1];
+            $path = $m[2];
             if (strpos($path, INVGEN_BASE . '/') === 0 || $path === INVGEN_BASE) {
                 return $m[0];
             }
-            return 'href="' . INVGEN_BASE . $path . '"';
+            return $attr . '="' . INVGEN_BASE . $path . '"';
         },
+        $html
+    );
+}
+
+/**
+ * Expand {{illustration:name}} tokens in article body HTML to the reusable
+ * SVG figures defined in articles/illustrations.php. Runs as a final pass over
+ * the assembled body, mirroring the link-class / link-prefix passes.
+ */
+function article_expand_illustrations(string $html): string
+{
+    if (strpos($html, '{{illustration:') === false) {
+        return $html;
+    }
+    return preg_replace_callback(
+        '/\{\{illustration:([a-z0-9-]+)\}\}/',
+        fn($m) => article_illustration($m[1]),
         $html
     );
 }

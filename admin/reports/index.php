@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../resources/icons.php';
 
@@ -7,6 +7,11 @@ require_once __DIR__ . '/../../resources/icons.php';
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
     exit;
+}
+
+// CSRF token for the moderation actions posted to handle_report.php.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Set page variables for the header
@@ -124,48 +129,44 @@ include __DIR__ . '/../admin_header.php';
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Status badges -->
-<div class="status-badges">
-    <div class="status-badge pending">
-        <div class="status-badge-label">Pending</div>
-        <div class="status-badge-count"><?php echo $status_counts['pending']; ?></div>
+<!-- Summary Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card pending">
+        <h3>Pending</h3>
+        <div class="value"><?php echo $status_counts['pending']; ?></div>
     </div>
-    <div class="status-badge">
-        <div class="status-badge-label">Resolved</div>
-        <div class="status-badge-count"><?php echo $status_counts['resolved']; ?></div>
+    <div class="stat-card">
+        <h3>Resolved</h3>
+        <div class="value"><?php echo $status_counts['resolved']; ?></div>
     </div>
-    <div class="status-badge">
-        <div class="status-badge-label">Dismissed</div>
-        <div class="status-badge-count"><?php echo $status_counts['dismissed']; ?></div>
+    <div class="stat-card">
+        <h3>Dismissed</h3>
+        <div class="value"><?php echo $status_counts['dismissed']; ?></div>
     </div>
 </div>
 
 <!-- Filters -->
-<div class="filters-container">
-    <form method="GET" action="">
-        <div class="filters-row">
-            <div class="filter-group">
-                <label for="status">Status</label>
-                <select name="status" id="status" onchange="this.form.submit()">
-                    <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="resolved" <?php echo $status_filter === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
-                    <option value="dismissed" <?php echo $status_filter === 'dismissed' ? 'selected' : ''; ?>>Dismissed</option>
-                    <option value="all" <?php echo $status_filter === 'all' ? 'selected' : ''; ?>>All</option>
-                </select>
-            </div>
+<form method="GET" action="" class="control-bar">
+    <div class="control-group">
+        <span class="control-label">Status</span>
+        <select name="status" id="status" class="control-select" onchange="this.form.submit()">
+            <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
+            <option value="resolved" <?php echo $status_filter === 'resolved' ? 'selected' : ''; ?>>Resolved</option>
+            <option value="dismissed" <?php echo $status_filter === 'dismissed' ? 'selected' : ''; ?>>Dismissed</option>
+            <option value="all" <?php echo $status_filter === 'all' ? 'selected' : ''; ?>>All</option>
+        </select>
+    </div>
 
-            <div class="filter-group">
-                <label for="content_type">Content Type</label>
-                <select name="content_type" id="content_type" onchange="this.form.submit()">
-                    <option value="all" <?php echo $content_type_filter === 'all' ? 'selected' : ''; ?>>All</option>
-                    <option value="post" <?php echo $content_type_filter === 'post' ? 'selected' : ''; ?>>Posts</option>
-                    <option value="comment" <?php echo $content_type_filter === 'comment' ? 'selected' : ''; ?>>Comments</option>
-                    <option value="user" <?php echo $content_type_filter === 'user' ? 'selected' : ''; ?>>Users</option>
-                </select>
-            </div>
-        </div>
-    </form>
-</div>
+    <div class="control-group">
+        <span class="control-label">Content Type</span>
+        <select name="content_type" id="content_type" class="control-select" onchange="this.form.submit()">
+            <option value="all" <?php echo $content_type_filter === 'all' ? 'selected' : ''; ?>>All</option>
+            <option value="post" <?php echo $content_type_filter === 'post' ? 'selected' : ''; ?>>Posts</option>
+            <option value="comment" <?php echo $content_type_filter === 'comment' ? 'selected' : ''; ?>>Comments</option>
+            <option value="user" <?php echo $content_type_filter === 'user' ? 'selected' : ''; ?>>Users</option>
+        </select>
+    </div>
+</form>
 
 <!-- Reports list -->
 <div class="reports-table">
@@ -244,14 +245,14 @@ include __DIR__ . '/../admin_header.php';
                         <?php if ($report['reported_user_role'] !== 'admin'): ?>
                             <div class="action-group action-group-danger">
                                 <?php if ($report['content_type'] === 'user'): ?>
-                                    <button class="btn-small btn-warning" onclick="showResetUsernameModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username']); ?>')">Reset Username</button>
-                                    <button class="btn-small btn-warning" onclick="showClearBioModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username']); ?>')">Clear Bio</button>
+                                    <button class="btn-small btn-warning" onclick="showResetUsernameModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username'], ENT_QUOTES); ?>')">Reset Username</button>
+                                    <button class="btn-small btn-warning" onclick="showClearBioModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username'], ENT_QUOTES); ?>')">Clear Bio</button>
                                 <?php else: ?>
                                     <button class="btn-small btn-delete" onclick="handleReport(<?php echo $report['id']; ?>, 'delete', '<?php echo $report['content_type']; ?>', <?php echo $report['content_id']; ?>)">Delete</button>
                                 <?php endif; ?>
 
                                 <?php if ($report['reported_user_id']): ?>
-                                    <button class="btn-small btn-ban" onclick="showBanModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username']); ?>')">Ban User</button>
+                                    <button class="btn-small btn-ban" onclick="showBanModal(<?php echo $report['id']; ?>, <?php echo $report['reported_user_id']; ?>, '<?php echo htmlspecialchars($report['reported_user_username'], ENT_QUOTES); ?>')">Ban User</button>
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
@@ -390,6 +391,7 @@ include __DIR__ . '/../admin_header.php';
     </div>
 </div>
 
+<script>window.REPORTS_CSRF = <?php echo json_encode($_SESSION['csrf_token']); ?>;</script>
 <script src="reports.js"></script>
 
         </main>

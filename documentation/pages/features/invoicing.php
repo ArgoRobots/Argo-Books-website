@@ -106,9 +106,9 @@ include __DIR__ . '/../../docs-header.php';
                     <span class="nav-label">Previous</span>
                     <span class="nav-title">&larr; Expense/Revenue Tracking</span>
                 </a>
-                <a href="bank-matching.php" class="nav-button next">
+                <a href="bank-statement-import.php" class="nav-button next">
                     <span class="nav-label">Next</span>
-                    <span class="nav-title">Bank Matching &rarr;</span>
+                    <span class="nav-title">Bank Statement Import &rarr;</span>
                 </a>
             </div>
         </div>

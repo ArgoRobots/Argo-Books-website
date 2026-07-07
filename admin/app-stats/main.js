@@ -1290,8 +1290,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const dates = Object.keys(dailyStats).sort();
-    const avgDurations = dates.map((date) =>
-      Math.round(dailyStats[date].totalDuration / dailyStats[date].count)
+    // Convert average seconds to minutes (one decimal) for a more readable scale.
+    const avgDurations = dates.map(
+      (date) =>
+        Math.round(
+          dailyStats[date].totalDuration / dailyStats[date].count / 6
+        ) / 10
     );
 
     new Chart(document.getElementById("sessionDurationChart"), {
@@ -1300,7 +1304,7 @@ document.addEventListener("DOMContentLoaded", function () {
         labels: dates,
         datasets: [
           {
-            label: "Average Session Duration (seconds)",
+            label: "Average Session Duration (minutes)",
             data: avgDurations,
             backgroundColor: "#3b82f6",
             borderColor: "#2563eb",
@@ -1315,13 +1319,18 @@ document.addEventListener("DOMContentLoaded", function () {
           legend: {
             display: false,
           },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ctx.parsed.y + " min",
+            },
+          },
         },
         scales: {
           y: {
             beginAtZero: true,
             title: {
               display: true,
-              text: "Duration (seconds)",
+              text: "Duration (minutes)",
             },
           },
           x: {
@@ -1723,12 +1732,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const now = new Date();
-    const todayStr = now.toISOString().split("T")[0];
     const msPerDay = 86400000;
 
-    // Helper: date string YYYY-MM-DD from timestamp
+    // Local date string YYYY-MM-DD (not UTC). This dashboard is read in the
+    // admin's own timezone, so "today" and the day buckets must be local.
+    // toISOString() bucketed by UTC and shifted every axis label back a day for
+    // timezones west of UTC (e.g. today, Jun 29, rendered as Jun 28).
+    const toLocalDateStr = (ts) => {
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    };
+    // Format a YYYY-MM-DD bucket as an axis label, parsing it as a local date
+    // (T00:00:00) so it isn't shifted back a day.
+    const fmtDayLabel = (d) =>
+      new Date(d + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+    const todayStr = toLocalDateStr(now);
+
+    // Helper: date string YYYY-MM-DD from timestamp (local)
     function toDateStr(ts) {
-      return new Date(ts).toISOString().split("T")[0];
+      return toLocalDateStr(ts);
     }
 
     // Build user map: hashedIP -> { firstSeen, lastSeen, platform, country, appVersion, sessionCount, days }
@@ -1774,7 +1800,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     allUsers.forEach((ip) => {
       const u = userMap[ip];
-      if (u.lastSeen >= new Date(todayStr).getTime()) todayUsers.add(ip);
+      if (u.lastSeen >= new Date(todayStr + "T00:00:00").getTime()) todayUsers.add(ip);
       if (u.lastSeen >= sevenDaysAgo) weekUsers.add(ip);
       if (u.lastSeen >= thirtyDaysAgo) monthUsers.add(ip);
     });
@@ -1796,7 +1822,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const last30Dates = [];
     for (let i = 29; i >= 0; i--) {
       const d = new Date(now.getTime() - i * msPerDay);
-      last30Dates.push(d.toISOString().split("T")[0]);
+      last30Dates.push(toLocalDateStr(d));
     }
     const dauData = last30Dates.map((d) =>
       dailyUsers[d] ? dailyUsers[d].size : 0
@@ -1805,10 +1831,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("dauChart"), {
       type: "line",
       data: {
-        labels: last30Dates.map((d) => {
-          const dt = new Date(d);
-          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        }),
+        labels: last30Dates.map((d) => fmtDayLabel(d)),
         datasets: [
           {
             label: "Unique Users",
@@ -1895,10 +1918,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("newVsReturningChart"), {
       type: "bar",
       data: {
-        labels: last30Dates.map((d) => {
-          const dt = new Date(d);
-          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        }),
+        labels: last30Dates.map((d) => fmtDayLabel(d)),
         datasets: [
           {
             label: "New",
@@ -1990,10 +2010,7 @@ document.addEventListener("DOMContentLoaded", function () {
     new Chart(document.getElementById("avgSessionDurationChart"), {
       type: "bar",
       data: {
-        labels: last30Dates.map((d) => {
-          const dt = new Date(d);
-          return dt.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        }),
+        labels: last30Dates.map((d) => fmtDayLabel(d)),
         datasets: [
           {
             label: "Avg Duration (min)",
@@ -2063,7 +2080,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const dates = Object.keys(categoryByDate).sort().slice(-30);
-    const categoryArray = Array.from(categories).slice(0, 6);
+
     const categoryColors = [
       "#ef4444",
       "#f59e0b",
@@ -2071,7 +2088,28 @@ document.addEventListener("DOMContentLoaded", function () {
       "#10b981",
       "#8b5cf6",
       "#ec4899",
+      "#14b8a6",
+      "#f97316",
+      "#6366f1",
+      "#06b6d4",
+      "#84cc16",
+      "#a855f7",
     ];
+
+    // Rank categories by their total count over the shown window, so the most
+    // active categories are plotted, including ones that only appear recently
+    // (e.g. Network). Previously this kept the first six categories the data
+    // happened to mention, which silently dropped any later ones.
+    const categoryTotals = {};
+    Array.from(categories).forEach((cat) => {
+      categoryTotals[cat] = dates.reduce(
+        (sum, date) => sum + (categoryByDate[date]?.[cat] || 0),
+        0
+      );
+    });
+    const categoryArray = Array.from(categories)
+      .sort((a, b) => categoryTotals[b] - categoryTotals[a])
+      .slice(0, categoryColors.length);
 
     const datasets = categoryArray.map((category, index) => ({
       label: category,

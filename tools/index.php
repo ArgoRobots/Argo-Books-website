@@ -20,6 +20,14 @@ if (PHP_SAPI !== 'cli') {
 // svg_icon() set and the about-us feature-icon color variants.
 $tools = [
     [
+        'name'        => 'Free Receipt Scanner',
+        'description' => 'Snap or upload a receipt and get every line item, each tax line, and the total in seconds. No signup, nothing stored.',
+        'href'        => '../free-receipt-scanner/',
+        'cta'         => 'Open the scanner',
+        'icon'        => 'receipt',
+        'icon_class'  => '',
+    ],
+    [
         'name'        => 'Free Profit Analyzer',
         'description' => 'Upload a spreadsheet and instantly see where your business is losing money: fees, unprofitable products, and your true margin. No signup.',
         'href'        => '../profit-analyzer/',

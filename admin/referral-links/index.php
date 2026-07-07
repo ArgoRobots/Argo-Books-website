@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../country_names.php';
 
@@ -45,10 +45,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name = trim($_POST['name']);
             $description = trim($_POST['description']);
             $target_url = trim($_POST['target_url']);
-            $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-            $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ?, is_active = ? WHERE id = ?');
-            $stmt->execute([$name, $description, $target_url, $is_active, $id]);
+            $stmt = $pdo->prepare('UPDATE referral_links SET name = ?, description = ?, target_url = ? WHERE id = ?');
+            $stmt->execute([$name, $description, $target_url, $id]);
 
             $_SESSION['success_message'] = 'Referral link updated successfully!';
             header('Location: index.php');
@@ -149,7 +148,7 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
             FROM referral_visits rv
             INNER JOIN referral_links rl ON rl.source_code = rv.source_code
             WHERE rv.source_code = ?
-            GROUP BY period
+            GROUP BY period, display_period
             ORDER BY period DESC
             LIMIT ?";
 
@@ -164,7 +163,7 @@ function get_visits_over_time($period = 'day', $limit = 30, $source_code = null)
                 SUM(CASE WHEN rv.converted = 1 THEN 1 ELSE 0 END) as conversions
             FROM referral_visits rv
             INNER JOIN referral_links rl ON rl.source_code = rv.source_code
-            GROUP BY period
+            GROUP BY period, display_period
             ORDER BY period DESC
             LIMIT ?";
 
@@ -231,6 +230,9 @@ function referral_category_key($source_code)
     if (strncmp($code, 'ai-', 3) === 0) {
         return 'ai';
     }
+    if (strncmp($code, 'dir-', 4) === 0) {
+        return 'directory';
+    }
     return 'other';
 }
 
@@ -254,10 +256,11 @@ $category_labels = [
     'website' => 'My website (guides & articles)',
     'social'  => 'Social media',
     'youtube' => 'YouTube',
-    'ai'      => 'AI assistants',
-    'other'   => 'Other',
+    'ai'        => 'AI assistants',
+    'directory' => 'Directories (launch & SaaS sites)',
+    'other'     => 'Other',
 ];
-$category_order = ['paid', 'website', 'social', 'youtube', 'ai', 'other'];
+$category_order = ['paid', 'website', 'social', 'youtube', 'ai', 'directory', 'other'];
 
 // Bucket every referral link by category and tally per-category subtotals.
 $grouped_links = [];
@@ -347,6 +350,36 @@ include __DIR__ . '/../admin_header.php';
         </div>
     <?php endif; ?>
 
+    <!-- Controls: group-by toggle + time period selector, combined into one bar -->
+    <div class="control-bar">
+        <div class="control-group">
+            <span class="control-label">Group by:</span>
+            <div class="control-pills">
+                <a href="?group=source&amp;period=<?php echo htmlspecialchars($period); ?>"
+                   class="control-pill <?php echo $group_mode === 'source' ? 'active' : ''; ?>">By source</a>
+                <a href="?group=category&amp;period=<?php echo htmlspecialchars($period); ?>"
+                   class="control-pill <?php echo $group_mode === 'category' ? 'active' : ''; ?>">By category</a>
+            </div>
+        </div>
+        <div class="control-group">
+            <span class="control-label">Time period:</span>
+            <div class="control-pills">
+                <?php
+                $periods = [
+                    'day' => 'Daily',
+                    'week' => 'Weekly',
+                    'month' => 'Monthly'
+                ];
+
+                foreach ($periods as $periodKey => $periodName) {
+                    $activeClass = ($period === $periodKey) ? 'active' : '';
+                    echo "<a href=\"?period={$periodKey}&amp;group={$group_mode}\" class=\"control-pill {$activeClass}\">{$periodName}</a>";
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+
     <!-- Summary Statistics Cards -->
     <div class="stats-grid">
         <div class="stat-card">
@@ -368,36 +401,6 @@ include __DIR__ . '/../admin_header.php';
             <h3>Active Sources</h3>
             <div class="value"><?php echo count($visits_by_source); ?></div>
             <div class="subtext">referral sources</div>
-        </div>
-    </div>
-
-    <!-- Group-by toggle: flips the breakdown charts + table between per-source and per-category -->
-    <div class="group-toggle">
-        <span>Group by:</span>
-        <div class="group-toggle-buttons">
-            <a href="?group=source&amp;period=<?php echo htmlspecialchars($period); ?>"
-               class="group-btn <?php echo $group_mode === 'source' ? 'active' : ''; ?>">By source</a>
-            <a href="?group=category&amp;period=<?php echo htmlspecialchars($period); ?>"
-               class="group-btn <?php echo $group_mode === 'category' ? 'active' : ''; ?>">By category</a>
-        </div>
-    </div>
-
-    <!-- Period selection for time series chart -->
-    <div class="period-selection">
-        <span>Time Period:</span>
-        <div class="period-buttons">
-            <?php
-            $periods = [
-                'day' => 'Daily',
-                'week' => 'Weekly',
-                'month' => 'Monthly'
-            ];
-
-            foreach ($periods as $periodKey => $periodName) {
-                $activeClass = ($period === $periodKey) ? 'active' : '';
-                echo "<a href=\"?period={$periodKey}&amp;group={$group_mode}\" class=\"period-btn {$activeClass}\">{$periodName}</a>";
-            }
-            ?>
         </div>
     </div>
 
@@ -453,7 +456,6 @@ include __DIR__ . '/../admin_header.php';
                         <th>Visits</th>
                         <th>Conversions</th>
                         <th>Rate</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -471,7 +473,7 @@ include __DIR__ . '/../admin_header.php';
                     ?>
                     <tbody class="category-group<?php echo $collapsed ? ' collapsed' : ''; ?>" data-cat="<?php echo htmlspecialchars($ckey); ?>">
                         <tr class="category-header" role="button" tabindex="0" aria-expanded="<?php echo $collapsed ? 'false' : 'true'; ?>">
-                            <td colspan="9">
+                            <td colspan="8">
                                 <span class="cat-caret" aria-hidden="true">&#9656;</span>
                                 <span class="cat-name"><?php echo htmlspecialchars($category_labels[$ckey]); ?></span>
                                 <span class="cat-meta"><?php echo count($clinks); ?> source<?php echo count($clinks) === 1 ? '' : 's'; ?>
@@ -490,14 +492,9 @@ include __DIR__ . '/../admin_header.php';
                                 <td><?php echo number_format($link['total_visits']); ?></td>
                                 <td><?php echo number_format($link['conversions']); ?></td>
                                 <td><?php echo $conv_rate; ?>%</td>
-                                <td>
-                                    <span class="status-badge <?php echo $link['is_active'] ? 'status-active' : 'status-inactive'; ?>">
-                                        <?php echo $link['is_active'] ? 'Active' : 'Inactive'; ?>
-                                    </span>
-                                </td>
-                                <td class="action-buttons">
-                                    <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-small btn-blue" title="Edit">Edit</button>
-                                    <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-small btn-red" title="Delete">Delete</button>
+                                <td class="actions-cell">
+                                    <button onclick="editLink(<?php echo htmlspecialchars(json_encode($link)); ?>)" class="btn-icon" title="Edit" aria-label="Edit"><?php echo svg_icon('pencil', 16); ?></button>
+                                    <button onclick="deleteLink(<?php echo $link['id']; ?>)" class="btn-icon" title="Delete" aria-label="Delete"><?php echo svg_icon('trash', 16); ?></button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -541,13 +538,6 @@ include __DIR__ . '/../admin_header.php';
                 <label for="target_url">Target URL *</label>
                 <input type="url" name="target_url" id="target_url" required>
                 <small>The page users will land on (usually your homepage)</small>
-            </div>
-
-            <div class="form-group checkbox-group" id="activeCheckboxGroup" style="display: none;">
-                <label>
-                    <input type="checkbox" name="is_active" id="is_active" value="1" checked>
-                    Active
-                </label>
             </div>
 
             <div class="form-actions">
@@ -822,7 +812,6 @@ include __DIR__ . '/../admin_header.php';
         document.getElementById('formAction').value = 'create';
         document.getElementById('modalTitle').textContent = 'Create Referral Link';
         document.getElementById('source_code').removeAttribute('readonly');
-        document.getElementById('activeCheckboxGroup').style.display = 'none';
     }
 
     function editLink(link) {
@@ -833,8 +822,6 @@ include __DIR__ . '/../admin_header.php';
         document.getElementById('name').value = link.name;
         document.getElementById('description').value = link.description;
         document.getElementById('target_url').value = link.target_url;
-        document.getElementById('is_active').checked = link.is_active == 1;
-        document.getElementById('activeCheckboxGroup').style.display = 'block';
         document.getElementById('modalTitle').textContent = 'Edit Referral Link';
         openModal();
     }

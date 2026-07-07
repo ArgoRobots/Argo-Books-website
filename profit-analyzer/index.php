@@ -4,7 +4,7 @@
 // Tool-isolated (own CSS, no main site header/footer): a focused, one-way
 // conversion funnel into Argo Books, matching the approved design mockup.
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 
 if (PHP_SAPI !== 'cli') {
     require_once __DIR__ . '/../statistics.php';
@@ -59,7 +59,6 @@ $schema = json_encode([
     <div class="links">
       <a href="#how">How it works</a>
       <a href="#trust">Privacy</a>
-      <a class="btn btn-primary" href="<?= $cta ?>">Try Argo free</a>
     </div>
   </div>
 </nav>

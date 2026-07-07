@@ -306,6 +306,7 @@ CREATE TABLE IF NOT EXISTS premium_subscriptions (
     email VARCHAR(100) DEFAULT NULL,
     billing_cycle ENUM('monthly', 'yearly') NOT NULL DEFAULT 'monthly',
     amount DECIMAL(10,2) NOT NULL,
+    signup_base_price DECIMAL(10,2) DEFAULT NULL COMMENT 'Base price (pre-processing-fee) locked at signup/cycle-switch. Renewals charge this so raising the env price never re-prices existing customers. NULL falls back to the current env price.',
     currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
@@ -350,7 +351,11 @@ CREATE TABLE IF NOT EXISTS premium_subscription_payments (
     INDEX idx_status (status),
     INDEX idx_created_at (created_at),
     INDEX idx_payment_type (payment_type),
-    INDEX idx_env_status_created (environment, status, created_at)
+    INDEX idx_env_status_created (environment, status, created_at),
+    -- Prevents a concurrent duplicate gateway/webhook delivery from recording
+    -- the same transaction twice (and double-extending end_date). NULLs allowed
+    -- (failed/credit rows use NULL), and MySQL permits multiple NULLs.
+    UNIQUE KEY uq_transaction_id (transaction_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Premium Subscription Keys table (free/promo keys)
@@ -1068,6 +1073,28 @@ CREATE TABLE IF NOT EXISTS outreach_shopify_candidates (
     INDEX idx_lead (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Candidate roundup/listicle articles for the Editorial outreach channel. One
+-- row per article URL (identity is the article, not the outlet), tracking
+-- fitness + dedup so discovery re-runs skip already-imported articles. Mirrors
+-- outreach_shopify_candidates.
+CREATE TABLE IF NOT EXISTS outreach_editorial_candidates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    canonical_url VARCHAR(500) NOT NULL,
+    status ENUM('imported','rejected','error','pending') NOT NULL DEFAULT 'pending',
+    reject_reason VARCHAR(100) DEFAULT NULL,
+    reject_detail VARCHAR(500) DEFAULT NULL,
+    outlet_name VARCHAR(150) DEFAULT NULL,
+    author_name VARCHAR(120) DEFAULT NULL,
+    harvested_email VARCHAR(255) DEFAULT NULL,
+    lead_id INT DEFAULT NULL,
+    last_query VARCHAR(255) DEFAULT NULL,
+    checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_canonical_url (canonical_url),
+    INDEX idx_status_checked (status, checked_at),
+    INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- 14-day cache of SerpAPI organic-results responses. The Shopify discovery
 -- cron rotates through ~12 dork queries on a daily schedule, and Google's
 -- site:myshopify.com results for these queries change slowly. Caching cuts
@@ -1168,7 +1195,7 @@ CREATE TABLE IF NOT EXISTS reddit_threads (
     comment_count INT DEFAULT 0,
     posted_at DATETIME DEFAULT NULL,
     discovered_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    discovery_source ENUM('watchlist','keyword','both') NOT NULL DEFAULT 'watchlist',
+    discovery_source ENUM('watchlist','keyword','both','manual') NOT NULL DEFAULT 'watchlist',
     matched_keywords JSON DEFAULT NULL,
     rules_score INT DEFAULT 0,
     ai_relevance TINYINT DEFAULT NULL COMMENT '0-10 or NULL if not checked',
@@ -1263,7 +1290,42 @@ INSERT IGNORE INTO reddit_subreddits (name, notes) VALUES
     ('sweatystartup', 'service-business owners'),
     ('microsaas', 'indie SaaS founders: invoicing + subscription accounting'),
     ('graphic_design', 'designers with invoicing pain'),
-    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking');
+    ('AmazonSeller', 'Amazon sellers: inventory + fees tracking'),
+    -- Expanded watchlist: more small-business owner / freelancer / service-biz
+    -- communities. Low-yield or high-removal subs auto-disable over time.
+    ('EntrepreneurRideAlong', 'early founders sharing the journey'),
+    ('startups', 'startup founders'),
+    ('smallbiz', 'small-business owners'),
+    ('selfemployed', 'self-employed / sole proprietors'),
+    ('Upwork', 'freelancers: client invoicing pain'),
+    ('Fiverr', 'freelancers / gig sellers'),
+    ('freelanceWriters', 'freelance writers: invoicing'),
+    ('WorkOnline', 'online earners / side income'),
+    ('digitalnomad', 'location-independent freelancers'),
+    ('SaaS', 'indie SaaS founders: subscription accounting'),
+    ('QuickBooks', 'QuickBooks users: strong switch-intent'),
+    ('Accounting', 'software-rec questions surface here, tune carefully'),
+    ('tax', 'US tax + software questions'),
+    ('cantax', 'Canadian tax: strong local fit'),
+    ('Contractor', 'contractors: invoicing + job costing'),
+    ('HVAC', 'HVAC business owners, tune carefully'),
+    ('lawncare', 'lawn-care operators'),
+    ('landscaping', 'landscaping businesses'),
+    ('pressurewashing', 'new service-biz owners'),
+    ('cleaningbusiness', 'cleaning-business owners'),
+    ('photography', 'photographers: client invoicing'),
+    ('WeddingPhotography', 'wedding pros: deposits + invoicing'),
+    ('videography', 'videographers: project invoicing'),
+    ('personaltraining', 'solo trainers: client billing'),
+    ('RealEstate', 'agents: expense tracking'),
+    ('realtors', 'realtors: expense + commission tracking'),
+    ('dropship', 'dropshippers: fees + bookkeeping'),
+    ('FulfillmentByAmazon', 'FBA sellers: fees + inventory'),
+    ('Etsy', 'broader Etsy community'),
+    ('Handmade', 'makers selling handmade'),
+    ('foodtrucks', 'food-truck owners'),
+    ('restaurateur', 'restaurant owners'),
+    ('nonprofit', 'nonprofit bookkeeping needs');
 
 INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('bookkeeping software', 'broad intent'),
@@ -1298,7 +1360,16 @@ INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('vendor tracking software', 'supplier mgmt'),
     -- General SMB / self-employed
     ('self-employed accounting', 'self-employed broad intent'),
-    ('sole proprietor taxes', 'sole proprietor pain');
+    ('sole proprietor taxes', 'sole proprietor pain'),
+    -- Expanded keyword pool: switch-intent, price pain, and broad SMB intent
+    ('xero alternative', 'switch-intent from Xero'),
+    ('free accounting software', 'price-sensitive new businesses'),
+    ('best accounting software small business', 'broad SMB intent'),
+    ('quickbooks too expensive', 'price pain / switch-intent'),
+    ('quickbooks self employed', 'switch-intent from QBSE'),
+    ('mileage tracking app', 'expense tracking for self-employed'),
+    ('contractor invoicing app', 'trades invoicing'),
+    ('profit and loss small business', 'bookkeeping reporting need');
 
 
 -- ============================================================
@@ -1350,4 +1421,33 @@ CREATE TABLE IF NOT EXISTS affiliate_payouts (
     INDEX idx_affiliate (affiliate_id),
     INDEX idx_paid_at (paid_at),
     FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Per-call timing of desktop AI operations (receipt scan, bank categorize, supplier
+-- suggestion, spreadsheet analysis/processing via /api/ai/completions.php, and bank
+-- PDF extraction via /api/bank/extract.php). elapsed_ms is the SERVER-measured Gemini
+-- wall time, isolated from the user's network. The desktop app fetches aggregated
+-- p50/p90 priors from /api/ai/timing-priors.php to drive accurate, smooth progress
+-- bars. No user/device identity is stored (not needed for duration priors). Also
+-- created lazily by api/ai/_timing.php so a fresh server works without a migration.
+CREATE TABLE IF NOT EXISTS ai_call_timings (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    operation VARCHAR(40) NOT NULL COMMENT 'receipt_scan, bank_categorize, supplier_category, spreadsheet_analysis, spreadsheet_process, bank_pdf_extract, completion',
+    model VARCHAR(50) NOT NULL,
+    size_feature INT DEFAULT NULL COMMENT 'Op-specific size hint: image bytes, line count, column count, pdf bytes',
+    page_count INT DEFAULT NULL COMMENT 'PDFs only',
+    input_bytes INT DEFAULT NULL,
+    mime VARCHAR(30) DEFAULT NULL,
+    prompt_tokens INT DEFAULT NULL,
+    output_tokens INT DEFAULT NULL,
+    max_output_tokens INT DEFAULT NULL,
+    finish_reason VARCHAR(20) DEFAULT NULL COMMENT 'Non-STOP rows are excluded from priors',
+    elapsed_ms INT NOT NULL COMMENT 'Server-measured Gemini generate wall time',
+    poll_count INT DEFAULT NULL COMMENT 'PDF Files-API polls until ACTIVE',
+    success TINYINT(1) NOT NULL DEFAULT 1,
+    app_platform VARCHAR(20) DEFAULT NULL,
+    environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_op_model_created (operation, model, created_at),
+    INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

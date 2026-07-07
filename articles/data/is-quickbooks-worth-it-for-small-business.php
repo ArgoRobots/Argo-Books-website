@@ -6,9 +6,9 @@ return [
 
   'slug' => 'is-quickbooks-worth-it-for-small-business',
 
-  'h1' => 'Is QuickBooks worth it for a small business?',
+  'h1' => 'Is QuickBooks worth it for a small business in 2026?',
 
-  'meta_title' => 'Is QuickBooks Worth It for Small Business? | Argo Books',
+  'meta_title' => 'Is QuickBooks Worth It for Small Business in 2026? | Argo Books',
 
   'meta_description' => 'An honest answer to whether QuickBooks is worth it for a small business: where it earns its price, where it\'s overkill, and a clear worth-it-if verdict.',
 
@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -43,7 +43,8 @@ HTML,
 <li><strong>The plan most businesses actually want</strong> (Plus) sits closer to ${quickbooks_plus} CAD a month. This is where the features people associate with QuickBooks live: more users, detailed reporting, inventory, project tracking, and more.</li>
 <li><strong>Payroll and higher tiers</strong> cost more again, with payroll usually an add-on on top of the base plan.</li>
 </ul>
-<p>The thing to notice is that the entry price and the real-use price are quite different. Many people start on the cheap plan, find the feature they need is a tier up, and end up paying the Plus price. So when you ask "is QuickBooks worth it," ask it against the plan you'll actually use, which for most businesses is Plus, not the entry sticker. The published prices also rise over time, so factor in that this year's number is likely the lowest you'll pay.</p>
+{{illustration:price-trend}}
+<p>The thing to notice is that the entry price and the real-use price are quite different. Many people start on the cheap plan, find the feature they need is a tier up, and end up paying the Plus price. So when you ask "is QuickBooks worth it," ask it against the plan you'll actually use, which for most businesses is Plus, not the entry sticker. The published prices also rise over time, so factor in that this year's number is likely the lowest you'll pay: the guide on <a href="/quickbooks-price-increases/">QuickBooks price increases</a> shows how much each plan has climbed over the last five years.</p>
 HTML,
     ],
 
@@ -97,6 +98,7 @@ HTML,
 <li>You feel like you're fighting the complexity rather than using it.</li>
 <li>Cost is your main concern and you'd use a fraction of the features.</li>
 </ul>
+{{illustration:compare-scale}}
 <p>If you're in the "skip it" group, you have good cheaper options, several of them free. Wave has free invoicing and accounting. FreshBooks is friendlier for freelancers who bill by time. Xero is the closest thing to a full QuickBooks experience if you want capability without the QuickBooks name. Argo Books has a free tier with no time limit and keeps your data on your own machine. The guide on <a href="/best-quickbooks-alternatives/">the best QuickBooks alternatives</a> covers each in detail. If you're in the "worth it" group, stay, and don't feel you're overpaying just because cheaper tools exist; they don't do what you need.</p>
 HTML,
     ],
@@ -137,7 +139,7 @@ HTML,
   'faqs' => [
     [
       'q' => 'Is QuickBooks worth it for a freelancer or sole proprietor?',
-      'a' => 'Usually not, if your accounting is mainly invoicing and tracking a few expenses and you don\'t run payroll. At that level you would be paying the Plus price, often closer to the higher of QuickBooks\' tiers once you want useful features, for a fraction of what the tool does. Free tools like Wave or a free tier handle a simple one-person business well, and friendlier paid tools like FreshBooks cost less and suit freelancers better. QuickBooks becomes worth it for a sole proprietor mainly when your accountant insists on it or you are about to grow into needing more. If you are a simple one-person operation and cost matters, it\'s probably overkill.',
+      'a' => 'Usually not, if your accounting is mainly invoicing and tracking a few expenses and you don\'t run payroll. At that level you would be paying the Plus price, often closer to the higher end of QuickBooks\' tiers once you want useful features, for a fraction of what the tool does. Free tools like Wave or a free tier handle a simple one-person business well, and friendlier paid tools like FreshBooks cost less and suit freelancers better. QuickBooks becomes worth it for a sole proprietor mainly when your accountant insists on it or you are about to grow into needing more. If you are a simple one-person operation and cost matters, it\'s probably overkill.',
     ],
     [
       'q' => 'Why is QuickBooks so expensive compared to other tools?',

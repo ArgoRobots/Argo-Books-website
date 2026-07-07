@@ -8,7 +8,7 @@
 // and defers to the same layout.php + main.js. See invoice-generator/doc-config.php
 // for the full config and the consolidation rationale.
 
-require_once __DIR__ . '/../invoice-generator/_base.php';
+require_once __DIR__ . '/../shared/_base.php';
 require_once __DIR__ . '/../invoice-generator/doc-config.php';
 
 $doc_type = 'purchase-order';
@@ -57,4 +57,4 @@ $body_content = ob_get_clean();
 $extra_scripts = '<script type="module" src="' . INVGEN_BASE . '/invoice-generator/scripts/main.js"></script>';
 $tools_back = ['href' => INVGEN_BASE . '/tools/', 'label' => 'All tools'];
 
-include __DIR__ . '/../invoice-generator/layout.php';
+include __DIR__ . '/../shared/layout.php';

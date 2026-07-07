@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -73,6 +73,7 @@ HTML,
 <li><strong>Lower upfront cost.</strong> A few dollars a month is easier to start with than a large one-time payment, which matters when cash is tight, as it often is early on.</li>
 <li><strong>Access anywhere, with cloud tools.</strong> Web-based subscriptions let you work from any device and share access with an accountant easily. That convenience is part of what you're paying for.</li>
 </ul>
+{{illustration:price-trend}}
 <p>The downside is the one everyone feels: you pay for as long as you use it, the price can rise, and if you stop paying you can lose access to the tool and sometimes the convenience of getting at your data. Whether that's worth it depends on how much the updates, support, and convenience are actually worth to your business.</p>
 HTML,
     ],
@@ -83,11 +84,12 @@ HTML,
       'html' => <<<'HTML'
 <p>Strip away the marketing and the real decision comes down to a few specific things. These are what to weigh.</p>
 <ul>
-<li><strong>Total cost over time.</strong> Add up several years of subscription fees and compare to the one-time price plus any paid upgrades you'd buy along the way. For a stable, simple business the one-time route can win on pure dollars. For a business that values staying current, the subscription's bundled updates may be worth the recurring cost.</li>
+<li><strong>Total cost over time.</strong> <a href="/how-much-does-accounting-software-cost/">Add up several years of subscription fees</a> and compare to the one-time price plus any paid upgrades you'd buy along the way. For a stable, simple business the one-time route can win on pure dollars. For a business that values staying current, the subscription's bundled updates may be worth the recurring cost.</li>
 <li><strong>Staying current.</strong> Accounting software has to keep up with changing tax rules and bank connections. A subscription handles this for you. A one-time purchase puts the burden of staying current on you, and old versions can stop working with newer systems.</li>
 <li><strong>Lock-in and your data.</strong> This is the one people underweight. With a cloud subscription, your data lives on the vendor's servers, and if you stop paying, getting it out cleanly can be awkward. With a desktop tool, one-time or subscription, your data is usually on your own machine, which you control. Whatever you choose, confirm you can export your data in a standard format before you commit.</li>
 <li><strong>Support and risk.</strong> Subscriptions tend to include help and active maintenance. A one-time tool from a small or fading vendor can leave you stranded if the company stops developing it.</li>
 </ul>
+{{illustration:compare-scale}}
 <p>Notice that "your data on your own machine" and "subscription versus one-time" are separate questions. A desktop subscription can keep your data on your computer; a cloud one-time tool, if it existed, would not. Don't assume buying once is the only way to control your own records.</p>
 HTML,
     ],
@@ -97,7 +99,7 @@ HTML,
       'anchor' => 'free-tier-middle-ground',
       'html' => <<<'HTML'
 <p>Here's the option that often gets lost in the one-time-versus-subscription argument: a genuinely free tier with no time limit. If your real goal is "I don't want to pay forever," a free tier gets you there without buying anything, and without the downsides of an aging one-time tool.</p>
-<p>Several modern tools have free tiers that aren't trials. Wave has free invoicing and accounting. ZipBooks, Zoho Books, and Argo Books all have free tiers you can run a simple business on indefinitely. You're not paying monthly, you're not paying once, you're not paying at all, and the tool still gets maintained because the vendor earns from the customers who do upgrade. The trade-off is the usual one for free software: limits on volume or features, and thinner support than a paid plan. But for a sole proprietor whose needs are simple, a free tier can be the practical answer to the whole question. You only step up to a paid subscription if and when you outgrow it, and even then you're paying for active development and support, not just access.</p>
+<p>Several modern tools have <a href="/best-free-accounting-software-for-small-business/">free tiers that aren't trials</a>. Wave has free invoicing and accounting. ZipBooks, Zoho Books, and Argo Books all have free tiers you can run a simple business on indefinitely. You're not paying monthly, you're not paying once, you're not paying at all, and the tool still gets maintained because the vendor earns from the customers who do upgrade. The trade-off is the usual one for free software: limits on volume or features, and thinner support than a paid plan. But for a sole proprietor whose needs are simple, a free tier can be the practical answer to the whole question. You only step up to a paid subscription if and when you outgrow it, and even then you're paying for active development and support, not just access.</p>
 <p>A quick note on where Argo Books sits, since it's mentioned: Argo Books is a freemium subscription, not a one-time purchase. It has a free tier with no time limit, and Premium is a monthly or yearly fee for higher volumes and advanced features. What it does offer that's relevant here is a desktop app, so your data lives on your own machine, which is the data-control benefit people often associate with buying once, without it being a one-time purchase. We say that plainly so there's no confusion: if a true buy-once-forever tool is specifically what you want, Argo Books isn't that.</p>
 HTML,
     ],

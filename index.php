@@ -43,14 +43,14 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Transform your small business with Argo Books. Smart receipt scanning, spreadsheet import, predictive analytics, inventory management and more. Free software.">
+        content="Argo Books is free accounting and invoicing software for small business. Track income and expenses, send invoices, and scan receipts in minutes.">
     <meta name="keywords"
         content="receipt scanning, smart spreadsheet import, predictive analytics, business software, inventory management, rental management, invoice generator, small business automation, data import">
 
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Argo Books - Smart Business Management Software">
+    <meta property="og:title" content="Argo Books: Free Accounting Software for Small Business">
     <meta property="og:description"
-        content="Transform your business with smart receipt scanning, predictive analytics, inventory management and automated invoicing.">
+        content="Free accounting and invoicing software for small business. Track income and expenses, send invoices, and scan receipts in minutes.">
     <meta property="og:url" content="https://argorobots.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
@@ -58,13 +58,13 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Argo Books - Smart Business Management Software">
+    <meta name="twitter:title" content="Argo Books: Free Accounting Software for Small Business">
     <meta name="twitter:description"
-        content="Transform your business with smart receipt scanning, predictive analytics, and automated business management.">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+        content="Free accounting and invoicing software for small business. Track income and expenses, send invoices, and scan receipts in minutes.">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books&subtitle=Simple%2C+modern+accounting+software+built+for+small+businesses+with+automation+that+saves+time+and+keeps+your+finances+organized&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <!-- Additional SEO Meta Tags -->
     <meta name="geo.region" content="CA-SK">
@@ -79,21 +79,12 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <link rel="preconnect" href="https://www.googletagmanager.com">
     <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-17210317271"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'AW-17210317271');
-    </script>
-
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             "name": "Argo Books",
-            "description": "Smart business management software with receipt scanning, predictive analytics, and inventory management",
+            "description": "Free accounting and invoicing software for small business, with receipt scanning, spreadsheet import, and inventory management",
             "url": "https://argorobots.com/",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Windows, macOS, Linux",
@@ -122,10 +113,13 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     </script>
 
     <link rel="shortcut icon" type="image/x-icon" href="resources/images/argo-logo/argo-icon.ico">
-    <title>Argo Books - Smart Business Management Software</title>
+    <title>Argo Books: Free Accounting Software for Small Business</title>
 
-    <script src="resources/scripts/main.js"></script>
+    <script defer src="resources/scripts/main.js"></script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . '/style.css') ?>">
     <link rel="stylesheet" href="resources/styles/custom-colors.css">
     <link rel="stylesheet" href="resources/styles/button.css">
@@ -149,15 +143,16 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         </div>
         <div class="container">
             <div class="hero-content">
-                <div class="hero-app-title animate-fade-in">Argo Books</div>
                 <h1 class="hero-title animate-fade-in-up">
-                    <span class="hero-title-line">Run your business</span>
-                    <span class="hero-title-line text-gradient">without spreadsheets</span>
-                    <span class="hero-title-line text-gradient">or chaos</span>
+                    <span class="hero-app-title hero-title-line">Argo Books</span>
+                    <span class="hero-title-line">Simple accounting</span>
+                    <span class="hero-title-line text-gradient">software for</span>
+                    <span class="hero-title-line text-gradient">small business</span>
                 </h1>
                 <p class="hero-subtitle animate-fade-in-up delay-1">
-                    Modern bookkeeping and accounting software for small business owners. 
-                    Manage invoicing, expenses, inventory, and receipts in one clean system.
+                    Track income and expenses, send invoices, and scan receipts in minutes.
+                    Automated imports and tax-ready reports keep you organized all year.
+                    Free to start, no accounting knowledge needed.
                 </p>
                 <div class="hero-cta animate-fade-in-up delay-2">
                     <a href="downloads" class="btn btn-primary btn-lg">
@@ -169,79 +164,14 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             <div class="hero-visual animate-fade-in-up delay-2">
                 <div class="hero-device">
                     <div class="device-frame">
-                        <img src="resources/images/dashboard.webp" alt="Argo Books Dashboard" class="device-screen" width="2400" height="1524">
+                        <img src="resources/images/dashboard.webp"
+                             srcset="resources/images/dashboard-800.webp 800w, resources/images/dashboard-1200.webp 1200w, resources/images/dashboard-1600.webp 1600w, resources/images/dashboard.webp 2400w"
+                             sizes="(max-width: 768px) 90vw, 600px"
+                             alt="Argo Books Dashboard" class="device-screen" width="2400" height="1528" fetchpriority="high">
                         <button class="hero-play-btn" id="heroPlayBtn" aria-label="Watch demo video">
                             <?= svg_icon('play-filled', 28) ?>
                         </button>
                     </div>
-                    <div class="floating-card floating-card-1 animate-float">
-                        <div class="floating-card-icon">
-                            <?= svg_icon('loading', 24) ?>
-                        </div>
-                        <div class="floating-card-content">
-                            <span class="floating-card-label">Smart Scanning</span>
-                            <span class="floating-card-value">Receipt processed</span>
-                        </div>
-                    </div>
-                    <div class="floating-card floating-card-2 animate-float-delayed">
-                        <div class="floating-card-icon success">
-                            <?= svg_icon('trending-up', 24) ?>
-                        </div>
-                        <div class="floating-card-content">
-                            <span class="floating-card-label">Revenue Up</span>
-                            <span class="floating-card-value success">+24% this month</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured On Section -->
-    <section class="featured-on">
-        <div class="container">
-            <span class="featured-on-label">Featured on</span>
-            <?php
-            // Badge list rendered twice back-to-back so the marquee can loop seamlessly
-            $featured_badges = [
-                ['href' => 'https://topfreeaitools.com', 'img' => 'topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
-                ['href' => 'https://startupfa.me/s/argo-books', 'img' => 'startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
-                ['href' => 'https://launch-list.org/product/argo-books', 'img' => 'launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
-                ['href' => 'https://twelve.tools', 'img' => 'twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
-                ['href' => 'https://wired.business', 'img' => 'wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
-                ['href' => 'https://auraplusplus.com/projects/argo-books', 'img' => 'auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
-                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'submitmysaas-top1.png', 'w' => 237, 'alt' => 'SubmitMySaas Top 1 Daily Winner'],
-                ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
-                ['href' => 'https://www.scrolllaunch.com', 'img' => 'scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
-                ['href' => 'https://starterbest.com', 'img' => 'https://starterbest.com/badages-awards.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],
-                ['href' => 'https://dayslaunch.com', 'img' => 'https://dayslaunch.com/badages-awards.svg', 'w' => 200, 'alt' => 'Featured on Days Launch'],
-                ['href' => 'https://toolrain.com/item/argo-books', 'img' => 'toolrain.svg', 'w' => 184, 'alt' => 'Listed on ToolRain'],
-                ['href' => 'https://saasfame.com/item/argo-books', 'img' => 'https://saasfame.com/badge-light.svg', 'w' => 170, 'alt' => 'Featured on SaaSFame'],
-                ['href' => 'https://deeplaunch.io', 'img' => 'https://deeplaunch.io/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on DeepLaunch.io'],
-                ['href' => 'https://directoryhunt.org/', 'img' => 'https://directoryhunt.org/assets/Badges/featured.svg', 'w' => 199, 'alt' => 'Featured on DirectoryHunt.org'],
-                ['href' => 'https://proofstories.io/directory/products/argo-books/', 'img' => 'https://proofstories.io/directory/badges/l/argo-books.svg', 'w' => 189, 'alt' => 'Listed on ProofStories'],
-                ['href' => 'https://dofollow.tools', 'img' => 'https://dofollow.tools/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on Dofollow.Tools'],
-                ['href' => 'https://open-launch.com/projects/argo-books', 'img' => 'https://open-launch.com/api/badge/84f80c1b-1825-496d-b98b-67919dd95a77/featured-light.svg', 'w' => 216, 'alt' => 'Featured on Open-Launch'],
-                ['href' => 'https://fazier.com/launches/argorobots.com', 'img' => 'https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light', 'w' => 229, 'alt' => 'Featured on Fazier'],
-            ];
-            ?>
-            <div class="featured-on-marquee">
-                <div class="featured-on-track">
-                    <?php for ($pass = 0; $pass < 2; $pass++): ?>
-                        <?php foreach ($featured_badges as $badge): ?>
-                            <a href="<?= htmlspecialchars($badge['href']) ?>" target="_blank" rel="noopener"<?= $pass === 1 ? ' aria-hidden="true" tabindex="-1"' : '' ?>>
-                                <?php
-                                // Badges are self-hosted under resources/images/featured/. An absolute
-                                // URL is used only where the directory's verifier requires its own hosted
-                                // badge image to be referenced directly (e.g. Starter Best).
-                                $src = strpos($badge['img'], '://') !== false
-                                    ? $badge['img']
-                                    : 'resources/images/featured/' . $badge['img'];
-                                ?>
-                                <img src="<?= htmlspecialchars($src) ?>" style="width: <?= (int) $badge['w'] ?>px; height: 54px;" width="<?= (int) $badge['w'] ?>" height="54" alt="<?= htmlspecialchars($badge['alt']) ?>" />
-                            </a>
-                        <?php endforeach; ?>
-                    <?php endfor; ?>
                 </div>
             </div>
         </div>
@@ -251,9 +181,8 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <section id="features" class="features-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">Features</span>
-                <h2 class="section-title">Everything you need to grow</h2>
-                <p class="section-description">Easy-to-use accounting software with smart receipt scanning, spreadsheet import, predictive analytics, and inventory management. Everything you need to run your business.</p>
+                <h2 class="section-title">The tools your business actually runs on</h2>
+                <p class="section-description">Smart receipt scanning, invoicing, analytics, and inventory tracking, all in one easy app.</p>
             </div>
 
             <div class="features-tabs">
@@ -263,8 +192,8 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                             <?= svg_icon('receipt-scan-detail', 24) ?>
                         </div>
                         <div class="tab-text">
-                            <span class="tab-title">AI Receipt Scanning</span>
-                            <span class="tab-subtitle">Snap, scan, done</span>
+                            <span class="tab-title">Receipt Scanning</span>
+                            <span class="tab-subtitle">Snap a photo and your books update instantly</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="invoices">
@@ -273,7 +202,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Invoicing</span>
-                            <span class="tab-subtitle">Professional invoices</span>
+                            <span class="tab-subtitle">Create, send, and track invoices to get paid</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="expenses">
@@ -282,7 +211,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Expense & Revenue Tracking</span>
-                            <span class="tab-subtitle">Track every dollar</span>
+                            <span class="tab-subtitle">Every dollar in and out, auto-categorized</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="customers">
@@ -291,7 +220,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Customer Management</span>
-                            <span class="tab-subtitle">Know your customers</span>
+                            <span class="tab-subtitle">Contacts, purchase history, and balances</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="predictive">
@@ -300,7 +229,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Predictive Analytics</span>
-                            <span class="tab-subtitle">Forecast your future</span>
+                            <span class="tab-subtitle">See next month's cash flow in advance</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="inventory">
@@ -309,7 +238,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Inventory Management</span>
-                            <span class="tab-subtitle">Track every item</span>
+                            <span class="tab-subtitle">Stock counts that stay accurate as you sell</span>
                         </div>
                     </button>
                     <button class="tab-btn" data-tab="rental">
@@ -318,7 +247,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                         </div>
                         <div class="tab-text">
                             <span class="tab-title">Rental Management</span>
-                            <span class="tab-subtitle">Bookings made easy</span>
+                            <span class="tab-subtitle">Bookings, availability, and returns tracked</span>
                         </div>
                     </button>
                 </div>
@@ -326,77 +255,77 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                 <div class="features-tabs-content">
                     <!-- AI Receipt Scanning -->
                     <div class="tab-content active" id="tab-ai-receipts">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Scan receipts instantly</h3>
-                                <p>Take a photo of any receipt with your phone or upload from your computer. The system automatically extracts supplier, date, amount, and line items with 99.9% accuracy.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Works with photos from your phone</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Automatic categorization</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Searchable receipt archive</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup receipt-mockup">
-                                        <div class="phone-frame">
-                                            <div class="phone-screen">
-                                                <div class="scan-animation" id="receiptScanAnimation">
-                                                    <div class="scan-line"></div>
-                                                    <div class="scan-complete-indicator">
-                                                        <?= svg_icon('check', null, '', 3, 'stroke-linecap="round" stroke-linejoin="round"') ?>
-                                                    </div>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                                            </div>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
                                                 </div>
-                                                <div class="receipt-preview">
-                                                    <div class="receipt-header">
-                                                        <div class="receipt-store-name scan-text">Office Depot #1284</div>
-                                                        <div class="receipt-date scan-text">Mar 14, 2026 &nbsp; 2:47 PM</div>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">Scan Receipt</div>
+                                                    <div class="scan-stage" id="receiptScan">
+                                                        <div class="scan-receipt">
+                                                            <div class="rcpt-paper">
+                                                                <div class="rcpt-store scan-row" data-field="merchant">OFFICE DEPOT</div>
+                                                                <div class="rcpt-meta scan-row" data-field="date">Store #1284 &middot; Mar 14, 2026</div>
+                                                                <div class="rcpt-divider"></div>
+                                                                <div class="rcpt-line scan-row" data-field="item-0"><span>COPY PAPER 5RM</span><span>42.99</span></div>
+                                                                <div class="rcpt-line scan-row" data-field="item-1"><span>INK CART BK</span><span>34.99</span></div>
+                                                                <div class="rcpt-line scan-row" data-field="item-2"><span>DESK ORGANIZER</span><span>24.49</span></div>
+                                                                <div class="rcpt-line scan-row" data-field="item-3"><span>STICKY NOTES 12</span><span>8.99</span></div>
+                                                                <div class="rcpt-divider"></div>
+                                                                <div class="rcpt-line rcpt-tax scan-row" data-field="tax"><span>TAX</span><span>8.89</span></div>
+                                                                <div class="rcpt-line rcpt-total scan-row" data-field="total"><span>TOTAL</span><span>120.35</span></div>
+                                                                <div class="rcpt-barcode"><svg viewBox="0 0 158 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0h2v34h-2z M4 0h1v34h-1z M7 0h3v34h-3z M12 0h1v34h-1z M15 0h2v34h-2z M19 0h1v34h-1z M22 0h3v34h-3z M27 0h1v34h-1z M30 0h2v34h-2z M34 0h1v34h-1z M37 0h3v34h-3z M42 0h2v34h-2z M46 0h1v34h-1z M49 0h2v34h-2z M53 0h3v34h-3z M58 0h1v34h-1z M61 0h1v34h-1z M64 0h3v34h-3z M69 0h2v34h-2z M73 0h1v34h-1z M76 0h2v34h-2z M80 0h1v34h-1z M83 0h3v34h-3z M88 0h1v34h-1z M91 0h2v34h-2z M95 0h3v34h-3z M100 0h1v34h-1z M103 0h2v34h-2z M107 0h1v34h-1z M110 0h3v34h-3z M115 0h2v34h-2z M119 0h1v34h-1z M122 0h2v34h-2z M126 0h3v34h-3z M131 0h1v34h-1z M134 0h1v34h-1z M137 0h2v34h-2z M141 0h3v34h-3z M146 0h1v34h-1z M149 0h2v34h-2z M153 0h1v34h-1z M156 0h2v34h-2z"/></svg></div>
+                                                            </div>
+                                                            <div class="scan-beam" id="scanBeam"></div>
+                                                        </div>
+                                                        <div class="scan-form">
+                                                            <div class="ef-head">
+                                                                <span class="ef-title">New Expense</span>
+                                                                <span class="ef-status" id="efStatus"><?= svg_icon('check', 13) ?> Added to Expenses</span>
+                                                            </div>
+                                                            <div class="ef-field" data-field="merchant">
+                                                                <span class="ef-label">Merchant</span>
+                                                                <span class="ef-value">Office Depot</span>
+                                                                <span class="ef-check"><?= svg_icon('check', 14) ?></span>
+                                                            </div>
+                                                            <div class="ef-field" data-field="date">
+                                                                <span class="ef-label">Date</span>
+                                                                <span class="ef-value">Mar 14, 2026</span>
+                                                                <span class="ef-check"><?= svg_icon('check', 14) ?></span>
+                                                            </div>
+                                                            <div class="ef-field" data-field="category">
+                                                                <span class="ef-label">Category</span>
+                                                                <span class="ef-value"><span class="ef-pill">Office Supplies</span></span>
+                                                                <span class="ef-check"><?= svg_icon('check', 14) ?></span>
+                                                            </div>
+                                                            <div class="ef-lines">
+                                                                <div class="ef-line" data-field="item-0"><span>Copy Paper (5 ream)</span><span>$42.99</span></div>
+                                                                <div class="ef-line" data-field="item-1"><span>Ink Cartridge BK</span><span>$34.99</span></div>
+                                                                <div class="ef-line" data-field="item-2"><span>Desk Organizer</span><span>$24.49</span></div>
+                                                                <div class="ef-line" data-field="item-3"><span>Sticky Notes (12pk)</span><span>$8.99</span></div>
+                                                            </div>
+                                                            <div class="ef-totals">
+                                                                <div class="ef-trow" data-field="tax"><span>Tax</span><span>$8.89</span></div>
+                                                                <div class="ef-trow ef-grand" data-field="total"><span>Total</span><span class="ef-total-val">$120.35</span></div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div class="receipt-items">
-                                                        <div class="receipt-item scan-text">
-                                                            <span>Copy Paper (5 ream)</span>
-                                                            <span>$42.99</span>
-                                                        </div>
-                                                        <div class="receipt-item scan-text">
-                                                            <span>Ink Cartridge BK</span>
-                                                            <span>$34.99</span>
-                                                        </div>
-                                                        <div class="receipt-item scan-text">
-                                                            <span>Desk Organizer</span>
-                                                            <span>$24.49</span>
-                                                        </div>
-                                                        <div class="receipt-item scan-text">
-                                                            <span>Sticky Notes (12pk)</span>
-                                                            <span>$8.99</span>
-                                                        </div>
-                                                        <div class="receipt-item receipt-tax scan-text">
-                                                            <span>Tax</span>
-                                                            <span>$8.89</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="receipt-total scan-text">
-                                                        <span>Total</span>
-                                                        <span>$120.35</span>
-                                                    </div>
-                                                </div>
-                                                <div class="ai-badge" id="aiBadge">
-                                                    <span class="badge-text-scanning">
-                                                        <?= svg_icon('clock', 16) ?>
-                                                        AI Processing...
-                                                    </span>
-                                                    <span class="badge-text-complete">
-                                                        <?= svg_icon('check', 16) ?>
-                                                        Scan Complete!
-                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -408,46 +337,88 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
                     <!-- Invoice Generation -->
                     <div class="tab-content" id="tab-invoices">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Professional invoices in seconds</h3>
-                                <p>Create, send, and track invoices with ease. Customize templates, set payment terms, and get paid faster.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Customizable templates</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Automatic numbering</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Payment tracking</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup invoice-mockup">
-                                        <div class="invoice-header">
-                                            <div class="invoice-logo">INVOICE</div>
-                                        </div>
-                                        <div class="invoice-meta">
-                                            <div class="meta-item">
-                                                <span class="meta-label">Date</span>
-                                                <span class="meta-value">Nov 28, 2025</span>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio" id="invoiceStudio" style="--inv-accent: 227 79% 58%;">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
                                             </div>
-                                            <div class="meta-item">
-                                                <span class="meta-label">Due</span>
-                                                <span class="meta-value">Dec 28, 2025</span>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                                                </div>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">New Invoice</div>
+                                                    <div class="invoice-doc theme-contemporary" id="invoiceDoc">
+                                                <div class="inv-brandbar"></div>
+                                                <div class="inv-top inv-anim">
+                                                    <div class="inv-brand-group">
+                                                        <div class="inv-brand">
+                                                            <span class="inv-mark"><svg viewBox="650 48 2400 2400" fill="currentColor" aria-hidden="true"><path fill-rule="nonzero" d="M 1825.109375 1914.148438 L 1295.769531 2027.972656 C 1292.101562 2028.761719 1288.289062 2027.59375 1285.679688 2024.890625 C 1283.089844 2022.1875 1282.070312 2018.335938 1283 2014.699219 L 1357.828125 1722.378906 L 1361.988281 1733.847656 L 715.601562 1267.910156 C 712.378906 1265.589844 710.6875 1261.691406 711.191406 1257.75 C 711.695312 1253.820312 714.3125 1250.46875 718.011719 1249.03125 L 917.507812 1171.558594 L 911.125 1184.988281 L 789.367188 808.660156 C 788.113281 804.78125 789.140625 800.53125 792.023438 797.660156 C 794.90625 794.78125 799.160156 793.769531 803.035156 795.03125 L 1179.679688 918.160156 L 1166.179688 924.648438 L 1242.941406 720.011719 C 1244.339844 716.28125 1247.671875 713.621094 1251.628906 713.089844 C 1255.570312 712.550781 1259.5 714.230469 1261.839844 717.460938 L 1570.75 1143.378906 L 1551.320312 1151.621094 L 1415.289062 379.421875 C 1414.609375 375.519531 1416.101562 371.558594 1419.191406 369.089844 C 1422.28125 366.621094 1426.46875 366.03125 1430.121094 367.550781 L 1651.171875 459.621094 L 1637.519531 464.410156 L 1838.308594 98.511719 C 1840.210938 95.050781 1843.839844 92.898438 1847.789062 92.890625 C 1851.738281 92.890625 1855.378906 95.03125 1857.28125 98.480469 L 2059.390625 464.289062 L 2045.660156 459.570312 L 2266.378906 365.238281 C 2270.019531 363.679688 2274.230469 364.238281 2277.351562 366.699219 C 2280.460938 369.160156 2281.980469 373.121094 2281.308594 377.03125 L 2148.550781 1148.769531 L 2129.089844 1140.609375 L 2436.378906 714 C 2438.710938 710.769531 2442.628906 709.070312 2446.570312 709.589844 C 2450.519531 710.109375 2453.871094 712.75 2455.289062 716.480469 L 2532.820312 920.359375 L 2519.289062 913.929688 L 2895.609375 789.078125 C 2899.480469 787.800781 2903.738281 788.789062 2906.628906 791.660156 C 2909.53125 794.519531 2910.570312 798.769531 2909.339844 802.648438 L 2788.570312 1180.890625 L 2782.050781 1167.460938 L 2983.929688 1242.929688 C 2987.671875 1244.320312 2990.339844 1247.660156 2990.871094 1251.621094 C 2991.410156 1255.570312 2989.71875 1259.5 2986.488281 1261.839844 L 2341.378906 1728.984375 L 2345.511719 1717.496094 L 2422.128906 2012.820312 C 2423.070312 2016.453125 2422.058594 2020.3125 2419.46875 2023.023438 C 2416.878906 2025.734375 2413.070312 2026.910156 2409.398438 2026.132812 L 1879.988281 1914.027344 L 1893.050781 1902.972656 L 1914.019531 2394.578125 C 1914.140625 2397.527344 1913.058594 2400.398438 1911.019531 2402.53125 C 1908.980469 2404.664062 1906.148438 2405.867188 1903.199219 2405.867188 L 1804.46875 2405.867188 C 1801.519531 2405.867188 1798.710938 2404.671875 1796.671875 2402.554688 C 1794.628906 2400.433594 1793.539062 2397.578125 1793.640625 2394.636719 L 1812.011719 1903.15625 L 1825.109375 1914.148438 Z"/></svg></span>
+                                                            <span class="inv-bizname">Maple &amp; Co.</span>
+                                                            <div class="inv-status" id="invStatus">Paid</div>
+                                                        </div>
+                                                        <div class="inv-docref">INVOICE &middot; #INV-0042</div>
+                                                    </div>
+                                                </div>
+                                                <div class="inv-billto inv-anim">
+                                                    <span class="inv-label">Bill to</span>
+                                                    <span class="inv-client">Sarah Miller</span>
+                                                    <span class="inv-client-sub">123 Hollywood Blvd, Los Angeles</span>
+                                                </div>
+                                                <div class="inv-table">
+                                                    <div class="inv-row inv-row-head inv-anim">
+                                                        <span>Description</span><span>Qty</span><span>Amount</span>
+                                                    </div>
+                                                    <div class="inv-row inv-item">
+                                                        <span>Logo &amp; brand design</span><span>1</span><span>$600.00</span>
+                                                    </div>
+                                                    <div class="inv-row inv-item">
+                                                        <span>Website build</span><span>1</span><span>$480.00</span>
+                                                    </div>
+                                                    <div class="inv-row inv-item">
+                                                        <span>Hosting (annual)</span><span>1</span><span>$154.00</span>
+                                                    </div>
+                                                </div>
+                                                <div class="inv-totals inv-anim">
+                                                    <div class="inv-subtotal"><span>Subtotal</span><span>$1,234.00</span></div>
+                                                    <div class="inv-amountdue"><span>Amount Due</span><span class="inv-total-value">$1,234.00</span></div>
+                                                </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="invoice-total">
-                                            <span class="total-label">Total Due</span>
-                                            <span class="total-value">$1,234.00</span>
+
+                                        <div class="studio-panel color-panel panel-hidden" id="colorPanel">
+                                            <div class="color-wheel" id="colorWheel">
+                                                <div class="color-thumb" id="colorThumb"></div>
+                                            </div>
+                                            <div class="light-slider" id="lightSlider">
+                                                <div class="light-thumb" id="lightThumb"></div>
+                                            </div>
                                         </div>
-                                        <div class="invoice-status paid">Paid</div>
+
+                                        <div class="studio-panel template-panel panel-hidden" id="templatePanel">
+                                            <button class="tmpl-btn" data-theme="theme-modern" type="button">
+                                                <span class="tmpl-thumb tmpl-modern"></span>Modern
+                                            </button>
+                                            <button class="tmpl-btn active" data-theme="theme-contemporary" type="button">
+                                                <span class="tmpl-thumb tmpl-contemporary"></span>Contemporary
+                                            </button>
+                                            <button class="tmpl-btn" data-theme="theme-classic" type="button">
+                                                <span class="tmpl-thumb tmpl-classic"></span>Classic
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -456,56 +427,97 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
                     <!-- Expense Tracking -->
                     <div class="tab-content" id="tab-expenses">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Track expenses and revenue with ease</h3>
-                                <p>Our intuitive interface makes recording expenses and revenue simple. Smart input validation prevents errors before they happen, so your books are always accurate.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Easy-to-use guided forms</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Smart validation prevents mistakes</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Categorize and organize transactions</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup expenses-mockup">
-                                        <div class="expense-form-header">
-                                            <span class="form-title">New Transaction</span>
-                                        </div>
-                                        <div class="expense-form-fields">
-                                            <div class="form-field">
-                                                <span class="field-label">Type</span>
-                                                <div class="field-toggle">
-                                                    <span class="toggle-option">Expense</span>
-                                                    <span class="toggle-option active">Revenue</span>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                                            </div>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
                                                 </div>
-                                            </div>
-                                            <div class="form-field">
-                                                <span class="field-label">Amount</span>
-                                                <span class="field-value">$85.00</span>
-                                            </div>
-                                            <div class="form-field">
-                                                <span class="field-label">Category</span>
-                                                <span class="field-value">Books</span>
-                                            </div>
-                                        </div>
-                                        <div class="expense-form-validation">
-                                            <div class="validation-check">
-                                                <?= svg_icon('check', 16) ?>
-                                                <span>Valid amount</span>
-                                            </div>
-                                            <div class="validation-check">
-                                                <?= svg_icon('check', 16) ?>
-                                                <span>Category selected</span>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">Overview</div>
+                                                    <div class="exp-stage" id="expenseStage">
+                                                        <div class="exp-inner">
+                                                            <div class="txn-table">
+                                                                <div class="txn-head"><span>Date</span><span>Description</span><span>Category</span><span class="txn-amt">Amount</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 14</span><span class="txn-desc">Client payment</span><span class="txn-cat"><span>Consulting</span></span><span class="txn-amt rev">+$1,200.00</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 13</span><span class="txn-desc">Office supplies</span><span class="txn-cat"><span>Office</span></span><span class="txn-amt exp">&minus;$120.35</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 12</span><span class="txn-desc">Website project</span><span class="txn-cat"><span>Consulting</span></span><span class="txn-amt rev">+$2,400.00</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 11</span><span class="txn-desc">Software license</span><span class="txn-cat"><span>Software</span></span><span class="txn-amt exp">&minus;$49.00</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 10</span><span class="txn-desc">Product sale</span><span class="txn-cat"><span>Sales</span></span><span class="txn-amt rev">+$340.00</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 9</span><span class="txn-desc">Utilities</span><span class="txn-cat"><span>Office</span></span><span class="txn-amt exp">&minus;$210.00</span></div>
+                                                                <div class="txn-row"><span class="txn-date">Mar 8</span><span class="txn-desc">Consulting fee</span><span class="txn-cat"><span>Consulting</span></span><span class="txn-amt rev">+$1,500.00</span></div>
+                                                            </div>
+
+                                                            <div class="exp-chart exp-chart-line" id="expChartLine">
+                                                                <div class="exp-chart-head">
+                                                                    <span>Revenue vs Expenses</span>
+                                                                    <span class="exp-legend"><i class="lg-dot lg-rev"></i>Rev<i class="lg-dot lg-exp"></i>Exp</span>
+                                                                </div>
+                                                                <svg class="exp-line-svg" viewBox="0 0 240 108" preserveAspectRatio="none" aria-hidden="true">
+                                                                    <defs>
+                                                                        <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
+                                                                            <stop offset="0" stop-color="#10b981" stop-opacity="0.32"/>
+                                                                            <stop offset="1" stop-color="#10b981" stop-opacity="0"/>
+                                                                        </linearGradient>
+                                                                        <linearGradient id="expGrad" x1="0" y1="0" x2="0" y2="1">
+                                                                            <stop offset="0" stop-color="#ef4444" stop-opacity="0.20"/>
+                                                                            <stop offset="1" stop-color="#ef4444" stop-opacity="0"/>
+                                                                        </linearGradient>
+                                                                    </defs>
+                                                                    <g class="exp-grid">
+                                                                        <line x1="8" y1="24" x2="232" y2="24"/>
+                                                                        <line x1="8" y1="48" x2="232" y2="48"/>
+                                                                        <line x1="8" y1="72" x2="232" y2="72"/>
+                                                                        <line x1="8" y1="96" x2="232" y2="96"/>
+                                                                    </g>
+                                                                    <path d="M12 94 C27 94 41 90 56 90 C71 90 85 92 100 92 C115 92 129 84 144 84 C159 84 173 86 188 86 C203 86 213 78 228 78 L228 104 L12 104 Z" fill="url(#expGrad)"/>
+                                                                    <path d="M12 80 C27 80 41 68 56 68 C71 68 85 72 100 72 C115 72 129 52 144 52 C159 52 173 46 188 46 C203 46 213 28 228 28 L228 104 L12 104 Z" fill="url(#revGrad)"/>
+                                                                    <path class="exp-line-e" d="M12 94 C27 94 41 90 56 90 C71 90 85 92 100 92 C115 92 129 84 144 84 C159 84 173 86 188 86 C203 86 213 78 228 78"/>
+                                                                    <path class="exp-line-r" d="M12 80 C27 80 41 68 56 68 C71 68 85 72 100 72 C115 72 129 52 144 52 C159 52 173 46 188 46 C203 46 213 28 228 28"/>
+                                                                    <g class="exp-dots-e">
+                                                                        <circle class="exp-dot-e" cx="12" cy="94" r="2.1"/><circle class="exp-dot-e" cx="56" cy="90" r="2.1"/><circle class="exp-dot-e" cx="100" cy="92" r="2.1"/><circle class="exp-dot-e" cx="144" cy="84" r="2.1"/><circle class="exp-dot-e" cx="188" cy="86" r="2.1"/><circle class="exp-dot-e" cx="228" cy="78" r="2.1"/>
+                                                                    </g>
+                                                                    <g class="exp-dots-r">
+                                                                        <circle class="exp-dot-r" cx="12" cy="80" r="2.3"/><circle class="exp-dot-r" cx="56" cy="68" r="2.3"/><circle class="exp-dot-r" cx="100" cy="72" r="2.3"/><circle class="exp-dot-r" cx="144" cy="52" r="2.3"/><circle class="exp-dot-r" cx="188" cy="46" r="2.3"/>
+                                                                    </g>
+                                                                    <circle class="exp-pulse" cx="228" cy="28" r="3.6" fill="#10b981"/>
+                                                                    <circle cx="228" cy="28" r="3.6" fill="#10b981" stroke="#fff" stroke-width="1.5"/>
+                                                                </svg>
+                                                                <div class="exp-axis"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span></div>
+                                                            </div>
+
+                                                            <div class="exp-chart exp-chart-bars" id="expChartBars">
+                                                                <div class="exp-chart-head">
+                                                                    <span>Cash flow</span>
+                                                                    <span class="exp-net">+$<span class="exp-net-val">0</span></span>
+                                                                </div>
+                                                                <div class="exp-bars">
+                                                                    <div class="exp-bar-group"><span class="exp-bar exp-bar-rev" style="--h:70%"></span><span class="exp-bar exp-bar-exp" style="--h:44%"></span></div>
+                                                                    <div class="exp-bar-group"><span class="exp-bar exp-bar-rev" style="--h:56%"></span><span class="exp-bar exp-bar-exp" style="--h:38%"></span></div>
+                                                                    <div class="exp-bar-group"><span class="exp-bar exp-bar-rev" style="--h:66%"></span><span class="exp-bar exp-bar-exp" style="--h:50%"></span></div>
+                                                                    <div class="exp-bar-group"><span class="exp-bar exp-bar-rev" style="--h:84%"></span><span class="exp-bar exp-bar-exp" style="--h:46%"></span></div>
+                                                                    <div class="exp-bar-group"><span class="exp-bar exp-bar-rev" style="--h:78%"></span><span class="exp-bar exp-bar-exp" style="--h:54%"></span></div>
+                                                                    <div class="exp-bar-group"><span class="exp-bar exp-bar-rev" style="--h:96%"></span><span class="exp-bar exp-bar-exp" style="--h:48%"></span></div>
+                                                                </div>
+                                                                <div class="exp-axis exp-axis-bars"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -516,59 +528,69 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
                     <!-- Customer Management -->
                     <div class="tab-content" id="tab-customers">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Build lasting relationships</h3>
-                                <p>Keep track of customer information, purchase history, and preferences. Deliver personalized service that keeps them coming back.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Customer profiles</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Purchase history</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Notes and preferences</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup customers-mockup">
-                                        <div class="customer-card">
-                                            <div class="customer-avatar">JD</div>
-                                            <div class="customer-info">
-                                                <span class="customer-name">Jane Doe</span>
-                                                <span class="customer-email">jane@company.com</span>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
                                             </div>
-                                            <div class="customer-stats">
-                                                <div class="stat">
-                                                    <span class="stat-val">$4,230</span>
-                                                    <span class="stat-lbl">Total Spent</span>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
                                                 </div>
-                                                <div class="stat">
-                                                    <span class="stat-val">12</span>
-                                                    <span class="stat-lbl">Orders</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="customer-card">
-                                            <div class="customer-avatar alt">MS</div>
-                                            <div class="customer-info">
-                                                <span class="customer-name">Mike Smith</span>
-                                                <span class="customer-email">mike@store.com</span>
-                                            </div>
-                                            <div class="customer-stats">
-                                                <div class="stat">
-                                                    <span class="stat-val">$2,890</span>
-                                                    <span class="stat-lbl">Total Spent</span>
-                                                </div>
-                                                <div class="stat">
-                                                    <span class="stat-val">8</span>
-                                                    <span class="stat-lbl">Orders</span>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">Customers</div>
+                                                    <div class="cust-stage" id="customerStage">
+                                                        <div class="cust-inner">
+                                                            <div class="cust-table">
+                                                                <div class="cust-head"><span>Customer</span><span>Company</span><span class="cust-spent">Total spent</span><span class="cust-status-h">Status</span></div>
+                                                                <div class="cust-row selected"><span class="cust-who"><span class="cust-av av-1">JD</span><span class="cust-name">Jane Doe</span></span><span class="cust-co">Acme Inc</span><span class="cust-spent">$4,230</span><span class="cust-status"><span class="badge-active">Active</span></span></div>
+                                                                <div class="cust-row"><span class="cust-who"><span class="cust-av av-2">MS</span><span class="cust-name">Mike Smith</span></span><span class="cust-co">Store Co</span><span class="cust-spent">$2,890</span><span class="cust-status"><span class="badge-active">Active</span></span></div>
+                                                                <div class="cust-row"><span class="cust-who"><span class="cust-av av-3">AL</span><span class="cust-name">Ana Lopez</span></span><span class="cust-co">Lopez Studio</span><span class="cust-spent">$6,100</span><span class="cust-status"><span class="badge-vip">VIP</span></span></div>
+                                                                <div class="cust-row"><span class="cust-who"><span class="cust-av av-4">RK</span><span class="cust-name">Raj Kumar</span></span><span class="cust-co">Kumar &amp; Sons</span><span class="cust-spent">$1,450</span><span class="cust-status"><span class="badge-active">Active</span></span></div>
+                                                                <div class="cust-row"><span class="cust-who"><span class="cust-av av-2">EW</span><span class="cust-name">Emma Wong</span></span><span class="cust-co">Wong Design</span><span class="cust-spent">$3,720</span><span class="cust-status"><span class="badge-active">Active</span></span></div>
+                                                                <div class="cust-row"><span class="cust-who"><span class="cust-av av-3">TB</span><span class="cust-name">Tom Brown</span></span><span class="cust-co">Brown LLC</span><span class="cust-spent">$980</span><span class="cust-status"><span class="badge-new">New</span></span></div>
+                                                            </div>
+
+                                                            <div class="cust-profile" id="custProfile">
+                                                                <div class="cust-profile-head">
+                                                                    <span class="cust-av-lg av-1">JD</span>
+                                                                    <div class="cust-profile-id">
+                                                                        <span class="cust-profile-name">Jane Doe</span>
+                                                                        <span class="cust-profile-email">jane@acme.com</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="cust-profile-stats">
+                                                                    <div class="cps"><span class="cps-val">$<span class="cps-ltv">0</span></span><span class="cps-lbl">Lifetime</span></div>
+                                                                    <div class="cps"><span class="cps-val">12</span><span class="cps-lbl">Orders</span></div>
+                                                                    <div class="cps"><span class="cps-val">2024</span><span class="cps-lbl">Since</span></div>
+                                                                </div>
+                                                                <span class="cust-spark-lbl">Purchases</span>
+                                                                <svg class="cust-spark-svg" viewBox="0 0 220 58" preserveAspectRatio="none" aria-hidden="true">
+                                                                    <defs>
+                                                                        <linearGradient id="custSpark" x1="0" y1="0" x2="0" y2="1">
+                                                                            <stop offset="0" stop-color="#3f63e8" stop-opacity="0.30"/>
+                                                                            <stop offset="1" stop-color="#3f63e8" stop-opacity="0"/>
+                                                                        </linearGradient>
+                                                                    </defs>
+                                                                    <path d="M6 44 C24 42 38 36 60 38 C84 40 100 26 130 28 C160 30 184 18 214 10 L214 54 L6 54 Z" fill="url(#custSpark)"/>
+                                                                    <path class="cust-spark-line" d="M6 44 C24 42 38 36 60 38 C84 40 100 26 130 28 C160 30 184 18 214 10"/>
+                                                                    <circle class="exp-pulse" cx="214" cy="10" r="3.4" fill="#3f63e8"/>
+                                                                    <circle cx="214" cy="10" r="3.4" fill="#3f63e8" stroke="#fff" stroke-width="1.4"/>
+                                                                </svg>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -580,48 +602,71 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
                     <!-- Predictive Analytics -->
                     <div class="tab-content" id="tab-predictive">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>See the future of your business</h3>
-                                <p>Our predictive engine analyzes your historical data to forecast sales trends, identify seasonal patterns, and help you make data-driven decisions.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Sales trend forecasting</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Seasonal pattern detection</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Revenue projections</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup chart-mockup">
-                                        <div class="chart-header">
-                                            <span class="chart-title">Sales Forecast</span>
-                                            <span class="chart-period">Next 6 months</span>
-                                        </div>
-                                        <div class="chart-area">
-                                            <svg viewBox="0 0 300 150" class="forecast-chart">
-                                                <defs>
-                                                    <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.3"/>
-                                                        <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0"/>
-                                                    </linearGradient>
-                                                </defs>
-                                                <path d="M0,130 C40,135 60,95 105,90 C150,85 155,65 200,50 L200,150 L0,150 Z" fill="url(#chartGradient)"/>
-                                                <path d="M0,130 C40,135 60,95 105,90 C150,85 155,65 200,50" fill="none" stroke="#3b82f6" stroke-width="3"/>
-                                                <path d="M200,50 C230,40 250,30 265,35 C280,40 285,20 300,15" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="5,5" opacity="0.5"/>
-                                                <circle cx="200" cy="50" r="5" fill="#3b82f6"/>
-                                            </svg>
-                                            <div class="prediction-badge">
-                                                <span class="prediction-arrow">+18%</span>
-                                                <span class="prediction-text">Predicted Growth</span>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
+                                            </div>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                                                </div>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">Forecast</div>
+                                                    <div class="fc-stage" id="forecastStage">
+                                                        <div class="fc-kpis">
+                                                            <div class="fc-kpi"><span class="fc-kpi-val">$<span class="fc-next">0</span></span><span class="fc-kpi-lbl">Next month</span></div>
+                                                            <div class="fc-kpi"><span class="fc-kpi-val fc-up">+18%</span><span class="fc-kpi-lbl">Projected growth</span></div>
+                                                            <div class="fc-kpi"><span class="fc-kpi-val"><span class="fc-conf">0</span>%</span><span class="fc-kpi-lbl">Confidence</span></div>
+                                                        </div>
+                                                        <div class="fc-chart">
+                                                            <div class="fc-chart-head">
+                                                                <span>Sales forecast</span>
+                                                                <span class="fc-legend"><i class="fc-lg-line"></i>History<i class="fc-lg-dash"></i>Forecast</span>
+                                                            </div>
+                                                            <svg class="fc-svg" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true">
+                                                                <defs>
+                                                                    <linearGradient id="fcArea" x1="0" y1="0" x2="0" y2="1">
+                                                                        <stop offset="0" stop-color="#3f63e8" stop-opacity="0.28"/>
+                                                                        <stop offset="1" stop-color="#3f63e8" stop-opacity="0"/>
+                                                                    </linearGradient>
+                                                                    <linearGradient id="fcCone" x1="0" y1="0" x2="0" y2="1">
+                                                                        <stop offset="0" stop-color="#3f63e8" stop-opacity="0.18"/>
+                                                                        <stop offset="1" stop-color="#3f63e8" stop-opacity="0.03"/>
+                                                                    </linearGradient>
+                                                                </defs>
+                                                                <g class="fc-grid">
+                                                                    <line x1="10" y1="34" x2="310" y2="34"/>
+                                                                    <line x1="10" y1="70" x2="310" y2="70"/>
+                                                                    <line x1="10" y1="106" x2="310" y2="106"/>
+                                                                </g>
+                                                                <g class="fc-history">
+                                                                    <path d="M10 120 C40 122 60 96 90 92 C120 88 140 70 170 64 C185 61 195 56 200 54 L200 138 L10 138 Z" fill="url(#fcArea)"/>
+                                                                    <path class="fc-hline" d="M10 120 C40 122 60 96 90 92 C120 88 140 70 170 64 C185 61 195 56 200 54"/>
+                                                                </g>
+                                                                <g class="fc-forecast">
+                                                                    <path d="M200 54 C225 44 245 32 270 26 C290 23 300 14 310 10 L310 40 C300 36 290 40 270 44 C245 49 225 51 200 54 Z" fill="url(#fcCone)"/>
+                                                                    <path class="fc-fline" d="M200 54 C225 48 245 40 270 36 C290 33 300 26 310 22"/>
+                                                                    <line class="fc-now" x1="200" y1="20" x2="200" y2="138"/>
+                                                                    <circle cx="200" cy="54" r="4.2" fill="#3f63e8" stroke="#fff" stroke-width="1.6"/>
+                                                                    <circle class="exp-pulse" cx="200" cy="54" r="4.2" fill="#3f63e8"/>
+                                                                </g>
+                                                            </svg>
+                                                            <div class="fc-axis"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span class="fc-fut">May</span><span class="fc-fut">Jun</span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -633,52 +678,87 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
                     <!-- Inventory Management -->
                     <div class="tab-content" id="tab-inventory">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Complete inventory control</h3>
-                                <p>Track stock levels, set reorder points, and never run out of your best-selling items. Real-time visibility across all your products.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Real-time stock tracking</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Low stock alerts</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Purchase order management</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup inventory-mockup">
-                                        <div class="inventory-grid">
-                                            <div class="inventory-item">
-                                                <div class="item-icon"><?= svg_icon('shape-square', 24) ?></div>
-                                                <div class="item-details">
-                                                    <span class="item-name">Widget Pro</span>
-                                                    <span class="item-stock high">142 in stock</span>
-                                                </div>
-                                                <div class="item-bar high"></div>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
                                             </div>
-                                            <div class="inventory-item">
-                                                <div class="item-icon"><?= svg_icon('shape-circle', 24) ?></div>
-                                                <div class="item-details">
-                                                    <span class="item-name">Basic Kit</span>
-                                                    <span class="item-stock medium">34 in stock</span>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('package', 18) ?></span>
                                                 </div>
-                                                <div class="item-bar medium"></div>
-                                            </div>
-                                            <div class="inventory-item">
-                                                <div class="item-icon"><?= svg_icon('shape-hexagon', 24) ?></div>
-                                                <div class="item-details">
-                                                    <span class="item-name">Deluxe Bundle</span>
-                                                    <span class="item-stock low">8 in stock</span>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">Inventory</div>
+                                                    <div class="inv-stage" id="inventoryStage">
+                                                        <div class="inv-grid">
+                                                            <div class="inv-card">
+                                                                <div class="inv-card-top">
+                                                                    <span class="inv-chip chip-1"><?= svg_icon('package', 18) ?></span>
+                                                                    <span class="inv-meta"><span class="inv-name">Widget Pro</span><span class="inv-sku">WGT-01</span></span>
+                                                                    <span class="inv-badge badge-ok">In stock</span>
+                                                                </div>
+                                                                <div class="inv-count"><span class="inv-num" data-target="142">0</span><span class="inv-unit">units</span></div>
+                                                                <div class="inv-bar"><span class="inv-fill fill-ok" style="--fill: 88%"></span></div>
+                                                            </div>
+                                                            <div class="inv-card">
+                                                                <div class="inv-card-top">
+                                                                    <span class="inv-chip chip-2"><?= svg_icon('package', 18) ?></span>
+                                                                    <span class="inv-meta"><span class="inv-name">Cable Set</span><span class="inv-sku">CBL-04</span></span>
+                                                                    <span class="inv-badge badge-ok">In stock</span>
+                                                                </div>
+                                                                <div class="inv-count"><span class="inv-num" data-target="96">0</span><span class="inv-unit">units</span></div>
+                                                                <div class="inv-bar"><span class="inv-fill fill-ok" style="--fill: 64%"></span></div>
+                                                            </div>
+                                                            <div class="inv-card">
+                                                                <div class="inv-card-top">
+                                                                    <span class="inv-chip chip-3"><?= svg_icon('package', 18) ?></span>
+                                                                    <span class="inv-meta"><span class="inv-name">Basic Kit</span><span class="inv-sku">KIT-09</span></span>
+                                                                    <span class="inv-badge badge-low">Low</span>
+                                                                </div>
+                                                                <div class="inv-count"><span class="inv-num" data-target="34">0</span><span class="inv-unit">units</span></div>
+                                                                <div class="inv-bar"><span class="inv-fill fill-low" style="--fill: 34%"></span></div>
+                                                            </div>
+                                                            <div class="inv-card">
+                                                                <div class="inv-card-top">
+                                                                    <span class="inv-chip chip-4"><?= svg_icon('package', 18) ?></span>
+                                                                    <span class="inv-meta"><span class="inv-name">Power Adapter</span><span class="inv-sku">PWR-11</span></span>
+                                                                    <span class="inv-badge badge-low">Low</span>
+                                                                </div>
+                                                                <div class="inv-count"><span class="inv-num" data-target="21">0</span><span class="inv-unit">units</span></div>
+                                                                <div class="inv-bar"><span class="inv-fill fill-low" style="--fill: 24%"></span></div>
+                                                            </div>
+                                                            <div class="inv-card">
+                                                                <div class="inv-card-top">
+                                                                    <span class="inv-chip chip-5"><?= svg_icon('package', 18) ?></span>
+                                                                    <span class="inv-meta"><span class="inv-name">Deluxe Bundle</span><span class="inv-sku">DLX-22</span></span>
+                                                                    <span class="inv-badge badge-crit">Critical</span>
+                                                                </div>
+                                                                <div class="inv-count"><span class="inv-num" data-target="8">0</span><span class="inv-unit">units</span></div>
+                                                                <div class="inv-bar"><span class="inv-fill fill-crit" style="--fill: 10%"></span></div>
+                                                            </div>
+                                                            <div class="inv-card">
+                                                                <div class="inv-card-top">
+                                                                    <span class="inv-chip chip-6"><?= svg_icon('package', 18) ?></span>
+                                                                    <span class="inv-meta"><span class="inv-name">Starter Pack</span><span class="inv-sku">STR-07</span></span>
+                                                                    <span class="inv-badge badge-ok">In stock</span>
+                                                                </div>
+                                                                <div class="inv-count"><span class="inv-num" data-target="73">0</span><span class="inv-unit">units</span></div>
+                                                                <div class="inv-bar"><span class="inv-fill fill-ok" style="--fill: 52%"></span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="item-bar low"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -689,61 +769,58 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
 
                     <!-- Rental Management -->
                     <div class="tab-content" id="tab-rental">
-                        <div class="tab-content-inner">
-                            <div class="tab-content-text">
-                                <h3>Simplify your rentals</h3>
-                                <p>Manage equipment rentals, track availability, and handle bookings with ease. Perfect for rental businesses of any size.</p>
-                                <ul class="feature-list">
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Availability calendar</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Booking management</span>
-                                    </li>
-                                    <li>
-                                        <?= svg_icon('check', 20) ?>
-                                        <span>Return tracking</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="tab-content-inner tab-content-inner--solo">
                             <div class="tab-content-visual">
-                                <div class="feature-visual-card">
-                                    <div class="visual-mockup calendar-mockup">
-                                        <div class="calendar-header">
-                                            <span class="cal-month">December 2025</span>
-                                            <div class="cal-nav">
-                                                <button><?= svg_icon('chevron-left-sm', 16) ?></button>
-                                                <button><?= svg_icon('chevron-right-sm', 16) ?></button>
+                                <div class="feature-visual-card invoice-studio-card">
+                                    <div class="invoice-studio">
+                                        <div class="invoice-window">
+                                            <div class="app-topbar">
+                                                <span class="app-brand"><img src="resources/images/argo-logo/argo-books-icon-transparent.png" alt="" class="app-brand-img">Argo Books</span>
                                             </div>
-                                        </div>
-                                        <div class="calendar-grid">
-                                            <div class="cal-day header">Su</div>
-                                            <div class="cal-day header">Mo</div>
-                                            <div class="cal-day header">Tu</div>
-                                            <div class="cal-day header">We</div>
-                                            <div class="cal-day header">Th</div>
-                                            <div class="cal-day header">Fr</div>
-                                            <div class="cal-day header">Sa</div>
-                                            <div class="cal-day">1</div>
-                                            <div class="cal-day booked">2</div>
-                                            <div class="cal-day booked">3</div>
-                                            <div class="cal-day booked">4</div>
-                                            <div class="cal-day">5</div>
-                                            <div class="cal-day">6</div>
-                                            <div class="cal-day">7</div>
-                                            <div class="cal-day">8</div>
-                                            <div class="cal-day">9</div>
-                                            <div class="cal-day available">10</div>
-                                            <div class="cal-day available">11</div>
-                                            <div class="cal-day available">12</div>
-                                            <div class="cal-day">13</div>
-                                            <div class="cal-day">14</div>
-                                        </div>
-                                        <div class="calendar-legend">
-                                            <span class="legend-item"><span class="dot booked"></span> Booked</span>
-                                            <span class="legend-item"><span class="dot available"></span> Available</span>
+                                            <div class="app-body">
+                                                <div class="app-nav" aria-hidden="true">
+                                                    <span class="app-nav-btn"><?= svg_icon('grid', 18) ?></span>
+                                                    <span class="app-nav-btn app-nav-btn--active"><?= svg_icon('calendar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('trending-up', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('document', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('receipt', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('dollar', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('credit-card', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('users', 18) ?></span>
+                                                    <span class="app-nav-btn"><?= svg_icon('package', 18) ?></span>
+                                                </div>
+                                                <div class="app-content">
+                                                    <div class="app-page-title">Rentals</div>
+                                                    <div class="rent-stage" id="rentalStage">
+                                                        <div class="rent-inner">
+                                                            <div class="rent-cal">
+                                                                <div class="rent-cal-head">
+                                                                    <span class="rent-month">December 2025</span>
+                                                                    <span class="rent-nav"><i><?= svg_icon('chevron-left-sm', 13) ?></i><i><?= svg_icon('chevron-right-sm', 13) ?></i></span>
+                                                                </div>
+                                                                <div class="rent-grid">
+                                                                    <span class="rent-wd">Su</span><span class="rent-wd">Mo</span><span class="rent-wd">Tu</span><span class="rent-wd">We</span><span class="rent-wd">Th</span><span class="rent-wd">Fr</span><span class="rent-wd">Sa</span>
+                                                                    <span class="rent-day rent-empty"></span><span class="rent-day">1</span><span class="rent-day">2</span><span class="rent-day">3</span><span class="rent-day">4</span><span class="rent-day">5</span><span class="rent-day">6</span>
+                                                                    <span class="rent-day">7</span><span class="rent-day">8</span><span class="rent-day rent-seq">9</span><span class="rent-day rent-seq">10</span><span class="rent-day rent-seq">11</span><span class="rent-day rent-seq">12</span><span class="rent-day">13</span>
+                                                                    <span class="rent-day">14</span><span class="rent-day">15</span><span class="rent-day booked">16</span><span class="rent-day booked">17</span><span class="rent-day">18</span><span class="rent-day">19</span><span class="rent-day">20</span>
+                                                                    <span class="rent-day">21</span><span class="rent-day">22</span><span class="rent-day booked">23</span><span class="rent-day booked">24</span><span class="rent-day">25</span><span class="rent-day">26</span><span class="rent-day">27</span>
+                                                                    <span class="rent-day">28</span><span class="rent-day">29</span><span class="rent-day">30</span><span class="rent-day">31</span><span class="rent-day rent-empty"></span><span class="rent-day rent-empty"></span><span class="rent-day rent-empty"></span>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="rent-booking" id="rentBooking">
+                                                                <div class="rent-bk-head">
+                                                                    <span class="rent-bk-icon"><?= svg_icon('package', 16) ?></span>
+                                                                    <span class="rent-bk-id"><span class="rent-bk-item">HD Projector</span><span class="rent-bk-cust">Sarah Miller</span></span>
+                                                                    <span class="rent-bk-badge">Out</span>
+                                                                </div>
+                                                                <div class="rent-bk-row"><span class="rent-bk-lbl">Rental</span><span class="rent-bk-val">Dec 9 &ndash; Dec 12</span></div>
+                                                                <div class="rent-bk-row"><span class="rent-bk-lbl">Returns</span><span class="rent-bk-val rent-bk-ret">in 3 days</span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -756,140 +833,66 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         </div>
     </section>
 
-    <!-- AI Spreadsheet Import Section -->
+    <!-- Import / Switching Section -->
     <section class="ai-import-section">
         <div class="container">
             <div class="ai-import-header animate-on-scroll">
-                <span class="section-tag">Smart Import</span>
-                <h2 class="section-title">Import any spreadsheet in seconds</h2>
-                <p class="section-description">Drop your file in and Argo Books handles the rest. No reformatting, no manual mapping, no headaches.</p>
+                <h2 class="section-title">Switch in minutes, not weekends</h2>
+                <p class="section-description">Bring your history with you. Drop in a spreadsheet or a bank statement and Argo Books turns it into clean, organized books. No reformatting, no manual mapping, no re-typing.</p>
             </div>
 
-            <div class="ai-import-flow animate-on-scroll" id="aiImportDemo">
-                <!-- Source: messy spreadsheet -->
-                <div class="ai-flow-source">
-                    <div class="ai-flow-card ai-flow-card-source">
-                        <div class="ai-flow-card-header">
-                            <div class="ai-flow-file-icon"><?= svg_icon('table', 16) ?></div>
-                            <span class="ai-flow-file-name">bill_export.xlsx</span>
-                            <span class="ai-flow-file-badge">Excel</span>
-                        </div>
-                        <div class="ai-flow-table">
-                            <div class="ai-flow-row ai-flow-row-header">
-                                <span>Supplier</span>
-                                <span>Amt Owed</span>
-                                <span>Pay By</span>
-                                <span>Memo</span>
-                            </div>
-                            <div class="ai-flow-row" data-row="0">
-                                <span>Acme Supply Co</span>
-                                <span>$4,280.00</span>
-                                <span>12/15/2025</span>
-                                <span>INV-3847</span>
-                            </div>
-                            <div class="ai-flow-row" data-row="1">
-                                <span>TechFlow LLC</span>
-                                <span>$950.50</span>
-                                <span>01/02/2026</span>
-                                <span>PO-9912</span>
-                            </div>
-                            <div class="ai-flow-row ai-flow-row-faded" data-row="2">
-                                <span>NovaCorp Int'l</span>
-                                <span>$12,100.00</span>
-                                <span>11/30/2025</span>
-                                <span>Contract #441</span>
-                            </div>
-                        </div>
-                        <div class="ai-flow-row-count">+384 rows</div>
+            <div class="imp-demo animate-on-scroll" id="aiImportDemo">
+                <div class="imp-sheet">
+                    <div class="imp-sheet-head">
+                        <span class="imp-file"><?= svg_icon('table', 16) ?> bill_export.xlsx</span>
+                        <span class="imp-pill" id="impPill"><?= svg_icon('check', 12) ?> Auto-mapped</span>
                     </div>
-                </div>
-
-                <!-- Center: processing hub -->
-                <div class="ai-flow-center">
-                    <div class="ai-flow-connector-line ai-flow-connector-left"></div>
-                    <div class="ai-flow-hub" id="aiFlowHub">
-                        <div class="ai-flow-hub-ring">
-                            <div class="ai-hub-glow"></div>
-                            <svg viewBox="0 0 80 80" class="ai-hub-svg">
-                                <circle cx="40" cy="40" r="36" fill="none" stroke="#e0e7ff" stroke-width="2"/>
-                                <circle cx="40" cy="40" r="36" fill="none" stroke="url(#hubGrad)" stroke-width="3" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round" class="ai-hub-progress"/>
-                                <defs>
-                                    <linearGradient id="hubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" style="stop-color:#3b82f6"/>
-                                        <stop offset="100%" style="stop-color:#2563eb"/>
-                                    </linearGradient>
-                                </defs>
-                            </svg>
-                            <div class="ai-hub-icon">
-                                <?= svg_icon('bolt', 24) ?>
-                            </div>
+                    <div class="imp-table">
+                        <div class="imp-row imp-row-head">
+                            <div class="imp-col" data-c="0"><span class="imp-raw">Supplier</span><span class="imp-clean">Supplier Name<i class="imp-tag">Text</i></span></div>
+                            <div class="imp-col" data-c="1"><span class="imp-raw">Amt Owed</span><span class="imp-clean">Balance Due<i class="imp-tag">Currency</i></span></div>
+                            <div class="imp-col" data-c="2"><span class="imp-raw">Pay By</span><span class="imp-clean">Due Date<i class="imp-tag">Date</i></span></div>
+                            <div class="imp-col" data-c="3"><span class="imp-raw">Memo</span><span class="imp-clean">Reference #<i class="imp-tag">ID</i></span></div>
                         </div>
-                        <span class="ai-flow-hub-label" id="aiHubLabel">Analyzing...</span>
+                        <div class="imp-row">
+                            <span>Acme Supply Co</span>
+                            <span class="imp-cell" data-c="1"><span class="imp-raw">4280</span><span class="imp-clean">$4,280.00</span></span>
+                            <span class="imp-cell" data-c="2"><span class="imp-raw">12/15/2025</span><span class="imp-clean">Dec 15, 2025</span></span>
+                            <span>INV-3847</span>
+                        </div>
+                        <div class="imp-row">
+                            <span>TechFlow LLC</span>
+                            <span class="imp-cell" data-c="1"><span class="imp-raw">950.5</span><span class="imp-clean">$950.50</span></span>
+                            <span class="imp-cell" data-c="2"><span class="imp-raw">01/02/2026</span><span class="imp-clean">Jan 2, 2026</span></span>
+                            <span>PO-9912</span>
+                        </div>
+                        <div class="imp-row imp-row-faded">
+                            <span>NovaCorp Int'l</span>
+                            <span class="imp-cell" data-c="1"><span class="imp-raw">12100</span><span class="imp-clean">$12,100.00</span></span>
+                            <span class="imp-cell" data-c="2"><span class="imp-raw">11/30/2025</span><span class="imp-clean">Nov 30, 2025</span></span>
+                            <span>Contract #441</span>
+                        </div>
                     </div>
-                    <div class="ai-flow-connector-line ai-flow-connector-right"></div>
-                    <!-- Animated particles -->
-                    <div class="ai-flow-particles" id="aiParticles"></div>
-                </div>
-
-                <!-- Destination: clean imported fields -->
-                <div class="ai-flow-dest">
-                    <div class="ai-flow-card ai-flow-card-dest">
-                        <div class="ai-flow-card-header ai-flow-card-header-dest">
-                            <span class="ai-flow-dest-title">Argo Books</span>
-                            <span class="ai-flow-dest-badge" id="aiMatchBadge">0/4</span>
-                        </div>
-                        <div class="ai-flow-fields" id="aiFlowFields">
-                            <div class="ai-flow-field" data-field="0">
-                                <div class="ai-flow-field-label">Supplier Name</div>
-                                <div class="ai-flow-field-value">Acme Supply Co</div>
-                                <div class="ai-flow-field-tag ai-flow-field-tag-text"><?= svg_icon('check', 12) ?> Text</div>
-                            </div>
-                            <div class="ai-flow-field" data-field="1">
-                                <div class="ai-flow-field-label">Balance Due</div>
-                                <div class="ai-flow-field-value">$4,280.00</div>
-                                <div class="ai-flow-field-tag ai-flow-field-tag-currency"><?= svg_icon('check', 12) ?> Currency</div>
-                            </div>
-                            <div class="ai-flow-field" data-field="2">
-                                <div class="ai-flow-field-label">Due Date</div>
-                                <div class="ai-flow-field-value">Dec 15, 2025</div>
-                                <div class="ai-flow-field-tag ai-flow-field-tag-date"><?= svg_icon('check', 12) ?> Date</div>
-                            </div>
-                            <div class="ai-flow-field" data-field="3">
-                                <div class="ai-flow-field-label">Reference #</div>
-                                <div class="ai-flow-field-value">INV-3847</div>
-                                <div class="ai-flow-field-tag ai-flow-field-tag-id"><?= svg_icon('check', 12) ?> ID</div>
-                            </div>
-                        </div>
-                        <div class="ai-flow-footer" id="aiFlowFooter">
-                            <?= svg_icon('check', 16) ?>
-                            <span>Ready to import 387 rows</span>
-                        </div>
+                    <div class="imp-foot">
+                        <span class="imp-rows">+384 more rows</span>
+                        <span class="imp-done" id="impDone"><?= svg_icon('check', 14) ?> Ready to import 387 rows</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Feature pills -->
-            <div class="ai-import-pills animate-on-scroll">
-                <div class="ai-pill">
-                    <div class="ai-pill-icon"><?= svg_icon('bolt', 18) ?></div>
-                    <div class="ai-pill-text">
-                        <strong>Instant detection</strong>
-                        <span>Names, emails, dates, currencies: recognized automatically</span>
-                    </div>
+            <!-- Capability strip -->
+            <div class="ai-import-points animate-on-scroll">
+                <div class="ai-point">
+                    <strong>Bring your whole history</strong>
+                    <span>Import months of spreadsheets or bank statements at once. CSV, Excel, or PDF.</span>
                 </div>
-                <div class="ai-pill">
-                    <div class="ai-pill-icon"><?= svg_icon('table', 18) ?></div>
-                    <div class="ai-pill-text">
-                        <strong>Any format</strong>
-                        <span>Messy columns, unusual names, mixed data: no cleanup needed</span>
-                    </div>
+                <div class="ai-point">
+                    <strong>Categorized for you</strong>
+                    <span>Statement lines become sorted expenses and revenue, and it learns your preferences as you go.</span>
                 </div>
-                <div class="ai-pill">
-                    <div class="ai-pill-icon"><?= svg_icon('shield', 18) ?></div>
-                    <div class="ai-pill-text">
-                        <strong>Private &amp; secure</strong>
-                        <span>Encrypted processing. Never stored or used for training</span>
-                    </div>
+                <div class="ai-point">
+                    <strong>No bank login required</strong>
+                    <span>Just the file you download from your bank. Encrypted on your device, never stored or used for training.</span>
                 </div>
             </div>
         </div>
@@ -899,7 +902,6 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <section class="tax-ready-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">Reports &amp; Insights</span>
                 <h2 class="section-title">Stay tax-ready with clean books and instant reports</h2>
                 <p class="section-description">Every transaction is categorized and matched to its receipt as you go. Generate any report you need in seconds. No spreadsheets, no scrambling at year-end.</p>
             </div>
@@ -1113,8 +1115,8 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                             <text x="28" y="38" font-family="-apple-system,system-ui,sans-serif" font-size="11" font-weight="700" fill="#0f172a">Transactions</text>
                             <text x="28" y="52" font-family="-apple-system,system-ui,sans-serif" font-size="7" fill="#94a3b8">April 2026 · 247 entries</text>
                             <rect x="218" y="26" width="76" height="20" rx="10" fill="#dcfce7"/>
-                            <path d="M 228 36 l 3 3 l 6 -6" stroke="#15803d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                            <text x="246" y="40" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#15803d">All matched</text>
+                            <path d="M 224 36 l 3 3 l 6 -6" stroke="#15803d" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <text x="242" y="39" font-family="-apple-system,system-ui,sans-serif" font-size="8" font-weight="700" fill="#15803d">All matched</text>
                             <!-- Column headers -->
                             <text x="28" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" font-weight="700" fill="#94a3b8" letter-spacing="0.3">DATE</text>
                             <text x="74" y="74" font-family="-apple-system,system-ui,sans-serif" font-size="6.5" font-weight="700" fill="#94a3b8" letter-spacing="0.3">DESCRIPTION</text>
@@ -1210,7 +1212,6 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         <div class="container">
             <div class="security-layout">
                 <div class="security-text animate-on-scroll">
-                    <span class="section-tag">Security</span>
                     <h2 class="section-title text-left">This is what your data looks like on disk</h2>
                     <p class="section-description text-left">Every transaction, invoice, and customer record is encrypted with AES-256-GCM before it's saved. Even if someone copied your files, they'd see nothing useful.</p>
 
@@ -1273,8 +1274,7 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
     <section class="pricing-section">
         <div class="container">
             <div class="section-header animate-on-scroll">
-                <span class="section-tag">Pricing</span>
-                <h2 class="section-title">Pick a plan that's right for you</h2>
+                <h2 class="section-title">Free to start. Upgrade when you need more.</h2>
                 <p class="section-description">Start free, upgrade when you need more. No hidden fees, no surprises.</p>
             </div>
 
@@ -1347,6 +1347,56 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
                     <?= svg_icon('message-circle', 20) ?>
                     Contact Us
                 </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured On Section -->
+    <section class="featured-on">
+        <div class="container">
+            <span class="featured-on-label">Featured on</span>
+            <?php
+            // Badge list rendered twice back-to-back so the marquee can loop seamlessly
+            $featured_badges = [
+                ['href' => 'https://topfreeaitools.com', 'img' => 'topfreeaitools.png', 'w' => 230, 'alt' => 'Featured on Top Free AI Tools'],
+                ['href' => 'https://startupfa.me/s/argo-books', 'img' => 'startupfame.webp', 'w' => 171, 'alt' => 'Argo Books - Featured on Startup Fame'],
+                ['href' => 'https://launch-list.org/product/argo-books', 'img' => 'launchlist.svg',     'w' => 165, 'alt' => 'Featured on Launch List'],
+                ['href' => 'https://twelve.tools', 'img' => 'twelvetools.svg',    'w' => 200, 'alt' => 'Featured on Twelve Tools'],
+                ['href' => 'https://wired.business', 'img' => 'wiredbusiness.svg',  'w' => 200, 'alt' => 'Featured on Wired Business'],
+                ['href' => 'https://auraplusplus.com/projects/argo-books', 'img' => 'auraplusplus.svg',   'w' => 184, 'alt' => 'Featured on Aura++'],
+                ['href' => 'https://submitmysaas.com/projects/argo-books', 'img' => 'submitmysaas-top1.png', 'w' => 237, 'alt' => 'SubmitMySaas Top 1 Daily Winner'],
+                ['href' => 'https://www.productlaunchify.com/projects/argo-books', 'img' => 'productlaunchify.svg', 'w' => 227, 'alt' => 'Featured on Product Launchify'],
+                ['href' => 'https://www.scrolllaunch.com', 'img' => 'scrolllaunch.svg', 'w' => 248, 'alt' => 'Featured on ScrollLaunch'],
+                ['href' => 'https://starterbest.com', 'img' => 'https://starterbest.com/badages-awards.svg', 'w' => 184, 'alt' => 'Featured on Starter Best'],
+                ['href' => 'https://dayslaunch.com', 'img' => 'https://dayslaunch.com/badages-awards.svg', 'w' => 200, 'alt' => 'Featured on Days Launch'],
+                ['href' => 'https://toolrain.com/item/argo-books', 'img' => 'toolrain.svg', 'w' => 184, 'alt' => 'Listed on ToolRain'],
+                ['href' => 'https://saasfame.com/item/argo-books', 'img' => 'https://saasfame.com/badge-light.svg', 'w' => 170, 'alt' => 'Featured on SaaSFame'],
+                ['href' => 'https://deeplaunch.io', 'img' => 'https://deeplaunch.io/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on DeepLaunch.io'],
+                ['href' => 'https://directoryhunt.org/', 'img' => 'https://directoryhunt.org/assets/Badges/featured.svg', 'w' => 199, 'alt' => 'Featured on DirectoryHunt.org'],
+                ['href' => 'https://proofstories.io/directory/products/argo-books/', 'img' => 'https://proofstories.io/directory/badges/l/argo-books.svg', 'w' => 189, 'alt' => 'Listed on ProofStories'],
+                ['href' => 'https://dofollow.tools', 'img' => 'https://dofollow.tools/badge/badge_light.svg', 'w' => 188, 'alt' => 'Featured on Dofollow.Tools'],
+                ['href' => 'https://open-launch.com/projects/argo-books', 'img' => 'https://open-launch.com/api/badge/84f80c1b-1825-496d-b98b-67919dd95a77/featured-light.svg', 'w' => 216, 'alt' => 'Featured on Open-Launch'],
+                ['href' => 'https://fazier.com/launches/argorobots.com', 'img' => 'https://fazier.com/api/v1//public/badges/launch_badges.svg?badge_type=featured&theme=light', 'w' => 229, 'alt' => 'Featured on Fazier'],
+            ];
+            ?>
+            <div class="featured-on-marquee">
+                <div class="featured-on-track">
+                    <?php for ($pass = 0; $pass < 2; $pass++): ?>
+                        <?php foreach ($featured_badges as $badge): ?>
+                            <a href="<?= htmlspecialchars($badge['href']) ?>" target="_blank" rel="noopener"<?= $pass === 1 ? ' aria-hidden="true" tabindex="-1"' : '' ?>>
+                                <?php
+                                // Badges are self-hosted under resources/images/featured/. An absolute
+                                // URL is used only where the directory's verifier requires its own hosted
+                                // badge image to be referenced directly (e.g. Starter Best).
+                                $src = strpos($badge['img'], '://') !== false
+                                    ? $badge['img']
+                                    : 'resources/images/featured/' . $badge['img'];
+                                ?>
+                                <img src="<?= htmlspecialchars($src) ?>" style="width: <?= (int) $badge['w'] ?>px; height: 54px;" width="<?= (int) $badge['w'] ?>" height="54" alt="<?= htmlspecialchars($badge['alt']) ?>" />
+                            </a>
+                        <?php endforeach; ?>
+                    <?php endfor; ?>
+                </div>
             </div>
         </div>
     </section>
@@ -1519,75 +1569,77 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
             });
         });
 
-        // Receipt scan animation cycle
-        const scanAnimation = document.getElementById('receiptScanAnimation');
-        const aiBadge = document.getElementById('aiBadge');
-        const scanLine = scanAnimation ? scanAnimation.querySelector('.scan-line') : null;
-        const scanTexts = scanAnimation ? scanAnimation.parentElement.querySelectorAll('.scan-text') : [];
-        let scanTimeouts = [];
+        // Receipt scan & extract animation (loops)
+        (function initReceiptScan() {
+            const stage = document.getElementById('receiptScan');
+            if (!stage) return;
+            const status = document.getElementById('efStatus');
+            const totalVal = stage.querySelector('.ef-total-val');
+            let timers = [];
+            function t(fn, d) { timers.push(setTimeout(fn, d)); }
+            function clearTimers() { timers.forEach(clearTimeout); timers = []; }
 
-        function clearScanTimeouts() {
-            scanTimeouts.forEach(t => clearTimeout(t));
-            scanTimeouts = [];
-        }
+            function countUp(el, target, duration) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = '$' + (target * eased).toLocaleString('en-US', {
+                        minimumFractionDigits: 2, maximumFractionDigits: 2
+                    });
+                    if (p < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
+            }
 
-        function runScanCycle() {
-            if (!scanAnimation || !aiBadge || !scanLine) return;
-            clearScanTimeouts();
+            const seq = [
+                { at: 380,  f: 'merchant' },
+                { at: 720,  f: 'date' },
+                { at: 1020, f: 'category', formOnly: true },
+                { at: 1320, f: 'item-0' },
+                { at: 1560, f: 'item-1' },
+                { at: 1800, f: 'item-2' },
+                { at: 2040, f: 'item-3' },
+                { at: 2380, f: 'tax' },
+                { at: 2680, f: 'total' }
+            ];
 
-            // Reset all states
-            scanAnimation.classList.remove('scan-complete');
-            aiBadge.classList.remove('complete');
-            scanTexts.forEach(el => {
-                el.classList.remove('highlighted', 'extracted');
-            });
+            function run() {
+                clearTimers();
+                stage.classList.remove('done');
+                stage.querySelectorAll('.scan-row').forEach(el => el.classList.remove('detected'));
+                stage.querySelectorAll('.ef-field, .ef-line, .ef-trow').forEach(el => el.classList.remove('in'));
+                if (status) status.classList.remove('in');
+                if (totalVal) totalVal.textContent = '$0.00';
 
-            // Run single scan pass
-            scanLine.style.animation = 'none';
-            scanLine.offsetHeight;
-            scanLine.style.animation = 'scanLine 2.5s linear 1 forwards';
+                // restart the beam sweep
+                stage.classList.remove('scanning');
+                void stage.offsetWidth;
+                stage.classList.add('scanning');
 
-            // Highlight each text line exactly when the scan line crosses it
-            const scanDuration = 2500;
-            const containerRect = scanAnimation.getBoundingClientRect();
-            const containerHeight = containerRect.height || 1;
-            scanTexts.forEach((el) => {
-                const elRect = el.getBoundingClientRect();
-                const elCenterY = (elRect.top - containerRect.top) + (elRect.height / 2);
-                const progress = Math.max(0, Math.min(1, elCenterY / containerHeight));
-                const highlightAt = progress * scanDuration;
-                scanTimeouts.push(setTimeout(() => {
-                    el.classList.add('highlighted');
-                }, highlightAt));
-            });
-
-            // After scan completes, transition highlights to extracted (green)
-            scanTimeouts.push(setTimeout(() => {
-                scanTexts.forEach((el, i) => {
-                    scanTimeouts.push(setTimeout(() => {
-                        el.classList.remove('highlighted');
-                        el.classList.add('extracted');
-                    }, i * 80));
+                seq.forEach(s => {
+                    t(() => {
+                        if (!s.formOnly) {
+                            const row = stage.querySelector('.scan-row[data-field="' + s.f + '"]');
+                            if (row) row.classList.add('detected');
+                        }
+                        stage.querySelectorAll(
+                            '.ef-field[data-field="' + s.f + '"], .ef-line[data-field="' + s.f + '"], .ef-trow[data-field="' + s.f + '"]'
+                        ).forEach(el => el.classList.add('in'));
+                        if (s.f === 'total' && totalVal) countUp(totalVal, 120.35, 800);
+                    }, s.at);
                 });
-            }, scanDuration + 200));
 
-            // Show complete state
-            const completeAt = scanDuration + 200 + (scanTexts.length * 80) + 300;
-            scanTimeouts.push(setTimeout(() => {
-                scanAnimation.classList.add('scan-complete');
-                aiBadge.classList.add('complete');
-
-                // Restart cycle after showing complete
-                scanTimeouts.push(setTimeout(() => {
-                    runScanCycle();
-                }, 3000));
-            }, completeAt));
-        }
-
-        // Start the scan animation cycle
-        if (scanAnimation) {
-            runScanCycle();
-        }
+                // completion + loop
+                t(() => {
+                    stage.classList.remove('scanning');
+                    stage.classList.add('done');
+                    if (status) status.classList.add('in');
+                }, 3150);
+                t(run, 6400);
+            }
+            run();
+        })();
 
         // Feature tab animation controller
         function startTabAnimation(tabId) {
@@ -1609,399 +1661,370 @@ if ($update_xml !== false && isset($update_xml->channel->item[0])) {
         }
 
         // Expense & Revenue Tracking animation
+        // Expense & Revenue overview: table streams in, charts pop up and animate
         function animateExpenses(t) {
-            const mockup = document.querySelector('.expenses-mockup');
-            if (!mockup) return;
+            const stage = document.getElementById('expenseStage');
+            if (!stage) return;
+            const rows = stage.querySelectorAll('.txn-row');
+            const chartLine = document.getElementById('expChartLine');
+            const chartBars = document.getElementById('expChartBars');
+            const netVal = stage.querySelector('.exp-net-val');
 
-            const fields = mockup.querySelectorAll('.form-field');
-            const checks = mockup.querySelectorAll('.validation-check');
-            const toggleOptions = mockup.querySelectorAll('.toggle-option');
-
-            // Initial animation: fields and checks appear once
-            mockup.classList.add('animating');
-            fields.forEach(f => f.classList.remove('field-visible'));
-            checks.forEach(c => c.classList.remove('check-visible'));
-
-            fields.forEach((field, i) => {
-                t(() => field.classList.add('field-visible'), 300 + i * 400);
-            });
-
-            checks.forEach((check, i) => {
-                t(() => check.classList.add('check-visible'), 2400 + i * 300);
-            });
-
-            // After initial build, cycle only the expense/revenue toggle
-            function toggleCycle() {
-                // Flip to Revenue
-                t(() => {
-                    toggleOptions.forEach(opt => opt.classList.toggle('active'));
-                    const amountField = fields[1]?.querySelector('.field-value');
-                    if (amountField) amountField.textContent = '$120.50';
-                    const catField = fields[2]?.querySelector('.field-value');
-                    if (catField) catField.textContent = 'Office Supplies';
-                }, 0);
-
-                // Flip back to Expense
-                t(() => {
-                    toggleOptions.forEach(opt => opt.classList.toggle('active'));
-                    const amountField = fields[1]?.querySelector('.field-value');
-                    if (amountField) amountField.textContent = '$85.00';
-                    const catField = fields[2]?.querySelector('.field-value');
-                    if (catField) catField.textContent = 'Books';
-
-                    // Continue cycling
-                    t(() => toggleCycle(), 5000);
-                }, 5000);
+            function countUp(el, target, duration) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(target * eased).toLocaleString('en-US');
+                    if (p < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
             }
 
-            // Start toggle cycling after initial animation settles
-            t(() => toggleCycle(), 5000);
+            function run() {
+                rows.forEach(r => r.classList.remove('in'));
+                if (chartLine) chartLine.classList.remove('in');
+                if (chartBars) chartBars.classList.remove('in');
+                if (netVal) netVal.textContent = '0';
+
+                rows.forEach((r, i) => t(() => r.classList.add('in'), 250 + i * 170));
+                const afterRows = 250 + rows.length * 170;
+
+                t(() => { if (chartLine) chartLine.classList.add('in'); }, afterRows + 200);
+                t(() => {
+                    if (chartBars) chartBars.classList.add('in');
+                    if (netVal) countUp(netVal, 12089, 1000);
+                }, afterRows + 1000);
+
+                t(run, afterRows + 4600);
+            }
+            run();
         }
 
         // Predictive Analytics animation
+        // Predictive Analytics: KPIs count up, history draws, forecast extends into the cone
         function animatePredictive(t) {
-            const mockup = document.querySelector('.chart-mockup');
-            if (!mockup) return;
+            const stage = document.getElementById('forecastStage');
+            if (!stage) return;
+            const chart = stage.querySelector('.fc-chart');
+            const kpis = stage.querySelectorAll('.fc-kpi');
+            const next = stage.querySelector('.fc-next');
+            const conf = stage.querySelector('.fc-conf');
 
-            function runCycle() {
-                const svg = mockup.querySelector('.forecast-chart');
-                const paths = svg.querySelectorAll('path');
-                const circle = svg.querySelector('circle');
-                const badge = mockup.querySelector('.prediction-badge');
-
-                mockup.classList.add('animating');
-
-                // Add draw classes to SVG elements
-                if (paths[0]) paths[0].classList.add('draw-fill');   // gradient fill
-                if (paths[1]) paths[1].classList.add('draw-line');   // main line
-                if (paths[2]) paths[2].classList.add('draw-dashed'); // dashed forecast
-                if (circle) circle.classList.add('draw-dot');
-
-                // Show prediction badge after dashed line finishes
-                t(() => {
-                    if (badge) badge.classList.add('badge-visible');
-                }, 3500);
-
-                // Hold and restart
-                t(() => {
-                    mockup.classList.remove('animating');
-                    [paths[0], paths[1], paths[2]].forEach(p => {
-                        if (p) p.className = '';
-                    });
-                    if (circle) circle.className = '';
-                    if (badge) badge.classList.remove('badge-visible');
-                    t(() => runCycle(), 300);
-                }, 6000);
+            function countUp(el, target, duration) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(target * eased).toLocaleString('en-US');
+                    if (p < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
             }
 
-            runCycle();
+            function run() {
+                kpis.forEach(k => k.classList.remove('in'));
+                if (chart) chart.classList.remove('in');
+                if (next) next.textContent = '0';
+                if (conf) conf.textContent = '0';
+
+                kpis.forEach((k, i) => t(() => k.classList.add('in'), 250 + i * 160));
+                t(() => {
+                    if (next) countUp(next, 48200, 1200);
+                    if (conf) countUp(conf, 94, 1200);
+                }, 650);
+                t(() => { if (chart) chart.classList.add('in'); }, 750);
+
+                t(run, 6400);
+            }
+            run();
         }
 
         // Inventory Management animation
+        // Inventory: stock cards stream in, counts count up, stock bars fill
         function animateInventory(t) {
-            const mockup = document.querySelector('.inventory-mockup');
-            if (!mockup) return;
+            const stage = document.getElementById('inventoryStage');
+            if (!stage) return;
+            const cards = stage.querySelectorAll('.inv-card');
 
-            function runCycle() {
-                const items = mockup.querySelectorAll('.inventory-item');
-                const bars = mockup.querySelectorAll('.item-bar');
-
-                mockup.classList.add('animating');
-
-                // Stagger items appearing
-                items.forEach((item, i) => {
-                    t(() => item.classList.add('item-visible'), 200 + i * 300);
-                });
-
-                // Fill bars after items visible
-                bars.forEach((bar, i) => {
-                    t(() => bar.classList.add('bar-fill'), 1200 + i * 200);
-                });
-
-                // Hold and restart
-                t(() => {
-                    mockup.classList.remove('animating');
-                    items.forEach(item => {
-                        item.classList.remove('item-visible');
-                    });
-                    bars.forEach(bar => bar.classList.remove('bar-fill'));
-                    t(() => runCycle(), 300);
-                }, 6000);
+            function countUp(el, target, duration) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(target * eased).toLocaleString('en-US');
+                    if (p < 1) requestAnimationFrame(step);
+                }
+                requestAnimationFrame(step);
             }
 
-            runCycle();
+            function run() {
+                cards.forEach(c => {
+                    c.classList.remove('in');
+                    const num = c.querySelector('.inv-num');
+                    if (num) num.textContent = '0';
+                });
+
+                cards.forEach((c, i) => {
+                    t(() => {
+                        c.classList.add('in');
+                        const num = c.querySelector('.inv-num');
+                        if (num) countUp(num, parseInt(num.dataset.target, 10), 800);
+                    }, 200 + i * 150);
+                });
+
+                t(run, 200 + cards.length * 150 + 4200);
+            }
+            run();
         }
 
-        // Rental Management animation
+        // Rental Management: calendar fades in, booked range fills, booking card pops up
         function animateRental(t) {
-            const mockup = document.querySelector('.calendar-mockup');
-            if (!mockup) return;
+            const stage = document.getElementById('rentalStage');
+            if (!stage) return;
+            const seqDays = stage.querySelectorAll('.rent-seq');
+            const booking = document.getElementById('rentBooking');
 
-            function runCycle() {
-                const days = mockup.querySelectorAll('.cal-day:not(.header)');
-                const bookedDays = mockup.querySelectorAll('.cal-day.booked');
-                const availDays = mockup.querySelectorAll('.cal-day.available');
+            function run() {
+                stage.classList.remove('shown');
+                seqDays.forEach(d => d.classList.remove('booked'));
+                if (booking) booking.classList.remove('in');
 
-                mockup.classList.add('animating');
+                t(() => stage.classList.add('shown'), 100);
+                seqDays.forEach((d, i) => t(() => d.classList.add('booked'), 800 + i * 200));
+                t(() => { if (booking) booking.classList.add('in'); }, 800 + seqDays.length * 200 + 350);
 
-                // Fade in days row by row (7 per row)
-                days.forEach((day, i) => {
-                    const row = Math.floor(i / 7);
-                    t(() => day.classList.add('day-visible'), 200 + row * 250);
-                });
-
-                // Highlight booked days
-                bookedDays.forEach((day, i) => {
-                    t(() => day.classList.add('day-highlight'), 1200 + i * 200);
-                });
-
-                // Highlight available days
-                availDays.forEach((day, i) => {
-                    t(() => day.classList.add('day-highlight'), 2000 + i * 200);
-                });
-
-                // Hold and restart
-                t(() => {
-                    mockup.classList.remove('animating');
-                    days.forEach(d => d.classList.remove('day-visible', 'day-highlight'));
-                    t(() => runCycle(), 300);
-                }, 5500);
+                t(run, 6200);
             }
-
-            runCycle();
+            run();
         }
 
         // Customer Management animation
+        // Customer Management: directory streams in, profile card pops up
         function animateCustomers(t) {
-            const mockup = document.querySelector('.customers-mockup');
-            if (!mockup) return;
+            const stage = document.getElementById('customerStage');
+            if (!stage) return;
+            const rows = stage.querySelectorAll('.cust-row');
+            const profile = document.getElementById('custProfile');
+            const ltv = stage.querySelector('.cps-ltv');
 
-            function animateCounter(el, target, prefix, duration) {
-                const start = 0;
-                const startTime = performance.now();
-                function update(now) {
-                    const elapsed = now - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const eased = 1 - Math.pow(1 - progress, 3);
-                    const current = Math.round(start + (target - start) * eased);
-                    el.textContent = prefix + current.toLocaleString();
-                    if (progress < 1) requestAnimationFrame(update);
+            function countUp(el, target, duration) {
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - p, 3);
+                    el.textContent = Math.round(target * eased).toLocaleString('en-US');
+                    if (p < 1) requestAnimationFrame(step);
                 }
-                requestAnimationFrame(update);
+                requestAnimationFrame(step);
             }
 
-            function runCycle() {
-                const cards = mockup.querySelectorAll('.customer-card');
+            function run() {
+                rows.forEach(r => r.classList.remove('in'));
+                if (profile) profile.classList.remove('in');
+                if (ltv) ltv.textContent = '0';
 
-                mockup.classList.add('animating');
+                rows.forEach((r, i) => t(() => r.classList.add('in'), 250 + i * 150));
+                const afterRows = 250 + rows.length * 150;
 
-                // Slide in cards
-                cards.forEach((card, i) => {
-                    t(() => {
-                        card.classList.add('card-visible');
-
-                        // Count up stats after card lands
-                        t(() => {
-                            const statVals = card.querySelectorAll('.stat-val');
-                            statVals.forEach(sv => {
-                                sv.classList.add('counting');
-                                const text = sv.textContent;
-                                if (text.startsWith('$')) {
-                                    const num = parseInt(text.replace(/[$,]/g, ''));
-                                    animateCounter(sv, num, '$', 1000);
-                                } else {
-                                    const num = parseInt(text);
-                                    animateCounter(sv, num, '', 800);
-                                }
-                            });
-                        }, 500);
-                    }, 300 + i * 500);
-                });
-
-                // Hold and restart
                 t(() => {
-                    mockup.classList.remove('animating');
-                    cards.forEach(card => card.classList.remove('card-visible'));
-                    const statVals = mockup.querySelectorAll('.stat-val');
-                    statVals.forEach(sv => {
-                        sv.classList.remove('counting');
-                        // Restore original values
-                    });
-                    // Reset original stat values
-                    const firstStats = cards[0]?.querySelectorAll('.stat-val');
-                    if (firstStats) {
-                        firstStats[0].textContent = '$4,230';
-                        firstStats[1].textContent = '12';
-                    }
-                    const secondStats = cards[1]?.querySelectorAll('.stat-val');
-                    if (secondStats) {
-                        secondStats[0].textContent = '$2,890';
-                        secondStats[1].textContent = '8';
-                    }
-                    t(() => runCycle(), 300);
-                }, 5500);
-            }
+                    if (profile) profile.classList.add('in');
+                    if (ltv) countUp(ltv, 4230, 1100);
+                }, afterRows + 300);
 
-            runCycle();
+                t(run, afterRows + 4600);
+            }
+            run();
         }
 
         // Invoicing animation
+        // Invoice Studio: one-shot intro build, then reveal interactive controls
         function animateInvoices(t) {
-            const mockup = document.querySelector('.invoice-mockup');
-            if (!mockup) return;
+            const studio = document.getElementById('invoiceStudio');
+            const doc = document.getElementById('invoiceDoc');
+            if (!studio || !doc) return;
 
-            function animateCounter(el, target, prefix, suffix, duration) {
+            const colorPanel = document.getElementById('colorPanel');
+            const templatePanel = document.getElementById('templatePanel');
+            const status = document.getElementById('invStatus');
+            const totalVal = doc.querySelector('.inv-total-value');
+
+            function animateCounter(el, target, duration) {
                 const startTime = performance.now();
                 function update(now) {
-                    const elapsed = now - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
+                    const progress = Math.min((now - startTime) / duration, 1);
                     const eased = 1 - Math.pow(1 - progress, 3);
-                    const current = (target * eased).toFixed(2);
-                    el.textContent = prefix + parseFloat(current).toLocaleString('en-US', {
+                    el.textContent = '$' + (target * eased).toLocaleString('en-US', {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2
-                    }) + suffix;
+                    });
                     if (progress < 1) requestAnimationFrame(update);
                 }
                 requestAnimationFrame(update);
             }
 
-            function runCycle() {
-                const header = mockup.querySelector('.invoice-header');
-                const meta = mockup.querySelector('.invoice-meta');
-                const total = mockup.querySelector('.invoice-total');
-                const status = mockup.querySelector('.invoice-status');
-                const totalVal = mockup.querySelector('.total-value');
+            // Reset to the intro state
+            doc.classList.add('intro');
+            doc.querySelectorAll('.inv-anim, .inv-item').forEach(el => el.classList.remove('in'));
+            if (status) status.classList.remove('in');
+            if (colorPanel) colorPanel.classList.add('panel-hidden');
+            if (templatePanel) templatePanel.classList.add('panel-hidden');
 
-                mockup.classList.add('animating');
+            // Staggered build of each section
+            const steps = doc.querySelectorAll('.inv-top, .inv-billto, .inv-row-head, .inv-item, .inv-totals');
+            steps.forEach((el, i) => t(() => el.classList.add('in'), 300 + i * 280));
 
-                // Sequential build-up
-                t(() => { if (header) header.classList.add('section-visible'); }, 300);
-                t(() => { if (meta) meta.classList.add('section-visible'); }, 700);
-                t(() => {
-                    if (total) total.classList.add('section-visible');
-                    // Count up total
-                    if (totalVal) animateCounter(totalVal, 1234, '$', '', 1000);
-                }, 1100);
+            const lastAt = 300 + (steps.length - 1) * 280; // when the totals row lands
 
-                // Stamp in paid badge
-                t(() => {
-                    if (status) status.classList.add('stamp-visible');
-                }, 2300);
-
-                // Hold and restart
-                t(() => {
-                    mockup.classList.remove('animating');
-                    [header, meta, total].forEach(el => {
-                        if (el) el.classList.remove('section-visible');
-                    });
-                    if (status) status.classList.remove('stamp-visible');
-                    if (totalVal) totalVal.textContent = '$1,234.00';
-                    t(() => runCycle(), 300);
-                }, 5800);
+            // Count the total up as it appears
+            if (totalVal) {
+                totalVal.textContent = '$0.00';
+                t(() => animateCounter(totalVal, 1234, 900), lastAt);
             }
 
-            runCycle();
+            // Stamp "Paid"
+            t(() => { if (status) status.classList.add('in'); }, lastAt + 600);
+
+            // Reveal the interactive controls, then drop the intro state
+            t(() => {
+                if (colorPanel) colorPanel.classList.remove('panel-hidden');
+                if (templatePanel) templatePanel.classList.remove('panel-hidden');
+            }, lastAt + 1000);
+            t(() => doc.classList.remove('intro'), lastAt + 1700);
         }
+
+        // Invoice Studio: live color wheel + template switching (set up once)
+        function initInvoiceStudio() {
+            const studio = document.getElementById('invoiceStudio');
+            const doc = document.getElementById('invoiceDoc');
+            if (!studio || !doc) return;
+
+            const wheel = document.getElementById('colorWheel');
+            const thumb = document.getElementById('colorThumb');
+            const lightSlider = document.getElementById('lightSlider');
+            const lightThumb = document.getElementById('lightThumb');
+
+            let hue = 227, sat = 79, light = 58;
+
+            function apply() {
+                studio.style.setProperty('--inv-accent', hue + ' ' + sat + '% ' + light + '%');
+                if (lightSlider) {
+                    lightSlider.style.background =
+                        'linear-gradient(to right, hsl(' + hue + ' ' + sat + '% 72%), hsl(' + hue + ' ' + sat + '% 20%))';
+                }
+            }
+
+            function pickColor(clientX, clientY) {
+                const rect = wheel.getBoundingClientRect();
+                const r = rect.width / 2;
+                let x = clientX - rect.left - r;
+                let y = clientY - rect.top - r;
+                let dist = Math.sqrt(x * x + y * y);
+                if (dist > r) { x = x / dist * r; y = y / dist * r; dist = r; }
+                let ang = Math.atan2(y, x) * 180 / Math.PI;
+                if (ang < 0) ang += 360;
+                hue = Math.round(ang);
+                sat = Math.round(48 + (dist / r) * 37); // 48–85, kept tasteful
+                thumb.style.left = (r + x) + 'px';
+                thumb.style.top = (r + y) + 'px';
+                apply();
+            }
+
+            function pickLight(clientX) {
+                const rect = lightSlider.getBoundingClientRect();
+                let p = (clientX - rect.left) / rect.width;
+                p = Math.max(0, Math.min(1, p));
+                light = Math.round(64 - p * 30); // 64 (light) → 34 (dark)
+                lightThumb.style.left = (p * 100) + '%';
+                apply();
+            }
+
+            function makeDrag(pickFn) {
+                return function (e) {
+                    e.preventDefault();
+                    const move = ev => {
+                        const pt = ev.touches ? ev.touches[0] : ev;
+                        pickFn(pt.clientX, pt.clientY);
+                    };
+                    move(e);
+                    const up = () => {
+                        document.removeEventListener('mousemove', move);
+                        document.removeEventListener('mouseup', up);
+                        document.removeEventListener('touchmove', move);
+                        document.removeEventListener('touchend', up);
+                    };
+                    document.addEventListener('mousemove', move);
+                    document.addEventListener('mouseup', up);
+                    document.addEventListener('touchmove', move, { passive: false });
+                    document.addEventListener('touchend', up);
+                };
+            }
+
+            if (wheel) {
+                const drag = makeDrag((x, y) => pickColor(x, y));
+                wheel.addEventListener('mousedown', drag);
+                wheel.addEventListener('touchstart', drag, { passive: false });
+            }
+            if (lightSlider) {
+                const drag = makeDrag(x => pickLight(x));
+                lightSlider.addEventListener('mousedown', drag);
+                lightSlider.addEventListener('touchstart', drag, { passive: false });
+            }
+
+            const tmplBtns = studio.querySelectorAll('.tmpl-btn');
+            tmplBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    doc.classList.remove('theme-modern', 'theme-contemporary', 'theme-classic');
+                    doc.classList.add(btn.dataset.theme);
+                    tmplBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+
+            // Place the wheel thumb at the starting accent
+            if (thumb && wheel) {
+                const r = 80; // half of the 160px wheel
+                const rad = hue * Math.PI / 180;
+                const d = ((sat - 48) / 37) * r;
+                thumb.style.left = (r + Math.cos(rad) * d) + 'px';
+                thumb.style.top = (r + Math.sin(rad) * d) + 'px';
+            }
+            apply();
+        }
+        initInvoiceStudio();
 
         // AI Import flow animation
         const aiImportDemo = document.getElementById('aiImportDemo');
         if (aiImportDemo) {
-            let aiAnimationStarted = false;
-            const particleColors = ['#3b82f6', '#60a5fa', '#2563eb', '#93c5fd'];
-
-            function spawnParticles(container, direction, count) {
-                for (let i = 0; i < count; i++) {
-                    setTimeout(() => {
-                        const p = document.createElement('div');
-                        p.className = 'ai-particle particle-' + direction;
-                        p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
-                        p.style.marginTop = (Math.random() * 20 - 10) + 'px';
-                        container.appendChild(p);
-                        setTimeout(() => p.remove(), 1300);
-                    }, i * 120);
-                }
-            }
+            let aiImportTimers = [];
+            const impPill = document.getElementById('impPill');
+            const impDone = document.getElementById('impDone');
 
             function runAiImportAnimation() {
-                const hub = document.getElementById('aiFlowHub');
-                const hubLabel = document.getElementById('aiHubLabel');
-                const hubRing = hub.querySelector('.ai-flow-hub-ring');
-                const progress = hub.querySelector('.ai-hub-progress');
-                const hubIcon = hub.querySelector('.ai-hub-icon');
-                const fields = document.querySelectorAll('#aiFlowFields .ai-flow-field');
-                const footer = document.getElementById('aiFlowFooter');
-                const badge = document.getElementById('aiMatchBadge');
-                const particles = document.getElementById('aiParticles');
-                const connLeft = document.querySelector('.ai-flow-connector-left');
-                const connRight = document.querySelector('.ai-flow-connector-right');
-                const sourceRows = document.querySelectorAll('.ai-flow-row[data-row]');
+                aiImportTimers.forEach(clearTimeout);
+                aiImportTimers = [];
 
-                // Reset
-                progress.style.transition = 'none';
-                progress.style.strokeDashoffset = '226';
-                hubLabel.textContent = 'Analyzing...';
-                hubLabel.classList.remove('complete');
-                hubIcon.classList.remove('complete');
-                hubRing.classList.remove('active', 'complete');
-                fields.forEach(f => f.classList.remove('visible'));
-                footer.classList.remove('visible');
-                badge.textContent = '0/4';
-                badge.classList.remove('complete');
-                connLeft.classList.remove('active');
-                connRight.classList.remove('active');
-                sourceRows.forEach(r => r.classList.remove('ai-flow-row-highlight'));
+                // Reset to the messy state
+                aiImportDemo.querySelectorAll('[data-c]').forEach(el => el.classList.remove('mapped'));
+                if (impPill) impPill.classList.remove('in');
+                if (impDone) impDone.classList.remove('in');
 
-                // Step 1: Activate connectors + start progress ring + glow (0.3s)
-                setTimeout(() => {
-                    connLeft.classList.add('active');
-                    hubRing.classList.add('active');
-                    spawnParticles(particles, 'left', 8);
-                    requestAnimationFrame(() => {
-                        progress.style.transition = '';
-                        requestAnimationFrame(() => {
-                            progress.style.strokeDashoffset = '0';
-                        });
-                    });
-                }, 300);
-
-                // Step 2: Highlight source rows one by one (0.6s, 1.0s, 1.4s)
-                sourceRows.forEach((row, i) => {
-                    setTimeout(() => {
-                        row.classList.add('ai-flow-row-highlight');
-                    }, 600 + i * 400);
+                // Map each column left to right (header renames + data reformats)
+                [0, 1, 2, 3].forEach((c, i) => {
+                    aiImportTimers.push(setTimeout(() => {
+                        aiImportDemo.querySelectorAll('[data-c="' + c + '"]').forEach(el => el.classList.add('mapped'));
+                    }, 800 + i * 480));
                 });
 
-                // Step 3: Hub complete + right connector + full glow (2.2s)
-                setTimeout(() => {
-                    hubLabel.textContent = 'Imported!';
-                    hubLabel.classList.add('complete');
-                    hubIcon.classList.add('complete');
-                    hubRing.classList.add('complete');
-                    connRight.classList.add('active');
-                    spawnParticles(particles, 'right', 8);
-                }, 2200);
-
-                // Step 4: Reveal destination fields one by one (2.6s+)
-                fields.forEach((field, i) => {
-                    setTimeout(() => {
-                        field.classList.add('visible');
-                        badge.textContent = (i + 1) + '/4';
-                    }, 2600 + i * 350);
-                });
-
-                // Step 5: Show footer + mark complete (4.2s)
-                setTimeout(() => {
-                    footer.classList.add('visible');
-                    badge.classList.add('complete');
-                }, 4200);
-
-                // Step 6: Hold, then restart (8.5s)
-                setTimeout(() => {
-                    runAiImportAnimation();
-                }, 8500);
+                // Confirmations, then loop
+                aiImportTimers.push(setTimeout(() => {
+                    if (impPill) impPill.classList.add('in');
+                    if (impDone) impDone.classList.add('in');
+                }, 800 + 4 * 480 + 250));
+                aiImportTimers.push(setTimeout(runAiImportAnimation, 800 + 4 * 480 + 3400));
             }
 
+            let aiAnimationStarted = false;
             const aiObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting && !aiAnimationStarted) {

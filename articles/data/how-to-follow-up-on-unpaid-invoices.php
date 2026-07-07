@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-05-30',
 
-  'updated' => '2026-05-30',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 8,
 
@@ -41,6 +41,7 @@ HTML,
       'step_text' => 'Don\'t chase on the day itself. If you wrote Net 15 on the invoice, the client has until the end of day 15 to pay. Reach out the morning after.',
       'html' => <<<'HTML'
 <p>The first rule of following up is to respect the term you wrote on the invoice. If the invoice says <a href="/net-30-vs-due-on-receipt/">Net 15</a> and you sent it on June 1, the client has until the end of June 16 to pay. Sending a reminder on June 15 makes you look like you can't count, and it gives a slow payer a reason to push back rather than pay. Wait until the morning of June 17 and the conversation is simple: the invoice is overdue, and you're asking about it.</p>
+{{illustration:calendar-due}}
 <p>Before you send anything, check three places. Check the bank account for a payment that landed but hasn't been matched to the invoice yet. Check the email inbox in case the client replied with a question and the message was filtered. Check your sent folder to confirm the original invoice actually went out, with the PDF attached, to the right address. Roughly one in ten "unpaid" invoices turns out to be a payment already received or an email that never sent. You don't want to send a reminder for an invoice the client paid yesterday.</p>
 <p>Also pull up your records on this client. How long do they usually take to pay? Some clients pay every invoice on day 14 of a Net 15 cycle and every invoice on day 29 of a Net 30 cycle. That's not late, that's their cadence, and a polite reminder one day late won't surprise them. Other clients pay within 48 hours of receiving the invoice, every time. If a normally fast payer is two days late, something specific has happened: a holiday, a sick week, an accounts payable handover. A short, low-pressure reminder is the right tool either way.</p>
 <p>Pick a time to send the reminder. Tuesday and Wednesday mornings, between 9am and 11am in the client's time zone, get the best response rates. Avoid Mondays (overflowing inbox), Friday afternoons (already checked out), and anything that lands during a public holiday.</p>
@@ -127,6 +128,7 @@ HTML,
 <li><strong>Line 1.</strong> The original work, as a single line, with the same description and amount as the original invoice. In the description, reference the original invoice number, for example "Re-issued from invoice 1023, dated May 8, for [project description]".</li>
 <li><strong>Line 2.</strong> The late fee, as a separate line. Label it "Late fee per agreed terms" and enter the dollar amount. The standard is 1.5% per month on the overdue balance, so a $2,000 invoice that's one month overdue carries a $30 late fee. If the invoice is two months overdue, the late fee is $60. State the calculation in the description if you want to be explicit: "Late fee: 1.5% of $2,000 for one month overdue".</li>
 </ul>
+{{illustration:invoice-doc}}
 <p>Set the due date to seven days from the new invoice date, which is short on purpose. Send the new invoice by email, with a short body that names the missed commitment from the phone call. Something like: "Hi [name], following our call on May 30 and the commitment to pay by June 6, I'm attaching a fresh invoice 1024 covering the original amount plus the late fee per the terms on the original invoice. Payment is due by June 13."</p>
 <p>The late fee isn't a punishment, it's a contract term. It was on the original invoice in the Terms section, and applying it now is consistent with what both sides agreed to at the start. For a full walkthrough of how to set the rate, what some states cap it at, and when to waive it for a good client, see <a href="/late-fees-when-and-how-to-charge/">late fees: when and how to charge</a>.</p>
 HTML,

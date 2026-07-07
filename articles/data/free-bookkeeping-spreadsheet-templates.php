@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-15',
 
-  'updated' => '2026-06-15',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -40,7 +40,7 @@ HTML,
 <p>A bookkeeping spreadsheet doesn't need to be clever. It needs four tabs, each doing one job. If a template has fewer than these, it's missing something; if it has many more, it's probably more than a small business needs to start.</p>
 <ul>
 <li><strong>An income tab.</strong> One row per payment that comes in: the date, who paid you, what for, and the amount. This is the record of every dollar the business earned.</li>
-<li><strong>An expense tab.</strong> One row per business cost going out, with a category on each row. This is the record that turns into your deductions at tax time, so it's the tab that matters most for your tax bill.</li>
+<li><strong>An expense tab.</strong> One row per business cost going out, with a category on each row. This is <a href="/small-business-tax-deductions/">the record that turns into your deductions at tax time</a>, so it's the tab that matters most for your tax bill.</li>
 <li><strong>A summary tab (your profit and loss).</strong> A handful of formulas that add up income, add up expenses by category, and show the difference. This is the tab you actually look at to know how the business is doing. You don't type into it; it reads from the other two.</li>
 <li><strong>An invoice tracker.</strong> A list of invoices you've sent with their status: sent, paid, overdue. This is what stops a forgotten invoice from quietly costing you money. If you don't send invoices, you can skip this one.</li>
 </ul>
@@ -123,6 +123,7 @@ HTML,
 <li><strong>Build the invoice tracker.</strong> Columns for invoice number, client, date sent, due date, amount, and a status drop-down of Sent / Paid / Overdue. You now know at a glance what's owed to you.</li>
 <li><strong>Log a week, then breathe.</strong> Enter a real week of income and expenses. If a column feels useless, delete it now. The template you keep is the one that fits how you actually work.</li>
 </ol>
+{{illustration:checklist}}
 <p>Keep it somewhere it backs up on its own. Google Sheets does this by default; an Excel file lives more safely in OneDrive, Dropbox, or Google Drive than on a single laptop. A bookkeeping file that exists in only one place is a file you can lose.</p>
 HTML,
     ],
@@ -138,7 +139,8 @@ HTML,
 <li><strong>A formula quietly went wrong.</strong> One mistyped range or a row inserted in the wrong place and the summary is off, and you can't fully trust the number you're handing your accountant.</li>
 <li><strong>The volume climbed.</strong> Twenty transactions a month is fine in a sheet. Two hundred, across several suppliers, with sales tax and invoices to track, is a part-time data-entry job.</li>
 </ul>
-<p>None of this means the spreadsheet was a mistake. It did exactly what it should: it got you tracking money for free while the business was small. When the typing outgrows it, the good news is you don't start over. Most accounting software lets you import a spreadsheet directly, so the months you've already logged carry across instead of being retyped. Argo Books, for example, takes a drag-and-drop of your Excel or CSV file and maps your columns to its fields no matter how you laid them out, with one-click undo if a mapping looks off, and the first {argo_free_invoice_limit} imports a month cost nothing. That's the natural next step when the sheet gets heavy: not throwing away your work, but moving it somewhere that does the typing for you.</p>
+{{illustration:spreadsheet-to-books}}
+<p>None of this means the spreadsheet was a mistake. It did exactly what it should: it got you tracking money for free while the business was small. When the typing outgrows it, the good news is you don't start over. Most accounting software lets you <a href="/how-to-move-from-spreadsheets-to-bookkeeping-software/">import a spreadsheet directly</a>, so the months you've already logged carry across instead of being retyped. Argo Books, for example, takes a drag-and-drop of your Excel or CSV file and maps your columns to its fields no matter how you laid them out, with one-click undo if a mapping looks off, and the first {argo_free_invoice_limit} imports a month cost nothing. That's the natural next step when the sheet gets heavy: not throwing away your work, but moving it somewhere that does the typing for you.</p>
 <p>Until then, a clean spreadsheet you keep current is a complete, valid bookkeeping system, and there's no rule that says you have to leave it. Plenty of small businesses never do.</p>
 HTML,
     ],

@@ -38,7 +38,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Argo Books">
     <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Auto+Detailing&subtitle=Tiered+packages%2C+ceramic+coating+jobs%2C+supply+receipts%2C+and+recurring+memberships&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta property="og:image" content="https://argorobots.com/resources/images/og/og-home.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
@@ -46,7 +46,7 @@ $pricing_url  = '../pricing/?source=' . $cta_source;
     <meta name="twitter:title" content="Argo Books for Auto Detailing: Packages, Add-Ons, and the Books, in One App">
     <meta name="twitter:description"
         content="Tiered packages, ceramic coating jobs, supply receipts, and recurring memberships.">
-    <meta name="twitter:image" content="https://ogimage.io/templates/brand?title=Argo+Books+for+Auto+Detailing&subtitle=Tiered+packages%2C+ceramic+coating+jobs%2C+supply+receipts%2C+and+recurring+memberships&logo=https%3A%2F%2Fargorobots.com%2Fresources%2Fimages%2Fargo-logo%2Fargo-icon.ico">
+    <meta name="twitter:image" content="https://argorobots.com/resources/images/og/og-home.png">
 
     <meta name="geo.region" content="CA-SK">
     <meta name="geo.placename" content="Canada">

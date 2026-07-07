@@ -411,13 +411,57 @@ namespace {
         $old_avatar_row = $stmt->fetch();
         $old_avatar = $old_avatar_row['avatar'] ?? '';
 
-        // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        // Derive the extension from the server-validated MIME type, never from
+        // the client-supplied filename. This stops an attacker from saving a
+        // valid image under a .php name. (The upload dir also blocks script
+        // execution via .htaccess, so this is defense in depth.)
+        $mime_to_ext = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp',
+        ];
+        $extension = $mime_to_ext[$detected_type]; // $detected_type validated above
         $filename = 'avatar_' . $user_id . '_' . time() . '.' . $extension;
         $target_path = $upload_dir . $filename;
 
-        // Move uploaded file
-        if (move_uploaded_file($file['tmp_name'], $target_path)) {
+        // Confirm this really is a PHP HTTP upload before reading it (the safety
+        // guarantee move_uploaded_file() used to give us here).
+        if (!is_uploaded_file($file['tmp_name'])) {
+            error_log("Avatar upload: tmp_name is not an uploaded file for user " . $user_id);
+            return false;
+        }
+
+        // Re-encode the image from its decoded pixels so anything appended after
+        // the real image data (e.g. a GIF/PHP polyglot) is discarded. The raw
+        // uploaded bytes are never written to disk.
+        $src_bytes = file_get_contents($file['tmp_name']);
+        $image = ($src_bytes !== false) ? @imagecreatefromstring($src_bytes) : false;
+        if ($image === false) {
+            error_log("Avatar upload: could not decode image for user " . $user_id);
+            return false;
+        }
+
+        switch ($detected_type) {
+            case 'image/png':
+                imagealphablending($image, false);
+                imagesavealpha($image, true);
+                $saved = imagepng($image, $target_path);
+                break;
+            case 'image/gif':
+                $saved = imagegif($image, $target_path);
+                break;
+            case 'image/webp':
+                $saved = imagewebp($image, $target_path);
+                break;
+            case 'image/jpeg':
+            default:
+                $saved = imagejpeg($image, $target_path, 90);
+                break;
+        }
+        imagedestroy($image);
+
+        if ($saved) {
             // Set permissions for the file
             chmod($target_path, 0644);
 
@@ -460,7 +504,10 @@ namespace {
             }
         }
 
-        error_log("Failed to move uploaded file to: " . $target_path);
+        error_log("Avatar upload: failed to write re-encoded image to: " . $target_path);
+        if (file_exists($target_path)) {
+            @unlink($target_path);
+        }
         return false;
     }
 

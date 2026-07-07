@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -234,13 +234,16 @@ include __DIR__ . '/../admin_header.php';
 
 <link rel="stylesheet" href="style.css">
 
-<div class="range-row">
-    <div class="range-selector">
-        <?php foreach ($rangeMap as $key => $r): ?>
-            <a href="?range=<?= $key ?>" class="range-btn <?= $range === $key ? 'active' : '' ?>">
-                <?= htmlspecialchars($r['label']) ?>
-            </a>
-        <?php endforeach; ?>
+<div class="control-bar">
+    <div class="control-group">
+        <span class="control-label">Period:</span>
+        <div class="control-pills">
+            <?php foreach ($rangeMap as $key => $r): ?>
+                <a href="?range=<?= $key ?>" class="control-pill <?= $range === $key ? 'active' : '' ?>">
+                    <?= htmlspecialchars($r['label']) ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
     </div>
 </div>
 
@@ -330,7 +333,7 @@ include __DIR__ . '/../admin_header.php';
         window.scrollTo(0, sessionStorage.getItem('scrollPosition'));
         sessionStorage.removeItem('scrollPosition');
     }
-    document.querySelectorAll('.range-btn').forEach(link => {
+    document.querySelectorAll('a[href^="?range="]').forEach(link => {
         link.addEventListener('click', function () {
             sessionStorage.setItem('scrollPosition', window.scrollY);
         });

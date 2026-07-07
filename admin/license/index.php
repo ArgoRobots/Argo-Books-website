@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../email_sender.php';
 require_once __DIR__ . '/../../license_functions.php';
@@ -35,7 +35,16 @@ function get_premium_subscriptions($search_filter = '')
 
     try {
         $query = "
-            SELECT s.*, u.username
+            SELECT s.*, u.username,
+                (
+                    SELECT p.amount
+                    FROM premium_subscription_payments p
+                    WHERE p.subscription_id = s.subscription_id
+                      AND p.status = 'completed'
+                      AND p.amount > 0
+                    ORDER BY p.created_at DESC
+                    LIMIT 1
+                ) AS last_paid_amount
             FROM premium_subscriptions s
             LEFT JOIN community_users u ON s.user_id = u.id
             WHERE s.payment_method != 'free_key'
@@ -70,7 +79,18 @@ function get_premium_subscription_keys()
     $keys = [];
 
     try {
-        $stmt = $pdo->query("SELECT * FROM premium_subscription_keys ORDER BY created_at DESC");
+        // Only genuine free/promo keys. Paid subscriptions auto-create a row in
+        // this table (so the desktop app can redeem the paid key), but those are
+        // not free keys and must not show in this list. Exclude any key tied to a
+        // paid subscription; keep unredeemed keys (no subscription yet) and keys
+        // redeemed into a free_key subscription.
+        $stmt = $pdo->query("
+            SELECT k.*
+            FROM premium_subscription_keys k
+            LEFT JOIN premium_subscriptions s ON s.subscription_id = k.subscription_id
+            WHERE s.subscription_id IS NULL OR s.payment_method = 'free_key'
+            ORDER BY k.created_at DESC
+        ");
         $keys = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         error_log("Error fetching Premium subscription keys: " . $e->getMessage());
@@ -461,7 +481,7 @@ include __DIR__ . '/../admin_header.php';
     padding: 2px 8px;
     font-size: 12px;
     font-weight: 500;
-    color: #6b7280;
+    color: var(--black);
     background: #f3f4f6;
     border: 1px solid #d1d5db;
     border-radius: 4px;
@@ -473,7 +493,7 @@ include __DIR__ . '/../admin_header.php';
 }
 .btn-copy:hover {
     background: #e5e7eb;
-    color: #374151;
+    color: var(--black);
 }
 .btn-copy.copied {
     background: #d1fae5;
@@ -482,12 +502,12 @@ include __DIR__ . '/../admin_header.php';
 }
 [data-theme="dark"] .btn-copy {
     background: #1e293b;
-    color: #94a3b8;
+    color: var(--white);
     border-color: #334155;
 }
 [data-theme="dark"] .btn-copy:hover {
     background: #334155;
-    color: #e2e8f0;
+    color: var(--white);
 }
 [data-theme="dark"] .btn-copy.copied {
     background: #064e3b;
@@ -613,7 +633,13 @@ include __DIR__ . '/../admin_header.php';
                                         <td class="key-field"><?php echo htmlspecialchars($sub['subscription_id']); ?></td>
                                         <td><?php echo htmlspecialchars($sub['username'] ?? 'N/A'); ?></td>
                                         <td><?php echo htmlspecialchars($sub['email']); ?></td>
-                                        <td><?php echo ucfirst($sub['billing_cycle']); ?> - $<?php echo number_format($sub['amount'], 2); ?></td>
+                                        <?php
+                                            // Show what the customer is actually billed (most recent completed
+                                            // payment), not the env-computed snapshot in s.amount, which can
+                                            // differ (e.g. a PayPal plan priced below the configured amount).
+                                            $billedAmount = $sub['last_paid_amount'] ?? $sub['amount'];
+                                        ?>
+                                        <td><?php echo ucfirst($sub['billing_cycle']); ?> - $<?php echo number_format((float) $billedAmount, 2); ?></td>
                                         <td>
                                             <?php
                                             $providerNames = ['paypal' => 'PayPal', 'stripe' => 'Stripe', 'square' => 'Square'];
@@ -678,17 +704,17 @@ include __DIR__ . '/../admin_header.php';
     <!-- Free Subscription Keys Tab -->
     <div id="free-sub-keys" class="tab-content">
         <div class="stats-grid">
-            <div class="stat-card free">
-                <h3>Available Keys</h3>
-                <div class="value"><?php echo $unredeemed_keys; ?></div>
+            <div class="stat-card">
+                <h3>Total Generated</h3>
+                <div class="value"><?php echo count($premium_subscription_keys); ?></div>
             </div>
             <div class="stat-card pending">
                 <h3>Redeemed Keys</h3>
                 <div class="value"><?php echo count($premium_subscription_keys) - $unredeemed_keys; ?></div>
             </div>
-            <div class="stat-card">
-                <h3>Total Generated</h3>
-                <div class="value"><?php echo count($premium_subscription_keys); ?></div>
+            <div class="stat-card free">
+                <h3>Available Keys</h3>
+                <div class="value"><?php echo $unredeemed_keys; ?></div>
             </div>
         </div>
 
@@ -722,7 +748,7 @@ include __DIR__ . '/../admin_header.php';
                     <div class="form-group">
                         <label for="notes">Notes (optional)</label>
                         <input type="text" id="notes" name="notes" placeholder="e.g., Giveaway winner">
-                         <p style="position: absolute; margin: 5px 0 20px; color: var(--gray-500);">This will also appear in the recipient's email.</p>
+                         <p style="position: absolute; margin: 5px 0 20px; color: var(--admin-text);">This will also appear in the recipient's email.</p>
                     </div>
                     <div class="form-group">
                         <button type="submit" name="generate_sub_key" class="btn btn-purple" style="margin-top: 24px;">Generate Key</button>
@@ -734,6 +760,10 @@ include __DIR__ . '/../admin_header.php';
         <div class="table-container">
             <h2>Free Subscription Keys</h2>
 
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')" style="max-width: 350px;">
+            </div>
+
             <!-- Bulk Actions for Subscription Keys -->
             <div class="bulk-actions-container" id="sub-key-bulk-actions">
                 <div class="selection-info">
@@ -744,10 +774,6 @@ include __DIR__ . '/../admin_header.php';
                     <button type="button" class="btn btn-bulk btn-reset-usage" id="sub-key-bulk-reset-usage" disabled>Reset Usage</button>
                     <button type="button" class="btn btn-bulk btn-delete" id="sub-key-bulk-delete" data-action="delete" disabled>Delete Selected</button>
                 </div>
-            </div>
-
-            <div style="margin-bottom: 12px;">
-                <input type="text" id="freeKeysSearch" placeholder="Search by key, email, or notes..." oninput="filterTable(this, 'free-keys-table-body')" style="max-width: 350px;">
             </div>
 
             <?php if (empty($premium_subscription_keys)): ?>
@@ -789,8 +815,8 @@ include __DIR__ . '/../admin_header.php';
                                             <?php echo htmlspecialchars($key['subscription_key']); ?>
                                             <button type="button" class="btn-copy" onclick="copyToClipboard('<?php echo htmlspecialchars($key['subscription_key'], ENT_QUOTES); ?>', this)" title="Copy key">Copy</button>
                                         </td>
-                                        <td><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
-                                        <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:#9ca3af;">Any user</span>'; ?></td>
+                                        <td class="col-nowrap"><?php echo $key['duration_months'] == 0 ? '<span style="color:#8b5cf6;font-weight:500;">Permanent</span>' : $key['duration_months'] . ' month' . ($key['duration_months'] > 1 ? 's' : ''); ?></td>
+                                        <td><?php echo $key['email'] ? htmlspecialchars($key['email']) : '<span style="color:var(--admin-text);">Any user</span>'; ?></td>
                                         <td>
                                             <?php if ($key['redeemed_at']): ?>
                                                 <span class="badge badge-redeemed">Redeemed</span>

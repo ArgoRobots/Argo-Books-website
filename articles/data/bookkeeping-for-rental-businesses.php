@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-02',
 
-  'updated' => '2026-06-02',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -64,6 +64,7 @@ HTML,
       'html' => <<<'HTML'
 <p>This is the habit that turns your books from a tax chore into the tool that grows the business. Give every rentable item a short name or number, and tag every rental payment to the item that earned it. Do that for a few months and the picture is striking: you find out which items are booked constantly, which earn well per rental, and which are dead weight taking up space and capital.</p>
 <p>This is sometimes called utilization, and it is the single most useful number a rental business can know. Utilization is just how often an item is actually out earning versus sitting idle. An item that rents three weekends a month at a good rate is carrying the business. An item that rents twice a year is tying up money you could have spent on more of what people actually want. You cannot see any of this from monthly totals. You can only see it when income is tagged to items.</p>
+{{illustration:cashflow-cycle}}
 <p>Once you can see per-item earnings, real decisions get easy. You buy more of what stays booked out. You sell off or stop maintaining what never moves. You raise prices on the items in constant demand and discount the ones gathering dust to get them earning. None of that is possible while every dollar lands in one undated, untagged pile. The same per-item discipline helps trades that own gear too, which is why <a href="/bookkeeping-for-contractors/">contractor bookkeeping</a> leans on tracking costs by job in much the same way.</p>
 HTML,
     ],
@@ -117,7 +118,8 @@ HTML,
 <li><strong>Keep the asset list current.</strong> Add anything significant you bought, and note anything you sold, scrapped, or lost. This is the backbone of your depreciation claim and it is far easier to maintain monthly than to rebuild yearly.</li>
 <li><strong>Set tax money aside as you earn it.</strong> Rental income arrives steadily but the tax on it is owed later. Moving a sensible percentage of earnings into a separate tax-savings account means the bill is never a shock. Your accountant can suggest a percentage for your situation.</li>
 </ol>
-<p>None of this is complicated. It is a short list of habits done consistently. The rental owners who dread tax season are almost always the ones who left deposits, maintenance, and asset records all tangled together until the end. The ones who spend a few minutes a month keeping it current barely notice the season arrive.</p>
+{{illustration:calendar-due}}
+<p>None of this is complicated. It's a short list of habits done consistently. The rental owners who dread tax season are almost always the ones who left deposits, maintenance, and asset records all tangled together until the end. The ones who spend a few minutes a month keeping it current barely notice the season arrive.</p>
 HTML,
     ],
 
@@ -128,7 +130,7 @@ HTML,
 <p>You don't need software to keep good rental books, and anyone who tells you otherwise is selling something. Plenty of small rental businesses run well on a separate bank account, a spreadsheet, and a folder of receipts. If that is where you are, here is an honest read on what works and where the line is.</p>
 <p>A spreadsheet is genuinely enough when you have a manageable number of items and rentals. One tab for rentals with a column for the item, the income, and the deposit. One tab for equipment with each asset's purchase date and price. One tab for maintenance tagged to items. Kept current every week, that setup gives you per-item earnings, a clean deposit trail, and a depreciation-ready asset list. Many owners run this way for years, and it costs nothing.</p>
 <p>The spreadsheet starts to strain as the moving parts multiply: lots of items, frequent rentals, deposits flowing in and out constantly, a calendar of what's booked when, and maintenance piling up across dozens of pieces of gear. At that point the manual typing becomes the bottleneck, and the risk of a deposit or a repair slipping through the cracks grows. That is where software earns its place, by keeping the rental calendar, the per-item income, the deposits, and the accounting in one place instead of three spreadsheets you have to keep in step by hand.</p>
-<p>Argo Books is one option there. It pairs rental management with the bookkeeping in a single app, so the item you rent out, the deposit you took, and the income it earned all live together, and it can scan receipts so maintenance costs land against the right item without manual typing. It is worth a look if you have outgrown the spreadsheet, and you can compare it honestly against the bigger names in our <a href="/best-quickbooks-alternatives/">guide to QuickBooks alternatives</a>. But start with whatever you will actually keep up with. A simple system used every week beats a powerful one you ignore.</p>
+<p>Argo Books is one option there. It pairs rental management with the bookkeeping in a single app, so the item you rent out, the deposit you took, and the income it earned all live together, and it can scan receipts so maintenance costs land against the right item without manual typing. It's worth a look if you have outgrown the spreadsheet, and you can compare it honestly against the bigger names in our <a href="/best-quickbooks-alternatives/">guide to QuickBooks alternatives</a>. But start with whatever you will actually keep up with. A simple system used every week beats a powerful one you ignore.</p>
 HTML,
     ],
 

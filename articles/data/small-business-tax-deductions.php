@@ -6,9 +6,9 @@ return [
 
   'slug' => 'small-business-tax-deductions',
 
-  'h1' => 'Small business tax deductions you might be missing',
+  'h1' => 'Small business tax deductions you might be missing (2026)',
 
-  'meta_title' => 'Small Business Tax Deductions You Might Be Missing | Argo Books',
+  'meta_title' => 'Small Business Tax Deductions (2026) | Argo Books',
 
   'meta_description' => 'The business tax deductions small businesses most often miss, the difference between an expense and an asset, and how to keep records that hold up.',
 
@@ -20,7 +20,7 @@ return [
 
   'published' => '2026-06-02',
 
-  'updated' => '2026-06-02',
+  'updated' => '2026-06-26',
 
   'reading_time_min' => 9,
 
@@ -38,6 +38,7 @@ HTML,
       'anchor' => 'why-missed',
       'html' => <<<'HTML'
 <p>The deductions you lose are almost never the rent or the big equipment purchase. Those are large, memorable, and easy to find on a bank statement. What slips away is the long tail of small costs: a tank of fuel, a box of supplies, a year of a software subscription, a parking fee at a client site. Individually they're trivial. Added up across a year, they're often thousands of dollars of deductions, and thousands of dollars is real tax.</p>
+{{illustration:coins}}
 <p>They get missed for one reason: no record. The receipt was never captured, the cost never made it into the books, and at tax time nobody remembers a small purchase from nine months ago. You can't claim what you can't show, so the deduction quietly disappears. The fix isn't knowing more tax law; it's capturing the cost when it happens. The <a href="/how-to-track-business-expenses-without-spreadsheets/">guide on tracking expenses</a> covers the system; this guide covers what to make sure you're capturing.</p>
 HTML,
     ],
@@ -59,6 +60,7 @@ HTML,
 <li><strong>Materials and supplies.</strong> The consumables you buy to deliver the work. Easy to capture for big purchases, easy to lose for the small frequent ones bought across several suppliers.</li>
 <li><strong>Startup costs.</strong> Money spent getting the business going before it opened, like registration, initial equipment, and early marketing, can often be claimed, sometimes spread over time. Many first-year owners don't realise these count.</li>
 </ul>
+{{illustration:checklist}}
 <p>You won't have all of these, and you shouldn't claim ones you don't genuinely incur. But most businesses have several they're not capturing, and each one is tax you're paying that you don't owe.</p>
 HTML,
     ],
@@ -137,7 +139,7 @@ HTML,
     ],
     [
       'q' => 'Is this article tax advice?',
-      'a' => 'No. It is a plain-language checklist of deductions small businesses commonly miss and the records that support them, written to help you ask your accountant better questions. The actual rules, rates, thresholds, and limits vary by country and by your specific situation, and only someone who knows your circumstances and your local tax law can tell you what you can claim and how. Use this to make sure you are capturing the right costs through the year; use a qualified accountant to turn those records into a correct return. This guide lives on the Argo Books site, and Argo Books sells expense-tracking software, so read the one product mention with that in mind.',
+      'a' => 'No. It\'s a plain-language checklist of deductions small businesses commonly miss and the records that support them, written to help you ask your accountant better questions. The actual rules, rates, thresholds, and limits vary by country and by your specific situation, and only someone who knows your circumstances and your local tax law can tell you what you can claim and how. Use this to make sure you are capturing the right costs through the year; use a qualified accountant to turn those records into a correct return. This guide lives on the Argo Books site, and Argo Books sells expense-tracking software, so read the one product mention with that in mind.',
     ],
   ],
 

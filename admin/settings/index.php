@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../admin_session.php';
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/2fa.php';
 
@@ -7,6 +7,11 @@ require_once __DIR__ . '/2fa.php';
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: ../login.php');
     exit;
+}
+
+// CSRF token for the enable/disable 2FA forms below.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Set page variables for the header
@@ -36,7 +41,9 @@ if (!$is_enabled && isset($_GET['setup'])) {
 
 // Handle disabling of 2FA
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['disable_2fa'])) {
-    if (disable_2fa($username)) {
+    if (!hash_equals($_SESSION['csrf_token'] ?? '', (string)($_POST['csrf_token'] ?? ''))) {
+        $error = 'Security check failed. Please refresh the page and try again.';
+    } elseif (disable_2fa($username)) {
         $success = 'Two-factor authentication has been disabled.';
         $is_enabled = false;
     } else {
@@ -49,7 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['enable_2fa'])) {
     $verification_code = $_POST['verification_code'] ?? '';
     $secret = $_SESSION['temp_2fa_secret'] ?? '';
 
-    if (empty($secret)) {
+    if (!hash_equals($_SESSION['csrf_token'] ?? '', (string)($_POST['csrf_token'] ?? ''))) {
+        $error = 'Security check failed. Please refresh the page and try again.';
+    } elseif (empty($secret)) {
         $error = 'Session expired or invalid. Please try again.';
     } else {
         // Check verification code
@@ -93,6 +102,7 @@ include __DIR__ . '/../admin_header.php';
             </p>
 
             <form method="post" onsubmit="return confirm('Are you sure you want to disable two-factor authentication? This will make your account less secure.');">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                 <div class="center">
                     <button type="submit" name="disable_2fa" class="btn btn-red">Disable 2FA</button>
                 </div>
@@ -127,6 +137,7 @@ include __DIR__ . '/../admin_header.php';
 
                 <button type="button" onclick="submitVerificationForm()" id="verify-button" class="btn btn-green">Verify and Enable</button>
                 <input type="hidden" name="enable_2fa" value="1">
+                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
             </form>
         <?php else: ?>
             <h2>Enhance Your Account Security</h2>

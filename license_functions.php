@@ -156,15 +156,27 @@ function redeem_premium_key($key, $device_id) {
             current_environment()
         ]);
 
-        // Mark the key as redeemed with device_id
+        // Mark the key as redeemed, but only if it is still unredeemed. The
+        // "AND redeemed_at IS NULL" guard makes this claim atomic: if two
+        // requests race to redeem the same key, the database lets exactly one
+        // UPDATE match. The loser sees rowCount() === 0, undoes its speculative
+        // subscription insert, and falls through to the re-redemption path (so
+        // one key can never mint two active subscriptions).
         $stmt = $pdo->prepare("
             UPDATE premium_subscription_keys
             SET redeemed_at = NOW(),
                 device_id = ?,
                 subscription_id = ?
             WHERE subscription_key = ?
+              AND redeemed_at IS NULL
         ");
         $stmt->execute([$device_id, $subscriptionId, $key]);
+
+        if ($stmt->rowCount() === 0) {
+            // Another concurrent request already redeemed this key first.
+            $pdo->rollBack();
+            return redeem_premium_key($key, $device_id);
+        }
 
         $pdo->commit();
 
@@ -304,9 +316,11 @@ function _recreate_subscription_for_key($key, $device_id) {
     global $pdo;
 
     try {
-        // Fetch the key's metadata to get duration_months
+        // Fetch the key's metadata. redeemed_at/created_at anchor the recreated
+        // term to the ORIGINAL start, so a customer whose subscription row went
+        // missing doesn't get an extra fresh term starting today.
         $stmt = $pdo->prepare("
-            SELECT duration_months
+            SELECT duration_months, redeemed_at, created_at
             FROM premium_subscription_keys
             WHERE subscription_key = ?
         ");
@@ -322,24 +336,34 @@ function _recreate_subscription_for_key($key, $device_id) {
         }
 
         $duration_months = $key_data['duration_months'];
+        // Original start = when the key was redeemed (or created); fall back to
+        // now only if neither is recorded.
+        $originalStart = $key_data['redeemed_at'] ?? $key_data['created_at'] ?? date('Y-m-d H:i:s');
+
+        // Calculate subscription dates from the original start, not today.
+        $startDate = $originalStart;
+        if ($duration_months == 0) {
+            $endDate = date('Y-m-d H:i:s', strtotime('+100 years'));
+            $billingCycle = 'yearly';
+        } else {
+            $endDate = date('Y-m-d H:i:s', strtotime("$originalStart +$duration_months months"));
+            $billingCycle = ($duration_months >= 12) ? 'yearly' : 'monthly';
+        }
+
+        // If the original term has already elapsed, don't hand out a fresh
+        // active subscription — the customer's access has expired.
+        if ($duration_months != 0 && strtotime($endDate) <= time()) {
+            return [
+                'success' => false,
+                'status' => 'expired',
+                'message' => "This license key's subscription has expired."
+            ];
+        }
 
         $pdo->beginTransaction();
 
         // Generate a new subscription ID
         $newSubscriptionId = generate_license_key('premium');
-
-        // Calculate subscription dates
-        $startDate = date('Y-m-d H:i:s');
-        if ($duration_months == 0) {
-            $endDate = date('Y-m-d H:i:s', strtotime('+100 years'));
-            $billingCycle = 'yearly';
-        } elseif ($duration_months >= 12) {
-            $endDate = date('Y-m-d H:i:s', strtotime("+$duration_months months"));
-            $billingCycle = 'yearly';
-        } else {
-            $endDate = date('Y-m-d H:i:s', strtotime("+$duration_months months"));
-            $billingCycle = 'monthly';
-        }
 
         // Create the premium subscription
         $stmt = $pdo->prepare("

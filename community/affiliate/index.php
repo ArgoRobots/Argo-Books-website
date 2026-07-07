@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $pdo->prepare('INSERT INTO affiliates (user_id, source_code, status, payout_method, payout_email, application_reason, promo_url, environment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
                     $stmt->execute([$user_id, $source_code, 'pending', 'paypal', $payout_email, $reason, $promo_url, $env]);
                     send_affiliate_application_received_email($user['email'], $user['username']);
-                    $_SESSION['affiliate_success'] = 'Application submitted! We\'ll email you once it\'s reviewed.';
+                    $_SESSION['affiliate_success'] = 'Application submitted. We\'ll email you once it\'s reviewed.';
                     header('Location: index.php');
                     exit;
                 } catch (PDOException $e) {
@@ -65,10 +65,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$status = $affiliate['status'] ?? 'none';
+
 // Compute dashboard figures only when approved.
-$money = null;
-$stats = null;
-if ($affiliate && $affiliate['status'] === 'approved') {
+if ($status === 'approved') {
     $money = affiliate_money_summary($affiliate, $env);
     $stats = get_affiliate_stats($affiliate['source_code'], $env);
     $referral_url = affiliate_referral_url($affiliate['source_code']);
@@ -90,7 +90,6 @@ if ($affiliate && $affiliate['status'] === 'approved') {
     <link rel="stylesheet" href="../../resources/styles/custom-colors.css">
     <link rel="stylesheet" href="../../resources/styles/link.css">
     <link rel="stylesheet" href="../../resources/header/style.css">
-    <link rel="stylesheet" href="../../resources/header/dark.css">
     <link rel="stylesheet" href="../../resources/footer/style.css">
 </head>
 
@@ -99,95 +98,130 @@ if ($affiliate && $affiliate['status'] === 'approved') {
         <?php include __DIR__ . '/../../resources/header/header.php'; ?>
     </header>
 
-    <main class="affiliate-main">
-        <?php if (!empty($success_message)): ?>
-            <div class="affiliate-banner affiliate-banner-success"><?php echo htmlspecialchars($success_message); ?></div>
-        <?php endif; ?>
-        <?php if (!empty($error_message)): ?>
-            <div class="affiliate-banner affiliate-banner-error"><?php echo htmlspecialchars($error_message); ?></div>
-        <?php endif; ?>
+    <main>
+        <?php
+        // State-aware hero copy (same centered dark hero as the community page).
+        $hero = [
+            'none'      => ['Become an Argo Books affiliate', 'Earn 50% commission for every customer you refer, for their first 12 months.'],
+            'approved'  => ['Your affiliate dashboard', 'Share your link and track every click, signup, and dollar you earn.'],
+            'pending'   => ['Application under review', 'Hang tight, we\'re taking a look.'],
+            'rejected'  => ['Affiliate application', 'An update on your application.'],
+            'suspended' => ['Affiliate account paused', 'Your referral link is currently inactive.'],
+        ][$status];
+        ?>
+        <div class="aff-hero">
+            <div class="aff-hero-bg">
+                <div class="aff-orb aff-orb-1"></div>
+                <div class="aff-orb aff-orb-2"></div>
+            </div>
+            <div class="aff-hero-content">
+                <h1><?php echo htmlspecialchars($hero[0]); ?></h1>
+                <p><?php echo htmlspecialchars($hero[1]); ?></p>
+            </div>
+        </div>
 
-        <?php if (!$affiliate): ?>
-            <!-- Application form -->
-            <section class="affiliate-card">
-                <h1>Become an Argo Books affiliate</h1>
-                <p class="affiliate-lead">Earn <strong>50% of every payment</strong> from customers you refer, for the first 12 months of their subscription. Share your link, make videos, and get paid.</p>
-                <ul class="affiliate-perks">
-                    <li>50% commission on initial and renewal payments</li>
-                    <li>Paid for the first 12 months of each subscription</li>
-                    <li>Real-time dashboard for clicks, signups, and earnings</li>
-                </ul>
+        <div class="aff-wrap">
+            <?php if ($success_message): ?><div class="aff-alert aff-alert-success"><?php echo htmlspecialchars($success_message); ?></div><?php endif; ?>
+            <?php if ($error_message): ?><div class="aff-alert aff-alert-error"><?php echo htmlspecialchars($error_message); ?></div><?php endif; ?>
 
-                <form method="POST" class="affiliate-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
-                    <input type="hidden" name="action" value="apply">
+            <?php if ($status === 'none'): ?>
+                <!-- ================= APPLY ================= -->
+                <section class="aff-card">
+                    <h2 class="aff-card-title">Apply to join</h2>
+                    <p class="aff-card-note">You'll earn 50% of every payment your referrals make, for the first 12 months of each subscription. We review every application by hand, usually within a day or two, and your unique link appears right here once you're in.</p>
 
-                    <div class="affiliate-field">
-                        <label for="payout_email">PayPal email for payouts *</label>
-                        <input type="email" name="payout_email" id="payout_email" required value="<?php echo htmlspecialchars($_POST['payout_email'] ?? $user['email']); ?>">
-                        <small>Where we'll send your commission.</small>
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                        <input type="hidden" name="action" value="apply">
+
+                        <div class="aff-field">
+                            <label for="payout_email">PayPal email for payouts</label>
+                            <input type="email" name="payout_email" id="payout_email" required value="<?php echo htmlspecialchars($_POST['payout_email'] ?? $user['email']); ?>">
+                            <small>Where we'll send your commission.</small>
+                        </div>
+
+                        <div class="aff-field">
+                            <label for="promo_url">Where will you promote? <span class="aff-optional">(optional)</span></label>
+                            <input type="url" name="promo_url" id="promo_url" placeholder="https://youtube.com/@yourchannel" value="<?php echo htmlspecialchars($_POST['promo_url'] ?? ''); ?>">
+                            <small>Your channel, page, or website.</small>
+                        </div>
+
+                        <div class="aff-field">
+                            <label for="application_reason">How do you plan to promote Argo Books?</label>
+                            <textarea name="application_reason" id="application_reason" rows="4" required placeholder="Tell us about your audience and where you'll share your link."><?php echo htmlspecialchars($_POST['application_reason'] ?? ''); ?></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-blue aff-form-submit">Apply to the program</button>
+                    </form>
+                </section>
+
+            <?php elseif ($status === 'approved'): ?>
+                <!-- ================= DASHBOARD ================= -->
+                <div class="aff-linkbox">
+                    <span class="aff-linkbox-label">Your referral link, share it anywhere</span>
+                    <div class="aff-linkbox-row">
+                        <input type="text" id="refLink" readonly value="<?php echo htmlspecialchars($referral_url); ?>">
+                        <button type="button" class="btn btn-blue aff-copy" id="copyBtn" onclick="copyRefLink()">Copy link</button>
                     </div>
-
-                    <div class="affiliate-field">
-                        <label for="promo_url">Where will you promote? (optional)</label>
-                        <input type="url" name="promo_url" id="promo_url" placeholder="https://youtube.com/@yourchannel" value="<?php echo htmlspecialchars($_POST['promo_url'] ?? ''); ?>">
-                        <small>Your channel, page, or website.</small>
-                    </div>
-
-                    <div class="affiliate-field">
-                        <label for="application_reason">How do you plan to promote Argo Books? *</label>
-                        <textarea name="application_reason" id="application_reason" rows="4" required><?php echo htmlspecialchars($_POST['application_reason'] ?? ''); ?></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-blue affiliate-submit">Apply to the program</button>
-                </form>
-            </section>
-
-        <?php elseif ($affiliate['status'] === 'pending'): ?>
-            <section class="affiliate-card affiliate-status">
-                <h1>Your application is under review</h1>
-                <p>Thanks for applying! We review applications manually, usually within a day or two. We'll email <strong><?php echo htmlspecialchars($user['email']); ?></strong> the moment there's a decision.</p>
-            </section>
-
-        <?php elseif ($affiliate['status'] === 'rejected'): ?>
-            <section class="affiliate-card affiliate-status">
-                <h1>Application not approved</h1>
-                <p>Thanks for your interest. We weren't able to approve your application at this time.</p>
-                <?php if (!empty($affiliate['review_notes'])): ?>
-                    <p><em><?php echo htmlspecialchars($affiliate['review_notes']); ?></em></p>
-                <?php endif; ?>
-            </section>
-
-        <?php elseif ($affiliate['status'] === 'suspended'): ?>
-            <section class="affiliate-card affiliate-status">
-                <h1>Your affiliate account is paused</h1>
-                <p>Your referral link is currently inactive. Please reach out to support if you think this is a mistake. Any commission you've already earned is safe.</p>
-            </section>
-
-        <?php else: // approved -> dashboard ?>
-            <section class="affiliate-card">
-                <h1>Your affiliate dashboard</h1>
-                <p class="affiliate-lead">Share this link anywhere. You earn 50% of every payment your referrals make, for their first 12 months.</p>
-
-                <div class="affiliate-link-row">
-                    <input type="text" id="refLink" readonly value="<?php echo htmlspecialchars($referral_url); ?>">
-                    <button type="button" class="btn btn-blue" id="copyBtn" onclick="copyRefLink()">Copy</button>
                 </div>
-            </section>
 
-            <section class="affiliate-stats-grid">
-                <div class="affiliate-stat"><span class="affiliate-stat-label">Clicks</span><span class="affiliate-stat-value"><?php echo number_format($stats['clicks']); ?></span></div>
-                <div class="affiliate-stat"><span class="affiliate-stat-label">Signups</span><span class="affiliate-stat-value"><?php echo number_format($stats['signups']); ?></span></div>
-                <div class="affiliate-stat"><span class="affiliate-stat-label">Paying customers</span><span class="affiliate-stat-value"><?php echo number_format($stats['paying']); ?></span></div>
-                <div class="affiliate-stat affiliate-stat-highlight"><span class="affiliate-stat-label">Commission earned</span><span class="affiliate-stat-value">$<?php echo number_format($money['earned'], 2); ?></span></div>
-                <div class="affiliate-stat"><span class="affiliate-stat-label">Paid out</span><span class="affiliate-stat-value">$<?php echo number_format($money['paid'], 2); ?></span></div>
-                <div class="affiliate-stat affiliate-stat-owed"><span class="affiliate-stat-label">Owed to you</span><span class="affiliate-stat-value">$<?php echo number_format($money['owed'], 2); ?></span></div>
-            </section>
+                <div class="aff-stats">
+                    <div class="aff-stat">
+                        <div class="aff-stat-num"><?php echo number_format($stats['clicks']); ?></div>
+                        <div class="aff-stat-label">Clicks</div>
+                    </div>
+                    <div class="aff-stat">
+                        <div class="aff-stat-num"><?php echo number_format($stats['signups']); ?></div>
+                        <div class="aff-stat-label">Signups</div>
+                    </div>
+                    <div class="aff-stat">
+                        <div class="aff-stat-num"><?php echo number_format($stats['paying']); ?></div>
+                        <div class="aff-stat-label">Paying customers</div>
+                    </div>
+                </div>
 
-            <section class="affiliate-card affiliate-fineprint">
-                <p>Amounts are in CAD. Commission is 50% of completed payments within the first 12 months of each referred subscription. Payouts are sent to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. Questions? Contact support.</p>
-            </section>
-        <?php endif; ?>
+                <div class="aff-earn">
+                    <div class="aff-earn-card featured">
+                        <div class="aff-earn-label">Owed to you</div>
+                        <div class="aff-earn-num">$<?php echo number_format($money['owed'], 2); ?></div>
+                        <div class="aff-earn-foot">Paid out on request</div>
+                    </div>
+                    <div class="aff-earn-card emerald">
+                        <div class="aff-earn-label">Total earned</div>
+                        <div class="aff-earn-num">$<?php echo number_format($money['earned'], 2); ?></div>
+                        <div class="aff-earn-foot">All time</div>
+                    </div>
+                    <div class="aff-earn-card">
+                        <div class="aff-earn-label">Already paid</div>
+                        <div class="aff-earn-num">$<?php echo number_format($money['paid'], 2); ?></div>
+                        <div class="aff-earn-foot">All time</div>
+                    </div>
+                </div>
+
+                <p class="aff-fineprint">Amounts in CAD. You earn 50% of every completed payment within the first 12 months of each referred subscription. Payouts go to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. Questions? <a href="../../contact-us/">Contact us</a>.</p>
+
+            <?php else: // pending / rejected / suspended ?>
+                <section class="aff-card aff-status">
+                    <?php if ($status === 'pending'): ?>
+                        <div class="aff-status-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <p>Thanks for applying. We review applications manually, usually within a day or two, and we'll email <strong><?php echo htmlspecialchars($user['email']); ?></strong> the moment there's a decision.</p>
+                    <?php elseif ($status === 'rejected'): ?>
+                        <div class="aff-status-icon muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        </div>
+                        <p>Thanks for your interest. We weren't able to approve your application at this time.</p>
+                        <?php if (!empty($affiliate['review_notes'])): ?><p class="aff-status-note"><?php echo htmlspecialchars($affiliate['review_notes']); ?></p><?php endif; ?>
+                    <?php else: // suspended ?>
+                        <div class="aff-status-icon muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>
+                        </div>
+                        <p>Your referral link is currently inactive. Any commission you've already earned is safe. <a href="../../contact-us/">Contact us</a> if you think this is a mistake.</p>
+                    <?php endif; ?>
+                </section>
+            <?php endif; ?>
+        </div>
     </main>
 
     <footer class="footer">
@@ -197,13 +231,16 @@ if ($affiliate && $affiliate['status'] === 'approved') {
     <script>
         function copyRefLink() {
             const input = document.getElementById('refLink');
+            const btn = document.getElementById('copyBtn');
             input.select();
             input.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(input.value).then(function () {
-                const btn = document.getElementById('copyBtn');
-                const original = btn.textContent;
-                btn.textContent = 'Copied!';
-                setTimeout(function () { btn.textContent = original; }, 1500);
+                btn.textContent = 'Copied';
+                btn.classList.add('copied');
+                setTimeout(function () {
+                    btn.textContent = 'Copy link';
+                    btn.classList.remove('copied');
+                }, 1600);
             });
         }
     </script>

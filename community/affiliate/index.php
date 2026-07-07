@@ -172,7 +172,7 @@ if ($status === 'approved') {
                         </div>
 
                         <button type="submit" class="btn btn-blue aff-form-submit">Apply to the program</button>
-                        <p class="aff-terms-note">By applying, you agree to the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener">Affiliate Program Terms</a>.</p>
+                        <p class="aff-terms-note">By applying, you agree to the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>.</p>
                     </form>
                 </section>
 
@@ -219,7 +219,7 @@ if ($status === 'approved') {
                     </div>
                 </div>
 
-                <p class="aff-fineprint">Figures shown are your gross commission in CAD, 50% of every completed payment within the first 12 months of each referred subscription. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/">Contact us</a>.</p>
+                <p class="aff-fineprint">Figures shown are your gross commission in CAD: 50% of every completed payment within the first 12 months of each referred subscription. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/" class="link">Contact us</a>.</p>
 
             <?php else: // pending / rejected / suspended ?>
                 <section class="aff-card aff-status">
@@ -238,7 +238,7 @@ if ($status === 'approved') {
                         <div class="aff-status-icon muted">
                             <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="9" x2="10" y2="15"/><line x1="14" y1="9" x2="14" y2="15"/></svg>
                         </div>
-                        <p>Your referral link is currently inactive. Any commission you've already earned is safe. <a href="../../contact-us/">Contact us</a> if you think this is a mistake.</p>
+                        <p>Your referral link is currently inactive. Any commission you've already earned is safe. <a href="../../contact-us/" class="link">Contact us</a> if you think this is a mistake.</p>
                     <?php endif; ?>
                 </section>
             <?php endif; ?>

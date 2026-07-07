@@ -146,8 +146,9 @@
             </ul>
 
             <h2>Changes to These Terms</h2>
-            <p>We may update these terms as the program evolves. Significant changes will be reflected on this
-                page, and your continued participation means you accept the updated terms.</p>
+            <p>We may update these terms. The version on this page is always the current one, and the date below
+                shows when it last changed. If you keep taking part in the program after an update, you accept the
+                new terms.</p>
 
             <h2>Contact Us</h2>
             <p>If you have any questions about these Affiliate Program Terms, please contact us:</p>

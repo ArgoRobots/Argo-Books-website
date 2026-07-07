@@ -45,6 +45,22 @@ function ensure_affiliate_referral_link(string $source_code, string $username): 
     ]);
 }
 
+/** Map an affiliate status to the shared admin badge modifier class. */
+function affiliate_status_badge_class(string $status): string
+{
+    switch ($status) {
+        case 'approved':
+            return 'badge-success';
+        case 'pending':
+            return 'badge-pending';
+        case 'suspended':
+        case 'rejected':
+            return 'badge-banned';
+        default:
+            return 'badge-user';
+    }
+}
+
 // Handle state-mutating POSTs.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $posted_token = $_POST['csrf_token'] ?? '';
@@ -162,6 +178,9 @@ include __DIR__ . '/../admin_header.php';
     .back-link { margin-bottom: 16px; }
     .code-edit-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 6px 0 4px; }
     .code-edit-form input { max-width: 320px; }
+    /* .btn-gray has no dark-theme rule, so it stays white in dark mode. */
+    [data-theme="dark"] .btn-gray { background: var(--gray-700); color: var(--white); }
+    [data-theme="dark"] .btn-gray:hover { background: var(--gray-600); }
 
     /* common-style.css styles text/number/email inputs but not date inputs,
        so match them here (both themes) instead of leaving the native control. */
@@ -209,7 +228,7 @@ include __DIR__ . '/../admin_header.php';
     <a href="index.php" class="link back-link">&larr; All affiliates</a>
 
     <h2><?php echo htmlspecialchars($cu['username']); ?>
-        <span class="status-badge status-<?php echo $aff['status'] === 'approved' ? 'active' : 'inactive'; ?>"><?php echo htmlspecialchars(ucfirst($aff['status'])); ?></span>
+        <span class="badge <?php echo affiliate_status_badge_class($aff['status']); ?>"><?php echo htmlspecialchars(ucfirst($aff['status'])); ?></span>
     </h2>
     <p><?php echo htmlspecialchars($cu['email']); ?> &middot; applied <?php echo htmlspecialchars(date('M j, Y', strtotime($aff['applied_at']))); ?></p>
 
@@ -365,7 +384,7 @@ include __DIR__ . '/../admin_header.php';
             <p class="subtext">No approved affiliates yet.</p>
         <?php else: ?>
             <table class="table">
-                <thead><tr><th>User</th><th>Code</th><th>Status</th><th>Clicks</th><th>Earned</th><th>Paid</th><th>Owed</th><th></th></tr></thead>
+                <thead><tr><th>User</th><th>Code</th><th>Status</th><th>Clicks</th><th>Earned</th><th>Paid</th><th>Owed</th><th>Actions</th></tr></thead>
                 <tbody>
                     <?php foreach ($active_rows as $a):
                         $money = affiliate_money_summary($a, $env);
@@ -376,7 +395,7 @@ include __DIR__ . '/../admin_header.php';
                         <tr>
                             <td><a href="index.php?id=<?php echo (int) $a['id']; ?>" class="link"><?php echo htmlspecialchars($a['username']); ?></a></td>
                             <td><code><?php echo htmlspecialchars($a['source_code']); ?></code></td>
-                            <td><span class="status-badge status-<?php echo $a['status'] === 'approved' ? 'active' : 'inactive'; ?>"><?php echo htmlspecialchars(ucfirst($a['status'])); ?></span></td>
+                            <td><span class="badge <?php echo affiliate_status_badge_class($a['status']); ?>"><?php echo htmlspecialchars(ucfirst($a['status'])); ?></span></td>
                             <td><?php echo number_format($stats['clicks']); ?></td>
                             <td class="money-positive">$<?php echo number_format($money['earned'], 2); ?></td>
                             <td>$<?php echo number_format($money['paid'], 2); ?></td>

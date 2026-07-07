@@ -1371,6 +1371,58 @@ INSERT IGNORE INTO reddit_keywords (keyword, notes) VALUES
     ('contractor invoicing app', 'trades invoicing'),
     ('profit and loss small business', 'bookkeeping reporting need');
 
+
+-- ============================================================
+-- Affiliate program
+-- ============================================================
+
+-- Affiliates: an existing community_users member who owns a referral source_code
+-- and earns commission on subscriptions attributed to it. The referral_links row
+-- for source_code is created on approval, so the link is dead until approved.
+CREATE TABLE IF NOT EXISTS affiliates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    source_code VARCHAR(50) NOT NULL UNIQUE COMMENT 'The referral_links.source_code this affiliate owns (e.g. aff-username)',
+    status ENUM('pending', 'approved', 'rejected', 'suspended') NOT NULL DEFAULT 'pending',
+    commission_rate DECIMAL(5,4) NOT NULL DEFAULT 0.5000 COMMENT '0.5000 = 50%. Per-affiliate so terms can be overridden later.',
+    commission_window_months INT NOT NULL DEFAULT 12 COMMENT 'Months from each subscription start_date during which payments earn commission',
+    payout_method VARCHAR(20) NOT NULL DEFAULT 'paypal',
+    payout_email VARCHAR(255) DEFAULT NULL COMMENT 'PayPal (or other) email for external payout',
+    application_reason TEXT DEFAULT NULL COMMENT 'Why they want to join / audience info',
+    promo_url VARCHAR(500) DEFAULT NULL COMMENT 'Where they will promote (channel/site)',
+    applied_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at DATETIME DEFAULT NULL,
+    reviewed_by VARCHAR(50) DEFAULT NULL COMMENT 'admin username that approved or rejected',
+    review_notes TEXT DEFAULT NULL,
+    environment ENUM('production', 'sandbox') NOT NULL DEFAULT 'production' COMMENT 'APP_ENV at insert time; reads filter by current env so sandbox test data does not pollute prod totals.',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_user_env (user_id, environment),
+    INDEX idx_status (status),
+    INDEX idx_source_code (source_code),
+    FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Affiliate payouts: manual ledger of money actually paid out to an affiliate.
+-- Commission earned is computed on the fly from premium_subscription_payments;
+-- owed = earned - SUM(affiliate_payouts.amount).
+CREATE TABLE IF NOT EXISTS affiliate_payouts (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    affiliate_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'CAD',
+    paid_at DATE NOT NULL COMMENT 'Date the payout was actually sent externally',
+    method VARCHAR(20) NOT NULL DEFAULT 'paypal',
+    reference VARCHAR(255) DEFAULT NULL COMMENT 'External txn id / PayPal reference',
+    notes TEXT DEFAULT NULL,
+    recorded_by VARCHAR(50) DEFAULT NULL COMMENT 'admin username who recorded it',
+    environment ENUM('production', 'sandbox') NOT NULL DEFAULT 'production',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_affiliate (affiliate_id),
+    INDEX idx_paid_at (paid_at),
+    FOREIGN KEY (affiliate_id) REFERENCES affiliates(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Per-call timing of desktop AI operations (receipt scan, bank categorize, supplier
 -- suggestion, spreadsheet analysis/processing via /api/ai/completions.php, and bank
 -- PDF extraction via /api/bank/extract.php). elapsed_ms is the SERVER-measured Gemini

@@ -1303,7 +1303,7 @@ body {
 /* ---------- Conversion-pitch banner above the invoice ---------- */
 
 .page-banner {
-  margin: 0 0 20px;
+  margin: 40px 0 20px;
   padding: 10px 16px;
   background: var(--tool-secondary);
   border: 1px solid var(--tool-border);

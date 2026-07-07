@@ -283,12 +283,7 @@ include __DIR__ . '/../admin_header.php';
                             <td><?php echo htmlspecialchars($a['promo_url'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars(mb_strimwidth($a['application_reason'] ?? '', 0, 60, '…')); ?></td>
                             <td class="action-buttons">
-                                <form method="POST" style="display:inline">
-                                    <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
-                                    <input type="hidden" name="action" value="approve">
-                                    <input type="hidden" name="affiliate_id" value="<?php echo (int) $a['id']; ?>">
-                                    <button type="submit" class="btn-small btn-green">Approve</button>
-                                </form>
+                                <button type="button" class="btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>)">Approve</button>
                                 <button type="button" class="btn-small btn-red" onclick="rejectAffiliate(<?php echo (int) $a['id']; ?>)">Reject</button>
                             </td>
                         </tr>
@@ -348,6 +343,19 @@ include __DIR__ . '/../admin_header.php';
     </div>
 
     <script>
+        const affiliateCsrf = <?php echo json_encode($csrf); ?>;
+
+        function approveAffiliate(id) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.innerHTML =
+                '<input type="hidden" name="csrf_token" value="' + affiliateCsrf + '">' +
+                '<input type="hidden" name="action" value="approve">' +
+                '<input type="hidden" name="affiliate_id" value="' + id + '">';
+            document.body.appendChild(form);
+            form.submit();
+        }
+
         function rejectAffiliate(id) {
             document.getElementById('rejectAffiliateId').value = id;
             document.getElementById('rejectModal').style.display = 'block';

@@ -484,7 +484,7 @@
 }
 .aff-card-figure {
     display: block;
-    font-family: var(--aff-mono);
+    font-family: var(--aff-body);
     font-weight: 700;
     font-size: 44px;
     line-height: 1;

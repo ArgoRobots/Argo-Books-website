@@ -187,7 +187,7 @@ $fmt = function (float $n): string {
                     <div class="aff-card aff-reveal">
                         <span class="aff-card-icon"><?php echo svg_icon('analytics', 26); ?></span>
                         <h3>Real-time dashboard</h3>
-                        <p>Watch clicks, signups, and commission update live, so you always know what's working.</p>
+                        <p>See your clicks, signups, paying customers, and exactly what you're owed, all updating as referrals come in.</p>
                     </div>
                     <div class="aff-card aff-reveal">
                         <span class="aff-card-icon"><?php echo svg_icon('dollar', 26); ?></span>
@@ -242,6 +242,10 @@ $fmt = function (float $n): string {
                     <details class="aff-faq-item aff-reveal">
                         <summary>How are referrals tracked?<?php echo svg_icon('chevron-down', 20); ?></summary>
                         <p>Your unique link tags every visitor you send. When they sign up and subscribe, the sale is credited to you automatically, and it keeps earning on their renewals for a full year.</p>
+                    </details>
+                    <details class="aff-faq-item aff-reveal">
+                        <summary>Where do I track everything?<?php echo svg_icon('chevron-down', 20); ?></summary>
+                        <p>In your affiliate dashboard. It shows your clicks, signups, paying customers, total earned, what's been paid, and what you're still owed. Open it any time from this page or from your Argo Books profile.</p>
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>Does it cost anything to join?<?php echo svg_icon('chevron-down', 20); ?></summary>

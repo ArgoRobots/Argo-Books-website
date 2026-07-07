@@ -24,6 +24,43 @@ HTML;
     }
 }
 
+if (!function_exists('send_affiliate_admin_notification_email')) {
+    /**
+     * Notify the admin (founder) that a new affiliate application came in, so
+     * they know to review it. Sends to contact@argorobots.com, matching the
+     * refund-alert convention in api/portal/_refund_helpers.php. Reply-to is the
+     * applicant so the founder can reply to them directly. Best-effort.
+     */
+    function send_affiliate_admin_notification_email(string $applicant_username, string $applicant_email, string $promo_url, string $reason): bool
+    {
+        $base = rtrim($_ENV['SITE_URL'] ?? 'https://argorobots.com', '/');
+        $admin_url = $base . '/admin/affiliates/';
+
+        $name  = htmlspecialchars($applicant_username, ENT_QUOTES, 'UTF-8');
+        $email = htmlspecialchars($applicant_email, ENT_QUOTES, 'UTF-8');
+        $promo = trim($promo_url) !== '' ? htmlspecialchars($promo_url, ENT_QUOTES, 'UTF-8') : '(not provided)';
+        $why   = nl2br(htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'));
+
+        $subject = '[Argo Books] New affiliate application: ' . $applicant_username;
+        $body = <<<HTML
+            <p><strong>A new affiliate application is waiting for review.</strong></p>
+            <ul>
+                <li><strong>User:</strong> {$name}</li>
+                <li><strong>Email:</strong> {$email}</li>
+                <li><strong>Promotes at:</strong> {$promo}</li>
+            </ul>
+            <p><strong>How they'll promote Argo Books:</strong></p>
+            <p>{$why}</p>
+            <div class="button-container">
+                <a href="{$admin_url}" class="button">Review in the admin panel</a>
+            </div>
+HTML;
+
+        // Reply-to the applicant so a reply reaches them, not the noreply box.
+        return send_styled_email('contact@argorobots.com', $subject, $body, 'purple', null, null, $applicant_email);
+    }
+}
+
 if (!function_exists('send_affiliate_approved_email')) {
     /** Approval email containing the affiliate's live referral link + dashboard. */
     function send_affiliate_approved_email(string $to_email, string $username, string $referral_url, string $dashboard_url): bool

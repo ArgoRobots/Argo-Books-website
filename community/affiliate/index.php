@@ -53,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $pdo->prepare('INSERT INTO affiliates (user_id, source_code, status, payout_method, payout_email, application_reason, promo_url, environment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
                     $stmt->execute([$user_id, $source_code, 'pending', 'paypal', $payout_email, $reason, $promo_url, $env]);
                     send_affiliate_application_received_email($user['email'], $user['username']);
+                    // Let the admin know there's an application to review.
+                    send_affiliate_admin_notification_email($user['username'], $user['email'], $promo_url, $reason);
                     $_SESSION['affiliate_success'] = 'Application submitted. We\'ll email you once it\'s reviewed.';
                     header('Location: index.php');
                     exit;

@@ -56,11 +56,11 @@ require_once __DIR__ . '/../track_referral.php';
                         <li><?= svg_icon('circle-check', 20) ?> Includes recurring subscriptions</li>
                         <li><?= svg_icon('circle-check', 20) ?> Real-time dashboard for clicks &amp; earnings</li>
                     </ul>
-                    <a href="../community/users/register.php" class="btn btn-blue aff-cta">
+                    <a href="../community/affiliate/" class="btn btn-blue aff-cta">
                         <span>Become an affiliate</span>
                         <?= svg_icon('arrow-right', 18) ?>
                     </a>
-                    <p class="aff-cta-note">Free to join. Create a free Argo account to apply.</p>
+                    <p class="aff-cta-note">Free to join. Sign in or create a free Argo account to apply.</p>
                 </div>
             </div>
         </section>

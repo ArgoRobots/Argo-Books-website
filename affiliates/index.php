@@ -259,7 +259,7 @@ $fmt = function (float $n): string {
                     <span>Become an affiliate</span>
                     <?php echo svg_icon('arrow-right', 18); ?>
                 </a>
-                <p class="aff-final-note">Free to join. Sign in or create a free Argo account to apply.</p>
+                <p class="aff-final-note">Free to join. Sign in or create a free Argo account to apply. See the <a href="../legal/affiliate-terms.php">Affiliate Program Terms</a>.</p>
             </div>
         </section>
     </main>

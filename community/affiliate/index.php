@@ -39,16 +39,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $reason = trim($_POST['application_reason'] ?? '');
             $promo_url = trim($_POST['promo_url'] ?? '');
 
+            // Applicant may request the tail of their link: ?source=aff-<tail>.
+            $desired_tail = affiliate_normalize_code($_POST['desired_code'] ?? '');
+            $source_code = null;
+
             if (!filter_var($payout_email, FILTER_VALIDATE_EMAIL)) {
                 $error_message = 'Enter a valid PayPal email so we can pay your commission.';
             } elseif ($reason === '') {
                 $error_message = 'Tell us a little about how you plan to promote Argo Books.';
             } elseif ($promo_url !== '' && !filter_var($promo_url, FILTER_VALIDATE_URL)) {
                 $error_message = 'The promotion link does not look like a valid URL.';
+            } elseif ($desired_tail !== '' && (strlen($desired_tail) < 2 || strlen($desired_tail) > 46)) {
+                $error_message = 'Your referral link must be 2 to 46 characters (letters, numbers, hyphens).';
+            } elseif ($desired_tail !== '' && affiliate_source_code_taken('aff-' . $desired_tail)) {
+                $error_message = 'That referral link is already taken. Please choose another.';
             } else {
                 // Reserve the source_code now; the referral_links row is created
-                // on approval so the link stays dead until then.
-                $source_code = generate_affiliate_source_code($user['username']);
+                // on approval so the link stays dead until then. Blank tail falls
+                // back to an auto-generated aff-<username> code.
+                $source_code = $desired_tail !== '' ? 'aff-' . $desired_tail : generate_affiliate_source_code($user['username']);
                 try {
                     $stmt = $pdo->prepare('INSERT INTO affiliates (user_id, source_code, status, payout_method, payout_email, application_reason, promo_url, environment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
                     $stmt->execute([$user_id, $source_code, 'pending', 'paypal', $payout_email, $reason, $promo_url, $env]);
@@ -149,11 +158,21 @@ if ($status === 'approved') {
                         </div>
 
                         <div class="aff-field">
+                            <label for="desired_code">Choose your referral link <span class="aff-optional">(optional)</span></label>
+                            <div class="aff-code-input">
+                                <span class="aff-code-prefix">argorobots.com/?source=aff-</span>
+                                <input type="text" name="desired_code" id="desired_code" pattern="[A-Za-z0-9\-]{2,46}" placeholder="yourname" value="<?php echo htmlspecialchars($_POST['desired_code'] ?? ''); ?>">
+                            </div>
+                            <small>Letters, numbers, and hyphens. Leave blank and we'll use your username.</small>
+                        </div>
+
+                        <div class="aff-field">
                             <label for="application_reason">How do you plan to promote Argo Books?</label>
                             <textarea name="application_reason" id="application_reason" rows="4" required placeholder="Tell us about your audience and where you'll share your link."><?php echo htmlspecialchars($_POST['application_reason'] ?? ''); ?></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-blue aff-form-submit">Apply to the program</button>
+                        <p class="aff-terms-note">By applying, you agree to the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener">Affiliate Program Terms</a>.</p>
                     </form>
                 </section>
 
@@ -200,7 +219,7 @@ if ($status === 'approved') {
                     </div>
                 </div>
 
-                <p class="aff-fineprint">Amounts in CAD. You earn 50% of every completed payment within the first 12 months of each referred subscription. Payouts go to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. Questions? <a href="../../contact-us/">Contact us</a>.</p>
+                <p class="aff-fineprint">Figures shown are your gross commission in CAD, 50% of every completed payment within the first 12 months of each referred subscription. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/">Contact us</a>.</p>
 
             <?php else: // pending / rejected / suspended ?>
                 <section class="aff-card aff-status">

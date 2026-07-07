@@ -192,9 +192,62 @@ body {
     color: var(--gray-600);
 }
 
+/* Requested referral link: fixed prefix + editable tail on one line. */
+.aff-code-input {
+    display: flex;
+    align-items: stretch;
+    border: 1px solid var(--gray-border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--white);
+}
+
+.aff-code-input:focus-within {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(63, 99, 232, 0.15);
+}
+
+.aff-code-prefix {
+    display: flex;
+    align-items: center;
+    padding: 0 4px 0 13px;
+    background: var(--gray-50, #f8fafc);
+    color: var(--gray-600);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    border-right: 1px solid var(--gray-border);
+}
+
+.aff-code-input input {
+    flex: 1;
+    min-width: 0;
+    border: none;
+    border-radius: 0;
+    padding: 11px 12px;
+    font-family: var(--font-mono);
+}
+
+.aff-code-input input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+@media (max-width: 460px) {
+    .aff-code-input { flex-direction: column; }
+    .aff-code-prefix { border-right: none; border-bottom: 1px solid var(--gray-border); padding: 8px 12px; }
+}
+
 /* Full-width submit; beats button.css .btn width via specificity */
 .aff-wrap .aff-form-submit {
     width: 100%;
+}
+
+.aff-terms-note {
+    margin: 12px 0 0;
+    font-size: 0.82rem;
+    color: var(--gray-600);
+    text-align: center;
 }
 
 /* Referral link toolbar (mirrors .community-actions gray-50) */

@@ -89,6 +89,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare("UPDATE affiliates SET status = 'approved' WHERE id = ?")->execute([$affiliate_id]);
             $pdo->prepare('UPDATE referral_links SET is_active = 1 WHERE source_code = ?')->execute([$affiliate['source_code']]);
             $_SESSION['success_message'] = 'Affiliate reactivated.';
+        } elseif ($action === 'update_code') {
+            $new_code = affiliate_normalize_code($_POST['source_code'] ?? '');
+            $old_code = $affiliate['source_code'];
+            if ($new_code === '' || strlen($new_code) < 3 || strlen($new_code) > 50) {
+                $_SESSION['error_message'] = 'Referral link must be 3 to 50 characters (letters, numbers, hyphens).';
+            } elseif (affiliate_code_has_reserved_prefix($new_code)) {
+                $_SESSION['error_message'] = 'That prefix is reserved for traffic sources. Pick a different link.';
+            } elseif ($new_code !== $old_code && affiliate_source_code_taken($new_code, $affiliate_id)) {
+                $_SESSION['error_message'] = 'That referral link is already taken.';
+            } elseif ($new_code !== $old_code) {
+                // Rename the code everywhere it is referenced so past clicks,
+                // events, and attribution move with it instead of orphaning.
+                $pdo->beginTransaction();
+                $pdo->prepare('UPDATE affiliates SET source_code = ? WHERE id = ?')->execute([$new_code, $affiliate_id]);
+                $pdo->prepare('UPDATE referral_links SET source_code = ? WHERE source_code = ?')->execute([$new_code, $old_code]);
+                $pdo->prepare('UPDATE referral_events SET source_code = ? WHERE source_code = ?')->execute([$new_code, $old_code]);
+                $pdo->prepare('UPDATE referral_visits SET source_code = ? WHERE source_code = ?')->execute([$new_code, $old_code]);
+                $pdo->commit();
+                $_SESSION['success_message'] = 'Referral link updated.';
+            }
+        } elseif ($action === 'delete') {
+            if (affiliate_is_deletable($affiliate, $env)) {
+                // Safe because there is zero activity: no visits/events reference
+                // the code, so removing the link row can't orphan history.
+                $pdo->beginTransaction();
+                $pdo->prepare('DELETE FROM referral_links WHERE source_code = ?')->execute([$affiliate['source_code']]);
+                $pdo->prepare('DELETE FROM affiliates WHERE id = ?')->execute([$affiliate_id]); // cascades payouts
+                $pdo->commit();
+                $_SESSION['success_message'] = 'Affiliate deleted.';
+            } else {
+                $_SESSION['error_message'] = 'Cannot delete an affiliate with clicks or earnings. Suspend it instead.';
+            }
         } elseif ($action === 'record_payout') {
             $amount = round((float) ($_POST['amount'] ?? 0), 2);
             $paid_at = $_POST['paid_at'] ?? date('Y-m-d');
@@ -106,7 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Redirect back to the detail view (if we were on one) or the list.
-    $back = $affiliate_id && $action !== 'reject' && $action !== 'approve'
+    // approve/reject/delete land on the list; per-affiliate edits stay on detail.
+    $back = $affiliate_id && !in_array($action, ['reject', 'approve', 'delete'], true)
         ? 'index.php?id=' . $affiliate_id
         : 'index.php';
     header('Location: ' . $back);
@@ -126,7 +159,31 @@ include __DIR__ . '/../admin_header.php';
     .affiliate-link-box { font-family: monospace; word-break: break-all; }
     .payout-form .form-row { display: flex; flex-wrap: wrap; gap: 12px; }
     .payout-form .form-group { flex: 1; min-width: 140px; }
-    .back-link { display: inline-block; margin-bottom: 16px; }
+    .back-link { margin-bottom: 16px; }
+    .code-edit-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 6px 0 4px; }
+    .code-edit-form input { max-width: 320px; }
+
+    /* common-style.css styles text/number/email inputs but not date inputs,
+       so match them here (both themes) instead of leaving the native control. */
+    .payout-form input[type="date"] {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid var(--gray-input-border);
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+        font-family: inherit;
+    }
+    /* Native date inputs reserve extra height for the picker; pin all row
+       inputs to one height (border-box) so they line up exactly. */
+    .payout-form .form-row input { height: 38px; }
+    [data-theme="dark"] .payout-form input[type="date"] {
+        background: var(--gray-700);
+        border-color: var(--gray-600);
+        color: var(--white);
+        /* render the native calendar picker + indicator in dark mode */
+        color-scheme: dark;
+    }
 </style>
 
 <div class="container">
@@ -149,7 +206,7 @@ include __DIR__ . '/../admin_header.php';
     $payout_rows = $payouts->fetchAll();
     $csrf = htmlspecialchars($_SESSION['csrf_token']);
 ?>
-    <a href="index.php" class="back-link">&larr; All affiliates</a>
+    <a href="index.php" class="link back-link">&larr; All affiliates</a>
 
     <h2><?php echo htmlspecialchars($cu['username']); ?>
         <span class="status-badge status-<?php echo $aff['status'] === 'approved' ? 'active' : 'inactive'; ?>"><?php echo htmlspecialchars(ucfirst($aff['status'])); ?></span>
@@ -168,7 +225,15 @@ include __DIR__ . '/../admin_header.php';
     <div class="table-container">
         <h3>Referral link &amp; payout details</h3>
         <p class="affiliate-link-box"><?php echo htmlspecialchars(affiliate_referral_url($aff['source_code'])); ?></p>
-        <p>Source code: <code><?php echo htmlspecialchars($aff['source_code']); ?></code></p>
+        <form method="POST" class="code-edit-form">
+            <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
+            <input type="hidden" name="action" value="update_code">
+            <input type="hidden" name="affiliate_id" value="<?php echo $detail_id; ?>">
+            <label for="source_code">Source code</label>
+            <input type="text" name="source_code" id="source_code" value="<?php echo htmlspecialchars($aff['source_code']); ?>" pattern="[A-Za-z0-9\-]{3,50}" required>
+            <button type="submit" class="btn btn-small btn-blue">Save link</button>
+        </form>
+        <p class="subtext">Changing this moves all past clicks and earnings to the new link.</p>
         <p>Payout: <?php echo htmlspecialchars($aff['payout_method']); ?>
             <?php echo $aff['payout_email'] ? '&rarr; ' . htmlspecialchars($aff['payout_email']) : '<em>(no payout email on file)</em>'; ?></p>
         <?php if (!empty($aff['promo_url'])): ?><p>Promotes at: <?php echo htmlspecialchars($aff['promo_url']); ?></p><?php endif; ?>
@@ -277,14 +342,15 @@ include __DIR__ . '/../admin_header.php';
                 <tbody>
                     <?php foreach ($pending_rows as $a): ?>
                         <tr>
-                            <td><a href="index.php?id=<?php echo (int) $a['id']; ?>"><?php echo htmlspecialchars($a['username']); ?></a></td>
+                            <td><a href="index.php?id=<?php echo (int) $a['id']; ?>" class="link"><?php echo htmlspecialchars($a['username']); ?></a></td>
                             <td><?php echo htmlspecialchars($a['email']); ?></td>
                             <td><?php echo htmlspecialchars(date('M j, Y', strtotime($a['applied_at']))); ?></td>
                             <td><?php echo htmlspecialchars($a['promo_url'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars(mb_strimwidth($a['application_reason'] ?? '', 0, 60, '…')); ?></td>
                             <td class="action-buttons">
-                                <button type="button" class="btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>)">Approve</button>
-                                <button type="button" class="btn-small btn-red" onclick="rejectAffiliate(<?php echo (int) $a['id']; ?>)">Reject</button>
+                                <button type="button" class="btn btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>)">Approve</button>
+                                <button type="button" class="btn btn-small btn-red" onclick="rejectAffiliate(<?php echo (int) $a['id']; ?>)">Reject</button>
+                                <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -304,16 +370,23 @@ include __DIR__ . '/../admin_header.php';
                     <?php foreach ($active_rows as $a):
                         $money = affiliate_money_summary($a, $env);
                         $stats = get_affiliate_stats($a['source_code'], $env);
+                        $deletable = $stats['clicks'] === 0 && $stats['signups'] === 0 && $stats['paying'] === 0
+                            && (float) $money['earned'] === 0.0 && (float) $money['paid'] === 0.0;
                     ?>
                         <tr>
-                            <td><a href="index.php?id=<?php echo (int) $a['id']; ?>"><?php echo htmlspecialchars($a['username']); ?></a></td>
+                            <td><a href="index.php?id=<?php echo (int) $a['id']; ?>" class="link"><?php echo htmlspecialchars($a['username']); ?></a></td>
                             <td><code><?php echo htmlspecialchars($a['source_code']); ?></code></td>
                             <td><span class="status-badge status-<?php echo $a['status'] === 'approved' ? 'active' : 'inactive'; ?>"><?php echo htmlspecialchars(ucfirst($a['status'])); ?></span></td>
                             <td><?php echo number_format($stats['clicks']); ?></td>
                             <td class="money-positive">$<?php echo number_format($money['earned'], 2); ?></td>
                             <td>$<?php echo number_format($money['paid'], 2); ?></td>
                             <td class="money-owed">$<?php echo number_format($money['owed'], 2); ?></td>
-                            <td><a href="index.php?id=<?php echo (int) $a['id']; ?>" class="btn-small btn-blue">View</a></td>
+                            <td class="action-buttons">
+                                <a href="index.php?id=<?php echo (int) $a['id']; ?>" class="btn btn-small btn-blue">View</a>
+                                <?php if ($deletable): ?>
+                                    <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -345,15 +418,25 @@ include __DIR__ . '/../admin_header.php';
     <script>
         const affiliateCsrf = <?php echo json_encode($csrf); ?>;
 
-        function approveAffiliate(id) {
+        function submitAffiliateAction(id, action) {
             const form = document.createElement('form');
             form.method = 'POST';
             form.innerHTML =
                 '<input type="hidden" name="csrf_token" value="' + affiliateCsrf + '">' +
-                '<input type="hidden" name="action" value="approve">' +
+                '<input type="hidden" name="action" value="' + action + '">' +
                 '<input type="hidden" name="affiliate_id" value="' + id + '">';
             document.body.appendChild(form);
             form.submit();
+        }
+
+        function approveAffiliate(id) {
+            submitAffiliateAction(id, 'approve');
+        }
+
+        function deleteAffiliate(id, name) {
+            if (confirm('Delete the affiliate "' + name + '"? This can\'t be undone. Only allowed when there are no clicks or earnings.')) {
+                submitAffiliateAction(id, 'delete');
+            }
         }
 
         function rejectAffiliate(id) {

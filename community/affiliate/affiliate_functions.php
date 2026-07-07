@@ -270,3 +270,74 @@ if (!function_exists('affiliate_referral_url')) {
         return 'https://argorobots.com/?source=' . rawurlencode($source_code);
     }
 }
+
+if (!function_exists('affiliate_normalize_code')) {
+    /** Lowercase + strip anything that isn't URL-safe from a requested code. */
+    function affiliate_normalize_code(string $raw): string
+    {
+        $c = strtolower(trim($raw));
+        $c = preg_replace('/[^a-z0-9-]/', '', $c);
+        return trim($c, '-');
+    }
+}
+
+if (!function_exists('affiliate_code_has_reserved_prefix')) {
+    /**
+     * True if a source_code starts with a prefix the referral system uses to
+     * auto-categorize traffic (see referral_category_key + track_referral.php).
+     * Affiliate codes must not masquerade as those, and google-ads-* also trips
+     * a gclid gate.
+     */
+    function affiliate_code_has_reserved_prefix(string $code): bool
+    {
+        foreach (['google-ads-', 'bing-ads-', 'ads-', 'paid-', 'ai-', 'social-', 'guide-', 'guides-', 'youtube-'] as $p) {
+            if (strncmp($code, $p, strlen($p)) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+if (!function_exists('affiliate_source_code_taken')) {
+    /**
+     * Whether a source_code is already used by a referral link or another
+     * affiliate. Pass $ignore_affiliate_id when editing an existing affiliate so
+     * its own code doesn't count as a collision.
+     */
+    function affiliate_source_code_taken(string $code, ?int $ignore_affiliate_id = null): bool
+    {
+        global $pdo;
+        $rl = $pdo->prepare('SELECT 1 FROM referral_links WHERE source_code = ? LIMIT 1');
+        $rl->execute([$code]);
+        if ($rl->fetchColumn()) {
+            return true;
+        }
+        if ($ignore_affiliate_id !== null) {
+            $a = $pdo->prepare('SELECT 1 FROM affiliates WHERE source_code = ? AND id <> ? LIMIT 1');
+            $a->execute([$code, $ignore_affiliate_id]);
+        } else {
+            $a = $pdo->prepare('SELECT 1 FROM affiliates WHERE source_code = ? LIMIT 1');
+            $a->execute([$code]);
+        }
+        return (bool) $a->fetchColumn();
+    }
+}
+
+if (!function_exists('affiliate_is_deletable')) {
+    /**
+     * An affiliate can be deleted only when it has no history worth keeping:
+     * zero clicks, signups, paying customers, and zero money earned or paid.
+     * Deleting one with activity would orphan referral attribution.
+     */
+    function affiliate_is_deletable(array $affiliate, string $environment): bool
+    {
+        $stats = get_affiliate_stats($affiliate['source_code'], $environment);
+        $money = affiliate_money_summary($affiliate, $environment);
+        return $stats['clicks'] === 0
+            && $stats['signups'] === 0
+            && $stats['paying'] === 0
+            && (float) $money['earned'] === 0.0
+            && (float) $money['paid'] === 0.0;
+    }
+}

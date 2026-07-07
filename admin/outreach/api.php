@@ -1038,6 +1038,7 @@ function editorial_run_discovery($pdo)
     $rejectedCount        = 0;
     $rejectReasons        = [];
     $alreadyImportedCount = 0;
+    $alreadyRejectedCount = 0;
     $totalEvaluated       = 0;
     $queriesRun           = [];
     $seen                 = [];
@@ -1047,7 +1048,7 @@ function editorial_run_discovery($pdo)
     // the total wall-clock, and persist rejects so repeated Run clicks make
     // progress (skipping already-handled articles) instead of re-doing them.
     $evaluated = 0;
-    $maxEval   = 8;
+    $maxEval   = 15;
     $deadline  = microtime(true) + 35;
 
     while (count($fits) < $limit && $callsToday < $serpapiLimit && $evaluated < $maxEval && microtime(true) < $deadline) {
@@ -1081,8 +1082,13 @@ function editorial_run_discovery($pdo)
                        OR (status = 'rejected' AND checked_at > DATE_SUB(NOW(), INTERVAL 14 DAY)))
                 LIMIT 1");
             $existing->execute([$canonical]);
-            if ($existing->fetchColumn() !== false) {
-                $alreadyImportedCount++;
+            $existingStatus = $existing->fetchColumn();
+            if ($existingStatus !== false) {
+                if ($existingStatus === 'imported') {
+                    $alreadyImportedCount++;
+                } else {
+                    $alreadyRejectedCount++;
+                }
                 continue;
             }
 
@@ -1139,6 +1145,7 @@ function editorial_run_discovery($pdo)
         'rejected_count'         => $rejectedCount,
         'reject_reasons'         => $rejectReasons,
         'already_imported_count' => $alreadyImportedCount,
+        'already_rejected_count' => $alreadyRejectedCount,
         'total_evaluated'        => $totalEvaluated,
         'queries_run'            => $queriesRun,
         'serpapi_calls_today'    => $callsToday,

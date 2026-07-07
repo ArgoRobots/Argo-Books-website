@@ -1639,6 +1639,7 @@ async function runEditorialDiscovery() {
             rejected_count: data.rejected_count || 0,
             reject_reasons: data.reject_reasons || {},
             already_imported_count: data.already_imported_count || 0,
+            already_rejected_count: data.already_rejected_count || 0,
             total_evaluated: data.total_evaluated || 0,
             requested_limit: data.requested_limit || limit,
             quota_exhausted: !!data.quota_exhausted,
@@ -1669,6 +1670,9 @@ function renderEditorialResults() {
     if (editorialLastSummary) {
         if (editorialLastSummary.already_imported_count > 0) {
             summary += ` · ${editorialLastSummary.already_imported_count} already imported (hidden)`;
+        }
+        if (editorialLastSummary.already_rejected_count > 0) {
+            summary += ` · ${editorialLastSummary.already_rejected_count} previously skipped (hidden)`;
         }
         if (editorialLastSummary.rejected_count > 0) {
             const reasons = editorialLastSummary.reject_reasons || {};

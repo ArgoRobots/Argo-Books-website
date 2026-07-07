@@ -1726,7 +1726,7 @@ async function importEditorialRow(idx, btn) {
             if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + 1;
             renderEditorialResults();
             loadStats();
-            loadLeads();
+            loadEditorialLeads();
         } else {
             notify(data.message || 'Import failed');
             btn.disabled = false;
@@ -1767,11 +1767,65 @@ async function importAllEditorialFits() {
     if (editorialLastSummary) editorialLastSummary.already_imported_count = (editorialLastSummary.already_imported_count || 0) + succeeded.size;
     renderEditorialResults();
     loadStats();
-    loadLeads();
+    loadEditorialLeads();
     notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
 }
 
 document.addEventListener('DOMContentLoaded', loadEditorialStatus);
+
+// Editorial leads list (own tab, scoped to source=editorial_auto). Reuses the
+// shared esc/formatStatus/formatDateTime helpers and the id-driven lead modal
+// (openLeadDetail) and draft flow (quickGenerateDraft), so nothing else needs
+// duplicating. Uses its own paginator + table class to avoid colliding with the
+// Email leads table.
+let editorialLeadsPaginator = null;
+
+async function loadEditorialLeads() {
+    const tbody = document.getElementById('editorialLeadsTableBody');
+    if (!tbody) return;
+    try {
+        const data = await api('get_leads', { params: { source: 'editorial_auto', sort: 'date_added_desc' } });
+        if (!data.success || !data.leads.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No editorial leads yet. Run discovery on the Discovery tab and import some articles.</td></tr>';
+            if (editorialLeadsPaginator) editorialLeadsPaginator.reset();
+            return;
+        }
+        tbody.innerHTML = data.leads.map(lead => `
+            <tr class="lead-row">
+                <td>
+                    <strong>${esc(lead.business_name)}</strong>
+                    ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
+                </td>
+                <td>${lead.website ? '<a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
+                <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
+                <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                        ${!lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status) ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+        const table = document.querySelector('.editorial-leads-table');
+        if (table) {
+            if (!editorialLeadsPaginator) editorialLeadsPaginator = new TablePaginator(table, { perPage: 25 });
+            else editorialLeadsPaginator.reset();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    }
+}
+
+// Load the editorial leads list when its section-tab is opened, and on initial
+// load if that tab is already active.
+document.querySelectorAll('.section-tab[data-tab="editorial-leads"]').forEach(btn =>
+    btn.addEventListener('click', () => setTimeout(loadEditorialLeads, 0)));
+document.addEventListener('DOMContentLoaded', function () {
+    if (document.querySelector('#editorial-leads.tab-content.active')) loadEditorialLeads();
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // Reddit outreach

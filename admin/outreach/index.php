@@ -457,6 +457,7 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
 
     <div class="section-tabs">
         <button class="section-tab active" data-tab="editorial-discovery">Discovery</button>
+        <button class="section-tab" data-tab="editorial-leads">Leads</button>
     </div>
 
     <div id="editorial-discovery" class="tab-content active">
@@ -508,8 +509,27 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
         </div>
 
         <p class="text-muted" style="margin-top:12px; font-size:13px;">
-            Imported articles become leads in the <a href="?channel=email&amp;tab=leads" class="link">Email &rarr; Leads</a> tab (filter Source: editorial), where you review the AI-drafted pitch and send it. Keep Send mode on Review-before-send.
+            Imported articles become leads in the <strong>Leads</strong> tab above, where you review the AI-drafted pitch and send it. Keep Send mode on Review-before-send.
         </p>
+    </div>
+
+    <div id="editorial-leads" class="tab-content">
+        <div class="discovery-table-wrapper">
+            <table class="data-table editorial-leads-table" data-paginate="25">
+                <thead>
+                    <tr>
+                        <th>Outlet</th>
+                        <th>Article</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Sent</th>
+                        <th>Clicked</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="editorialLeadsTableBody"></tbody>
+            </table>
+        </div>
     </div>
 </div> <!-- /.channel-pane[data-channel-pane="editorial"] -->
 

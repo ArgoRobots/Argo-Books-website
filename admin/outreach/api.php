@@ -313,6 +313,11 @@ function get_leads($pdo)
             $where[] = 'ol.source = ?';
             $params[] = $source;
         }
+    } else {
+        // Editorial leads have their own channel tab (source=editorial_auto is
+        // requested explicitly there). Keep them out of the default Email leads
+        // list so the two channels stay organized and separate.
+        $where[] = "ol.source != 'editorial_auto'";
     }
     if ($search) {
         $where[] = '(ol.business_name LIKE ? OR ol.email LIKE ? OR ol.contact_name LIKE ? OR ol.city LIKE ? OR ol.category LIKE ?)';

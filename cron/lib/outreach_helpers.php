@@ -2378,14 +2378,16 @@ About Argo Books:
 - Genuinely free tier with no user cap; a paid Premium tier exists but the core is free
 - Made by Evan, a solo independent developer
 
-You are given the article, its outlet, the author, and which tools it already lists. Use that to point out a specific gap (for example: their list has no genuinely-free option, nothing that works offline as a desktop app, or nothing that runs on Mac and Linux) that Argo Books fills.
+You are given the article, its outlet, the author, and which tools it already lists. Use that to point out a specific gap (for example: their list has no genuinely-free option, nothing that works offline as a desktop app, or nothing that runs on Mac and Linux) that Argo Books fills. When the tools it already lists are provided to you, name one or two of them so it is obvious you actually read the piece.
 
 Rules:
 - Keep it short (2-3 short paragraphs, under 120 words). Sound like one human emailing another, not a PR blast
-- Address the author by first name if known (e.g. \"Hi Sarah\"); otherwise \"Hi there\"
+- Address the author by first name if known (e.g. \"Hi Sarah\"). If no author name is provided, use \"Hi there\", but then the very first sentence MUST name their specific article and the gap, so the opening never reads like a mass mailing
 - First sentence: say you read their specific article and noticed it is missing a certain kind of tool. Do NOT open with generic flattery
-- Briefly say what Argo Books is and why it fills that gap for their readers. Do NOT list every feature
+- ARTICLE TITLE: quote a title in quotation marks ONLY if a real one is given in the article context below. NEVER invent, guess, or build a title from the article URL or its slug (do not title-case a URL path). If no real title is provided, refer to the article generically instead (e.g. \"your roundup of free accounting software\" or \"your list of QuickBooks alternatives\"), with no quoted title
+- In your own words, name the gap and why Argo Books fills it, in one or two short sentences. It helps to contrast with a tool the article already lists (for example: \"your list covers Wave and FreshBooks, both cloud and subscription-based, but nothing that runs fully offline as a desktop app\"). Do NOT describe Argo Books feature by feature here
 - Include a ready-to-paste blurb they can drop straight into the article, on its own line, in this style: \"Argo Books, a free bookkeeping and invoicing app for small businesses that needs no accounting knowledge. Works offline on Windows, Mac, and Linux, with a free tier that has no user limit. https://argorobots.com/\"
+- Your own sentences and the paste-ready blurb must NOT repeat the same specs. The blurb carries the full description (free, offline, the platforms); your sentences carry the gap and the fit. If you catch yourself listing \"free, offline, Windows/Mac/Linux\" a second time in your own paragraph, cut it
 - Offer an honest, non-monetary incentive: you will link to their article from your comparison page (a real backlink), and you are happy to answer questions or give a walkthrough
 - Frame it as keeping their already-strong article complete and current for their readers, not as a favor to you
 - Do NOT offer money, paid placement, or affiliate commissions

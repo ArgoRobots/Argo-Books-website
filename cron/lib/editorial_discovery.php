@@ -176,11 +176,15 @@ function evaluate_editorial_candidate(string $url, PDO $pdo, string $serpTitle =
 You analyze a web page to decide if it is a "best/top software" ROUNDUP article
 (a listicle comparing several accounting, bookkeeping, or invoicing tools) and to
 pull structured facts from it. Return ONLY a JSON object with exactly these keys:
-{"is_roundup": boolean, "outlet_name": string|null, "author_name": string|null, "listed_tools": string[], "mentions_argo_books": boolean, "article_angle": string|null}
+{"is_roundup": boolean, "article_title": string|null, "outlet_name": string|null, "author_name": string|null, "listed_tools": string[], "mentions_argo_books": boolean, "article_angle": string|null}
 
 - is_roundup: true only if the page lists and compares MULTIPLE distinct software
   products (e.g. "10 best free accounting tools"). A single-product page, a
   pricing page, a vendor's own homepage, or a generic blog post is NOT a roundup.
+- article_title: the article's real headline/title exactly as it appears on the
+  page (the H1 or page title, e.g. "The 8 Best Free Accounting Software of 2025").
+  Return the actual words on the page. Do NOT construct a title from the URL or its
+  slug, and do NOT title-case a URL path. If you cannot find a real title, null.
 - outlet_name: the publication/site name (e.g. "Forbes Advisor", "PCMag").
 - author_name: the article's author/byline full name, or null if none is shown.
 - listed_tools: the software product names the article lists (e.g. ["Wave","Zoho Books","FreshBooks"]). Empty array if none.
@@ -201,6 +205,7 @@ PROMPT;
     }
 
     $isRoundup = !empty($parsed['is_roundup']);
+    $articleTitle = trim((string) ($parsed['article_title'] ?? ''));
     $outlet    = trim((string) ($parsed['outlet_name'] ?? '')) ?: ucfirst($domain);
     $author    = trim((string) ($parsed['author_name'] ?? ''));
     $tools     = is_array($parsed['listed_tools'] ?? null) ? array_slice(array_map('strval', $parsed['listed_tools']), 0, 20) : [];
@@ -208,6 +213,7 @@ PROMPT;
     $mentions  = !empty($parsed['mentions_argo_books']);
 
     $baseMeta = [
+        'article_title' => mb_substr($articleTitle, 0, 200),
         'outlet_name'  => mb_substr($outlet, 0, 150),
         'author_name'  => mb_substr($author, 0, 120),
         'listed_tools' => $tools,
@@ -249,9 +255,13 @@ PROMPT;
     }
 
     // Article context stored on the lead so the draft prompt can personalize.
-    $toolList = $tools ? implode(', ', array_slice($tools, 0, 10)) : 'none detected';
-    $title    = $serpTitle !== '' ? $serpTitle : $outlet;
-    $summary  = "Roundup article: \"{$title}\" on {$outlet}"
+    // Prefer the AI-extracted on-page title; fall back to the SERP title. Only a
+    // real title is quoted, so the draft never invents one from the URL slug.
+    $toolList  = $tools ? implode(', ', array_slice($tools, 0, 10)) : 'none detected';
+    $realTitle = $articleTitle !== '' ? $articleTitle : $serpTitle;
+    $summary   = ($realTitle !== ''
+            ? "Roundup article titled \"{$realTitle}\" on {$outlet}"
+            : "Roundup article on {$outlet} (real title unknown, do not quote a title)")
         . ($author !== '' ? " by {$author}" : '')
         . ". Already lists: {$toolList}."
         . ($angle !== '' ? " Focus: {$angle}." : '')

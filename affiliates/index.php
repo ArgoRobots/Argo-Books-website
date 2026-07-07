@@ -55,6 +55,7 @@ $fmt = function (float $n): string {
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="../resources/styles/custom-colors.css">
+    <link rel="stylesheet" href="../resources/styles/link.css">
     <link rel="stylesheet" href="../resources/styles/button.css">
     <link rel="stylesheet" href="../resources/header/style.css">
     <link rel="stylesheet" href="../resources/footer/style.css">
@@ -259,7 +260,7 @@ $fmt = function (float $n): string {
                     <span>Become an affiliate</span>
                     <?php echo svg_icon('arrow-right', 18); ?>
                 </a>
-                <p class="aff-final-note">Free to join. Sign in or create a free Argo account to apply. See the <a href="../legal/affiliate-terms.php">Affiliate Program Terms</a>.</p>
+                <p class="aff-final-note">Free to join. Sign in or create a free Argo account to apply. See the <a href="../legal/affiliate-terms.php" class="link">Affiliate Program Terms</a>.</p>
             </div>
         </section>
     </main>

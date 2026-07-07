@@ -1,98 +1,660 @@
-/* Public affiliate-program landing page. */
+/* ============================================================
+   Public affiliate-program landing page.
+   Type:   Fraunces (display) + IBM Plex Sans (body) + IBM Plex Mono (figures)
+   Colour: midnight ink hero, Argo blue primary, mint reserved for money.
+   Everything is scoped under .aff-page so it can't leak into the shared
+   header/footer or collide with button.css.
+   ============================================================ */
 
+.aff-page {
+    /* Page-scoped tokens (the site's global :root vars aren't loaded here). */
+    --aff-ink: #0a0f1e;
+    --aff-ink-2: #111a30;
+    --aff-panel: #16223c;
+    --aff-panel-line: rgba(255, 255, 255, 0.09);
+    --aff-blue: #3f63e8;
+    --aff-blue-glow: #6985f0;
+    --aff-mint: #4ade80;
+    --aff-mint-soft: #86efac;
+    --aff-paper: #f7f8fb;
+    --aff-card: #ffffff;
+    --aff-line: #e6e9f0;
+    --aff-text: #1f2937;
+    --aff-text-soft: #5a6577;
+    --aff-text-inv: #e8ecf6;
+    --aff-text-inv-soft: #9fabc4;
+
+    --aff-display: "Fraunces", Georgia, "Times New Roman", serif;
+    --aff-body: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --aff-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+    font-family: var(--aff-body);
+    color: var(--aff-text);
+    background: var(--aff-paper);
+    /* The site's included header carries an off-canvas hamburger menu (#menu)
+       whose min-content width props the whole document wider than a phone
+       viewport. Clipping horizontal overflow at the page root contains it. */
+    overflow-x: hidden;
+}
+
+.aff-page main {
+    overflow-x: hidden;
+}
+
+.aff-page *,
+.aff-page *::before,
+.aff-page *::after {
+    box-sizing: border-box;
+}
+
+.aff-container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+/* ---------- Shared buttons (own classes so button.css can't override) ---------- */
+.aff-page .aff-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    padding: 14px 26px;
+    border-radius: 12px;
+    font-family: var(--aff-body);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.aff-page .aff-btn svg { flex-shrink: 0; }
+
+.aff-page .aff-btn-primary {
+    background: var(--aff-blue);
+    color: #fff;
+    box-shadow: 0 10px 26px rgba(63, 99, 232, 0.42);
+}
+.aff-page .aff-btn-primary:hover {
+    background: #3355db;
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(63, 99, 232, 0.5);
+}
+.aff-page .aff-btn-primary svg { transition: transform .18s ease; }
+.aff-page .aff-btn-primary:hover svg { transform: translateX(3px); }
+
+.aff-page .aff-btn-ghost {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--aff-text-inv);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+.aff-page .aff-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.32);
+}
+
+.aff-page .aff-btn-lg {
+    padding: 17px 34px;
+    font-size: 17px;
+    border-radius: 14px;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
 .aff-hero {
     position: relative;
     box-sizing: border-box;
-    /* Fill the viewport so the dark hero flows straight into the dark footer
-       instead of leaving an awkward band. Content is vertically centered. */
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 140px 20px 80px;
-    text-align: center;
-    /* Colored backdrop so the site's transparent white header (white logo +
-       white nav) stays legible at the top of the page, like every other
-       marketing hero. */
-    background: linear-gradient(135deg, var(--hero-gradient-start) 0%, var(--hero-gradient-end) 100%);
-    color: var(--white);
+    /* White logo + white nav in the transparent site header need a dark top. */
+    background:
+        radial-gradient(900px 520px at 78% -8%, rgba(63, 99, 232, 0.34), transparent 60%),
+        radial-gradient(760px 520px at 6% 108%, rgba(74, 222, 128, 0.12), transparent 55%),
+        linear-gradient(168deg, var(--aff-ink) 0%, var(--aff-ink-2) 100%);
+    color: var(--aff-text-inv);
+    padding: 168px 0 96px;
     overflow: hidden;
 }
 
-.aff-hero .container {
+/* Faint ledger grid, the accounting texture behind the thesis. */
+.aff-hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(1000px 640px at 60% 20%, #000 30%, transparent 78%);
+    -webkit-mask-image: radial-gradient(1000px 640px at 60% 20%, #000 30%, transparent 78%);
+    pointer-events: none;
+}
+
+.aff-hero-inner {
     position: relative;
-    max-width: 760px;
+    max-width: 1120px;
     margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: center;
+    gap: 56px;
 }
 
-.aff-hero h1 {
-    font-size: 48px;
-    line-height: 1.1;
-    font-weight: 800;
-    color: var(--white);
-    margin: 0 0 20px;
+.aff-hero-copy { min-width: 0; }
+
+.aff-headline {
+    font-family: var(--aff-display);
+    font-weight: 600;
+    font-size: clamp(42px, 6vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #fff;
+}
+.aff-headline-accent {
+    color: var(--aff-mint);
+    font-style: italic;
 }
 
-.aff-subtitle {
+.aff-lede {
     font-size: 19px;
-    color: var(--white-alpha-80, rgba(255, 255, 255, 0.8));
     line-height: 1.6;
-    margin: 0 auto 40px;
-    max-width: 560px;
+    color: var(--aff-text-inv-soft);
+    max-width: 520px;
+    margin: 22px 0 32px;
+}
+.aff-lede strong { color: #fff; font-weight: 600; }
+
+.aff-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
 }
 
-.aff-offer {
-    background: var(--white);
-    border: 1px solid var(--gray-border);
-    border-radius: 16px;
-    padding: 32px;
-    max-width: 420px;
-    margin: 0 auto;
-    box-shadow: 0 8px 30px var(--shadow-default);
-    text-align: left;
-}
-
-.aff-offer-list {
+.aff-trust {
     list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
     padding: 0;
-    margin: 0 0 24px;
+    margin: 30px 0 0;
+}
+.aff-trust li {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 14px;
+    color: var(--aff-text-inv-soft);
+}
+.aff-trust svg { color: var(--aff-mint); }
+
+/* ---------- The signature: live earnings calculator ---------- */
+.aff-calc {
+    position: relative;
+    background: linear-gradient(180deg, rgba(22, 34, 60, 0.92), rgba(16, 25, 45, 0.92));
+    border: 1px solid var(--aff-panel-line);
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 30px 70px rgba(4, 8, 20, 0.55);
+    backdrop-filter: blur(4px);
+}
+.aff-calc::before {
+    /* Thin mint top edge: the "money" cue on the earnings panel. */
+    content: "";
+    position: absolute;
+    top: -1px; left: 26px; right: 26px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--aff-mint), transparent);
 }
 
-.aff-offer-list li {
+.aff-calc-head {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    font-size: 16px;
-    color: var(--gray-800, #1f2937);
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 22px;
 }
-
-.aff-offer-list li svg {
-    flex-shrink: 0;
-    color: var(--success-green, #10b981);
-}
-
-/* Higher specificity than .btn (in button.css, which loads after this file)
-   so width/centering actually win. Auto width + auto margins center it. */
-.aff-offer .aff-cta {
-    display: flex;
-    width: auto;
-    margin: 4px auto 0;
-    gap: 8px;
-    padding: 14px 28px;
-    font-size: 16px;
-    max-height: none;
-}
-
-.aff-cta-note {
-    margin: 14px 0 0;
+.aff-calc-title {
     font-size: 13px;
-    color: var(--gray-500, #9ca3af);
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--aff-text-inv-soft);
+}
+
+.aff-calc-toggle {
+    display: inline-flex;
+    padding: 3px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--aff-panel-line);
+    border-radius: 10px;
+}
+.aff-calc-tab {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--aff-text-inv-soft);
+    font-family: var(--aff-body);
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+}
+.aff-calc-tab:hover { color: #fff; }
+.aff-calc-tab.is-active {
+    background: var(--aff-blue);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(63, 99, 232, 0.4);
+}
+
+.aff-calc-readout {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+.aff-calc-big {
+    font-family: var(--aff-mono);
+    font-weight: 600;
+    font-size: clamp(48px, 8vw, 68px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--aff-mint);
+    font-variant-numeric: tabular-nums;
+}
+.aff-calc-cur {
+    font-family: var(--aff-mono);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--aff-mint-soft);
+    margin-left: -2px;
+}
+.aff-calc-unit {
+    font-family: var(--aff-mono);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--aff-text-inv);
+}
+.aff-calc-sub {
+    margin: 10px 0 26px;
+    font-size: 15px;
+    color: var(--aff-mint-soft);
+    font-weight: 500;
+}
+
+.aff-calc-control-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+.aff-calc-control-label label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--aff-text-inv);
+}
+.aff-calc-control-label output {
+    font-family: var(--aff-mono);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(63, 99, 232, 0.22);
+    border: 1px solid rgba(105, 133, 240, 0.34);
+    border-radius: 8px;
+    padding: 3px 12px;
+    min-width: 30px;
     text-align: center;
 }
 
-@media (max-width: 768px) {
-    .aff-hero { padding: 120px 20px 60px; }
-    .aff-hero h1 { font-size: 36px; }
+/* Custom slider, blue thumb, mint-filled feel via accent-color fallback. */
+.aff-calc input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--aff-blue), var(--aff-blue-glow));
+    outline: none;
+    cursor: pointer;
+}
+.aff-calc input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 5px solid var(--aff-blue-glow);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    transition: transform .12s ease;
+}
+.aff-calc input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+.aff-calc input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    border: 5px solid var(--aff-blue-glow);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.aff-calc input[type="range"]:focus-visible {
+    box-shadow: 0 0 0 4px rgba(105, 133, 240, 0.4);
+}
+.aff-calc-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--aff-text-inv-soft);
+    font-family: var(--aff-mono);
+}
+
+.aff-calc-fine {
+    margin: 22px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--aff-panel-line);
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: var(--aff-text-inv-soft);
+}
+
+/* ============================================================
+   Shared section scaffolding
+   ============================================================ */
+.aff-section-head {
+    max-width: 640px;
+    margin-bottom: 52px;
+}
+.aff-kicker {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--aff-blue);
+    margin-bottom: 14px;
+}
+.aff-section-head h2 {
+    font-family: var(--aff-display);
+    font-weight: 600;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: #101728;
+}
+
+/* Scroll reveal */
+.aff-reveal {
+    opacity: 0;
+    transform: translateY(22px);
+    transition: opacity .6s ease, transform .6s ease;
+}
+.aff-reveal.is-in {
+    opacity: 1;
+    transform: none;
+}
+.aff-step:nth-child(2).is-in,
+.aff-card:nth-child(2).is-in { transition-delay: .06s; }
+.aff-step:nth-child(3).is-in,
+.aff-card:nth-child(3).is-in { transition-delay: .12s; }
+
+/* ============================================================
+   HOW IT WORKS
+   ============================================================ */
+.aff-steps {
+    background: var(--aff-card);
+    padding: 96px 0;
+    border-bottom: 1px solid var(--aff-line);
+}
+.aff-step-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+.aff-step {
+    position: relative;
+    padding: 32px 28px;
+    border: 1px solid var(--aff-line);
+    border-radius: 18px;
+    background: var(--aff-paper);
+    transition: opacity .6s ease, transform .6s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.aff-step:hover {
+    border-color: rgba(63, 99, 232, 0.35);
+    box-shadow: 0 16px 34px rgba(16, 23, 40, 0.08);
+}
+.aff-step-num {
+    font-family: var(--aff-mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--aff-blue);
+    background: var(--aff-blue-50, #eef2fe);
+    border-radius: 9px;
+    padding: 5px 11px;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+.aff-step h3 {
+    font-family: var(--aff-display);
+    font-weight: 600;
+    font-size: 21px;
+    margin: 0 0 10px;
+    color: #101728;
+}
+.aff-step p {
+    margin: 0;
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--aff-text-soft);
+}
+
+/* ============================================================
+   WHY JOIN
+   ============================================================ */
+.aff-why {
+    padding: 96px 0;
+    background: var(--aff-paper);
+}
+.aff-why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+}
+.aff-card {
+    background: var(--aff-card);
+    border: 1px solid var(--aff-line);
+    border-radius: 18px;
+    padding: 30px 26px;
+    transition: opacity .6s ease, transform .6s ease, box-shadow .2s ease, transform .2s ease;
+}
+.aff-card.is-in:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(16, 23, 40, 0.1);
+}
+.aff-card-figure {
+    display: block;
+    font-family: var(--aff-mono);
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1;
+    color: var(--aff-blue);
+    letter-spacing: -0.02em;
+    margin-bottom: 18px;
+}
+.aff-card-figure-unit {
+    font-size: 20px;
+    color: var(--aff-text-soft);
+    margin-left: 2px;
+}
+.aff-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 13px;
+    background: var(--aff-blue-50, #eef2fe);
+    color: var(--aff-blue);
+    margin-bottom: 18px;
+}
+.aff-card h3 {
+    font-family: var(--aff-display);
+    font-weight: 600;
+    font-size: 20px;
+    margin: 0 0 9px;
+    color: #101728;
+}
+.aff-card p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--aff-text-soft);
+}
+
+/* ============================================================
+   WHO IT'S FOR
+   ============================================================ */
+.aff-audience {
+    padding: 96px 0;
+    background: var(--aff-card);
+    border-top: 1px solid var(--aff-line);
+}
+.aff-audience-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+.aff-audience-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 22px 24px;
+    border-radius: 14px;
+    background: var(--aff-paper);
+    border: 1px solid var(--aff-line);
+    font-size: 16px;
+    font-weight: 500;
+    color: #26314a;
+    transition: opacity .6s ease, transform .6s ease, border-color .2s ease;
+}
+.aff-audience-item:hover { border-color: rgba(63, 99, 232, 0.32); }
+.aff-audience-item svg {
+    flex-shrink: 0;
+    color: var(--aff-blue);
+}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.aff-faq {
+    padding: 96px 0;
+    background: var(--aff-paper);
+}
+.aff-faq-inner { max-width: 780px; }
+.aff-faq-list { display: flex; flex-direction: column; gap: 12px; }
+.aff-faq-item {
+    background: var(--aff-card);
+    border: 1px solid var(--aff-line);
+    border-radius: 14px;
+    padding: 4px 22px;
+    transition: opacity .6s ease, transform .6s ease, border-color .2s ease;
+}
+.aff-faq-item[open] { border-color: rgba(63, 99, 232, 0.3); }
+.aff-faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    font-size: 17px;
+    font-weight: 600;
+    color: #101728;
+    cursor: pointer;
+    list-style: none;
+}
+.aff-faq-item summary::-webkit-details-marker { display: none; }
+.aff-faq-item summary svg {
+    flex-shrink: 0;
+    color: var(--aff-text-soft);
+    transition: transform .22s ease;
+}
+.aff-faq-item[open] summary svg { transform: rotate(180deg); }
+.aff-faq-item p {
+    margin: 0;
+    padding: 0 0 20px;
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: var(--aff-text-soft);
+}
+
+/* ============================================================
+   FINAL CTA (dark, flows into the footer)
+   ============================================================ */
+.aff-final {
+    background:
+        radial-gradient(700px 420px at 50% -20%, rgba(63, 99, 232, 0.34), transparent 62%),
+        linear-gradient(180deg, var(--aff-ink-2) 0%, var(--aff-ink) 100%);
+    color: var(--aff-text-inv);
+    padding: 100px 0 108px;
+    text-align: center;
+}
+.aff-final-inner { max-width: 640px; }
+.aff-final h2 {
+    font-family: var(--aff-display);
+    font-weight: 600;
+    font-size: clamp(30px, 4.5vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    color: #fff;
+}
+.aff-final p {
+    font-size: 18px;
+    color: var(--aff-text-inv-soft);
+    line-height: 1.6;
+    margin: 0 0 32px;
+}
+/* Needs to out-specify `.aff-final p` above, which otherwise zeroes the top margin. */
+.aff-final .aff-final-note {
+    font-size: 13.5px;
+    color: var(--aff-text-inv-soft);
+    margin: 30px 0 0;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 960px) {
+    .aff-hero-inner { grid-template-columns: minmax(0, 1fr); gap: 44px; }
+    .aff-calc { max-width: 480px; width: 100%; }
+    .aff-step-list { grid-template-columns: 1fr; }
+    .aff-why-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .aff-hero { padding: 140px 0 72px; }
+    .aff-why-grid { grid-template-columns: 1fr; }
+    .aff-audience-grid { grid-template-columns: 1fr; }
+    .aff-calc-head { flex-direction: column; align-items: flex-start; }
+    .aff-hero-actions { flex-direction: column; align-items: stretch; }
+    .aff-hero-actions .aff-btn { width: 100%; }
+    .aff-section-head { margin-bottom: 40px; }
+    .aff-steps, .aff-why, .aff-audience, .aff-faq { padding: 68px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .aff-page * { animation: none !important; }
+    .aff-reveal { opacity: 1; transform: none; transition: none; }
+    .aff-btn:hover { transform: none; }
 }

@@ -260,7 +260,7 @@ include __DIR__ . '/../admin_header.php';
 
         <div class="action-buttons">
             <?php if ($aff['status'] === 'pending'): ?>
-                <form method="POST" style="display:inline">
+                <form method="POST" style="display:inline" onsubmit="return confirm('Approve this affiliate? Their referral link goes live and they\'ll be emailed.');">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
                     <input type="hidden" name="action" value="approve">
                     <input type="hidden" name="affiliate_id" value="<?php echo $detail_id; ?>">
@@ -274,7 +274,7 @@ include __DIR__ . '/../admin_header.php';
                     <button type="submit" class="btn btn-red">Suspend</button>
                 </form>
             <?php elseif ($aff['status'] === 'suspended'): ?>
-                <form method="POST" style="display:inline">
+                <form method="POST" style="display:inline" onsubmit="return confirm('Reactivate this affiliate? Their referral link starts working again.');">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
                     <input type="hidden" name="action" value="reactivate">
                     <input type="hidden" name="affiliate_id" value="<?php echo $detail_id; ?>">
@@ -367,7 +367,7 @@ include __DIR__ . '/../admin_header.php';
                             <td><?php echo htmlspecialchars($a['promo_url'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars(mb_strimwidth($a['application_reason'] ?? '', 0, 60, '…')); ?></td>
                             <td class="action-buttons">
-                                <button type="button" class="btn btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>)">Approve</button>
+                                <button type="button" class="btn btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Approve</button>
                                 <button type="button" class="btn btn-small btn-red" onclick="rejectAffiliate(<?php echo (int) $a['id']; ?>)">Reject</button>
                                 <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
                             </td>
@@ -448,8 +448,10 @@ include __DIR__ . '/../admin_header.php';
             form.submit();
         }
 
-        function approveAffiliate(id) {
-            submitAffiliateAction(id, 'approve');
+        function approveAffiliate(id, name) {
+            if (confirm('Approve "' + name + '"? Their referral link goes live and they\'ll be emailed.')) {
+                submitAffiliateAction(id, 'approve');
+            }
         }
 
         function deleteAffiliate(id, name) {

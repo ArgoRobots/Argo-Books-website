@@ -243,11 +243,20 @@ body {
     width: 100%;
 }
 
-.aff-terms-note {
-    margin: 12px 0 0;
-    font-size: 0.82rem;
-    color: var(--gray-600);
-    text-align: center;
+.aff-terms-agree {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin: 4px 0 18px;
+    font-size: 0.88rem;
+    line-height: 1.4;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+
+.aff-terms-agree input {
+    margin: 2px 0 0;
+    flex-shrink: 0;
 }
 
 /* Referral link toolbar (mirrors .community-actions gray-50) */
@@ -290,7 +299,11 @@ body {
     padding-right: 24px;
 }
 
-.aff-copy.copied {
+/* Include :hover/:focus so the green "Copied" state isn't overridden by
+   .btn-blue:hover while the cursor is still on the button after clicking. */
+.aff-copy.copied,
+.aff-copy.copied:hover,
+.aff-copy.copied:focus {
     background: #dcfce7;
     color: #166534;
 }

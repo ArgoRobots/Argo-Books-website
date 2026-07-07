@@ -49,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error_message = 'Tell us a little about how you plan to promote Argo Books.';
             } elseif ($promo_url !== '' && !filter_var($promo_url, FILTER_VALIDATE_URL)) {
                 $error_message = 'The promotion link does not look like a valid URL.';
+            } elseif (empty($_POST['agree_terms'])) {
+                $error_message = 'Please agree to the Affiliate Program Terms to apply.';
             } elseif ($desired_tail !== '' && (strlen($desired_tail) < 2 || strlen($desired_tail) > 46)) {
                 $error_message = 'Your referral link must be 2 to 46 characters (letters, numbers, hyphens).';
             } elseif ($desired_tail !== '' && affiliate_source_code_taken('aff-' . $desired_tail)) {
@@ -171,8 +173,12 @@ if ($status === 'approved') {
                             <textarea name="application_reason" id="application_reason" rows="4" required placeholder="Tell us about your audience and where you'll share your link."><?php echo htmlspecialchars($_POST['application_reason'] ?? ''); ?></textarea>
                         </div>
 
+                        <label class="aff-terms-agree">
+                            <input type="checkbox" name="agree_terms" value="1" required <?php echo !empty($_POST['agree_terms']) ? 'checked' : ''; ?>>
+                            <span>I agree to the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>.</span>
+                        </label>
+
                         <button type="submit" class="btn btn-blue aff-form-submit">Apply to the program</button>
-                        <p class="aff-terms-note">By applying, you agree to the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>.</p>
                     </form>
                 </section>
 

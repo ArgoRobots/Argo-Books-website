@@ -1041,8 +1041,16 @@ function editorial_run_discovery($pdo)
     $totalEvaluated       = 0;
     $queriesRun           = [];
     $seen                 = [];
+    // Bound the expensive work per run so the request can't time out: each
+    // evaluation does a live page fetch + a Gemini call (+ a contact-page scrape
+    // for fits), which is slow and variable. Cap the number of evaluations and
+    // the total wall-clock, and persist rejects so repeated Run clicks make
+    // progress (skipping already-handled articles) instead of re-doing them.
+    $evaluated = 0;
+    $maxEval   = 8;
+    $deadline  = microtime(true) + 35;
 
-    while (count($fits) < $limit && $callsToday < $serpapiLimit) {
+    while (count($fits) < $limit && $callsToday < $serpapiLimit && $evaluated < $maxEval && microtime(true) < $deadline) {
         $query = EDITORIAL_QUERY_POOL[$cursor % $poolSize];
         $cursor++;
         _shopify_state_set($pdo, 'editorial_query_cursor', (string) $cursor);
@@ -1059,25 +1067,51 @@ function editorial_run_discovery($pdo)
         $totalEvaluated += count($serpResults);
 
         foreach ($serpResults as $r) {
-            if (count($fits) >= $limit) break 2;
+            if (count($fits) >= $limit || $evaluated >= $maxEval || microtime(true) >= $deadline) break 2;
 
             $canonical = $r['url'];
             if (isset($seen[$canonical])) continue;
             $seen[$canonical] = true;
 
-            $importedCheck = $pdo->prepare("SELECT 1 FROM outreach_editorial_candidates
-                WHERE canonical_url = ? AND status = 'imported' AND lead_id IS NOT NULL LIMIT 1");
-            $importedCheck->execute([$canonical]);
-            if ($importedCheck->fetchColumn() !== false) {
+            // Skip articles already imported or recently rejected, so repeated
+            // runs advance to new candidates instead of re-evaluating the same ones.
+            $existing = $pdo->prepare("SELECT status FROM outreach_editorial_candidates
+                WHERE canonical_url = ?
+                  AND (status = 'imported'
+                       OR (status = 'rejected' AND checked_at > DATE_SUB(NOW(), INTERVAL 14 DAY)))
+                LIMIT 1");
+            $existing->execute([$canonical]);
+            if ($existing->fetchColumn() !== false) {
                 $alreadyImportedCount++;
                 continue;
             }
 
-            $result = evaluate_editorial_candidate($canonical, $pdo, $r['title'] ?? '');
+            $evaluated++;
+            try {
+                $result = evaluate_editorial_candidate($canonical, $pdo, $r['title'] ?? '');
+            } catch (Throwable $e) {
+                outreach_log("Editorial evaluate error for $canonical: " . $e->getMessage());
+                $result = ['fit' => false, 'reason' => 'eval_error', 'detail' => $e->getMessage()];
+            }
+
             if (empty($result['fit'])) {
                 $rejectedCount++;
                 $reason = $result['reason'] ?? 'unknown';
                 $rejectReasons[$reason] = ($rejectReasons[$reason] ?? 0) + 1;
+                // Persist the rejection so future runs skip this article.
+                $up = $pdo->prepare("INSERT INTO outreach_editorial_candidates
+                    (canonical_url, status, reject_reason, reject_detail, last_query)
+                    VALUES (?, 'rejected', ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE status = 'rejected',
+                        reject_reason = VALUES(reject_reason),
+                        reject_detail = VALUES(reject_detail),
+                        checked_at = NOW()");
+                $up->execute([
+                    $canonical,
+                    mb_substr($reason, 0, 100),
+                    mb_substr((string) ($result['detail'] ?? ''), 0, 500),
+                    mb_substr($query, 0, 255),
+                ]);
                 continue;
             }
 

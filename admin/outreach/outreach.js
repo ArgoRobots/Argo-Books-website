@@ -291,31 +291,43 @@ let bulkDraftCancelled = false;
 
 function cancelBulkDrafts() {
     bulkDraftCancelled = true;
-    const btn = document.getElementById('btnCancelDraft');
-    if (btn) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+    // Disable whichever cancel button is currently visible (email or editorial).
+    ['btnCancelDraft', 'edBtnCancelDraft'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn && btn.offsetParent !== null) { btn.disabled = true; btn.textContent = 'Cancelling...'; }
+    });
 }
 
-async function bulkGenerateDrafts() {
-    const ids = getSelectedLeadIds();
+/**
+ * Shared bulk-draft engine used by both the Email and Editorial leads tables.
+ * The two tables use distinct checkbox classes/IDs and distinct progress/button
+ * element IDs, so the caller passes those in; everything else is id-based and
+ * identical. Concurrency of 3, per-row live updates, cancellable.
+ */
+async function runBulkDrafts(opts) {
+    const {
+        ids, checkClass, checkIdPrefix,
+        progressId, progressTextId, cancelBtnId, draftBtnId, onDone,
+    } = opts;
     if (!ids.length) return;
     if (!confirm(`Generate drafts for ${ids.length} lead(s)?`)) return;
 
     bulkDraftCancelled = false;
     const total = ids.length;
     let success = 0, fail = 0;
-    const progressEl = document.getElementById('bulkDraftProgress');
-    const progressText = document.getElementById('bulkDraftProgressText');
-    const cancelBtn = document.getElementById('btnCancelDraft');
-    progressEl.style.display = 'flex';
+    const progressEl = document.getElementById(progressId);
+    const progressText = document.getElementById(progressTextId);
+    const cancelBtn = document.getElementById(cancelBtnId);
+    if (progressEl) progressEl.style.display = 'flex';
     if (cancelBtn) { cancelBtn.disabled = false; cancelBtn.textContent = 'Cancel'; }
 
     // Disable the draft button during processing
-    const draftBtn = document.getElementById('btnDraftSelected');
+    const draftBtn = document.getElementById(draftBtnId);
     if (draftBtn) draftBtn.disabled = true;
 
     function updateProgress() {
         const done = success + fail;
-        progressText.textContent = `Drafting: ${done} of ${total} complete` + (fail ? ` (${fail} failed)` : '');
+        if (progressText) progressText.textContent = `Drafting: ${done} of ${total} complete` + (fail ? ` (${fail} failed)` : '');
     }
     updateProgress();
 
@@ -324,7 +336,7 @@ async function bulkGenerateDrafts() {
     async function processDraft(id) {
         if (bulkDraftCancelled) return;
 
-        const row = document.querySelector(`#lead-check-${id}`)?.closest('tr');
+        const row = document.querySelector(`#${checkIdPrefix}${id}`)?.closest('tr');
         const draftCellBtn = row?.querySelector('.actions-cell .btn-blue[title="Generate Draft"]');
         if (draftCellBtn) {
             draftCellBtn.disabled = true;
@@ -346,7 +358,7 @@ async function bulkGenerateDrafts() {
                         badge.className = 'badge badge-status-draft_generated';
                         badge.textContent = 'Draft Generated';
                     }
-                    const cb = row.querySelector('.lead-check');
+                    const cb = row.querySelector(checkClass);
                     if (cb) cb.dataset.hasDraft = '1';
                 }
             } else {
@@ -372,13 +384,23 @@ async function bulkGenerateDrafts() {
     const doneMsg = cancelled
         ? `Cancelled: ${success} drafted` + (fail ? `, ${fail} failed` : '') + `, ${total - success - fail} skipped`
         : `Done: ${success} drafted` + (fail ? `, ${fail} failed` : '');
-    progressText.textContent = doneMsg;
-    setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
+    if (progressText) progressText.textContent = doneMsg;
+    if (progressEl) setTimeout(() => { progressEl.style.display = 'none'; }, 3000);
 
     if (draftBtn) draftBtn.disabled = false;
     notify(doneMsg, success ? 'success' : 'error');
     loadStats();
-    updateBulkBar();
+    if (onDone) onDone();
+}
+
+function bulkGenerateDrafts() {
+    return runBulkDrafts({
+        ids: getSelectedLeadIds(),
+        checkClass: '.lead-check', checkIdPrefix: 'lead-check-',
+        progressId: 'bulkDraftProgress', progressTextId: 'bulkDraftProgressText',
+        cancelBtnId: 'btnCancelDraft', draftBtnId: 'btnDraftSelected',
+        onDone: updateBulkBar,
+    });
 }
 
 async function bulkDeleteLeads() {
@@ -406,8 +428,8 @@ async function bulkDeleteLeads() {
 // ─── Bulk Send Email ───
 let bulkSendLeads = [];
 
-async function openBulkSendModal() {
-    const ids = getSelectedLeadIds();
+async function openBulkSendModal(idsArg) {
+    const ids = (Array.isArray(idsArg) && idsArg.length) ? idsArg : getSelectedLeadIds();
     if (!ids.length) { notify('No leads selected', 'error'); return; }
 
     const statusEl = document.getElementById('bulkSendStatus');
@@ -526,6 +548,9 @@ async function executeBulkSend() {
     if (success > 0) {
         loadLeads();
         loadStats();
+        // Refresh the editorial leads table too if it was ever populated, so a
+        // bulk send launched from the Editorial tab reflects the new sent status.
+        if (editorialLeadsPaginator) loadEditorialLeads();
     }
 }
 
@@ -1812,28 +1837,116 @@ document.addEventListener('DOMContentLoaded', loadEditorialStatus);
 // Email leads table.
 let editorialLeadsPaginator = null;
 
+// ─── Editorial Leads: bulk select (distinct class/IDs from the Email tab so the
+// two tables' selections never collide, since both live in the DOM at once) ───
+function toggleEditorialLeadCheckboxes(master) {
+    document.querySelectorAll('.ed-lead-check').forEach(cb => cb.checked = master.checked);
+    updateEditorialBulkBar();
+}
+
+function updateEditorialBulkBar() {
+    const checked = document.querySelectorAll('.ed-lead-check:checked');
+    const bar = document.getElementById('edBulkActionsBar');
+    const count = document.getElementById('edSelectedCount');
+    const selectAll = document.getElementById('edLeadsSelectAll');
+    const allBoxes = document.querySelectorAll('.ed-lead-check');
+
+    if (bar) bar.style.display = checked.length ? 'flex' : 'none';
+    if (count) count.textContent = checked.length;
+
+    if (selectAll && allBoxes.length) {
+        if (checked.length === 0) { selectAll.checked = false; selectAll.indeterminate = false; }
+        else if (checked.length === allBoxes.length) { selectAll.checked = true; selectAll.indeterminate = false; }
+        else { selectAll.checked = false; selectAll.indeterminate = true; }
+    }
+
+    const draftBtn = document.getElementById('edBtnDraftSelected');
+    if (draftBtn) {
+        const allDrafted = checked.length > 0 && Array.from(checked).every(cb => cb.dataset.hasDraft === '1');
+        draftBtn.textContent = allDrafted ? 'Redraft Selected' : 'Draft Selected';
+    }
+}
+
+function getSelectedEditorialLeadIds() {
+    return Array.from(document.querySelectorAll('.ed-lead-check:checked')).map(cb => parseInt(cb.value));
+}
+
+function bulkGenerateEditorialDrafts() {
+    return runBulkDrafts({
+        ids: getSelectedEditorialLeadIds(),
+        checkClass: '.ed-lead-check', checkIdPrefix: 'ed-lead-check-',
+        progressId: 'edBulkDraftProgress', progressTextId: 'edBulkDraftProgressText',
+        cancelBtnId: 'edBtnCancelDraft', draftBtnId: 'edBtnDraftSelected',
+        onDone: updateEditorialBulkBar,
+    });
+}
+
+function openEditorialBulkSend() {
+    openBulkSendModal(getSelectedEditorialLeadIds());
+}
+
+async function bulkDeleteEditorialLeads() {
+    const ids = getSelectedEditorialLeadIds();
+    if (!ids.length) return;
+    if (!confirm(`Delete ${ids.length} lead(s)? This cannot be undone.`)) return;
+
+    let success = 0, fail = 0, lastError = '';
+    for (const id of ids) {
+        try {
+            const result = await api('delete_lead', { method: 'POST', body: { id } });
+            if (result.success) success++; else { fail++; lastError = result.message || 'Unknown error'; }
+        } catch (err) { fail++; lastError = err.message; }
+    }
+    if (fail > 0) notify(`Deleted: ${success}, Failed: ${fail}. Last error: ${lastError}`, 'error');
+    else notify(`Successfully deleted ${success} lead(s)`, 'success');
+    loadEditorialLeads();
+    loadStats();
+}
+
+function debounceLoadEditorialLeads() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadEditorialLeads, 300);
+}
+
 async function loadEditorialLeads() {
     const tbody = document.getElementById('editorialLeadsTableBody');
     if (!tbody) return;
+
+    const params = { source: 'editorial_auto' };
+    const searchEl = document.getElementById('edFilterSearch');
+    const statusEl = document.getElementById('edFilterStatus');
+    const responseEl = document.getElementById('edFilterResponse');
+    const sortEl = document.getElementById('edFilterSort');
+    if (searchEl && searchEl.value.trim()) params.search = searchEl.value.trim();
+    if (statusEl && statusEl.value) params.status = statusEl.value;
+    if (responseEl && responseEl.value) params.response_status = responseEl.value;
+    params.sort = (sortEl && sortEl.value) ? sortEl.value : 'date_added_desc';
+
     try {
-        const data = await api('get_leads', { params: { source: 'editorial_auto', sort: 'date_added_desc' } });
+        const data = await api('get_leads', { params });
         if (!data.success || !data.leads.length) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No editorial leads yet. Run discovery on the Discovery tab and import some articles.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No editorial leads found.</td></tr>';
             if (editorialLeadsPaginator) editorialLeadsPaginator.reset();
+            const selectAll = document.getElementById('edLeadsSelectAll');
+            if (selectAll) selectAll.checked = false;
+            updateEditorialBulkBar();
             return;
         }
         tbody.innerHTML = data.leads.map(lead => `
             <tr class="lead-row">
+                <td class="checkbox-column" onclick="event.stopPropagation()">
+                    <div class="checkbox"><input type="checkbox" class="ed-lead-check" value="${lead.id}" id="ed-lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateEditorialBulkBar()"><label for="ed-lead-check-${lead.id}"></label></div>
+                </td>
                 <td>
                     <strong>${esc(lead.business_name)}</strong>
                     ${lead.contact_name ? '<br><small>' + esc(lead.contact_name) + '</small>' : ''}
                 </td>
-                <td>${lead.website ? '<a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.website ? '<a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
                 <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
                 <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
                 <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
-                <td>
+                <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
                         ${!lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status) ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
@@ -1841,6 +1954,11 @@ async function loadEditorialLeads() {
                 </td>
             </tr>
         `).join('');
+
+        const selectAll = document.getElementById('edLeadsSelectAll');
+        if (selectAll) selectAll.checked = false;
+        updateEditorialBulkBar();
+
         const table = document.querySelector('.editorial-leads-table');
         if (table) {
             if (!editorialLeadsPaginator) editorialLeadsPaginator = new TablePaginator(table, { perPage: 25 });

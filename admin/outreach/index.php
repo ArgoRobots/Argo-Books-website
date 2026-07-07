@@ -527,10 +527,67 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
     </div>
 
     <div id="editorial-leads" class="tab-content">
-        <div class="discovery-table-wrapper">
-            <table class="data-table editorial-leads-table" data-paginate="25">
+        <!-- Filters -->
+        <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Search</span>
+                <input type="text" class="control-input" id="edFilterSearch" placeholder="Outlet, author, email..." oninput="debounceLoadEditorialLeads()">
+            </div>
+            <div class="control-group">
+                <span class="control-label">Status</span>
+                <select class="control-select" id="edFilterStatus" onchange="loadEditorialLeads()">
+                    <option value="">All</option>
+                    <option value="new">New</option>
+                    <option value="draft_generated">Draft Generated</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="replied">Replied</option>
+                    <option value="interested">Interested</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="onboarded">Onboarded</option>
+                    <option value="disqualified">Disqualified</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Response</span>
+                <select class="control-select" id="edFilterResponse" onchange="loadEditorialLeads()">
+                    <option value="">All</option>
+                    <option value="no_response">No Response</option>
+                    <option value="positive">Positive</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="negative">Negative</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Sort</span>
+                <select class="control-select" id="edFilterSort" onchange="loadEditorialLeads()">
+                    <option value="date_added_desc">Newest First</option>
+                    <option value="date_added_asc">Oldest First</option>
+                    <option value="last_contact_desc">Last Contacted</option>
+                    <option value="business_name_asc">Name A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions-bar" id="edBulkActionsBar" style="display:none;">
+            <span><strong id="edSelectedCount">0</strong> selected</span>
+            <button class="btn btn-small btn-blue" id="edBtnDraftSelected" onclick="bulkGenerateEditorialDrafts()">Draft Selected</button>
+            <button class="btn btn-small btn-blue" onclick="openEditorialBulkSend()">Send Email</button>
+            <button class="btn btn-small btn-blue" onclick="bulkDeleteEditorialLeads()">Delete Selected</button>
+        </div>
+
+        <!-- Bulk Draft Progress -->
+        <div class="bulk-draft-progress" id="edBulkDraftProgress" style="display:none;">
+            <span class="bulk-draft-spinner"></span>
+            <span id="edBulkDraftProgressText"></span>
+            <button class="btn btn-small btn-neutral" id="edBtnCancelDraft" onclick="cancelBulkDrafts()" style="margin-left:8px;">Cancel</button>
+        </div>
+
+        <div class="leads-table-wrapper">
+            <table class="data-table editorial-leads-table">
                 <thead>
                     <tr>
+                        <th class="checkbox-column"><div class="checkbox"><input type="checkbox" id="edLeadsSelectAll" onchange="toggleEditorialLeadCheckboxes(this)"><label for="edLeadsSelectAll"></label></div></th>
                         <th>Outlet</th>
                         <th>Article</th>
                         <th>Email</th>

@@ -54,6 +54,44 @@ const CREATOR_NEWSLETTER_HOSTS = [
 ];
 
 /**
+ * Hosts that are never a recruitable affiliate partner and should be dropped
+ * before we spend any AI on them. Three kinds:
+ *   - communities / forums / Q&A (a subreddit is not a creator you can recruit)
+ *   - software marketplaces / review aggregators (not a creator at all)
+ *   - major mainstream publishers (they won't join a small app's affiliate
+ *     program via a cold email; those belong in the Editorial channel instead)
+ * Matched as a substring of the registrable host.
+ */
+const CREATOR_EXCLUDED_HOSTS = [
+    // Communities / forums / social / Q&A
+    'reddit.com', 'quora.com', 'wikipedia.org', 'wikihow.com', 'stackexchange.com',
+    'stackoverflow.com', 'facebook.com', 'twitter.com', 'x.com', 'pinterest.com',
+    'yelp.com', 'glassdoor.com', 'indeed.com',
+    // Software marketplaces / review aggregators
+    'g2.com', 'capterra.com', 'getapp.com', 'softwareadvice.com', 'trustpilot.com',
+    'producthunt.com', 'crunchbase.com', 'sourceforge.net', 'slashdot.org',
+    // Major mainstream publishers (Editorial-channel targets, not affiliates to recruit)
+    'forbes.com', 'nerdwallet.com', 'pcmag.com', 'cnet.com', 'techradar.com',
+    'businessinsider.com', 'investopedia.com', 'entrepreneur.com', 'inc.com',
+    'nytimes.com', 'wsj.com', 'bankrate.com', 'fool.com', 'usnews.com', 'zdnet.com',
+];
+
+/** True if a URL's host is on the never-recruit blocklist above. */
+function creator_host_excluded(string $url): bool
+{
+    $host = strtolower((string) (parse_url($url, PHP_URL_HOST) ?: ''));
+    if ($host === '') {
+        return false;
+    }
+    foreach (CREATOR_EXCLUDED_HOSTS as $bad) {
+        if (str_contains($host, $bad)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
  * Classify a result URL into a creator platform. Drives the pitch angle and,
  * critically, whether we even try to auto-harvest an email.
  *
@@ -102,14 +140,17 @@ function creator_canonical_url(string $url): string
     $path   = $parts['path'] ?? '';
 
     if (str_contains($host, 'youtube.com')) {
-        // Keep only the channel-identifying first path segment (@handle) or the
-        // /channel|/c|/user + name pair; strip /watch, /shorts, etc.
+        // Prefer the channel identity (@handle or /channel|/c|/user + name).
         if (preg_match('#^/(@[^/]+)#', $path, $m)) {
             $path = '/' . $m[1];
         } elseif (preg_match('#^/(channel|c|user)/([^/]+)#', $path, $m)) {
             $path = '/' . $m[1] . '/' . $m[2];
         } else {
-            $path = ''; // a bare youtube.com/watch?v=... has no channel identity here
+            // A /watch, /shorts, or other non-channel URL: keep the full path AND
+            // query (the ?v= id) so the "open" link actually resolves to the video
+            // instead of collapsing to youtube.com. Identity is then the video.
+            $query = (isset($parts['query']) && $parts['query'] !== '') ? '?' . $parts['query'] : '';
+            return $scheme . '://' . $host . rtrim($path, '/') . $query;
         }
     } else {
         $path = rtrim($path, '/');
@@ -140,8 +181,9 @@ function creator_search(string $query, string $apiKey, int $limit, PDO $pdo, int
             continue;
         }
         $domain = editorial_domain_from_url($canon);
-        // Skip our own site and generic aggregators that aren't a single creator.
-        if ($domain === '' || str_contains($domain, 'argorobots.com')) {
+        // Skip our own site, and communities/aggregators/major publishers that are
+        // not recruitable affiliate partners (drop them before spending any AI).
+        if ($domain === '' || str_contains($domain, 'argorobots.com') || creator_host_excluded($canon)) {
             continue;
         }
         $seen[$canon] = true;
@@ -218,9 +260,15 @@ invoicing app for small businesses and freelancers, as an affiliate partner. Ret
 ONLY a JSON object with exactly these keys:
 {"is_relevant": boolean, "creator_name": string|null, "audience": string|null, "topics": string[], "external_site": string|null}
 
-- is_relevant: true only if the creator/publication regularly reaches small-business
-  owners, freelancers, solopreneurs, bookkeepers, accountants, or similar people who
-  would use accounting/invoicing software. A general/unrelated channel is NOT relevant.
+- is_relevant: true ONLY if BOTH hold: (a) it regularly reaches small-business
+  owners, freelancers, solopreneurs, bookkeepers, or accountants who would use
+  accounting/invoicing software, AND (b) it is an INDEPENDENT individual creator or
+  a small-to-mid independent blog/newsletter/channel that could realistically join
+  an affiliate program. It is NOT relevant if it is a major mainstream publisher
+  (e.g. Forbes, NerdWallet, PCMag, Investopedia, Business Insider), a community or
+  forum or Q&A site (e.g. Reddit, Quora), a software marketplace or review
+  aggregator (e.g. G2, Capterra), or a software vendor's own site. When unsure
+  whether it is an independent recruitable creator, return false.
 - creator_name: the person's or publication's name/handle, or null.
 - audience: one short phrase describing who they reach (e.g. "freelance designers", "small e-commerce owners").
 - topics: up to 6 short topic tags the creator covers.

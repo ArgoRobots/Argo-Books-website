@@ -240,7 +240,7 @@ $fmt = function (float $n): string {
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>When and how do I get paid?<?php echo svg_icon('chevron-down', 20); ?></summary>
-                        <p>Commission is paid to your PayPal once it clears a <?php echo (int) $hold_days; ?>-day hold and you've reached a payout. The hold is the refund window: sales that get refunded or charged back in that time simply don't earn commission, so there's nothing to game. Your dashboard shows what's pending, what's cleared and available, and what's been paid.</p>
+                        <p>Commission is paid to your PayPal once it clears a <?php echo (int) $hold_days; ?>-day hold and you've reached a payout. The hold is the refund window: if a sale is refunded or charged back in that time, no commission is earned on it. Your dashboard shows what's pending, what's cleared and available, and what's been paid.</p>
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>How are referrals tracked?<?php echo svg_icon('chevron-down', 20); ?></summary>

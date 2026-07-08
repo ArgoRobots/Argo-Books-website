@@ -150,6 +150,45 @@
                     breach remains payable.</li>
             </ul>
 
+            <h2>Independent Relationship</h2>
+            <p>You take part in the program as an independent party. Nothing in these terms creates an employment,
+                agency, partnership, joint venture, or franchise relationship between you and Argo Books. You have
+                no authority to make any statement, representation, or commitment on behalf of Argo Books, or to
+                bind us in any way, beyond promoting the Service as permitted here. You are responsible for your own
+                costs, equipment, and taxes connected with your promotional activity.</p>
+
+            <h2>No Guarantee</h2>
+            <p>The affiliate program is provided on an "as is" and "as available" basis. We do not guarantee any
+                particular level of earnings, that every referral will be tracked, or that the program, your
+                referral link, or your dashboard will be available without interruption. Commission rates, cookie
+                duration, and program features may change, and the program may be paused or ended, as described in
+                these terms.</p>
+
+            <h2>Indemnification</h2>
+            <p>You agree to defend, indemnify, and hold harmless Argo Books, and its directors, employees, and
+                agents, from and against any claims, damages, losses, liabilities, costs, and expenses (including
+                reasonable legal fees) arising out of or connected with your participation in the program. This
+                includes your promotional methods and content, your use of your referral link, any statement you
+                make about Argo Books, your breach of these terms, and your violation of any law or the rights of
+                any third party.</p>
+
+            <h2>Limitation of Liability</h2>
+            <p>To the fullest extent permitted by law, Argo Books, and its directors, employees, and agents, will
+                not be liable for any indirect, incidental, special, consequential, or punitive damages, or for any
+                loss of profits, revenue, data, or goodwill, arising out of or connected with the affiliate program,
+                whether based on warranty, contract, tort (including negligence), or any other legal theory, even if
+                we have been advised of the possibility of such damages. In any event, our total liability to you
+                relating to the program will not exceed the total commission paid or payable to you in the twelve
+                months before the event giving rise to the claim.</p>
+
+            <h2>Governing Law</h2>
+            <p>These terms are governed by the laws of Canada, excluding its conflict of law rules. Any dispute
+                arising out of or in connection with these terms or the program is subject to the exclusive
+                jurisdiction of the courts located in Canada. Our failure to enforce any right or provision of these
+                terms is not a waiver of that right or provision. If any provision of these terms is held to be
+                invalid or unenforceable, the remaining provisions stay in effect. These terms are the entire
+                agreement between you and Argo Books regarding the affiliate program.</p>
+
             <h2>Changes to These Terms</h2>
             <p>We may update these terms. The version on this page is always the current one, and the date below
                 shows when it last changed. If you keep taking part in the program after an update, you accept the

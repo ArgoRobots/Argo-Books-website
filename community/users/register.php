@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($password !== $password_confirm) {
         $error = 'Passwords do not match';
     } elseif (!$terms_agreed) {
-        $error = 'You must agree to the terms of service';
+        $error = 'You must agree to the Terms and Privacy Policy';
     } else {
         // Attempt to register user
         $result = register_user($username, $email, $password, $email_marketing_consent);
@@ -179,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="checkbox">
                     <input type="checkbox" id="terms" name="terms" <?php echo isset($_POST['terms']) ? 'checked' : ''; ?> required>
-                    <label for="terms">I agree to the <a href="../../legal/terms.php" target="_blank" class="link-no-underline">terms of service</a></label>
+                    <label for="terms">I agree to the <a href="../../legal/terms.php" target="_blank" class="link-no-underline">Terms</a> and <a href="../../legal/privacy.php" target="_blank" class="link-no-underline">Privacy Policy</a></label>
                 </div>
 
                 <div class="checkbox">
@@ -368,7 +368,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     termsGroup.classList.add('valid');
                     return true;
                 } else {
-                    termsFeedback.textContent = "You must agree to the terms";
+                    termsFeedback.textContent = "You must agree to the Terms and Privacy Policy";
                     termsGroup.classList.add('invalid');
                     termsGroup.classList.remove('valid');
                     return false;

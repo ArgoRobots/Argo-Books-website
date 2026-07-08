@@ -81,8 +81,8 @@
             <p>When you register for an account on our Website, we collect:</p>
             <ul>
                 <li>Username</li>
-                <li>Email address (stored in encrypted form)</li>
-                <li>Password (stored in encrypted form)</li>
+                <li>Email address</li>
+                <li>Password (stored as a one-way hash, never in plain text)</li>
             </ul>
 
             <h4>User-Generated Content</h4>
@@ -113,7 +113,7 @@
             <p>When you use the payment portal to publish invoices for online payment, we store:</p>
             <ul>
                 <li>Invoice data (customer name, amounts, line items, due dates)</li>
-                <li>Connected payment provider type (Stripe, PayPal, or Square)</li>
+                <li>Connected payment provider type (Stripe or Square)</li>
                 <li>Authentication tokens for your connected payment accounts</li>
                 <li>Payment status for each published invoice</li>
             </ul>
@@ -122,11 +122,11 @@
             <h4>Technical Information</h4>
             <p>We automatically collect certain information when you visit our Website:</p>
             <ul>
-                <li>IP address (temporarily stored for security purposes)</li>
+                <li>IP address (used for security and to determine your general location)</li>
                 <li>Browser type and version</li>
                 <li>Operating system</li>
                 <li>Referral source</li>
-                <li>Length of visit and page views</li>
+                <li>Page views</li>
             </ul>
 
             <h3>How We Use Your Website Information</h3>
@@ -145,11 +145,12 @@
             <p>We retain your personal information only for as long as necessary to fulfill the purposes for which we
                 collected it, including for the purposes of satisfying any legal, accounting, or reporting requirements.
             </p>
-            <p>Website user accounts that remain inactive for over 15 years may be removed from our system. Before
-                removing any inactive account, we will send an email notification to the registered email address at
-                least 30 days prior to deletion. This notice will include instructions on how to keep your account
-                active. If we do not receive a response or account activity within the 30-day notice period, the account
-                and associated data will be permanently deleted from our system.</p>
+            <p>We reserve the right to remove accounts that have been inactive for an extended period. If we ever
+                remove an inactive account, we will first email the registered address with instructions on how to keep
+                the account active, and give you an opportunity to respond before any data is deleted.</p>
+            <p>When you choose to delete your account, it is scheduled for permanent deletion after a 30-day grace
+                period. Signing back in during that period cancels the deletion. After the grace period, the account and
+                its associated data are permanently removed from our system.</p>
 
             <h3>Website Data Security</h3>
             <p>We have implemented appropriate security measures to prevent your personal data from being accidentally
@@ -191,8 +192,8 @@
             <ul>
                 <li><strong>Export data</strong>: Type of export (Excel, Google Sheets, backup, etc.), duration of
                     export operation, and file size</li>
-                <li><strong>API usage</strong>: API type (Google Sheets, Google Gemini, Microsoft Translator, Open Exchange
-                    Rates), operation duration, and whether the call succeeded</li>
+                <li><strong>API usage</strong>: API type (Google Sheets, Google Gemini, Open Exchange Rates, and
+                    receipt scanning), operation duration, and whether the call succeeded</li>
                 <li><strong>Error data</strong>: Error category, exception type name, source filename, line number,
                     and method name so we can identify and fix software issues. The error message text itself is
                     never sent</li>
@@ -205,10 +206,11 @@
             </ul>
 
             <p>We never collect financial data, transaction data, customer names, vendor names, company names, file
-                paths, document contents, city-level location data, or per-user identifiers. Your IP address is
-                visible to our server during the upload itself (as with any web request) and is used to derive your
-                country and region, but the IP address itself is not stored alongside the collected data. The data
-                collected describes how the application is used, not what you use it for.</p>
+                paths, or document contents. The anonymous usage data uploaded to our servers does not include
+                city-level location or any per-user identifier. Your IP address is visible to our server during the
+                upload itself (as with any web request) and is used to derive your country and region, but the IP
+                address itself is not stored alongside the collected data. The data collected describes how the
+                application is used, not what you use it for.</p>
 
             <p>This data is separate from any standard web analytics we use on our Website.</p>
 
@@ -266,7 +268,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: May 21, 2026</p>
+            <p class="last-updated">Last updated: July 8, 2026</p>
         </div>
     </div>
 

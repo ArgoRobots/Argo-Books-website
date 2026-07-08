@@ -142,7 +142,7 @@
             <p>We reserve the right to modify subscription pricing with 30 days notice to existing subscribers.</p>
 
             <h2>Payment Portal</h2>
-            <p>Argo Books allows you to connect your own Stripe, PayPal, or Square merchant account so your customers can view and pay invoices online through our payment portal.</p>
+            <p>Argo Books allows you to connect your own Stripe or Square merchant account so your customers can view and pay invoices online through our payment portal.</p>
             <ul>
                 <li><strong>Facilitation only</strong>: Argo Books facilitates the connection between you and your payment provider. We do not process, hold, or have access to funds at any point.</li>
                 <li><strong>Your responsibility</strong>: You are responsible for maintaining your merchant account and complying with the terms of your payment provider.</li>
@@ -186,11 +186,30 @@
                     informed of the possibility of such damage.</li>
             </ol>
 
+            <h2>Indemnification</h2>
+            <p>You agree to defend, indemnify, and hold harmless Argo Books, and its directors, employees, and
+                agents, from and against any claims, damages, losses, liabilities, costs, and expenses (including
+                reasonable legal fees) arising out of or connected with your use of the Service, any Content you post,
+                your breach of these Terms, your violation of any law, or your infringement of the rights of any third
+                party.</p>
+
             <h2>Disclaimer</h2>
             <p>Your use of the Service is at your sole risk. The Service is provided on an "AS IS" and "AS AVAILABLE"
                 basis. The Service is provided without warranties of any kind, whether express or implied, including,
                 but not limited to, implied warranties of merchantability, fitness for a particular purpose,
                 non-infringement or course of performance.</p>
+
+            <h2>No Financial or Professional Advice</h2>
+            <p><strong>Argo Books is a tool to help you record and organize your own financial information. It is not
+                a substitute for professional accounting, bookkeeping, tax, legal, or financial advice, and we are not
+                acting as your accountant, bookkeeper, or tax advisor.</strong> You are solely responsible for the
+                accuracy and completeness of the information you enter and for reviewing and verifying any
+                calculations, reports, tax figures, or other output before relying on them or submitting them to any
+                authority or third party. We do not guarantee that any output is accurate, complete, or suitable for
+                your circumstances or compliant with the laws that apply to you, and we recommend that you consult a
+                qualified professional for advice specific to your situation. To the fullest extent permitted by law,
+                we are not liable for any financial, tax, accounting, or business decision made, or any loss, penalty,
+                or liability incurred, in reliance on the Service or its output.</p>
 
             <h2>Governing Law</h2>
             <p>These Terms shall be governed and construed in accordance with the laws of Canada, without
@@ -212,7 +231,7 @@
                 <li>By email: <a class="link" href="mailto:contact@argorobots.com">contact@argorobots.com</a></li>
             </ul>
 
-            <p class="last-updated">Last updated: May 21, 2026</p>
+            <p class="last-updated">Last updated: July 8, 2026</p>
         </div>
     </div>
 

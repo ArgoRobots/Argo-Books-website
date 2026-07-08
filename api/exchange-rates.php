@@ -65,14 +65,6 @@ $lookupDate = $isLatest ? date('Y-m-d') : $date;
 // Check MySQL cache
 require_once __DIR__ . '/../db_connect.php';
 if ($pdo) {
-    // Ensure table exists
-    $pdo->exec("CREATE TABLE IF NOT EXISTS exchange_rates (
-        rate_date DATE NOT NULL,
-        rates JSON NOT NULL,
-        fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (rate_date)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
     $stmt = $pdo->prepare("SELECT rates, fetched_at FROM exchange_rates WHERE rate_date = ?");
     $stmt->execute([$lookupDate]);
     $cached = $stmt->fetch(PDO::FETCH_ASSOC);

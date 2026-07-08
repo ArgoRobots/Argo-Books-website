@@ -85,14 +85,6 @@ if (!$pdo) {
     send_error_response(500, 'Database connection failed.', 'DB_ERROR');
 }
 
-// Ensure table exists
-$pdo->exec("CREATE TABLE IF NOT EXISTS exchange_rates (
-    rate_date DATE NOT NULL,
-    rates JSON NOT NULL,
-    fetched_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (rate_date)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
 // Fetch all cached rates from MySQL in one query
 $placeholders = implode(',', array_fill(0, count($validDates), '?'));
 $stmt = $pdo->prepare("SELECT rate_date, rates, fetched_at FROM exchange_rates WHERE rate_date IN ($placeholders)");

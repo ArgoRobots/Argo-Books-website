@@ -37,13 +37,6 @@ function settings_tab_get_state($pdo, $key, $default = null)
 
 function settings_tab_set_state($pdo, $key, $value)
 {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_pipeline_state (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        state_key VARCHAR(100) NOT NULL UNIQUE,
-        state_value TEXT,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
     $stmt = $pdo->prepare("INSERT INTO outreach_pipeline_state (state_key, state_value) VALUES (?, ?)
         ON DUPLICATE KEY UPDATE state_value = VALUES(state_value)");
     $stmt->execute([$key, $value]);

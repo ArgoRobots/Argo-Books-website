@@ -146,18 +146,6 @@ function logPipeline($message, $type = 'INFO')
 
 // log_activity() is provided by cron/lib/outreach_helpers.php
 
-// ─── Ensure outreach_pipeline_state table exists ───
-
-function ensureStateTable($pdo)
-{
-    $pdo->exec("CREATE TABLE IF NOT EXISTS outreach_pipeline_state (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        state_key VARCHAR(100) NOT NULL UNIQUE,
-        state_value TEXT,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
 function getState($pdo, $key, $default = null)
 {
     $stmt = $pdo->prepare("SELECT state_value FROM outreach_pipeline_state WHERE state_key = ?");
@@ -184,8 +172,6 @@ global $pdo;
 $cronRunId = $dryRun ? 0 : cron_run_start($pdo, 'outreach_pipeline');
 
 try {
-    ensureStateTable($pdo);
-
     // ─── Master kill-switch: admin can disable the entire outreach system
     // from the Settings tab. When off, the server cron still fires but does
     // nothing until re-enabled.

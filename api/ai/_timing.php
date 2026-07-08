@@ -19,46 +19,6 @@
 require_once __DIR__ . '/../../db_connect.php';
 
 /**
- * Creates the timings table on first use (mirrors the definition in mysql_schema.sql
- * so a fresh server works without a manual migration). Runs at most once per request.
- */
-function ai_timing_ensure_table(PDO $pdo): void
-{
-    static $done = false;
-    if ($done) {
-        return;
-    }
-    try {
-        $pdo->exec(
-            "CREATE TABLE IF NOT EXISTS ai_call_timings (
-                id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                operation VARCHAR(40) NOT NULL,
-                model VARCHAR(50) NOT NULL,
-                size_feature INT DEFAULT NULL,
-                page_count INT DEFAULT NULL,
-                input_bytes INT DEFAULT NULL,
-                mime VARCHAR(30) DEFAULT NULL,
-                prompt_tokens INT DEFAULT NULL,
-                output_tokens INT DEFAULT NULL,
-                max_output_tokens INT DEFAULT NULL,
-                finish_reason VARCHAR(20) DEFAULT NULL,
-                elapsed_ms INT NOT NULL,
-                poll_count INT DEFAULT NULL,
-                success TINYINT(1) NOT NULL DEFAULT 1,
-                app_platform VARCHAR(20) DEFAULT NULL,
-                environment ENUM('production','sandbox') NOT NULL DEFAULT 'production',
-                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                INDEX idx_op_model_created (operation, model, created_at),
-                INDEX idx_created (created_at)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
-        );
-        $done = true;
-    } catch (Throwable $e) {
-        error_log('[ai-timing] ensure table failed: ' . $e->getMessage());
-    }
-}
-
-/**
  * Best-effort INSERT of one timing sample. Never throws. Required keys: operation,
  * model, elapsed_ms. All other keys are optional (see the column list).
  */
@@ -72,7 +32,6 @@ function ai_timing_record(array $row): void
         return;
     }
     try {
-        ai_timing_ensure_table($pdo);
         $stmt = $pdo->prepare(
             "INSERT INTO ai_call_timings
                 (operation, model, size_feature, page_count, input_bytes, mime,
@@ -204,7 +163,6 @@ function ai_timing_compute_priors(string $model): array
         return [];
     }
     try {
-        ai_timing_ensure_table($pdo);
         $stmt = $pdo->prepare(
             "SELECT operation, elapsed_ms, size_feature, output_tokens, page_count
              FROM ai_call_timings

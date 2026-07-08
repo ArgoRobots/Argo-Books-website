@@ -131,6 +131,19 @@ CREATE TABLE IF NOT EXISTS community_votes (
     CHECK (vote_type IN (-1, 1))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- In-app notifications (e.g. @mentions in posts/comments). Written by
+-- community/mentions/mentions.php when a user is mentioned.
+CREATE TABLE IF NOT EXISTS user_notifications (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    link VARCHAR(255),
+    is_read BOOLEAN DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES community_users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Create comment votes table
 CREATE TABLE IF NOT EXISTS comment_votes (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -1093,6 +1106,17 @@ CREATE TABLE IF NOT EXISTS outreach_editorial_candidates (
     UNIQUE KEY uniq_canonical_url (canonical_url),
     INDEX idx_status_checked (status, checked_at),
     INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Key/value state for the outreach pipeline: master kill-switch
+-- (outreach_enabled), auto-send mode, follow-up sequence config, and other
+-- runtime flags. Read/written via getState/setState in cron/outreach_pipeline.php
+-- and the admin Settings tab (admin/outreach/tabs/settings.php).
+CREATE TABLE IF NOT EXISTS outreach_pipeline_state (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    state_key VARCHAR(100) NOT NULL UNIQUE,
+    state_value TEXT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 14-day cache of SerpAPI organic-results responses. The Shopify discovery

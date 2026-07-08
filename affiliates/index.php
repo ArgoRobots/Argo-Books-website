@@ -2,6 +2,9 @@
 require_once __DIR__ . '/../resources/icons.php';
 require_once __DIR__ . '/../track_referral.php';
 require_once __DIR__ . '/../config/pricing.php';
+require_once __DIR__ . '/../community/affiliate/affiliate_functions.php';
+
+$hold_days = affiliate_hold_days();
 
 // Real numbers drive both the copy and the calculator, so the page can never
 // drift from actual pricing. Commission is 50% for the first 12 months.
@@ -214,7 +217,7 @@ $fmt = function (float $n): string {
                     <div class="aff-audience-item aff-reveal"><?php echo svg_icon('bank', 22); ?><span>Bookkeepers &amp; accountants setting up client books</span></div>
                     <div class="aff-audience-item aff-reveal"><?php echo svg_icon('play', 22); ?><span>Creators &amp; YouTubers in finance and small business</span></div>
                     <div class="aff-audience-item aff-reveal"><?php echo svg_icon('pencil', 22); ?><span>Bloggers &amp; reviewers writing software roundups</span></div>
-                    <div class="aff-audience-item aff-reveal"><?php echo svg_icon('users', 22); ?><span>Consultants &amp; agencies onboarding new clients</span></div>
+                    <div class="aff-audience-item aff-reveal"><?php echo svg_icon('users', 22); ?><span>LinkedIn creators posting to a small-business audience</span></div>
                 </div>
             </div>
         </section>
@@ -237,7 +240,7 @@ $fmt = function (float $n): string {
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>When and how do I get paid?<?php echo svg_icon('chevron-down', 20); ?></summary>
-                        <p>Commission is paid to your PayPal on a monthly cadence once you've earned a payout. Your dashboard shows exactly what you've earned, what's been paid, and what's still owed.</p>
+                        <p>Commission is paid to your PayPal once it clears a <?php echo (int) $hold_days; ?>-day hold and you've reached a payout. The hold is the refund window: sales that get refunded or charged back in that time simply don't earn commission, so there's nothing to game. Your dashboard shows what's pending, what's cleared and available, and what's been paid.</p>
                     </details>
                     <details class="aff-faq-item aff-reveal">
                         <summary>How are referrals tracked?<?php echo svg_icon('chevron-down', 20); ?></summary>

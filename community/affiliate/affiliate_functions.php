@@ -30,6 +30,22 @@ if (!function_exists('affiliate_processing_fee_config')) {
     }
 }
 
+if (!function_exists('affiliate_hold_days')) {
+    /**
+     * Days a commission is held after each payment before it becomes payable.
+     * Covers the refund/chargeback window so we never pay out on money that can
+     * still be reversed (which also protects the merchant account from the
+     * dispute ratios Stripe/Square/PayPal penalize). Override via
+     * AFFILIATE_HOLD_DAYS; defaults to 30.
+     */
+    function affiliate_hold_days(): int
+    {
+        $raw = $_ENV['AFFILIATE_HOLD_DAYS'] ?? getenv('AFFILIATE_HOLD_DAYS');
+        $days = (int) ($raw !== false && $raw !== null && $raw !== '' ? $raw : 30);
+        return $days > 0 ? $days : 30;
+    }
+}
+
 if (!function_exists('compute_commission')) {
     /**
      * Pure commission math (no DB) so it can be unit-tested in isolation.
@@ -83,50 +99,100 @@ if (!function_exists('compute_commission')) {
     }
 }
 
-if (!function_exists('affiliate_earned_for_source')) {
+if (!function_exists('compute_commission_split')) {
     /**
-     * Total commission earned across every subscription attributed to a
-     * source_code, windowed per-subscription to its own start_date.
+     * Pure version of the eligible/pending split (no DB) for unit testing.
+     * Eligible = commission on qualifying payments older than the hold window
+     * (payable now); pending = payments still inside the hold window.
      *
-     * Mirrors the revenue join in admin/marketing-funnel/index.php
-     * (get_funnel_per_source) but adds the 12-month window + self-referral
-     * guard. Attribution is via the premium_signup event's subscription_id;
-     * the money comes from premium_subscription_payments (the source of truth),
-     * so renewals inside the window are captured even though the join is on
-     * payments rather than premium_paid events.
+     * @param string $now       Reference "now" ('Y-m-d H:i:s') so tests are deterministic
+     * @return array{eligible: float, pending: float}
+     */
+    function compute_commission_split(array $payments, string $start_date, float $rate, int $window_months, string $environment, float $fee_percent, float $fee_fixed, int $hold_days, string $now): array
+    {
+        $start = strtotime($start_date);
+        $now_ts = strtotime($now);
+        if ($start === false || $now_ts === false) {
+            return ['eligible' => 0.0, 'pending' => 0.0];
+        }
+        $window_end = strtotime('+' . $window_months . ' months', $start);
+        $cutoff = strtotime('-' . $hold_days . ' days', $now_ts); // <= cutoff is seasoned
+
+        $eligible_base = 0.0;
+        $pending_base = 0.0;
+        foreach ($payments as $p) {
+            if (($p['status'] ?? '') !== 'completed' || ($p['environment'] ?? '') !== $environment) {
+                continue;
+            }
+            $when = strtotime($p['created_at'] ?? '');
+            if ($when === false || $when < $start || $when >= $window_end) {
+                continue;
+            }
+            $base = max(0.0, round(((float) $p['amount'] - $fee_fixed) / (1 + $fee_percent / 100), 2));
+            if ($when <= $cutoff) {
+                $eligible_base += $base;
+            } else {
+                $pending_base += $base;
+            }
+        }
+
+        return [
+            'eligible' => round($eligible_base * $rate, 2),
+            'pending'  => round($pending_base * $rate, 2),
+        ];
+    }
+}
+
+if (!function_exists('affiliate_earnings_breakdown')) {
+    /**
+     * Commission split into eligible (past the hold window, payable now) and
+     * pending (still inside the hold window, could still be refunded). Attribution
+     * is via the premium_signup event's subscription_id; money comes from
+     * premium_subscription_payments. Fee-stripped, self-referral-guarded, and
+     * windowed per-subscription to its own start_date.
      *
      * @param int $affiliate_user_id community_users.id of the affiliate, so
      *                               their own purchases never earn commission.
+     * @return array{eligible: float, pending: float}
      */
-    function affiliate_earned_for_source(string $source_code, float $rate, int $window_months, int $affiliate_user_id, string $environment): float
+    function affiliate_earnings_breakdown(string $source_code, float $rate, int $window_months, int $affiliate_user_id, string $environment): array
     {
         global $pdo;
 
-        $fee = affiliate_processing_fee_config();
+        $fee  = affiliate_processing_fee_config();
+        $hold = affiliate_hold_days();
 
-        // Strip the processing fee from each charge (amount = base*(1+pct/100) +
-        // fixed) so commission is paid on the subscription price, not the fee.
-        // GREATEST(..., 0) guards credit/$0 charges from going negative.
+        // Base = subscription price with the processing fee stripped back out.
+        // seasoned = charge is older than the hold window (past refund risk).
+        // Computed once per row in the derived table so each bound parameter is
+        // used a single time (required with emulated prepares disabled).
         $sql = "
-            SELECT COALESCE(SUM(GREATEST(ROUND((p.amount - :fee_fixed) / (1 + :fee_pct / 100), 2), 0)), 0) AS earned_base
+            SELECT
+              COALESCE(SUM(CASE WHEN t.seasoned = 1 THEN t.base ELSE 0 END), 0) AS eligible_base,
+              COALESCE(SUM(CASE WHEN t.seasoned = 0 THEN t.base ELSE 0 END), 0) AS pending_base
             FROM (
-                SELECT DISTINCT subscription_id
-                FROM referral_events
-                WHERE event_type = 'premium_signup'
-                  AND source_code = :src
-                  AND environment = :env
-                  AND subscription_id IS NOT NULL
-            ) sub
-            JOIN premium_subscriptions ps
-              ON ps.subscription_id = sub.subscription_id
-             AND ps.environment = :env2
-             AND (ps.user_id IS NULL OR ps.user_id <> :aff_user)
-            JOIN premium_subscription_payments p
-              ON p.subscription_id = sub.subscription_id
-             AND p.status = 'completed'
-             AND p.environment = :env3
-             AND p.created_at >= ps.start_date
-             AND p.created_at <  DATE_ADD(ps.start_date, INTERVAL :win MONTH)";
+                SELECT
+                    GREATEST(ROUND((p.amount - :fee_fixed) / (1 + :fee_pct / 100), 2), 0) AS base,
+                    CASE WHEN p.created_at <= DATE_SUB(NOW(), INTERVAL :hold DAY) THEN 1 ELSE 0 END AS seasoned
+                FROM (
+                    SELECT DISTINCT subscription_id
+                    FROM referral_events
+                    WHERE event_type = 'premium_signup'
+                      AND source_code = :src
+                      AND environment = :env
+                      AND subscription_id IS NOT NULL
+                ) sub
+                JOIN premium_subscriptions ps
+                  ON ps.subscription_id = sub.subscription_id
+                 AND ps.environment = :env2
+                 AND (ps.user_id IS NULL OR ps.user_id <> :aff_user)
+                JOIN premium_subscription_payments p
+                  ON p.subscription_id = sub.subscription_id
+                 AND p.status = 'completed'
+                 AND p.environment = :env3
+                 AND p.created_at >= ps.start_date
+                 AND p.created_at <  DATE_ADD(ps.start_date, INTERVAL :win MONTH)
+            ) t";
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -138,10 +204,14 @@ if (!function_exists('affiliate_earned_for_source')) {
             ':win'       => $window_months,
             ':fee_fixed' => $fee['fixed'],
             ':fee_pct'   => $fee['percent'],
+            ':hold'      => $hold,
         ]);
-        $base = (float) ($stmt->fetchColumn() ?: 0);
+        $row = $stmt->fetch() ?: ['eligible_base' => 0, 'pending_base' => 0];
 
-        return round($base * $rate, 2);
+        return [
+            'eligible' => round(((float) $row['eligible_base']) * $rate, 2),
+            'pending'  => round(((float) $row['pending_base']) * $rate, 2),
+        ];
     }
 }
 
@@ -161,17 +231,30 @@ if (!function_exists('affiliate_money_summary')) {
      * Earned / paid / owed for one affiliate row (as returned by
      * get_affiliate_for_user / the admin list).
      *
-     * @return array{earned: float, paid: float, owed: float}
+     * @return array{eligible: float, pending: float, earned: float, paid: float, owed: float}
+     *   eligible = seasoned commission (past the hold window, payable)
+     *   pending  = commission still inside the hold window
+     *   earned   = eligible + pending (total commission generated)
+     *   paid     = payouts already recorded
+     *   owed     = eligible - paid (payable now; negative = clawback after a
+     *              paid-out payment was refunded, netted off future payouts)
      */
     function affiliate_money_summary(array $affiliate, string $environment): array
     {
         $rate   = (float) $affiliate['commission_rate'];
         $window = (int) $affiliate['commission_window_months'];
-        $earned = affiliate_earned_for_source($affiliate['source_code'], $rate, $window, (int) $affiliate['user_id'], $environment);
+        $b      = affiliate_earnings_breakdown($affiliate['source_code'], $rate, $window, (int) $affiliate['user_id'], $environment);
         $paid   = affiliate_total_paid((int) $affiliate['id'], $environment);
-        // owed never goes negative (an over-payment shows as owed 0, not a debt).
-        $owed   = max(0.0, round($earned - $paid, 2));
-        return ['earned' => $earned, 'paid' => $paid, 'owed' => $owed];
+
+        $eligible = $b['eligible'];
+        $pending  = $b['pending'];
+        return [
+            'eligible' => $eligible,
+            'pending'  => $pending,
+            'earned'   => round($eligible + $pending, 2),
+            'paid'     => $paid,
+            'owed'     => round($eligible - $paid, 2),
+        ];
     }
 }
 
@@ -182,28 +265,30 @@ if (!function_exists('affiliate_program_totals')) {
      * returns zeros if the affiliate tables don't exist yet on this server, so
      * callers like the admin dashboard never break before the schema is created.
      *
-     * @return array{earned: float, paid: float, owed: float}
+     * @return array{earned: float, pending: float, paid: float, owed: float}
      */
     function affiliate_program_totals(string $environment): array
     {
         global $pdo;
-        $totals = ['earned' => 0.0, 'paid' => 0.0, 'owed' => 0.0];
+        $totals = ['earned' => 0.0, 'pending' => 0.0, 'paid' => 0.0, 'owed' => 0.0];
         try {
             $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE environment = ? AND status IN ('approved', 'suspended')");
             $stmt->execute([$environment]);
             foreach ($stmt->fetchAll() as $a) {
                 $m = affiliate_money_summary($a, $environment);
-                $totals['earned'] += $m['earned'];
-                $totals['paid']   += $m['paid'];
-                $totals['owed']   += $m['owed'];
+                $totals['earned']  += $m['earned'];
+                $totals['pending'] += $m['pending'];
+                $totals['paid']    += $m['paid'];
+                $totals['owed']    += $m['owed'];
             }
         } catch (PDOException $e) {
             // Affiliate tables not present on this server yet; report zeros.
         }
         return [
-            'earned' => round($totals['earned'], 2),
-            'paid'   => round($totals['paid'], 2),
-            'owed'   => round($totals['owed'], 2),
+            'earned'  => round($totals['earned'], 2),
+            'pending' => round($totals['pending'], 2),
+            'paid'    => round($totals['paid'], 2),
+            'owed'    => round($totals['owed'], 2),
         ];
     }
 }

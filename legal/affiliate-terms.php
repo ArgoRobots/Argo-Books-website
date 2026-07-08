@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../community/affiliate/affiliate_functions.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -108,6 +109,9 @@
 
             <h2>Payouts</h2>
             <ul>
+                <li>Commission is held for <?php echo (int) affiliate_hold_days(); ?> days after each payment before
+                    it becomes payable. This covers the refund and chargeback window, so commission is only paid on
+                    payments that have settled. Your dashboard shows held amounts as "Pending" until they clear.</li>
                 <li>Payouts are made in Canadian dollars (CAD) by PayPal to the email address on your affiliate
                     account. Keep that address accurate.</li>
                 <li>We may set a minimum balance before a payout is issued.</li>

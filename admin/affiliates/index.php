@@ -237,8 +237,9 @@ include __DIR__ . '/../admin_header.php';
         <div class="stat-card"><h3>Signups</h3><div class="value"><?php echo number_format($stats['signups']); ?></div></div>
         <div class="stat-card"><h3>Paying customers</h3><div class="value"><?php echo number_format($stats['paying']); ?></div></div>
         <div class="stat-card"><h3>Commission earned</h3><div class="value money-positive">$<?php echo number_format($money['earned'], 2); ?></div><div class="subtext">CAD, 50% / 12 mo</div></div>
+        <div class="stat-card"><h3>Pending</h3><div class="value">$<?php echo number_format($money['pending'], 2); ?></div><div class="subtext">in the <?php echo (int) affiliate_hold_days(); ?>-day hold</div></div>
         <div class="stat-card"><h3>Paid out</h3><div class="value">$<?php echo number_format($money['paid'], 2); ?></div></div>
-        <div class="stat-card"><h3>Owed</h3><div class="value money-owed">$<?php echo number_format($money['owed'], 2); ?></div></div>
+        <div class="stat-card"><h3>Owed now</h3><div class="value money-owed">$<?php echo number_format($money['owed'], 2); ?></div><div class="subtext">cleared &amp; unpaid</div></div>
     </div>
 
     <div class="table-container">
@@ -286,7 +287,10 @@ include __DIR__ . '/../admin_header.php';
 
     <div class="table-container">
         <h3>Record a payout</h3>
-        <p class="subtext">Owed right now: <strong class="money-owed">$<?php echo number_format($money['owed'], 2); ?></strong> CAD. Record what you actually paid externally.</p>
+        <p class="subtext">Owed now (cleared, unpaid): <strong class="money-owed">$<?php echo number_format($money['owed'], 2); ?></strong> CAD.
+            <?php if ($money['pending'] > 0): ?>Another <strong>$<?php echo number_format($money['pending'], 2); ?></strong> is still in the <?php echo (int) affiliate_hold_days(); ?>-day hold. <?php endif; ?>
+            Only pay what's cleared; record what you actually sent externally.
+            <?php if ($money['owed'] < 0): ?><br><strong>Note:</strong> this is negative, meaning a refund landed after a payout, they were overpaid by $<?php echo number_format(abs($money['owed']), 2); ?>. It nets off future commission.<?php endif; ?></p>
         <form method="POST" class="payout-form">
             <input type="hidden" name="csrf_token" value="<?php echo $csrf; ?>">
             <input type="hidden" name="action" value="record_payout">
@@ -353,7 +357,7 @@ include __DIR__ . '/../admin_header.php';
 
     // Compute per-affiliate money/stats once (reused by the summary cards and
     // the table) and roll them up into program totals.
-    $totals = ['clicks' => 0, 'signups' => 0, 'paying' => 0, 'earned' => 0.0, 'paid' => 0.0, 'owed' => 0.0];
+    $totals = ['clicks' => 0, 'signups' => 0, 'paying' => 0, 'earned' => 0.0, 'pending' => 0.0, 'paid' => 0.0, 'owed' => 0.0];
     $row_data = [];
     $approved_count = 0;
     foreach ($active_rows as $a) {
@@ -369,6 +373,7 @@ include __DIR__ . '/../admin_header.php';
         $totals['signups'] += $stats['signups'];
         $totals['paying']  += $stats['paying'];
         $totals['earned']  += $money['earned'];
+        $totals['pending'] += $money['pending'];
         $totals['paid']    += $money['paid'];
         $totals['owed']    += $money['owed'];
         if ($a['status'] === 'approved') {
@@ -381,7 +386,8 @@ include __DIR__ . '/../admin_header.php';
         <div class="stat-card"><h3>Active affiliates</h3><div class="value"><?php echo number_format($approved_count); ?></div></div>
         <div class="stat-card"><h3>Clicks</h3><div class="value"><?php echo number_format($totals['clicks']); ?></div><div class="subtext">all affiliate links</div></div>
         <div class="stat-card"><h3>Paying customers</h3><div class="value"><?php echo number_format($totals['paying']); ?></div></div>
-        <div class="stat-card"><h3>Commission owed</h3><div class="value money-owed">$<?php echo number_format($totals['owed'], 2); ?></div><div class="subtext">CAD, across all affiliates</div></div>
+        <div class="stat-card"><h3>Owed now</h3><div class="value money-owed">$<?php echo number_format($totals['owed'], 2); ?></div><div class="subtext">CAD, cleared &amp; unpaid</div></div>
+        <div class="stat-card"><h3>Pending</h3><div class="value">$<?php echo number_format($totals['pending'], 2); ?></div><div class="subtext">CAD, in the <?php echo (int) affiliate_hold_days(); ?>-day hold</div></div>
         <div class="stat-card"><h3>Paid out</h3><div class="value">$<?php echo number_format($totals['paid'], 2); ?></div><div class="subtext">CAD, all time</div></div>
     </div>
 
@@ -420,7 +426,7 @@ include __DIR__ . '/../admin_header.php';
             <p class="subtext">No approved affiliates yet.</p>
         <?php else: ?>
             <table class="table">
-                <thead><tr><th>User</th><th>Code</th><th>Status</th><th>Clicks</th><th>Earned</th><th>Paid</th><th>Owed</th><th>Actions</th></tr></thead>
+                <thead><tr><th>User</th><th>Code</th><th>Status</th><th>Clicks</th><th>Earned</th><th>Pending</th><th>Owed now</th><th>Paid</th><th>Actions</th></tr></thead>
                 <tbody>
                     <?php foreach ($active_rows as $a):
                         $money = $row_data[$a['id']]['money'];
@@ -433,8 +439,9 @@ include __DIR__ . '/../admin_header.php';
                             <td><span class="badge <?php echo affiliate_status_badge_class($a['status']); ?>"><?php echo htmlspecialchars(ucfirst($a['status'])); ?></span></td>
                             <td><?php echo number_format($stats['clicks']); ?></td>
                             <td class="money-positive">$<?php echo number_format($money['earned'], 2); ?></td>
-                            <td>$<?php echo number_format($money['paid'], 2); ?></td>
+                            <td>$<?php echo number_format($money['pending'], 2); ?></td>
                             <td class="money-owed">$<?php echo number_format($money['owed'], 2); ?></td>
+                            <td>$<?php echo number_format($money['paid'], 2); ?></td>
                             <td>
                                 <div class="action-buttons">
                                     <a href="index.php?id=<?php echo (int) $a['id']; ?>" class="btn btn-small btn-blue">View</a>

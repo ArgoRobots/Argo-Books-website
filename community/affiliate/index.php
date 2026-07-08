@@ -85,6 +85,8 @@ if ($status === 'approved') {
     $money = affiliate_money_summary($affiliate, $env);
     $stats = get_affiliate_stats($affiliate['source_code'], $env);
     $referral_url = affiliate_referral_url($affiliate['source_code']);
+    $hold_days = affiliate_hold_days();
+    $available = max(0.0, $money['owed']); // seasoned commission not yet paid out
 }
 ?>
 <!DOCTYPE html>
@@ -209,23 +211,25 @@ if ($status === 'approved') {
 
                 <div class="aff-earn">
                     <div class="aff-earn-card featured">
-                        <div class="aff-earn-label">Owed to you</div>
-                        <div class="aff-earn-num">$<?php echo number_format($money['owed'], 2); ?></div>
-                        <div class="aff-earn-foot">Paid out on request</div>
-                    </div>
-                    <div class="aff-earn-card emerald">
-                        <div class="aff-earn-label">Total earned</div>
-                        <div class="aff-earn-num">$<?php echo number_format($money['earned'], 2); ?></div>
-                        <div class="aff-earn-foot">All time</div>
+                        <div class="aff-earn-label">Available now</div>
+                        <div class="aff-earn-num">$<?php echo number_format($available, 2); ?></div>
+                        <div class="aff-earn-foot">Ready to pay out</div>
                     </div>
                     <div class="aff-earn-card">
-                        <div class="aff-earn-label">Already paid</div>
+                        <div class="aff-earn-label">Pending
+                            <span class="aff-info" tabindex="0" role="button" aria-label="Why is commission pending?" title="Commission is held for <?php echo (int) $hold_days; ?> days after each payment in case the customer gets a refund. After that it moves to Available.">i</span>
+                        </div>
+                        <div class="aff-earn-num">$<?php echo number_format($money['pending'], 2); ?></div>
+                        <div class="aff-earn-foot">Clears after <?php echo (int) $hold_days; ?> days</div>
+                    </div>
+                    <div class="aff-earn-card">
+                        <div class="aff-earn-label">Paid out</div>
                         <div class="aff-earn-num">$<?php echo number_format($money['paid'], 2); ?></div>
                         <div class="aff-earn-foot">All time</div>
                     </div>
                 </div>
 
-                <p class="aff-fineprint">Figures shown are your gross commission in CAD: 50% of the subscription price, before payment processing fees, for the first 12 months of each referred subscription. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/" class="link">Contact us</a>.</p>
+                <p class="aff-fineprint">You've earned <strong>$<?php echo number_format($money['earned'], 2); ?></strong> in total. Figures are in CAD: 50% of the subscription price, before payment processing fees, for the first 12 months of each referred subscription. New commission is held for <?php echo (int) $hold_days; ?> days (the refund window) before it can be paid, and commission on a payment that's later refunded is not paid. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/" class="link">Contact us</a>.</p>
 
             <?php else: // pending / rejected / suspended ?>
                 <section class="aff-card aff-status">

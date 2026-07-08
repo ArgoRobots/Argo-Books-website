@@ -2,6 +2,7 @@
 require_once __DIR__ . '/admin_session.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../resources/icons.php';
+require_once __DIR__ . '/../community/affiliate/affiliate_functions.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -226,6 +227,11 @@ try {
     $revenue_all = 0;
 }
 
+// Affiliate commission currently owed across the whole program. Revenue figures
+// above are gross (before this), so this surfaces the liability separately.
+// Resilient: 0 if the affiliate tables aren't created on this server yet.
+$affiliate_owed = affiliate_program_totals($env)['owed'];
+
 // Build arrays for last 12 months
 $chart_labels = [];
 $mrr_data = [];
@@ -288,6 +294,11 @@ include __DIR__ . '/admin_header.php';
         <div class="stat-card">
             <h3>Revenue (All Time)</h3>
             <div class="value">$<?php echo number_format($revenue_all, 2); ?></div>
+        </div>
+        <div class="stat-card">
+            <h3>Affiliate Commission Owed</h3>
+            <div class="value">$<?php echo number_format($affiliate_owed, 2); ?></div>
+            <div class="subtext">not deducted from revenue above</div>
         </div>
     </div>
 

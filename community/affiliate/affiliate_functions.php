@@ -175,6 +175,39 @@ if (!function_exists('affiliate_money_summary')) {
     }
 }
 
+if (!function_exists('affiliate_program_totals')) {
+    /**
+     * Program-wide affiliate money totals (earned, paid, owed) across all
+     * approved/suspended affiliates in an environment. Resilient by design:
+     * returns zeros if the affiliate tables don't exist yet on this server, so
+     * callers like the admin dashboard never break before the schema is created.
+     *
+     * @return array{earned: float, paid: float, owed: float}
+     */
+    function affiliate_program_totals(string $environment): array
+    {
+        global $pdo;
+        $totals = ['earned' => 0.0, 'paid' => 0.0, 'owed' => 0.0];
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM affiliates WHERE environment = ? AND status IN ('approved', 'suspended')");
+            $stmt->execute([$environment]);
+            foreach ($stmt->fetchAll() as $a) {
+                $m = affiliate_money_summary($a, $environment);
+                $totals['earned'] += $m['earned'];
+                $totals['paid']   += $m['paid'];
+                $totals['owed']   += $m['owed'];
+            }
+        } catch (PDOException $e) {
+            // Affiliate tables not present on this server yet; report zeros.
+        }
+        return [
+            'earned' => round($totals['earned'], 2),
+            'paid'   => round($totals['paid'], 2),
+            'owed'   => round($totals['owed'], 2),
+        ];
+    }
+}
+
 if (!function_exists('get_affiliate_for_user')) {
     /** The affiliate row for a community user in the current environment, or null. */
     function get_affiliate_for_user(int $user_id, string $environment): ?array

@@ -350,7 +350,41 @@ include __DIR__ . '/../admin_header.php';
     $active->execute([$env]);
     $active_rows = $active->fetchAll();
     $csrf = htmlspecialchars($_SESSION['csrf_token']);
+
+    // Compute per-affiliate money/stats once (reused by the summary cards and
+    // the table) and roll them up into program totals.
+    $totals = ['clicks' => 0, 'signups' => 0, 'paying' => 0, 'earned' => 0.0, 'paid' => 0.0, 'owed' => 0.0];
+    $row_data = [];
+    $approved_count = 0;
+    foreach ($active_rows as $a) {
+        $money = affiliate_money_summary($a, $env);
+        $stats = get_affiliate_stats($a['source_code'], $env);
+        $row_data[$a['id']] = [
+            'money'     => $money,
+            'stats'     => $stats,
+            'deletable' => $stats['clicks'] === 0 && $stats['signups'] === 0 && $stats['paying'] === 0
+                && (float) $money['earned'] === 0.0 && (float) $money['paid'] === 0.0,
+        ];
+        $totals['clicks']  += $stats['clicks'];
+        $totals['signups'] += $stats['signups'];
+        $totals['paying']  += $stats['paying'];
+        $totals['earned']  += $money['earned'];
+        $totals['paid']    += $money['paid'];
+        $totals['owed']    += $money['owed'];
+        if ($a['status'] === 'approved') {
+            $approved_count++;
+        }
+    }
 ?>
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Pending applications</h3><div class="value"><?php echo number_format(count($pending_rows)); ?></div></div>
+        <div class="stat-card"><h3>Active affiliates</h3><div class="value"><?php echo number_format($approved_count); ?></div></div>
+        <div class="stat-card"><h3>Clicks</h3><div class="value"><?php echo number_format($totals['clicks']); ?></div><div class="subtext">all affiliate links</div></div>
+        <div class="stat-card"><h3>Paying customers</h3><div class="value"><?php echo number_format($totals['paying']); ?></div></div>
+        <div class="stat-card"><h3>Commission owed</h3><div class="value money-owed">$<?php echo number_format($totals['owed'], 2); ?></div><div class="subtext">CAD, across all affiliates</div></div>
+        <div class="stat-card"><h3>Paid out</h3><div class="value">$<?php echo number_format($totals['paid'], 2); ?></div><div class="subtext">CAD, all time</div></div>
+    </div>
+
     <div class="table-container">
         <div class="table-header-actions"><h2>Pending applications</h2></div>
         <?php if (empty($pending_rows)): ?>
@@ -366,10 +400,12 @@ include __DIR__ . '/../admin_header.php';
                             <td><?php echo htmlspecialchars(date('M j, Y', strtotime($a['applied_at']))); ?></td>
                             <td><?php echo htmlspecialchars($a['promo_url'] ?? ''); ?></td>
                             <td><?php echo htmlspecialchars(mb_strimwidth($a['application_reason'] ?? '', 0, 60, '…')); ?></td>
-                            <td class="action-buttons">
-                                <button type="button" class="btn btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Approve</button>
-                                <button type="button" class="btn btn-small btn-red" onclick="rejectAffiliate(<?php echo (int) $a['id']; ?>)">Reject</button>
-                                <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
+                            <td>
+                                <div class="action-buttons">
+                                    <button type="button" class="btn btn-small btn-green" onclick="approveAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Approve</button>
+                                    <button type="button" class="btn btn-small btn-red" onclick="rejectAffiliate(<?php echo (int) $a['id']; ?>)">Reject</button>
+                                    <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -387,10 +423,9 @@ include __DIR__ . '/../admin_header.php';
                 <thead><tr><th>User</th><th>Code</th><th>Status</th><th>Clicks</th><th>Earned</th><th>Paid</th><th>Owed</th><th>Actions</th></tr></thead>
                 <tbody>
                     <?php foreach ($active_rows as $a):
-                        $money = affiliate_money_summary($a, $env);
-                        $stats = get_affiliate_stats($a['source_code'], $env);
-                        $deletable = $stats['clicks'] === 0 && $stats['signups'] === 0 && $stats['paying'] === 0
-                            && (float) $money['earned'] === 0.0 && (float) $money['paid'] === 0.0;
+                        $money = $row_data[$a['id']]['money'];
+                        $stats = $row_data[$a['id']]['stats'];
+                        $deletable = $row_data[$a['id']]['deletable'];
                     ?>
                         <tr>
                             <td><a href="index.php?id=<?php echo (int) $a['id']; ?>" class="link"><?php echo htmlspecialchars($a['username']); ?></a></td>
@@ -400,11 +435,13 @@ include __DIR__ . '/../admin_header.php';
                             <td class="money-positive">$<?php echo number_format($money['earned'], 2); ?></td>
                             <td>$<?php echo number_format($money['paid'], 2); ?></td>
                             <td class="money-owed">$<?php echo number_format($money['owed'], 2); ?></td>
-                            <td class="action-buttons">
-                                <a href="index.php?id=<?php echo (int) $a['id']; ?>" class="btn btn-small btn-blue">View</a>
-                                <?php if ($deletable): ?>
-                                    <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
-                                <?php endif; ?>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="index.php?id=<?php echo (int) $a['id']; ?>" class="btn btn-small btn-blue">View</a>
+                                    <?php if ($deletable): ?>
+                                        <button type="button" class="btn btn-small btn-gray" onclick="deleteAffiliate(<?php echo (int) $a['id']; ?>, <?php echo htmlspecialchars(json_encode($a['username'])); ?>)">Delete</button>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

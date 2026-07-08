@@ -163,6 +163,12 @@ switch ($action) {
     case 'creator_add_url':
         creator_add_url($pdo);
         break;
+    case 'creator_export_emailless':
+        creator_export_emailless($pdo);
+        break;
+    case 'creator_set_email':
+        creator_set_email($pdo);
+        break;
 
     // AI draft
     case 'generate_draft':
@@ -1776,6 +1782,76 @@ function creator_import($pdo)
         outreach_log("Creator import failed: " . $e->getMessage());
         json_response(['success' => false, 'message' => 'Database error: ' . $e->getMessage()], 500);
     }
+}
+
+// Export creator leads that still have no email, as the input file for the local
+// assisted-captcha helper (tools/youtube-email-assist). Shape: [{lead_id, name, url}].
+function creator_export_emailless($pdo)
+{
+    $stmt = $pdo->query("SELECT id, business_name, website FROM outreach_leads
+        WHERE source = 'creator_auto' AND (email IS NULL OR email = '')
+        ORDER BY date_added DESC");
+    $rows = $stmt->fetchAll();
+    $out = [];
+    foreach ($rows as $r) {
+        $out[] = ['lead_id' => (int) $r['id'], 'name' => $r['business_name'], 'url' => $r['website']];
+    }
+    json_response(['success' => true, 'count' => count($out), 'leads' => $out]);
+}
+
+// Apply emails captured by the assisted helper back onto creator leads. Accepts
+// either a single {lead_id, email} or {results: [{lead_id, url, email}, ...]}.
+function creator_set_email($pdo)
+{
+    $data = json_decode(file_get_contents('php://input'), true) ?: [];
+    if (is_array($data) && array_is_list($data)) {
+        // Raw top-level array (the helper's output.json posted directly).
+        $results = $data;
+    } else {
+        $results = $data['results'] ?? null;
+        if (!is_array($results)) {
+            // Single-item form.
+            if (isset($data['email'])) {
+                $results = [['lead_id' => $data['lead_id'] ?? null, 'url' => $data['url'] ?? null, 'email' => $data['email']]];
+            } else {
+                json_response(['success' => false, 'message' => 'Provide results[] or a single {lead_id/url, email}'], 400);
+            }
+        }
+    }
+
+    $updated = 0;
+    $skipped = 0;
+    foreach ($results as $row) {
+        $email = trim((string) ($row['email'] ?? ''));
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) { $skipped++; continue; }
+
+        $leadId = (int) ($row['lead_id'] ?? 0);
+        $url    = trim((string) ($row['url'] ?? ''));
+
+        if ($leadId > 0) {
+            $stmt = $pdo->prepare("UPDATE outreach_leads SET email = ? WHERE id = ? AND source = 'creator_auto' AND (email IS NULL OR email = '')");
+            $stmt->execute([$email, $leadId]);
+        } elseif ($url !== '') {
+            $stmt = $pdo->prepare("UPDATE outreach_leads SET email = ? WHERE website = ? AND source = 'creator_auto' AND (email IS NULL OR email = '')");
+            $stmt->execute([$email, $url]);
+        } else {
+            $skipped++;
+            continue;
+        }
+
+        if ($stmt->rowCount() > 0) {
+            $updated++;
+            // Mirror onto the candidate row's harvested_email where we can match it.
+            if ($url !== '') {
+                $c = $pdo->prepare("UPDATE outreach_creator_candidates SET harvested_email = ? WHERE canonical_url = ?");
+                $c->execute([$email, $url]);
+            }
+        } else {
+            $skipped++;
+        }
+    }
+
+    json_response(['success' => true, 'updated' => $updated, 'skipped' => $skipped]);
 }
 
 // ─── AI Draft Generation ───

@@ -298,7 +298,7 @@ include __DIR__ . '/admin_header.php';
         <div class="stat-card">
             <h3>Affiliate Commission Owed</h3>
             <div class="value">$<?php echo number_format($affiliate_owed, 2); ?></div>
-            <div class="subtext">not deducted from revenue above</div>
+            <div class="subtext">not deducted from revenue</div>
         </div>
     </div>
 

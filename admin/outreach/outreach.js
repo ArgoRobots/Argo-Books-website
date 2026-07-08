@@ -548,9 +548,10 @@ async function executeBulkSend() {
     if (success > 0) {
         loadLeads();
         loadStats();
-        // Refresh the editorial leads table too if it was ever populated, so a
-        // bulk send launched from the Editorial tab reflects the new sent status.
+        // Refresh the editorial/creator leads tables too if they were ever
+        // populated, so a bulk send launched from those tabs reflects the new status.
         if (editorialLeadsPaginator) loadEditorialLeads();
+        if (creatorLeadsPaginator) loadCreatorLeads();
     }
 }
 
@@ -1982,6 +1983,343 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
+// Creators / affiliate-partner outreach channel
+// Mirrors the editorial channel (discovery + leads with filters/bulk), scoped to
+// source=creator_auto, reusing the shared runBulkDrafts()/openBulkSendModal() and
+// the id-driven lead modal. Distinct classes/IDs (.cr-lead-check, cr*) so its
+// selection never collides with the other leads tables in the DOM.
+// ═══════════════════════════════════════════════════════════════════════════
+
+let creatorResults = [];
+let creatorLastSummary = null;
+let creatorLeadsPaginator = null;
+
+async function loadCreatorStatus() {
+    try {
+        const data = await api('creator_get_status');
+        if (data.success) {
+            const usage = document.getElementById('creatorSerpUsage');
+            if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+            const hunter = document.getElementById('creatorHunterState');
+            if (hunter) hunter.textContent = data.has_hunter ? 'connected' : 'not set (scrapes linked sites instead)';
+        }
+    } catch (e) { /* non-fatal */ }
+}
+
+async function runCreatorDiscovery() {
+    const limit = Math.min(30, Math.max(1, parseInt(document.getElementById('creatorLimit').value, 10) || 8));
+    const btn = document.getElementById('creatorRunBtn');
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    try {
+        const data = await api('creator_run_discovery', { method: 'POST', body: { limit } });
+        if (!data.success) {
+            notify(data.message || 'Creator discovery failed');
+            return;
+        }
+        creatorResults = data.results || [];
+        creatorLastSummary = {
+            rejected_count: data.rejected_count || 0,
+            reject_reasons: data.reject_reasons || {},
+            already_imported_count: data.already_imported_count || 0,
+            already_rejected_count: data.already_rejected_count || 0,
+            total_evaluated: data.total_evaluated || 0,
+            requested_limit: data.requested_limit || limit,
+            quota_exhausted: !!data.quota_exhausted,
+            stop_reason: data.stop_reason || '',
+        };
+        const usage = document.getElementById('creatorSerpUsage');
+        if (usage) usage.textContent = `${data.serpapi_calls_today}/${data.serpapi_limit} queries`;
+        document.getElementById('creatorResults').style.display = 'block';
+        renderCreatorResults();
+        if (creatorLastSummary.quota_exhausted) {
+            notify(`SerpAPI daily quota hit before finding ${creatorLastSummary.requested_limit}. Got ${creatorResults.length} fit${creatorResults.length === 1 ? '' : 's'}. Resets at midnight or raise SERPAPI_DAILY_QUERY_LIMIT in .env.`);
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Run';
+    }
+}
+
+function renderCreatorResults() {
+    const body = document.getElementById('creatorResultsBody');
+    const countEl = document.getElementById('creatorResultsCount');
+    const importAllBtn = document.getElementById('creatorImportAllBtn');
+    const safe = (s) => escapeHtml(String(s ?? ''));
+
+    let summary = `${creatorResults.length} fit`;
+    if (creatorLastSummary) {
+        if (creatorLastSummary.already_imported_count > 0) summary += ` · ${creatorLastSummary.already_imported_count} already imported (hidden)`;
+        if (creatorLastSummary.already_rejected_count > 0) summary += ` · ${creatorLastSummary.already_rejected_count} previously skipped (hidden)`;
+        if (creatorLastSummary.rejected_count > 0) {
+            const reasons = creatorLastSummary.reject_reasons || {};
+            const reasonStr = Object.entries(reasons).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => `${n}× ${k}`).join(', ');
+            summary += ` · ${creatorLastSummary.rejected_count} skipped`;
+            if (reasonStr) summary += ` (${reasonStr})`;
+        }
+    }
+    countEl.textContent = summary;
+
+    if (importAllBtn) {
+        importAllBtn.disabled = creatorResults.length === 0;
+        importAllBtn.textContent = creatorResults.length > 0 ? `Import ${creatorResults.length} Fit${creatorResults.length !== 1 ? 's' : ''}` : 'Import All Fits';
+    }
+
+    if (creatorResults.length === 0) {
+        const n = (creatorLastSummary && creatorLastSummary.total_evaluated) || 0;
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#888;">No new creators to recruit (evaluated ${n}). They were not a fit for the audience, or already imported.</td></tr>`;
+        return;
+    }
+
+    body.innerHTML = creatorResults.map((r, idx) => {
+        const name = `<div><strong>${safe(r.creator_name) || safe(r.canonical_url)}</strong></div>`;
+        const emailSrc = r.email_source ? ` <span style="color:#888; font-size:11px;">(${safe(r.email_source)})</span>` : '';
+        const emailCell = r.email ? (safe(r.email) + emailSrc) : '<span style="color:#c00; font-size:12px;">manual</span>';
+        return '<tr>' +
+            `<td>${name}</td>` +
+            `<td><span class="badge">${safe(r.platform) || '—'}</span></td>` +
+            `<td style="max-width:200px; font-size:12px;">${safe(r.audience) || '—'}</td>` +
+            `<td>${emailCell}</td>` +
+            `<td><a href="${safe(r.canonical_url)}" target="_blank" rel="noopener" class="link">open</a></td>` +
+            `<td><button class="btn btn-small btn-blue" onclick="importCreatorRow(${idx}, this)">Import</button></td>` +
+        '</tr>';
+    }).join('');
+}
+
+async function importCreatorRow(idx, btn) {
+    const row = creatorResults[idx];
+    if (!row) return;
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    try {
+        const data = await api('creator_import', { method: 'POST', body: {
+            canonical_url: row.canonical_url,
+            platform: row.platform,
+            creator_name: row.creator_name,
+            email: row.email,
+            business_summary: row.business_summary
+        } });
+        if (data.success) {
+            creatorResults = creatorResults.filter(r => r.canonical_url !== row.canonical_url);
+            if (creatorLastSummary) creatorLastSummary.already_imported_count = (creatorLastSummary.already_imported_count || 0) + 1;
+            renderCreatorResults();
+            loadStats();
+            loadCreatorLeads();
+        } else {
+            notify(data.message || 'Import failed');
+            btn.disabled = false;
+            btn.textContent = 'Import';
+        }
+    } catch (e) {
+        notify(e.message);
+        btn.disabled = false;
+        btn.textContent = 'Import';
+    }
+}
+
+async function importAllCreatorFits() {
+    if (creatorResults.length === 0) return;
+    if (!confirm(`Import ${creatorResults.length} creator${creatorResults.length === 1 ? '' : 's'} as new partner leads?`)) return;
+    const toImport = creatorResults.map(r => ({
+        canonical_url: r.canonical_url,
+        platform: r.platform,
+        creator_name: r.creator_name,
+        email: r.email,
+        business_summary: r.business_summary
+    }));
+    const btn = document.getElementById('creatorImportAllBtn');
+    btn.disabled = true;
+    btn.textContent = 'Importing…';
+    const succeeded = new Set();
+    let failed = 0;
+    for (const item of toImport) {
+        try {
+            const data = await api('creator_import', { method: 'POST', body: item });
+            if (data.success) succeeded.add(item.canonical_url);
+            else failed++;
+        } catch (e) {
+            failed++;
+        }
+    }
+    creatorResults = creatorResults.filter(r => !succeeded.has(r.canonical_url));
+    if (creatorLastSummary) creatorLastSummary.already_imported_count = (creatorLastSummary.already_imported_count || 0) + succeeded.size;
+    renderCreatorResults();
+    loadStats();
+    loadCreatorLeads();
+    notify(`Imported ${succeeded.size} lead${succeeded.size === 1 ? '' : 's'}` + (failed > 0 ? `, ${failed} failed` : ''));
+}
+
+// Add one specific creator URL directly (YouTube channel, newsletter, blog, or a
+// LinkedIn profile which imports as a manual, email-less lead).
+async function addCreatorUrl() {
+    const input = document.getElementById('creatorUrl');
+    const url = (input.value || '').trim();
+    if (!url) { notify('Enter a creator URL'); return; }
+    const btn = document.getElementById('creatorAddBtn');
+    btn.disabled = true;
+    btn.textContent = 'Adding…';
+    try {
+        const data = await api('creator_add_url', { method: 'POST', body: { url } });
+        if (data.success) {
+            input.value = '';
+            const emailMsg = data.has_email ? `email ${data.email}` : 'no email found — add it on the lead or use assisted email';
+            notify(`Added ${data.name || 'creator'} (${data.platform || ''}, ${emailMsg})`, 'success');
+            loadCreatorLeads();
+            loadStats();
+        } else {
+            notify(data.message || 'Could not add that URL');
+        }
+    } catch (e) {
+        notify(e.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Add';
+    }
+}
+
+// ─── Creator Leads: bulk select (distinct .cr-lead-check class / cr* IDs) ───
+function toggleCreatorLeadCheckboxes(master) {
+    document.querySelectorAll('.cr-lead-check').forEach(cb => cb.checked = master.checked);
+    updateCreatorBulkBar();
+}
+
+function updateCreatorBulkBar() {
+    const checked = document.querySelectorAll('.cr-lead-check:checked');
+    const bar = document.getElementById('crBulkActionsBar');
+    const count = document.getElementById('crSelectedCount');
+    const selectAll = document.getElementById('crLeadsSelectAll');
+    const allBoxes = document.querySelectorAll('.cr-lead-check');
+
+    if (bar) bar.style.display = checked.length ? 'flex' : 'none';
+    if (count) count.textContent = checked.length;
+
+    if (selectAll && allBoxes.length) {
+        if (checked.length === 0) { selectAll.checked = false; selectAll.indeterminate = false; }
+        else if (checked.length === allBoxes.length) { selectAll.checked = true; selectAll.indeterminate = false; }
+        else { selectAll.checked = false; selectAll.indeterminate = true; }
+    }
+
+    const draftBtn = document.getElementById('crBtnDraftSelected');
+    if (draftBtn) {
+        const allDrafted = checked.length > 0 && Array.from(checked).every(cb => cb.dataset.hasDraft === '1');
+        draftBtn.textContent = allDrafted ? 'Redraft Selected' : 'Draft Selected';
+    }
+}
+
+function getSelectedCreatorLeadIds() {
+    return Array.from(document.querySelectorAll('.cr-lead-check:checked')).map(cb => parseInt(cb.value));
+}
+
+function bulkGenerateCreatorDrafts() {
+    return runBulkDrafts({
+        ids: getSelectedCreatorLeadIds(),
+        checkClass: '.cr-lead-check', checkIdPrefix: 'cr-lead-check-',
+        progressId: 'crBulkDraftProgress', progressTextId: 'crBulkDraftProgressText',
+        cancelBtnId: 'crBtnCancelDraft', draftBtnId: 'crBtnDraftSelected',
+        onDone: updateCreatorBulkBar,
+    });
+}
+
+function openCreatorBulkSend() {
+    openBulkSendModal(getSelectedCreatorLeadIds());
+}
+
+async function bulkDeleteCreatorLeads() {
+    const ids = getSelectedCreatorLeadIds();
+    if (!ids.length) return;
+    if (!confirm(`Delete ${ids.length} lead(s)? This cannot be undone.`)) return;
+
+    let success = 0, fail = 0, lastError = '';
+    for (const id of ids) {
+        try {
+            const result = await api('delete_lead', { method: 'POST', body: { id } });
+            if (result.success) success++; else { fail++; lastError = result.message || 'Unknown error'; }
+        } catch (err) { fail++; lastError = err.message; }
+    }
+    if (fail > 0) notify(`Deleted: ${success}, Failed: ${fail}. Last error: ${lastError}`, 'error');
+    else notify(`Successfully deleted ${success} lead(s)`, 'success');
+    loadCreatorLeads();
+    loadStats();
+}
+
+function debounceLoadCreatorLeads() {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(loadCreatorLeads, 300);
+}
+
+async function loadCreatorLeads() {
+    const tbody = document.getElementById('creatorLeadsTableBody');
+    if (!tbody) return;
+
+    const params = { source: 'creator_auto' };
+    const searchEl = document.getElementById('crFilterSearch');
+    const statusEl = document.getElementById('crFilterStatus');
+    const responseEl = document.getElementById('crFilterResponse');
+    const sortEl = document.getElementById('crFilterSort');
+    if (searchEl && searchEl.value.trim()) params.search = searchEl.value.trim();
+    if (statusEl && statusEl.value) params.status = statusEl.value;
+    if (responseEl && responseEl.value) params.response_status = responseEl.value;
+    params.sort = (sortEl && sortEl.value) ? sortEl.value : 'date_added_desc';
+
+    try {
+        const data = await api('get_leads', { params });
+        if (!data.success || !data.leads.length) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No partner leads found.</td></tr>';
+            if (creatorLeadsPaginator) creatorLeadsPaginator.reset();
+            const selectAll = document.getElementById('crLeadsSelectAll');
+            if (selectAll) selectAll.checked = false;
+            updateCreatorBulkBar();
+            return;
+        }
+        tbody.innerHTML = data.leads.map(lead => {
+            const platform = (lead.category || '').replace(/^creator:/, '') || '—';
+            return `
+            <tr class="lead-row">
+                <td class="checkbox-column" onclick="event.stopPropagation()">
+                    <div class="checkbox"><input type="checkbox" class="cr-lead-check" value="${lead.id}" id="cr-lead-check-${lead.id}" data-has-draft="${lead.draft_subject ? '1' : ''}" onchange="updateCreatorBulkBar()"><label for="cr-lead-check-${lead.id}"></label></div>
+                </td>
+                <td>
+                    <strong>${esc(lead.business_name)}</strong>
+                    ${lead.website ? '<br><a class="website-link" href="' + esc(lead.website) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">' + esc(lead.website.replace(/^https?:\/\//, '').replace(/\?.*$/, '')) + '</a>' : ''}
+                </td>
+                <td><span class="badge">${esc(platform)}</span></td>
+                <td>${lead.email ? esc(lead.email) : '<span class="text-muted">—</span>'}</td>
+                <td><span class="badge badge-status-${lead.status || 'new'}">${formatStatus(lead.status || 'new')}</span></td>
+                <td>${lead.sent_at ? formatDateTime(lead.sent_at) : '<span class="text-muted">—</span>'}</td>
+                <td>${lead.clicked_at ? formatDateTime(lead.clicked_at) : '<span class="text-muted">—</span>'}</td>
+                <td onclick="event.stopPropagation()">
+                    <div class="actions-cell">
+                        <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
+                        ${lead.email && !lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status) ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+
+        const selectAll = document.getElementById('crLeadsSelectAll');
+        if (selectAll) selectAll.checked = false;
+        updateCreatorBulkBar();
+
+        const table = document.querySelector('.creator-leads-table');
+        if (table) {
+            if (!creatorLeadsPaginator) creatorLeadsPaginator = new TablePaginator(table, { perPage: 25 });
+            else creatorLeadsPaginator.reset();
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    }
+}
+
+document.querySelectorAll('.section-tab[data-tab="creator-leads"]').forEach(btn =>
+    btn.addEventListener('click', () => setTimeout(loadCreatorLeads, 0)));
+document.addEventListener('DOMContentLoaded', function () {
+    loadCreatorStatus();
+    if (document.querySelector('#creator-leads.tab-content.active')) loadCreatorLeads();
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Reddit outreach
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -2020,7 +2358,7 @@ function switchChannel(channel) {
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('channel', channel);
-        if (channel === 'email' && /^(reddit|editorial)-/.test(url.searchParams.get('tab') || '')) {
+        if (channel === 'email' && /^(reddit|editorial|creator)-/.test(url.searchParams.get('tab') || '')) {
             url.searchParams.set('tab', 'leads');
         }
         if (channel === 'reddit' && !['reddit-threads', 'reddit-settings'].includes(url.searchParams.get('tab') || '')) {
@@ -2028,6 +2366,9 @@ function switchChannel(channel) {
         }
         if (channel === 'editorial') {
             url.searchParams.set('tab', 'editorial-discovery');
+        }
+        if (channel === 'creator') {
+            url.searchParams.set('tab', 'creator-discovery');
         }
         history.replaceState({}, '', url.toString());
     } catch (e) { /* ignore */ }
@@ -2049,6 +2390,9 @@ function switchChannel(channel) {
     }
     if (channel === 'editorial') {
         loadEditorialStatus();
+    }
+    if (channel === 'creator') {
+        loadCreatorStatus();
     }
 }
 

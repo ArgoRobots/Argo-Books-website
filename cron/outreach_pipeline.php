@@ -538,12 +538,29 @@ function stepDiscoverShopify($pdo, $dryRun)
 
         // Pick next dork and advance cursor immediately so failures don't get re-tried next dork
         $cursor = (int) getState($pdo, 'shopify_dork_cursor', '0');
-        $query = $dorkPool[$cursor % $totalDorks];
+        $idx = $cursor % $totalDorks;
+        $query = $dorkPool[$idx];
         setState($pdo, 'shopify_dork_cursor', (string) ($cursor + 1));
         $dorksTriedThisRun++;
         $queriesUsed[] = $query;
 
-        logPipeline("Shopify dork #$dorksTriedThisRun/$totalDorks (cursor=$cursor): '$query'");
+        // Per-dork page offset (shared with the admin Run button via the
+        // shopify_dork_pages state) so each pass pulls a DEEPER result page
+        // instead of re-reading page 1 and re-seeing already-imported stores.
+        // Capped by SHOPIFY_MAX_PAGE_DEPTH; a tapped-out dork is skipped (the
+        // $dorksTriedThisRun guard still terminates the loop).
+        $shopifyPages = json_decode(getState($pdo, 'shopify_dork_pages', '{}'), true);
+        if (!is_array($shopifyPages)) {
+            $shopifyPages = [];
+        }
+        $maxStart = (max(1, (int) ($_ENV['SHOPIFY_MAX_PAGE_DEPTH'] ?? 3)) - 1) * 100;
+        $start = (int) ($shopifyPages[(string) $idx] ?? 0);
+        if ($start > $maxStart) {
+            logPipeline("Dork '$query' past page-depth cap (start=$start). Skipping this pass.");
+            continue;
+        }
+
+        logPipeline("Shopify dork #$dorksTriedThisRun/$totalDorks (cursor=$cursor, page=" . (intdiv($start, 100) + 1) . "): '$query'");
 
         // SerpAPI call via 14-day response cache. Append global exclusions
         // so we don't pay for results that openly advertise being decades
@@ -551,7 +568,7 @@ function stepDiscoverShopify($pdo, $dryRun)
         // num=10 on SerpAPI, 10x the candidates per credit. Cache hits
         // do NOT consume daily SerpAPI quota.
         $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
-        $queryResult = serpapi_query_cached($queryWithExclusions, $serpapiKey, 100, $pdo);
+        $queryResult = serpapi_query_cached($queryWithExclusions, $serpapiKey, 100, $pdo, $start);
         $results = $queryResult['results'];
         if ($queryResult['from_cache']) {
             logPipeline("'$query' served from SerpAPI cache (no credit spent).");
@@ -559,6 +576,9 @@ function stepDiscoverShopify($pdo, $dryRun)
             $serpapiCallsToday++;
             setState($pdo, 'serpapi_calls_today', (string) $serpapiCallsToday);
         }
+        // Advance this dork's page offset so the next pass goes deeper.
+        $shopifyPages[(string) $idx] = $start + 100;
+        setState($pdo, 'shopify_dork_pages', json_encode($shopifyPages));
 
         if (empty($results)) {
             logPipeline("SerpAPI returned no results for '$query'. Moving to next dork.");

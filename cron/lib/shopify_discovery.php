@@ -87,12 +87,16 @@ const SHOPIFY_DORK_POOL = [
  *                        is the most efficient single-call value)
  * @return array          Array of ['link'=>..., 'title'=>..., 'snippet'=>...] entries
  */
-function serpapi_query(string $query, string $apiKey, int $limit = 100): array
+function serpapi_query(string $query, string $apiKey, int $limit = 100, int $start = 0): array
 {
+    // $start is the organic-result offset (Google's `start` param): 0 = first
+    // page, $limit = second page, etc. Without it every call returns the same
+    // first page, so repeat runs only ever re-see already-imported results.
     $url = 'https://serpapi.com/search.json?engine=google'
         . '&q=' . urlencode($query)
         . '&api_key=' . urlencode($apiKey)
         . '&num=' . (int) $limit
+        . ($start > 0 ? '&start=' . (int) $start : '')
         . '&hl=en&gl=ca';
 
     $context = stream_context_create([
@@ -153,15 +157,16 @@ function serpapi_query(string $query, string $apiKey, int $limit = 100): array
  * Returns ['results' => array, 'from_cache' => bool]. Callers MUST only
  * increment the daily SerpAPI counter when from_cache is false.
  *
- * Cache key: SHA-256 of "{query}|num={limit}" so different limits don't
- * share cache entries. Empty result sets are NOT cached so transient SerpAPI
- * failures get retried on the next run instead of returning [] for 14 days.
+ * Cache key: SHA-256 of "{query}|num={limit}|start={start}" so different limits
+ * AND different result pages each get their own entry (otherwise page 2 would
+ * collide with page 1's cache). Empty result sets are NOT cached so transient
+ * SerpAPI failures get retried on the next run instead of returning [] for 14 days.
  */
 const SERPAPI_CACHE_TTL_DAYS = 14;
 
-function serpapi_query_cached(string $query, string $apiKey, int $limit, PDO $pdo): array
+function serpapi_query_cached(string $query, string $apiKey, int $limit, PDO $pdo, int $start = 0): array
 {
-    $cacheKey = hash('sha256', $query . '|num=' . $limit);
+    $cacheKey = hash('sha256', $query . '|num=' . $limit . '|start=' . $start);
 
     $stmt = $pdo->prepare(
         "SELECT response_json FROM serpapi_response_cache
@@ -179,7 +184,7 @@ function serpapi_query_cached(string $query, string $apiKey, int $limit, PDO $pd
     }
 
     // Cache miss → live SerpAPI call
-    $results = serpapi_query($query, $apiKey, $limit);
+    $results = serpapi_query($query, $apiKey, $limit, $start);
 
     // Only cache non-empty results. An empty array could be either a
     // legitimately empty result set or a transient HTTP/JSON failure,

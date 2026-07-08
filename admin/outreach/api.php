@@ -766,12 +766,27 @@ function shopify_run_dork($pdo)
     // keep hitting the same query.
     $cursor               = (int) _shopify_state_get($pdo, 'shopify_dork_cursor', '0');
     $poolSize             = count(SHOPIFY_DORK_POOL);
+    $pages                = json_decode(_shopify_state_get($pdo, 'shopify_dork_pages', '{}'), true);
+    if (!is_array($pages)) {
+        $pages = [];
+    }
     $fits                 = [];
     $rejectedCount        = 0;
     $rejectReasons        = [];
     $alreadyImportedCount = 0;
     $totalEvaluated       = 0;
     $queriesRun           = [];
+
+    // Per-run guardrails (mirror the editorial channel): a SerpAPI-call budget so
+    // one Run can't drain the daily quota, a page-depth cap per dork, and a
+    // dry-streak exit so we stop once the whole pool stops yielding new stores.
+    $serpCallsThisRun = 0;
+    $perRunSerpBudget = max(1, (int) ($_ENV['SERPAPI_MAX_CALLS_PER_RUN'] ?? 12));
+    $maxPageDepth     = max(1, (int) ($_ENV['SHOPIFY_MAX_PAGE_DEPTH'] ?? 3));
+    $pageSize         = 100;
+    $maxStart         = ($maxPageDepth - 1) * $pageSize;
+    $dryQueries       = 0;
+    $stopReason       = 'target_reached';
 
     // Within-run dedup. The same store surfaces across multiple dork queries
     // (and via different deep links that all canonicalize to one origin), so
@@ -785,25 +800,44 @@ function shopify_run_dork($pdo)
     $seenCanonicals = [];
     $seenIdentities = [];
 
-    while (count($fits) < $limit && $callsToday < $serpapiLimit) {
-        $query = SHOPIFY_DORK_POOL[$cursor % $poolSize];
+    while (true) {
+        if (count($fits) >= $limit)                 { $stopReason = 'target_reached'; break; }
+        if ($callsToday >= $serpapiLimit)           { $stopReason = 'daily_quota';    break; }
+        if ($serpCallsThisRun >= $perRunSerpBudget) { $stopReason = 'run_budget';     break; }
+        if ($dryQueries >= $poolSize)               { $stopReason = 'exhausted';      break; }
+
+        $idx   = $cursor % $poolSize;
+        $query = SHOPIFY_DORK_POOL[$idx];
         $cursor++;
         _shopify_state_set($pdo, 'shopify_dork_cursor', (string) $cursor);
 
+        $start = (int) ($pages[(string) $idx] ?? 0);
+        if ($start > $maxStart) {
+            $dryQueries++;
+            continue;
+        }
+
         $queryWithExclusions = $query . SHOPIFY_DORK_EXCLUSIONS;
-        $queryResult = serpapi_query_cached($queryWithExclusions, $apiKey, 100, $pdo);
+        $queryResult = serpapi_query_cached($queryWithExclusions, $apiKey, $pageSize, $pdo, $start);
         $serpResults = $queryResult['results'];
         if (!$queryResult['from_cache']) {
             $callsToday++;
+            $serpCallsThisRun++;
             _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
         }
-        $queriesRun[] = $query;
+        $pages[(string) $idx] = $start + $pageSize;
+        _shopify_state_set($pdo, 'shopify_dork_pages', json_encode($pages));
+        $queriesRun[] = $query . ' (p' . (intdiv($start, $pageSize) + 1) . ')';
 
-        if (empty($serpResults)) continue;
+        if (empty($serpResults)) {
+            $dryQueries++;
+            continue;
+        }
         $totalEvaluated += count($serpResults);
 
+        $foundNew = false;
         foreach ($serpResults as $r) {
-            if (count($fits) >= $limit) break 2;
+            if (count($fits) >= $limit) break;
 
             $canonical = shopify_canonical_url($r['link'] ?? '');
             if ($canonical === '') continue;
@@ -827,6 +861,7 @@ function shopify_run_dork($pdo)
                 continue;
             }
 
+            $foundNew = true;
             $result = evaluate_shopify_candidate($canonical);
 
             if (empty($result['fit'])) {
@@ -861,6 +896,12 @@ function shopify_run_dork($pdo)
                 'country'          => $meta['country'] ?? '',
             ];
         }
+
+        if ($foundNew) {
+            $dryQueries = 0;
+        } else {
+            $dryQueries++;
+        }
     }
 
     $quotaExhausted = $callsToday >= $serpapiLimit && count($fits) < $limit;
@@ -869,12 +910,15 @@ function shopify_run_dork($pdo)
         'success'                => true,
         'results'                => $fits,
         'requested_limit'        => $limit,
+        'found_count'            => count($fits),
+        'stop_reason'            => $stopReason,
         'quota_exhausted'        => $quotaExhausted,
         'rejected_count'         => $rejectedCount,
         'reject_reasons'         => $rejectReasons,
         'already_imported_count' => $alreadyImportedCount,
         'total_evaluated'        => $totalEvaluated,
         'queries_run'            => $queriesRun,
+        'serpapi_calls_this_run' => $serpCallsThisRun,
         'serpapi_calls_today'    => $callsToday,
         'serpapi_limit'          => $serpapiLimit,
         'imports_today'          => (int) _shopify_state_get($pdo, 'shopify_imports_today', '0'),
@@ -1037,6 +1081,11 @@ function editorial_run_discovery($pdo)
 
     $cursor               = (int) _shopify_state_get($pdo, 'editorial_query_cursor', '0');
     $poolSize             = count(EDITORIAL_QUERY_POOL);
+    $pages                = json_decode(_shopify_state_get($pdo, 'editorial_pages', '{}'), true);
+    if (!is_array($pages)) {
+        $pages = [];
+    }
+
     $fits                 = [];
     $rejectedCount        = 0;
     $rejectReasons        = [];
@@ -1045,40 +1094,74 @@ function editorial_run_discovery($pdo)
     $totalEvaluated       = 0;
     $queriesRun           = [];
     $seen                 = [];
-    // Bound the expensive work per run so the request can't time out: each
-    // evaluation does a live page fetch + a Gemini call (+ a contact-page scrape
-    // for fits), which is slow and variable. Cap the number of evaluations and
-    // the total wall-clock, and persist rejects so repeated Run clicks make
-    // progress (skipping already-handled articles) instead of re-doing them.
-    $evaluated = 0;
-    $maxEval   = 15;
-    $deadline  = microtime(true) + 35;
 
-    while (count($fits) < $limit && $callsToday < $serpapiLimit && $evaluated < $maxEval && microtime(true) < $deadline) {
-        $query = EDITORIAL_QUERY_POOL[$cursor % $poolSize];
+    // Target-count loop: keep pulling deeper result pages and rotating queries
+    // until we've collected $limit NEW fits, bounded by guardrails so a run can't
+    // time out or run up the SerpAPI/AI bill. Everything that makes this resumable
+    // is persisted (query cursor + per-query page offset), so clicking Run again
+    // continues from where this left off instead of re-scanning page 1.
+    $evaluated        = 0;
+    $serpCallsThisRun = 0;
+    $maxEval          = max(1, (int) ($_ENV['EDITORIAL_MAX_EVAL_PER_RUN'] ?? 20));   // Gemini/scrape ceiling per run
+    $perRunSerpBudget = max(1, (int) ($_ENV['SERPAPI_MAX_CALLS_PER_RUN'] ?? 12));    // SerpAPI calls per run
+    $maxPageDepth     = max(1, (int) ($_ENV['EDITORIAL_MAX_PAGE_DEPTH'] ?? 6));      // how deep per query before it's "tapped out"
+    $pageSize         = 15;
+    $maxStart         = ($maxPageDepth - 1) * $pageSize;
+    $deadline         = microtime(true) + 50;
+    $dryQueries       = 0;   // consecutive queries that yielded no NEW candidate
+    $stopReason       = 'target_reached';
+
+    while (true) {
+        if (count($fits) >= $limit)                 { $stopReason = 'target_reached'; break; }
+        if ($callsToday >= $serpapiLimit)           { $stopReason = 'daily_quota';    break; }
+        if ($serpCallsThisRun >= $perRunSerpBudget) { $stopReason = 'run_budget';     break; }
+        if ($evaluated >= $maxEval)                 { $stopReason = 'eval_cap';       break; }
+        if (microtime(true) >= $deadline)           { $stopReason = 'time';           break; }
+        if ($dryQueries >= $poolSize)               { $stopReason = 'exhausted';      break; }
+
+        $idx   = $cursor % $poolSize;
+        $query = EDITORIAL_QUERY_POOL[$idx];
         $cursor++;
         _shopify_state_set($pdo, 'editorial_query_cursor', (string) $cursor);
 
-        $searchResult = editorial_search($query, $apiKey, 15, $pdo);
+        $start = (int) ($pages[(string) $idx] ?? 0);
+        if ($start > $maxStart) {
+            // This query is tapped out to our page-depth cap; skip without a call.
+            $dryQueries++;
+            continue;
+        }
+
+        $searchResult = editorial_search($query, $apiKey, $pageSize, $pdo, $start);
         if (!$searchResult['from_cache']) {
             $callsToday++;
+            $serpCallsThisRun++;
             _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
         }
-        $queriesRun[] = $query;
+        // Advance this query's page offset so the next iteration/run goes deeper.
+        $pages[(string) $idx] = $start + $pageSize;
+        _shopify_state_set($pdo, 'editorial_pages', json_encode($pages));
+        $queriesRun[] = $query . ' (p' . (intdiv($start, $pageSize) + 1) . ')';
 
         $serpResults = $searchResult['results'];
-        if (empty($serpResults)) continue;
+        if (empty($serpResults)) {
+            $dryQueries++;
+            continue;
+        }
         $totalEvaluated += count($serpResults);
 
+        $foundNew = false;
         foreach ($serpResults as $r) {
-            if (count($fits) >= $limit || $evaluated >= $maxEval || microtime(true) >= $deadline) break 2;
+            if (count($fits) >= $limit || $evaluated >= $maxEval || microtime(true) >= $deadline) {
+                break;
+            }
 
             $canonical = $r['url'];
             if (isset($seen[$canonical])) continue;
             $seen[$canonical] = true;
 
-            // Skip articles already imported or recently rejected, so repeated
-            // runs advance to new candidates instead of re-evaluating the same ones.
+            // Pre-dedup BEFORE spending any AI: skip already-imported or recently
+            // rejected articles so we never pay Gemini/Hunter to re-evaluate a
+            // candidate we've already handled.
             $existing = $pdo->prepare("SELECT status FROM outreach_editorial_candidates
                 WHERE canonical_url = ?
                   AND (status = 'imported'
@@ -1095,6 +1178,7 @@ function editorial_run_discovery($pdo)
                 continue;
             }
 
+            $foundNew = true;
             $evaluated++;
             try {
                 $result = evaluate_editorial_candidate($canonical, $pdo, $r['title'] ?? '');
@@ -1136,6 +1220,14 @@ function editorial_run_discovery($pdo)
                 'business_summary' => $meta['business_summary'] ?? '',
             ];
         }
+
+        // A query that surfaced no new candidate counts toward exhaustion; one
+        // that did resets the dry streak so we keep mining productive queries.
+        if ($foundNew) {
+            $dryQueries = 0;
+        } else {
+            $dryQueries++;
+        }
     }
 
     $quotaExhausted = $callsToday >= $serpapiLimit && count($fits) < $limit;
@@ -1144,6 +1236,8 @@ function editorial_run_discovery($pdo)
         'success'                => true,
         'results'                => $fits,
         'requested_limit'        => $limit,
+        'found_count'            => count($fits),
+        'stop_reason'            => $stopReason,
         'quota_exhausted'        => $quotaExhausted,
         'rejected_count'         => $rejectedCount,
         'reject_reasons'         => $rejectReasons,
@@ -1151,6 +1245,7 @@ function editorial_run_discovery($pdo)
         'already_rejected_count' => $alreadyRejectedCount,
         'total_evaluated'        => $totalEvaluated,
         'queries_run'            => $queriesRun,
+        'serpapi_calls_this_run' => $serpCallsThisRun,
         'serpapi_calls_today'    => $callsToday,
         'serpapi_limit'          => $serpapiLimit,
     ]);

@@ -74,6 +74,78 @@ function editorial_domain_from_url(string $url): string
 }
 
 /**
+ * Detect whether a roundup page is affiliate-monetized, from its raw HTML.
+ *
+ * We only want to offer our affiliate program to sites that already run
+ * affiliate links (commission is their business model, so it is a persuasive
+ * hook there). Genuine, neutral editorial outlets must stay a clean pitch, since
+ * to them a commission offer reads as a bribe. This is a deterministic scan that
+ * pairs with the AI's is_affiliate_monetized read; any single signal is enough.
+ * It errs specific (matches affiliate infrastructure and disclosure phrases, not
+ * the bare word "affiliate"), because the safe failure is a miss: when unsure we
+ * simply do not mention money.
+ *
+ * @return array{is_affiliate: bool, signals: array<int,string>}
+ */
+function editorial_detect_affiliate(string $html): array
+{
+    $signals = [];
+    if ($html === '') {
+        return ['is_affiliate' => false, 'signals' => $signals];
+    }
+
+    // 1) Known affiliate-network domains / redirectors appearing in the page.
+    //    These strings essentially never appear except as affiliate links.
+    $networks = [
+        'amzn.to', 'shareasale.com', 'anrdoezrs.net', 'dpbolvw.net', 'jdoqocy.com',
+        'tkqlhkg.com', 'kqzyfj.com', 'linksynergy.com', 'awin1.com', 'impactradius',
+        'partnerstack', 'refersion.com', 'tapfiliate.com', 'avantlink.com',
+        'skimresources.com', 'redirectingat.com', 'gopjn.com', 'pntra.com',
+        'hop.clickbank.net', 'shopstyle.com', 'rstyle.me',
+    ];
+    foreach ($networks as $n) {
+        if (stripos($html, $n) !== false) {
+            $signals[] = 'network';
+            break;
+        }
+    }
+
+    // Amazon associate tag on an amazon.* product link.
+    if (preg_match('/amazon\.[a-z.]+\/[^"\']*[?&]tag=/i', $html)) {
+        $signals[] = 'amazon-tag';
+    }
+
+    // 2) Affiliate/cloaking query params on outbound links. Deliberately omits
+    //    generic ones like ref= and partner= that non-affiliate links also use.
+    if (preg_match('/href=["\'][^"\']*[?&](?:aff|affid|affiliate|a_aid|fpr|irclickid|clickid|subid|pubid)=/i', $html)) {
+        $signals[] = 'param';
+    }
+
+    // 3) rel="sponsored" (Google's designated rel for affiliate/paid links).
+    if (preg_match('/rel=["\'][^"\']*\bsponsored\b/i', $html)) {
+        $signals[] = 'rel-sponsored';
+    }
+
+    // 4) Affiliate-disclosure phrases (specific wording, not the bare word
+    //    "affiliate", so a nav link to a site's own "Affiliate Program" is ignored).
+    $phrases = [
+        'we may earn a commission', 'we earn a commission', 'may earn a commission',
+        'earn from qualifying purchases', 'affiliate link', 'affiliate commission',
+        'at no additional cost to you', 'at no extra cost to you',
+        'advertiser disclosure', 'we may be compensated', 'may receive compensation',
+        'earn a small commission',
+    ];
+    foreach ($phrases as $p) {
+        if (stripos($html, $p) !== false) {
+            $signals[] = 'disclosure';
+            break;
+        }
+    }
+
+    return ['is_affiliate' => !empty($signals), 'signals' => $signals];
+}
+
+/**
  * Hunter.io Email Finder: given an outlet domain and an author's full name,
  * return ['email' => string, 'score' => int] or null. Best-effort; never throws.
  */
@@ -176,7 +248,7 @@ function evaluate_editorial_candidate(string $url, PDO $pdo, string $serpTitle =
 You analyze a web page to decide if it is a "best/top software" ROUNDUP article
 (a listicle comparing several accounting, bookkeeping, or invoicing tools) and to
 pull structured facts from it. Return ONLY a JSON object with exactly these keys:
-{"is_roundup": boolean, "article_title": string|null, "outlet_name": string|null, "author_name": string|null, "listed_tools": string[], "mentions_argo_books": boolean, "article_angle": string|null}
+{"is_roundup": boolean, "article_title": string|null, "outlet_name": string|null, "author_name": string|null, "listed_tools": string[], "mentions_argo_books": boolean, "article_angle": string|null, "is_affiliate_monetized": boolean}
 
 - is_roundup: true only if the page lists and compares MULTIPLE distinct software
   products (e.g. "10 best free accounting tools"). A single-product page, a
@@ -190,6 +262,7 @@ pull structured facts from it. Return ONLY a JSON object with exactly these keys
 - listed_tools: the software product names the article lists (e.g. ["Wave","Zoho Books","FreshBooks"]). Empty array if none.
 - mentions_argo_books: true if "Argo Books" is already listed or named on the page.
 - article_angle: one short phrase describing the list's focus (e.g. "free tools for freelancers").
+- is_affiliate_monetized: true if the page shows it earns affiliate commissions from the tools it links to (e.g. an affiliate/advertiser disclosure, wording like "we may earn a commission", "affiliate links", or "at no cost to you"). false for a genuinely neutral article with no such disclosure.
 No preamble, JSON only.
 PROMPT;
 
@@ -212,6 +285,13 @@ PROMPT;
     $angle     = trim((string) ($parsed['article_angle'] ?? ''));
     $mentions  = !empty($parsed['mentions_argo_books']);
 
+    // Affiliate-monetized? Combine the AI's read (semantic, first 3000 chars) with
+    // a deterministic scan of the full raw HTML (affiliate networks, rel=sponsored,
+    // disclosure phrases). Either signal is enough; gates the affiliate-program
+    // offer in the pitch so it only goes to sites that actually run affiliate links.
+    $detAffiliate = editorial_detect_affiliate($fetched['html'] ?? '');
+    $isAffiliate  = !empty($parsed['is_affiliate_monetized']) || $detAffiliate['is_affiliate'];
+
     $baseMeta = [
         'article_title' => mb_substr($articleTitle, 0, 200),
         'outlet_name'  => mb_substr($outlet, 0, 150),
@@ -219,6 +299,7 @@ PROMPT;
         'listed_tools' => $tools,
         'article_angle' => mb_substr($angle, 0, 200),
         'domain'       => $domain,
+        'is_affiliate_monetized' => $isAffiliate,
     ];
 
     // $force skips the roundup/mentions gates: a URL the operator adds by hand is
@@ -265,6 +346,7 @@ PROMPT;
         . ($author !== '' ? " by {$author}" : '')
         . ". Already lists: {$toolList}."
         . ($angle !== '' ? " Focus: {$angle}." : '')
+        . ($isAffiliate ? ' This roundup is monetized with affiliate links.' : '')
         . " Argo Books is NOT yet included. Goal: get it added to the list.";
 
     $meta = $baseMeta + [

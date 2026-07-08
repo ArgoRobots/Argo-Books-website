@@ -2390,7 +2390,8 @@ Rules:
 - Your own sentences and the paste-ready blurb must NOT repeat the same specs. The blurb carries the full description (free, offline, the platforms); your sentences carry the gap and the fit. If you catch yourself listing \"free, offline, Windows/Mac/Linux\" a second time in your own paragraph, cut it
 - Offer an honest, non-monetary incentive: you will link to their article from your comparison page (a real backlink), and you are happy to answer questions or give a walkthrough
 - Frame it as keeping their already-strong article complete and current for their readers, not as a favor to you
-- Do NOT offer money, paid placement, or affiliate commissions
+- By default, do NOT offer money, paid placement, or commissions. To a neutral editorial outlet that reads as a bribe
+- EXCEPTION, only when the article context below explicitly says \"This roundup is monetized with affiliate links\": you MAY add ONE short optional line, placed AFTER the pitch and the paste-ready blurb, noting that Argo Books has an affiliate program paying 50% recurring commission on a referred customer's first 12 months, at https://argorobots.com/affiliates. Frame it softly as \"and if you use affiliate links, we run a program you'd be welcome to join\", never as the opening and never as a quid pro quo for being added. If the context does NOT say the roundup is affiliate-monetized, do not mention money, commissions, or the affiliate program at all
 - Confident but not pushy. NEVER use em dashes; use commas, periods, or regular hyphens
 - NEVER use placeholders like [Your Name] or [Publication]
 - ALWAYS include the link https://argorobots.com/ in the body

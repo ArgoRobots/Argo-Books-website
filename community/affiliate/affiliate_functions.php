@@ -12,6 +12,23 @@
  */
 
 require_once __DIR__ . '/../../db_connect.php';
+require_once __DIR__ . '/../../config/pricing.php';
+
+if (!function_exists('affiliate_processing_fee_config')) {
+    /**
+     * Processing-fee rate applied to subscription charges, used to strip the
+     * fee back out so commission is paid on the subscription price only. Returns
+     * ['percent' => float, 'fixed' => float].
+     */
+    function affiliate_processing_fee_config(): array
+    {
+        $cfg = function_exists('get_pricing_config') ? get_pricing_config() : [];
+        return [
+            'percent' => (float) ($cfg['processing_fee_percent'] ?? 0),
+            'fixed'   => (float) ($cfg['processing_fee_fixed'] ?? 0),
+        ];
+    }
+}
 
 if (!function_exists('compute_commission')) {
     /**
@@ -27,9 +44,13 @@ if (!function_exists('compute_commission')) {
      * @param float  $rate       e.g. 0.5 for 50%
      * @param int    $window_months Commission window length in months
      * @param string $environment   Only payments in this environment count
+     * @param float  $fee_percent   Processing-fee percent that was added to each
+     *                              charge (stripped so commission is on the
+     *                              subscription price, not the fee)
+     * @param float  $fee_fixed     Fixed processing-fee amount added to each charge
      * @return float Commission earned, rounded to 2 decimals
      */
-    function compute_commission(array $payments, string $start_date, float $rate, int $window_months, string $environment): float
+    function compute_commission(array $payments, string $start_date, float $rate, int $window_months, string $environment, float $fee_percent = 0.0, float $fee_fixed = 0.0): float
     {
         $start = strtotime($start_date);
         if ($start === false) {
@@ -39,7 +60,7 @@ if (!function_exists('compute_commission')) {
         // a relative "+N months" matches MySQL DATE_ADD(..., INTERVAL N MONTH).
         $window_end = strtotime('+' . $window_months . ' months', $start);
 
-        $base = 0.0;
+        $base_total = 0.0;
         foreach ($payments as $p) {
             if (($p['status'] ?? '') !== 'completed') {
                 continue; // excludes pending / failed / refunded
@@ -51,10 +72,14 @@ if (!function_exists('compute_commission')) {
             if ($when === false || $when < $start || $when >= $window_end) {
                 continue; // outside the per-subscription commission window
             }
-            $base += (float) $p['amount'];
+            // The charged amount = subscription price + processing fee. Reverse
+            // the fee (amount = base*(1+pct/100) + fixed) so commission is paid
+            // on the subscription price only. Floor at 0 for credit/$0 charges.
+            $base = round(((float) $p['amount'] - $fee_fixed) / (1 + $fee_percent / 100), 2);
+            $base_total += max(0.0, $base);
         }
 
-        return round($base * $rate, 2);
+        return round($base_total * $rate, 2);
     }
 }
 
@@ -77,8 +102,13 @@ if (!function_exists('affiliate_earned_for_source')) {
     {
         global $pdo;
 
+        $fee = affiliate_processing_fee_config();
+
+        // Strip the processing fee from each charge (amount = base*(1+pct/100) +
+        // fixed) so commission is paid on the subscription price, not the fee.
+        // GREATEST(..., 0) guards credit/$0 charges from going negative.
         $sql = "
-            SELECT COALESCE(SUM(p.amount), 0) AS earned_base
+            SELECT COALESCE(SUM(GREATEST(ROUND((p.amount - :fee_fixed) / (1 + :fee_pct / 100), 2), 0)), 0) AS earned_base
             FROM (
                 SELECT DISTINCT subscription_id
                 FROM referral_events
@@ -100,12 +130,14 @@ if (!function_exists('affiliate_earned_for_source')) {
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
-            ':src'      => $source_code,
-            ':env'      => $environment,
-            ':env2'     => $environment,
-            ':env3'     => $environment,
-            ':aff_user' => $affiliate_user_id,
-            ':win'      => $window_months,
+            ':src'       => $source_code,
+            ':env'       => $environment,
+            ':env2'      => $environment,
+            ':env3'      => $environment,
+            ':aff_user'  => $affiliate_user_id,
+            ':win'       => $window_months,
+            ':fee_fixed' => $fee['fixed'],
+            ':fee_pct'   => $fee['percent'],
         ]);
         $base = (float) ($stmt->fetchColumn() ?: 0);
 

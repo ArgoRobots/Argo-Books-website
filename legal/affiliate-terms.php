@@ -80,10 +80,11 @@
 
             <h2>Commissions</h2>
             <ul>
-                <li>You earn <strong>50% of every completed payment</strong> made by a customer you refer, for
-                    the <strong>first 12 months</strong> of that customer's subscription. This includes the
-                    initial payment and renewals within that window.</li>
-                <li>Commission is calculated on the amount actually collected, in Canadian dollars (CAD).</li>
+                <li>You earn <strong>50% of the subscription price</strong> on every completed payment made by a
+                    customer you refer, for the <strong>first 12 months</strong> of that customer's subscription.
+                    This includes the initial payment and renewals within that window.</li>
+                <li>Commission is calculated on the subscription price, before payment processing fees, in
+                    Canadian dollars (CAD).</li>
                 <li>Commission is earned only on genuine, completed payments. Payments that are pending, failed,
                     or refunded do not earn commission.</li>
             </ul>

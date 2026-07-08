@@ -225,7 +225,7 @@ if ($status === 'approved') {
                     </div>
                 </div>
 
-                <p class="aff-fineprint">Figures shown are your gross commission in CAD: 50% of every completed payment within the first 12 months of each referred subscription. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/" class="link">Contact us</a>.</p>
+                <p class="aff-fineprint">Figures shown are your gross commission in CAD: 50% of the subscription price, before payment processing fees, for the first 12 months of each referred subscription. Payouts are sent by PayPal to <strong><?php echo htmlspecialchars($affiliate['payout_email'] ?: $user['email']); ?></strong>. If your PayPal account receives money in a different currency or country, PayPal's currency-conversion and cross-border fees apply and are taken out of the amount you receive, they are not covered by Argo Books. Receiving in CAD avoids these fees. See the <a href="../../legal/affiliate-terms.php" target="_blank" rel="noopener" class="link">Affiliate Program Terms</a>. Questions? <a href="../../contact-us/" class="link">Contact us</a>.</p>
 
             <?php else: // pending / rejected / suspended ?>
                 <section class="aff-card aff-status">

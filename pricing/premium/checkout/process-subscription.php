@@ -872,6 +872,13 @@ try {
         $referralSource = $_SESSION['referral_source'] ?? null;
         $visitorId      = $_COOKIE[ARGO_VISITOR_COOKIE] ?? null;
 
+        // The session value is lost if the buyer created their account or logged
+        // in between landing and paying (both reset the PHP session), so fall
+        // back to the durable visitor cookie's first-touch source.
+        if (empty($referralSource) && !empty($visitorId)) {
+            $referralSource = get_referral_source_for_visitor($visitorId);
+        }
+
         if (!empty($referralSource)) {
             try {
                 $refStmt = $pdo->prepare("UPDATE referral_visits SET converted = 1, license_key = ? WHERE source_code = ? AND converted = 0 ORDER BY visited_at DESC LIMIT 1");

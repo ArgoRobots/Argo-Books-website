@@ -259,16 +259,27 @@ if ($status === 'approved') {
         function copyRefLink() {
             const input = document.getElementById('refLink');
             const btn = document.getElementById('copyBtn');
-            input.select();
-            input.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(input.value).then(function () {
+            function showCopied() {
                 btn.textContent = 'Copied';
                 btn.classList.add('copied');
                 setTimeout(function () {
                     btn.textContent = 'Copy link';
                     btn.classList.remove('copied');
                 }, 1600);
-            });
+            }
+            // Clipboard API copies without touching the text selection. Only the
+            // legacy fallback needs to select the field.
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(input.value).then(showCopied).catch(function () {
+                    input.select();
+                    document.execCommand('copy');
+                    showCopied();
+                });
+            } else {
+                input.select();
+                document.execCommand('copy');
+                showCopied();
+            }
         }
     </script>
 </body>

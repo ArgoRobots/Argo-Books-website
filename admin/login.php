@@ -7,6 +7,25 @@ require_once __DIR__ . '/../rate_limit_helper.php';
 require_once __DIR__ . '/settings/2fa.php';
 require_once __DIR__ . '/trusted_devices.php';
 
+/**
+ * Where to send an admin after a successful login: back to the admin page they
+ * were trying to reach (captured in admin_session.php), else the dashboard.
+ * Validated as a local admin path so it can't become an open redirect.
+ */
+function admin_login_destination(): string
+{
+    $r = $_SESSION['admin_return_to'] ?? '';
+    unset($_SESSION['admin_return_to']);
+    if (is_string($r) && $r !== ''
+        && preg_match('#^/[^/\\\\]#', $r)      // local absolute path, not //
+        && !preg_match('#[:\s]#', $r)          // no scheme or whitespace
+        && strpos($r, '/admin/') !== false     // must be an admin page
+        && strpos($r, '/login.php') === false) {
+        return $r;
+    }
+    return 'index.php';
+}
+
 // Check if user is already logged in
 if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
     header('Location: index.php');
@@ -66,7 +85,7 @@ if (isset($_SESSION['awaiting_2fa']) && $_SESSION['awaiting_2fa'] === true) {
                     $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                     $stmt->execute([$username]);
 
-                    header('Location: index.php');
+                    header('Location: ' . admin_login_destination());
                     exit;
                 } else {
                     $error = 'Invalid verification code. Please try again.';
@@ -118,7 +137,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                     $stmt->execute([$actual_username]);
 
-                    header('Location: index.php');
+                    header('Location: ' . admin_login_destination());
                     exit;
                 }
 
@@ -140,7 +159,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 $stmt = $pdo->prepare('UPDATE admin_users SET last_login = CURRENT_TIMESTAMP WHERE username = ?');
                 $stmt->execute([$actual_username]);
 
-                header('Location: index.php');
+                header('Location: ' . admin_login_destination());
                 exit;
             }
         } else {

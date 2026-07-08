@@ -121,9 +121,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } // end rate limit check
 }
 
-// If verification is successful, redirect to profile
+// On success, return the user to the page they were trying to reach before
+// signing up (set by require_login), otherwise their profile. Same validation
+// as login.php: only local, non-protocol-relative paths are honored.
 if ($success) {
-    header('Location: profile.php');
+    if (!empty($_SESSION['redirect_after_login'])) {
+        $redirect = $_SESSION['redirect_after_login'];
+        unset($_SESSION['redirect_after_login']);
+        if (preg_match('#^/[^/\\\\]#', $redirect) && !preg_match('#[:\s]#', $redirect)) {
+            header("Location: $redirect");
+        } else {
+            header('Location: profile.php');
+        }
+    } else {
+        header('Location: profile.php');
+    }
     exit;
 }
 

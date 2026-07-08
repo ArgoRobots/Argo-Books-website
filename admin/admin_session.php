@@ -60,3 +60,15 @@ session_set_cookie_params([
 ]);
 
 session_start();
+
+// Remember the admin page currently being requested so the login page can send
+// the admin back here after they re-authenticate. Skip the login/logout
+// endpoints (so we never bounce back to them) and non-GET requests (so form
+// posts and AJAX endpoints aren't treated as "the page to return to").
+$admin_request_uri = $_SERVER['REQUEST_URI'] ?? '';
+if ($admin_request_uri !== ''
+    && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+    && strpos($admin_request_uri, '/login.php') === false
+    && strpos($admin_request_uri, '/logout.php') === false) {
+    $_SESSION['admin_return_to'] = $admin_request_uri;
+}

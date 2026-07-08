@@ -3,9 +3,24 @@ session_start();
 require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/user_functions.php';
 
+// Carry a return target through the signup flow (register -> verify_code),
+// e.g. register.php?redirect=/pricing/premium/. Validated as a local path.
+if (isset($_GET['redirect']) && is_string($_GET['redirect'])
+    && preg_match('#^/[^/\\\\]#', $_GET['redirect'])
+    && !preg_match('#[:\s]#', $_GET['redirect'])) {
+    $_SESSION['redirect_after_login'] = $_GET['redirect'];
+}
+
 // Redirect if already logged in
 if (is_user_logged_in()) {
-    header('Location: profile.php');
+    $dest = 'profile.php';
+    if (!empty($_SESSION['redirect_after_login'])
+        && preg_match('#^/[^/\\\\]#', $_SESSION['redirect_after_login'])
+        && !preg_match('#[:\s]#', $_SESSION['redirect_after_login'])) {
+        $dest = $_SESSION['redirect_after_login'];
+    }
+    unset($_SESSION['redirect_after_login']);
+    header('Location: ' . $dest);
     exit;
 }
 

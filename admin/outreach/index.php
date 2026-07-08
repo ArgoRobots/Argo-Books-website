@@ -65,7 +65,7 @@ include __DIR__ . '/../admin_header.php';
 // everything else (including legacy URLs without a tab param) maps to email.
 $redditTabs = ['reddit-threads', 'reddit-settings'];
 $activeChannel = $_GET['channel'] ?? (in_array($activeTab, $redditTabs, true) ? 'reddit' : 'email');
-if (!in_array($activeChannel, ['email', 'reddit', 'editorial'], true)) {
+if (!in_array($activeChannel, ['email', 'reddit', 'editorial', 'creator'], true)) {
     $activeChannel = 'email';
 }
 ?>
@@ -75,6 +75,7 @@ if (!in_array($activeChannel, ['email', 'reddit', 'editorial'], true)) {
     <button class="channel-tab <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel="email">Email</button>
     <button class="channel-tab <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel="reddit">Reddit</button>
     <button class="channel-tab <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel="editorial">Editorial</button>
+    <button class="channel-tab <?php echo $activeChannel === 'creator' ? 'active' : ''; ?>" data-channel="creator">Partners</button>
 </div>
 
 <!-- Email channel -->
@@ -602,6 +603,156 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
         </div>
     </div>
 </div> <!-- /.channel-pane[data-channel-pane="editorial"] -->
+
+<div class="channel-pane <?php echo $activeChannel === 'creator' ? 'active' : ''; ?>" data-channel-pane="creator">
+
+    <div class="section-tabs">
+        <button class="section-tab active" data-tab="creator-discovery">Discovery</button>
+        <button class="section-tab" data-tab="creator-leads">Leads</button>
+    </div>
+
+    <div id="creator-discovery" class="tab-content active">
+        <div class="panel discovery-panel">
+            <div class="panel-header" onclick="togglePanel('creatorContent')">
+                <h2><?= svg_icon('search', 18) ?> Creators / Affiliate Partners</h2>
+                <span class="panel-toggle" id="creatorToggle">&#9660;</span>
+            </div>
+            <div class="panel-content" id="creatorContent">
+                <div class="discovery-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="creatorLimit">How many creators to find</label>
+                            <input type="number" id="creatorLimit" value="8" min="1" max="30">
+                        </div>
+                        <div class="form-group form-group-btn">
+                            <button class="btn btn-blue" onclick="runCreatorDiscovery()" id="creatorRunBtn">Run</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
+                        Finds YouTubers, newsletter writers, and niche bloggers whose audience is small businesses and freelancers, then drafts an affiliate-partner pitch (50% recurring). Emails are harvested from linked sites where possible; YouTube emails are captcha-gated, so those come in without one for manual or assisted contact. SerpAPI usage today: <span id="creatorSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="creatorHunterState">&hellip;</span>.
+                    </p>
+
+                    <div class="form-row" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color, #e2e8f0);">
+                        <div class="form-group" style="flex:1;">
+                            <label for="creatorUrl">Or add a specific creator URL (YouTube channel, newsletter, blog, LinkedIn)</label>
+                            <input type="text" id="creatorUrl" placeholder="https://youtube.com/@somechannel" style="width:100%;">
+                        </div>
+                        <div class="form-group form-group-btn">
+                            <button class="btn btn-blue" onclick="addCreatorUrl()" id="creatorAddBtn">Add</button>
+                        </div>
+                    </div>
+                    <p class="text-muted" style="margin:8px 0 0; font-size:12px; text-align:center;">
+                        Researches the creator and scrapes a contact email if one is public, then adds them to your Leads. LinkedIn profiles are added as a manual list (no email, no auto-draft).
+                    </p>
+                </div>
+
+                <div id="creatorResults" style="display:none; margin-top:16px;">
+                    <div class="discovery-actions">
+                        <span id="creatorResultsCount">0 results</span>
+                        <div>
+                            <button class="btn btn-small btn-blue" onclick="importAllCreatorFits()" id="creatorImportAllBtn">Import All Fits</button>
+                        </div>
+                    </div>
+                    <div class="discovery-table-wrapper">
+                        <table class="data-table discovery-table" data-paginate="25">
+                            <thead>
+                                <tr>
+                                    <th>Creator</th>
+                                    <th>Platform</th>
+                                    <th>Audience</th>
+                                    <th>Email</th>
+                                    <th>Profile</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="creatorResultsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-muted" style="margin-top:12px; font-size:13px;">
+            Imported creators become leads in the <strong>Leads</strong> tab above, where you review the AI-drafted affiliate pitch and send it. Keep Send mode on Review-before-send.
+        </p>
+    </div>
+
+    <div id="creator-leads" class="tab-content">
+        <!-- Filters -->
+        <div class="control-bar">
+            <div class="control-group">
+                <span class="control-label">Search</span>
+                <input type="text" class="control-input" id="crFilterSearch" placeholder="Creator, email..." oninput="debounceLoadCreatorLeads()">
+            </div>
+            <div class="control-group">
+                <span class="control-label">Status</span>
+                <select class="control-select" id="crFilterStatus" onchange="loadCreatorLeads()">
+                    <option value="">All</option>
+                    <option value="new">New</option>
+                    <option value="draft_generated">Draft Generated</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="replied">Replied</option>
+                    <option value="interested">Interested</option>
+                    <option value="not_interested">Not Interested</option>
+                    <option value="onboarded">Onboarded</option>
+                    <option value="disqualified">Disqualified</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Response</span>
+                <select class="control-select" id="crFilterResponse" onchange="loadCreatorLeads()">
+                    <option value="">All</option>
+                    <option value="no_response">No Response</option>
+                    <option value="positive">Positive</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="negative">Negative</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <span class="control-label">Sort</span>
+                <select class="control-select" id="crFilterSort" onchange="loadCreatorLeads()">
+                    <option value="date_added_desc">Newest First</option>
+                    <option value="date_added_asc">Oldest First</option>
+                    <option value="last_contact_desc">Last Contacted</option>
+                    <option value="business_name_asc">Name A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions-bar" id="crBulkActionsBar" style="display:none;">
+            <span><strong id="crSelectedCount">0</strong> selected</span>
+            <button class="btn btn-small btn-blue" id="crBtnDraftSelected" onclick="bulkGenerateCreatorDrafts()">Draft Selected</button>
+            <button class="btn btn-small btn-blue" onclick="openCreatorBulkSend()">Send Email</button>
+            <button class="btn btn-small btn-blue" onclick="bulkDeleteCreatorLeads()">Delete Selected</button>
+        </div>
+
+        <!-- Bulk Draft Progress -->
+        <div class="bulk-draft-progress" id="crBulkDraftProgress" style="display:none;">
+            <span class="bulk-draft-spinner"></span>
+            <span id="crBulkDraftProgressText"></span>
+            <button class="btn btn-small btn-neutral" id="crBtnCancelDraft" onclick="cancelBulkDrafts()" style="margin-left:8px;">Cancel</button>
+        </div>
+
+        <div class="leads-table-wrapper">
+            <table class="data-table creator-leads-table">
+                <thead>
+                    <tr>
+                        <th class="checkbox-column"><div class="checkbox"><input type="checkbox" id="crLeadsSelectAll" onchange="toggleCreatorLeadCheckboxes(this)"><label for="crLeadsSelectAll"></label></div></th>
+                        <th>Creator</th>
+                        <th>Platform</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Sent</th>
+                        <th>Clicked</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="creatorLeadsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div> <!-- /.channel-pane[data-channel-pane="creator"] -->
 
 <!-- Lead Detail Modal -->
 <div id="leadDetailModal" class="modal" style="display:none;">

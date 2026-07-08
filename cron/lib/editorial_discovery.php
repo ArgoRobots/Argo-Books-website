@@ -186,9 +186,9 @@ function hunter_find_email(string $domain, string $fullName, string $apiKey): ?a
  *
  * @return array{results: array<int, array{url:string,title:string,snippet:string}>, from_cache: bool}
  */
-function editorial_search(string $query, string $apiKey, int $limit, PDO $pdo): array
+function editorial_search(string $query, string $apiKey, int $limit, PDO $pdo, int $start = 0): array
 {
-    $resp = serpapi_query_cached($query, $apiKey, $limit, $pdo);
+    $resp = serpapi_query_cached($query, $apiKey, $limit, $pdo, $start);
     $out  = [];
     $seen = [];
     foreach ($resp['results'] as $r) {

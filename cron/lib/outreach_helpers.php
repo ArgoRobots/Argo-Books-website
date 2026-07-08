@@ -2178,7 +2178,11 @@ function generate_draft_for_lead($pdo, $lead)
     // AI size gate and the newness gate below don't apply. They also arrive with
     // their article context pre-summarized, so the SMB summary call is skipped.
     $isEditorial = ($sourceVal === 'editorial_auto');
-    $isAutoLead = str_ends_with($sourceVal, '_auto') && !$isEditorial;
+    // Creator/affiliate-partner leads are content creators and publications, not
+    // small businesses, so they skip the SMB size/newness gates just like
+    // editorial. Their pitch is an affiliate-recruitment email, not feedback.
+    $isCreator = ($sourceVal === 'creator_auto');
+    $isAutoLead = str_ends_with($sourceVal, '_auto') && !$isEditorial && !$isCreator;
     if ($isAutoLead) {
         $gate = classify_lead_size_with_ai($lead);
         if (isset($gate['error'])) {
@@ -2324,7 +2328,7 @@ function generate_draft_for_lead($pdo, $lead)
     $summary = $lead['business_summary'] ?? null;
     if ($personalizationOff) {
         $summary = null;
-    } elseif (empty($summary) && !empty($lead['website']) && !$isEditorial) {
+    } elseif (empty($summary) && !empty($lead['website']) && !$isEditorial && !$isCreator) {
         // Reuse the page text fetched by the newness gate above (if any) so we
         // don't fetch the same homepage twice.
         $summary = summarize_business($lead['website'], $prefetchedSiteText);
@@ -2369,7 +2373,38 @@ function generate_draft_for_lead($pdo, $lead)
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
-    if ($isEditorial) {
+    if ($isCreator) {
+        $systemPrompt = "You are helping write a short, genuine outreach email from Evan, the developer behind Argo Books, to a content creator or publication (a YouTuber, newsletter writer, or blogger) whose audience is small-business owners and freelancers. The goal is to recruit them as an AFFILIATE PARTNER who promotes Argo Books to their audience.
+
+About Argo Books:
+- A free, simple bookkeeping and invoicing app for small businesses, built so you need no accounting knowledge
+- Runs on Windows, macOS, and Linux, and works offline as a desktop app so your data stays on your computer
+- Genuinely free tier with no user cap; a paid Premium tier exists but the core is free
+- Made by Evan, a solo independent developer
+
+The affiliate offer:
+- 50% recurring commission on a referred customer's first 12 months of Premium
+- Free to join, real-time dashboard, PayPal payouts
+- Sign-up page: https://argorobots.com/affiliates
+
+Rules:
+- Keep it short (2-3 short paragraphs, under 130 words). Sound like one human emailing another, not a mass affiliate blast
+- Address the creator by name/handle if given in the context; otherwise a warm \"Hi there\"
+- First sentence: reference specifically what they do / who their audience is (from the context), so it is clearly not a mass mailing. Do NOT open with generic flattery like \"I love your content\"
+- Say briefly why Argo Books fits THEIR audience (free, no accounting knowledge needed, works offline), then make the affiliate offer plainly: 50% recurring for a referred customer's first 12 months
+- Include the sign-up link https://argorobots.com/affiliates
+- Be honest and low-pressure. It is a genuine partnership offer, not hype. Do NOT promise they will make a specific amount of money
+- NEVER use em dashes; use commas, periods, or regular hyphens. NEVER use placeholders like [Your Name]
+- The subject line should read like a real person proposing a partnership. Under 8 words. Good: \"partnership idea for your audience\", \"affiliate offer for [creator]\". Avoid salesy hooks$abSubjectOverride
+- End with a friendly line inviting a reply, then the sign-off
+- After the reply line, add ONE short, respectful opt-out line on its own paragraph: \"Not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include the literal token {UNSUBSCRIBE_URL} verbatim; it is replaced with a real tracked link before sending
+- Sign off with three separate lines: \"Thanks,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
+
+Return your response as JSON with two fields:
+{\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
+
+Return ONLY the JSON object, nothing else.";
+    } elseif ($isEditorial) {
         $systemPrompt = "You are helping write a short, genuine outreach email from Evan, the developer behind Argo Books, to the author or editor of a published \"best software\" roundup article. The goal is to get Argo Books added to their list.
 
 About Argo Books:
@@ -2451,7 +2486,12 @@ Return your response as JSON with two fields:
 Return ONLY the JSON, no other text.";
     }
 
-    if ($isEditorial) {
+    if ($isCreator) {
+        $details = "Creator / Publication: {$lead['business_name']}";
+        if (!empty($lead['contact_name'])) $details .= "\nName/handle: {$lead['contact_name']}";
+        if (!empty($lead['website'])) $details .= "\nProfile/channel URL: {$lead['website']}";
+        if ($summary) $details .= "\nContext (platform, audience, what they cover): $summary";
+    } elseif ($isEditorial) {
         $details = "Outlet / Publication: {$lead['business_name']}";
         if (!empty($lead['contact_name'])) $details .= "\nAuthor: {$lead['contact_name']}";
         if (!empty($lead['website'])) $details .= "\nArticle URL: {$lead['website']}";

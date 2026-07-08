@@ -1108,6 +1108,29 @@ CREATE TABLE IF NOT EXISTS outreach_editorial_candidates (
     INDEX idx_lead (lead_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Dedup/audit table for the Creators / affiliate-partner discovery channel
+-- (YouTubers, newsletter writers, niche bloggers, and LinkedIn profiles found by
+-- cron/lib/creator_discovery.php). Mirrors outreach_editorial_candidates: one row
+-- per canonical creator URL, status tracks imported/rejected so repeat runs skip
+-- already-handled candidates. platform records youtube/newsletter/blog/linkedin.
+CREATE TABLE IF NOT EXISTS outreach_creator_candidates (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    canonical_url VARCHAR(500) NOT NULL,
+    status ENUM('imported','rejected','error','pending') NOT NULL DEFAULT 'pending',
+    reject_reason VARCHAR(100) DEFAULT NULL,
+    reject_detail VARCHAR(500) DEFAULT NULL,
+    platform VARCHAR(20) DEFAULT NULL,
+    creator_name VARCHAR(150) DEFAULT NULL,
+    harvested_email VARCHAR(255) DEFAULT NULL,
+    lead_id INT DEFAULT NULL,
+    last_query VARCHAR(255) DEFAULT NULL,
+    checked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_canonical_url (canonical_url),
+    INDEX idx_status_checked (status, checked_at),
+    INDEX idx_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Key/value state for the outreach pipeline: master kill-switch
 -- (outreach_enabled), auto-send mode, follow-up sequence config, and other
 -- runtime flags. Read/written via getState/setState in cron/outreach_pipeline.php

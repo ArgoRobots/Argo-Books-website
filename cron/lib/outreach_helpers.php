@@ -2374,73 +2374,45 @@ function generate_draft_for_lead($pdo, $lead)
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
     if ($isCreator) {
-        $systemPrompt = "You are helping write a short, genuine outreach email from Evan, the developer behind Argo Books, to a content creator or publication (a YouTuber, newsletter writer, or blogger) whose audience is small-business owners and freelancers. The goal is to recruit them as an AFFILIATE PARTNER who promotes Argo Books to their audience.
+        $systemPrompt = "Write a short, genuine outreach email from Evan, the solo developer of Argo Books, to a YouTuber or newsletter writer whose audience is small-business owners and freelancers, to recruit them as an AFFILIATE PARTNER who promotes Argo Books.
 
-About Argo Books:
-- A free, simple bookkeeping and invoicing app for small businesses, built so you need no accounting knowledge
-- Runs on Windows, macOS, and Linux, and works offline as a desktop app so your data stays on your computer
-- Genuinely free tier with no user cap; a paid Premium tier exists but the core is free
-- Made by Evan, a solo independent developer
-
-The affiliate offer:
-- 50% recurring commission on a referred customer's first 12 months of Premium
-- Free to join, real-time dashboard, PayPal payouts
-- Sign-up page: https://argorobots.com/affiliates
+Argo Books: a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. Runs offline on Windows, macOS, and Linux. Genuinely free tier with no user cap; paid Premium exists but the core is free.
+Affiliate offer: 50% recurring commission on a referral's first 12 months of Premium. Free to join, real-time dashboard, PayPal payouts. Sign up: https://argorobots.com/affiliates.
 
 Rules:
-- Keep it short (2-3 short paragraphs, under 130 words). Sound like one human emailing another, not a mass affiliate blast
-- Address the creator by handle if a clean @handle is given in the context; otherwise a warm \"Hi there\"
-- First sentence: reference something SPECIFIC they cover, using a concrete topic from the context's \"Covers:\" topics list (e.g. \"your videos on invoicing for freelancers\" or \"your content on freelance taxes\"), then connect it to Argo Books. Citing a real topic they cover is what makes the email clearly not a blast, so prefer a specific topic over a generic audience line. Only if NO specific topic is given, fall back to their audience. Do NOT open with generic flattery like \"I love your content\", and do NOT settle for \"your audience is small businesses\" when a specific topic is available
-- NEVER quote a specific video title, article title, or the raw creator \"name\" field: it is often a truncated video headline and quoting it looks like a bot. Refer to the channel generically (\"your channel\", \"your audience\") and describe what they cover, do not paste a title in quotes
-- Say briefly why Argo Books fits THEIR audience (free, no accounting knowledge needed, works offline), then make the affiliate offer plainly: 50% recurring for a referred customer's first 12 months
-- CRITICAL logic: commission is earned ONLY when a referred user upgrades to the paid Premium tier, never on free users. Do NOT imply they earn money from the free tier. Tie the two together coherently: the free tier is the low-friction hook that gets their audience to actually sign up and use it (a free tool converts far more of an audience than a paid one), and they earn 50% recurring whenever one of those users upgrades to Premium. Never present \"free tier\" and \"50% commission\" as two disconnected selling points
-- Include the sign-up link https://argorobots.com/affiliates
-- Be honest and low-pressure. It is a genuine partnership offer, not hype. Do NOT promise they will make a specific amount of money
-- NEVER use em dashes; use commas, periods, or regular hyphens. NEVER use placeholders like [Your Name]
-- The subject line should read like a real person proposing a partnership. Under 8 words. Good: \"partnership idea for your audience\", \"affiliate offer for [creator]\". Avoid salesy hooks$abSubjectOverride
-- End with a friendly line inviting a reply, then the sign-off
-- After the reply line, add ONE short, respectful opt-out line on its own paragraph: \"Not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include the literal token {UNSUBSCRIBE_URL} verbatim; it is replaced with a real tracked link before sending
-- Sign off with three separate lines: \"Thanks,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
+- Under 130 words, 2-3 short paragraphs, one human to another (not a mass blast). No em dashes (use commas/periods). No placeholders like [Name].
+- Greeting: \"Hi <@handle>\" if a clean handle is given, otherwise \"Hi there\".
+- Open by referencing a SPECIFIC topic they cover from the context's \"Covers:\" list (e.g. \"your videos on invoicing for freelancers\"), then connect it to Argo. Fall back to their audience only if no topic is given. No flattery like \"I love your content\".
+- NEVER quote a video/article title or the raw creator \"name\" field (often a truncated headline). Refer to the channel generically (\"your channel\").
+- Briefly say why Argo fits their audience, then make the offer: 50% recurring on a referral's first 12 months.
+- Commission is earned ONLY when a referred user upgrades to paid Premium, never on free users. Do NOT imply they earn on free users. Frame it coherently: the free tier is the low-friction hook that drives signups, and they earn 50% recurring on whoever upgrades. Never present \"free\" and \"50%\" as two disconnected points.
+- Include the sign-up link https://argorobots.com/affiliates. Be honest and low-pressure; do NOT promise a specific dollar amount.
+- End with a friendly line inviting a reply, then one opt-out line on its own paragraph: \"Not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include {UNSUBSCRIBE_URL} verbatim.
+- Sign off on three lines: \"Thanks,\" then \"Evan\" then \"Argo Books\".
+- Subject: like a real person proposing a partnership, under 8 words, no salesy hooks (good: \"partnership idea for your audience\").$abSubjectOverride$abBodyOverride
 
-Return your response as JSON with two fields:
-{\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
-
-Return ONLY the JSON object, nothing else.";
+Return ONLY a JSON object: {\"subject\": \"...\", \"body\": \"the body, plain text, use \\n for line breaks\"}";
     } elseif ($isEditorial) {
-        $systemPrompt = "You are helping write a short, genuine outreach email from Evan, the developer behind Argo Books, to the author or editor of a published \"best software\" roundup article. The goal is to get Argo Books added to their list.
+        $systemPrompt = "Write a short, genuine outreach email from Evan, the solo developer of Argo Books, to the author/editor of a \"best software\" roundup, to get Argo Books added to their list.
 
-About Argo Books:
-- A free, simple bookkeeping and invoicing app for small businesses, built so you need no accounting knowledge
-- Runs on Windows, macOS, and Linux, and works offline as a desktop app so your data stays on your computer
-- Genuinely free tier with no user cap; a paid Premium tier exists but the core is free
-- Made by Evan, a solo independent developer
+Argo Books: a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. Runs offline on Windows, macOS, and Linux (data stays on the user's computer). Genuinely free tier with no user cap; a paid Premium exists but the core is free.
 
-You are given the article, its outlet, the author, and which tools it already lists. Use that to point out a specific gap (for example: their list has no genuinely-free option, nothing that works offline as a desktop app, or nothing that runs on Mac and Linux) that Argo Books fills. When the tools it already lists are provided to you, name one or two of them so it is obvious you actually read the piece.
+You are given the article's title (maybe), outlet, author, and the tools it already lists.
 
 Rules:
-- Keep it short (2-3 short paragraphs, under 120 words). Sound like one human emailing another, not a PR blast
-- Address the author by first name if known (e.g. \"Hi Sarah\"). If no author name is provided, use \"Hi there\", but then the very first sentence MUST name their specific article and the gap, so the opening never reads like a mass mailing
-- First sentence: say you read their specific article and noticed it is missing a certain kind of tool. Do NOT open with generic flattery
-- ARTICLE TITLE: quote a title in quotation marks ONLY if a real one is given in the article context below. NEVER invent, guess, or build a title from the article URL or its slug (do not title-case a URL path). If no real title is provided, refer to the article generically instead (e.g. \"your roundup of free accounting software\" or \"your list of QuickBooks alternatives\"), with no quoted title
-- In your own words, name the gap and why Argo Books fills it, in one or two short sentences. It helps to contrast with a tool the article already lists (for example: \"your list covers Wave and FreshBooks, both cloud and subscription-based, but nothing that runs fully offline as a desktop app\"). Do NOT describe Argo Books feature by feature here
-- Include a short description they can add, but present it as ADAPTABLE, not a fixed sentence to paste verbatim, because roundups are formatted differently (a paragraph per tool, a comparison-table row, pros/cons, not always one sentence). Introduce it like \"Here's a short description you can trim or format to match your list:\" then put it on its own line: \"Argo Books, a free bookkeeping and invoicing app for small businesses that needs no accounting knowledge. Works offline on Windows, Mac, and Linux, with a free tier that has no user limit. https://argorobots.com/\". You may add that you are happy to send the details in whatever format fits their piece
-- Your own sentences and that description must NOT repeat the same specs. The description carries the full facts (free, offline, the platforms); your sentences carry the gap and the fit. If you catch yourself listing \"free, offline, Windows/Mac/Linux\" a second time in your own paragraph, cut it
-- Offer an honest, non-monetary incentive: you are happy to link back to their article from our site where it fits, and to answer questions or give a walkthrough. Do NOT restrict the backlink to one specific page (never say \"only from our comparison page\")
-- Frame it as keeping their already-strong article complete and current for their readers, not as a favor to you
-- By default, do NOT offer money, paid placement, or commissions. To a neutral editorial outlet that reads as a bribe
-- EXCEPTION, only when the article context below explicitly says \"This roundup is monetized with affiliate links\": you MAY add ONE short optional line, placed AFTER the pitch and the paste-ready blurb, noting that Argo Books has an affiliate program paying 50% recurring commission on a referred customer's first 12 months, at https://argorobots.com/affiliates. Frame it softly as \"and if you use affiliate links, we run a program you'd be welcome to join\", never as the opening and never as a quid pro quo for being added. If the context does NOT say the roundup is affiliate-monetized, do not mention money, commissions, or the affiliate program at all
-- Confident but not pushy. NEVER use em dashes; use commas, periods, or regular hyphens
-- NEVER use placeholders like [Your Name] or [Publication]
-- ALWAYS include the link https://argorobots.com/ in the body
-- The subject line should read like a real person emailing about their article. Under 8 words. Good: \"a free option missing from your roundup\", \"quick addition for your accounting software list\". Avoid salesy hooks$abSubjectOverride
-- End with a friendly line inviting a reply, then the sign-off
-- After the reply line, add ONE short, respectful opt-out line on its own paragraph: \"Not the right contact, or not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include the literal token {UNSUBSCRIBE_URL} verbatim; it is replaced with a real tracked link before sending
-- Sign off with three separate lines: \"Thanks,\" then \"Evan\" then \"Argo Books\" (each on its own line, separated by \\n)$abBodyOverride
+- Under 120 words, 2-3 short paragraphs, one human to another (not a PR blast). No em dashes (use commas/periods). No placeholders like [Name]. Confident, not pushy.
+- Greeting: \"Hi <first name>\" if an author name is given, otherwise \"Hi there\".
+- Open by referencing their specific article and a gap you noticed, ideally naming a tool they list (e.g. \"your list covers Wave and FreshBooks, both cloud-only, but nothing that runs offline as a desktop app\"). No flattery.
+- Quote the article title ONLY if a real one is given below; never invent one or build it from a URL. Otherwise refer to it generically (\"your roundup of free accounting software\").
+- Briefly say what Argo is and why it fills the gap (2-3 sentences, no feature dump). Do NOT paste a canned blurb; instead offer to send details in whatever format matches their list.
+- Offer a real backlink to their article from our site where it fits, and to answer questions or do a walkthrough. Frame it as keeping their article complete for readers, not a favor to you.
+- Do NOT offer money or commissions (reads as a bribe) UNLESS the context below says \"This roundup is monetized with affiliate links\", then you MAY add ONE soft optional line after the pitch: Argo has an affiliate program, 50% recurring on a referral's first 12 months, https://argorobots.com/affiliates, framed as \"if you use affiliate links, you'd be welcome to join\", never a quid pro quo.
+- Include the link https://argorobots.com/ in the body.
+- End with a friendly line inviting a reply, then one opt-out line on its own paragraph: \"Not the right contact, or not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include {UNSUBSCRIBE_URL} verbatim.
+- Sign off on three lines: \"Thanks,\" then \"Evan\" then \"Argo Books\".
+- Subject: like a real person emailing about their article, under 8 words, no salesy hooks (good: \"a free option missing from your roundup\").$abSubjectOverride$abBodyOverride
 
-Return your response as JSON with two fields:
-{\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
-
-Return ONLY the JSON object, nothing else.";
+Return ONLY a JSON object: {\"subject\": \"...\", \"body\": \"the body, plain text, use \\n for line breaks\"}";
     } else {
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 

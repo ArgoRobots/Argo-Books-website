@@ -87,7 +87,7 @@ $sizeFeature = isset($data['sizeFeature']) && is_numeric($data['sizeFeature']) ?
 $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 
 // Validate model: Gemini is the only supported provider
-$geminiModels = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-2.0-flash'];
+$geminiModels = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'];
 if (!empty($requestedModel) && !in_array($requestedModel, $geminiModels, true)) {
     send_error_response(400, 'Unsupported model. Supported: ' . implode(', ', $geminiModels), 'INVALID_MODEL');
 }
@@ -97,7 +97,7 @@ if (empty($geminiKey)) {
     send_error_response(500, 'Gemini AI service not configured on server.', 'CONFIG_ERROR');
 }
 
-$model = !empty($requestedModel) ? $requestedModel : ($_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash');
+$model = !empty($requestedModel) ? $requestedModel : ($_ENV['GEMINI_MODEL'] ?? 'gemini-3.1-flash-lite');
 
 // Build Gemini request: https://ai.google.dev/api/generate-content
 $contents = [];

@@ -39,7 +39,7 @@ if (is_rate_limited($rateLimitId, 120, 900, 'ai_priors')) {
 }
 record_rate_limit_attempt($rateLimitId, 'ai_priors');
 
-$model = $_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
+$model = $_ENV['GEMINI_MODEL'] ?? 'gemini-3.1-flash-lite';
 
 // p50/p90 change slowly, so a 1h shared cache is fine. load_factor is recomputed at
 // most every 60s server-side, so occasional client polls still see it move.

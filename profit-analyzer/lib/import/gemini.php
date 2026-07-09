@@ -13,7 +13,9 @@
 // so the two stay behaviourally identical and easy to merge later.
 
 if (!defined('PA_GEMINI_MODEL')) {
-    define('PA_GEMINI_MODEL', 'gemini-2.5-flash');
+    // Financial-import extraction: use the accuracy-tier model like the receipt
+    // scanner and bank extractor.
+    define('PA_GEMINI_MODEL', $_ENV['GEMINI_MODEL_EXTRACTION'] ?? 'gemini-3.5-flash');
 }
 
 /** Loads GEMINI_API_KEY from the project .env if it isn't already in the environment. */

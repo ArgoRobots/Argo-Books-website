@@ -82,7 +82,7 @@ $geminiKey = $_ENV['GEMINI_API_KEY'] ?? '';
 if ($geminiKey === '') {
     send_error_response(500, 'Extraction is not configured on the server.', 'CONFIG_ERROR');
 }
-$model = $_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
+$model = $_ENV['GEMINI_MODEL_EXTRACTION'] ?? 'gemini-3.5-flash';
 
 // --- 5. Upload the PDF to the Gemini Files API (inline_data only supports images). ---
 $fileName = bs_upload_pdf($geminiKey, $pdfBytes);

@@ -155,7 +155,7 @@ if (!$isLocal) {
     }
 }
 
-$model = $_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
+$model = $_ENV['GEMINI_MODEL_EXTRACTION'] ?? 'gemini-3.5-flash';
 $content = rs_call_gemini($geminiKey, $model, 'image/jpeg', $base64);
 if ($content === null) {
     rs_fail(502, 'upstream', 'The scanner had trouble reading that. Please try again in a moment.', ['scan_pass' => $authPass]);

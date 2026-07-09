@@ -1977,7 +1977,7 @@ function call_gemini($systemPrompt, $userPrompt)
         return ['error' => 'Gemini API key not configured'];
     }
 
-    $model = $_ENV['GEMINI_MODEL'] ?? 'gemini-2.5-flash';
+    $model = $_ENV['GEMINI_MODEL'] ?? 'gemini-3.1-flash-lite';
 
     $payload = [
         'contents' => [

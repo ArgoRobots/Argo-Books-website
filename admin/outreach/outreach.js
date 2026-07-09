@@ -245,6 +245,16 @@ async function loadLeads() {
     }
 }
 
+// Refresh whichever leads tables are currently populated. The lead detail modal
+// (and quick-draft) can be opened from the Email, Editorial, or Creator tab, so
+// after a status change we refresh all of them; the editorial/creator tables only
+// reload if they've been opened (their paginator exists), keeping this cheap.
+function refreshLeadViews() {
+    loadLeads();
+    if (typeof editorialLeadsPaginator !== 'undefined' && editorialLeadsPaginator) loadEditorialLeads();
+    if (typeof creatorLeadsPaginator !== 'undefined' && creatorLeadsPaginator) loadCreatorLeads();
+}
+
 // ─── Bulk Select ───
 function toggleLeadCheckboxes(master) {
     document.querySelectorAll('.lead-check').forEach(cb => cb.checked = master.checked);
@@ -721,7 +731,7 @@ async function saveLeadDetails() {
         const result = await api('update_lead', { method: 'POST', body: data });
         if (result.success) {
             closeModal('leadDetailModal');
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         } else {
             notify(result.message, 'error');
@@ -738,7 +748,7 @@ async function deleteCurrentLead() {
         notify(result.message, result.success ? 'success' : 'error');
         if (result.success) {
             closeModal('leadDetailModal');
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         }
     } catch (e) {
@@ -996,7 +1006,7 @@ async function quickGenerateDraft(id, btn) {
     try {
         const result = await api('generate_draft', { method: 'POST', body: { id } });
         if (result.success) {
-            loadLeads();
+            refreshLeadViews();
             loadStats();
         } else {
             notify(result.message, 'error');
@@ -1023,12 +1033,8 @@ async function sendEmail() {
 
         if (result.success) {
             openLeadDetail(currentLeadId);
-            loadLeads();
+            refreshLeadViews();
             loadStats();
-            // If this lead was opened from the Editorial tab, refresh that table
-            // too so its row reflects the new sent status instead of staying on
-            // "Draft Generated" until a manual refresh (mirrors executeBulkSend).
-            if (editorialLeadsPaginator) loadEditorialLeads();
         } else {
             notify(result.message, 'error');
             btn.disabled = false;

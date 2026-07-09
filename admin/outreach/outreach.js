@@ -2082,7 +2082,7 @@ function renderCreatorResults() {
             `<td><span class="badge">${safe(r.platform) || '—'}</span></td>` +
             `<td style="max-width:200px; font-size:12px;">${safe(r.audience) || '—'}</td>` +
             `<td>${emailCell}</td>` +
-            `<td><a href="${safe(r.canonical_url)}" target="_blank" rel="noopener" class="link">open</a></td>` +
+            `<td><a href="${safe(r.profile_url || r.canonical_url)}" target="_blank" rel="noopener" class="link">open</a></td>` +
             `<td><button class="btn btn-small btn-blue" onclick="importCreatorRow(${idx}, this)">Import</button></td>` +
         '</tr>';
     }).join('');
@@ -2096,6 +2096,7 @@ async function importCreatorRow(idx, btn) {
     try {
         const data = await api('creator_import', { method: 'POST', body: {
             canonical_url: row.canonical_url,
+            profile_url: row.profile_url,
             platform: row.platform,
             creator_name: row.creator_name,
             email: row.email,
@@ -2124,6 +2125,7 @@ async function importAllCreatorFits() {
     if (!confirm(`Import ${creatorResults.length} creator${creatorResults.length === 1 ? '' : 's'} as new partner leads?`)) return;
     const toImport = creatorResults.map(r => ({
         canonical_url: r.canonical_url,
+        profile_url: r.profile_url,
         platform: r.platform,
         creator_name: r.creator_name,
         email: r.email,
@@ -2244,6 +2246,44 @@ async function bulkDeleteCreatorLeads() {
     loadStats();
 }
 
+// Grab a creator's email when none was auto-found: open the page where the email
+// lives (the channel About page for YouTube) in a new tab, then paste it back
+// onto the lead. Beats a command-line tool for a handful of leads.
+async function getCreatorEmail(btn) {
+    const leadId = parseInt(btn.dataset.leadId, 10);
+    let target = btn.dataset.website || '';
+    if (/youtube\.com/i.test(target)) {
+        target = target.replace(/\/+$/, '');
+        if (!/\/about$/i.test(target)) target += '/about';
+    }
+    if (target) window.open(target, '_blank', 'noopener');
+
+    const entered = prompt('On the page that just opened, reveal the email (solve the captcha if asked), then paste it here:');
+    if (entered === null) return;
+    const email = entered.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+        notify('That does not look like an email address', 'error');
+        return;
+    }
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    try {
+        const res = await api('creator_set_email', { method: 'POST', body: { lead_id: leadId, email } });
+        if (res.success && res.updated > 0) {
+            notify('Email saved', 'success');
+            loadCreatorLeads();
+        } else {
+            notify(res.message || 'Could not save the email', 'error');
+            btn.disabled = false;
+            btn.textContent = 'Get email';
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+        btn.disabled = false;
+        btn.textContent = 'Get email';
+    }
+}
+
 function debounceLoadCreatorLeads() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(loadCreatorLeads, 300);
@@ -2292,7 +2332,11 @@ async function loadCreatorLeads() {
                 <td onclick="event.stopPropagation()">
                     <div class="actions-cell">
                         <button class="btn btn-small btn-blue" onclick="openLeadDetail(${lead.id})" title="View">View</button>
-                        ${lead.email && !lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status) ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>` : ''}
+                        ${!lead.email
+                            ? `<button class="btn btn-small btn-blue" data-lead-id="${lead.id}" data-website="${escapeHtml(lead.website || '')}" onclick="getCreatorEmail(this)" title="Open the channel and paste the email">Get email</button>`
+                            : (!lead.draft_subject && !['contacted','replied','interested','not_interested','onboarded'].includes(lead.status)
+                                ? `<button class="btn btn-small btn-blue" onclick="quickGenerateDraft(${lead.id}, this)" title="Generate Draft">Draft</button>`
+                                : '')}
                     </div>
                 </td>
             </tr>`;

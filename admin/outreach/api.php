@@ -163,9 +163,6 @@ switch ($action) {
     case 'creator_add_url':
         creator_add_url($pdo);
         break;
-    case 'creator_export_emailless':
-        creator_export_emailless($pdo);
-        break;
     case 'creator_set_email':
         creator_set_email($pdo);
         break;
@@ -1586,6 +1583,7 @@ function creator_run_discovery($pdo)
             $meta = $result['metadata'] ?? [];
             $fits[] = [
                 'canonical_url'    => $canonical,
+                'profile_url'      => !empty($meta['channel_url']) ? $meta['channel_url'] : $canonical,
                 'serp_title'       => $r['title'] ?? '',
                 'platform'         => $meta['platform'] ?? ($r['platform'] ?? ''),
                 'creator_name'     => $meta['creator_name'] ?? '',
@@ -1665,6 +1663,17 @@ function creator_add_url($pdo)
     if ($summary === '') {
         $summary = "Creator to recruit as an affiliate: {$canonical} (platform: {$platform}). Goal: recruit as an Argo Books affiliate partner.";
     }
+    // Prefer the resolved channel/profile URL as the lead website (its About page
+    // is where the email lives), otherwise the URL as given.
+    $channelUrl = trim((string) ($meta['channel_url'] ?? ''));
+    $website = ($channelUrl !== '' && filter_var($channelUrl, FILTER_VALIDATE_URL)) ? $channelUrl : $canonical;
+    if ($website !== $canonical) {
+        $dupe = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
+        $dupe->execute([$website]);
+        if ($existing = $dupe->fetchColumn()) {
+            json_response(['success' => false, 'message' => 'This creator is already a lead', 'existing_lead_id' => (int) $existing], 409);
+        }
+    }
 
     try {
         $stmt = $pdo->prepare("INSERT INTO outreach_leads
@@ -1674,8 +1683,8 @@ function creator_add_url($pdo)
             $name,
             $name !== '' ? $name : null,
             $email !== '' ? $email : null,
-            $canonical,
-            $canonical,
+            $website,
+            $website,
             $summary,
             'creator:' . $platform,
         ]);
@@ -1708,6 +1717,7 @@ function creator_import($pdo)
 {
     $data         = json_decode(file_get_contents('php://input'), true) ?: [];
     $canonicalUrl = trim($data['canonical_url'] ?? '');
+    $profileUrl   = trim($data['profile_url'] ?? '');
     $email        = trim($data['email'] ?? '');
     $platform     = trim($data['platform'] ?? '');
     $name         = trim($data['creator_name'] ?? '');
@@ -1715,10 +1725,13 @@ function creator_import($pdo)
 
     // Import from the discovery-computed data (no re-evaluate). Unlike editorial,
     // an email is NOT required: many creators (especially YouTubers) have no
-    // auto-harvestable email and are worked manually or via the assisted helper.
+    // auto-harvestable email and are worked from the lead's Get email button.
     if ($canonicalUrl === '') {
         json_response(['success' => false, 'message' => 'canonical_url is required'], 400);
     }
+    // The lead's website is the channel/profile when we resolved one (its About
+    // page is where the email lives), otherwise the original canonical URL.
+    $website = ($profileUrl !== '' && filter_var($profileUrl, FILTER_VALIDATE_URL)) ? $profileUrl : $canonicalUrl;
     if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         json_response(['success' => false, 'message' => 'The provided email is not valid'], 400);
     }
@@ -1733,14 +1746,14 @@ function creator_import($pdo)
         $summary = 'Creator to recruit as an affiliate' . ($platform !== '' ? " (platform: {$platform})" : '') . '. Goal: recruit as an Argo Books affiliate partner.';
     }
 
-    // Dedup by canonical URL always, and by email only when one was provided
-    // (empty email must not collide with other email-less creator leads).
+    // Dedup by the lead website (channel/profile) always, and by email only when
+    // one was provided (empty email must not collide with other email-less leads).
     if ($email !== '') {
         $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? OR email = ? LIMIT 1");
-        $check->execute([$canonicalUrl, $email]);
+        $check->execute([$website, $email]);
     } else {
         $check = $pdo->prepare("SELECT id FROM outreach_leads WHERE website = ? LIMIT 1");
-        $check->execute([$canonicalUrl]);
+        $check->execute([$website]);
     }
     if ($existing = $check->fetchColumn()) {
         json_response([
@@ -1758,8 +1771,8 @@ function creator_import($pdo)
             $name,
             $name,
             $email !== '' ? $email : null,
-            $canonicalUrl,
-            $canonicalUrl,
+            $website,
+            $website,
             $summary,
             'creator:' . $platform,
         ]);
@@ -1784,23 +1797,8 @@ function creator_import($pdo)
     }
 }
 
-// Export creator leads that still have no email, as the input file for the local
-// assisted-captcha helper (tools/youtube-email-assist). Shape: [{lead_id, name, url}].
-function creator_export_emailless($pdo)
-{
-    $stmt = $pdo->query("SELECT id, business_name, website FROM outreach_leads
-        WHERE source = 'creator_auto' AND (email IS NULL OR email = '')
-        ORDER BY date_added DESC");
-    $rows = $stmt->fetchAll();
-    $out = [];
-    foreach ($rows as $r) {
-        $out[] = ['lead_id' => (int) $r['id'], 'name' => $r['business_name'], 'url' => $r['website']];
-    }
-    json_response(['success' => true, 'count' => count($out), 'leads' => $out]);
-}
-
-// Apply emails captured by the assisted helper back onto creator leads. Accepts
-// either a single {lead_id, email} or {results: [{lead_id, url, email}, ...]}.
+// Apply an email captured via the lead's "Get email" button back onto a creator
+// lead. Accepts a single {lead_id, email}, or {results: [{lead_id, url, email}]}.
 function creator_set_email($pdo)
 {
     $data = json_decode(file_get_contents('php://input'), true) ?: [];

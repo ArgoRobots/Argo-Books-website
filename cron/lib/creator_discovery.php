@@ -76,6 +76,31 @@ const CREATOR_EXCLUDED_HOSTS = [
     'nytimes.com', 'wsj.com', 'bankrate.com', 'fool.com', 'usnews.com', 'zdnet.com',
 ];
 
+/**
+ * Extract a YouTube channel URL from a watch/video page's raw HTML, so a video
+ * result becomes a channel lead (the "open" link and the Get-email flow both want
+ * the channel, not the video). Returns a channel URL or null.
+ */
+function youtube_channel_from_html(string $html): ?string
+{
+    if ($html === '') {
+        return null;
+    }
+    if (preg_match('#"canonicalBaseUrl":"(/@[^"/]+)"#', $html, $m)) {
+        return 'https://www.youtube.com' . $m[1];
+    }
+    if (preg_match('#ownerProfileUrl":"https?://www\.youtube\.com/(@[^"/]+)"#', $html, $m)) {
+        return 'https://www.youtube.com/' . $m[1];
+    }
+    if (preg_match('#"canonicalBaseUrl":"(/channel/UC[\w-]+)"#', $html, $m)) {
+        return 'https://www.youtube.com' . $m[1];
+    }
+    if (preg_match('#"channelId":"(UC[\w-]+)"#', $html, $m)) {
+        return 'https://www.youtube.com/channel/' . $m[1];
+    }
+    return null;
+}
+
 /** True if a URL's host is on the never-recruit blocklist above. */
 function creator_host_excluded(string $url): bool
 {
@@ -252,6 +277,10 @@ function evaluate_creator_candidate(string $url, PDO $pdo, string $serpTitle = '
         $fetched = ['text' => $serpTitle, 'html' => ''];
     }
 
+    // For YouTube video results, resolve the channel so the lead points at the
+    // channel (its About page is where the email lives), not a single video.
+    $channelUrl = ($platform === 'youtube') ? youtube_channel_from_html($fetched['html'] ?? '') : null;
+
     // One Gemini call: is the audience a fit, who is the creator, what do they cover?
     $systemPrompt = <<<'PROMPT'
 You analyze a web page (a YouTube channel/video, a newsletter, or a blog) to decide
@@ -300,6 +329,7 @@ PROMPT;
         'audience'     => mb_substr($audience, 0, 200),
         'topics'       => $topics,
         'domain'       => $domain,
+        'channel_url'  => $channelUrl ?? '',
     ];
 
     if (!$isRelevant && !$force) {
@@ -348,7 +378,7 @@ PROMPT;
         . ($audience !== '' ? " reaching {$audience}" : '')
         . ". Covers: {$topicList}."
         . ($needsManualEmail
-            ? ' No email auto-found' . ($platform === 'youtube' ? ' (YouTube hides it behind a captcha, contact via their channel or the assisted-email helper).' : '.')
+            ? ' No email auto-found' . ($platform === 'youtube' ? ' (YouTube hides it behind a captcha; use Get email on the lead to grab it from the channel).' : '.')
             : '')
         . ' Goal: recruit as an Argo Books affiliate partner.';
 
@@ -360,5 +390,7 @@ PROMPT;
         'business_summary' => mb_substr($summary, 0, 1000),
     ];
 
-    return ['fit' => true, 'reason' => 'fit', 'detail' => 'Relevant creator', 'final_url' => $url, 'metadata' => $meta];
+    // Point the lead at the channel when we resolved one (better "open" target
+    // and the right page for the Get-email flow); otherwise the original URL.
+    return ['fit' => true, 'reason' => 'fit', 'detail' => 'Relevant creator', 'final_url' => $channelUrl ?: $url, 'metadata' => $meta];
 }

@@ -2389,8 +2389,9 @@ The affiliate offer:
 
 Rules:
 - Keep it short (2-3 short paragraphs, under 130 words). Sound like one human emailing another, not a mass affiliate blast
-- Address the creator by name/handle if given in the context; otherwise a warm \"Hi there\"
-- First sentence: reference specifically what they do / who their audience is (from the context), so it is clearly not a mass mailing. Do NOT open with generic flattery like \"I love your content\"
+- Address the creator by handle if a clean @handle is given in the context; otherwise a warm \"Hi there\"
+- First sentence: reference their AUDIENCE and topic (from the context's audience/topics), e.g. \"your channel covers bookkeeping for freelancers, which is exactly who Argo Books is for\". Do NOT open with generic flattery like \"I love your content\"
+- NEVER quote a specific video title, article title, or the raw creator \"name\" field: it is often a truncated video headline and quoting it looks like a bot. Refer to the channel generically (\"your channel\", \"your audience\") and describe what they cover, do not paste a title in quotes
 - Say briefly why Argo Books fits THEIR audience (free, no accounting knowledge needed, works offline), then make the affiliate offer plainly: 50% recurring for a referred customer's first 12 months
 - Include the sign-up link https://argorobots.com/affiliates
 - Be honest and low-pressure. It is a genuine partnership offer, not hype. Do NOT promise they will make a specific amount of money

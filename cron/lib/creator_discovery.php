@@ -102,6 +102,28 @@ function youtube_channel_from_html(string $html): ?string
     return null;
 }
 
+/**
+ * Extract the CHANNEL name (not the video title) from a YouTube page's raw HTML,
+ * so the lead is named after the creator instead of a truncated video headline.
+ * Returns the channel name or null.
+ */
+function youtube_channel_name_from_html(string $html): ?string
+{
+    if ($html === '') {
+        return null;
+    }
+    if (preg_match('#"ownerChannelName":"([^"]{1,120})"#', $html, $m)) {
+        return json_decode('"' . $m[1] . '"') ?: $m[1];
+    }
+    if (preg_match('#"author":"([^"]{1,120})"#', $html, $m)) {
+        return json_decode('"' . $m[1] . '"') ?: $m[1];
+    }
+    if (preg_match('#<link itemprop="name" content="([^"]{1,120})">#', $html, $m)) {
+        return html_entity_decode($m[1], ENT_QUOTES);
+    }
+    return null;
+}
+
 /** True if a URL's host is on the never-recruit blocklist above. */
 function creator_host_excluded(string $url): bool
 {
@@ -329,6 +351,14 @@ PROMPT;
 
     $isRelevant   = !empty($parsed['is_relevant']);
     $creatorName  = trim((string) ($parsed['creator_name'] ?? '')) ?: ($serpTitle !== '' ? $serpTitle : ucfirst($domain));
+    // For YouTube, prefer the real channel name off the page over the AI's guess
+    // or the SERP video title (which is what was making leads show a video headline).
+    if ($platform === 'youtube') {
+        $ytName = youtube_channel_name_from_html($fetched['html'] ?? '');
+        if ($ytName !== null && trim($ytName) !== '') {
+            $creatorName = trim($ytName);
+        }
+    }
     $audience     = trim((string) ($parsed['audience'] ?? ''));
     $topics       = is_array($parsed['topics'] ?? null) ? array_slice(array_map('strval', $parsed['topics']), 0, 6) : [];
     $externalSite = trim((string) ($parsed['external_site'] ?? ''));

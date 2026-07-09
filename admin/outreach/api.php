@@ -101,9 +101,6 @@ switch ($action) {
     case 'get_lead':
         get_lead($pdo);
         break;
-    case 'create_lead':
-        create_lead($pdo);
-        break;
     case 'create_lead_from_website':
         create_lead_from_website($pdo);
         break;
@@ -393,39 +390,6 @@ function bulk_get_leads($pdo)
     $leads = $stmt->fetchAll();
 
     json_response(['success' => true, 'leads' => $leads]);
-}
-
-function create_lead($pdo)
-{
-    $data = json_decode(file_get_contents('php://input'), true) ?: $_POST;
-
-    if (empty($data['business_name'])) {
-        json_response(['success' => false, 'message' => 'Business name is required'], 400);
-    }
-
-    $stmt = $pdo->prepare("INSERT INTO outreach_leads
-        (business_name, contact_name, email, phone, website, address, category, city, source, status, notes, contact_page_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    $stmt->execute([
-        $data['business_name'],
-        $data['contact_name'] ?? null,
-        $data['email'] ?? null,
-        $data['phone'] ?? null,
-        $data['website'] ?? null,
-        $data['address'] ?? null,
-        $data['category'] ?? null,
-        $data['city'] ?? null,
-        $data['source'] ?? 'manual',
-        $data['status'] ?? 'new',
-        $data['notes'] ?? null,
-        $data['contact_page_url'] ?? null,
-    ]);
-
-    $id = $pdo->lastInsertId();
-    log_activity($pdo, $id, 'lead_created', 'Lead created: ' . $data['business_name']);
-
-    json_response(['success' => true, 'id' => $id, 'message' => 'Lead created']);
 }
 
 /**

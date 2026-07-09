@@ -2609,12 +2609,6 @@ function setText(id, value) {
 let redditProgressPollTimer = null;
 let redditDiscoveryWasRunning = false;
 
-async function loadRedditPipelineStatus() {
-    // Kept for backwards compat. Delegates to the progress poller which has
-    // strictly more info.
-    return loadRedditPipelineProgress();
-}
-
 async function loadRedditPipelineProgress() {
     const data = await api('reddit_pipeline_progress');
     if (!data || !data.success) return;

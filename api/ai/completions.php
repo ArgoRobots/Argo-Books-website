@@ -86,9 +86,21 @@ $operation = isset($data['operation']) ? (string) $data['operation'] : 'completi
 $sizeFeature = isset($data['sizeFeature']) && is_numeric($data['sizeFeature']) ? (int) $data['sizeFeature'] : null;
 $appPlatform = isset($data['platform']) ? (string) $data['platform'] : null;
 
+// Installed desktop builds pin a model id that Google has since retired (e.g.
+// gemini-2.5-flash); empty requests also need a default. Remap both to a current
+// model so existing installs keep working without a forced app update instead of
+// failing every AI call. Vision requests (receipt scans include an image) get the
+// accuracy tier; text-only calls get the cheaper general model.
+$retiredModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash-001'];
+if ($requestedModel === '' || in_array($requestedModel, $retiredModels, true)) {
+    $requestedModel = $base64Image
+        ? ($_ENV['GEMINI_MODEL_EXTRACTION'] ?? 'gemini-3.5-flash')
+        : ($_ENV['GEMINI_MODEL'] ?? 'gemini-3.1-flash-lite');
+}
+
 // Validate model: Gemini is the only supported provider
-$geminiModels = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash', 'gemini-2.5-pro'];
-if (!empty($requestedModel) && !in_array($requestedModel, $geminiModels, true)) {
+$geminiModels = ['gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-pro'];
+if (!in_array($requestedModel, $geminiModels, true)) {
     send_error_response(400, 'Unsupported model. Supported: ' . implode(', ', $geminiModels), 'INVALID_MODEL');
 }
 
@@ -97,7 +109,7 @@ if (empty($geminiKey)) {
     send_error_response(500, 'Gemini AI service not configured on server.', 'CONFIG_ERROR');
 }
 
-$model = !empty($requestedModel) ? $requestedModel : ($_ENV['GEMINI_MODEL'] ?? 'gemini-3.1-flash-lite');
+$model = $requestedModel;
 
 // Build Gemini request: https://ai.google.dev/api/generate-content
 $contents = [];

@@ -883,6 +883,7 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                     </div>
                     <div class="draft-actions">
                         <button class="btn btn-blue" onclick="generateDraft()" id="btnGenerate">Generate Draft</button>
+                        <button class="btn btn-blue" onclick="saveDraft()" id="btnSaveDraft">Save Draft</button>
                         <button class="btn btn-blue" onclick="sendEmail()" id="btnSend" disabled>Send Email</button>
                         <button class="btn btn-blue btn-small draft-copy-btn" onclick="copyDraft(this)">Copy</button>
                     </div>

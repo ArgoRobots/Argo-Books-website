@@ -624,10 +624,14 @@ function updateDraftStatus(lead) {
     const bar = document.getElementById('draftStatusBar');
     const sendBtn = document.getElementById('btnSend');
     const genBtn = document.getElementById('btnGenerate');
+    const saveBtn = document.getElementById('btnSaveDraft');
 
     let statusHtml = '';
     const isSent = ['contacted','replied','interested','not_interested','onboarded'].includes(lead.status);
     const isDisqualified = lead.status === 'disqualified';
+
+    // Editing the draft only makes sense before it's sent or disqualified.
+    if (saveBtn) saveBtn.style.display = (isDisqualified || (isSent && lead.sent_at)) ? 'none' : '';
 
     if (isDisqualified) {
         const reasonTag = lead.disqualified_reason ? ` (${escapeHtml(lead.disqualified_reason)})` : '';
@@ -1019,6 +1023,38 @@ async function quickGenerateDraft(id, btn) {
 }
 
 // ─── Email Workflow ───
+// Persist the current subject/body from the Draft tab. Used on its own via the
+// Save Draft button, and by sendEmail() so a send always uses exactly what's
+// shown (the send endpoint reads the draft straight from the DB).
+async function saveDraft() {
+    if (!currentLeadId) return;
+    const subject = document.getElementById('draftSubject').value;
+    const body = document.getElementById('draftBody').value;
+    const btn = document.getElementById('btnSaveDraft');
+    const original = btn ? btn.textContent : '';
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    try {
+        const result = await api('update_lead', {
+            method: 'POST',
+            body: { id: currentLeadId, draft_subject: subject, draft_body: body }
+        });
+        if (result.success) {
+            notify('Draft saved', 'success');
+            // A draft typed from scratch (Send was disabled) should now be sendable.
+            const sendBtn = document.getElementById('btnSend');
+            const hasEmail = (document.getElementById('detailEmail').value || '').trim() !== '';
+            if (sendBtn && (subject.trim() || body.trim()) && hasEmail) sendBtn.disabled = false;
+            refreshLeadViews();
+        } else {
+            notify(result.message, 'error');
+        }
+    } catch (e) {
+        notify(e.message, 'error');
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = original; }
+    }
+}
+
 async function sendEmail() {
     if (!currentLeadId) return;
     if (!confirm('Send this email now?')) return;
@@ -1028,6 +1064,16 @@ async function sendEmail() {
     btn.textContent = 'Sending...';
 
     try {
+        // Persist any edits first so we send exactly what's shown in the textareas.
+        await api('update_lead', {
+            method: 'POST',
+            body: {
+                id: currentLeadId,
+                draft_subject: document.getElementById('draftSubject').value,
+                draft_body: document.getElementById('draftBody').value
+            }
+        });
+
         const result = await api('send_email', { method: 'POST', body: { id: currentLeadId } });
         btn.textContent = 'Send Email';
 

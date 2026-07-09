@@ -2393,7 +2393,7 @@ Rules:
 
 Return ONLY a JSON object: {\"subject\": \"...\", \"body\": \"the body, plain text, use \\n for line breaks\"}";
     } elseif ($isEditorial) {
-        $systemPrompt = "Write a short, genuine outreach email from Evan, the solo developer of Argo Books, to the author/editor of a \"best software\" roundup, to get Argo Books added to their list.
+        $systemPrompt = "Write a short, genuine outreach email from Evan, the developer of Argo Books, to the author/editor of a \"best software\" roundup, to get Argo Books added to their list.
 
 Argo Books: a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. Runs offline on Windows, macOS, and Linux (data stays on the user's computer). Genuinely free tier with no user cap; a paid Premium exists but the core is free.
 
@@ -2427,7 +2427,6 @@ Rules:
 - Sound human, friendly, and genuine, not like marketing spam
 $localInstruction
 $inPersonInstruction
-- Do NOT refer to a \"team\", Evan is a solo developer
 - Get to the point quickly in the first sentence - say why you are emailing. Do NOT open with generic filler like \"I hope this message finds you well\" or vague flattery like \"I admire your work\"
 - Use the business name in the greeting (e.g. \"Hi LVM Landscaping\" or \"Hi [business name]\" if available)
 
@@ -2743,7 +2742,7 @@ function generate_ab_subject_variants($pdo, $count = 3)
         }
     }
 
-    $systemPrompt = "You generate subject-line directives for an A/B test on a small-business outreach email from Evan, a solo developer, about a simple bookkeeping app called Argo Books.\n\n"
+    $systemPrompt = "You generate subject-line directives for an A/B test on a small-business outreach email from Evan, a developer, about a simple bookkeeping app called Argo Books.\n\n"
         . "Return STRICT JSON: { \"directives\": [\"directive 1\", \"directive 2\", ...] } with exactly $count entries.\n\n"
         . "CRITICAL: Each directive describes a STYLE for the writer to follow when crafting one specific lead's subject; it is NOT the subject itself. A second AI will read your directive and generate a fresh subject in that style for each lead. Your directive must NOT look like a subject line.\n\n"
         . "Bad examples (these read like subject lines, not styles): \"Lead with a personal touch about Argo Books\" / \"Quick question for {business}\" / \"Let's simplify your bookkeeping\"\n"

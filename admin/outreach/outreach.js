@@ -2255,7 +2255,14 @@ async function bulkDeleteCreatorLeads() {
 // Grab a creator's email when none was auto-found: open the page where the email
 // lives (the channel About page for YouTube) in a new tab, then paste it back
 // onto the lead. Beats a command-line tool for a handful of leads.
-async function getCreatorEmail(btn) {
+// Holds the button + lead being resolved while the paste-email modal is open.
+// We use an in-page modal rather than a native prompt() because getCreatorEmail
+// opens the channel in a foreground tab, and browsers suppress prompt()/alert()
+// dialogs fired from the now-backgrounded admin tab (the box never appeared).
+let creatorEmailBtn = null;
+let creatorEmailLeadId = null;
+
+function getCreatorEmail(btn) {
     const leadId = parseInt(btn.dataset.leadId, 10);
     let target = btn.dataset.website || '';
     if (/youtube\.com/i.test(target)) {
@@ -2264,15 +2271,28 @@ async function getCreatorEmail(btn) {
     }
     if (target) window.open(target, '_blank', 'noopener');
 
-    const entered = prompt('On the page that just opened, reveal the email (solve the captcha if asked), then paste it here:');
-    if (entered === null) return;
-    const email = entered.trim();
+    creatorEmailBtn = btn;
+    creatorEmailLeadId = leadId;
+    const input = document.getElementById('creatorEmailInput');
+    if (input) input.value = '';
+    showModal('creatorEmailModal');
+    if (input) setTimeout(() => input.focus(), 50);
+}
+
+async function saveCreatorEmail() {
+    const input = document.getElementById('creatorEmailInput');
+    const email = (input ? input.value : '').trim();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
         notify('That does not look like an email address', 'error');
         return;
     }
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
+    const btn = creatorEmailBtn;
+    const leadId = creatorEmailLeadId;
+    closeModal('creatorEmailModal');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+    }
     try {
         const res = await api('creator_set_email', { method: 'POST', body: { lead_id: leadId, email } });
         if (res.success && res.updated > 0) {
@@ -2280,13 +2300,17 @@ async function getCreatorEmail(btn) {
             loadCreatorLeads();
         } else {
             notify(res.message || 'Could not save the email', 'error');
-            btn.disabled = false;
-            btn.textContent = 'Get email';
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Get email';
+            }
         }
     } catch (e) {
         notify(e.message, 'error');
-        btn.disabled = false;
-        btn.textContent = 'Get email';
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Get email';
+        }
     }
 }
 

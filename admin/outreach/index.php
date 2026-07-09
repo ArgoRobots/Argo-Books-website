@@ -1091,6 +1091,30 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
     </div>
 </div>
 
+<!-- Creator: paste email modal -->
+<div id="creatorEmailModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-header">
+            <h3>Paste the creator's email</h3>
+            <button class="modal-close" onclick="closeModal('creatorEmailModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="text-muted" style="margin-top:0; font-size:13px;">
+                On the channel page that just opened, reveal the email (solve the captcha if asked), then paste it here.
+            </p>
+            <div class="form-group full-width">
+                <label>Email <span class="required">*</span></label>
+                <input type="email" id="creatorEmailInput" placeholder="creator@example.com" autocomplete="off"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();saveCreatorEmail();}">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-blue" onclick="closeModal('creatorEmailModal')">Cancel</button>
+            <button class="btn btn-blue" onclick="saveCreatorEmail()">Save email</button>
+        </div>
+    </div>
+</div>
+
 <!-- Shopify Rejection Reasons Modal -->
 <div id="shopifyRejectStatsModal" class="modal" style="display:none;">
     <div class="modal-content modal-large" style="height:auto; max-height:80vh;">

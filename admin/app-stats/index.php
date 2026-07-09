@@ -863,7 +863,7 @@ include __DIR__ . '/../admin_header.php';
 // Pass PHP data to JavaScript
 window.dashboardData = <?= $jsonData ?>;
 </script>
-<script src="main.js"></script>
+<script src="main.js?v=<?= filemtime(__DIR__ . '/main.js') ?>"></script>
 
 <script>
 // Preserve scroll position when switching tier filter (shared admin pattern; see CLAUDE.md)

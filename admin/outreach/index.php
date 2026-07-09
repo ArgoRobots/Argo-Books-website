@@ -74,8 +74,8 @@ if (!in_array($activeChannel, ['email', 'reddit', 'editorial', 'creator'], true)
 <div class="channel-tabs">
     <button class="channel-tab <?php echo $activeChannel === 'email' ? 'active' : ''; ?>" data-channel="email">Email</button>
     <button class="channel-tab <?php echo $activeChannel === 'reddit' ? 'active' : ''; ?>" data-channel="reddit">Reddit</button>
-    <button class="channel-tab <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel="editorial">Editorial</button>
-    <button class="channel-tab <?php echo $activeChannel === 'creator' ? 'active' : ''; ?>" data-channel="creator">Partners</button>
+    <button class="channel-tab <?php echo $activeChannel === 'editorial' ? 'active' : ''; ?>" data-channel="editorial">Editorial Partners</button>
+    <button class="channel-tab <?php echo $activeChannel === 'creator' ? 'active' : ''; ?>" data-channel="creator">Creator Partners</button>
 </div>
 
 <!-- Email channel -->
@@ -464,7 +464,7 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
     <div id="editorial-discovery" class="tab-content active">
         <div class="panel discovery-panel">
             <div class="panel-header" onclick="togglePanel('editorialContent')">
-                <h2><?= svg_icon('search', 18) ?> Editorial / Roundups</h2>
+                <h2><?= svg_icon('search', 18) ?> Editorial Partners (roundups)</h2>
                 <span class="panel-toggle" id="editorialToggle">&#9660;</span>
             </div>
             <div class="panel-content" id="editorialContent">
@@ -614,7 +614,7 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
     <div id="creator-discovery" class="tab-content active">
         <div class="panel discovery-panel">
             <div class="panel-header" onclick="togglePanel('creatorContent')">
-                <h2><?= svg_icon('search', 18) ?> Creators / Affiliate Partners</h2>
+                <h2><?= svg_icon('search', 18) ?> Creator Partners (YouTube &amp; newsletters)</h2>
                 <span class="panel-toggle" id="creatorToggle">&#9660;</span>
             </div>
             <div class="panel-content" id="creatorContent">
@@ -629,12 +629,12 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                         </div>
                     </div>
                     <p class="text-muted" style="margin:8px 0 0; font-size:13px; text-align:center;">
-                        Finds YouTubers, newsletter writers, and niche bloggers whose audience is small businesses and freelancers, then drafts an affiliate-partner pitch (50% recurring). Emails are harvested from linked sites where possible; YouTube emails are captcha-gated, so those come in without one for manual or assisted contact. SerpAPI usage today: <span id="creatorSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="creatorHunterState">&hellip;</span>.
+                        Finds YouTubers and newsletter writers whose audience is small businesses and freelancers, then drafts an affiliate-partner pitch (50% recurring). Blogs and roundup articles live in the Editorial channel, not here. Emails are harvested from linked sites where possible; YouTube emails are captcha-gated, so those come in blank, use Get email on the lead to grab them. SerpAPI usage today: <span id="creatorSerpUsage">&hellip;</span> &middot; Hunter.io: <span id="creatorHunterState">&hellip;</span>.
                     </p>
 
                     <div class="form-row" style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border-color, #e2e8f0);">
                         <div class="form-group" style="flex:1;">
-                            <label for="creatorUrl">Or add a specific creator URL (YouTube channel, newsletter, blog, LinkedIn)</label>
+                            <label for="creatorUrl">Or add a specific creator URL (YouTube channel, newsletter, or LinkedIn profile)</label>
                             <input type="text" id="creatorUrl" placeholder="https://youtube.com/@somechannel" style="width:100%;">
                         </div>
                         <div class="form-group form-group-btn">

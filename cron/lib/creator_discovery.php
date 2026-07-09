@@ -2,12 +2,12 @@
 /**
  * Creator / affiliate-partner discovery for the outreach pipeline.
  *
- * Finds content creators and publications whose audience is small-business
- * owners, freelancers, bookkeepers, or accountants, YouTubers, newsletter
- * writers, and niche bloggers, so we can pitch them the Argo Books AFFILIATE
- * program (50% recurring for a referred customer's first 12 months). This is a
- * money proposition, unlike the editorial channel's "add me to your roundup"
- * pitch, so the audiences overlap but the ask is different.
+ * Finds YouTubers and newsletter writers whose audience is small-business
+ * owners, freelancers, bookkeepers, or accountants, so we can pitch them the Argo
+ * Books AFFILIATE program (50% recurring for a referred customer's first 12
+ * months). This is a money proposition, unlike the editorial channel's "add me to
+ * your roundup" pitch. Blogs and roundup/listicle sites deliberately belong to the
+ * Editorial channel, not here, so this channel skips the 'blog' platform.
  *
  * Reuses the shared discovery helpers (paginated SerpAPI cache, page fetch,
  * email scrape, Gemini) so it inherits the same pagination + target-count loop
@@ -19,7 +19,7 @@
  *   - YouTube deliberately hides the About-page business email behind a captcha,
  *     so email is harvested only when a creator links a scrapeable site/Linktree.
  *     Channels without a findable email are still imported (email left blank) so
- *     they can be worked manually or via the assisted-captcha helper.
+ *     they can be worked from the lead's "Get email" button (opens the channel).
  *   - LinkedIn blocks scraping; profile URLs are surfaced as a manual list only
  *     (no auto email, no auto draft). See creator_platform_from_url().
  */
@@ -28,23 +28,24 @@ require_once __DIR__ . '/shopify_discovery.php'; // serpapi_query_cached(), _sho
 require_once __DIR__ . '/editorial_discovery.php'; // hunter_find_email(), editorial_domain_from_url(), editorial_detect_affiliate()
 
 /**
- * Topic queries that surface creators/publications in our niche. Kept broad on
- * intent (audience = freelancers / small business / bookkeeping) and mixed
- * across platforms; creator_platform_from_url() then classifies each result.
+ * Topic queries that surface YouTubers and newsletter writers in our niche
+ * (audience = freelancers / small business / bookkeeping). Deliberately steered
+ * at video + newsletter results; creator_platform_from_url() classifies each, and
+ * plain blogs are dropped (they are Editorial-channel targets).
  */
 const CREATOR_QUERY_POOL = [
     'best accounting software youtube review',
     'bookkeeping tips for freelancers youtube',
     'small business finance youtube channel',
     'quickbooks alternative review youtube',
+    'accounting software review youtube',
+    'bookkeeping tutorial youtube channel',
     'freelance finances newsletter',
     'small business bookkeeping newsletter',
-    'accounting software review blog',
-    'bookkeeping for small business blog',
-    'freelancer tax and bookkeeping tips',
     'solopreneur finance newsletter',
-    'best free accounting software for freelancers',
-    'invoicing tips for small business owners',
+    'freelancer money newsletter substack',
+    'small business accounting substack',
+    'bookkeeping newsletter for freelancers',
 ];
 
 /** Newsletter-platform hosts we treat as "newsletter" for the pitch angle. */
@@ -267,6 +268,15 @@ function evaluate_creator_candidate(string $url, PDO $pdo, string $serpTitle = '
         ];
     }
 
+    // Plain blogs and roundup/listicle sites belong in the Editorial channel, not
+    // here. Partners is YouTubers + newsletter writers only. (A hand-added URL with
+    // $force still imports, so the operator can override for a specific site.)
+    if ($platform === 'blog' && !$force) {
+        return $fail('belongs_in_editorial', 'Blogs/roundup sites belong in the Editorial channel', $url, [
+            'platform' => 'blog', 'domain' => $domain,
+        ]);
+    }
+
     $fetched = fetch_website_text($url);
     if ($fetched === null) {
         // YouTube and some platforms are JS-heavy / block scrapers. Fall back to
@@ -283,7 +293,7 @@ function evaluate_creator_candidate(string $url, PDO $pdo, string $serpTitle = '
 
     // One Gemini call: is the audience a fit, who is the creator, what do they cover?
     $systemPrompt = <<<'PROMPT'
-You analyze a web page (a YouTube channel/video, a newsletter, or a blog) to decide
+You analyze a web page (a YouTube channel/video or a newsletter) to decide
 whether its AUDIENCE is a good fit to promote Argo Books, a free bookkeeping and
 invoicing app for small businesses and freelancers, as an affiliate partner. Return
 ONLY a JSON object with exactly these keys:
@@ -291,13 +301,13 @@ ONLY a JSON object with exactly these keys:
 
 - is_relevant: true ONLY if BOTH hold: (a) it regularly reaches small-business
   owners, freelancers, solopreneurs, bookkeepers, or accountants who would use
-  accounting/invoicing software, AND (b) it is an INDEPENDENT individual creator or
-  a small-to-mid independent blog/newsletter/channel that could realistically join
-  an affiliate program. It is NOT relevant if it is a major mainstream publisher
-  (e.g. Forbes, NerdWallet, PCMag, Investopedia, Business Insider), a community or
-  forum or Q&A site (e.g. Reddit, Quora), a software marketplace or review
-  aggregator (e.g. G2, Capterra), or a software vendor's own site. When unsure
-  whether it is an independent recruitable creator, return false.
+  accounting/invoicing software, AND (b) it is an INDEPENDENT YouTube channel or
+  newsletter that could realistically join an affiliate program and promote a tool
+  to its audience. It is NOT relevant if it is a plain blog or a roundup/listicle
+  site (those are handled by a separate channel), a major mainstream publisher
+  (e.g. Forbes, NerdWallet, PCMag), a community/forum/Q&A site (e.g. Reddit,
+  Quora), a software marketplace or review aggregator (e.g. G2, Capterra), or a
+  software vendor's own site. When unsure, return false.
 - creator_name: the person's or publication's name/handle, or null.
 - audience: one short phrase describing who they reach (e.g. "freelance designers", "small e-commerce owners").
 - topics: up to 6 short topic tags the creator covers.

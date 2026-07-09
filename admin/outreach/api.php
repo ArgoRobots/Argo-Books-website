@@ -1141,7 +1141,11 @@ function editorial_run_discovery($pdo)
         $cursor++;
         _shopify_state_set($pdo, 'editorial_query_cursor', (string) $cursor);
 
-        $start = (int) ($pages[(string) $idx] ?? 0);
+        // Key the page offset by the query text (not its index) so editing the
+        // query pool never misaligns cursors: new queries start at page 1, and an
+        // existing query keeps its own depth regardless of where it sits now.
+        $pageKey = substr(hash('sha1', $query), 0, 12);
+        $start = (int) ($pages[$pageKey] ?? 0);
         if ($start > $maxStart) {
             // This query is tapped out to our page-depth cap; skip without a call.
             $dryQueries++;
@@ -1155,7 +1159,7 @@ function editorial_run_discovery($pdo)
             _shopify_state_set($pdo, 'serpapi_calls_today', (string) $callsToday);
         }
         // Advance this query's page offset so the next iteration/run goes deeper.
-        $pages[(string) $idx] = $start + $pageSize;
+        $pages[$pageKey] = $start + $pageSize;
         _shopify_state_set($pdo, 'editorial_pages', json_encode($pages));
         $queriesRun[] = $query . ' (p' . (intdiv($start, $pageSize) + 1) . ')';
 

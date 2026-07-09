@@ -26,18 +26,49 @@ require_once __DIR__ . '/shopify_discovery.php'; // serpapi_query_cached(), _sho
  * getting added to.
  */
 const EDITORIAL_QUERY_POOL = [
+    // Core "best free" set
     'best free accounting software',
     'best free accounting software for small business',
-    'best quickbooks alternatives',
-    'quickbooks alternatives for small business',
+    'best free bookkeeping software',
     'best free invoicing software',
     'best free invoicing software for small business',
-    'best free bookkeeping software',
+    // Alternatives to specific tools (each surfaces a different set of listicles)
+    'best quickbooks alternatives',
+    'quickbooks alternatives for small business',
+    'xero alternatives',
+    'freshbooks alternatives',
+    'zoho books alternatives',
+    'wave accounting alternatives',
+    'sage accounting alternatives',
+    'quickbooks self employed alternatives',
+    // By audience / niche
     'best accounting software for freelancers',
     'best accounting software for self employed',
-    'wave accounting alternatives',
+    'best accounting software for consultants',
+    'best accounting software for contractors',
+    'best accounting software for sole proprietors',
+    'best accounting software for startups',
+    'best accounting software for etsy sellers',
+    'best accounting software for photographers',
+    'best accounting software for nonprofits',
+    'best accounting software for ecommerce',
+    'best bookkeeping software for freelancers',
+    'best invoicing software for freelancers',
+    // Platform / attribute
     'best free accounting software for mac',
     'free desktop accounting software',
+    'offline accounting software for small business',
+    'simple accounting software for small business',
+    'cheapest accounting software for small business',
+    // Comparison / top-N phrasings
+    'top accounting software for small business',
+    'accounting software comparison small business',
+    'best small business accounting software 2026',
+    // Regional
+    'best accounting software for small business canada',
+    'best accounting software for small business uk',
+    'best accounting software for small business australia',
+    'best free accounting software canada',
 ];
 
 /**

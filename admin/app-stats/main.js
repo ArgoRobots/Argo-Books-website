@@ -2562,13 +2562,23 @@ document.addEventListener("DOMContentLoaded", function () {
     return featureUsageData.filter((f) => f.FeatureName === "DataImported");
   }
 
+  // The app tags AI imports "ai-xlsx" / "ai-csv", plus "-tier2" / "-mixed"
+  // variants for multi-tier imports (App.axaml.cs). Bucket every variant by its
+  // base file type so the charts count all of them, not just plain tier-1 imports.
+  function aiImportType(context) {
+    if (typeof context !== "string") return null;
+    if (context.startsWith("ai-xlsx")) return "ai-xlsx";
+    if (context.startsWith("ai-csv")) return "ai-csv";
+    return null;
+  }
+
   function generateAIImportStats(featureUsageData) {
     const statsGrid = document.getElementById("aiImportStatsGrid");
     if (!statsGrid) return;
 
     const importEvents = getDataImportedEvents(featureUsageData);
-    const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx");
-    const aiCsv = importEvents.filter((e) => e.Context === "ai-csv");
+    const aiXlsx = importEvents.filter((e) => aiImportType(e.Context) === "ai-xlsx");
+    const aiCsv = importEvents.filter((e) => aiImportType(e.Context) === "ai-csv");
     const totalAI = aiXlsx.length + aiCsv.length;
 
     const stats = [
@@ -2626,8 +2636,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const aiXlsx = importEvents.filter((e) => e.Context === "ai-xlsx").length;
-    const aiCsv = importEvents.filter((e) => e.Context === "ai-csv").length;
+    const aiXlsx = importEvents.filter((e) => aiImportType(e.Context) === "ai-xlsx").length;
+    const aiCsv = importEvents.filter((e) => aiImportType(e.Context) === "ai-csv").length;
 
     if (aiXlsx === 0 && aiCsv === 0) {
       document.getElementById("aiImportOverviewChart").parentElement.innerHTML =
@@ -2670,9 +2680,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function generateAIImportTrendChart(featureUsageData) {
     const importEvents = getDataImportedEvents(featureUsageData);
-    const aiEvents = importEvents.filter(
-      (e) => e.Context === "ai-xlsx" || e.Context === "ai-csv"
-    );
+    const aiEvents = importEvents.filter((e) => aiImportType(e.Context) !== null);
 
     if (aiEvents.length === 0) {
       document.getElementById("aiImportTrendChart").parentElement.innerHTML =
@@ -2732,7 +2740,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateAIImportDurationChart(featureUsageData) {
     const importEvents = getDataImportedEvents(featureUsageData).filter(
       (e) =>
-        (e.Context === "ai-xlsx" || e.Context === "ai-csv") &&
+        aiImportType(e.Context) !== null &&
         e.DurationMs != null &&
         e.DurationMs > 0
     );
@@ -2818,7 +2826,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function generateAIImportDurationByTypeChart(featureUsageData) {
     const importEvents = getDataImportedEvents(featureUsageData).filter(
       (e) =>
-        (e.Context === "ai-xlsx" || e.Context === "ai-csv") &&
+        aiImportType(e.Context) !== null &&
         e.DurationMs != null &&
         e.DurationMs > 0
     );
@@ -2833,8 +2841,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const byType = { "ai-xlsx": [], "ai-csv": [] };
     importEvents.forEach((e) => {
-      if (byType[e.Context]) {
-        byType[e.Context].push(e.DurationMs);
+      const t = aiImportType(e.Context);
+      if (t && byType[t]) {
+        byType[t].push(e.DurationMs);
       }
     });
 
@@ -2933,8 +2942,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!dailyByType[date]) {
         dailyByType[date] = { "ai-xlsx": 0, "ai-csv": 0 };
       }
-      const detail = item.Context || "";
-      if (dailyByType[date][detail] !== undefined) {
+      const detail = aiImportType(item.Context);
+      if (detail && dailyByType[date][detail] !== undefined) {
         dailyByType[date][detail]++;
       }
     });

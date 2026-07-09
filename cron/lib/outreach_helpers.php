@@ -2204,6 +2204,41 @@ function generate_draft_for_lead($pdo, $lead)
         // classification === 'small_independent' falls through to drafting.
     }
 
+    // ─── Creator/affiliate outreach: fixed template, no AI ───
+    // The AI drafts for creators kept inventing specifics about the channel
+    // (fake claims about their content, audience, etc.). A plain template with
+    // the creator's name inserted is honest and predictable, so creators skip
+    // the whole Gemini path below.
+    if ($isCreator) {
+        $creatorName = trim((string) ($lead['contact_name'] ?? '')) ?: trim((string) ($lead['business_name'] ?? ''));
+        $greeting = $creatorName !== '' ? "Hi {$creatorName}," : 'Hi there,';
+
+        $subject = 'Partnership idea for your audience';
+        $body =
+            $greeting . "\n\n"
+            . "I'm Evan, the developer of Argo Books, a free, simple bookkeeping and invoicing app for small businesses and freelancers, no accounting knowledge needed. It runs offline on Windows, macOS, and Linux, and has a genuinely free tier.\n\n"
+            . "I think your audience would be a good fit, so I'd like to invite you to join our affiliate program. You'd earn 50% recurring commission on the first 12 months of Premium for anyone who upgrades through your referral link. It's free to join, with a real-time dashboard and PayPal payouts: https://argorobots.com/affiliates\n\n"
+            . "Happy to give you complimentary Premium access so you can try it yourself and see whether it's a fit for your audience.\n\n"
+            . "If you're interested, just reply and I'll send over the details.\n\n"
+            . "Thanks,\nEvan\nArgo Books\n\n"
+            . "Not interested? {UNSUBSCRIBE_URL} and I won't follow up.";
+
+        // Same per-lead unsubscribe substitution the AI path uses further down.
+        $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+        if (empty($unsubscribeToken)) {
+            $unsubscribeToken = bin2hex(random_bytes(32));
+            $tokStmt = $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?");
+            $tokStmt->execute([$unsubscribeToken, $id]);
+        }
+        $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+        $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
+
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = NULL, ab_variant_id = NULL, drafted_at = NOW(), status = CASE WHEN status IN ('new','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt->execute([$subject, $body, $id]);
+
+        return ['success' => true, 'subject' => $subject, 'body' => $body, 'ab_test_id' => null, 'ab_variant_id' => null];
+    }
+
     // ─── Newness gate ───
     // Argo Books targets NEW / early businesses that likely haven't settled on
     // accounting software yet. Skip auto-discovered leads whose own website
@@ -2373,26 +2408,7 @@ function generate_draft_for_lead($pdo, $lead)
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
-    if ($isCreator) {
-        $systemPrompt = "Write a short, genuine outreach email from Evan, the solo developer of Argo Books, to a YouTuber or newsletter writer whose audience is small-business owners and freelancers, to recruit them as an AFFILIATE PARTNER who promotes Argo Books.
-
-Argo Books: a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. Runs offline on Windows, macOS, and Linux. Genuinely free tier with no user cap; paid Premium exists but the core is free.
-Affiliate offer: 50% recurring commission on a referral's first 12 months of Premium. Free to join, real-time dashboard, PayPal payouts. Sign up: https://argorobots.com/affiliates.
-
-Rules:
-- Under 130 words, 2-3 short paragraphs, one human to another (not a mass blast). No em dashes (use commas/periods). No placeholders like [Name].
-- Greeting: \"Hi <@handle>\" if a clean handle is given, otherwise \"Hi there\".
-- Open by referencing a SPECIFIC topic they cover from the context's \"Covers:\" list (e.g. \"your videos on invoicing for freelancers\"), then connect it to Argo. Fall back to their audience only if no topic is given. No flattery like \"I love your content\".
-- NEVER quote a video/article title or the raw creator \"name\" field (often a truncated headline). Refer to the channel generically (\"your channel\").
-- Briefly say why Argo fits their audience, then make the offer: 50% recurring on a referral's first 12 months.
-- Commission is earned ONLY when a referred user upgrades to paid Premium, never on free users. Do NOT imply they earn on free users. Frame it coherently: the free tier is the low-friction hook that drives signups, and they earn 50% recurring on whoever upgrades. Never present \"free\" and \"50%\" as two disconnected points.
-- Include the sign-up link https://argorobots.com/affiliates. Be honest and low-pressure; do NOT promise a specific dollar amount.
-- End with a friendly line inviting a reply, then one opt-out line on its own paragraph: \"Not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include {UNSUBSCRIBE_URL} verbatim.
-- Sign off on three lines: \"Thanks,\" then \"Evan\" then \"Argo Books\".
-- Subject: like a real person proposing a partnership, under 8 words, no salesy hooks (good: \"partnership idea for your audience\").$abSubjectOverride$abBodyOverride
-
-Return ONLY a JSON object: {\"subject\": \"...\", \"body\": \"the body, plain text, use \\n for line breaks\"}";
-    } elseif ($isEditorial) {
+    if ($isEditorial) {
         $systemPrompt = "Write a short, genuine outreach email from Evan, the developer of Argo Books, to the author/editor of a \"best software\" roundup, to get Argo Books added to their list.
 
 Argo Books: a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. Runs offline on Windows, macOS, and Linux (data stays on the user's computer). Genuinely free tier with no user cap; a paid Premium exists but the core is free.
@@ -2459,12 +2475,7 @@ Return your response as JSON with two fields:
 Return ONLY the JSON, no other text.";
     }
 
-    if ($isCreator) {
-        $details = "Creator / Publication: {$lead['business_name']}";
-        if (!empty($lead['contact_name'])) $details .= "\nName/handle: {$lead['contact_name']}";
-        if (!empty($lead['website'])) $details .= "\nProfile/channel URL: {$lead['website']}";
-        if ($summary) $details .= "\nContext (platform, audience, what they cover): $summary";
-    } elseif ($isEditorial) {
+    if ($isEditorial) {
         $details = "Outlet / Publication: {$lead['business_name']}";
         if (!empty($lead['contact_name'])) $details .= "\nAuthor: {$lead['contact_name']}";
         if (!empty($lead['website'])) $details .= "\nArticle URL: {$lead['website']}";

@@ -2216,12 +2216,52 @@ function generate_draft_for_lead($pdo, $lead)
         $subject = 'Partnership idea for your audience';
         $body =
             $greeting . "\n\n"
-            . "I'm Evan, the developer of Argo Books, a free, simple bookkeeping and invoicing app for small businesses and freelancers, no accounting knowledge needed. It runs offline on Windows, macOS, and Linux, and has a genuinely free tier.\n\n"
+            . "I'm Evan, the developer of Argo Books, a free, simple bookkeeping and accounting app for small businesses. It runs on Windows and Linux, and is easy to use.\n\n"
             . "I think your audience would be a good fit, so I'd like to invite you to join our affiliate program. You'd earn 50% recurring commission on the first 12 months of Premium for anyone who upgrades through your referral link. It's free to join, with a real-time dashboard and PayPal payouts: https://argorobots.com/affiliates\n\n"
-            . "Happy to give you complimentary Premium access so you can try it yourself and see whether it's a fit for your audience.\n\n"
+            . "I can give you Premium access to Argo Books so you can try it yourself and see whether it's a fit for your audience.\n\n"
             . "If you're interested, just reply and I'll send over the details.\n\n"
             . "Thanks,\nEvan\nArgo Books\n\n"
             . "Not interested? {UNSUBSCRIBE_URL} and I won't follow up.";
+
+        // Same per-lead unsubscribe substitution the AI path uses further down.
+        $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
+        if (empty($unsubscribeToken)) {
+            $unsubscribeToken = bin2hex(random_bytes(32));
+            $tokStmt = $pdo->prepare("UPDATE outreach_leads SET unsubscribe_token = ? WHERE id = ?");
+            $tokStmt->execute([$unsubscribeToken, $id]);
+        }
+        $unsubUrl = 'https://argorobots.com/unsubscribe?t=' . $unsubscribeToken;
+        $body = str_replace('{UNSUBSCRIBE_URL}', $unsubUrl, $body);
+
+        $stmt = $pdo->prepare("UPDATE outreach_leads SET draft_subject = ?, draft_body = ?, ab_test_id = NULL, ab_variant_id = NULL, drafted_at = NOW(), status = CASE WHEN status IN ('new','approved') THEN 'draft_generated' ELSE status END WHERE id = ?");
+        $stmt->execute([$subject, $body, $id]);
+
+        return ['success' => true, 'subject' => $subject, 'body' => $body, 'ab_test_id' => null, 'ab_variant_id' => null];
+    }
+
+    // ─── Editorial (roundup) outreach: fixed template, no AI ───
+    // Same reasoning as creators: these emails don't need to differ per
+    // recipient, and the AI tended to invent article specifics (fake titles,
+    // tools the list doesn't actually cover). A plain template with the author
+    // name and their article URL inserted is honest, predictable, and free.
+    if ($isEditorial) {
+        $authorName = trim((string) ($lead['contact_name'] ?? ''));
+        $greeting = $authorName !== '' ? "Hi {$authorName}," : 'Hi there,';
+        $articleUrl = trim((string) ($lead['website'] ?? ''));
+        $articleRef = $articleUrl !== ''
+            ? "I came across your accounting software roundup ({$articleUrl})"
+            : "I came across your accounting software roundup";
+
+        $subject = 'A free option for your software roundup';
+        $body =
+            $greeting . "\n\n"
+            . $articleRef . " and thought Argo Books might be worth adding.\n\n"
+            . "I'm Evan, the developer. Argo Books is a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. It is a desktop app for Windows and Linux, so unlike the cloud tools that usually fill these lists, the data stays on the user's own computer. It has a genuinely free tier with no user cap.\n\n"
+            . "Happy to send whatever would help, a short blurb in your format, screenshots, or a feature list, and I'd gladly add a link to your article from our site. If your roundup uses affiliate links, we also have an affiliate program, 50% recurring on a referral's first 12 months: https://argorobots.com/affiliates\n\n"
+            . "You can see it here: https://argorobots.com/\n\n"
+            . "If you think it's a fit, just reply and I'll send what you need.\n\n"
+            . "Thanks,\nEvan\nArgo Books\n\n"
+            . "Not the right contact, or not interested? {UNSUBSCRIBE_URL} and I won't follow up.";
 
         // Same per-lead unsubscribe substitution the AI path uses further down.
         $unsubscribeToken = $lead['unsubscribe_token'] ?? null;
@@ -2408,28 +2448,6 @@ function generate_draft_for_lead($pdo, $lead)
         . $painPointsList
         . "You MAY gently allude to ONE of these as something Argo Books can help with, phrased as a general industry pattern (e.g. \"businesses like yours often deal with X\"), NEVER as an assertion about this specific business. Pick at most one. If none fit naturally, skip them entirely.";
 
-    if ($isEditorial) {
-        $systemPrompt = "Write a short, genuine outreach email from Evan, the developer of Argo Books, to the author/editor of a \"best software\" roundup, to get Argo Books added to their list.
-
-Argo Books: a free, simple bookkeeping and invoicing app for small businesses, no accounting knowledge needed. Runs offline on Windows, macOS, and Linux (data stays on the user's computer). Genuinely free tier with no user cap; a paid Premium exists but the core is free.
-
-You are given the article's title (maybe), outlet, author, and the tools it already lists.
-
-Rules:
-- Under 120 words, 2-3 short paragraphs, one human to another (not a PR blast). No em dashes (use commas/periods). No placeholders like [Name]. Confident, not pushy.
-- Greeting: \"Hi <first name>\" if an author name is given, otherwise \"Hi there\".
-- Open by referencing their specific article and a gap you noticed, ideally naming a tool they list (e.g. \"your list covers Wave and FreshBooks, both cloud-only, but nothing that runs offline as a desktop app\"). No flattery.
-- Quote the article title ONLY if a real one is given below; never invent one or build it from a URL. Otherwise refer to it generically (\"your roundup of free accounting software\").
-- Briefly say what Argo is and why it fills the gap (2-3 sentences, no feature dump). Do NOT paste a canned blurb; instead offer to send details in whatever format matches their list.
-- Offer a real backlink to their article from our site where it fits, and to answer questions or do a walkthrough. Frame it as keeping their article complete for readers, not a favor to you.
-- Do NOT offer money or commissions (reads as a bribe) UNLESS the context below says \"This roundup is monetized with affiliate links\", then you MAY add ONE soft optional line after the pitch: Argo has an affiliate program, 50% recurring on a referral's first 12 months, https://argorobots.com/affiliates, framed as \"if you use affiliate links, you'd be welcome to join\", never a quid pro quo.
-- Include the link https://argorobots.com/ in the body.
-- End with a friendly line inviting a reply, then one opt-out line on its own paragraph: \"Not the right contact, or not interested? {UNSUBSCRIBE_URL} and I won't follow up.\" Include {UNSUBSCRIBE_URL} verbatim.
-- Sign off on three lines: \"Thanks,\" then \"Evan\" then \"Argo Books\".
-- Subject: like a real person emailing about their article, under 8 words, no salesy hooks (good: \"a free option missing from your roundup\").$abSubjectOverride$abBodyOverride
-
-Return ONLY a JSON object: {\"subject\": \"...\", \"body\": \"the body, plain text, use \\n for line breaks\"}";
-    } else {
     $systemPrompt = "You are helping write a brief, personal outreach email from Evan, the developer behind Argo Books, to a small business. The goal is to get honest product feedback on Argo Books, a bookkeeping and invoicing app for small businesses.
 
 About Argo Books:
@@ -2473,22 +2491,14 @@ Return your response as JSON with two fields:
 {\"subject\": \"the email subject line\", \"body\": \"the email body text (plain text, use \\n for line breaks)\"}
 
 Return ONLY the JSON, no other text.";
-    }
 
-    if ($isEditorial) {
-        $details = "Outlet / Publication: {$lead['business_name']}";
-        if (!empty($lead['contact_name'])) $details .= "\nAuthor: {$lead['contact_name']}";
-        if (!empty($lead['website'])) $details .= "\nArticle URL: {$lead['website']}";
-        if ($summary) $details .= "\nArticle context (what it lists and its angle): $summary";
-    } else {
-        $details = "Business: {$lead['business_name']}";
-        if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
-        if ($lead['city']) $details .= "\nCity: {$lead['city']}";
-        if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
-        if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
-        if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
-        if ($summary) $details .= "\nBusiness summary: $summary";
-    }
+    $details = "Business: {$lead['business_name']}";
+    if ($lead['category']) $details .= "\nCategory/Industry: {$lead['category']}";
+    if ($lead['city']) $details .= "\nCity: {$lead['city']}";
+    if ($isLocal) $details .= "\nLocal: Yes, this business is in Saskatchewan (same province as Evan)";
+    if ($lead['website']) $details .= "\nWebsite: {$lead['website']}";
+    if ($lead['contact_name']) $details .= "\nContact person: {$lead['contact_name']}";
+    if ($summary) $details .= "\nBusiness summary: $summary";
 
     $result = call_gemini($systemPrompt, $details);
 

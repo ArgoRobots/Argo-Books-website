@@ -584,20 +584,14 @@ async function openLeadDetail(id) {
         document.getElementById('detailBusinessName').value = lead.business_name || '';
         document.getElementById('detailContactName').value = lead.contact_name || '';
         document.getElementById('detailEmail').value = lead.email || '';
-        document.getElementById('detailPhone').value = lead.phone || '';
         document.getElementById('detailWebsite').value = lead.website || '';
-        document.getElementById('detailAddress').value = lead.address || '';
         document.getElementById('detailCategory').value = lead.category || '';
-        document.getElementById('detailCity').value = lead.city || '';
         document.getElementById('detailSource').value = lead.source || 'manual';
         document.getElementById('detailStatus').value = lead.status || 'new';
-        document.getElementById('detailResponseStatus').value = lead.response_status || 'no_response';
 
         document.getElementById('detailCompanySize').value = lead.company_size || '';
-        document.getElementById('detailOfferSent').value = lead.offer_sent ? '1' : '0';
         document.getElementById('detailContactPageUrl').value = lead.contact_page_url || '';
         document.getElementById('detailNotes').value = lead.notes || '';
-        document.getElementById('detailFeedback').value = lead.feedback_summary || '';
 
         // Meta info
         // Meta info removed from UI
@@ -631,7 +625,15 @@ function updateDraftStatus(lead) {
     const isDisqualified = lead.status === 'disqualified';
 
     // Editing the draft only makes sense before it's sent or disqualified.
-    if (saveBtn) saveBtn.style.display = (isDisqualified || (isSent && lead.sent_at)) ? 'none' : '';
+    const locked = isDisqualified || (isSent && lead.sent_at);
+    if (saveBtn) saveBtn.style.display = locked ? 'none' : '';
+
+    // Lock the subject/body fields too, not just hide the Save button, so a sent
+    // draft can't be typed into (which previously looked editable but never saved).
+    const subjectEl = document.getElementById('draftSubject');
+    const bodyEl = document.getElementById('draftBody');
+    if (subjectEl) subjectEl.readOnly = locked;
+    if (bodyEl) bodyEl.readOnly = locked;
 
     if (isDisqualified) {
         const reasonTag = lead.disqualified_reason ? ` (${escapeHtml(lead.disqualified_reason)})` : '';
@@ -713,18 +715,12 @@ async function saveLeadDetails() {
         business_name: document.getElementById('detailBusinessName').value,
         contact_name: document.getElementById('detailContactName').value,
         email: document.getElementById('detailEmail').value,
-        phone: document.getElementById('detailPhone').value,
         website: document.getElementById('detailWebsite').value,
-        address: document.getElementById('detailAddress').value,
         category: document.getElementById('detailCategory').value,
-        city: document.getElementById('detailCity').value,
         status: document.getElementById('detailStatus').value,
-        response_status: document.getElementById('detailResponseStatus').value,
         company_size: document.getElementById('detailCompanySize').value,
-        offer_sent: document.getElementById('detailOfferSent').value,
         contact_page_url: document.getElementById('detailContactPageUrl').value,
         notes: document.getElementById('detailNotes').value,
-        feedback_summary: document.getElementById('detailFeedback').value,
     };
 
     // Also save draft fields if modified

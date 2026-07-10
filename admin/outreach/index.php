@@ -786,10 +786,6 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                         <input type="email" id="detailEmail">
                     </div>
                     <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" id="detailPhone">
-                    </div>
-                    <div class="form-group">
                         <label>Website</label>
                         <div class="input-with-btn">
                             <input type="url" id="detailWebsite">
@@ -797,16 +793,8 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Address</label>
-                        <input type="text" id="detailAddress">
-                    </div>
-                    <div class="form-group">
                         <label>Category</label>
                         <input type="text" id="detailCategory">
-                    </div>
-                    <div class="form-group">
-                        <label>City</label>
-                        <input type="text" id="detailCity">
                     </div>
                     <div class="form-group">
                         <label>Source</label>
@@ -826,22 +814,6 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Response Status</label>
-                        <select id="detailResponseStatus">
-                            <option value="no_response">No Response</option>
-                            <option value="positive">Positive</option>
-                            <option value="neutral">Neutral</option>
-                            <option value="negative">Negative</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Offer Sent</label>
-                        <select id="detailOfferSent">
-                            <option value="0">No</option>
-                            <option value="1">Yes</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Company Size</label>
                         <select id="detailCompanySize">
                             <option value="">Unknown</option>
@@ -858,10 +830,6 @@ if ($activeChannel === 'reddit' && !in_array($activeTab, ['reddit-threads', 'red
                 <div class="form-group full-width">
                     <label>Notes</label>
                     <textarea id="detailNotes" rows="4" placeholder="Add notes about this lead..."></textarea>
-                </div>
-                <div class="form-group full-width">
-                    <label>Feedback Summary</label>
-                    <textarea id="detailFeedback" rows="3" placeholder="Summarize feedback received..."></textarea>
                 </div>
                 <div class="detail-actions">
                     <button class="btn btn-red" onclick="deleteCurrentLead()">Delete Lead</button>

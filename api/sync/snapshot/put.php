@@ -21,8 +21,8 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 $companyUid = trim((string) ($data['company_uid'] ?? ''));
 $ciphertext = (string) ($data['ciphertext'] ?? '');
-if ($companyUid === '' || $ciphertext === '') {
-    send_error_response(400, 'company_uid and ciphertext are required.', 'INVALID_INPUT');
+if ($companyUid === '' || strlen($companyUid) > 64 || $ciphertext === '') {
+    send_error_response(400, 'company_uid (max 64 chars) and ciphertext are required.', 'INVALID_INPUT');
 }
 
 global $pdo;
